@@ -212,7 +212,7 @@ class PointStatConfInfo {
       StringArray                   msg_typ_sfc;
 
       // Mapping of mask names to DataPlanes
-      map<ConcatString,DataPlane>   mask_dp_map;
+      map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
       map<ConcatString,StringArray> mask_sid_map;

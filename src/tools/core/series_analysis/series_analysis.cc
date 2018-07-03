@@ -684,7 +684,7 @@ void process_scores() {
             // Store valid fcst/obs/climo pairs where the mask is on
             if(!is_bad_data(fcst_dp(x, y)) &&
                !is_bad_data(obs_dp(x, y))  &&
-               !is_bad_data(conf_info.mask_dp(x, y))) {
+               !is_bad_data(conf_info.mask_area(x, y))) {
                f_na[i].add(fcst_dp(x, y));
                o_na[i].add(obs_dp(x, y));
                c_na[i].add((cmn_flag ? cmn_dp(x, y) : bad_data_double));

@@ -51,20 +51,21 @@ extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,
                SingleThresh t, double vld_t);
 
-extern void apply_mask(const DataPlane &, const DataPlane &, NumArray &);
-
-extern void apply_mask(DataPlane &, const DataPlane &);
+extern void apply_mask(const DataPlane &, const MaskPlane &, NumArray &);
+extern void apply_mask(DataPlane &, const MaskPlane &);
+extern void apply_mask(MaskPlane &, const MaskPlane &);
 
 extern void mask_bad_data(DataPlane &, const DataPlane &,
-               double v = bad_data_double);
+                          double v = bad_data_double);
+extern void mask_bad_data(MaskPlane &, const DataPlane &);
 
 extern DataPlane subtract(const DataPlane &, const DataPlane &);
 
 extern DataPlane normal_cdf(const DataPlane &, const DataPlane &,
-                    const DataPlane &);
+                            const DataPlane &);
 
 extern DataPlane normal_cdf_inv(const double, const DataPlane &,
-                    const DataPlane &);
+                                const DataPlane &);
 
 extern DataPlane gradient(const DataPlane &, int dim);
 

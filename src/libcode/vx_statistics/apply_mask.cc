@@ -182,6 +182,23 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
+                     MaskPlane &mask, ConcatString &mask_name) {
+   DataPlane dp;
+
+   parse_grid_mask(mask_grid_str, grid, dp, mask_name);
+
+   mask.set_size(dp.nx(), dp.ny());
+
+   int Nxy = dp.nx()*dp.ny();
+
+   for(int i=0; i<Nxy; i++) mask.buf()[i] = !is_eq(dp.data()[i], 0.0);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //
 // The mask_poly_str contains masking regions defined one of 3 ways:
 //
@@ -281,7 +298,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
          RegridInfo ri;
          ri.enable = true;
-         ri.method = InterpMthd_Nearest; 
+         ri.method = InterpMthd_Nearest;
          ri.width  = 1;
          ri.shape  = GridTemplateFactory::GridTemplate_Square;
 
@@ -297,6 +314,23 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    // Clean up
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
    if(info)  { delete info;  info  = (VarInfo *)       0; }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
+                     MaskPlane &mask, ConcatString &mask_name) {
+   DataPlane dp;
+
+   parse_poly_mask(mask_poly_str, grid, dp, mask_name);
+
+   mask.set_size(dp.nx(), dp.ny());
+
+   int Nxy = dp.nx()*dp.ny();
+
+   for(int i=0; i<Nxy; i++) mask.buf()[i] = !is_eq(dp.data()[i], 0.0);
 
    return;
 }

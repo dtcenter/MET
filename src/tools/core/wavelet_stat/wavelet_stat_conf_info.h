@@ -79,7 +79,7 @@ class WaveletStatConfInfo {
       // Wavelet-Stat configuration object
       MetConfig conf;
 
-//       // Store data parsed from the Wavelet-Stat configuration object
+      // Store data parsed from the Wavelet-Stat configuration object
       ConcatString            model;              // Model name
       ConcatString            obtype;             // Observation type
 

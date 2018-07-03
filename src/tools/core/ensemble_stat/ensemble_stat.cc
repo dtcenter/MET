@@ -96,7 +96,7 @@ static void process_grid_scores   (int,
                const DataPlane *, const DataPlane *,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
-               const DataPlane &, ObsErrorEntry *,
+               const MaskPlane &, ObsErrorEntry *,
                PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
@@ -1406,7 +1406,7 @@ void process_point_scores() {
 void process_grid_vx() {
    int i, j, k, l, m, n_miss;
    bool found;
-   DataPlane  mask_dp;
+   MaskPlane  mask_mp;
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fraw_dp = (DataPlane *) 0;
    DataPlane  obs_dp, oraw_dp;
@@ -1670,7 +1670,7 @@ void process_grid_vx() {
             shc.set_mask(conf_info.vx_opt[i].mask_name_area[k]);
 
             // Store the current mask
-            mask_dp = conf_info.mask_dp_map[conf_info.vx_opt[i].mask_name_area[k]];
+            mask_mp = conf_info.mask_area_map[conf_info.vx_opt[i].mask_name_area[k]];
 
             // Initialize
             pd_all.clear();
@@ -1682,7 +1682,7 @@ void process_grid_vx() {
                                 fcst_dp, fraw_dp,
                                 obs_dp, oraw_dp,
                                 emn_dp, cmn_dp,
-                                mask_dp, oerr_ptr,
+                                mask_mp, oerr_ptr,
                                 pd_all);
 
             mlog << Debug(2)
@@ -1825,7 +1825,7 @@ void process_grid_scores(int i_vx,
         const DataPlane *fcst_dp, const DataPlane *fraw_dp,
         const DataPlane &obs_dp,  const DataPlane &oraw_dp,
         const DataPlane &emn_dp,  const DataPlane &cmn_dp,
-        const DataPlane &mask_dp, ObsErrorEntry *oerr_ptr,
+        const MaskPlane &mask_mp, ObsErrorEntry *oerr_ptr,
         PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
    double cmn;
@@ -1845,7 +1845,7 @@ void process_grid_scores(int i_vx,
          // Skip any grid points containing bad data values or where the
          // verification masking region is turned off
          if(is_bad_data(obs_dp(x, y)) ||
-            !mask_dp.s_is_on(x, y)) continue;
+            !mask_mp.s_is_on(x, y)) continue;
 
          // Get current climatology value
          cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);

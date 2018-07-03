@@ -398,53 +398,33 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Select points inside the mask and write them to a NumArray.
+// For an empty input field, write all bad data values.
+//
+////////////////////////////////////////////////////////////////////////
 
-void apply_mask(const DataPlane &dp, const DataPlane &mask_dp,
+void apply_mask(const DataPlane &in, const MaskPlane &mask,
                 NumArray &na) {
-   int x, y;
-   double v;
 
-   // Initialize the NumArray object
-   na.erase();
-
-   // Loop through the mask data points
-   for(x=0; x<mask_dp.nx(); x++) {
-      for(y=0; y<mask_dp.ny(); y++) {
-
-         // Skip points where the mask is off
-         if(is_bad_data(mask_dp.get(x, y)) ||
-            !mask_dp.s_is_on(x, y)) continue;
-
-         // Get the current value
-         v = (dp.nx() == 0 && dp.ny() == 0 ?
-              bad_data_double : dp.get(x, y));
-
-         // Store the value
-         na.add(v);
-      } // end for y
-   } // end for x
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void apply_mask(DataPlane &dp, const DataPlane &mask_dp) {
-   int x, y;
-
-   if(dp.nx() != mask_dp.nx() ||
-      dp.ny() != mask_dp.ny() ) {
-
+   if((in.nx() != mask.nx() || in.ny() != mask.ny()) &&
+       in.nx() != 0         && in.ny() != 0) {
       mlog << Error << "\napply_mask() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+   // Initialize the NumArray object
+   na.erase();
 
-         // Put bad data everywhere the mask is bad data or turned off
-         if(is_bad_data(mask_dp(x, y)) || !mask_dp(x, y)) dp.set(bad_data_double, x, y);
+   int Nxy = mask.nx() * mask.ny();
+
+   for(int i=0; i<Nxy; i++) {
+
+      // Store the values where the mask in on
+      if(mask.data()[i]) {
+         na.add(in.nx() == 0 && in.ny() == 0 ?
+                bad_data_double : in.data()[i]);
       }
    }
 
@@ -452,23 +432,97 @@ void apply_mask(DataPlane &dp, const DataPlane &mask_dp) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Write bad data everywhere the mask is turned off.
+//
+////////////////////////////////////////////////////////////////////////
+
+void apply_mask(DataPlane &in, const MaskPlane &mask) {
+
+   if(in.nx() != mask.nx() || in.ny() != mask.ny()) {
+      mlog << Error << "\napply_mask() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   int Nxy = mask.nx() * mask.ny();
+
+   for(int i=0; i<Nxy; i++) {
+      if(!is_bad_data(in.data()[i]) && !mask.data()[i]) {
+         in.buf()[i] = bad_data_double;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Turn input field off everywhere the mask is off.
+//
+////////////////////////////////////////////////////////////////////////
+
+void apply_mask(MaskPlane &in, const MaskPlane &mask) {
+
+   if(in.nx() != mask.nx() || in.ny() != mask.ny() ) {
+      mlog << Error << "\napply_mask() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   int Nxy = mask.nx() * mask.ny();
+
+   for(int i=0; i<Nxy; i++) {
+      if(!mask.data()[i]) in.buf()[i] = false;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Turn off the mask at any grid points containing missing data.
+//
+////////////////////////////////////////////////////////////////////////
 
 void mask_bad_data(DataPlane &dp, const DataPlane &mask_dp, double v) {
-   int x, y;
 
-   if(dp.nx() != mask_dp.nx() ||
-      dp.ny() != mask_dp.ny() ) {
-
+   if(dp.nx() != mask_dp.nx() || dp.ny() != mask_dp.ny()) {
       mlog << Error << "\nmask_bad_data() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+   int Nxy = mask_dp.nx() * mask_dp.ny();
 
-         if(is_bad_data(mask_dp.get(x, y)))
-            dp.set(v, x, y);
+   for(int i=0; i<Nxy; i++) {
+      if(is_bad_data(mask_dp.data()[i])) {
+         dp.buf()[i] = v;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Turn off the mask at any grid points containing missing data.
+//
+////////////////////////////////////////////////////////////////////////
+
+void mask_bad_data(MaskPlane &mp, const DataPlane &dp) {
+
+   if(mp.nx() != dp.nx() || mp.ny() != dp.ny()) {
+      mlog << Error << "\nmask_bad_data() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   int Nxy = dp.nx() * dp.ny();
+
+   for(int i=0; i<Nxy; i++) {
+      if(is_bad_data(dp.data()[i])) {
+         mp.buf()[i] = false;
       }
    }
 

@@ -33,8 +33,13 @@ extern void parse_grid_weight(const Grid &, const GridWeightType,
 
 extern void parse_grid_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
+extern void parse_grid_mask(const ConcatString &, const Grid &,
+                            MaskPlane &, ConcatString &);
+
 extern void parse_poly_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
+extern void parse_poly_mask(const ConcatString &, const Grid &,
+                            MaskPlane &, ConcatString &);
 
 extern void apply_grid_mask(const Grid &, const Grid &,
                             DataPlane &);

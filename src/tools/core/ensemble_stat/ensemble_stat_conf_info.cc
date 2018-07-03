@@ -73,7 +73,7 @@ void EnsembleStatConfInfo::clear() {
    vld_data_thresh = bad_data_double;
    msg_typ_group_map.clear();
    msg_typ_sfc.clear();
-   mask_dp_map.clear();
+   mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType_None;
    tmp_dir.clear();
@@ -409,7 +409,7 @@ void EnsembleStatConfInfo::process_flags() {
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
-   DataPlane dp;
+   MaskPlane mp;
    StringArray sid;
    ConcatString name;
 
@@ -422,7 +422,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    map<ConcatString,ConcatString>  sid_map;
 
    // Initialize
-   mask_dp_map.clear();
+   mask_area_map.clear();
    mask_sid_map.clear();
 
    // Process the masks for each vx task
@@ -440,9 +440,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing grid mask: "
                  << vx_opt[i].mask_grid[j] << "\n";
-            parse_grid_mask(vx_opt[i].mask_grid[j], grid, dp, name);
+            parse_grid_mask(vx_opt[i].mask_grid[j], grid, mp, name);
             grid_map[vx_opt[i].mask_grid[j]] = name;
-            mask_dp_map[name] = dp;
+            mask_area_map[name] = mp;
          }
 
          // Store the name for gridded and point verification
@@ -459,9 +459,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing poly mask: "
                  << vx_opt[i].mask_poly[j] << "\n";
-            parse_poly_mask(vx_opt[i].mask_poly[j], grid, dp, name);
+            parse_poly_mask(vx_opt[i].mask_poly[j], grid, mp, name);
             poly_map[vx_opt[i].mask_poly[j]] = name;
-            mask_dp_map[name] = dp;
+            mask_area_map[name] = mp;
          }
 
          // Store the name for gridded and point verification
@@ -811,15 +811,15 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    // Define the grid masks
    for(i=0; i<mask_grid.n_elements(); i++) {
       n = i;
-      vx_pd.set_mask_dp(n, mask_name[n],
-                        &(conf_info->mask_dp_map[mask_name[n]]));
+      vx_pd.set_mask_area(n, mask_name[n],
+                          &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
    for(i=0; i<mask_poly.n_elements(); i++) {
       n = i + mask_grid.n_elements();
-      vx_pd.set_mask_dp(n, mask_name[n],
-                        &(conf_info->mask_dp_map[mask_name[n]]));
+      vx_pd.set_mask_area(n, mask_name[n],
+                          &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks

@@ -186,12 +186,12 @@ class VxPairDataPoint {
       void set_sid_exc_filt(const StringArray);
       void set_obs_qty_filt(const StringArray);
 
-      // Call set_pd_size before set_msg_typ, set_mask_dp, and set_interp
+      // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
       void set_pd_size(int, int, int);
 
       void set_msg_typ(int, const char *);
       void set_msg_typ_vals(int, const StringArray &);
-      void set_mask_dp(int, const char *, DataPlane *);
+      void set_mask_area(int, const char *, MaskPlane *);
       void set_mask_sid(int, const char *, StringArray *);
 
       void set_interp(int i_interp, const char *interp_mthd_str, int width,

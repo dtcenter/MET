@@ -287,7 +287,7 @@ void GridStatConfInfo::process_flags() {
 
 void GridStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
-   DataPlane dp;
+   MaskPlane mp;
    ConcatString name;
 
    mlog << Debug(2)
@@ -314,9 +314,9 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing grid mask: "
                  << vx_opt[i].mask_grid[j] << "\n";
-            parse_grid_mask(vx_opt[i].mask_grid[j], grid, dp, name);
+            parse_grid_mask(vx_opt[i].mask_grid[j], grid, mp, name);
             grid_map[vx_opt[i].mask_grid[j]] = name;
-            mask_map[name] = dp;
+            mask_map[name] = mp;
          }
 
          // Store the name for the current grid mask
@@ -332,9 +332,9 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing poly mask: "
                  << vx_opt[i].mask_poly[j] << "\n";
-            parse_poly_mask(vx_opt[i].mask_poly[j], grid, dp, name);
+            parse_poly_mask(vx_opt[i].mask_poly[j], grid, mp, name);
             poly_map[vx_opt[i].mask_poly[j]] = name;
-            mask_map[name] = dp;
+            mask_map[name] = mp;
          }
 
          // Store the name for the current poly mask
