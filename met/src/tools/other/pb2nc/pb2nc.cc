@@ -1548,8 +1548,8 @@ void process_pbfile(int i_pb) {
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
-   mlog << Debug(2) << "Total " << (is_prepbufr ? "PrepBufr" : "Bufr")
-        << " Messages processed\t= " << npbmsg << "\n"
+   mlog << Debug(2)
+        << "Total Messages processed\t\t= " << npbmsg << "\n"
         << "Rejected based on message type\t\t= "
         << rej_typ << "\n"
         << "Rejected based on station id\t\t= "
@@ -1570,7 +1570,7 @@ void process_pbfile(int i_pb) {
         << rej_itp << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
-        << "Total " << (is_prepbufr ? "PrepBufr" : "Bufr") << " Messages retained\t= "
+        << "Total Messages retained\t\t= "
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
