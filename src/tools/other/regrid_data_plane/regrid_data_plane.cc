@@ -150,7 +150,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_field,      "-field",      1);
-   cline.add(set_method,     "-method",     1);  
+   cline.add(set_method,     "-method",     1);
    cline.add(set_shape,      "-shape",      1);
    cline.add(set_width,      "-width",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
@@ -334,7 +334,7 @@ Grid get_grid(ConcatString grid_name_file) {
    else {
       Met2dDataFileFactory factory;
       Met2dDataFile * datafile = (Met2dDataFile *) 0;
-      
+
       // If that doesn't work, try to open a data file.
       datafile = factory.new_met_2d_data_file(replace_path(grid_name_file));
 
@@ -394,13 +394,13 @@ void get_grid_mapping(const ConcatString coord_name,
    static const char *method_name = "get_grid_mapping()";
    DataPlane from_dp;
    DataPlane to_dp;
-   
+
    // Determine the "from" grid
    mlog << Debug(2)  << method_name << " Reading coord file: " << coord_name << "\n";
    NcFile *_nc = open_ncfile(coord_name);
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   
+
    from_lat_count = 1500;
    from_lon_count = 2500;
    if (!IS_INVALID_NC_P(_nc)) {
@@ -412,10 +412,10 @@ void get_grid_mapping(const ConcatString coord_name,
         << " = " << from_lat_count << " * " << from_lon_count << "\n"
         << "                   target grid (nx,ny)="
         << to_lon_count << "," << to_lat_count << "\n";
-   
+
    from_dp.set_size(from_lon_count, from_lat_count);
    to_dp.set_size(to_lon_count, to_lat_count);
-   
+
    if (data_size > 0) {
       double x, y;
       float  lat, lon;
@@ -427,7 +427,7 @@ void get_grid_mapping(const ConcatString coord_name,
 
       memset(latitudes,  0, data_size*sizeof(float));
       memset(longitudes, 0, data_size*sizeof(float));
-      
+
       if (!IS_INVALID_NC_P(_nc)) {
          NcVar var_lat = get_nc_var(_nc, "latitude");
          NcVar var_lon = get_nc_var(_nc, "longitude");
@@ -446,7 +446,7 @@ void get_grid_mapping(const ConcatString coord_name,
       check_lat_lon(data_size, latitudes, longitudes);
 
       count_in_grid = 0;
-      
+
       //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
       for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
          int lat_offset = from_lon_count * xIdx;
@@ -498,7 +498,7 @@ void process_data_only_file() {
 
    // Determine the "to" grid
    to_grid = get_grid(RGInfo.name);
-   
+
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
    int from_lat_count, from_lon_count, from_data_size;
@@ -523,7 +523,7 @@ void process_data_only_file() {
 
    // Open the output file
    open_nc(to_grid, run_cs);
-   
+
    bool all_attrs = false;
    NcFile   *_nc_in = open_ncfile(InputFilename);
    ncbyte  *qc_data = new ncbyte[from_data_size];
@@ -549,20 +549,20 @@ void process_data_only_file() {
       int missing_count = 0;
       int non_missing_count = 0;
       float data_value;
-      float from_min_value =  10e10; 
+      float from_min_value =  10e10;
       float from_max_value = -10e10;
-      float qc_min_value =  10e10; 
+      float qc_min_value =  10e10;
       float qc_max_value = -10e10;
       IntArray cellArray;
       NumArray dataArray;
-      
+
       // Initialize
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
       config.read_string(FieldSA[i]);
       vinfo->set_dict(config);
-      
+
       //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
       bool has_qc_var = false;
       NcVar var_data = get_nc_var(_nc_in, vinfo->name());
@@ -574,12 +574,12 @@ void process_data_only_file() {
       }
 
       get_nc_data(&var_data, (float *)from_data);
-      
+
       censored_count = 0;
       qc_filtered_count = 0;
       to_dp.erase();
       to_dp.set_constant(bad_data_double);
-      
+
       for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
          for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
             offset = to_dp.two_to_one(xIdx,yIdx);
@@ -593,12 +593,12 @@ void process_data_only_file() {
                      missing_count++;
                      continue;
                   }
-                  
+
                   if(mlog.verbosity_level() >= 4) {
                      if (from_min_value > data_value) from_min_value = data_value;
                      if (from_max_value < data_value) from_max_value = data_value;
                   }
-                  
+
                   //Filter by QC flag
                   if (!has_qc_var || !has_qc_flags
                        || qc_flags.has(qc_data[cellArray[dIdx]])) {
@@ -657,7 +657,7 @@ void process_data_only_file() {
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
          to_dp.data_range(dmin, dmax);
-         
+
          char censored_info[50];
          if (censored_count > 0) {
             sprintf (censored_info, " censored count: %d", censored_count);
@@ -683,7 +683,7 @@ void process_data_only_file() {
       write_nc_var(to_dp, to_grid, vinfo, vname);
       NcVar to_var = get_nc_var(nc_out, vname);
       copy_nc_atts(&var_data, &to_var, all_attrs);
-   
+
    } // end for i
 
    if (from_data) {
@@ -704,9 +704,9 @@ void process_data_only_file() {
          NcVar *to_var = copy_nc_var(nc_out, &from_var);
       }
    }
-   
+
    copy_nc_atts(_nc_in, nc_out, all_attrs);
-   
+
    // Close the output file
    close_nc();
 
@@ -796,7 +796,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    write_netcdf_var_times(&data_var, dp);
 
    write_nc_data(dp, grid, &data_var);
-   
+
    return;
 }
 
@@ -808,12 +808,12 @@ void write_nc_var(const DataPlane &dp, const Grid &grid,
 
    NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
-                            
+
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
 
    write_nc_data(dp, grid, &data_var);
-   
+
    return;
 }
 
@@ -832,7 +832,7 @@ int get_lon_count(NcFile *_nc) {
    if(!IS_INVALID_NC(dim_lon)) lon_count= get_dim_size(&dim_lon);
    return lon_count;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 void close_nc() {
@@ -852,7 +852,7 @@ void close_nc() {
 ////////////////////////////////////////////////////////////////////////
 
 void usage() {
-   
+
    GridTemplateFactory gtf;
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -863,7 +863,7 @@ void usage() {
         << "\toutput_filename\n"
         << "\t-field string\n"
         << "\t[-coord filename]\n"
-        << "\t[-qc 0,1]\n"
+        << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
         << "\t[-shape type]\n"
@@ -885,6 +885,10 @@ void usage() {
 
         << "\t\t\"-field string\" may be used multiple times to define "
         << "the data to be regridded (required).\n"
+
+        << "\t\t\"-coord filename\" specifies the lat/lon grid mapping information (optional).\n"
+        << "\t\t\"-qc flags\" specifies a comma-separated list of QC flags, for example \"0,1\" (optional).\n"
+        << "\t\t\tOnly applied if the -coord argument is given and the QC variable exists.\n"
 
         << "\t\t\"-method type\" overrides the default regridding "
         << "method (" << interpmthd_to_string(RGInfo.method)
@@ -910,10 +914,6 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-coord corrd_file\" provides the lat/lon (optional).\n"
-        << "\t\t\"-qc qc_flags\" provides comma separated QC flags, for example \"0,1\" (optional).\n"
-        << "\t\t\t\tOnly applied if -coord argument is given and QC variable exists\n"
-        
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);

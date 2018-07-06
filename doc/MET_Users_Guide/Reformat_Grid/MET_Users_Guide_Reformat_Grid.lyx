@@ -1645,6 +1645,38 @@ hskip 0.5in}
 
 \end_inset
 
+[-coord filename]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-qc flags]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-method type] 
 \end_layout
 
@@ -1816,6 +1848,35 @@ Optional arguments for regrid_data_plane
 \series default
 The 
 \series bold
+-coord filename
+\series default
+ option specifies the lat/lon grid mapping information.
+ This is used when processing GOES-16 data.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ 
+\series default
+The 
+\series bold
+-qc flags
+\series default
+ option specifies a comma-separated list of QC flags, for example "0,1".
+ This option is only applied if the -coord argument is given and the QC
+ variable exists.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ 
+\series default
+The 
+\series bold
 -method type
 \series default
  option overrides the default regridding method.
@@ -1825,7 +1886,7 @@ The
 \begin_layout Description
 
 \series medium
-6.
+8.
  
 \series default
 The 
@@ -1839,7 +1900,7 @@ The
 \begin_layout Description
 
 \series medium
-7.
+9.
  
 \series default
 The 
@@ -1854,7 +1915,7 @@ The
 \begin_layout Description
 
 \series medium
-8.
+10.
  
 \series default
 The 
@@ -1868,7 +1929,7 @@ The
 \begin_layout Description
 
 \series medium
-9.
+11.
  The 
 \series bold
 -log file
@@ -1887,7 +1948,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-10.
+12.
  The 
 \series bold
 -v level
@@ -1913,7 +1974,7 @@ level
 \begin_layout Description
 
 \series medium
-11.
+13.
 
 \series default
  The 
