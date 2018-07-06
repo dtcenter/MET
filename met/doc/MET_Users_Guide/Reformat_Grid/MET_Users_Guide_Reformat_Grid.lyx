@@ -1850,7 +1850,7 @@ The
 \series bold
 -coord filename
 \series default
- option specifies the lat/lon grid mapping information.
+ option specifies the lat/lon location for the input data.
  This is used when processing GOES-16 data.
 \end_layout
 
