@@ -59,6 +59,34 @@ static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
 static const double     DefaultVldThresh  = 0.5;
 
+static const float      MISSING_LATLON = -999.0;
+
+static const char * GOES_global_attr_names[] = {
+      "naming_authority",
+      "project",
+      "production_site",
+      "production_environment",
+      "spatial_resolution",
+      "orbital_slot",
+      "platform_ID",
+      "instrument_type",
+      "scene_id",
+      "instrument_ID",
+      "dataset_name",
+      "iso_series_metadata_id",
+      "title",
+      "keywords",
+      "keywords_vocabulary",
+      "processing_level",
+      "date_created",
+      "cdm_data_type",
+      "time_coverage_start",
+      "time_coverage_end",
+      "timeline_id",
+      "id"
+};
+
+
 // Variables for command line arguments
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
@@ -66,6 +94,8 @@ static StringArray FieldSA;
 static RegridInfo RGInfo;
 static StringArray VarNameSA;
 static int compress_level = -1;
+static bool opt_override_method = false;
+static bool opt_override_width = false;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -354,6 +384,8 @@ Grid get_grid(ConcatString grid_name_file) {
    return grid;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    int cnt_printed = 0;
    int cnt_missing_lat = 0;
@@ -365,34 +397,36 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
    float min_lon=360.0;
    float max_lon=-360.0;
    for (int idx=0; idx<data_size; idx++) {
-      if (cnt_printed < 10 && !is_eq(latitudes[idx], -999.0) && !is_eq(longitudes[idx], -999.0)) {
+      if (cnt_printed < 10 && latitudes[idx] > MISSING_LATLON
+            && longitudes[idx] > MISSING_LATLON) {
          mlog << Debug(7) << "  index: " << idx <<  " lat: " << latitudes[idx]
                           << ", lon: " << longitudes[idx] << "\n";
          cnt_printed++;
       }
-      if (is_eq(latitudes[idx], -999.0))  cnt_missing_lat++;
+      if (latitudes[idx] <= MISSING_LATLON) cnt_missing_lat++;
       else if (latitudes[idx] < -90 || latitudes[idx] > 90)  cnt_bad_lat++;
       else {
          if (min_lat > latitudes[idx]) min_lat = latitudes[idx];
          if (max_lat < latitudes[idx]) max_lat = latitudes[idx];
       }
-      if (is_eq(longitudes[idx], -999.0)) cnt_missing_lon++;
+      if (longitudes[idx] <= MISSING_LATLON) cnt_missing_lon++;
       else if (longitudes[idx] < -180 || longitudes[idx] > 180) cnt_bad_lon++;
       else {
          if (min_lon > longitudes[idx]) min_lon = longitudes[idx];
          if (max_lon < longitudes[idx]) max_lon = longitudes[idx];
       }
    }
-   mlog << Debug(7) << "\n MISSING lat: " << cnt_missing_lat << ", lon: " << cnt_missing_lon << "\n"
-                    << "     bad lat: " << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
-                    << "     LAT min: " << min_lat << ", max: " << max_lat << "\n"
-                    << "    LONG min: " << min_lon << ", max: " << max_lon << "\n"
-                    << "\n\n";
-
+   mlog << Debug(7) << "\n Count: missing - lat: " << cnt_missing_lat
+        << ", lon: " << cnt_missing_lon << "\n"
+        << "        invalid - lat: " << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
+        << "     LAT min: " << min_lat << ", max: " << max_lat << "\n"
+        << "    LONG min: " << min_lon << ", max: " << max_lon << "\n";
 }
 
-void get_grid_mapping(const ConcatString coord_name,
-      Grid to_grid, IntArray *cellMapping, int &from_lat_count, int &from_lon_count) {
+////////////////////////////////////////////////////////////////////////
+
+void get_grid_mapping(const ConcatString coord_name, Grid to_grid,
+      IntArray *cellMapping, int &from_lat_count, int &from_lon_count) {
    static const char *method_name = "get_grid_mapping()";
    DataPlane from_dp;
    DataPlane to_dp;
@@ -478,6 +512,8 @@ void get_grid_mapping(const ConcatString coord_name,
    }
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void process_data_only_file() {
    DataPlane to_dp;
    Grid fr_grid, to_grid;
@@ -496,7 +532,15 @@ void process_data_only_file() {
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
 
-   // Read the input data file
+   if ((RGInfo.method != InterpMthd_Min)
+         && (RGInfo.method != InterpMthd_Max)
+         && (RGInfo.method != InterpMthd_Median)
+         && (RGInfo.method != InterpMthd_UW_Mean)) {
+      mlog << Error << "\n" << method_name << " The Interpolation method \""
+           << interpmthd_to_string(RGInfo.method)
+           << "\" is not supported.\n\n";
+      exit(1);
+   }
 
    // Determine the "to" grid
    to_grid = get_grid(RGInfo.name);
@@ -505,18 +549,18 @@ void process_data_only_file() {
    int to_lon_count = to_grid.nx();
    int from_lat_count, from_lon_count, from_data_size;
    IntArray *cellMapping = new IntArray[(to_lat_count * to_lon_count)];
-   get_grid_mapping(coord_name, to_grid, cellMapping, from_lat_count, from_lon_count);
+   get_grid_mapping(coord_name, to_grid, cellMapping,
+         from_lat_count, from_lon_count);
    from_data_size = from_lat_count * from_lon_count;
 
    GridTemplateFactory gtf;
-   mlog << Debug(2) << "Interpolation options: "
+   mlog << Debug(2) << method_name << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
-        //<< ", width = " << RGInfo.width
-        //<< ", shape = " << gtf.enum2String(RGInfo.shape)
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
 
    // Build the run command string
-   run_cs << "Regrid from " << coord_name << " to " << to_grid.serialize();
+   run_cs << "Regrid " << InputFilename << " from " << coord_name
+          << " to " << to_grid.serialize();
 
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
@@ -526,19 +570,68 @@ void process_data_only_file() {
    // Open the output file
    open_nc(to_grid, run_cs);
 
-   bool all_attrs = false;
+   if ( ! file_exists(InputFilename) )  {
+      mlog << Error << "\nmethod_name -> "
+           << "input file does not exist \"" << InputFilename << "\"\n\n";
+      exit(1);
+   }
+
+   // Read the input data file
+   bool opt_all_attrs = false;
    NcFile   *_nc_in = open_ncfile(InputFilename);
    ncbyte  *qc_data = new ncbyte[from_data_size];
    float *from_data = new float[from_data_size];
 
-   memset(qc_data, -99, from_data_size*sizeof(ncbyte)); // -99 is arbitrary number as invliad QC value
+   memset(qc_data, -99, from_data_size*sizeof(ncbyte)); // -99 is arbitrary number as invalid QC value
+
+   NcVar from_var;
+   unixtime init_time, valid_time;
+   ConcatString time_unit, tmp_time_unit;
+   double *time_values = new double[100];
+   
+   valid_time = 0;
+   time_values[0] = 0;
+   multimap<string,NcVar> mapVar = GET_NC_VARS_P(_nc_in);
+   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+         itVar != mapVar.end(); ++itVar) {
+      if ((*itVar).first == "t" || (*itVar).first == "time") {
+         from_var = (*itVar).second;
+         get_nc_data(&from_var, time_values);
+         get_nc_att(&from_var, "units", time_unit);
+         valid_time = get_reference_unixtime(time_unit);
+         valid_time += (unixtime)nint(time_values[0]);
+         mlog << Debug(2) << method_name << "valid time: " << time_values[0] << " "
+              << time_unit << " ==> " << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
+         break;
+      }
+   }
+   
+   if (valid_time == 0) {
+      mlog << Error << "\n" << method_name << "-> "
+           << "trouble finding time variable from \""
+           << InputFilename << "\"\n\n";
+      exit(1);
+   }
+   
+   init_time = valid_time;
+   // time_coverage_start = "2018-05-14T17:02:21.5Z" ;
+   //ConcatString att_value;
+   //if (get_global_att(_nc_in, "time_coverage_start", att_value)) {
+   //   init_time = get_reference_unixtime(att_value);
+   //   cout << "    " << att_value << " ==> " << unix_to_yyyymmdd_hhmmss(init_time) << "\n";
+   //}
 
    to_dp.set_size(to_lon_count, to_lat_count);
-
-   int qc_filtered_count;
+   to_dp.set_init(init_time);
+   to_dp.set_valid(valid_time);
+   
    NcVar var_qc;
+   int qc_filtered_count;
+   int global_attr_count;
    ConcatString qc_var_name;
 
+   global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
+   
    // Loop through the requested fields
    bool has_qc_flags = (qc_flags.n_elements() > 0);
    for(int i=0; i<FieldSA.n_elements(); i++) {
@@ -580,6 +673,10 @@ void process_data_only_file() {
       censored_count = 0;
       qc_filtered_count = 0;
       to_dp.erase();
+      to_dp.set_init(init_time);
+      to_dp.set_valid(valid_time);
+      //to_dp.set_lead((unixtime)obs_time[0]);
+
       to_dp.set_constant(bad_data_double);
 
       for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
@@ -596,6 +693,7 @@ void process_data_only_file() {
                      continue;
                   }
 
+                  non_missing_count++;
                   if(mlog.verbosity_level() >= 4) {
                      if (from_min_value > data_value) from_min_value = data_value;
                      if (from_max_value < data_value) from_max_value = data_value;
@@ -607,10 +705,8 @@ void process_data_only_file() {
                      for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
                         // Break out after the first match.
                         if(vinfo->censor_thresh()[i].check(data_value)) {
-                           //float saved_value = data_value;
                            data_value = vinfo->censor_val()[i];
                            censored_count++;
-                           //cout << "   DEBUG org value: " << saved_value << " to " << data_value << "\n";
                            break;
                         }
                      }
@@ -627,24 +723,25 @@ void process_data_only_file() {
                }
                if (0 < dataArray.n_elements()) {
                   int data_count = dataArray.n_elements();
-                  float new_value;
-                  if      (RGInfo.method == InterpMthd_Min) new_value = dataArray.min();
-                  else if (RGInfo.method == InterpMthd_Max) new_value = dataArray.max();
+                  float to_value;
+                  if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
+                  else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
                   else if (RGInfo.method == InterpMthd_Median) {
                      cellArray.sort_increasing();
-                     new_value = dataArray[data_count/2];
-                     if (0 == data_count % 2) new_value = (new_value + dataArray[(data_count/2)+1])/2;
+                     to_value = dataArray[data_count/2];
+                     if (0 == data_count % 2)
+                        to_value = (to_value + dataArray[(data_count/2)+1])/2;
                   }
-                  else {
-                     float sum_value = dataArray.sum();
-                     new_value = dataArray.sum() / data_count;
-                  }
-                  to_dp.set(new_value, xIdx, yIdx);
+                  else to_value = dataArray.sum() / data_count;
+                  
+                  to_dp.set(to_value, xIdx, yIdx);
                   if(mlog.verbosity_level() > 7) {
                      if (300 < dataArray.n_elements()) {
-                        cout << " data from " << dataArray.n_elements() << ". max: "
-                             << dataArray.max() << ", min: " << dataArray.min()
-                             << " mean: " << dataArray.sum()/dataArray.n_elements() << "\n";
+                        mlog << Debug(7) << method_name
+                             << ". max: " << dataArray.max()
+                             << ", min: " << dataArray.min()
+                             << ", mean: " << dataArray.sum()/data_count
+                             << " from " << data_count << "data.\n";
                      }
                   }
                }
@@ -684,9 +781,22 @@ void process_data_only_file() {
       // Write the regridded data
       write_nc_var(to_dp, to_grid, vinfo, vname);
       NcVar to_var = get_nc_var(nc_out, vname);
-      copy_nc_atts(&var_data, &to_var, all_attrs);
+      for (int idx=0; idx<global_attr_count; idx++) {
+         copy_nc_att(_nc_in, &to_var, GOES_global_attr_names[idx]);
+      }
+      copy_nc_atts(&var_data, &to_var, opt_all_attrs);
 
    } // end for i
+
+   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+         itVar != mapVar.end(); ++itVar) {
+      if ((*itVar).first == "t" 
+            || string::npos != (*itVar).first.find("time")) {
+         from_var = (*itVar).second;
+         copy_nc_var(nc_out, &from_var);
+      }
+   }
+   //copy_nc_atts(_nc_in, nc_out, opt_all_attrs);
 
    if (from_data) {
       delete[] from_data;
@@ -696,18 +806,6 @@ void process_data_only_file() {
       delete[] cellMapping;
       cellMapping = (IntArray *)0;
    }
-
-   NcVar from_var;
-   multimap<string,NcVar> mapVar = GET_NC_VARS_P(_nc_in);
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-         itVar != mapVar.end(); ++itVar) {
-      if ((*itVar).first == "t" || string::npos != (*itVar).first.find("time")) {
-         from_var = (*itVar).second;
-         NcVar *to_var = copy_nc_var(nc_out, &from_var);
-      }
-   }
-
-   copy_nc_atts(_nc_in, nc_out, all_attrs);
 
    // Close the output file
    close_nc();
@@ -931,20 +1029,22 @@ void set_field(const StringArray &a) {
 
 void set_method(const StringArray &a) {
    RGInfo.method = string_to_interpmthd(a[0]);
+   opt_override_method = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0]);
+   opt_override_width = true;
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_shape(const StringArray &a) {
-	GridTemplateFactory gtf;
-	RGInfo.shape = gtf.string2Enum(a[0]);
+   GridTemplateFactory gtf;
+   RGInfo.shape = gtf.string2Enum(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -991,8 +1091,10 @@ void set_compress(const StringArray & a) {
 
 void set_coord_name(const StringArray & a) {
    coord_name = a[0];
-   if (RGInfo.method == DefaultInterpMthd) {
-      RGInfo.width  = 0;
+   if (!opt_override_width && RGInfo.width == DefaultInterpWdth) {
+      RGInfo.width = 0;
+   }
+   if (!opt_override_method && RGInfo.method == DefaultInterpMthd) {
       RGInfo.method = InterpMthd_UW_Mean;
    }
 }
