@@ -1531,6 +1531,8 @@ This section contains a description of running the regrid_data_plane tool.
  This tool may be run to read data from any gridded file MET supports (i.e
  GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a user-specified
  grid, and write the field(s) out in NetCDF format.
+ In addition, regrid_data_plane can read GOES-16 AOD input files in NetCDF
+ format.
  The user may specify the method of interpolation used for regridding as
  well as which fields to regrid.
  This tool is particularly useful when dealing with GRIB2 and NetCDF input
@@ -2104,6 +2106,76 @@ regridded.nc
 will include 6-hour accumulated precipitation, 2m temperature, 10m U and
  V components of the wind, and the 500mb geopotential height.
  
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of call regrid_data_plane to process GOES-16 AOD data is shown
+ below:
+\end_layout
+
+\begin_layout LyX-Code
+regrid_data_plane 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+G212 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+regrid_data_plane_GOES-16_AOD_TO_G212.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-field 'name="AOD"; level="(*,*)";' 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-coord g16_conus_latlon_2km_20180620.dat 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-qc 1,2,3
+\end_layout
+
+\begin_layout LyX-Code
+-method MAX -v 1
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When processing GOES-16 data, the 
+\series bold
+-coord
+\series medium
+ option must be used to define the input GOES-16 lat/lon locations.
+ The 
+\series bold
+-qc
+\series medium
+ option may also be used to specify the acceptable quality control flag
+ values.
+ The example above regrids the GOES-16 AOD values to NCEP Grid number 212,
+ writing to the output the maximum AOD value falling inside each grid box.
 \end_layout
 
 \begin_layout Subsection

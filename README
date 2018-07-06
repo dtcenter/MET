@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 5 (June 18, 2018)
+Model Evaluation Tools METv7.1 BETA 6 (July 6, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,30 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 7.1 BETA 6 Release Notes:
+--------------------------------
+
+- Continue development on calling python scripts from MET config files.
+- Enhance PB2NC to compute time summaries across multiple BUFR or PrepBUFR
+  input files.
+- Round timestamps in PB2NC to the nearest second instead of truncating.
+- In MODE, replace the area_thresh and inten_perc_thresh config file options
+  with the more generic filter_attr_name and filter_attr_thresh options.
+- In MODE, add aspect_diff and curvature_ratio as new inputs to the fuzzy logic
+  engine and add corresponding columns to the output file.
+- Enhance Regrid-Data-Plane to read GOES-16 AOD data using the new -coord and
+  -qc command line options.
+- Fix bug in Ensemble-Stat when filtering out missing data values to ensure that
+  the ECNT line type contains the same number of matched pairs as the others.
+- Enhance the observation error logic in Ensemble-Stat.  Replace the
+  obs_error.field config option with obs_error.flag.  When enabled, apply
+  peturbations to ensemble member values and bias correction to observation
+  values.
+- Switch from using double precision to booleans for storing mask fields in
+  Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and Series-Analysis. When
+  processing many masking regions, this will run faster and consume less memory.
+- Fix memory allocation issue in Grid-Stat, leading to faster run times.
 
 Version 7.1 BETA 5 Release Notes:
 --------------------------------
