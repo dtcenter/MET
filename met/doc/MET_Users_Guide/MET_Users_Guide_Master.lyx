@@ -78,7 +78,7 @@
 \begin_layout Title
 
 \series bold
-Model Evaluation Tools Version 7.1 (METv7.1 BETA5)
+Model Evaluation Tools Version 7.1 (METv7.1 BETA6)
 \begin_inset Newline newline
 \end_inset
 
@@ -163,7 +163,7 @@ Minna Win-Gildenmeister and James Frimel
 \begin_layout Date
 
 \series bold
-June 2018
+July 2018
 \end_layout
 
 \begin_layout Standard
@@ -636,7 +636,6 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixE.lyx"
 
 \end_layout
 
-
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
@@ -644,8 +643,8 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixF.lyx"
 
 \end_inset
 
-\end_layout
 
+\end_layout
 
 \end_body
 \end_document
