@@ -2744,7 +2744,7 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const char * attr_name) {
       default:
          mlog << Error << "\ncopy_nc_var_atts() -> "
               << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
-              << GET_NC_TYPE_NAME_P(var_from) << "\").\n\n";
+              << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
          exit(1);
          break;
       }
@@ -2826,7 +2826,7 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
          default:
             mlog << Error << "\ncopy_nc_var_atts() -> "
                  << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
-                 << GET_NC_TYPE_NAME_P(var_from) << "\").\n\n";
+                 << GET_NC_TYPE_NAME_P(var_from) << "\".\n\n";
             exit(1);
             break;
          }
