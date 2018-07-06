@@ -161,6 +161,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_coord_name, "-coord",      1);
    cline.add(set_qc_flags,   "-qc",         1);
 
+   cline.allow_numbers();
+
    // Parse the command line
    cline.parse();
 
@@ -886,7 +888,7 @@ void usage() {
         << "\t\t\"-field string\" may be used multiple times to define "
         << "the data to be regridded (required).\n"
 
-        << "\t\t\"-coord filename\" specifies the lat/lon grid mapping information (optional).\n"
+        << "\t\t\"-coord filename\" specifies the lat/lon location for the input data (optional).\n"
         << "\t\t\"-qc flags\" specifies a comma-separated list of QC flags, for example \"0,1\" (optional).\n"
         << "\t\t\tOnly applied if the -coord argument is given and the QC variable exists.\n"
 
