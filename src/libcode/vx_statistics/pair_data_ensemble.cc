@@ -197,6 +197,10 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
+   cmn_na         = pd.cmn_na;
+   csd_na         = pd.csd_na;
+   cdf_na         = pd.cdf_na;
+
    // PairDataEnsemble
    v_na           = pd.v_na;
    r_na           = pd.r_na;
