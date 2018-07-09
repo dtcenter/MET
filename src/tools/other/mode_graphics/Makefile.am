@@ -51,7 +51,7 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lz
 
 if ENABLE_PYTHON
-   plot_mode_field_ensemble_statCPPFLAGS += ${MET_PYTHON_CC}
+   plot_mode_field_CPPFLAGS += ${MET_PYTHON_CC}
    plot_mode_field_LDFLAGS  += $(MET_PYTHON_LD)
 endif
 
