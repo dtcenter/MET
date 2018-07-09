@@ -24,6 +24,11 @@ using namespace std;
 #include "data2d_nc_pinterp.h"
 #include "data2d_nccf.h"
 
+
+#ifdef WITH_PYTHON
+#include "../vx_data2d_python/data2d_python.h"
+#endif
+
 #ifdef WITH_GRIB2
    #include "data2d_grib2.h"
 #endif
@@ -36,8 +41,15 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
+
+{
+
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+#ifdef WITH_PYTHON
+MetPythonDataFile * p = 0;
+#endif
 
    //
    // Switch on file type and instantiate the appropriate class.
@@ -72,6 +84,22 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
          mtddf = new MetNcCFDataFile;
          break;
 
+#ifdef WITH_PYTHON
+
+      case FileType_Python_Numpy:
+         p = new MetPythonDataFile;
+         p->set_type(type);
+         mtddf = p;
+         break;
+
+      case FileType_Python_Xarray:
+         p = new MetPythonDataFile;
+         p->set_type(type);
+         mtddf = p;
+         break;
+
+#endif
+
       case FileType_HdfEos:
 
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
@@ -95,7 +123,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
 
       default:
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
-              << "unsupported gridded data file type \"" << type
+              << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
          break;
@@ -137,7 +165,10 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type) {
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
+
+{
+
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    //

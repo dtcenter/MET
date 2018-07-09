@@ -35,6 +35,7 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lvx_data2d_nccf \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
@@ -52,6 +53,11 @@ modis_regrid_LDADD = -lvx_pxm \
 	-ljpeg \
 	-lz \
 	-lm
+
+if ENABLE_PYTHON
+   modis_regrid_CPPFLAGS += ${MET_PYTHON_CC}
+   modis_regrid_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 EXTRA_DIST = cloudsat_swath_file.h \
 	data_averager.h \

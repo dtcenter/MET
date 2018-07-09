@@ -18,6 +18,7 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -38,3 +39,8 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_math \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+   plot_point_obs_CPPFLAGS += ${MET_PYTHON_CC}
+   plot_point_obs_LDFLAGS  += $(MET_PYTHON_LD)
+endif

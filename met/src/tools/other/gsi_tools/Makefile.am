@@ -37,6 +37,7 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -74,6 +75,7 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -86,3 +88,10 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lm -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+   gsid2mpr_CPPFLAGS += ${MET_PYTHON_CC}
+   gsid2mpr_LDFLAGS  += $(MET_PYTHON_LD)
+   gsidens2orank_CPPFLAGS += ${MET_PYTHON_CC}
+   gsidens2orank_LDFLAGS  += $(MET_PYTHON_LD)
+endif

@@ -50,12 +50,13 @@ inline void toggle_sign(double & x) { x = -x;  return; }
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid grid_from_python_dict(PyObject * dict)
+void grid_from_python_dict(PyObject * dict, Grid & g)
 
 {
 
-Grid g;
 ConcatString proj_type;
+
+g.clear();
 
    //
    //  get projection type
@@ -81,7 +82,7 @@ else {
    //  done
    //
 
-return ( g );
+return;
 
 }
 

@@ -62,7 +62,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char *program_name = "plot_data_plane";
+static ConcatString program_name = "plot_data_plane";
+
+static const char  numpy_field_string [] = "numpy";
+static const char xarray_field_string [] = "xarray";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +97,11 @@ static void set_verbosity(const StringArray &);
 
 int main(int argc, char * argv[])
 {
+
+
+   program_name = get_short_name(argv[0]);
+
+
    Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
    Met2dDataFileFactory m_factory;
    VarInfo * var_ptr = (VarInfo * ) 0;
@@ -103,6 +111,8 @@ int main(int argc, char * argv[])
    GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
+   bool python = false;
+   bool status = false;
 
       //
       // set the default color table
@@ -120,12 +130,27 @@ int main(int argc, char * argv[])
    MetConfig config;
    config.read(replace_path(config_const_filename));
    config.read(replace_path(config_map_data_filename));
-   config.read_string(FieldString);
 
       //
-      // get the gridded file type from config string, if present
+      //  get the field info from the command line
       //
-   ftype = parse_conf_file_type(&config);
+      //
+
+        if ( FieldString ==  numpy_field_string )  { python = true;  ftype = FileType_Python_Numpy;  }
+   else if ( FieldString == xarray_field_string )  { python = true;  ftype = FileType_Python_Xarray; }
+
+   else {
+
+      python = false;
+
+      config.read_string(FieldString);
+
+         //
+         // get the gridded file type from config string, if present
+         //
+      ftype = parse_conf_file_type(&config);
+
+   }
 
       //
       // instantiate the Met2dDataFile object using the data_2d_factory
@@ -141,34 +166,44 @@ int main(int argc, char * argv[])
       exit (1);
    }
 
-   var_ptr = v_factory.new_var_info(met_ptr->file_type());
+   if ( ! python )  {
 
-   if (!var_ptr)
-   {
-      mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
-           << InputFilename << "\"\n\n";
-      exit (1);
+      var_ptr = v_factory.new_var_info(met_ptr->file_type());
+
+      if (!var_ptr)
+      {
+         mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
+              << InputFilename << "\"\n\n";
+         exit (1);
+      }
+
+         //
+         // populate the var_info object from the magic string
+         //
+      var_ptr->set_dict(config);
+
    }
-
-      //
-      // populate the var_info object from the magic string
-      //
-   var_ptr->set_dict(config);
 
       //
       // open the file
       //
+/*
    if (!met_ptr->open(InputFilename))
    {
       mlog << Error << "\n" << program_name << " -> can't open file \""
            << InputFilename << "\"\n\n";
       exit (1);
    }
-
+*/
       //
       // get the data plane from the file for this VarInfo object
       //
-   if (!met_ptr->data_plane(*var_ptr, data_plane))
+
+   if ( python )  status = met_ptr->data_plane(data_plane);
+   else           status = met_ptr->data_plane(*var_ptr, data_plane);
+
+
+   if ( ! status )
    {
       mlog << Error << "\n" << program_name << " -> trouble getting field \""
            << FieldString << "\" from file \"" << InputFilename << "\"\n\n";

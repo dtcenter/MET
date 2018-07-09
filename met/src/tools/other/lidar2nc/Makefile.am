@@ -24,6 +24,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -47,3 +48,8 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_log \
 	-lmfhdf -ldf -ljpeg \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+
+if ENABLE_PYTHON
+   lidar2nc_CPPFLAGS += ${MET_PYTHON_CC}
+   lidar2nc_LDFLAGS  += $(MET_PYTHON_LD)
+endif

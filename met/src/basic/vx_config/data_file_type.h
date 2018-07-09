@@ -22,6 +22,7 @@
 
 enum GrdFileType
 {
+
    FileType_None,           // Default
    FileType_Gb1,            // GRIB version 1
    FileType_Gb2,            // GRIB version 2
@@ -30,8 +31,24 @@ enum GrdFileType
    FileType_NcPinterp,      // NetCDF output of WRF-ARW pinterp tool
    FileType_NcCF,           // NetCDF Climate-Forecast Convention
    FileType_HdfEos,         // Hierarchical Data Format - Earth Observing System
-   FileType_Bufr            // Bufr or PrepBufr format
+   FileType_Bufr,           // Bufr or PrepBufr format
+
+   FileType_Python_Xarray,  // python script using xarray dataplane
+   FileType_Python_Numpy,   // python script using numpy array and attributes dictionary
+
 };
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+inline bool is_python_grdfiletype(const GrdFileType _t)
+
+{
+
+return ( (_t == FileType_Python_Xarray) || (_t == FileType_Python_Numpy) );
+
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -51,3 +52,8 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_log \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+   ascii2nc_CPPFLAGS += ${MET_PYTHON_CC}
+   ascii2nc_LDFLAGS  += $(MET_PYTHON_LD)
+endif

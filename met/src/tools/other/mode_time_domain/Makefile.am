@@ -53,6 +53,7 @@ mtd_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -67,6 +68,10 @@ mtd_LDADD = -lvx_pxm \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 
+if ENABLE_PYTHON
+   mtd_CPPFLAGS += ${MET_PYTHON_CC}
+   mtd_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 
 # If we are in development mode, generate the "to_string" files and
