@@ -21,6 +21,7 @@
 //   003    06/02/16  Halley Gotway   Add box masking type.
 //   004    11/15/16  Halley Gotway   Add solar masking types.
 //   005    04/08/17  Halley Gotway   Add lat/lon masking types.
+//   006    07/09/18  Bullock         Add shapefile masking type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -236,7 +237,7 @@ void process_mask_file(DataPlane &dp)
       poly_mask.load(mask_filename);
 
       mlog << Debug(2)
-           << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
+           << "Parsed Lat/Lon Mask:\t" << poly_mask.name()
            << " containing " << poly_mask.n_points() << " points\n";
    }
 
@@ -246,13 +247,11 @@ void process_mask_file(DataPlane &dp)
 
    else if ( mask_type == MaskType_Shape )  {
 
-      // mlog << Error
-      //      << program_name << ": -> shapefile masking not yet implemented\n\n";
-      //
-      // exit ( 1 );
-
       get_shapefile_outline(shape);
 
+      mlog << Debug(2)
+           << "Parsed Shape Mask:\t" << mask_filename
+           << " containing " << shape.n_points << " points\n";
    }
 
    // For solar masking, check for a date/time string
@@ -1043,6 +1042,9 @@ for (x=0, n_in=0; x<(grid.nx()); ++x)  {
 
       status = a.is_inside(x, y);
 
+      // Check the complement
+      if(complement) status = !status;
+
       if(status)  n_in++;
 
       dp.set( (status ? 1.0 : 0.0 ), x, y);
@@ -1051,14 +1053,19 @@ for (x=0, n_in=0; x<(grid.nx()); ++x)  {
 
 }   //  for x
 
+if(complement) {
+   mlog << Debug(3)
+        << "Applying complement of the shapefile mask.\n";
+}
+
    //
    //  done
    //
 
-   // List number of points inside the mask
-   mlog << Debug(3)
-        << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+// List number of points inside the mask
+mlog << Debug(3)
+     << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
+     << " points inside\n";
 
 return;
 
