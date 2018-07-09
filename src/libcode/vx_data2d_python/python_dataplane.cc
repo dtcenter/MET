@@ -41,7 +41,19 @@ Py_Initialize();
    //   import the python script as a module
    //
 
-module = PyImport_ImportModule (script_name);
+   module = PyImport_ImportModule        (script_name);
+// module = PyImport_ImportModuleNoBlock (script_name);
+
+if ( PyErr_Occurred() )  {
+
+   mlog << Error
+        << "\n\n   an error occurred\n\n";
+
+   PyErr_PrintEx(1);
+
+   exit ( 1 );
+
+}
 
 if ( ! module )  {
 
@@ -49,9 +61,9 @@ if ( ! module )  {
         << "python_dataplane() -> error running python script \""
         << script_name << "\"\n\n";
 
-   exit ( 1 );
-
    Py_Finalize();
+
+   exit ( 1 );
 
 }
 

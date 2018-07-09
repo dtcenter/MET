@@ -89,7 +89,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type) {
 
       default:
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
-              << "unsupported gridded data file type \"" << type
+              << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
          break;

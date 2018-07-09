@@ -12,6 +12,7 @@
 #include "vx_python_utils.h"
 
 #include "dataplane_from_numpy_array.h"
+#include "grid_from_python_dict.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,11 +158,12 @@ dp_out.set_lead(t);
 
      ////////////////////
 
-j = dict_lookup_int(attrs_dict, "accum");
+PyObject * py_grid = dict_lookup_dict(attrs_dict, "grid");
 
-dp_out.set_accum(t);
+grid_from_python_dict(py_grid, grid_out);
 
 
+     ////////////////////
 
    //
    //  done

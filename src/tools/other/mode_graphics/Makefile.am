@@ -31,6 +31,7 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lvx_config \
         -lvx_plot_util \
         -lvx_data2d_nc_met \
+        $(PYTHON_LIBS) \
         -lvx_grid \
         -lvx_nc_util \
         -lvx_ps \
@@ -48,6 +49,11 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lfreetype \
         -lm  \
         -lz
+
+if ENABLE_PYTHON
+   plot_mode_field_ensemble_statCPPFLAGS += ${MET_PYTHON_CC}
+   plot_mode_field_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

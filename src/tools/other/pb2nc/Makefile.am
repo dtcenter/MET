@@ -29,6 +29,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -43,6 +44,11 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(FLIBS)
+
+if ENABLE_PYTHON
+   pb2nc_CPPFLAGS += ${MET_PYTHON_CC}
+   pb2nc_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 EXTRA_DIST = readpb.prm \
 	pb2nc_conf_info.h

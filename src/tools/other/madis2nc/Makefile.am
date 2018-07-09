@@ -20,6 +20,7 @@ madis2nc_LDADD = -lvx_shapedata \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -42,5 +43,10 @@ madis2nc_LDADD = -lvx_shapedata \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+   madis2nc_CPPFLAGS += ${MET_PYTHON_CC}
+   madis2nc_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 EXTRA_DIST = madis2nc.h

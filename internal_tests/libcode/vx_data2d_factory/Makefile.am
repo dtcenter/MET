@@ -29,6 +29,7 @@ test_factory_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -39,4 +40,9 @@ test_factory_LDADD = -lvx_data2d_factory \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
+
+if ENABLE_PYTHON
+   test_factory_CPPFLAGS += ${MET_PYTHON_CC}
+   test_factory_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 

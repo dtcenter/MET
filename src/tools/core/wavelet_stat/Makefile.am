@@ -30,6 +30,7 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -42,6 +43,11 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_color \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+   wavelet_stat_CPPFLAGS += ${MET_PYTHON_CC}
+   wavelet_stat_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 EXTRA_DIST = wavelet_stat.h \
 	wavelet_stat_conf_info.h

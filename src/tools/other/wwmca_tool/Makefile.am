@@ -42,6 +42,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -83,6 +84,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -95,6 +97,14 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_color \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+
+
+if ENABLE_PYTHON
+   wwmca_plot_CPPFLAGS += ${MET_PYTHON_CC}
+   wwmca_plot_LDFLAGS  += $(MET_PYTHON_LD)
+   wwmca_regrid_CPPFLAGS += ${MET_PYTHON_CC}
+   wwmca_regrid_LDFLAGS  += $(MET_PYTHON_LD)
+endif
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

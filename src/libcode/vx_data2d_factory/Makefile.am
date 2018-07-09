@@ -19,4 +19,4 @@ libvx_data2d_factory_a_SOURCES = \
               data2d_factory_utils.cc data2d_factory_utils.h \
               data2d_factory.cc data2d_factory.h \
               vx_data2d_factory.h
-libvx_data2d_factory_a_CPPFLAGS = ${MET_CPPFLAGS}
+libvx_data2d_factory_a_CPPFLAGS = ${MET_CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)

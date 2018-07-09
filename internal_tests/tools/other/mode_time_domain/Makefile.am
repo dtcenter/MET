@@ -55,6 +55,7 @@ test_velocity_LDADD = \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+     $(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -67,3 +68,8 @@ test_velocity_LDADD = \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+
+if ENABLE_PYTHON
+   test_velocity_CPPFLAGS += ${MET_PYTHON_CC}
+   test_velocity_LDFLAGS  += $(MET_PYTHON_LD)
+endif

@@ -943,7 +943,7 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS=""
+    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
