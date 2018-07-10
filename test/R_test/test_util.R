@@ -353,6 +353,16 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	dfV1 = readStatData(stat1, strV1, lty);
 	dfV2 = readStatData(stat2, strV2, lty);
 
+	# replace NA with bad data value in the data columns
+	for(i in 22:ncol(dfV1)){
+		ind = is.na(dfV1[,i]);
+		if(sum(ind) > 0) { dfV1[ind,i] = -9999.0; }
+	}
+	for(i in 22:ncol(dfV2)){
+		ind = is.na(dfV2[,i]);
+		if(sum(ind) > 0) { dfV2[ind,i] = -9999.0; }
+	}
+
 	# check for a mis-match on number of rows, and report if any are found
 	listNrow = c(nrow(dfV1), nrow(dfV2));
 	boolTestNrow = ( listNrow[1] == listNrow[2] );
@@ -364,7 +374,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		return (list("nrow" = FALSE));
 	}
 
-	# compare the information in the first 20 header columns
+	# compare the information in the header columns
 	for(intCol in 2:21){
 		listMatch = apply(data.frame(dfV1[,intCol], dfV2[,intCol]), 1,
 				function(a){ a[1] == a[2] });
@@ -391,7 +401,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 
 		# compare the columns in different ways, depending on bootstrapping
 		boolBc = ( 0 < length( grep("_BC[UL]$", strCol, perl=TRUE) ) );
-		boolNum = is.numeric( dfV1[[strCol]] );
+		boolNum = is.numeric( dfV1[[strCol]] ) | is.numeric( dfV2[[strCol]] );
 		if( TRUE == boolBc & FALSE == strict){
 			listDiff = signif(dfV1[[strCol]], intSigFig) - signif(dfV2[[strCol]], intSigFig);
 			if( 0 < intAbsDifBc ){ listDiff[ abs(listDiff) < intAbsDifBc ] = 0; }
@@ -659,7 +669,7 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 			quit(status=1);
 		}
 	}
-    
+
     skip_nc_size_checking = system("echo $MET_TEST_NO_NC_SIZE", intern=T);
     if (skip_nc_size_checking != "" ) {
         cat("INFO: NetCDF file size checking was disabled by environment variable MET_TEST_NO_NC_SIZE\n");
