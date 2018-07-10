@@ -185,17 +185,6 @@ int main(int argc, char * argv[])
    }
 
       //
-      // open the file
-      //
-/*
-   if (!met_ptr->open(InputFilename))
-   {
-      mlog << Error << "\n" << program_name << " -> can't open file \""
-           << InputFilename << "\"\n\n";
-      exit (1);
-   }
-*/
-      //
       // get the data plane from the file for this VarInfo object
       //
 
