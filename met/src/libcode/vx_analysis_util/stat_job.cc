@@ -2382,12 +2382,6 @@ void STATAnalysisJob::process_mask_grid() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// To apply a masking polyline, the -mask_grid_str option must first be
-// specified to define the grid to which the polyline should applied.
-// The lat/lon masking polyline is then converted to grid x/y.
-//
-////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::process_mask_poly() {
 
