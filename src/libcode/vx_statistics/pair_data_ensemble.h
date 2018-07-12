@@ -98,7 +98,6 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   mn_na;           // Ensemble mean value [n_obs]
       NumArray   mn_oerr_na;      // Mean of perturbed members [n_obs]
-      NumArray   o_oerr_na;       // Perturbed observations [n_obs]
 
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]

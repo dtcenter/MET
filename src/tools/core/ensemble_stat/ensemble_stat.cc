@@ -1870,9 +1870,6 @@ void process_grid_scores(int i_vx,
          // Store the observation error entry pointer
          pd.add_obs_error_entry(e);
 
-         // Store the perturbed observation value
-         pd.o_oerr_na.add(obs_dp(x, y));
-
          // Add the ensemble mean value for this point
          pd.mn_na.add(emn_dp(x, y));
 
