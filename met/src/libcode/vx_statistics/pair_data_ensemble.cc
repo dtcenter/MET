@@ -118,7 +118,6 @@ void PairDataEnsemble::clear() {
 
    mn_na.clear();
    mn_oerr_na.clear();
-   o_oerr_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
 
@@ -162,7 +161,6 @@ void PairDataEnsemble::extend(int n) {
    esumsq_na.extend(n);
    mn_na.extend(n);
    mn_oerr_na.extend(n);
-   o_oerr_na.extend(n);
 
    return;
 }
@@ -220,7 +218,6 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    mn_na          = pd.mn_na;
    mn_oerr_na     = pd.mn_oerr_na;
-   o_oerr_na      = pd.o_oerr_na;
 
    rhist_na       = pd.rhist_na;
    relp_na        = pd.relp_na;
@@ -527,11 +524,11 @@ void PairDataEnsemble::compute_stats() {
 
          // Track running sums
          w      = wgt_na[i]/w_sum;
-         obar  += w *  o_oerr_na[i];
-         oobar += w *  o_oerr_na[i] *  o_oerr_na[i];
+         obar  += w *       o_na[i];
+         oobar += w *       o_na[i] *       o_na[i];
          fbar  += w * mn_oerr_na[i];
          ffbar += w * mn_oerr_na[i] * mn_oerr_na[i];
-         fobar += w * mn_oerr_na[i] *  o_oerr_na[i];
+         fobar += w * mn_oerr_na[i] *       o_na[i];
       }
 
       // Derive ME_OERR and RMSE_OERR from partial sums
@@ -845,7 +842,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       // Include in subset:
       //   wgt_na, o_na, v_na, r_na, crps_na, ign_na, pit_na,
       //   spread_na, spread_oerr_na, spread_plus_oerr_na,
-      //   mn_na, mn_oerr_na, o_oerr_na, e_na
+      //   mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -864,7 +861,6 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.spread_plus_oerr_na.add(spread_plus_oerr_na[i]);
       pd.mn_na.add(mn_na[i]);
       pd.mn_oerr_na.add(mn_oerr_na[i]);
-      pd.o_oerr_na.add(o_oerr_na[i]);
 
       for(j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
 
@@ -1351,7 +1347,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double cmn_v, csd_v, obs_v, obs_v_oerr, wgt_v;
+   double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
@@ -1499,11 +1495,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
 
    // Apply observation error logic bias correction, if requested
    if(obs_error_info->flag) {
-      obs_v_oerr = add_obs_error_bc(obs_error_info->rng_ptr,
-                                    FieldType_Obs, oerr_ptr, obs_v);
-   }
-   else {
-      obs_v_oerr = obs_v;
+      obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
+                               FieldType_Obs, oerr_ptr, obs_v);
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1578,7 +1571,6 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
                                 obs_lvl, obs_hgt, obs_v, obs_qty,
                                 cmn_v, csd_v, wgt_v);
             pd[i][j][k].add_obs_error_entry(oerr_ptr);
-            pd[i][j][k].o_oerr_na.add(obs_v_oerr);
          } // end for k
       } // end for j
    } // end for i
