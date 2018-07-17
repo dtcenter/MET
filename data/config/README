@@ -104,14 +104,26 @@ If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
 
 The MET_OBS_ERROR_TABLE environment variable can be set to specify the location
-of an ASCII file defining observation error information.  The default table
-can be found in the installed share/met/table_files/obs_error_table.txt.  This
+of an ASCII file defining observation error information.  The default table can
+be found in the installed share/met/table_files/obs_error_table.txt.  This
 observation error logic is applied in Ensemble-Stat to perturb ensemble member
-values and/or observation values.  When processing each point observation,
-Ensemble-Stat searches the table to find the entry defining the observation
-error perturbation information.  The table file consists of 13 columns and
-includes a header row defining each column.  The special string "ALL" is
-interpreted as a wildcard in these files.
+values and/or define observation bias corrections.
+
+When processing point and gridded observations, Ensemble-Stat searches the table
+to find the entry defining the observation error information.  The table
+consists of 13 columns and includes a header row defining each column.  The
+special string "ALL" is interpreted as a wildcard in these files.  The first 6
+columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
+and STATION_ID) may be set to a comma-separated list of strings to be matched.
+In addition, the strings in the OBS_VAR column are interpreted as regular
+expressions when searching for a match.  The HGT_RANGE, VAL_RANGE, and PRS_RANGE
+columns should either be set to "ALL" or "BEG,END" where BEG and END specify
+the range of values to be used.  The INST_BIAS_SCALE and INST_BIAS_OFFSET
+columns define instrument bias adjustments which are applied to the observation
+values.  The the DIST_TYPE and DIST_PARM columns define the distribution from
+which random perturbations should be drawn and applied to the ensemble member
+values.  See dist_type below for a description of the supported error
+distributions.
 
 The MET_GRIB_TABLES environment variable can be set to specify the location of
 custom GRIB tables.  It can either be set to a specific file name or to a

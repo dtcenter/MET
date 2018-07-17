@@ -19,7 +19,6 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
-#include <regex.h>
 
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -704,35 +703,6 @@ ConcatString str = junk;
 
 return ( str );
 
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool check_reg_exp(const char *reg_exp_str, const char *test_str)
-
-{
-   bool valid = false;
-   regex_t buffer;
-   regex_t *preg = &buffer;
-
-   if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
-      mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
-           << "regcomp error for \""
-           << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
-
-      exit ( 1 );
-   }
-
-   if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
-
-   //
-   // Free allocated memory.
-   //
-   regfree( preg );
-
-   return( valid );
 }
 
 

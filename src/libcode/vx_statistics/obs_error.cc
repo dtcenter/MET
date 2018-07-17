@@ -199,8 +199,20 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
    line_number = dl.line_number();
 
+   // Observation variable name column
+   if(strcasecmp(dl[0],  wildcard_str) != 0) {
+      StringArray sa;
+      ConcatString cs;
+
+      // Parse entries and store as regular expressions
+      sa.parse_css(dl[0]);
+      for(int i=0; i<sa.n_elements(); i++) {
+         cs << cs_erase << "^" << sa[i] << "$";
+         var_name.add(cs);
+      }
+   }
+
    // Filtering parameters
-   if(strcasecmp(dl[0],  wildcard_str) != 0)  var_name.parse_css(dl[0]);
    if(strcasecmp(dl[1],  wildcard_str) != 0)  msg_type.parse_css(dl[1]);
    if(strcasecmp(dl[5],  wildcard_str) != 0)       sid.parse_css(dl[2]);
    if(strcasecmp(dl[2],  wildcard_str) != 0) pb_rpt_type.add_css(dl[3]);
@@ -260,12 +272,12 @@ bool ObsErrorEntry::is_match(const char *cur_var_name,
                              double cur_val) {
 
    // Check array filters
-   if(var_name.n()    > 0 && !var_name.has(cur_var_name))  return(false);
-   if(msg_type.n()    > 0 && !msg_type.has(cur_msg_type))  return(false);
-   if(sid.n()         > 0 && !sid.has(cur_sid))            return(false);
-   if(pb_rpt_type.n() > 0 && !pb_rpt_type.has(cur_pb_rpt)) return(false);
-   if(in_rpt_type.n() > 0 && !in_rpt_type.has(cur_in_rpt)) return(false);
-   if(inst_type.n()   > 0 && !inst_type.has(cur_inst))     return(false);
+   if(var_name.n()    > 0 && !var_name.reg_exp_match(cur_var_name))  return(false);
+   if(msg_type.n()    > 0 && !msg_type.has(cur_msg_type))            return(false);
+   if(sid.n()         > 0 && !sid.has(cur_sid))                      return(false);
+   if(pb_rpt_type.n() > 0 && !pb_rpt_type.has(cur_pb_rpt))           return(false);
+   if(in_rpt_type.n() > 0 && !in_rpt_type.has(cur_in_rpt))           return(false);
+   if(inst_type.n()   > 0 && !inst_type.has(cur_inst))               return(false);
 
    // Check ranges
    if(!is_bad_data(cur_hgt) && hgt_range.n() == 2) {
