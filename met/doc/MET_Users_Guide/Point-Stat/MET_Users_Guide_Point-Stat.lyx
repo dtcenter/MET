@@ -10028,7 +10028,7 @@ O_SPEED_BAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-mean observed wind speed
+Mean observed wind speed
 \end_layout
 
 \end_inset
@@ -10672,7 +10672,7 @@ FS_RMS
 \begin_inset Text
 
 \begin_layout Plain Layout
-Root mean square forcast wind speed
+Root mean square forecast wind speed
 \end_layout
 
 \end_inset
