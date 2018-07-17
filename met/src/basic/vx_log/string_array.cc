@@ -15,6 +15,7 @@ using namespace std;
 
 
 #include <iostream>
+#include <regex.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -479,15 +480,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int StringArray::has(const char * text) const
+bool StringArray::has(const char * text) const
 
 {
 
-int index, status;
+int index;
 
-status = has(text, index);
-
-return ( status );
+return ( has(text, index) );
 
 }
 
@@ -495,13 +494,13 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-int StringArray::has(const char * text, int & index) const
+bool StringArray::has(const char * text, int & index) const
 
 {
 
 index = -1;
 
-if ( Nelements == 0 || !text )  return ( 0 );
+if ( Nelements == 0 || !text )  return ( false );
 
 int j;
 
@@ -509,12 +508,12 @@ for (j=0; j<Nelements; ++j)  {
 
    if ( IgnoreCase ) {
 
-      if ( strcasecmp(s[j], text) == 0 )  { index = j;  return ( 1 ); }
+      if ( strcasecmp(s[j], text) == 0 )  { index = j;  return ( true ); }
 
    }
    else {
 
-      if ( strcmp(s[j], text) == 0 )  { index = j;  return ( 1 ); }
+      if ( strcmp(s[j], text) == 0 )  { index = j;  return ( true ); }
 
    }
 
@@ -524,7 +523,7 @@ for (j=0; j<Nelements; ++j)  {
    //  nope
    //
 
-return ( 0 );
+return ( false );
 
 }
 
@@ -661,7 +660,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int StringArray::has_option(int & index) const
+bool StringArray::has_option(int & index) const
 
 {
 
@@ -675,13 +674,40 @@ for (j=0; j<Nelements; ++j)  {
 
       index = j;
 
-      return ( 1 );
+      return ( true );
 
    }
 
 }
 
-return ( 0 );
+return ( false );
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool StringArray::reg_exp_match(const char * text) const
+
+{
+
+if ( Nelements == 0 || !text )  return ( false );
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( check_reg_exp(s[j], text) )  { return ( true ); }
+
+}
+
+   //
+   //  nope
+   //
+
+return ( false );
 
 }
 
@@ -728,6 +754,35 @@ return;
    //
    //  Code for misc functions
    //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool check_reg_exp(const char *reg_exp_str, const char *test_str)
+
+{
+
+bool valid = false;
+regex_t buffer;
+regex_t *preg = &buffer;
+
+if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
+   mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
+        << "regcomp error for \""
+        << reg_exp_str << "\" and \"" << test_str << "\"\n\n";
+
+   exit ( 1 );
+}
+
+if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
+
+// Free allocated memory.
+regfree( preg );
+
+return( valid );
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////

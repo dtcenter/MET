@@ -21,6 +21,7 @@
 #include <iostream>
 #include <ostream>
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -80,9 +81,9 @@ class StringArray {
 
       int length(int) const;
 
-      int has(const char *) const;
+      bool has(const char *) const;
 
-      int has(const char *, int & index) const;
+      bool has(const char *, int & index) const;
 
          //
          //  parse delimited strings
@@ -100,7 +101,13 @@ class StringArray {
 
       void shift_down(int pos, int shift);
 
-      int has_option(int & index) const;
+      bool has_option(int & index) const;
+
+         //
+         //  for use with a list of regular expressions
+         //
+
+      bool reg_exp_match(const char *) const;
 
          //
          //  sort in increasing lex order  (uses qsort)
@@ -119,6 +126,12 @@ inline int StringArray::n_elements() const { return ( Nelements ); }
 inline int StringArray::n         () const { return ( Nelements ); }
 
 inline int StringArray::max_length() const { return ( MaxLength ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern bool check_reg_exp(const char *, const char *);
 
 
 ////////////////////////////////////////////////////////////////////////

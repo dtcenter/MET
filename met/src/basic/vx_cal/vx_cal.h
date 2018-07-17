@@ -121,8 +121,6 @@ extern  ConcatString sec_to_timestring(int);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool check_reg_exp(const char *, const char *);
-
 extern  bool is_datestring(const char * text);
 
 extern  bool is_yyyymmdd(const char * text);
