@@ -23,7 +23,7 @@
   <!--                                                                  -->
   <!-- gen_vx_mask                                                    -->
   <!--                                                                  -->
-  
+
   <test name="test_all_gen_vx_mask_1">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
@@ -53,7 +53,7 @@
   <!--                                                                  -->
   <!-- pcp_combine                                                      -->
   <!--                                                                  -->
-  
+
   <test name="test_all_pcp_combine_1">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -125,11 +125,11 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_24A.nc</grid_nc>
     </output>
   </test>
-   
+
   <!--                                                                  -->
   <!-- mode                                                             -->
   <!--                                                                  -->
-  
+
   <test name="test_all_mode_1">
     <exec>&MET_DIR;/bin/mode</exec>
     <param> \
@@ -142,7 +142,7 @@
     <output>
       <stat>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_cts.txt</stat>
       <stat>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.nc</grid_nc>      
+      <grid_nc>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.nc</grid_nc>
       <ps>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A.ps</ps>
     </output>
   </test>
@@ -179,12 +179,12 @@
       <grid_nc>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_000000A_obj.nc</grid_nc>
       <ps>&OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_000000A.ps</ps>
     </output>
-  </test>    
+  </test>
 
   <!--                                                                  -->
   <!-- grid_stat                                                        -->
   <!--                                                                  -->
-  
+
   <test name="test_all_grid_stat_1">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
@@ -210,7 +210,7 @@
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_APCP_12_120000L_20050807_120000V_pairs.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="test_all_grid_stat_2">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <param> \
@@ -229,7 +229,7 @@
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_POP_12_1080000L_20050808_000000V_pairs.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="test_all_grid_stat_3">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
@@ -288,7 +288,7 @@
   <!--                                                                  -->
   <!-- pb2nc                                                            -->
   <!--                                                                  -->
-  
+
   <test name="test_all_pb2nc">
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <param> \
@@ -305,12 +305,12 @@
   <!--                                                                  -->
   <!-- plot_point_obs                                                   -->
   <!--                                                                  -->
-  
+
   <test name="test_all_plot_point_obs">
     <exec>&MET_DIR;/bin/plot_point_obs</exec>
     <param> \
       &OUTPUT_DIR;/pb2nc/sample_pb.nc \
-      &OUTPUT_DIR;/plot_point_obs/sample_pb.ps 
+      &OUTPUT_DIR;/plot_point_obs/sample_pb.ps
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_point_obs/sample_pb.ps</ps>
@@ -320,7 +320,7 @@
   <!--                                                                  -->
   <!-- ascii2nc                                                         -->
   <!--                                                                  -->
-  
+
   <test name="test_all_ascii2nc_1">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
@@ -348,7 +348,7 @@
   <!--                                                                  -->
   <!-- madis2nc                                                         -->
   <!--                                                                  -->
-  
+
   <test name="test_all_madis2nc">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
@@ -364,7 +364,7 @@
   <!--                                                                  -->
   <!-- point_stat                                                       -->
   <!--                                                                  -->
-  
+
   <test name="test_all_point_stat">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <param> \
@@ -389,7 +389,7 @@
   <!--                                                                  -->
   <!-- wavelet_stat                                                     -->
   <!--                                                                  -->
-  
+
   <test name="test_all_wavelet_stat_1">
     <exec>&MET_DIR;/bin/wavelet_stat</exec>
     <param> \
@@ -406,7 +406,7 @@
       <ps>&OUTPUT_DIR;/wavelet_stat/wavelet_stat_120000L_20050807_120000V.ps</ps>
     </output>
   </test>
-  
+
   <test name="test_all_wavelet_stat_2">
     <exec>&MET_DIR;/bin/wavelet_stat</exec>
     <param> \
@@ -427,7 +427,7 @@
   <!--                                                                  -->
   <!-- ensemble_stat                                                    -->
   <!--                                                                  -->
-  
+
   <test name="test_all_ensemble_stat">
     <exec>&MET_DIR;/bin/ensemble_stat</exec>
     <param> \
@@ -441,6 +441,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_20100101_120000V.stat</stat>
@@ -452,7 +453,7 @@
   <!--                                                                  -->
   <!-- stat_analysis                                                    -->
   <!--                                                                  -->
-  
+
   <test name="test_all_stat_analysis">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <env>
@@ -504,7 +505,7 @@
       <stat>&OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_fcst.out</stat>
     </output>
   </test>
-  
+
   <test name="test_all_mode_analysis_2">
     <exec>&MET_DIR;/bin/mode_analysis</exec>
     <param> \
@@ -521,7 +522,7 @@
       <stat>&OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_obs.out</stat>
     </output>
   </test>
-  
+
   <test name="test_all_mode_analysis_3">
     <exec>&MET_DIR;/bin/mode_analysis</exec>
     <param> \

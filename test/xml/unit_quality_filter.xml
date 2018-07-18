@@ -86,6 +86,7 @@
     </param>   
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_MADIS_VGS_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_MADIS_VGS_20120409_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_MADIS_VGS_20120409_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_QTY_MADIS_VGS_20120409_120000V_orank.txt</stat>

@@ -28,6 +28,7 @@
     <exec>&MET_DIR;/bin/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>CMD_LINE</value></pair>
     </env>
@@ -46,6 +47,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V_orank.txt</stat>
@@ -68,6 +70,7 @@
           &MET_DIR;/bin/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>FILE_LIST</value></pair>
     </env>
@@ -80,6 +83,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_FILE_LIST_20120410_120000V_orank.txt</stat>
@@ -160,6 +164,7 @@
           &MET_DIR;/bin/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>SKIP_CONST</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>SKIP_CONST</value></pair>
     </env>
@@ -172,12 +177,49 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_rhist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_phist.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_orank.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_ssvar.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_ens.nc</grid_nc>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V_orank.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--  Add observation error perturbations.  -->
+
+  <test name="ensemble_stat_OBS_ERROR">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
+                &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
+                &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F024.grib \
+                &DATA_DIR_MODEL;/grib1/arw-sch-gep6/arw-sch-gep6_2012040912_F024.grib \
+                &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
+                &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib" \
+                > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
+          &MET_DIR;/bin/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>OBS_ERROR</value></pair>
+      <pair><name>OBS_ERROR_FLAG</name> <value>TRUE</value></pair>
+      <pair><name>SKIP_CONST</name>     <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OBS_ERROR</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/ensemble_stat/input_file_list \
+      &CONFIG_DIR;/EnsembleStatConfig \
+      -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
+      -point_obs &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_rhist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_phist.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_orank.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ssvar.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_ens.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V_orank.nc</grid_nc>
     </output>
   </test>
 
