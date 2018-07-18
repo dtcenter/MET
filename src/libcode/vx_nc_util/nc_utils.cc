@@ -1766,6 +1766,86 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long *dim, const long *cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data_to_array(NcVar  *var, StringArray *array_buf) {
+   bool result = true;
+   if (!IS_INVALID_NC_P(var)) {
+      int dim_count = var->getDimCount();
+      if (2 != dim_count) {
+         mlog << Error << "\nget_nc_data_to_array() -> "
+              << "Invalid dimensions " <<  dim_count << " for "
+              << GET_NC_NAME_P(var) << "\n\n";
+         result = false;
+      }
+      else {
+         long offsets[2] = { 0, 0 };
+         long lengths[2] = { 1, 1 };
+         NcDim count_dim = var->getDim(dim_count-2);
+         NcDim str_dim = var->getDim(dim_count-1);
+         int count = get_dim_size(&count_dim);
+         int str_len = get_dim_size(&str_dim);
+         lengths[1] = str_len;
+         char str_buffer[str_len+1];
+         for (int idx=0; idx<count; idx++) {
+            if(!get_nc_data(var, str_buffer, lengths, offsets)) {
+               result = false;
+               break;
+            }
+            else {
+               array_buf->add(str_buffer);
+            }
+            offsets[0]++;
+         }
+      }
+   }
+   else {
+      mlog << Error << "\nget_nc_data_to_array() -> "
+           << "the variable \"" << GET_NC_NAME_P(var) << "\" does not exist!\n\n";
+      result = false;
+   }
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data_to_array(NcFile *nc_in, const char *var_name, StringArray *array_buf) {
+   bool result = true;
+   NcVar obs_var = get_nc_var(nc_in, var_name);
+   result = get_nc_data_to_array(&obs_var, array_buf);
+   return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int get_nc_string_length(NcVar *var) {
+   int str_length = 0;
+   if (!IS_INVALID_NC_P(var)) {
+      int dim_count = var->getDimCount();
+      NcDim str_dim = var->getDim(dim_count-1);
+      if (!IS_INVALID_NC(str_dim)) str_length = get_dim_size(&str_dim);
+   }
+   return str_length;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int get_nc_string_length(NcFile *nc_in, const char *var_name) {
+   int str_length = 0;
+   NcVar obs_var = get_nc_var(nc_in, var_name);
+   str_length = get_nc_string_length(&obs_var);
+   return str_length;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int get_nc_string_length(NcFile *nc_file, NcVar var, const char *var_name) {
+   int string_len = IS_INVALID_NC(var)
+                        ? get_nc_string_length(nc_file, var_name)
+                        : get_nc_string_length(&var);
+   return string_len;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    NcHeaderData header_data;
    long nhdr_count  = get_dim_size(&obs_vars.hdr_dim);
@@ -3286,3 +3366,105 @@ unixtime get_reference_unixtime(ConcatString time_str) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool is_using_var_id(const char * nc_name) {
+   bool use_var_id = false;
+   ConcatString attr_name = nc_att_use_var_id;
+   if (!get_global_att(nc_name, nc_att_use_var_id, use_var_id)) {
+      use_var_id = false;
+   }
+   return use_var_id;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
+      int qty_len, float *obs_arr, int *qty_idx_arr, char *obs_qty_buf) {
+   bool result = true;
+   long offsets[2] = { offset, 0 };
+   long lengths[2] = { buf_size, 1 };
+   
+   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {
+      // Read the current observation message
+      lengths[1] = OBS_ARRAY_LEN;
+      if(!get_nc_data(&obs_vars.obs_arr_var, (float *)obs_arr, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> trouble getting obs_arr\n\n";
+         result = false;
+      }
+
+      lengths[1] = qty_len;
+      if(!get_nc_data(&obs_vars.obs_qty_var, obs_qty_buf, lengths, offsets)) {
+         mlog << Error << "\nprocess_point_obs() -> trouble getting obs_qty\n\n";
+         result = false;
+      }
+   }
+   else {
+      int   *obs_hid_buf = new   int[buf_size];
+      int   *obs_vid_buf = new   int[buf_size];
+      float *obs_lvl_buf = new float[buf_size];
+      float *obs_hgt_buf = new float[buf_size];
+      float *obs_val_buf = new float[buf_size];
+      
+      lengths[1] = 1;
+      
+      cout << " DEBUG HS offsets[0]: " << offsets[0] << " offsets[1]: " << offsets[1] << "  lengths[0]: " << lengths[0] << "  lengths[1]: " << lengths[1] << "\n";
+      
+      if(!get_nc_data(&obs_vars.obs_hid_var, obs_hid_buf, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the record for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+      if(!get_nc_data((IS_INVALID_NC(obs_vars.obs_gc_var) ? &obs_vars.obs_vid_var : &obs_vars.obs_gc_var),
+            obs_vid_buf, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the record (vid or gc) for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+      if(!get_nc_data(&obs_vars.obs_lvl_var, obs_lvl_buf, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the record (lvl) for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+      if(!get_nc_data(&obs_vars.obs_hgt_var, obs_hgt_buf, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the record (hgt) for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+      if(!get_nc_data(&obs_vars.obs_val_var, obs_val_buf, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the record (val) for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+
+      if (!get_nc_data(&obs_vars.obs_qty_var, qty_idx_arr, lengths, offsets)) {
+         mlog << Error << "\nread_nc_obs_array() -> "
+              << "can't read the index of quality flag for observation "
+              << "index " << offset << "\n\n";
+         result = false;
+      }
+      
+      if (result) {
+         float *tmp_obs_arr = obs_arr;
+         for(int index=0; index<buf_size; index++) {
+            *tmp_obs_arr++ = (float)obs_hid_buf[index];
+            *tmp_obs_arr++ = (float)obs_vid_buf[index];
+            *tmp_obs_arr++ = obs_lvl_buf[index];
+            *tmp_obs_arr++ = obs_hgt_buf[index];
+            *tmp_obs_arr++ = obs_val_buf[index];
+         }
+      }
+   
+      delete obs_hid_buf;
+      delete obs_vid_buf;
+      delete obs_lvl_buf;
+      delete obs_hgt_buf;
+      delete obs_val_buf;
+   }
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////

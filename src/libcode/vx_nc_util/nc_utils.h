@@ -332,6 +332,12 @@ extern bool get_nc_data(NcFile *, const char *var_name, float  *data, const long
 extern bool get_nc_data(NcFile *, const char *var_name, double *data, const long *cur, const long *dim);
 extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long *cur, const long *dim);
 
+extern bool get_nc_data_to_array(NcVar  *, StringArray *);
+extern bool get_nc_data_to_array(NcFile *, const char *, StringArray *);
+//extern int  get_nc_string_length(NcVar  *);
+//extern int  get_nc_string_length(NcFile *, const char *);
+extern int  get_nc_string_length(NcFile *, NcVar, const char *var_name);
+
 extern bool put_nc_data(NcVar *, const int    *data );
 extern bool put_nc_data(NcVar *, const char   *data );
 extern bool put_nc_data(NcVar *, const float  *data );
@@ -410,6 +416,12 @@ extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
 extern unixtime get_reference_unixtime(ConcatString);
+
+
+extern bool is_using_var_id(const char * nc_name);
+
+extern bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
+      int qty_len, float *obs_arr, int *qty_idx_arr, char *obs_qty_buf);
 
 ////////////////////////////////////////////////////////////////////////
 
