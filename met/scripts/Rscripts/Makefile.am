@@ -36,6 +36,7 @@ rscripts_DATA = \
 	mode_summary.R \
 	plot_cnt.R \
 	plot_mpr.R \
+	plot_ensemble.R \
 	plot_probri.R \
 	plot_tcmpr.R \
 	pntnc2ascii.R \
