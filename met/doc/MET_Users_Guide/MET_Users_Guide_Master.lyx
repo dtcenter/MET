@@ -646,5 +646,19 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixF.lyx"
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixG.lyx"
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document
