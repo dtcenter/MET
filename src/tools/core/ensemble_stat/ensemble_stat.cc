@@ -1652,7 +1652,9 @@ void process_grid_vx() {
             fraw_dp[k] = fcst_dp[k];
 
             // Apply observation error perturbation, if requested
-            if(conf_info.vx_opt[i].obs_error.flag) {
+            // and data is present for this ensemble member
+            if(conf_info.vx_opt[i].obs_error.flag &&
+               !fraw_dp[k].is_empty()) {
                mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
@@ -1860,7 +1862,7 @@ void process_grid_scores(int i_vx,
          }
          else if(conf_info.vx_opt[i_vx].obs_error.flag) {
             e = obs_error_table.lookup(
-                   conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name(),
                    conf_info.obtype, oraw_dp(x,y));
          }
          else {
