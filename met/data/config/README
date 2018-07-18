@@ -116,14 +116,15 @@ special string "ALL" is interpreted as a wildcard in these files.  The first 6
 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
 and STATION_ID) may be set to a comma-separated list of strings to be matched.
 In addition, the strings in the OBS_VAR column are interpreted as regular
-expressions when searching for a match.  The HGT_RANGE, VAL_RANGE, and PRS_RANGE
-columns should either be set to "ALL" or "BEG,END" where BEG and END specify
-the range of values to be used.  The INST_BIAS_SCALE and INST_BIAS_OFFSET
-columns define instrument bias adjustments which are applied to the observation
-values.  The the DIST_TYPE and DIST_PARM columns define the distribution from
-which random perturbations should be drawn and applied to the ensemble member
-values.  See dist_type below for a description of the supported error
-distributions.
+expressions when searching for a match.  For example, setting the OBS_VAR column
+to 'APCP_[0-9]+' would match observations for both APCP_03 and APCP_24. The
+HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to "ALL" or
+"BEG,END" where BEG and END specify the range of values to be used.  The
+INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
+which are applied to the observation values.  The DIST_TYPE and DIST_PARM
+columns define the distribution from which random perturbations should be drawn
+and applied to the ensemble member values.  See the obs_error description below
+for details on the supported error distributions.
 
 The MET_GRIB_TABLES environment variable can be set to specify the location of
 custom GRIB tables.  It can either be set to a specific file name or to a
@@ -139,13 +140,13 @@ share/met/table_files directory, and their file formats are described below:
 GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB1".
 The following lines consist of 4 integers followed by 3 strings:
-column 1: GRIB code (e.g. 11 for temperature)
-column 2: center id (e.g. 07 for US Weather Service- National Met. Center)
-column 3: subcenter id
-column 4: parameter table version number
-column 5: variable name
-column 6: variable description
-column 7: units
+Column 1: GRIB code (e.g. 11 for temperature)
+Column 2: center id (e.g. 07 for US Weather Service- National Met. Center)
+Column 3: subcenter id
+Column 4: parameter table version number
+Column 5: variable name
+Column 6: variable description
+Column 7: units
 
 References:
    http://www.nco.ncep.noaa.gov/pmb/docs/on388
@@ -1537,18 +1538,23 @@ skip_const = FALSE;
 // file settings.
 //
 // The dist_parm entry is an array of length 1 or 2 specifying the parameters
-// for the distribution selected in dist_type.
+// for the distribution selected in dist_type.  The NORMAL, LOGNORMAL,
+// EXPONENTIAL, and CHISQUARED distributions are defined by a single parameter.
+// The GAMMA, UNIFORM, and BETA distributions are defined by two parameters.
+// See the GNU Scientific Library Reference Manual for more information on these
+// distributions:
+//    https://www.gnu.org/software/gsl/manual
 //
 // The inst_bias_scale and inst_bias_offset entries specify bias scale and
 // offset values that should be applied to observation values prior to
 // perturbing them. These entries enable bias-correction on the fly.
 //
 // Defining the observation error information in the configuration file is
-// convenient but limited. The random perturbations for all points in the
-// current verification task are drawn from the same distribution. Specifying an
-// observation error table file instead (by setting dist_type = NONE;) provides
-// much finer control, enabling the user to define observation error
-// distribution information and bias-correction logic separately for each
+// convenient but limited. If defined this way, the random perturbations for all
+// points in the current verification task are drawn from the same distribution.
+// Specifying an observation error table file instead (by setting dist_type =
+// NONE;) provides much finer control, enabling the user to define observation
+// error distribution information and bias-correction logic separately for each
 // observation variable name, message type, PREPBUFR report type, input report
 // type, instrument type, station ID, range of heights, range of pressure
 // levels, and range of values.
