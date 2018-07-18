@@ -740,7 +740,7 @@ void create_nc_other_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
    if (var_count > 0) {
       NcDim var_dim  = add_dim(f_out, nc_dim_nvar, var_count);
 
-      obs_vars.obs_var  = add_var(f_out, nc_var_obs_var, ncChar, var_dim, obs_vars.strl_dim,  deflate_level);
+      obs_vars.obs_var  = add_var(f_out, nc_var_obs_var, ncChar, var_dim, obs_vars.strl2_dim,  deflate_level);
       add_att(&obs_vars.obs_var,  "long_name", "variable names");
       if (unit_count > 0) {
          obs_vars.unit_var = add_var(f_out,    nc_var_unit, ncChar, var_dim, obs_vars.strl2_dim, deflate_level);
@@ -1224,3 +1224,4 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
