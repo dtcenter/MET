@@ -1650,6 +1650,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_grad:   c = n_grad_columns;         break;
          case stat_isc:    c = n_isc_columns;          break;
          case stat_wdir:   c = n_job_wdir_columns;     break;
+         case stat_ecnt:   c = n_ecnt_columns;         break;
          case stat_rhist:  c = get_n_rhist_columns(n); break;
          case stat_phist:  c = get_n_phist_columns(n); break;
          case stat_relp:   c = get_n_relp_columns(n);  break;
@@ -1707,6 +1708,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
       case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
       case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
+      case stat_ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
       case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
