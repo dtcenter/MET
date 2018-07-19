@@ -751,6 +751,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+StringArray StringArray::uniq()
+
+{
+
+StringArray sa;
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( !sa.has(s[j]) )  sa.add(s[j]);
+
+}
+
+return ( sa );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

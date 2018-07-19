@@ -115,6 +115,12 @@ class StringArray {
 
       void sort();
 
+         //
+         //  return a unique subset of strings
+         //
+
+      StringArray uniq();
+
 };
 
 
