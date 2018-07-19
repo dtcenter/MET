@@ -205,6 +205,6 @@ rng = {
 
 grid_weight_flag = ${GRID_WEIGHT};
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V7.1";
+version          = "V8.0";
 
 ////////////////////////////////////////////////////////////////////////////////

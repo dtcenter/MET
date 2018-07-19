@@ -206,6 +206,6 @@ grid_weight_flag = COS_LAT;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V7.1";
+version          = "V8.0";
 
 ////////////////////////////////////////////////////////////////////////////////

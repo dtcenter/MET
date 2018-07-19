@@ -99,6 +99,6 @@ wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V7.1";
+version        = "V8.0";
 
 ////////////////////////////////////////////////////////////////////////////////
