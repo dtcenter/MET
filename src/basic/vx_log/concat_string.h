@@ -257,6 +257,8 @@ extern bool operator >  (const ConcatString &, const ConcatString &);
 extern bool operator >  (const ConcatString &, const char *);
 extern bool operator >  (const char *, const ConcatString &);
 
+extern ConcatString write_css(const StringArray &);
+
 
 ////////////////////////////////////////////////////////////////////////
 

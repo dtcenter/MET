@@ -54,10 +54,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static bool is_precip_var_name(const ConcatString &s);
-static ConcatString write_css(const StringArray &sa);
-static ConcatString write_css(const ThreshArray &sa);
-static ConcatString write_css(const NumArray &na);
-static ConcatString write_css_hhmmss(const NumArray &na);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -678,58 +674,6 @@ void AggrTimeSeriesInfo::sort() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Build a comma-separated list of strings
-//
-////////////////////////////////////////////////////////////////////////
-
-ConcatString write_css(const StringArray &sa) {
-   ConcatString css;
-
-   for(int i=0; i<sa.n_elements(); i++) {
-      css << (i == 0 ? "" : ",") << sa[i];
-   }
-
-   return(css);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString write_css(const ThreshArray &ta) {
-   ConcatString css;
-
-   for(int i=0; i<ta.n_elements(); i++) {
-      css << (i == 0 ? "" : ",") << ta[i].get_str();
-   }
-
-   return(css);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString write_css(const NumArray &na) {
-   ConcatString css;
-
-   for(int i=0; i<na.n_elements(); i++) {
-      css << (i == 0 ? "" : ",") << na[i];
-   }
-
-   return(css);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString write_css_hhmmss(const NumArray &na) {
-   ConcatString css;
-
-   for(int i=0; i<na.n_elements(); i++) {
-      css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
-   }
-
-   return(css);
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
                         map<ConcatString, AggrSummaryInfo> &m,
@@ -782,20 +726,29 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
    }
 
    //
+   // When -column_union is true, store a list of unique line types and columns
+   //
+   if(j.column_union) {
+      ConcatString cs;
+      cs << write_css(req_lty.uniq()) << ":" << write_css(req_col.uniq());
+      req_stat.set(0, cs);
+   }
+
+   //
    // Check for derived types:
    //   FHO, CTC      -> CTS
    //   SL1L2, SAL1L2 -> CNT
    //   VL1L2         -> VCNT
    //
    bool do_cts  = j.do_derive && req_lty.has(stat_cts_str);
-   if(do_cts) mlog << Debug(3)
-                   << "Deriving CTS statistics from input FHO/CTC lines.\n";
+   if(do_cts)  mlog << Debug(3)
+                    << "Deriving CTS statistics from input FHO/CTC lines.\n";
    bool do_cnt  = j.do_derive && req_lty.has(stat_cnt_str);
-   if(do_cnt) mlog << Debug(3)
-                   << "Deriving CNT statistics from input SL1L2/SAL1L2 lines.\n";
+   if(do_cnt)  mlog << Debug(3)
+                    << "Deriving CNT statistics from input SL1L2/SAL1L2 lines.\n";
    bool do_vcnt = j.do_derive && req_lty.has(stat_vcnt_str);
-   if(do_cnt) mlog << Debug(3)
-                   << "Deriving VCNT statistics from input VL1L2 lines.\n";
+   if(do_vcnt) mlog << Debug(3)
+                    << "Deriving VCNT statistics from input VL1L2 lines.\n";
 
    //
    // Process the STAT lines
@@ -855,7 +808,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Update the map entries for each requested statistic
          //
-         for(i=0,n_add=0; i<req_stat.n_elements(); i++) {
+         for(i=0,n_add=0; i<req_col.n_elements(); i++) {
 
             //
             // Store the current requested line type
@@ -897,9 +850,16 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
 
             //
             // Add the current column value and weight
+            // If computing a union, concatentate them all
             //
-            m[key].val[req_stat[i]].add(v);
-            m[key].wgt[req_stat[i]].add(w);
+            if(j.column_union) {
+               m[key].val[req_stat[0]].add(v);
+               m[key].wgt[req_stat[0]].add(w);
+            }
+            else {
+               m[key].val[req_stat[i]].add(v);
+               m[key].wgt[req_stat[i]].add(w);
+            }
 
             // Keep track of the unique header column entries
             m[key].hdr.add(line);

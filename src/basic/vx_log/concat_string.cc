@@ -1374,6 +1374,24 @@ return ( status < 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString write_css(const StringArray &sa)
+
+{
+
+ConcatString css;
+
+for ( int i=0; i<sa.n_elements(); ++i )  {
+   css << (i == 0 ? "" : ",") << sa[i];
+}
+
+return(css);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool is_empty(const char * text)
 
 {

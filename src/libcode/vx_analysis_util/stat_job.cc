@@ -97,7 +97,7 @@ void STATAnalysisJob::init_from_scratch() {
    interp_mthd.set_ignore_case(1);
    line_type.set_ignore_case(1);
    column.set_ignore_case(1);
-   column_case.set_ignore_case(1);
+   by_column.set_ignore_case(1);
    hdr_name.set_ignore_case(1);
 
    clear();
@@ -154,16 +154,17 @@ void STATAnalysisJob::clear() {
 
    line_type.clear();
    column.clear();
+   column_union = default_column_union;
    weight.clear();
 
-   do_derive = false;
+   do_derive = default_do_derive;
    wmo_sqrt_stats.clear();
    wmo_fisher_stats.clear();
 
    column_thresh_map.clear();
    column_str_map.clear();
 
-   column_case.clear();
+   by_column.clear();
 
    hdr_name.clear();
    hdr_value.clear();
@@ -273,6 +274,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    line_type            = aj.line_type;
    column               = aj.column;
+   column_union         = aj.column_union;
    weight               = aj.weight;
 
    do_derive            = aj.do_derive;
@@ -282,7 +284,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    column_thresh_map    = aj.column_thresh_map;
    column_str_map       = aj.column_str_map;
 
-   column_case          = aj.column_case;
+   by_column            = aj.by_column;
 
    hdr_name             = aj.hdr_name;
    hdr_value            = aj.hdr_value;
@@ -430,6 +432,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "column ...\n";
    column.dump(out, depth + 1);
 
+   out << prefix << "column_union = "
+       << bool_to_string(column_union) << "\n";
+
    out << prefix << "weight ...\n";
    weight.dump(out, depth + 1);
 
@@ -450,8 +455,8 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
       str_it->second.dump(out, depth + 1);
    }
 
-   out << prefix << "column_case ...\n";
-   column_case.dump(out, depth + 1);
+   out << prefix << "by_column ...\n";
+   by_column.dump(out, depth + 1);
 
    out << prefix << "hdr_name ...\n";
    hdr_name.dump(out, depth + 1);
@@ -984,7 +989,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          hdr_value.clear();
       }
       else if(strcmp(jc_array[i], "-by"             ) == 0) {
-         column_case.clear();
+         by_column.clear();
       }
       else if(strcmp(jc_array[i], "-out_line_type"  ) == 0) {
          out_line_type.clear();
@@ -1148,6 +1153,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          column.add_css(to_upper(jc_array[i+1]));
          i++;
       }
+      else if(strcmp(jc_array[i], "-column_union") == 0) {
+         column_union = string_to_bool(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-weight") == 0) {
          weight.add_css(jc_array[i+1]);
          i++;
@@ -1205,7 +1214,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(strcmp(jc_array[i], "-by") == 0) {
-         column_case.add_css(to_upper(jc_array[i+1]));
+         by_column.add_css(to_upper(jc_array[i+1]));
          i+=1;
       }
       else if(strcmp(jc_array[i], "-dump_row") == 0) {
@@ -1904,11 +1913,11 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    ConcatString key = "";
 
    //
-   // Retrieve value for each column_case option
+   // Retrieve value for each by_column option
    //
-   for(i=0; i<column_case.n_elements(); i++) {
+   for(i=0; i<by_column.n_elements(); i++) {
       key << (i == 0 ? "" : ":")
-          << L.get(column_case[i], false);
+          << L.get(by_column[i], false);
    }
 
    return(key);
@@ -2110,6 +2119,11 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
+   // column_union
+   if(column_union != default_column_union) {
+      js << "-column_union " << bool_to_string(column_union) << " ";
+   }
+
    // weight
    if(weight.n_elements() > 0) {
       for(i=0; i<weight.n_elements(); i++) {
@@ -2140,10 +2154,10 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
-   // column_case
-   if(column_case.n_elements() > 0) {
-      for(i=0; i<column_case.n_elements(); i++)
-         js << "-by " << column_case[i] << " ";
+   // by_column
+   if(by_column.n_elements() > 0) {
+      for(i=0; i<by_column.n_elements(); i++)
+         js << "-by " << by_column[i] << " ";
    }
 
    // set_hdr

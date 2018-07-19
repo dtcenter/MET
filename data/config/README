@@ -218,12 +218,12 @@ tmp_dir = "/tmp";
 
 //
 // The "message_type_group_map" entry is an array of dictionaries, each
-// containing a "key" string and "val" string.  This defines a mapping of message
-// type group names to a comma-separated list of values.  This map is defined in
-// the config files for PB2NC, Point-Stat, or Ensemble-Stat.  Modify this map to
-// define sets of message types that should be processed together as a group.
-// The "SURFACE" entry must be present to define message types for which surface
-// verification logic should be applied.
+// containing a "key" string and "val" string.  This defines a mapping of
+// message type group names to a comma-separated list of values.  This map is
+// defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat.  Modify
+// this map to define sets of message types that should be processed together as
+// a group. The "SURFACE" entry must be present to define message types for
+// which surface verification logic should be applied.
 //
 
 mesage_type_group_map = [
@@ -238,7 +238,8 @@ mesage_type_group_map = [
 // a "key" string and "val" string.  This defines a mapping of input strings
 // to output message types.  This mapping is applied in ASCII2NC when
 // converting input little_r report types to output message types. This mapping
-// is also supported in PBN2NC as a way of renaming input PREPBUFR message types.
+// is also supported in PBN2NC as a way of renaming input PREPBUFR message
+// types.
 //
 message_type_map = [
    { key = "FM-12 SYNOP";  val = "ADPSFC"; },
@@ -316,7 +317,8 @@ obtype = "ANALYS";
 //         - MAX         for the maximum value
 //         - MEDIAN      for the median value
 //         - UW_MEAN     for the unweighted average value
-//         - DW_MEAN     for the distance-weighted average value (weight = distance^-2)
+//         - DW_MEAN     for the distance-weighted average value (weight =
+//                       distance^-2)
 //         - LS_FIT      for a least-squares fit
 //         - BILIN       for bilinear interpolation (width = 2)
 //         - NEAREST     for the nearest grid point (width = 1)
@@ -401,20 +403,21 @@ regrid = {
 //        before applying the probabilistic verification methods.
 //
 //      - Set "prob_as_scalar = TRUE" to override the processing of probability
-//        data.  When the "prob" entry is set as a dictionary to define the field
-//        of interest, setting "prob_as_scalar = TRUE" indicates that this data
-//        should be processed as regular scalars rather than probabilities.
+//        data.  When the "prob" entry is set as a dictionary to define the
+//        field of interest, setting "prob_as_scalar = TRUE" indicates that this
+//        data should be processed as regular scalars rather than probabilities.
 //        For example, this option can be used to compute traditional 2x2
 //        contingency tables and neighborhood verification statistics for
 //        probability data.  It can also be used to compare two probability
 //        fields directly.  When this flag is set, probability values are
 //        automatically rescaled from the range [0, 100] to [0, 1].
 //
-//      - The "convert" entry is a user-defined function of a single variable for
-//        processing input data values.  Any input values that are not bad data
-//        are replaced by the value of this function.  The convert function is
-//	  applied prior to regridding or thresholding. This function may include
-//        any of the built-in math functions (e.g. sqrt, log10) described above.
+//      - The "convert" entry is a user-defined function of a single variable
+//        for processing input data values.  Any input values that are not bad
+//        data are replaced by the value of this function.  The convert function
+//        is applied prior to regridding or thresholding. This function may
+//        include any of the built-in math functions (e.g. sqrt, log10)
+//        described above.
 //        Several standard unit conversion functions are already defined in
 //        data/config/ConfigConstants.
 //        Examples of user-defined conversion functions include:
@@ -423,25 +426,26 @@ regrid = {
 //          convert(a) = log10(a);
 //          convert(a) = a^10;
 //          convert(t) = max(1, sqrt(abs(t)));
-//          convert(x) = K_to_C(x); where K_to_C(x) is defined in ConfigConstants
+//          convert(x) = K_to_C(x); where K_to_C(x) is defined in
+//                                  ConfigConstants
 //
 //      - The "censor_thresh" entry is an array of thresholds to be applied
 //        to the input data.  The "censor_val" entry is an array of numbers
 //        and must be the same length as "censor_thresh".  These arguments must
 //        appear together in the correct format (threshold and number). For each
-//        censor threshold, any input values meeting the threshold criteria will be
-//        reset to the corresponding censor value.  An empty list indicates that
-//        no censoring should be performed.  The censoring logic is applied
+//        censor threshold, any input values meeting the threshold criteria will
+//        be reset to the corresponding censor value.  An empty list indicates
+//        that no censoring should be performed.  The censoring logic is applied
 //        prior to any regridding but after the convert function. All statistics
-// 	  are computed on the censored data. These entries may be used to apply
-//	  quality control logic by resetting data outside of an expected range to
-//        the bad data value of -9999. These entries are not indicated in the
+//        are computed on the censored data. These entries may be used to apply
+//        quality control logic by resetting data outside of an expected range
+//        to the bad data value of -9999. These entries are not indicated in the
 //        metadata of any output files, but the user can set the "desc" entry
-//	  accordingly.
+//        accordingly.
 //
-// 	Examples of user-defined conversion functions include:
+//      Examples of user-defined conversion functions include:
 //          censor_thresh = [ >12000 ];
-//	    censor_val    = [ 12000 ];
+//          censor_val    = [ 12000 ];
 //
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
@@ -455,9 +459,9 @@ regrid = {
 //        observed values.
 //
 //   - The "file_type" entry specifies the input file type rather than letting
-//     the code determine it itself.  For valid file_type values, see "File types"
-//     in the data/config/ConfigConstants file.  This entry should be defined
-//     within the "fcst" or "obs" dictionaries.
+//     the code determine it itself.  For valid file_type values, see
+//     "File types" in the data/config/ConfigConstants file.  This entry should
+//     be defined within the "fcst" or "obs" dictionaries.
 //     e.g.
 //     fcst = {
 //        file_type = NETCDF_NCCF;
@@ -483,7 +487,8 @@ regrid = {
 //     eclv_points defines the spacing.  Cost/loss values are omitted for
 //     ratios of 0.0 and 1.0 since they are undefined.
 //
-//   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]]
+//   - The "init_time" entry specifies the initialization time in
+//     YYYYMMDD[_HH[MMSS]]
 //     format.  This entry can be included in the "fcst" entry as shown below or
 //     included in the "field" entry if the user would like to use different
 //     initialization times for different fields.
@@ -524,9 +529,10 @@ regrid = {
 //       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries specify the first
 //         and second level values.
 //       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the
-//         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n",
-//         or "-n", for the n-th ensemble member.
-//       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version number.
+//         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl",
+//         "+n", or "-n", for the n-th ensemble member.
+//       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
+//         number.
 //       - The "GRIB1_code" entry specifies the GRIB1 code (wgrib kpds5 value).
 //       - The "GRIB1_center" entry specifies the originating center.
 //       - The "GRIB1_subcenter" entry specifies the originating subcenter.
@@ -535,12 +541,17 @@ regrid = {
 //       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
-//       - The "GRIB2_pdt" entry specifies the product definition template (Table 4.0).
-//       - The "GRIB2_process" entry specifies the generating process (Table 4.3).
+//       - The "GRIB2_pdt" entry specifies the product definition template
+//         (Table 4.0).
+//       - The "GRIB2_process" entry specifies the generating process
+//         (Table 4.3).
 //       - The "GRIB2_cntr" entry specifies the originating center.
-//       - The "GRIB2_ens_type" entry specifies the ensemble type (Table 4.6).
-//       - The "GRIB2_der_type" entry specifies the derived product type (Table 4.7).
-//       - The "GRIB2_stat_type" entry specifies the statistical processing type (Table 4.10).
+//       - The "GRIB2_ens_type" entry specifies the ensemble type
+//         (Table 4.6).
+//       - The "GRIB2_der_type" entry specifies the derived product type
+//         (Table 4.7).
+//       - The "GRIB2_stat_type" entry specifies the statistical processing type
+//         (Table 4.10).
 //
 //    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
 //       - The "name" entry specifies the NetCDF variable name.
@@ -636,10 +647,12 @@ fcst = {
 //     to be used.  This only applies to the tools that verify against point
 //     observations.  This may be specified once at the top-level "obs"
 //     dictionary or separately for each "field" array element.  In the example
-//     shown above, this is specified in the "fcst" dictionary and copied to "obs".
+//     shown above, this is specified in the "fcst" dictionary and copied to
+//     "obs".
 //
-//   - Simplified vertical level matching logic is applied for surface message types.
-//     Observations for the following message types are assumed to be at the surface:
+//   - Simplified vertical level matching logic is applied for surface message
+//     types. Observations for the following message types are assumed to be at
+//     the surface, as defined by the default message_type_group_map:
 //        ADPSFC, SFCSHP, MSONET
 //
 //   - The "message_type" would be placed in the "field" array element if more
@@ -672,11 +685,12 @@ fcst = {
 //     }
 //
 //    - The "sid_exc" entry is an array of station ID groups indicating which
-//      station ID's should be excluded from the verification tasks.  Each element
-//      is either the name of a single station ID or the full path to a station ID
-//      group file name.  A station ID group file consists of a name for the group
-//      followed by a list of station ID's.  All of the station ID's indicated will
-//      be placed into one long list of station ID's to be excluded.
+//      station ID's should be excluded from the verification tasks.  Each
+//      element is either the name of a single station ID or the full path to a
+//      station ID group file name.  A station ID group file consists of a name
+//      for the group followed by a list of station ID's.  All of the station
+//      ID's indicated will be placed into one long list of station ID's to be
+//      excluded.
 //    - As with "message_type" above, the "sid_exc" setting can be placed in the
 //      in the "field" array element to control which station ID's are excluded
 //      for each verification task.
@@ -849,9 +863,10 @@ obs_window = {
 //       - Any gridded data file that MET can read may be used to define a
 //         verification masking region. Users must specify a description of the
 //         field to be used from the input file and, optionally, may specify a
-//         threshold to be applied to that field. Once this threshold is applied,
-//         any grid point where the resulting field is 0, the mask is turned off.
-//         Any grid point where it is non-zero, the mask is turned on.
+//         threshold to be applied to that field. Once this threshold is
+//         applied, any grid point where the resulting field is 0, the mask is
+//         turned off. Any grid point where it is non-zero, the mask is turned
+//         on.
 //         e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 //
 //    - The "sid" entry is an array of strings which define groups of
@@ -885,8 +900,9 @@ mask = {
 //
 // The "ci_alpha" entry is an array of floats specifying the values for alpha
 // to be used when computing confidence intervals.  Values of alpha must be
-// between 0 and 1.  The confidence interval computed is 1 minus the alpha value.
-// Therefore, an alpha value of 0.05 corresponds to a 95% confidence interval.
+// between 0 and 1.  The confidence interval computed is 1 minus the alpha
+// value. Therefore, an alpha value of 0.05 corresponds to a 95% confidence
+// interval.
 //
 ci_alpha = [ 0.05, 0.10 ];
 
@@ -929,7 +945,8 @@ ci_alpha = [ 0.05, 0.10 ];
 //      by the random number generator specified. Users should refer to detailed
 //      documentation of the GNU Scientific Library for a listing of the random
 //      number generators available for use.
-//      http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generator-Performance.html
+//      http://www.gnu.org/software/gsl/manual/html_node/
+//      Random-Number-Generator-Performance.html
 //
 //    - The "seed" entry may be set to a specific value to make the computation
 //      of bootstrap confidence intervals fully repeatable. When left empty
@@ -1144,14 +1161,18 @@ output_flag = {
    mcts   = NONE;  // Multi-category Contingency Table Statistics
    cnt    = NONE;  // Continuous Statistics
    sl1l2  = NONE;  // Scalar L1L2 Partial Sums
-   sal1l2 = NONE;  // Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
+   sal1l2 = NONE;  // Scalar Anomaly L1L2 Partial Sums when climatological data
+                   // is supplied
    vl1l2  = NONE;  // Vector L1L2 Partial Sums
-   val1l2 = NONE;  // Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+   val1l2 = NONE;  // Vector Anomaly L1L2 Partial Sums when climatological data
+                   // is supplied
    pct    = NONE;  // Contingency Table Counts for Probabilistic Forecasts
-   pstd   = NONE;  // Contingency Table Statistics for Probabilistic Forecasts with
-                   // Dichotomous outcomes
-   pjc    = NONE;  // Joint and Conditional Factorization for Probabilistic Forecasts
-   prc    = NONE;  // Receiver Operating Characteristic for Probabilistic Forecasts
+   pstd   = NONE;  // Contingency Table Statistics for Probabilistic Forecasts
+                   // with Dichotomous outcomes
+   pjc    = NONE;  // Joint and Conditional Factorization for Probabilistic
+                   // Forecasts
+   prc    = NONE;  // Receiver Operating Characteristic for Probabilistic
+                   // Forecasts
    eclv   = NONE;  // Economic Cost/Loss Value derived from CTC and PCT lines
    mpr    = NONE;  // Matched Pair Data
    nbrctc = NONE;  // Neighborhood Contingency Table Counts
@@ -1239,10 +1260,10 @@ rank_corr_flag = FALSE;
 // observations in Point-Stat and Ensemble-Stat:
 //
 //    - "NONE" to use all point observations (legacy behavior)
-//    - "UNIQUE" only use a single observation if two or more observations match.
-//             Matching observations are determined if they contain identical
-//             latitude, longitude, level, elevation, and time information.
-//             They may contain different observation values or station IDs
+//    - "UNIQUE" only use a single observation if two or more observations
+//      match. Matching observations are determined if they contain identical
+//      latitude, longitude, level, elevation, and time information.
+//      They may contain different observation values or station IDs
 //
 // The reporting mechanism for this feature can be activated by specifying
 // a verbosity level of three or higher.  The report will show information
@@ -1350,10 +1371,10 @@ version = "V6.0";
 // with high temporal resolution. The "flag" entry toggles the "time_summary"
 // on (TRUE) and off (FALSE).  Obs may be summarized across the user specified
 // time period defined by the "beg" and "end" entries.  The "step" entry defines
-// the time between intervals in seconds.  The "width" entry specifies the summary
-// interval in seconds.  It may either be set as an integer number of seconds for
-// a centered time interval or a dictionary with beginning and ending time offsets
-// in seconds.
+// the time between intervals in seconds.  The "width" entry specifies the
+// summary interval in seconds.  It may either be set as an integer number of
+// seconds for a centered time interval or a dictionary with beginning and
+// ending time offsets in seconds.
 //
 // e.g. beg = "00";
 //      end = "235959";
@@ -1367,8 +1388,9 @@ version = "V6.0";
 // through 00:09:59. And so on.
 //
 // The two "width" settings listed above are equivalent.  Both define a centered
-// 10-minute time interval.  Use the "beg" and "end" entries to define uncentered
-// time intervals.  The following example requests observations for one hour prior:
+// 10-minute time interval.  Use the "beg" and "end" entries to define
+// uncentered time intervals.  The following example requests observations for
+// one hour prior:
 //      width = { beg = -3600; end = 0; }
 //
 // The summaries will only be calculated for the specified GRIB codes.
@@ -1508,11 +1530,12 @@ nc_var_str = "";
 obs_thresh = [ NA ];
 
 //
-// Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all the
-// ensemble members and the observation have a constant value.  For example,
+// Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all
+// the ensemble members and the observation have a constant value.  For example,
 // exclude points with zero precipitation amounts from all output line types.
-// This option may be set separately for each obs.field entry.  When set to false,
-// constant points are included and the observation rank is chosen at random.
+// This option may be set separately for each obs.field entry.  When set to
+// false, constant points are included and the observation rank is chosen at
+// random.
 //
 skip_const = FALSE;
 
@@ -1601,7 +1624,8 @@ ensemble_flag = {
 //
 // Random number generator used for random assignment of ranks when they
 // are tied.
-// http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generator-Performance.html
+// http://www.gnu.org/software/gsl/manual/html_node/
+// Random-Number-Generator-Performance.html
 //
 rng = {
    type = "mt19937";
@@ -1615,51 +1639,57 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// MODE line options are used to create filters that determine which MODE output lines
-// lines are read in and processed.  The MODE line options are numerous.  They fall into
-// seven categories: toggles, multiple set string options, multiple set integer options,
-// integer max/min options, date/time max/min options, floating-point max/min options, and
-// miscellaneous options.  In order to be applied, the options must be uncommented (i.e.
-// remove  the "//" marks) before running. These options are described in subsequent sections.
+// MODE line options are used to create filters that determine which MODE output
+// lines are read in and processed.  The MODE line options are numerous.  They
+// fall into seven categories: toggles, multiple set string options, multiple
+// set integer options, integer max/min options, date/time max/min options,
+// floating-point max/min options, and miscellaneous options.  In order to be
+// applied, the options must be uncommented (i.e. remove  the "//" marks) before
+// running. These options are described in subsequent sections.
 //
 
 //
-// Toggles: The MODE line options described in this section are shown in pairs.  These
-// toggles represent parameters that can have only one (or none) of two values.  Any
-// of these toggles may be left unspecified.  However, if neither option for toggle is
-// indicated, the analysis will produce results that combine data from both toggles.
-// This may produce unintended results.
+// Toggles: The MODE line options described in this section are shown in pairs.
+// These toggles represent parameters that can have only one (or none) of two
+// values.  Any of these toggles may be left unspecified.  However, if neither
+// option for toggle is indicated, the analysis will produce results that
+// combine data from both toggles. This may produce unintended results.
 //
 
 //
-// This toggle indicates whether forecast or observed lines should be used for analysis.
+// This toggle indicates whether forecast or observed lines should be used for
+// analysis.
 //
 fcst      = FALSE;
 obs       = FALSE;
 
 //
-// This toggle indicates whether single object or object pair lines should be used.
+// This toggle indicates whether single object or object pair lines should be
+// used.
 //
 single    = FALSE;
 pair      = FALSE;
 
 //
-// This toggle indicates whether simple object or object cluster object lines should be used.
+// This toggle indicates whether simple object or object cluster object lines
+// should be used.
 //
 simple    = FALSE;
 cluster   = FALSE;
 
 //
-// This toggle indicates whether matched or unmatched object lines should be used.
+// This toggle indicates whether matched or unmatched object lines should be
+// used.
 //
 matched   = FALSE;
 unmatched = FALSE;
 
 //
-// Multiple-set string options: The following options set various string attributes.  They
-// can be set multiple times on the command line but must be separated by spaces.  Each of
-// these options must be indicated as a string.  String values that include spaces may be
-// used by enclosing the string in quotation marks.
+// Multiple-set string options: The following options set various string
+// attributes.  They can be set multiple times on the command line but must be
+// separated by spaces.  Each of these options must be indicated as a string.
+// String values that include spaces may be used by enclosing the string in
+// quotation marks.
 //
 
 //
@@ -1668,115 +1698,116 @@ unmatched = FALSE;
 //model    = [];
 
 //
-// These two options specify thresholds for forecast and observations objects to be used in
-// the analysis, respectively.
+// These two options specify thresholds for forecast and observations objects to
+// be used in the analysis, respectively.
 //
 //fcst_thr = [];
 //obs_thr  = [];
 
 //
-// These options indicate the names of variables to be used in the analysis for forecast
-// and observed fields.
+// These options indicate the names of variables to be used in the analysis for
+// forecast and observed fields.
 //
 //fcst_var = [];
 //obs_var = [];
 
 //
-// These options indicate vertical levels for forecast and observed fields to be used in
-// the analysis.
+// These options indicate vertical levels for forecast and observed fields to be
+// used in the analysis.
 //
 //fcst_lev = [];
 //obs_lev = [];
 
 //
-// Multiple-set integer options: The following options set various integer attributes.
-// Each of the following options may only be indicated as an integer.
+// Multiple-set integer options: The following options set various integer
+// attributes. Each of the following options may only be indicated as an
+// integer.
 //
 
 //
-// These options are integers of the form HH[MMSS] specifying an (hour-minute-second)
-// lead time.
+// These options are integers of the form HH[MMSS] specifying the lead_time.
 //
 //fcst_lead       = [];
 //obs_lead       = [];
 
 //
-// These options are integers of the form HH[MMSS] specifying an (hour-minute-second)
-// valid hour.
+// These options are integers of the form HH[MMSS] specifying the valid hour.
 //
 //fcst_valid_hour = [];
 //obs_valid_hour = [];
 
 //
-// These options are integers of the form HH[MMSS] specifying an (hour-minute-second)
-// model initialization hour.
+// These options are integers of the form HH[MMSS] specifying the model
+// initialization hour.
 //
 //fcst_init_hour  = [];
 //obs_init_hour  = [];
 
 //
-// These options are integers of the form HHMMSS specifying an (hour-minute-second)
-// accumulation time.
+// These options are integers of the form HHMMSS specifying the accumulation
+// time.
 //
 //fcst_accum      = [];
 //obs_accum      = [];
 
 //
-// These options indicate the convolution radius used for forecast of observed objects,
-// respectively.
+// These options indicate the convolution radius used for forecast of observed
+// objects, respectively.
 //
 //fcst_rad        = [];
 //obs_rad        = [];
 
 //
-// Integer max/min options: These options set limits on various integer attributes.
-// Leaving a maximum value unset means no upper limit is imposed on the value of
-// the attribute.  The option works similarly for minimum values.
+// Integer max/min options: These options set limits on various integer
+// attributes. Leaving a maximum value unset means no upper limit is imposed on
+// the value of the attribute.  The option works similarly for minimum values.
 //
 
 //
-// These options are used to indicate minimum/maximum values for the area attribute
-// to be used in the analysis.
+// These options are used to indicate minimum/maximum values for the area
+// attribute to be used in the analysis.
 //
 //area_min              = 0;
 //area_max              = 0;
 
 //
-// These options are used to indicate minimum/maximum values accepted for the area thresh.
-// The area thresh is the area of the raw field inside the object that meets the threshold
-// criteria.
+// These options are used to indicate minimum/maximum values accepted for the
+// area thresh. The area thresh is the area of the raw field inside the object
+// that meets the threshold criteria.
 //
 //area_thresh_min       = 0;
 //area_thresh_max       = 0;
 
 //
-// These options refer to the minimum/maximum values accepted for the intersection area
-// attribute.
+// These options refer to the minimum/maximum values accepted for the
+// intersection area attribute.
 //
 //intersection_area_min = 0;
 //intersection_area_max = 0;
 
 //
-// These options refer to the minimum/maximum union area values accepted for analysis.
+// These options refer to the minimum/maximum union area values accepted for
+// analysis.
 //
 //union_area_min        = 0;
 //union_area_max        = 0;
 
 //
-// These options refer to the minimum/maximum values for symmetric difference for objects
-// to be used in the analysis.
+// These options refer to the minimum/maximum values for symmetric difference
+// for objects to be used in the analysis.
 //
 //symmetric_diff_min    = 0;
 //symmetric_diff_max    = 0;
 
 //
-// Date/time max/min options: These options set limits on various date/time attributes.
-// The values can be specified in one of three ways:  First, the options may be indicated
-// by a string of the form YYYMMDD_HHMMSS.  This specifies a complete calendar date and
-// time.  Second, they may be indicated by a string of the form YYYYMMMDD_HH.  Here, the
-// minutes and seconds are assumed to be zero.  The third way of indicating date/time
-// attributes is by a string of the form YYYMMDD.  Here, hours, minutes, and seconds are
-// assumed to be zero.
+// Date/time max/min options: These options set limits on various date/time
+// attributes. The values can be specified in one of three ways:  First, the
+// options may be indicated by a string of the form YYYMMDD_HHMMSS.  This
+// specifies a complete calendar date and time.  Second, they may be indicated
+// by a string of the form YYYYMMMDD_HH.  Here, the minutes and seconds are
+// assumed to be zero.  The third way of indicating date/time attributes is by a
+// string of the form YYYMMDD.  Here, hours, minutes, and seconds are assumed to
+// be zero.
 //
 
 //
@@ -1792,23 +1823,26 @@ unmatched = FALSE;
 //obs_valid_max  = "";
 
 //
-// These options indicate minimum/maximum values for the forecast initialization time.
+// These options indicate minimum/maximum values for the forecast initialization
+// time.
 //
 //fcst_init_min  = "";
 //fcst_init_max  = "";
 
 //
-// These options indicate minimum/maximum values for the observation initialization time.
+// These options indicate minimum/maximum values for the observation
+// initialization time.
 //
 //obs_init_min   = "";
 //obs_init_max   = "";
 
 //
-// Floating-point max/min options: Setting limits on various floating-point attributes.
-// One may specify these as integers (i.e., without a decimal point), if desired.  The
-// following pairs of options indicate minimum and maximum values for each MODE attribute
-// that can be described as a floating-point number.  Please refer to "The MODE Tool"
-// section on attributes in the MET User's Guide for a description of these attributes.
+// Floating-point max/min options: Setting limits on various floating-point
+// attributes. One may specify these as integers (i.e., without a decimal
+// point), if desired.  The following pairs of options indicate minimum and
+// maximum values for each MODE attribute that can be described as a floating-
+// point number.  Please refer to "The MODE Tool" section on attributes in the
+// MET User's Guide for a description of these attributes.
 //
 
 //centroid_x_min                 = 0.0;
@@ -1982,10 +2016,11 @@ fcst = {
 }
 
 //
-// The "grid_res" entry is the nominal spacing for each grid square in kilometers.
-// The variable is not used directly in the code, but subsequent variables in the
-// configuration files are defined in terms of it.  Therefore, setting the appropriately
-// will help ensure that appropriate default values are used for these variables.
+// The "grid_res" entry is the nominal spacing for each grid square in
+// kilometers. The variable is not used directly in the code, but subsequent
+// variables in the configuration files are defined in terms of it.  Therefore,
+// setting the appropriately will help ensure that appropriate default values
+// are used for these variables.
 //
 grid_res = 4;
 
@@ -2028,11 +2063,12 @@ weight = {
 }
 
 //
-// The set of interest function variables listed define which values are of interest
-// for each pairwise attribute measured.  The interest functions may be defined as
-// a piecewise linear function or as an algebraic expression.  A piecewise linear
-// function is defined by specifying the corner points of its graph.  An algebraic
-// function may be defined in terms of several built-in mathematical functions.
+// The set of interest function variables listed define which values are of
+// interest for each pairwise attribute measured.  The interest functions may be
+// defined as a piecewise linear function or as an algebraic expression.  A
+// piecewise linear function is defined by specifying the corner points of its
+// graph.  An algebraic function may be defined in terms of several built-in
+// mathematical functions.
 //
 interest_function = {
 
@@ -2080,49 +2116,52 @@ interest_function = {
 }
 
 //
-// The total_interest_thresh variable should be set between 0 and 1.  This threshold
-// is applied to the total interest values computed for each pair of objects and
-// is used in determining matches.
+// The total_interest_thresh variable should be set between 0 and 1.  This
+// threshold is applied to the total interest values computed for each pair of
+// objects and is used in determining matches.
 //
 total_interest_thresh = 0.7;
 
 //
-// The print_interest_thresh variable determines which pairs of object attributes will
-// be written to the output object attribute ASCII file.  The user may choose to set
-// the print_interest_thresh to the same value as the total_interest_thresh, meaning
-// that only object pairs that actually match are written to the output file. When set
-// to zero, all object pair attributes will be written as long as the distance between
-// the object centroids is less than the max_centroid_dist variable.
+// The print_interest_thresh variable determines which pairs of object
+// attributes will be written to the output object attribute ASCII file.  The
+// user may choose to set the print_interest_thresh to the same value as the
+// total_interest_thresh, meaning that only object pairs that actually match are
+// written to the output file. When set to zero, all object pair attributes will
+// be written as long as the distance between the object centroids is less than
+// the max_centroid_dist variable.
 //
 print_interest_thresh = 0.0;
 
 //
-// When applied, the plot_valid_flag variable indicates that only the region containing
-// valid data after masking is applied should be plotted. TRUE indicates the entire domain
-// should be plotted; FALSE indicates only the region containing valid data after masking
-// should be plotted.
+// When applied, the plot_valid_flag variable indicates that only the region
+// containing valid data after masking is applied should be plotted. TRUE
+// indicates the entire domain should be plotted; FALSE indicates only the
+// region containing valid data after masking should be plotted.
 //
 plot_valid_flag = FALSE;
 
 //
-// When applied, the plot_gcarc_flag variable indicates that the edges of polylines should
-// be plotted using great circle arcs as opposed to straight lines in the grid.
+// When applied, the plot_gcarc_flag variable indicates that the edges of
+// polylines should be plotted using great circle arcs as opposed to straight
+// lines in the grid.
 //
 plot_gcarc_flag = FALSE;
 
 //
-// The ct_stats_flag can be set to TRUE or FALSE to produce additional output, in the form
-// of contingency table counts and statistics.
+// The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
+// in the form of contingency table counts and statistics.
 //
 ct_stats_flag = TRUE;
 
 //
-// When MODE is run on global grids, this parameter specifies how many grid squares to
-// shift the grid to the right.  MODE does not currently connect objects from one side
-// of a global grid to the other, potentially causing objects straddling that longitude
-// to be cut in half.  Shifting the grid by some amount enables the user to control
-// where that longitude cut line occurs.  This option provides a very specialized case
-// of automated regridding.  The much more flexible "regrid" option may be used instead.
+// When MODE is run on global grids, this parameter specifies how many grid
+// squares to shift the grid to the right.  MODE does not currently connect
+// objects from one side of a global grid to the other, potentially causing
+// objects straddling that longitude to be cut in half.  Shifting the grid by
+// some amount enables the user to control where that longitude cut line occurs.
+// This option provides a very specialized case of automated regridding.  The
+// much more flexible "regrid" option may be used instead.
 //
 shift_right = 0;
 
@@ -2221,8 +2260,9 @@ elevation_range = {
 
 //
 // The "pb_report_type" entry is an array of PREPBUFR report types to be
-// retained.  The numeric "pb_report_type" entry allows for further stratification
-// within message types.  An empty list indicates that all should be retained.
+// retained.  The numeric "pb_report_type" entry allows for further
+// stratification within message types.  An empty list indicates that all should
+// be retained.
 //
 // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
 //
@@ -2407,29 +2447,38 @@ output_stats = {
 //    Where "job_name" is set to one of the following:
 //
 //       "filter"
-//          To filter out the STAT or TCMPR lines matching the job filtering criteria
-//          specified below and using the optional arguments below.  The
-//          output STAT lines are written to the file specified using the
+//          To filter out the STAT or TCMPR lines matching the job filtering
+//          criteria specified below and using the optional arguments below.
+//          The output STAT lines are written to the file specified using the
 //          "-dump_row" argument.
 //          Required Args: -dump_row
 //
 //       "summary"
 //          To compute summary information for a set of statistics.
-//          The summary output includes the mean, standard deviation, percentiles
-//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range, and inter-quartile
-//          range.  Also included are columns summarizing the computation of WMO
-//          mean values.  Both unweighted and weighted mean values are reported,
-//          and they are computed using three types of logic:
+//          The summary output includes the mean, standard deviation,
+//          percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
+//          and inter-quartile range.  Also included are columns summarizing the
+//          computation of WMO mean values.  Both unweighted and weighted mean
+//          values are reported, and they are computed using three types of
+//          logic:
 //             - simple arithmetic mean (default)
 //             - square root of the mean of the statistic squared
 //               (applied to columns listed in "wmo_sqrt_stats")
 //             - apply fisher transform
 //              (applied to columns listed in "wmo_fisher_stats")
-//          The columns of data to be summarized are specified in one of two ways:
-//             - Specify one -line_type option and one or more -column names.
+//          The columns of data to be summarized are specified in one of two
+//          ways:
+//             - Specify the -line_type option once and specify one or more
+//               -column names.
 //             - Format the -column option as LINE_TYPE:COLUMN.
-//          Use the -derive job command option to automatically derive statistics
-//          on the fly from input contingency tables and partial sums.
+//
+//          Use the -derive job command option to automatically derive
+//          statistics on the fly from input contingency tables and partial
+//          sums.
+//
+//          Use the -column_union TRUE/FALSE job command option to compute
+//          summary statistics across the union of input columns rather than
+//          processing them separately.
 //
 //          For TCStat, the "-column" argument may be set to:
 //             "TRACK" for track, along-track, and cross-track errors.
@@ -2445,6 +2494,7 @@ output_stats = {
 //          Optional Args: -by column_name to specify case information
 //                         -out_alpha to override default alpha value of 0.05
 //                         -derive to derive statistics on the fly
+//                         -column_union to summarize multiple columns
 //
 //       "aggregate"
 //          To aggregate the STAT data for the STAT line type specified using
@@ -2486,12 +2536,15 @@ output_stats = {
 //             -mask_grid, -mask_poly, -mask_sid
 //             -out_thresh or -out_fcst_thresh and -out_obs_thresh
 //             -out_cnt_logic
-//             -out_wind_thresh or -out_fcst_wind_thresh and -out_obs_wind_thresh
+//             -out_wind_thresh or -out_fcst_wind_thresh and
+//             -out_obs_wind_thresh
 //             -out_wind_logic
 //             When -out_line_type WDIR
-//          Additional Optional Arg for -line_type ORANK -out_line_type PHIST, SSVAR:
+//          Additional Optional Arg for:
+//             -line_type ORANK -out_line_type PHIST, SSVAR ...
 //             -out_bin_size
-//          Additional Optional Args for -out_line_type ECLV:
+//          Additional Optional Args for:
+//             -out_line_type ECLV ...
 //             -out_eclv_points
 //
 //       "ss_index"
@@ -2530,16 +2583,17 @@ output_stats = {
 //          Required Args: None
 //
 //       "ramp"
-//          The ramp job operates on a time-series of forecast and observed values
-//          and is analogous to the RIRW (Rapid Intensification and Weakening) job
-//          supported by the tc_stat tool.  The amount of change from one time to
-//          the next is computed for forecast and observed values.  Those changes
-//          are thresholded to define events which are used to populate a 2x2
-//          contingency table.
+//          The ramp job operates on a time-series of forecast and observed
+//          values and is analogous to the RIRW (Rapid Intensification and
+//          Weakening) job supported by the tc_stat tool.  The amount of change
+//          from one time to the next is computed for forecast and observed
+//          values.  Those changes are thresholded to define events which are
+//          used to populate a 2x2 contingency table.
 //
 //          Required Args:
 //             -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
-//                For DYDT, threshold for the amount of change required to define an event.
+//                For DYDT, threshold for the amount of change required to
+//                define an event.
 //                For SWING, threshold the slope.
 //             -swing_width val
 //                Required for the swinging door algorithm width.
@@ -2547,7 +2601,8 @@ output_stats = {
 //          Optional Args:
 //             -ramp_type str
 //                Overrides the default ramp definition algorithm to be used.
-//                May be set to DYDT (default) or SWING for the swinging door algorithm.
+//                May be set to DYDT (default) or SWING for the swinging door
+//                algorithm.
 //             -line_type str
 //                Overrides the default input line type, MPR.
 //             -out_line_type str
@@ -2565,8 +2620,8 @@ output_stats = {
 //             -ramp_window beg end in HH[MMSS] format
 //                Defines a search time window when attempting to convert misses
 //                to hits and false alarms to correct negatives.  Use 1 argument
-//                to define a symmetric time window or 2 for an asymmetric window.
-//                Default window is 0 0, requiring an exact match.
+//                to define a symmetric time window or 2 for an asymmetric
+//                window. Default window is 0 0, requiring an exact match.
 //
 //    Job command FILTERING options to further refine the STAT data:
 //       Each optional argument may be used in the job specification multiple
@@ -2617,7 +2672,7 @@ output_stats = {
 //       "-column_min    col_name value"     e.g. -column_min BASER 0.02
 //       "-column_max    col_name value"
 //       "-column_eq     col_name value"
-//       "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273&&<283'
+//       "-column_thresh col_name threshold" e.g. -column_thresh FCST '>273'
 //       "-column_str    col_name string" separate multiple filtering strings
 //                                        with commas
 //
@@ -2644,7 +2699,8 @@ output_stats = {
 //
 //       "-out_bin_size    value"
 //
-//       "-out_eclv_points value" see description of "eclv_points" config file entry
+//       "-out_eclv_points value" see description of "eclv_points" config file
+//                                entry
 //
 //       "-out_alpha       value"
 //
@@ -2659,33 +2715,37 @@ output_stats = {
 //
 //   For aggregate and aggregate_stat job types:
 //
-//       "-out_stat        path"   to write a .stat output file for the job including
-//                                 the .stat header columns.  Multiple values for each
-//                                 header column are written as a comma-separated list.
-//       "-set_hdr col_name value" may be used multiple times to explicity specify what
-//                                 should be written to the header columns of the output
-//                                 .stat file.
+//       "-out_stat        path"   to write a .stat output file for the job
+//                                 including the .stat header columns.  Multiple
+//                                 values for each header column are written as
+//                                 a comma-separated list.
+//       "-set_hdr col_name value" may be used multiple times to explicity
+//                                 specify what should be written to the header
+//                                 columns of the output .stat file.
 //
 jobs = [
-   "-job filter         -line_type SL1L2 -vx_mask DTC165 -dump_row job_filter_SL1L2.stat",
+   "-job filter         -line_type SL1L2 -vx_mask DTC165 \
+    -dump_row  job_filter_SL1L2.stat",
    "-job summary        -line_type CNT   -alpha 0.050 -fcst_var TMP \
     -dump_row job_summary_ME.stat -column ME",
-   "-job aggregate      -line_type SL1L2 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP \
-    -dump_row job_aggregate_SL1L2_dump.stat  -out_stat job_aggregate_SL1L2_out.stat \
+   "-job aggregate      -line_type SL1L2 -vx_mask DTC165 -vx_mask DTC166 \
+    -fcst_var TMP -dump_row job_aggregate_SL1L2_dump.stat  \
+    -out_stat job_aggregate_SL1L2_out.stat \
     -set_hdr VX_MASK CONUS",
    "-job aggregate_stat -line_type SL1L2 -out_line_type CNT -vx_mask DTC165  \
-    -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_stat_SL1L2_CNT_in.stat",
+    -vx_mask DTC166 -fcst_var TMP \
+    -dump_row  job_aggregate_stat_SL1L2_CNT_in.stat",
    "-job aggregate_stat -line_type MPR   -out_line_type CNT -vx_mask DTC165 \
     -vx_mask DTC166 -fcat_var TMP -dump_row job_aggregate_stat_MPR_CNT_in.stat",
    "-job aggregate      -line_type CTC   -fcst_thresh <300.000 -vx_mask DTC165 \
     -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_CTC_in.stat",
-   "-job aggregate_stat -line_type CTC   -out_line_type CTS -fcst_thresh <300.000 \
-    -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP \
+   "-job aggregate_stat -line_type CTC   -out_line_type CTS \
+    -fcst_thresh <300.000 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP \
     -dump_row job_aggregate_stat_CTC_CTS_in.stat",
    "-job aggregate      -line_type MCTC  -column_eq N_CAT 4 -vx_mask DTC165 \
     -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_MCTC_in.stat",
-   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS -column_eq N_CAT 4 \
-    -vx_mask DTC165 -vx_mask DTC166 -fcst_var APCP_24 \
+   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS \
+    -column_eq N_CAT 4 -vx_mask DTC165 -vx_mask DTC166 -fcst_var APCP_24 \
     -dump_row job_aggregate_stat_MCTC_MCTS_in.stat",
    "-job aggregate      -line_type PCT   -vx_mask DTC165 -vx_mask DTC166 \
     -dump_row job_aggregate_PCT_in.stat",
