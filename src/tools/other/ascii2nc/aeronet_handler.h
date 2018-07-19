@@ -75,6 +75,8 @@ protected:
   double _stationLat;
   double _stationLon;
   double _stationAlt;
+
+  StringArray var_names;
   
   
   ///////////////////////
@@ -96,6 +98,15 @@ protected:
 
   virtual bool _readObservations(LineDataFile &ascii_file);
 
+  // Extract the height from the field name
+  double extract_height(string hdr_field);
+  
+  // Get the number of headers
+  int get_header_count_v3(StringArray hdr_tokens);
+  
+  // Make the variable name from header (field name)
+  string make_var_name_from_header(string hdr_field);
+  
 };
 
 

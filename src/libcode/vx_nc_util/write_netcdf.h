@@ -102,6 +102,7 @@ extern long count_nc_headers   (vector< Observation > &observations);
 
 extern void create_nc_hdr_vars (NetcdfObsVars &, NcFile *, const int hdr_count, const int deflate_level=0);
 extern void create_nc_pb_hdrs  (NetcdfObsVars &, NcFile *, const int hdr_count, const int deflate_level=0);
+extern NcDim create_nc_obs_var (NetcdfObsVars &, NcFile *, int var_count, const int deflate_level);
 extern void create_nc_obs_vars (NetcdfObsVars &, NcFile *, const int deflate_level=0, const bool use_var_id=true);
 extern void create_nc_other_vars (NetcdfObsVars &, NcFile *, const NcDataBuffer &data_buf,
                                   const NcHeaderData &hdr_buf, const int var_count = 0,
