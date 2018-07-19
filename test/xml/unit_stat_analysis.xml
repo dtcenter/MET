@@ -286,4 +286,17 @@
     </output>
   </test>
 
+  <test name="stat_analysis_POINT_STAT_SUMMARY_UNION">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS' -column_union true \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY_UNION.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY_UNION.out</exist>
+    </output>
+  </test>
+
 </met_test>

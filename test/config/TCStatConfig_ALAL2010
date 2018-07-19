@@ -76,7 +76,7 @@ valid_hour = [];
 lead       = [];
 
 //
-// Select tracks which contain all required lead times. 
+// Select tracks which contain all required lead times.
 //
 lead_req = [];
 
@@ -176,9 +176,10 @@ out_valid_mask = "";
 //
 // Array of TCStat analysis jobs to be performed on the filtered data
 //
-jobs = [ 
+jobs = [
    "-job summary -column TRACK -by AMODEL      -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst",
    "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst",
+   "-job summary -column WIND  -by AMODEL      -column_union true",
    "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh >=30  -rirw_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_ri.tcst",
    "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh <=-30 -rirw_exact TRUE  -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_rw.tcst",
    "-job rirw                  -rirw_window 00   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR",
