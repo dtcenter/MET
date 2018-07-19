@@ -380,10 +380,13 @@ water_only = FALSE;
 //
 
 rirw = {
-   track  = NONE;       // Specify which track types to search (NONE, ADECK, BDECK, or BOTH)
+   track  = NONE;       // Specify which track types to search (NONE, ADECK,
+                        // BDECK, or BOTH)
    adeck = {
-      time   = "24";    // Rapid intensification/weakening time period in HHMMSS format.
-      exact  = TRUE;    // Use the exact or maximum intensity difference over the time period.
+      time   = "24";    // Rapid intensification/weakening time period in HHMMSS
+                        // format.
+      exact  = TRUE;    // Use the exact or maximum intensity difference over the
+                        // time period.
       thresh = >=30.0;  // Threshold for the intensity change.
    }
    bdeck = adeck;       // Copy settings to the BDECK or specify different logic.
@@ -399,11 +402,12 @@ rirw = {
 // May modify using the "-landfall_window" job command option, which
 // automatically sets -landfall to TRUE.
 //
-// The "-landfall_window" job command option takes 1 or 2 arguments in  HH[MMSS] format.
-// Use 1 argument to define a symmetric time window.  For example, "-landfall_window 06"
-// defines the time window +/- 6 hours around the landfall time.
-// Use 2 arguments to define an asymmetric time window.  For example, "-landfall_window 00 12"
-// defines the time window from the landfall event to 12 hours after.
+// The "-landfall_window" job command option takes 1 or 2 arguments in  HH[MMSS]
+// format.  Use 1 argument to define a symmetric time window.  For example,
+// "-landfall_window 06" defines the time window +/- 6 hours around the landfall
+// time.  Use 2 arguments to define an asymmetric time window.  For example,
+// "-landfall_window 00 12" defines the time window from the landfall event to 12
+// hours after.
 //
 // e.g. landfall     = FALSE;
 //      landfall_beg = "-24"; (24 hours prior to landfall)
@@ -491,9 +495,9 @@ out_valid_mask = "";
 //
 //          Additional filtering options that may be used only when -line_type
 //          has been listed only once. These options take two arguments: the name
-//          of the data column to be used and the min, max, or exact value for that
-//          column. If multiple column eq/min/max/str options are listed, the job
-//          will be performed on their intersection:
+//          of the data column to be used and the min, max, or exact value for
+//          that column. If multiple column eq/min/max/str options are listed,
+//          the job will be performed on their intersection:
 //
 //          "-column_min col_name value"  e.g. -column_min TK_ERR 100.00
 //          "-column_max col_name value"
@@ -518,9 +522,14 @@ out_valid_mask = "";
 //             "col1-col2" for a difference of two columns.
 //             "ABS(col or col1-col2)" for the absolute value.
 //
+//          Use the -column_union TRUE/FALSE job command option to compute
+//          summary statistics across the union of input columns rather than
+//          processing them separately.
+//
 //          Required Args: -line_type, -column
 //          Optional Args: -by column_name to specify case information
 //                         -out_alpha to override default alpha value
+//                         -column_union to summarize multiple columns
 //
 //       "rirw"
 //          To define rapid intensification/weakening contingency table using
@@ -528,51 +537,62 @@ out_valid_mask = "";
 //          and output contingency table counts and statistics.
 //
 //          Optional Args:
-//             -rirw_window width in HH[MMSS] format to define a symmetric time window
-//             -rirw_window beg end in HH[MMSS] format to define an asymmetric time window
+//             -rirw_window width in HH[MMSS] format to define a symmetric time
+//                window
+//             -rirw_window beg end in HH[MMSS] format to define an asymmetric
+//                time window
 //              Default search time window is 0 0, requiring exact match
-//             -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override defaults
-//             -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override defaults
-//             -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override defaults
+//             -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override
+//                defaults
+//             -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override
+//                defaults
+//             -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to
+//                override defaults
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
 //             -out_line_type to specify output line types (CTC, CTS, and MPR)
 //
-//          Note that the "-dump_row path" option results in 4 files being created:
-//             path_FY_OY.tcst, path_FY_ON.tcst, path_FN_OY.tcst, and path_FN_ON.tcst
-//             containing the TCST lines that were hits, false alarms, misses, and correct
-//             negatives,  respectively.  These files may be used as input for additional
-//             TC-Stat analysis.
+//          Note that the "-dump_row path" option results in 4 files being
+//          created:
+//             path_FY_OY.tcst, path_FY_ON.tcst, path_FN_OY.tcst, and
+//             path_FN_ON.tcst, containing the TCST lines that were hits, false
+//             alarms, misses, and correct negatives,  respectively.  These files
+//             may be used as input for additional TC-Stat analysis.
 //
 //       "probrirw"
-//          To define an Nx2 probabilistic contingency table by reading the PROBRIRW line type,
-//          binning the forecast probabilities, and writing output probabilistic counts and
-//          statistics.
+//          To define an Nx2 probabilistic contingency table by reading the
+//          PROBRIRW line type, binning the forecast probabilities, and writing
+//          output probabilistic counts and statistics.
 //
 //          Required Args:
-//             -probrirw_thresh to define the forecast probabilities to be evaluated
-//                (e.g. -probrirw_thresh 30)
+//             -probrirw_thresh to define the forecast probabilities to be
+//                evaluated (e.g. -probrirw_thresh 30)
 //
 //          Optional Args:
-//             -probrirw_exact TRUE/FALSE to verify against the exact (e.g. BDELTA column)
-//                or maximum (e.g. BDELTA_MAX column) intensity change in the BEST track
-//             -probrirw_bdelta_thresh to define BEST track change event threshold
-//                (e.g. -probrirw_bdelta_thresh >=30)
+//             -probrirw_exact TRUE/FALSE to verify against the exact (e.g.
+//                BDELTA column) or maximum (e.g. BDELTA_MAX column) intensity
+//                change in the BEST track
+//             -probrirw_bdelta_thresh to define BEST track change event
+//                threshold (e.g. -probrirw_bdelta_thresh >=30)
 //             -probrirw_prob_thresh to define output probability thresholds
 //                (e.g. -probrirw_prob_thresh ==0.1)
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
-//             -out_line_type to specify output line types (PCT, PSTD, PRC, and PJC)
+//             -out_line_type to specify output line types (PCT, PSTD, PRC, and
+//                PJC)
 //
-//       For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.  For example,
-//       the following options select 30 kt probabilities and match probability values
-//       greater than 0:
+//       For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.
+//       For example, the following options select 30 kt probabilities and match
+//       probability values greater than 0:
 //         -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
 //
 //       e.g.
-//       jobs = ["-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
-//               "-job filter -column_min TK_ERR 100.000 -dumprow ./tc_filter_job.tcst",
-//               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst",
-//               "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
+//       jobs = [
+//          "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
+//          "-job filter -column_min TK_ERR 100.000 \
+//           -dumprow ./tc_filter_job.tcst",
+//          "-job summary -line_type TCMPR -column AC \
+//           -dumprow  ./tc_summary_job.tcst",
+//          "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
 //
 jobs = [];

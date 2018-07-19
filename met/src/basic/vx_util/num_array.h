@@ -131,6 +131,13 @@ inline void           NumArray::inc(int i, double v)       { e[i] += v; return; 
 ////////////////////////////////////////////////////////////////////////
 
 
+extern ConcatString write_css       (const NumArray &);
+extern ConcatString write_css_hhmmss(const NumArray &);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __NUM_ARRAY_H__  */
 
 

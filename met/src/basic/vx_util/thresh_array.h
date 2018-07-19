@@ -85,6 +85,7 @@ inline       SingleThresh * ThreshArray::buf()        const { return ( t );     
 extern ThreshArray  string_to_prob_thresh(const char *);
 extern ConcatString prob_thresh_to_string(const ThreshArray &);
 extern bool         check_prob_thresh    (const ThreshArray &, bool error_out = true);
+extern ConcatString write_css            (const ThreshArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

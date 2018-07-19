@@ -350,21 +350,21 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
- 
+
 void ThreshArray::check_bin_thresh() const {
    int i;
- 
+
    //
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
    //
    for(i=0; i<Nelements-1; i++) {
- 
+
       if(t[i].get_value() >  t[i+1].get_value() ||
          t[i].get_type()  != t[i+1].get_type()  ||
          t[i].get_type()  == thresh_eq          ||
          t[i].get_type()  == thresh_ne) {
- 
+
          mlog << Error << "\nThreshArray::check_bin_thresh() const -> "
               << "thresholds must be monotonically increasing and be of "
               << "the same inequality type (lt, le, gt, or ge)."
@@ -532,7 +532,6 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-
 bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    int i, n;
 
@@ -588,10 +587,16 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    return(true);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString write_css(const ThreshArray &ta) {
+   ConcatString css;
 
+   for(int i=0; i<ta.n_elements(); i++) {
+      css << (i == 0 ? "" : ",") << ta[i].get_str();
+   }
 
+   return(css);
+}
 
-
+////////////////////////////////////////////////////////////////////////

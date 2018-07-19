@@ -116,7 +116,7 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    //
    // No settings in the default job for column_min_name/value,
    // column_max_name/value, column_str_name/value, and
-   // column_case since those are strictly job command options.
+   // by_column since those are strictly job command options.
    //
 
    return;
@@ -169,9 +169,9 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    }
 
    //
-   // Print warning for column_case option
+   // Print warning for by_column option
    //
-   if(j.column_case.n_elements() > 0   &&
+   if(j.by_column.n_elements() > 0   &&
       j.job_type != stat_job_summary   &&
       j.job_type != stat_job_aggr      &&
       j.job_type != stat_job_aggr_stat &&
@@ -909,8 +909,8 @@ void write_job_summary(STATAnalysisJob &j,
       r += (int) it->second.val.size();
    }
    at.set_size(r + 1,
-               3 + j.column_case.n() + n_job_summary_columns);
-   setup_table(at, 3 + j.column_case.n(), j.get_precision());
+               3 + j.by_column.n() + n_job_summary_columns);
+   setup_table(at, 3 + j.by_column.n(), j.get_precision());
 
    //
    // Initialize
@@ -923,8 +923,8 @@ void write_job_summary(STATAnalysisJob &j,
    at.set_entry(r, c++, "COL_NAME:");
    at.set_entry(0, c++, "LINE_TYPE");
    at.set_entry(0, c++, "COLUMN");
-   for(i=0; i<j.column_case.n(); i++) {
-      at.set_entry(0, c++, j.column_case[i]);
+   for(i=0; i<j.by_column.n(); i++) {
+      at.set_entry(0, c++, j.by_column[i]);
    }
    write_header_row(job_summary_columns, n_job_summary_columns,
                     0, at, r, c);
@@ -1072,15 +1072,15 @@ void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
    // Setup the output table
    //
    at.set_size(n_row, n_col);
-   setup_table(at, 1 + j.column_case.n_elements(), j.get_precision());
+   setup_table(at, 1 + j.by_column.n_elements(), j.get_precision());
 
    //
    // Write the header information
    //
    c = 0;
    at.set_entry(0, c++, "COL_NAME:");
-   for(i=0; i<j.column_case.n_elements(); i++) {
-      at.set_entry(0, c++, j.column_case[i]);
+   for(i=0; i<j.by_column.n_elements(); i++) {
+      at.set_entry(0, c++, j.by_column[i]);
    } // end for i
 
    return;
@@ -1102,7 +1102,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_fho)    n_col += n_fho_columns;
    else if(lt == stat_ctc)    n_col += n_ctc_columns;
    else if(lt == stat_cts)    n_col += n_cts_columns;
@@ -1114,7 +1114,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the output header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
@@ -1269,7 +1269,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_mctc) n_col += get_n_mctc_columns(n);
    else if(lt == stat_mcts) n_col += n_mcts_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -1277,7 +1277,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_mctc) write_mctc_header_row(0, n, at, 0, c);
    else if(lt == stat_mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
 
@@ -1371,7 +1371,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    //
    if(lt == stat_eclv) n_row = 1 + m.size() * n;
    else                n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_pct)  n_col += get_n_pct_columns(n);
    else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
    else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
@@ -1382,7 +1382,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_pct)  write_pct_header_row (0, n, at, 0, c);
    else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
    else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
@@ -1507,7 +1507,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_sl1l2)  n_col += n_sl1l2_columns;
    else if(lt == stat_sal1l2) n_col += n_sal1l2_columns;
    else if(lt == stat_vl1l2)  n_col += n_vl1l2_columns;
@@ -1520,7 +1520,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
    else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
    else if(lt == stat_vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
@@ -1660,14 +1660,14 @@ void write_job_aggr_grad(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row  = 1 + m.size();
-   n_col  = 1 + j.column_case.n_elements();
+   n_col  = 1 + j.by_column.n_elements();
    n_col += n_grad_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_header_row(grad_columns,  n_grad_columns,  0, at, 0, c);
 
    //
@@ -1720,13 +1720,13 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + (2 * m.size());
-   n_col = 1 + j.column_case.n_elements() + n_job_wdir_columns;
+   n_col = 1 + j.by_column.n_elements() + n_job_wdir_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_header_row(job_wdir_columns, n_job_wdir_columns, 0, at, 0, c);
 
    mlog << Debug(2) << "Computing output for "
@@ -1887,14 +1887,14 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row  = 1 + m.size();
-   n_col  = 1 + j.column_case.n_elements();
+   n_col  = 1 + j.by_column.n_elements();
    n_col += n_ecnt_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_header_row(ecnt_columns,  n_ecnt_columns,  0, at, 0, c);
 
    //
@@ -1953,13 +1953,13 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements() + get_n_rhist_columns(n);
+   n_col = 1 + j.by_column.n_elements() + get_n_rhist_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_rhist_header_row(0, n, at, 0, c);
 
    //
@@ -2020,13 +2020,13 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements() + get_n_phist_columns(n);
+   n_col = 1 + j.by_column.n_elements() + get_n_phist_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_phist_header_row(0, n, at, 0, c);
 
    //
@@ -2087,13 +2087,13 @@ void write_job_aggr_relp(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements() + get_n_relp_columns(n);
+   n_col = 1 + j.by_column.n_elements() + get_n_relp_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_relp_header_row(0, n, at, 0, c);
 
    //
@@ -2163,13 +2163,13 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + n;
-   n_col = 1 + j.column_case.n_elements() + n_ssvar_columns;
+   n_col = 1 + j.by_column.n_elements() + n_ssvar_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
 
    //
@@ -2334,7 +2334,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output table
    //
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
    if(lt == stat_ecnt) {
       n_row  = 1 + m.size();
       n_col += n_ecnt_columns;
@@ -2360,7 +2360,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
    else if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
    else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
@@ -2510,13 +2510,13 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + (n * m.size());
-   n_col = 1 + j.column_case.n_elements() + n_isc_columns;
+   n_col = 1 + j.by_column.n_elements() + n_isc_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
    write_header_row(isc_columns, n_isc_columns, 0, at, 0, c);
 
    //
@@ -2575,7 +2575,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    //
    n     = 0;
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_fho)    { n_col += n_fho_columns; }
    else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
    else if(lt == stat_cts)    { n_col += n_cts_columns; }
@@ -2600,7 +2600,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
@@ -2800,7 +2800,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.column_case.n_elements();
+   n_col = 1 + j.by_column.n_elements();
         if(lt == stat_vl1l2) n_col += n_vl1l2_columns;
    else if(lt == stat_vcnt)  n_col += n_vcnt_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -2808,7 +2808,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.column_case.n_elements();
+   c = 1 + j.by_column.n_elements();
         if(lt == stat_vl1l2) write_header_row(vl1l2_columns, n_vl1l2_columns, 0, at, 0, c);
    else if(lt == stat_vcnt)  write_header_row(vcnt_columns,  n_vcnt_columns,  0, at, 0, c);
 
@@ -2896,14 +2896,14 @@ void write_job_ramp(STATAnalysisJob &j,
    if(j.out_line_type.has(stat_ctc_str)) {
       n_row = 1 + m.size();
       n_stat_row += m.size();
-      n_col = 1 + j.column_case.n_elements() +
+      n_col = 1 + j.by_column.n_elements() +
               n_job_ramp_columns + n_ctc_columns;
       write_job_aggr_hdr(j, n_row, n_col, ctc_at);
 
       //
       // Write the ramp job definition and CTC header columns
       //
-      c = 1 + j.column_case.n_elements();
+      c = 1 + j.by_column.n_elements();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, ctc_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(ctc_columns, n_ctc_columns, 0, ctc_at, 0, c);
@@ -2915,14 +2915,14 @@ void write_job_ramp(STATAnalysisJob &j,
    if(j.out_line_type.has(stat_cts_str)) {
       n_row = 1 + m.size();
       n_stat_row += m.size();
-      n_col = 1 + j.column_case.n_elements() +
+      n_col = 1 + j.by_column.n_elements() +
               n_job_ramp_columns + n_cts_columns;
       write_job_aggr_hdr(j, n_row, n_col, cts_at);
 
       //
       // Write the ramp job definition and CTS header columns
       //
-      c = 1 + j.column_case.n_elements();
+      c = 1 + j.by_column.n_elements();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, cts_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(cts_columns, n_cts_columns, 0, cts_at, 0, c);
@@ -2935,14 +2935,14 @@ void write_job_ramp(STATAnalysisJob &j,
       for(it = m.begin(), n_row = 1; it != m.end(); it++) {
          n_row += it->second.valid_ts.n_elements();
       }
-      n_col = 1 + j.column_case.n_elements() +
+      n_col = 1 + j.by_column.n_elements() +
               n_job_ramp_columns + n_job_ramp_mpr_columns;
       write_job_aggr_hdr(j, n_row, n_col, mpr_at);
 
       //
       // Write the ramp job definition and RAMP_MPR header columns
       //
-      c = 1 + j.column_case.n_elements();
+      c = 1 + j.by_column.n_elements();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, mpr_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(job_ramp_mpr_columns, n_job_ramp_mpr_columns, 0, mpr_at, 0, c);

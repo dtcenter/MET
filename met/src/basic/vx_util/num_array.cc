@@ -1052,5 +1052,46 @@ return(v);
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  Utility Functions
+   //
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString write_css(const NumArray &na)
+
+{
+
+ConcatString css;
+
+for ( int i=0; i<na.n_elements(); ++i ) {
+   css << (i == 0 ? "" : ",") << na[i];
+}
+
+return(css);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString write_css_hhmmss(const NumArray &na)
+
+{
+
+ConcatString css;
+
+for ( int i=0; i<na.n_elements(); ++i ) {
+   css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
+}
+
+return(css);
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////

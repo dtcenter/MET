@@ -31,9 +31,10 @@
 //
 // Defaults to be used if not specified by the user
 //
-static const double default_bin_size    = 0.05;
-static const double default_eclv_points = 0.05;
-static const bool   default_do_derive   = false;
+static const double default_bin_size     = 0.05;
+static const double default_eclv_points  = 0.05;
+static const bool   default_do_derive    = false;
+static const bool   default_column_union = false;
 
 //
 // Ramp job type defaults
@@ -206,6 +207,7 @@ class STATAnalysisJob {
 
       StringArray line_type;
       StringArray column;
+      bool        column_union;
       NumArray    weight;
 
       // Numeric column thresholds
@@ -220,13 +222,11 @@ class STATAnalysisJob {
       //
       // Store the case information for the -by option
       //
-
-      StringArray column_case;
+      StringArray by_column;
 
       //
       // Variables used to the store the analysis job specification
       //
-
       char        *dump_row; // dump rows used to a file
       ofstream    *dr_out;   // output file stream for dump row
       int         n_dump;    // number of lines written to dump row
@@ -235,7 +235,6 @@ class STATAnalysisJob {
       char        *stat_file; // dump output statistics to a STAT file
       ofstream    *stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
-
 
       StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)
@@ -251,7 +250,6 @@ class STATAnalysisJob {
       //
       // Variables used for the stat_job_summary job type
       //
-
       bool         do_derive;
       StringArray  wmo_sqrt_stats;
       StringArray  wmo_fisher_stats;
@@ -259,7 +257,6 @@ class STATAnalysisJob {
       //
       // Variables used for the stat_job_aggr_mpr job type
       //
-
       char        *mask_grid_str;
       char        *mask_poly_str;
       char        *mask_sid_str;
@@ -271,7 +268,6 @@ class STATAnalysisJob {
       //
       // Variables used for the stat_job_ramp job type
       //
-
       TimeSeriesType ramp_type;
       int            ramp_time_fcst;   // stored in seconds
       int            ramp_time_obs;

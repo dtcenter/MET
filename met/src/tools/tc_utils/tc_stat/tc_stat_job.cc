@@ -1686,7 +1686,7 @@ void TCStatJobSummary::init_from_scratch() {
    // Ignore case when performing comparisons
    ReqColumn.set_ignore_case(1);
    Column.set_ignore_case(1);
-   CaseColumn.set_ignore_case(1);
+   ByColumn.set_ignore_case(1);
 
    clear();
 
@@ -1703,12 +1703,13 @@ void TCStatJobSummary::clear() {
 
    ReqColumn.clear();
    Column.clear();
-   CaseColumn.clear();
+   ByColumn.clear();
    SummaryMap.clear();
 
    // Set to default value
-   OutAlpha  = default_tc_alpha;
-   FSPThresh = default_fsp_thresh;
+   ColumnUnion = default_column_union;
+   OutAlpha    = default_tc_alpha;
+   FSPThresh   = default_fsp_thresh;
 
    return;
 }
@@ -1719,12 +1720,13 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 
    TCStatJob::assign(j);
 
-   ReqColumn = j.ReqColumn;
-   Column = j.Column;
-   CaseColumn = j.CaseColumn;
-   SummaryMap = j.SummaryMap;
-   OutAlpha = j.OutAlpha;
-   FSPThresh = j.FSPThresh;
+   ReqColumn   = j.ReqColumn;
+   Column      = j.Column;
+   ColumnUnion = j.ColumnUnion;
+   ByColumn    = j.ByColumn;
+   SummaryMap  = j.SummaryMap;
+   OutAlpha    = j.OutAlpha;
+   FSPThresh   = j.FSPThresh;
 
    return;
 }
@@ -1752,12 +1754,13 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"    ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
-                                                   add_column(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"        ) == 0) { CaseColumn.add_css(to_upper(a[i+1])); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha" ) == 0) { OutAlpha = atof(a[i+1]);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh") == 0) { FSPThresh.set(a[i+1]);                a.shift_down(i, 1); }
-      else                                       {                                       b.add(a[i]);        }
+           if(strcasecmp(c, "-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
+                                                     add_column(a[i+1]);                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1]); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1]);              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1]);                a.shift_down(i, 1); }
+      else                                         {                                       b.add(a[i]);        }
    }
 
    return(b);
@@ -1816,8 +1819,10 @@ ConcatString TCStatJobSummary::serialize() const {
    // Add summary job-specific options
    for(i=0; i<ReqColumn.n_elements(); i++)
       s << "-column " << ReqColumn[i] << " ";
-   for(i=0; i<CaseColumn.n_elements(); i++)
-      s << "-by " << CaseColumn[i] << " ";
+   if(ColumnUnion != default_column_union)
+      s << "-column_union " << bool_to_string(ColumnUnion) << " ";
+   for(i=0; i<ByColumn.n_elements(); i++)
+      s << "-by " << ByColumn[i] << " ";
    if(!(FSPThresh == default_fsp_thresh))
       s << "-fsp_thresh " << FSPThresh.get_str();
 
@@ -1972,7 +1977,7 @@ void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
 void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
    int i, j;
    map<ConcatString,SummaryMapData,cs_cmp> cur_map;
-   ConcatString key, cur;
+   ConcatString prefix, key, cur;
    SummaryMapData data;
    double val;
 
@@ -1986,7 +1991,10 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
       for(j=0; j<Column.n_elements(); j++) {
 
          // Build the key and get the current column value
-         key = build_map_key(Column[j], *pair.line(i), CaseColumn);
+         // For -column_union, put all columns in the same key
+         if(ColumnUnion) prefix = write_css(ReqColumn);
+         else            prefix = Column[j];
+         key = build_map_key(prefix, *pair.line(i), ByColumn);
          val = get_column_double(*pair.line(i), Column[j]);
 
          // Add map entry for this key, if necessary
@@ -2014,7 +2022,7 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
 void TCStatJobSummary::process_line(TCStatLine &line) {
    int i;
    map<ConcatString,SummaryMapData,cs_cmp> cur_map;
-   ConcatString key, cur;
+   ConcatString prefix, key, cur;
    SummaryMapData data;
    double val;
 
@@ -2025,7 +2033,10 @@ void TCStatJobSummary::process_line(TCStatLine &line) {
    for(i=0; i<Column.n_elements(); i++) {
 
       // Build the key and get the current column value
-      key = build_map_key(Column[i], line, CaseColumn);
+      // For -column_union, put all columns in the same key
+      if(ColumnUnion) prefix = write_css(Column);
+      else            prefix = Column[i];
+      key = build_map_key(prefix, line, ByColumn);
       val = get_column_double(line, Column[i]);
 
       // Add map entry for this key, if necessary
@@ -2103,11 +2114,11 @@ void TCStatJobSummary::do_output(ostream &out) {
 
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1,
-                   CaseColumn.n_elements() + 24);
+                   ByColumn.n_elements() + 24);
 
    // Left-justify case info and right-justify summary output
    for(i=0; i<out_at.ncols(); i++) {
-      if(i < CaseColumn.n_elements()) out_at.set_column_just(i, LeftJust);
+      if(i < ByColumn.n_elements()) out_at.set_column_just(i, LeftJust);
       else                            out_at.set_column_just(i, RightJust);
    }
    out_at.set_precision(get_precision());
@@ -2127,8 +2138,8 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "COLUMN");
 
    // Write case column names
-   for(i=0; i<CaseColumn.n_elements(); i++) {
-      out_at.set_entry(r, c++, CaseColumn[i]);
+   for(i=0; i<ByColumn.n_elements(); i++) {
+      out_at.set_entry(r, c++, ByColumn[i]);
    }
 
    out_at.set_entry(r, c++, "TOTAL");
@@ -2268,7 +2279,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
    } // end for it
 
    // Only compute FSP when AMODEL is in the case information
-   if(!CaseColumn.has("AMODEL")) {
+   if(!ByColumn.has("AMODEL")) {
       mlog << Debug(4)
            << "Skipping frequency of superior performance since "
            << "the case information does not contain \"AMODEL\".\n";
@@ -2646,7 +2657,7 @@ void TCStatJobRIRW::init_from_scratch() {
    TCStatJob::init_from_scratch();
 
    // Ignore case when performing comparisons
-   CaseColumn.set_ignore_case(1);
+   ByColumn.set_ignore_case(1);
 
    clear();
 
@@ -2665,7 +2676,7 @@ void TCStatJobRIRW::clear() {
    // Disable rapid intensification/weakening filtering logic.
    RIRWTrack = TrackType_None;
 
-   CaseColumn.clear();
+   ByColumn.clear();
    RIRWMap.clear();
 
    for(i=0; i<4; i++) DumpFileCTC[i].clear();
@@ -2686,7 +2697,7 @@ void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
 
    TCStatJob::assign(j);
 
-   CaseColumn  = j.CaseColumn;
+   ByColumn    = j.ByColumn;
    OutAlpha    = j.OutAlpha;
    OutLineType = j.OutLineType;
    RIRWMap     = j.RIRWMap;
@@ -2720,7 +2731,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"            ) == 0) { CaseColumn.add_css(to_upper(a[i+1]));  a.shift_down(i, 1); }
+           if(strcasecmp(c, "-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));  a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1])); a.shift_down(i, 1); }
       else                                           {                                        b.add(a[i]);        }
@@ -2814,8 +2825,8 @@ ConcatString TCStatJobRIRW::serialize() const {
      << sec_to_hhmmss(RIRWWindowEnd) << " ";
 
    // Add RIRW job-specific options
-   for(i=0; i<CaseColumn.n_elements(); i++)
-      s << "-by " << CaseColumn[i] << " ";
+   for(i=0; i<ByColumn.n_elements(); i++)
+      s << "-by " << ByColumn[i] << " ";
 
    for(i=0; i<OutLineType.n_elements(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
@@ -2901,7 +2912,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    for(i=0; i<pair.n_points(); i++) {
 
       // Build the map key
-      key = build_map_key("RIRW", *pair.line(i), CaseColumn);
+      key = build_map_key("RIRW", *pair.line(i), ByColumn);
 
       // Add map entry for this key, if necessary
       if(cur_map.count(key) == 0) cur_map[key] = data;
@@ -3095,8 +3106,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + CaseColumn.n_elements() + n_ctc_columns);
-   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
+                   9 + ByColumn.n_elements() + n_ctc_columns);
+   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3115,8 +3126,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<CaseColumn.n_elements(); i++) {
-      out_at.set_entry(r, c++, CaseColumn[i]);
+   for(i=0; i<ByColumn.n_elements(); i++) {
+      out_at.set_entry(r, c++, ByColumn[i]);
    }
 
    // Write the header columns
@@ -3169,8 +3180,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + CaseColumn.n_elements() + n_cts_columns);
-   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
+                   9 + ByColumn.n_elements() + n_cts_columns);
+   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3189,8 +3200,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<CaseColumn.n_elements(); i++) {
-      out_at.set_entry(r, c++, CaseColumn[i]);
+   for(i=0; i<ByColumn.n_elements(); i++) {
+      out_at.set_entry(r, c++, ByColumn[i]);
    }
 
    // Write the header columns
@@ -3257,8 +3268,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
    // Format the output table
    out_at.set_size(r + 1,
-                   9 + CaseColumn.n_elements() + 15);
-   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
+                   9 + ByColumn.n_elements() + 15);
+   setup_table(out_at, 9 + ByColumn.n_elements(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3277,8 +3288,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    out_at.set_entry(r, c++, "WINDOW_END");
 
    // Write case column names
-   for(i=0; i<CaseColumn.n_elements(); i++) {
-      out_at.set_entry(r, c++, CaseColumn[i]);
+   for(i=0; i<ByColumn.n_elements(); i++) {
+      out_at.set_entry(r, c++, ByColumn[i]);
    }
 
    // Write the header columns
@@ -3388,7 +3399,7 @@ void TCStatJobProbRIRW::init_from_scratch() {
    TCStatJob::init_from_scratch();
 
    // Ignore case when performing comparisons
-   CaseColumn.set_ignore_case(1);
+   ByColumn.set_ignore_case(1);
 
    clear();
 
@@ -3403,7 +3414,7 @@ void TCStatJobProbRIRW::clear() {
 
    JobType = TCStatJobType_ProbRIRW;
 
-   CaseColumn.clear();
+   ByColumn.clear();
    ProbRIRWMap.clear();
 
    // Set to default values
@@ -3429,7 +3440,7 @@ void TCStatJobProbRIRW::assign(const TCStatJobProbRIRW & j) {
    ProbRIRWExact        = j.ProbRIRWExact;
    ProbRIRWBDeltaThresh = j.ProbRIRWBDeltaThresh;
    ProbRIRWProbThresh   = j.ProbRIRWProbThresh;
-   CaseColumn           = j.CaseColumn;
+   ByColumn             = j.ByColumn;
    MaxNThresh           = j.MaxNThresh;
    NDumpLines           = j.NDumpLines;
    OutAlpha             = j.OutAlpha;
@@ -3466,7 +3477,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"                    ) == 0) { CaseColumn.add_css(to_upper(a[i+1]));                  a.shift_down(i, 1); }
+           if(strcasecmp(c, "-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                    a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1]);                               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                 a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1]);                a.shift_down(i, 1); }
@@ -3559,8 +3570,8 @@ ConcatString TCStatJobProbRIRW::serialize() const {
    s << "-probrirw_prob_thresh " << prob_thresh_to_string(ProbRIRWProbThresh) << " ";
 
    // Add ProbRIRW job-specific options
-   for(i=0; i<CaseColumn.n_elements(); i++)
-      s << "-by " << CaseColumn[i] << " ";
+   for(i=0; i<ByColumn.n_elements(); i++)
+      s << "-by " << ByColumn[i] << " ";
 
    for(i=0; i<OutLineType.n_elements(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
@@ -3659,7 +3670,7 @@ void TCStatJobProbRIRW::process_pair(ProbRIRWPairInfo &pair) {
    if(n > MaxNThresh) MaxNThresh = n;
 
    // Build the map key
-   key = build_map_key("PROBRIRW", pair.line(), CaseColumn);
+   key = build_map_key("PROBRIRW", pair.line(), ByColumn);
 
    // Add map entry for this key, if necessary
    if(ProbRIRWMap.count(key) == 0) {
@@ -3751,8 +3762,8 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       // Initialize the output table
       out_at.clear();
       out_at.set_size((int) ProbRIRWMap.size() + 1,
-                      5 + CaseColumn.n_elements() + lt_cols);
-      setup_table(out_at, 5 + CaseColumn.n_elements(), get_precision());
+                      5 + ByColumn.n_elements() + lt_cols);
+      setup_table(out_at, 5 + ByColumn.n_elements(), get_precision());
 
       // Initialize row and column indices
       r = c = 0;
@@ -3768,8 +3779,8 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       out_at.set_entry(r, c++, "PROB_THRESH");
 
       // Write case column names
-      for(j=0; j<CaseColumn.n_elements(); j++)
-         out_at.set_entry(r, c++, CaseColumn[j]);
+      for(j=0; j<ByColumn.n_elements(); j++)
+         out_at.set_entry(r, c++, ByColumn[j]);
 
       // Write the header columns
            if(out_lt == stat_pct)  write_pct_header_row (0, n, out_at, r, c);

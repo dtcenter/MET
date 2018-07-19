@@ -28,9 +28,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Defaults to be used if not specified by the user
-static const bool         default_water_only         = false;
-static const bool         default_match_points       = false;
-static const bool         default_event_equal        = false;
+static const bool         default_column_union = false;
+static const bool         default_water_only   = false;
+static const bool         default_match_points = false;
+static const bool         default_event_equal  = false;
 
 // Default rapid intensification is an increase of 30 kts over 24 hours
 static const TrackType    default_rirw_track  = TrackType_None;
@@ -408,9 +409,10 @@ class TCStatJobSummary : public TCStatJob {
 
       // Store the actual column names
       StringArray Column;
+      bool ColumnUnion;
 
       // Store the case information
-      StringArray CaseColumn;
+      StringArray ByColumn;
 
       // Confidence interval alpha value
       double OutAlpha;
@@ -464,7 +466,7 @@ class TCStatJobRIRW : public TCStatJob {
       void do_mpr_output(ostream &);
 
       // Store the case information
-      StringArray CaseColumn;
+      StringArray ByColumn;
 
       // Confidence interval alpha value
       double OutAlpha;
@@ -514,7 +516,7 @@ class TCStatJobProbRIRW : public TCStatJob {
       ThreshArray  ProbRIRWProbThresh;   // Array of probabilities for PCT bins
 
       // Store the case information
-      StringArray CaseColumn;
+      StringArray ByColumn;
 
       // Maximum number of thresholds encountered
       int MaxNThresh;
