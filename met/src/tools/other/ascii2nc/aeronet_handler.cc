@@ -32,12 +32,30 @@ static const char *AERONET_NA_STR = "N/A";
 
 const int AeronetHandler::NUM_HDR_COLS = 7;
 const int AeronetHandler::NUM_OBS_COLS = 45;
+//const int NUM_OBS_COLS_V3 = 113;
+//const int NUM_OBS_COLS_V3_tot  = 57;
+//const int NUM_OBS_COLS_V3_oneill = 267;
+
+const int version_3_columns[7] = { 113, 81, 53, 33, 41, 259 };
+
+const string site_name_col = "AERONET_Site_Name";
+const string lat_col       = "Site_Latitude";       // "Site_Latitude(Degrees)";
+const string lon_col       = "Site_Longitude";      // "Site_Longitude(Degrees)";
+const string elv_col       = "Site_Elevation";      // "Site_Elevation(m)";
 
 const string AeronetHandler::HEADER_TYPE = "";  /////
 
 const int AeronetHandler::AOT_GRIB_CODE = 129;
 const string AOT_NAME = "AOT";
+const string AOD_NAME = "AOD";
+const string INPUT_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
+const string WAVELENGTHS_AOD_NAME = "Exact_Wavelengths_of_AOD"; // Exact_Wavelengths_of_AOD(um)_865nm
+const string WAVELENGTHS_PW_NAME = "Exact_Wavelengths_of_PW";   // Exact_Wavelengths_of_PW(um)_935nm
+const string TRIPLET_VAR_NAME = "Triplet_Variability";  // Triplet_Variability_1640
+const string TRIPLET_VPW_NAME = "Triplet_Variability_Precipitable_Water";
+const string WAVELENGTHS_INPUT_AOD_NAME = "Exact_Wavelengths_for_Input_AOD";    // Exact_Wavelengths_for_Input_AOD(um)
 
+static int format_version;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,6 +100,18 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   DataLine dl;
   dl.set_delimiter(",");
   ascii_file >> dl;
+  
+  //Check if version 3
+  string line = dl.get_line();
+  if (line.length() > 17) {
+     line = line.substr(0, 17);
+     if (strcmp(line.c_str(), "AERONET Version 3") == 0) {
+       is_file_type = true;
+       format_version = 3;
+       return is_file_type;
+     }
+  }
+  
   ascii_file >> dl;
   ascii_file >> dl;
 
@@ -89,7 +119,7 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   // Read the fourth line in the file.  It should start with AOD Level.
   //
   ascii_file >> dl;
-  string line = dl.get_line();
+  line = dl.get_line();
   line = line.substr(0, 9);
 
   if (strcmp(line.c_str(), "AOD Level") == 0)
@@ -122,19 +152,51 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   ConcatString dl_string(data_line[0]);
   StringArray tokens = dl_string.split(" ");
   string header_type = "AERONET" + string("_") + tokens[tokens.n_elements()-1];
+  
+  if (format_version == 3 && data_line.n_items() > 1) {
+    //string tmp_str = string(data_line[1]);
+    string tmp_str = string(data_line.get_line());
+    int offset = tmp_str.find(":");
+    if (offset != string::npos)
+      header_type += tmp_str.substr(0, offset);
+    mlog << Debug(5) << "_readObservations() message_type: [" << header_type << "]\n";
+  }
 
   //
   // Get the field information from the fifth header line
   //
 
+  if (format_version == 3) {
+    use_var_id = true;
+    // Get the field information from the 7-th header line
+    ascii_file >> data_line;
+    ascii_file >> data_line;
+    ascii_file >> data_line;
+  }
   ascii_file >> data_line;
-  StringArray hdr_tokens;
+  StringArray hdr_tokens, extra_hdr_tokens;
   IntArray process_flag;
 
   hdr_tokens.parse_css(data_line.get_line());
+  if (data_line.n_items() > 1) {
+    for (int idx=1; idx<data_line.n_items(); idx++) {
+      extra_hdr_tokens.parse_css(data_line[idx]);
+      hdr_tokens.add(extra_hdr_tokens);
+    }
+  }
 
+  int flag;
+  int var_idx, sid_idx, elv_idx, lat_idx, lon_idx;
+  double height_from_header;
   string aot = "AOT";
   //string angstrom = "Angstrom";
+  string var_name;
+  StringArray hdr_names;
+  NumArray header_heights;
+  IntArray header_var_index;
+  StringArray header_var_names;
+  
+  sid_idx = elv_idx = lat_idx = lon_idx = -1;
 
   for (int j = 0; j < hdr_tokens.n_elements(); j++)
   {
@@ -142,24 +204,67 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Set the process_flag to 1 if AOT (or Angstrom - future code) is in the field name
     // otherwise set the process flag to 0
+    flag = 0;
 
     if (hdr_field.find(aot) != string::npos)
     {
-      process_flag.add(1);
+      flag = 1;
     }
     //else if (hdr_field.find(angstrom) != string::npos)
     //{
     //  process_flag.add(1);
     //}
-    else
+    else if ((0 == hdr_field.find(AOD_NAME))
+        || (string::npos != hdr_field.find(INPUT_AOD_NAME))
+        || (string::npos != hdr_field.find(TRIPLET_VAR_NAME))
+        || (string::npos != hdr_field.find(TRIPLET_VPW_NAME))
+        || (string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME))
+        || (string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) )
     {
-      process_flag.add(0);
+      if (hdr_field.find("Empty") == string::npos) flag = 1;
+    }
+    
+    process_flag.add(flag);
+    
+    if (format_version == 3) {
+      if (0 == hdr_field.find(site_name_col)) sid_idx = j;
+      else if (0 == hdr_field.find(lat_col))  lat_idx = j;
+      else if (0 == hdr_field.find(lon_col))  lon_idx = j;
+      else if (0 == hdr_field.find(elv_col))  elv_idx = j;
+      
+      //if (0 == hdr_field.find(site_name_col)) cout << "   DEBUG HS " << sid_idx << "  " << hdr_field <<"\n";
+      //else if (0 == hdr_field.find(lat_col))  cout << "   DEBUG HS " << lat_idx << "  " << hdr_field <<"\n";
+      //else if (0 == hdr_field.find(lon_col))  cout << "   DEBUG HS " << lon_idx << "  " << hdr_field <<"\n";
+      //else if (0 == hdr_field.find(elv_col))  cout << "   DEBUG HS " << elv_idx << "  " << hdr_field <<"\n";
+
+      // Collect variable names and index
+      var_name = make_var_name_from_header(hdr_field);
+      if (!var_names.has(var_name.c_str(), var_idx)) {
+        if (flag) {
+          var_idx = var_names.n_elements();
+          var_names.add(var_name.c_str());
+        }
+      }
+      height_from_header = extract_height(hdr_field);
+      header_var_index.add(var_idx);
+      header_var_names.add(var_name.c_str());
+      header_heights.add(height_from_header);
+      mlog << Debug(5) << "AeronetHandler::_readObservations() header_idx: " << j
+           << ", var_idx: " << var_idx << ", var: " << var_name << " from " << hdr_field
+           << ", flag: " << flag << ", height: " << height_from_header << "\n";
     }
   }
-
+  
+  int column_cnt = NUM_OBS_COLS;
+  if (format_version == 3) {
+    column_cnt = get_header_count_v3(hdr_tokens);
+  }
+  
   //
   // Process the observation lines
   //
+  int bad_line_count = 0;
+  bool first_line = true;
   data_line.set_delimiter(",");
   while (ascii_file >> data_line)
   {
@@ -167,15 +272,75 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     // Make sure that the line contains the correct number of tokens
     //
 
-    if (data_line.n_items() != NUM_OBS_COLS)
+    if (data_line.n_items() != column_cnt)
     {
-      mlog << Error << "\nAeronetHandler::_readObservations() -> "
-	   << "line number " << data_line.line_number()
-	   << " does not have the correct number of columns  ("
-	   << NUM_OBS_COLS << ").\n\n";
-      return false;
+      bad_line_count++;
+      if (format_version != 3) {
+        mlog << Error << "\nAeronetHandler::_readObservations() -> "
+             << "line number " << data_line.line_number()
+             << " does not have the correct number of columns " << data_line.n_items()
+             << " (" << column_cnt << "). Stop processing \""
+             << ascii_file.filename() << "\".\n\n";
+        return false;
+      }
+      else if (data_line.n_items() < column_cnt) {
+        mlog << Error << "\nAeronetHandler::_readObservations() -> "
+             << "line number " << data_line.line_number()
+             << " does not have the correct number of columns " << data_line.n_items()
+             << " (" << column_cnt << "). Stop processing \""
+             << ascii_file.filename() << "\".\n\n";
+        break;
+      }
+      else {
+        if (bad_line_count < 5) {
+          mlog << Warning << "\nAeronetHandler::_readObservations() -> "
+               << "line number " << data_line.line_number()
+               << " has more number of columns " << data_line.n_items()
+               << " (" << column_cnt << ").\n\n";
+        }
+      }
     }
 
+    if (first_line) {
+      if (format_version == 3) {
+        // Get the stationId
+        if (elv_idx < 0) {
+          mlog << Warning << "AeronetHandler::_readObservations() Can not find header column \""
+               << elv_col << "\". from " << ascii_file.filename() << "\".\n\n";
+          break;
+        }
+        else if ((sid_idx < 0) || (lat_idx < 0) || (lon_idx < 0)) {
+          string field_name = (sid_idx < 0) ? site_name_col
+                            : (lat_idx < 0) ? lat_col : lon_col;
+          mlog << Error << "AeronetHandler::_readObservations() Can not find header column \""
+               << field_name << "\". Skip the input \"" << ascii_file.filename()
+               << "\"\n\n";
+          break;
+        }
+        if (_stationId != data_line[sid_idx]) {
+          mlog << Error << "\nAeronetHandler::_readObservations() The header and data columns don't match."
+               << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
+               << " is different from " << _stationId
+               << ". Skip this input \"" << ascii_file.filename()
+               << "\"\n\n";
+          break;
+        }
+        //_stationId = data_line[sid_idx];
+        // Get the stationLat
+        _stationLat = atof(data_line[lat_idx]);
+        // Get the stationLon
+        _stationLon = atof(data_line[lon_idx]);
+        // Get the stationAlt
+        if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
+        else _stationAlt = bad_data_float;
+        mlog << Debug(5) << "AeronetHandler::_readObservations() stationID: "
+             << data_line[sid_idx] << " from index " << sid_idx
+             << "  lat: " << _stationLat
+             << "  lon: " << _stationLon
+             << "  elv: " << _stationAlt << " from index " << elv_idx << "\n";
+      }
+      first_line = false;
+    }
     //
     // Pull the valid time from the data line
     //
@@ -185,50 +350,65 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     if (valid_time == 0)
       return false;
 
+    int var_id = AOT_GRIB_CODE;
+    string var_name = AOT_NAME;
     //
     // Save the desired observations from the line
     //
     for (int k = 0; k < process_flag.n_elements(); k++)
     {
-      if (process_flag[k] == 1)
+      if (process_flag[k] != 1) continue;
+
+      string hdr_field = hdr_tokens[k];
+      size_t found_aot = hdr_field.find(aot);
+      //int found_angstrom = hdr_field.find(angstrom);
+      string height = "";
+
+      if (found_aot != string::npos)
       {
-	string hdr_field = hdr_tokens[k];
-	size_t found_aot = hdr_field.find(aot);
-	//int found_angstrom = hdr_field.find(angstrom);
-	string height = "";
-
-	if (found_aot != string::npos)
-	{
-	  height = hdr_field.substr((found_aot + 4), hdr_field.size() - 1);
-	}
-
-	//if (found_angstrom != string::npos)
-	//{
-	//  size_t found_dash = hdr_field.find("-");
-	//  if (found_dash != string::npos)
-	//  {
-	//    height = hdr_field.substr(0, found_dash);
-	//  }
-	//}
-
-	double dlevel = bad_data_double;
-	double dheight = atoi(height.c_str());
-
-	if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
-
-    _addObservations(Observation(header_type, _stationId,
-                                 valid_time,
-                                 _stationLat, _stationLon,
-                                 _stationAlt,
-                                 na_str,
-                                 AOT_GRIB_CODE,
-                                 dlevel, dheight,
-                                 atof(data_line[k]),
-                                 AOT_NAME));
+        height = hdr_field.substr((found_aot + 4), hdr_field.size() - 1);
       }
+
+      //if (found_angstrom != string::npos)
+      //{
+      //  size_t found_dash = hdr_field.find("-");
+      //  if (found_dash != string::npos)
+      //  {
+      //    height = hdr_field.substr(0, found_dash);
+      //  }
+      //}
+
+      if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
+
+      string var_name = AOT_NAME;
+      
+      double dlevel = bad_data_double;
+      double dheight = atoi(height.c_str());
+
+      if (format_version == 3) {
+        var_id   = header_var_index[k];
+        var_name = header_var_names[k];
+        dheight  = header_heights[k];
+      }
+      
+      _addObservations(Observation(header_type, _stationId,
+                                   valid_time,
+                                   _stationLat, _stationLon,
+                                   _stationAlt,
+                                   na_str,
+                                   var_id,
+                                   dlevel, dheight,
+                                   atof(data_line[k]),
+                                   var_name));
     }
   } // end while
-
+  if (bad_line_count > 0) {
+    mlog << Warning << "\nAeronetHandler::_readObservations() -> "
+         << "Found " << bad_line_count 
+         << " lines with more data columns from " 
+         << ascii_file.filename() << "\".\n\n";
+  }
+  
   return true;
 }
 
@@ -292,11 +472,19 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   // longitude, and elevation.
   //
 
+  if (format_version == 3) {
+    _stationId = data_line[0];
+    if (' ' == _stationId[0]) _stationId = _stationId.substr(1);
+    mlog << Debug(5) << " _stationId: [" <<  _stationId << "]\n";
+    // read lat/lon from https://aeronet.gsfc.nasa.gov/aeronet_locations_v3.txt
+    return true;
+  }
+
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\nAeronetHandler::_readHeaderInfo() -> "
-	 << "error reading station id line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading station id line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -308,8 +496,8 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (data_line.n_items() != NUM_HDR_COLS)
   {
     mlog << Error << "\nAeronetHandler::_readHeaderInfo() -> "
-	 << "AERONET file has incorrect number of columns ("
-	 << data_line.n_items() << ") in header line\n\n";
+         << "AERONET file has incorrect number of columns ("
+         << data_line.n_items() << ") in header line\n\n";
     return false;
   }
 
@@ -347,4 +535,146 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   return true;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double AeronetHandler::extract_height(string hdr_field) {
+  double height;
+
+  size_t offset;
+  string height_str = "";
+  string tmp_height;
+  bool with_unit = false;
+  StringArray hdr_names;
+
+  if (string::npos == hdr_field.find("Empty")) {
+    int token_count = 0;
+    hdr_names.parse_delim(hdr_field.c_str(), "_");
+    // AOD_1640nm-Total,AOD_1640nm-AOD,AOD_1640nm-Rayleigh,AOD_1640nm-O3,
+    //   AOD_1640nm-NO2,AOD_1640nm-CO2,AOD_1640nm-CH4,AOD_1640nm-WaterVapor
+    if (0 == (offset = hdr_field.find(AOD_NAME))) {
+      with_unit = true;
+      tmp_height = hdr_names[hdr_names.n_elements()-1];
+      hdr_names.clear();
+      hdr_names.parse_delim(tmp_height.c_str(), "-");
+      height_str = hdr_names[0];
+    }
+    // Exact_Wavelengths_for_Input_AOD(um)
+    else if (0 == (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME))) {
+      StringArray tmp_hdr_names;
+      tmp_hdr_names.parse_delim(WAVELENGTHS_INPUT_AOD_NAME.c_str(), "_");
+      token_count = tmp_hdr_names.n_elements();
+    }
+    // 870nm_Input_AOD
+    else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
+      with_unit = true;
+      height_str = hdr_names[0];
+    }
+    // Triplet_Variability_Precipitable_Water
+    else if (string::npos != (offset = hdr_field.find(TRIPLET_VPW_NAME)) ) {
+      StringArray tmp_hdr_names;
+      tmp_hdr_names.parse_delim(TRIPLET_VPW_NAME.c_str(), "_");
+      token_count = tmp_hdr_names.n_elements();
+    }
+    // Triplet_Variability_1640
+    else if (string::npos != (offset = hdr_field.find(TRIPLET_VAR_NAME)) ) {
+      height_str = hdr_names[hdr_names.n_elements()-1];
+    }
+    // Exact_Wavelengths_of_AOD(um)_865nm
+    // Exact_Wavelengths_of_PW(um)_935nm
+    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))
+        || string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME)) ) {
+      with_unit = true;
+      StringArray tmp_hdr_names;
+      tmp_hdr_names.parse_delim(WAVELENGTHS_AOD_NAME.c_str(), "_");
+      token_count = tmp_hdr_names.n_elements();
+    }
+    // Exact_Wavelengths_of_INPUT_AOD(um)
+    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME)) ) {
+      StringArray tmp_hdr_names;
+      tmp_hdr_names.parse_delim(WAVELENGTHS_INPUT_AOD_NAME.c_str(), "_");
+      token_count = tmp_hdr_names.n_elements();
+    }
+    
+    if (0 < token_count && token_count < hdr_names.n_elements())
+      height_str = hdr_names[hdr_names.n_elements()-1];
+    
+    if (with_unit && height_str.length() > 2)
+      height_str = height_str.substr(0, (height_str.length()-2));
+  }
+  mlog << Debug(10) << "AeronetHandler::extract_height() height: "
+       << height_str << " from " << hdr_field << "\n";
+
+  if (height_str == "") height = bad_data_double;
+  else {
+    height = (double)atoi(height_str.c_str());
+    if (is_eq(height, 0,0)) {
+      mlog << Warning << "AeronetHandler::extract_height() converted to 0 from (" << height_str << ")\n";
+    }
+  }
+ 
+  return height;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int AeronetHandler::get_header_count_v3(StringArray hdr_tokens) {
+  int header_cnt = hdr_tokens.n_elements();
+  
+  mlog << Debug(5) << "get_header_count_v3() " << header_cnt << "\n";
+  return header_cnt;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+string AeronetHandler::make_var_name_from_header(string hdr_field) {
+  string var_name = hdr_field;
+  if (format_version == 3) {
+    int offset;
+    bool found = true;
+    StringArray hdr_names;
+    // AOD_1640nm-Total,AOD_1640nm-AOD,AOD_1640nm-Rayleigh,AOD_1640nm-O3,
+    //   AOD_1640nm-NO2,AOD_1640nm-CO2,AOD_1640nm-CH4,AOD_1640nm-WaterVapor
+    if (0 == (offset = hdr_field.find(AOD_NAME))) {
+      hdr_names.parse_delim(hdr_field.c_str(), "_");
+      var_name = hdr_names[0];
+    }
+    // Exact_Wavelengths_for_Input_AOD(um)
+    else if (0 == (offset = hdr_field.find(WAVELENGTHS_INPUT_AOD_NAME))) {
+      var_name = WAVELENGTHS_INPUT_AOD_NAME;
+    }
+    // const string Input_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
+    else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
+      var_name = INPUT_AOD_NAME;
+    }
+    // Triplet_Variability_Precipitable_Water
+    else if (string::npos != (offset = hdr_field.find(TRIPLET_VPW_NAME))) {
+      var_name = TRIPLET_VPW_NAME;
+    }
+    // Triplet_Variability_1640
+    else if (string::npos != (offset = hdr_field.find(TRIPLET_VAR_NAME))) {
+      var_name = TRIPLET_VAR_NAME;
+    }
+    // Exact_Wavelengths_of_AOD(um)_865nm
+    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))) {
+      var_name = WAVELENGTHS_AOD_NAME;
+    }
+    // Exact_Wavelengths_of_PW(um)_935nm
+    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME))) {
+      var_name = WAVELENGTHS_PW_NAME;
+    }
+    else {
+      found = false;
+    }
+    if (found) {
+      hdr_names.clear();
+      hdr_names.parse_delim(hdr_field.c_str(), "-");
+      if (hdr_names.n_elements() > 1) {
+        var_name += "-";
+        var_name += hdr_names[hdr_names.n_elements()-1];
+      }
+    }
+  }
+  return var_name;
 }

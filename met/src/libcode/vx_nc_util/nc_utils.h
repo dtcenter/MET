@@ -334,7 +334,7 @@ extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long
 
 extern bool get_nc_data_to_array(NcVar  *, StringArray *);
 extern bool get_nc_data_to_array(NcFile *, const char *, StringArray *);
-//extern int  get_nc_string_length(NcVar  *);
+extern int  get_nc_string_length(NcVar  *);
 //extern int  get_nc_string_length(NcFile *, const char *);
 extern int  get_nc_string_length(NcFile *, NcVar, const char *var_name);
 

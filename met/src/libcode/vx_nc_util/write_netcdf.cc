@@ -663,6 +663,17 @@ void create_nc_pb_hdrs (NetcdfObsVars &obs_vars, NcFile *f_out,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+NcDim create_nc_obs_var (NetcdfObsVars &obs_vars, NcFile *f_out, int var_count, const int deflate_level) {
+   NcDim var_dim  = add_dim(f_out, nc_dim_nvar, var_count);
+   if (IS_INVALID_NC(obs_vars.strl2_dim)) obs_vars.strl2_dim = add_dim(f_out, nc_dim_mxstr2, HEADER_STR_LEN2);
+   
+   obs_vars.obs_var = add_var(f_out, nc_var_obs_var, ncChar, var_dim, obs_vars.strl2_dim, deflate_level);
+   add_att(&obs_vars.obs_var,  "long_name", "variable names");
+   return var_dim;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int deflate_level, bool use_var_id) {
    const char *long_name_str;
    const char *method_name = "  create_nc_obs_vars()";
@@ -738,10 +749,7 @@ void create_nc_other_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
    add_att(&obs_vars.hdr_vld_tbl_var, "units", "YYYYMMDD_HHMMSS UTC");
 
    if (var_count > 0) {
-      NcDim var_dim  = add_dim(f_out, nc_dim_nvar, var_count);
-
-      obs_vars.obs_var  = add_var(f_out, nc_var_obs_var, ncChar, var_dim, obs_vars.strl2_dim,  deflate_level);
-      add_att(&obs_vars.obs_var,  "long_name", "variable names");
+      NcDim var_dim = create_nc_obs_var(obs_vars, f_out, var_count, deflate_level);
       if (unit_count > 0) {
          obs_vars.unit_var = add_var(f_out,    nc_var_unit, ncChar, var_dim, obs_vars.strl2_dim, deflate_level);
          obs_vars.desc_var = add_var(f_out,    nc_var_desc, ncChar, var_dim, obs_vars.strl3_dim, deflate_level);

@@ -200,23 +200,22 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
   // Add variable names
   if (use_var_id) {
-    int max_name_len = HEADER_STR_LEN;
-    char var_name[max_name_len];
     add_att(_ncFile, nc_att_use_var_id, "true");
-    NcDim var_dim     = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());
-    NcDim strl_dim    = get_nc_dim(_ncFile,  nc_dim_mxstr);
-    NcVar var_obs_var = add_var(_ncFile, nc_var_obs_var, ncChar, var_dim, strl_dim, deflate_level);
-    add_att(&var_obs_var,  "long_name", "variable names from ASCII input");
+    if (IS_INVALID_NC(obs_vars.obs_var)) create_nc_obs_var(obs_vars, _ncFile, obs_names.n_elements(), deflate_level);
     
+    int max_name_len = get_nc_string_length(&obs_vars.obs_var);
+    char var_name[max_name_len];
     long offsets[2] = { 0, 0 };
     long lengths[2] = { 1, max_name_len } ;
     for(int i=0; i<obs_names.n_elements(); i++) {
-      for(int tIdx=0; tIdx<max_name_len; tIdx++) {
+      int var_len = strlen(obs_names[i]);
+      if (var_len >= max_name_len) var_len = max_name_len -1;
+      strncpy(var_name, obs_names[i], var_len);
+      for(int tIdx=var_len; tIdx<max_name_len; tIdx++) {
         var_name[tIdx] = bad_data_char;
       }
-      strcpy(var_name, obs_names[i]);
 
-      if(!put_nc_data(&var_obs_var, (char *)var_name, lengths, offsets)) {
+      if(!put_nc_data(&obs_vars.obs_var, (char *)var_name, lengths, offsets)) {
          mlog << Error << "\nwriteNetcdfFile() -> "
               << "error writing the variable name to the netCDF file\n\n";
          exit(1);
