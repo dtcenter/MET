@@ -64,6 +64,7 @@ using namespace netCDF;
 
 #include "data2d_factory.h"
 #include "mask_poly.h"
+#include "apply_mask.h"
 #include "vx_grid.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
@@ -109,6 +110,7 @@ static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
 
 static Grid        mask_grid;
+static MaskPlane   mask_plane;
 static MaskPoly    mask_poly;
 static StringArray mask_sid;
 
@@ -213,6 +215,7 @@ int main(int argc, char *argv[]) {
    // Set the masking grid and polyline, if specified.
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) file_handler->setGridMask(mask_grid);
+   if(!mask_plane.is_empty())                   file_handler->setAreaMask(mask_plane);
    if(mask_poly.n_points() > 0)                 file_handler->setPolyMask(mask_poly);
    if(mask_sid.n_elements() > 0)                file_handler->setSIDMask(mask_sid);
 
@@ -428,10 +431,11 @@ void usage() {
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
 
-        << "\t\t\"-mask_grid string\" is a named grid or a data file "
-        << "defining grid for filtering the point observations spatially (optional).\n"
+        << "\t\t\"-mask_grid string\" is a named grid or a data file defining "
+        << "the grid for filtering the point observations spatially (optional).\n"
 
-        << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
+        << "\t\t\"-mask_poly file\" is a polyline file, the output of gen_vx_mask, "
+        << "or a gridded data file with field information for filtering "
         << "the point observations spatially (optional).\n"
 
         << "\t\t\"-mask_sid file|list\" is a station ID masking file or a "
@@ -473,27 +477,27 @@ void usage() {
 
 void set_format(const StringArray & a) {
 
-  if(MetHandler::getFormatString() == a[0]) {
-    ascii_format = ASCIIFormat_MET;
-  }
-  else if(LittleRHandler::getFormatString() == a[0]) {
-    ascii_format = ASCIIFormat_Little_R;
-  }
-  else if(SurfradHandler::getFormatString() == a[0]) {
-    ascii_format = ASCIIFormat_SurfRad;
-  }
-  else if(WwsisHandler::getFormatString() == a[0]) {
-    ascii_format = ASCIIFormat_WWSIS;
-  }
-  else if(AeronetHandler::getFormatString() == a[0]) {
-    ascii_format = ASCIIFormat_Aeronet;
-  }
-  else {
-    mlog << Error << "\nset_format() -> "
-         << "unsupported ASCII observation format \""
-         << a[0] << "\".\n\n";
-    exit(1);
-  }
+   if(MetHandler::getFormatString() == a[0]) {
+      ascii_format = ASCIIFormat_MET;
+   }
+   else if(LittleRHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_Little_R;
+   }
+   else if(SurfradHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_SurfRad;
+   }
+   else if(WwsisHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_WWSIS;
+   }
+   else if(AeronetHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_Aeronet;
+   }
+   else {
+      mlog << Error << "\nset_format() -> "
+           << "unsupported ASCII observation format \""
+           << a[0] << "\".\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -508,60 +512,51 @@ void set_logfile(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a)
-{
-  config_filename = a[0];
+void set_config(const StringArray & a) {
+   config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask_grid(const StringArray & a) {
-  Met2dDataFileFactory factory;
-  Met2dDataFile * datafile = (Met2dDataFile *) 0;
 
-  // List the grid masking file
-  mlog << Debug(1)
-       << "Grid Masking: " << a[0] << "\n";
+   // List the grid masking file
+   mlog << Debug(1)
+        << "Grid Masking: " << a[0] << "\n";
 
-  // First, try to find the grid by name.
-  if(!find_grid_by_name(a[0], mask_grid)) {
+   parse_grid_mask(a[0], mask_grid);
 
-    // If that doesn't work, try to open a data file.
-    datafile = factory.new_met_2d_data_file(replace_path(a[0]));
-
-    if(!datafile) {
-      mlog << Error << "\nset_mask_grid() -> "
-           << "can't open data file \"" << a[0] << "\"\n\n";
-      exit(1);
-    }
-
-    // Store the data file's grid
-    mask_grid = datafile->grid();
-
-    delete datafile; datafile = (Met2dDataFile *) 0;
-  }
-
-  // List the grid mask
-  mlog << Debug(2)
-       << "Parsed Masking Grid: " << mask_grid.name() << " ("
-       << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
+   // List the grid mask
+   mlog << Debug(2)
+        << "Parsed Masking Grid: " << mask_grid.name() << " ("
+        << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask_poly(const StringArray & a) {
+   ConcatString mask_name;
 
-  // List the polyline masking file
-  mlog << Debug(1)
-       << "Polyline Masking File: " << a[0] << "\n";
+   // List the poly masking file
+   mlog << Debug(1)
+        << "Polyline Masking File: " << a[0] << "\n";
 
-  // Parse the polyline file.
-  mask_poly.load(replace_path(a[0]));
+   parse_poly_mask(a[0], mask_poly, mask_grid, mask_plane, mask_name);
 
-  // List the polyline mask
-  mlog << Debug(2)
-       << "Parsed Masking Polyline: " << mask_poly.name()
-       << " containing " <<  mask_poly.n_points() << " points\n";
+   // List the mask information
+   if(mask_poly.n_points() > 0) {
+      mlog << Debug(2)
+           << "Parsed Masking Polyline: " << mask_poly.name()
+           << " containing " <<  mask_poly.n_points() << " points\n";
+   }
+   else {
+      mlog << Debug(2)
+           << "Parsed Masking Area: " << mask_name
+           << " for (" << mask_grid.nx() << " x " << mask_grid.ny()
+           << ") grid\n";
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

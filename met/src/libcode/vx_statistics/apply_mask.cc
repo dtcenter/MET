@@ -5,6 +5,7 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -27,12 +28,12 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 static void process_poly_mask(const ConcatString &, const Grid &,
                               DataPlane &, ConcatString&);
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) {
    Grid vx_grid;
@@ -109,7 +110,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    return(vx_grid);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
                        DataPlane &wgt_dp) {
@@ -144,7 +145,7 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name) {
@@ -181,7 +182,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      MaskPlane &mask, ConcatString &mask_name) {
@@ -189,16 +190,39 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 
    parse_grid_mask(mask_grid_str, grid, dp, mask_name);
 
-   mask.set_size(dp.nx(), dp.ny());
-
-   int Nxy = dp.nx()*dp.ny();
-
-   for(int i=0; i<Nxy; i++) mask.buf()[i] = !is_eq(dp.data()[i], 0.0);
+   mask = dp.mask_plane();
 
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
+   Met2dDataFileFactory factory;
+   Met2dDataFile * datafile = (Met2dDataFile *) 0;
+
+   // First, try to find the grid by name.
+   if(!find_grid_by_name(mask_grid_str, grid)) {
+
+      // If that doesn't work, try to open a data file.
+      datafile = factory.new_met_2d_data_file(replace_path(mask_grid_str));
+
+      if(!datafile) {
+        mlog << Error << "\nparse_grid_mask() -> "
+             << "can't open data file \"" << mask_grid_str << "\"\n\n";
+        exit(1);
+      }
+
+      // Store the data file's grid
+      grid = datafile->grid();
+
+      delete datafile; datafile = (Met2dDataFile *) 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // The mask_poly_str contains masking regions defined one of 3 ways:
 //
@@ -207,94 +231,39 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 // (3) A 2D data file, followed by a description of the field to be used,
 //     and optionally, a threshold to be applied to the field.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+//
+// Parse the specified mask and regrid to the input grid, if needed.
+//
+////////////////////////////////////////////////////////////////////////
 
 void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
-                     DataPlane &mask_dp, ConcatString &mask_name)
-
-{
+                     DataPlane &mask_dp, ConcatString &mask_name) {
+   ConcatString file_name;
    StringArray tokens;
-   ConcatString s, file_name, thresh_str;
-   SingleThresh st;
-   MetConfig config;
-   const char *delim = "{}";
-   bool append_level, append_thresh;
+   Grid mask_grid;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask \"" << mask_poly_str << "\"\n";
 
-   // 2D Data file
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-
-   // VarInfo object
-   VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) 0;
-
-   // Split up the input string
-   tokens = mask_poly_str.split(delim);
-
-   // Store masking file name
-   if(tokens.n_elements() > 0) file_name = replace_path(tokens[0]);
+   // Tokenize the input string
+   tokens = mask_poly_str.split(poly_str_delim);
+   file_name = replace_path(tokens[0]);
    file_name.ws_strip();
 
-   // Attempt to open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(file_name);
-
-   // If data file pointer is NULL, assume a lat/lon polyline file
-   if(!mtddf) {
+   // If not a 2D data file, process as a lat/lon polyline file
+   if(!is_2d_data_file(file_name)) {
       process_poly_mask(file_name, grid, mask_dp, mask_name);
    }
-   // Otherwise, process the input data file
+   // Otherwise, process as a 2d data file
    else {
 
-      // Create a new VarInfo object
-      info = info_factory.new_var_info(mtddf->file_type());
-
-      // Parse the dictionary string
-      if(tokens.n_elements() > 1) {
-         append_level = true;
-         config.read_string(tokens[1]);
-      }
-      else {
-         append_level = false;
-         config.read_string(default_mask_dict);
-      }
-
-      // Set up the VarInfo object
-      info->set_dict(config);
-
-      // Extract the data plane from the input file
-      mtddf->data_plane(*info, mask_dp);
-
-      // Parse the threshold string
-      if(tokens.n_elements() > 2) {
-         append_thresh = true;
-         thresh_str = tokens[2];
-      }
-      else {
-         append_thresh = false;
-         thresh_str = default_mask_thresh;
-      }
-      thresh_str.ws_strip();
-
-      // Parse the threshold information
-      st.set(thresh_str);
-
-      // Apply threshold to the data plane
-      mask_dp.threshold(st);
-
-      // Store the mask name
-      mask_name = info->name();
-
-      // Append level info
-      if(append_level) mask_name << "_" << info->level_name();
-
-      // Append threshold info
-      if(append_thresh) mask_name << st.get_str();
+      parse_poly_2d_data_mask(mask_poly_str, mask_grid, mask_dp, mask_name);
 
       // Regrid, if necessary, using nearest neighbor.
-      if(!(mtddf->grid() == grid)) {
+      if(!(mask_grid == grid)) {
 
          RegridInfo ri;
          ri.enable = true;
@@ -305,20 +274,16 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
          mlog << Debug(2)
               << "Regridding mask grid to the verification grid using nearest "
               << "neighbor interpolation:\n"
-              << mtddf->grid().serialize() << "!=\n" << grid.serialize() << "\n";
+              << mask_grid.serialize() << "!=\n" << grid.serialize() << "\n";
 
-         mask_dp = met_regrid(mask_dp, mtddf->grid(), grid, ri);
+         mask_dp = met_regrid(mask_dp, mask_grid, grid, ri);
       }
    }
-
-   // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-   if(info)  { delete info;  info  = (VarInfo *)       0; }
 
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
                      MaskPlane &mask, ConcatString &mask_name) {
@@ -326,16 +291,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
    parse_poly_mask(mask_poly_str, grid, dp, mask_name);
 
-   mask.set_size(dp.nx(), dp.ny());
-
-   int Nxy = dp.nx()*dp.ny();
-
-   for(int i=0; i<Nxy; i++) mask.buf()[i] = !is_eq(dp.data()[i], 0.0);
+   mask = dp.mask_plane();
 
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void process_poly_mask(const ConcatString &file_name, const Grid &grid,
                        DataPlane &mask_dp, ConcatString &mask_name) {
@@ -363,7 +324,130 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
+//
+// Parse the poly mask information.  If it's a gridded data file,
+// return the masking grid, mask plane, and the name of the mask.
+// If not, return the polyline object.
+//
+////////////////////////////////////////////////////////////////////////
+
+void parse_poly_mask(const ConcatString &mask_poly_str,
+                     MaskPoly &mask_poly, Grid &mask_grid,
+                     MaskPlane &mask_plane, ConcatString &mask_name) {
+   ConcatString file_name;
+   DataPlane mask_dp;
+   StringArray tokens;
+
+   mlog << Debug(4) << "parse_poly_mask() -> "
+        << "parsing poly mask \"" << mask_poly_str << "\"\n";
+
+   // Tokenize the input string
+   tokens = mask_poly_str.split(poly_str_delim);
+   file_name = replace_path(tokens[0]);
+   file_name.ws_strip();
+
+   // If not a 2D data file, process as a lat/lon polyline file
+   if(!is_2d_data_file(file_name)) {
+      mask_poly.load(file_name);
+   }
+   // Otherwise, process as a 2d data file
+   else {
+      parse_poly_2d_data_mask(mask_poly_str, mask_grid, mask_dp, mask_name);
+      mask_plane = mask_dp.mask_plane();
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
+                             Grid &mask_grid, DataPlane &mask_dp,
+                             ConcatString &mask_name) {
+   ConcatString file_name, thresh_str;
+   StringArray tokens;
+   SingleThresh st;
+   MetConfig config;
+   bool append_level, append_thresh;
+
+   // Tokenize the input string
+   tokens = mask_poly_str.split(poly_str_delim);
+   file_name = replace_path(tokens[0]);
+   file_name.ws_strip();
+
+   // 2D Data file
+   Met2dDataFileFactory mtddf_factory;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   // VarInfo object
+   VarInfoFactory info_factory;
+   VarInfo *info = (VarInfo *) 0;
+
+   // Open the data file
+   mtddf = mtddf_factory.new_met_2d_data_file(file_name);
+
+   // If data file pointer is NULL, assume a lat/lon polyline file
+   if(!mtddf) {
+      mlog << Error << "\nparse_poly_2d_data_mask() -> "
+           << "cannot read file \"" << file_name << "\"!\n\n";
+      exit(1);
+   }
+
+   // Store the masking grid
+   mask_grid = mtddf->grid();
+
+   // Create a new VarInfo object
+   info = info_factory.new_var_info(mtddf->file_type());
+
+   // Parse the dictionary string
+   if(tokens.n_elements() > 1) {
+      append_level = true;
+      config.read_string(tokens[1]);
+   }
+   else {
+      append_level = false;
+      config.read_string(default_mask_dict);
+   }
+
+   // Set up the VarInfo object
+   info->set_dict(config);
+
+   // Extract the data plane from the input file
+   mtddf->data_plane(*info, mask_dp);
+
+   // Parse the threshold string
+   if(tokens.n_elements() > 2) {
+      append_thresh = true;
+      thresh_str = tokens[2];
+   }
+   else {
+      append_thresh = false;
+      thresh_str = default_mask_thresh;
+   }
+   thresh_str.ws_strip();
+
+   // Apply threshold to the data plane and convert to MaskPlane
+   st.set(thresh_str);
+   mask_dp.threshold(st);
+
+   // Store the mask name
+   mask_name = info->name();
+
+   // Append level info
+   if(append_level) mask_name << "_" << info->level_name();
+
+   // Append threshold info
+   if(append_thresh) mask_name << st.get_str();
+
+   // Clean up
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(info)  { delete info;  info  = (VarInfo *)       0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
    int x, y;
@@ -406,7 +490,7 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &dp) {
    int x, y;
@@ -447,4 +531,4 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
    return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////

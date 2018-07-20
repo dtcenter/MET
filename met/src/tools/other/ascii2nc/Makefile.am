@@ -21,16 +21,19 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	aeronet_handler.cc aeronet_handler.h
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
 ascii2nc_LDFLAGS = ${MET_LDFLAGS}
-ascii2nc_LDADD = -lvx_shapedata \
+ascii2nc_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
-     $(PYTHON_LIBS) \
+	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_nc_util \
 	-lvx_data2d \
+	-lvx_nc_util \
 	-lvx_render \
 	-lvx_plot_util \
 	-lvx_pxm \
@@ -40,9 +43,7 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_pb_util \
 	-lvx_nav \
 	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_summary \

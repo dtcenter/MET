@@ -54,9 +54,11 @@ FileHandler::FileHandler(const string &program_name) :
   _hdrNum(0),
   _obsNum(0),
   _gridMaskNum(0),
+  _areaMaskNum(0),
   _polyMaskNum(0),
   _sidMaskNum(0),
   _gridMask(0),
+  _areaMask(0),
   _polyMask(0),
   _sidMask(0),
   use_var_id(false),
@@ -77,7 +79,7 @@ FileHandler::~FileHandler()
 bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
 {
   nc_obs_initialize();
-  
+
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
 
@@ -120,7 +122,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   mlog << Debug(2)
        << "Rejected " << _gridMaskNum
        << " observations off the masking grid.\n"
-       << "Rejected " << _polyMaskNum
+       << "Rejected " << _areaMaskNum + _polyMaskNum
        << " observations outside the masking polyline.\n"
        << "Rejected " << _sidMaskNum
        << " observations not matched with station ID's.\n";
@@ -202,7 +204,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   if (use_var_id) {
     add_att(_ncFile, nc_att_use_var_id, "true");
     if (IS_INVALID_NC(obs_vars.obs_var)) create_nc_obs_var(obs_vars, _ncFile, obs_names.n_elements(), deflate_level);
-    
+
     int max_name_len = get_nc_string_length(&obs_vars.obs_var);
     char var_name[max_name_len];
     long offsets[2] = { 0, 0 };
@@ -223,7 +225,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
       offsets[0] += 1;
     } // end for i
   }
-  
+
   // Close the netCDF file.
 
   _closeNetcdf();
@@ -237,7 +239,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 ////////////////////////////////////////////////////////////////////////
 
 void FileHandler::setSummaryInfo(const TimeSummaryInfo &summary_info) {
-   do_summary = summary_info.flag; 
+   do_summary = summary_info.flag;
    _summaryInfo = summary_info;
    summary_obs.setSummaryInfo(summary_info);
 }
@@ -247,9 +249,9 @@ void FileHandler::setSummaryInfo(const TimeSummaryInfo &summary_info) {
 bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 {
    bool result = summary_obs.summarizeObs(summary_info);
-   
+
    //_observations = summary_obs.getSummaries();
-   
+
    _dataSummarized = true;
    _summaryInfo = summary_info;
    StringArray summary_vnames = summary_obs.getObsNames();
@@ -365,10 +367,10 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
    obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
    obs_arr[4] = obs;   // Observation value
-   
+
    obs_qty = (qty.length() == 0 ? na_str : qty.text());
    write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
-   
+
    return true;
 }
 
@@ -381,16 +383,25 @@ bool FileHandler::_addObservations(const Observation &obs)
    //
    // Apply the grid mask
    //
-   if(_gridMask)
-   {
-     _gridMask->latlon_to_xy(obs.getLatitude(), -1.0*obs.getLongitude(),
-                             grid_x, grid_y);
+   if(_gridMask) {
+      _gridMask->latlon_to_xy(obs.getLatitude(), -1.0*obs.getLongitude(),
+                              grid_x, grid_y);
 
-     if(grid_x < 0 || grid_x >= _gridMask->nx() ||
-        grid_y < 0 || grid_y >= _gridMask->ny()) {
-        _gridMaskNum++;
-        return false;
-     }
+      if(grid_x < 0 || grid_x >= _gridMask->nx() ||
+         grid_y < 0 || grid_y >= _gridMask->ny()) {
+         _gridMaskNum++;
+         return false;
+      }
+
+      //
+      // Apply the area mask
+      //
+      if(_areaMask) {
+         if(!_areaMask->s_is_on(nint(grid_x), nint(grid_y))) {
+            _areaMaskNum++;
+            return false;
+         }
+      }
    }
 
    //
@@ -419,7 +430,7 @@ bool FileHandler::_addObservations(const Observation &obs)
 
    summary_obs.addObservationObj(obs);
    //   _observations.push_back(obs);
-   
+
    if (!do_summary) {
       const char *var_name = obs.getVarName().c_str();
       if (0 < strlen(var_name) && !obs_names.has(var_name)) {
@@ -453,11 +464,11 @@ bool FileHandler::_writeObservations()
   }
   else {
     _observations = summary_obs.getObservations();
-    
+
     for (vector< Observation >::const_iterator obs = _observations.begin();
          obs != _observations.end(); ++obs)
     {
-    
+
       if (obs->getHeaderType() != prev_header_type    ||
           obs->getStationId()  != prev_station_id     ||
           obs->getValidTime()  != prev_valid_time     ||
@@ -472,7 +483,7 @@ bool FileHandler::_writeObservations()
                            obs->getLongitude(),
                            obs->getElevation()))
           return false;
-    
+
         prev_header_type = obs->getHeaderType();
         prev_station_id  = obs->getStationId();
         prev_valid_time  = obs->getValidTime();
@@ -480,16 +491,16 @@ bool FileHandler::_writeObservations()
         prev_longitude   = obs->getLongitude();
         prev_elevation   = obs->getElevation();
       }
-      
+
       if (!_writeObsInfo(obs->getGribCode(),
                          obs->getPressureLevel(),
                          obs->getHeight(),
                          obs->getValue(),
                          obs->getQualityFlag().c_str()))
         return false;
-      
+
     } /* endfor - obs */
-    
+
     write_nc_observation(obs_vars, nc_data_buffer);
 
     int var_count = 0;
