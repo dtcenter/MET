@@ -195,3 +195,17 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+bool is_2d_data_file(const char *filename) {
+   Met2dDataFileFactory mtddf_factory;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   mtddf = mtddf_factory.new_met_2d_data_file(filename);
+   bool status = (mtddf != 0);
+
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
+   return(status);
+}
+
+///////////////////////////////////////////////////////////////////////////////
