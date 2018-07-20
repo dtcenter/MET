@@ -415,6 +415,22 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Return a MaskPlane version of the DataPlane object
+//
+///////////////////////////////////////////////////////////////////////////////
+
+MaskPlane DataPlane::mask_plane() const {
+   MaskPlane mp;
+
+   mp.set_size(Nx, Ny);
+
+   for(int i=0; i<Nxy; i++) mp.buf()[i] = !is_eq(Data[i], 0.0);
+
+   return(mp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 
 void DataPlane::shift_right(int N)

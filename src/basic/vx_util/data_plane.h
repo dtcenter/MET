@@ -108,6 +108,8 @@ class DataPlane {
 
       void data_range(double & data_min, double & data_max) const;
 
+      MaskPlane mask_plane() const;
+
       void shift_right  (int n);
 
       void put(const double, const int __x__, const int __y__);
