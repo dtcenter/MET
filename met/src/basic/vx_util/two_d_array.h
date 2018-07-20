@@ -78,8 +78,9 @@ class TwoD_Array {
          //  get stuff
          //
 
-      int nx() const { return ( Nx ); }
-      int ny() const { return ( Ny ); }
+      int  nx()       const { return ( Nx ); }
+      int  ny()       const { return ( Ny ); }
+      bool is_empty() const { return ( Nx*Ny == 0 ); }
 
       const T * data() const { return ( E ); }
 
