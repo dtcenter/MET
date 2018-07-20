@@ -332,8 +332,7 @@ while ( in.getline(line, sizeof(line)) ) {
          mlog << Error << "\nMaskPoly::load() -> "
               << "masking polyline files consist of a string for the "
               << "name followed by pairs of latitude and longitude values. "
-              << "The polyline name (\"" <<  Name << "\") cannot "
-              << "contain embedded whitespace!\n\n";
+              << "The polyline name cannot contain embedded whitespace!\n\n";
          exit(1);
       }
 
