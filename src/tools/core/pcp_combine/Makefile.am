@@ -21,7 +21,7 @@ pcp_combine_LDADD = -lvx_data2d \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_data2d_nc_pinterp \
-     $(PYTHON_LIBS) \
+	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_grid \
 	-lvx_config \
