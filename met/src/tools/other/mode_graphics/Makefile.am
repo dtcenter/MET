@@ -28,27 +28,27 @@ plot_mode_field_SOURCES = plot_mode_field.cc \
 plot_mode_field_CPPFLAGS = ${MET_CPPFLAGS}
 plot_mode_field_LDFLAGS = -L. ${MET_LDFLAGS}
 plot_mode_field_LDADD = -lvx_cgraph \
-        -lvx_config \
-        -lvx_plot_util \
-        -lvx_data2d_nc_met \
-        $(PYTHON_LIBS) \
-        -lvx_grid \
-        -lvx_nc_util \
-        -lvx_ps \
-        -lvx_afm \
-        -lvx_pxm \
-        -lvx_render \
-        -lvx_color \
-        -lvx_util \
-        -lvx_cal \
-        -lvx_log \
-        -lvx_math \
-        -lnetcdf_c++4 \
-        -lnetcdf \
-        -lcairo \
-        -lfreetype \
-        -lm  \
-        -lz
+	-lvx_config \
+	-lvx_plot_util \
+	-lvx_data2d_nc_met \
+	$(PYTHON_LIBS) \
+	-lvx_grid \
+	-lvx_nc_util \
+	-lvx_ps \
+	-lvx_afm \
+	-lvx_pxm \
+	-lvx_render \
+	-lvx_color \
+	-lvx_util \
+	-lvx_cal \
+	-lvx_log \
+	-lvx_math \
+	-lnetcdf_c++4 \
+	-lnetcdf \
+	-lcairo \
+	-lfreetype \
+	-lm  \
+	-lz
 
 if ENABLE_PYTHON
    plot_mode_field_CPPFLAGS += ${MET_PYTHON_CC}

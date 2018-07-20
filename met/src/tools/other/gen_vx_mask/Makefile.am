@@ -23,8 +23,8 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-     $(PYTHON_LIBS) \
-     -lvx_gis  \
+	$(PYTHON_LIBS) \
+	-lvx_gis  \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_render \
