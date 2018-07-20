@@ -50,6 +50,7 @@ public:
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
 
   void setGridMask(Grid        &g);
+  void setAreaMask(MaskPlane   &a);
   void setPolyMask(MaskPoly    &p);
   void setSIDMask (StringArray &s);
   void setMessageTypeMap(map<ConcatString, ConcatString> m);
@@ -90,10 +91,12 @@ protected:
   int _obsNum;
 
   int _gridMaskNum;
+  int _areaMaskNum;
   int _polyMaskNum;
   int _sidMaskNum;
 
   Grid        *_gridMask;
+  MaskPlane   *_areaMask;
   MaskPoly    *_polyMask;
   StringArray *_sidMask;
 
@@ -140,20 +143,20 @@ protected:
   static string _secsToTimeString(const int secs)
   {
     // Get the different fields from the number of seconds
-  
+
     int remaining_secs = secs;
     int hour = remaining_secs / 3600;
     remaining_secs -= hour * 3600;
     int minute = remaining_secs / 60;
     remaining_secs -= minute * 60;
     int second = remaining_secs;
-  
+
     // Create the string
-  
+
     char string_buffer[20];
-  
+
     sprintf(string_buffer, "%02d%02d%02d", hour, minute, second);
-  
+
     return string(string_buffer);
   }
 
@@ -161,16 +164,17 @@ protected:
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
   bool _writeHdrInfo(const ConcatString &hdr_typ,
-		     const ConcatString &hdr_sid,
-		     const ConcatString &hdr_vld,
-		     double lat, double lon, double elv);
+                     const ConcatString &hdr_sid,
+                     const ConcatString &hdr_vld,
+                     double lat, double lon, double elv);
   bool _writeObsInfo(int gc, float prs, float hgt, float obs,
-		     const ConcatString &qty);
+                     const ConcatString &qty);
 
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }
 inline void FileHandler::setGridMask(Grid        &g) { _gridMask = &g; }
+inline void FileHandler::setAreaMask(MaskPlane   &a) { _areaMask = &a; }
 inline void FileHandler::setPolyMask(MaskPoly    &p) { _polyMask = &p; }
 inline void FileHandler::setSIDMask (StringArray &s) { _sidMask  = &s; }
 inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {

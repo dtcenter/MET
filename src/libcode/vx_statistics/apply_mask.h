@@ -23,6 +23,7 @@ static const double mask_on_value         = 1.0;
 static const double mask_off_value        = 0.0;
 static const char   default_mask_thresh[] = "!=0.0";
 static const char   default_mask_dict[]   = "name=\"NA\"; level=\"NA\";";
+static const char  *poly_str_delim        = "{}";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -35,11 +36,16 @@ extern void parse_grid_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
 extern void parse_grid_mask(const ConcatString &, const Grid &,
                             MaskPlane &, ConcatString &);
+extern void parse_grid_mask(const ConcatString &, Grid &);
 
 extern void parse_poly_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
 extern void parse_poly_mask(const ConcatString &, const Grid &,
                             MaskPlane &, ConcatString &);
+extern void parse_poly_mask(const ConcatString &, MaskPoly &,
+                            Grid &, MaskPlane &, ConcatString &);
+extern void parse_poly_2d_data_mask(const ConcatString &, Grid &,
+                                    DataPlane &, ConcatString &);
 
 extern void apply_grid_mask(const Grid &, const Grid &,
                             DataPlane &);
