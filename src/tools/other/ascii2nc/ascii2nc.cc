@@ -39,6 +39,7 @@
 //   012    07-23-14  Halley Gotway  Add message_type_map configuration
 //                                     file option.
 //   013    09-21-15  Prestopnik     Add Aeronet observations.
+//   014    07-23-18  Halley Gotway  Support masks defined by gen_vx_mask.
 //
 ////////////////////////////////////////////////////////////////////////
 
