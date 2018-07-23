@@ -3406,8 +3406,6 @@ bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
       
       lengths[1] = 1;
       
-      cout << " DEBUG HS offsets[0]: " << offsets[0] << " offsets[1]: " << offsets[1] << "  lengths[0]: " << lengths[0] << "  lengths[1]: " << lengths[1] << "\n";
-      
       if(!get_nc_data(&obs_vars.obs_hid_var, obs_hid_buf, lengths, offsets)) {
          mlog << Error << "\nread_nc_obs_array() -> "
               << "can't read the record for observation "
