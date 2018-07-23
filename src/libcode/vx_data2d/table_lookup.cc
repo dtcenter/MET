@@ -1079,9 +1079,12 @@ return ( false );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
+
 bool TableFlatFile::lookup_grib1(int code, int table_number, int center, int subcenter, Grib1TableEntry & e)
+
 {
    int j;
 
@@ -1179,10 +1182,13 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
                   Grib1TableEntry & e, int & n_matches)
+
 {
 
    //  clear the by-reference arguments
@@ -1290,6 +1296,7 @@ return ( false );
 bool TableFlatFile::lookup_grib2(int a, int b, int c,
                                  int mtab, int cntr, int ltab,
                                  Grib2TableEntry & e)
+
 {
    int j;
 
@@ -1302,14 +1309,11 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
            g2e[j]->index_b != b ||
            g2e[j]->index_c != c ) continue;
 
-      // Check local table
-      if ( g2e[j]->ltab > 0 && g2e[j]->ltab != ltab ) continue;
-
-      // Check master table
-      if ( g2e[j]->mtab_low > mtab || g2e[j]->mtab_high < mtab ) continue;
-
-      // Check center
-      if ( g2e[j]->cntr > 0 && g2e[j]->cntr != cntr ) continue;
+      // Check master table, center, and local table
+      if ( (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
+           (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
+           (bad_data_int != cntr && g2e[j]->cntr > 0 && g2e[j]->cntr != cntr) ||
+           (bad_data_int != ltab && g2e[j]->ltab > 0 && g2e[j]->ltab != ltab) ) continue;
 
       e = *(g2e[j]);
 
@@ -1319,7 +1323,6 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
 
    return ( false );
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1388,6 +1391,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                                  int a, int b, int c,
                                  int mtab, int cntr, int ltab,
                                  Grib2TableEntry & e, int & n_matches)
+
 {
    //  clear the by-reference arguments
    e.clear();
@@ -1454,7 +1458,6 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -1467,9 +1470,4 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, Grib2TableEntry & e, in
 }
 
 
-
-
-
-
 ////////////////////////////////////////////////////////////////////////
-
