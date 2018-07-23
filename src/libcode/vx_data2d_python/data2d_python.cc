@@ -156,6 +156,9 @@ bool MetPythonDataFile::open(const char * script_filename)
 {
 
 close();
+ConcatString path = script_filename;
+
+path.chomp(".py");   //  remove possible ".py" suffix from script filename
 
 bool use_xarray = false;
 
@@ -181,12 +184,12 @@ switch ( Type )  {   //  assumes Type is already set
 
 
 
-Filename = script_filename;
+Filename = path;
 
 Raw_Grid = new Grid;
 
 
-python_dataplane(script_filename, use_xarray, Plane, *Raw_Grid);
+python_dataplane(path, use_xarray, Plane, *Raw_Grid);
 
 Dest_Grid = new Grid;
 

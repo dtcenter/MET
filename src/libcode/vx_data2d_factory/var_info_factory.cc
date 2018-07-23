@@ -30,6 +30,10 @@ using namespace std;
 #include "var_info_nc_met.h"
 #include "var_info_nc_pinterp.h"
 
+#ifdef WITH_PYTHON
+   #include "var_info_python.h"
+#endif
+
 #ifdef WITH_GRIB2
    #include "var_info_grib2.h"
 #endif
@@ -43,8 +47,15 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(GrdFileType type) {
+VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
+
+{
+
    VarInfo *vi = (VarInfo *) 0;
+
+#ifdef WITH_PYTHON
+   VarInfoPython * p = 0;
+#endif
 
    //
    // Switch on file type and instantiate the appropriate class.
@@ -74,6 +85,16 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type) {
       case FileType_NcPinterp:
          vi = new VarInfoNcPinterp;
          break;
+
+#ifdef WITH_PYTHON
+      case FileType_Python_Numpy:    //  fall through
+      case FileType_Python_Xarray:   //  fall through
+         p = new VarInfoPython;
+         p->set_file_type(type);
+         vi = p;
+         p = 0;
+         break;
+#endif
 
       case FileType_NcCF:
 	vi = new VarInfoNcCF;

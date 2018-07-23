@@ -111,7 +111,6 @@ int main(int argc, char * argv[])
    GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
-   bool python = false;
    bool status = false;
 
       //
@@ -136,21 +135,13 @@ int main(int argc, char * argv[])
       //
       //
 
-        if ( FieldString ==  numpy_field_string )  { python = true;  ftype = FileType_Python_Numpy;  }
-   else if ( FieldString == xarray_field_string )  { python = true;  ftype = FileType_Python_Xarray; }
+   config.read_string(FieldString);
 
-   else {
+      //
+      // get the gridded file type from config string, if present
+      //
+   ftype = parse_conf_file_type(&config);
 
-      python = false;
-
-      config.read_string(FieldString);
-
-         //
-         // get the gridded file type from config string, if present
-         //
-      ftype = parse_conf_file_type(&config);
-
-   }
 
       //
       // instantiate the Met2dDataFile object using the data_2d_factory
@@ -166,30 +157,25 @@ int main(int argc, char * argv[])
       exit (1);
    }
 
-   if ( ! python )  {
+   var_ptr = v_factory.new_var_info(met_ptr->file_type());
 
-      var_ptr = v_factory.new_var_info(met_ptr->file_type());
-
-      if (!var_ptr)
-      {
-         mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
-              << InputFilename << "\"\n\n";
-         exit (1);
-      }
-
-         //
-         // populate the var_info object from the magic string
-         //
-      var_ptr->set_dict(config);
-
+   if (!var_ptr)
+   {
+      mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""
+           << InputFilename << "\"\n\n";
+      exit (1);
    }
+
+      //
+      // populate the var_info object from the magic string
+      //
+   var_ptr->set_dict(config);
 
       //
       // get the data plane from the file for this VarInfo object
       //
 
-   if ( python )  status = met_ptr->data_plane(data_plane);
-   else           status = met_ptr->data_plane(*var_ptr, data_plane);
+   status = met_ptr->data_plane(*var_ptr, data_plane);
 
 
    if ( ! status )

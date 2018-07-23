@@ -923,11 +923,13 @@ static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 //
 
 // File types
-static const char conf_val_grib1[]       = "GRIB1";
-static const char conf_val_grib2[]       = "GRIB2";
-static const char conf_val_netcdf_met[]  = "NETCDF_MET";
-static const char conf_val_netcdf_pint[] = "NETCDF_PINT";
-static const char conf_val_netcdf_nccf[] = "NETCDF_NCCF";
+static const char conf_val_grib1         [] = "GRIB1";
+static const char conf_val_grib2         [] = "GRIB2";
+static const char conf_val_netcdf_met    [] = "NETCDF_MET";
+static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
+static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
+static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
+static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 
 // Output flag values: NONE, BOTH, STAT
 static const char conf_val_none[] = "NONE";

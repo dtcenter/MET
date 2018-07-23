@@ -55,6 +55,8 @@ GRIB2          = 2;
 NETCDF_MET     = 3;
 NETCDF_PINT    = 4;
 NETCDF_NCCF    = 5;
+PYTHON_NUMPY   = 6;
+PYTHON_XARRAY  = 7;
 
 // Set Logic
 NONE           = 1;
