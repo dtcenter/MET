@@ -245,6 +245,9 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    StringArray tokens;
    Grid mask_grid;
 
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
+
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask \"" << mask_poly_str << "\"\n";
 
@@ -289,6 +292,9 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
                      MaskPlane &mask, ConcatString &mask_name) {
    DataPlane dp;
 
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
+  
    parse_poly_mask(mask_poly_str, grid, dp, mask_name);
 
    mask = dp.mask_plane();
@@ -339,6 +345,9 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
    DataPlane mask_dp;
    StringArray tokens;
 
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
+   
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask \"" << mask_poly_str << "\"\n";
 
@@ -370,6 +379,9 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    SingleThresh st;
    MetConfig config;
    bool append_level, append_thresh;
+
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
