@@ -10,7 +10,7 @@ include ${top_srcdir}/Make-include
 
 # The program
 
-bin_PROGRAMS    = pb2nc
+bin_PROGRAMS  = pb2nc
 pb2nc_SOURCES = pb2nc.cc \
 	pb2nc_conf_info.cc \
 	numpbmsg.f \
@@ -33,6 +33,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_pb_util \

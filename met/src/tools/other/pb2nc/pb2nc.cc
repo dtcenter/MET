@@ -52,6 +52,7 @@
 //          06/07/17  Howard Soh     Added more options: -vars, -all, and -index.
 //          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
+//   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -363,7 +364,7 @@ int main(int argc, char *argv[]) {
       }
       display_bufr_variables(tableB_vars, tableB_descs,
                              bufr_hdr_name_arr, bufr_obs_name_arr);
-       
+
    }
    else {
       // Open the NetCDF file
@@ -374,12 +375,12 @@ int main(int argc, char *argv[]) {
          process_pbfile_metadata(i);
          process_pbfile(i);
       }
-      
+
       if (doSummary) {
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
          summaryObs->summarizeObs(summaryInfo);
       }
-   
+
       // Write the NetCDF file
       write_netcdf_hdr_data();
    }
@@ -765,6 +766,8 @@ void process_pbfile(int i_pb) {
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
+   bool apply_area_mask = (conf_info.area_mask.nx() > 0 &&
+                           conf_info.area_mask.ny() > 0);
    bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
    // List the PrepBufr file being processed
@@ -871,19 +874,19 @@ void process_pbfile(int i_pb) {
       log_message << " (out of " << unixtime_to_string(npbmsg_total) << ")";
    }
    mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
-   
+
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
-   
+
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
-   
+
    int bin_count = nint(npbmsg/20.0);
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
 
    for (int idx=0; idx<obs_arr_len; idx++) obs_arr[idx] = 0;
-   
+
    header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var);
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -960,7 +963,7 @@ void process_pbfile(int i_pb) {
       if (cycle_minute != missing_cycle_minute) {
          msg_ut += cycle_minute * 60;
       }
-      
+
       if (!is_prepbufr) {
          int index;
          int length;
@@ -976,7 +979,7 @@ void process_pbfile(int i_pb) {
          for (index=0; index<4; index++) {
             hdr[index] = bufr_obs[0][index];
          }
-         
+
          // Update hdr[3] and file_ut for obs_time
          if (bufr_obs[0][3] > r8bfms) {
             hdr[3] = 0;
@@ -990,7 +993,7 @@ void process_pbfile(int i_pb) {
             if (min > r8bfms) min = 0;
             if (sec > r8bfms || sec < 0) sec = 0;
             msg_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
-            mlog << Debug(7) << "Bufr obs_time:\t" 
+            mlog << Debug(7) << "Bufr obs_time:\t"
                  << unix_to_yyyymmdd_hhmmss(msg_ut) << "\n\n";
             for (index=0; index<mxr8lv; index++) {
                bufr_pres_lv[index] = fill_value;
@@ -1088,6 +1091,15 @@ void process_pbfile(int i_pb) {
             y < 0 || y >= conf_info.grid_mask.ny()) {
             rej_grid++;
             continue;
+         }
+
+         // Include the area mask rejection counts with the polyline since
+         // it is specified using the mask.poly config option.
+         if(apply_area_mask) {
+            if(!conf_info.area_mask.s_is_on(nint(x), nint(y))) {
+               rej_poly++;
+               continue;
+            }
          }
       }
 
@@ -1429,7 +1441,7 @@ void process_pbfile(int i_pb) {
 
             readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &use_small_buffer);
             if (0 >= nlev2) continue;
-            
+
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
@@ -1442,7 +1454,7 @@ void process_pbfile(int i_pb) {
                }
             }
             mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
-                 << ", vIdx: " << vIdx << ", obs_data_idx: " 
+                 << ", vIdx: " << vIdx << ", obs_data_idx: "
                  << nc_data_buffer.obs_data_idx << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
             for(lv=0; lv<buf_nlev; lv++) {
@@ -1479,7 +1491,7 @@ void process_pbfile(int i_pb) {
 
                if (is_airnow) {
                   obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
-                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface 
+                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface
                   quality_mark = bufr_obs_extra[lv][1];
                   // Convert a special number (1e+11) to NA at addObservation
                }
@@ -1525,7 +1537,7 @@ void process_pbfile(int i_pb) {
          if (is_prepbufr) {
             add_nc_header_prepbufr(pb_report_type, in_report_type, instrument_type);
          }
-         
+
          i_msg++;
       }
       else {
@@ -1644,7 +1656,7 @@ void process_pbfile_metadata(int i_pb) {
    // Build the temporary block file name
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
-   
+
    blk_file = make_temp_file_name(blk_prefix2, NULL);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
@@ -1667,15 +1679,15 @@ void process_pbfile_metadata(int i_pb) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
-   
+
    // Open the blocked temp PrepBufr file for reading
    openpb_(blk_file, &unit);
-   
+
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
-   
+
    // Use the number of records requested by the user if there
    // are enough present.
    if(nmsg >= 0 && nmsg <= npbmsg) {
@@ -2056,7 +2068,7 @@ void write_netcdf_hdr_data() {
            << " header count: " << dim_count
            << " summary header count: " << (dim_count-pb_hdr_count) << "\n";
    }
-   
+
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
    create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
@@ -2109,7 +2121,7 @@ void write_netcdf_hdr_data() {
             ? tableB_descs[var_index]
             : "";
       nc_var_desc_arr.add(desc_str);
-      
+
       ConcatString grib_name = obs_var_map[var_name];
       if (0 < grib_name.length()) {
          var_name = grib_name.text();
@@ -2158,7 +2170,7 @@ void write_netcdf_hdr_data() {
       }
       add_att(f_out, "time_summary_type", type_string.c_str());
    }
-   
+
    return;
 }
 

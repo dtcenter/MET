@@ -39,8 +39,9 @@ class PB2NCConfInfo {
       StringArray  message_type;        // Obseration message type
       StringArray  station_id;          // Observation location station id
       int          beg_ds;              // Time range of observations to be retained,
-      int          end_ds;              // defined relative to the PrepBufr center time (seconds)
+      int          end_ds;              // Defined relative to the PrepBufr center time (seconds)
       Grid         grid_mask;           // Grid masking region
+      MaskPlane    area_mask;           // Data masking region
       MaskPoly     poly_mask;           // Lat/Lon polyline masking region
       double       beg_elev;            // Range of observing location elevations to be retained
       double       end_elev;
