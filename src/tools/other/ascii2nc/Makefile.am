@@ -10,7 +10,7 @@ include ${top_srcdir}/Make-include
 
 # The program
 
-bin_PROGRAMS    = ascii2nc
+bin_PROGRAMS     = ascii2nc
 ascii2nc_SOURCES = ascii2nc.cc \
 	ascii2nc_conf_info.cc ascii2nc_conf_info.h \
 	file_handler.cc file_handler.h \
@@ -34,22 +34,14 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
-	-lvx_summary \
+	-lvx_pb_util \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

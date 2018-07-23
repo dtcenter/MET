@@ -21,12 +21,12 @@ using namespace std;
 #include "pb2nc_conf_info.h"
 
 #include "vx_data2d_factory.h"
+#include "apply_mask.h"
 #include "grib_strings.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class PB2NCConfInfo
 //  Code for class PB2NCConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -61,6 +61,7 @@ void PB2NCConfInfo::clear() {
    station_id.clear();
    beg_ds = end_ds = bad_data_int;
    grid_mask.clear();
+   area_mask.clear();
    poly_mask.clear();
    beg_elev = end_elev = bad_data_double;
    pb_report_type.clear();
@@ -153,32 +154,11 @@ void PB2NCConfInfo::process_config() {
 
    // Conf: grid_mask
    s = conf.lookup_string(conf_key_mask_grid);
-
-   // Parse the masking grid
-   if(s.nonempty()) {
-      if(!find_grid_by_name(s, grid_mask)) {
-         Met2dDataFileFactory factory;
-         Met2dDataFile * datafile = (Met2dDataFile *) 0;
-         // If that doesn't work, try to open a data file.
-         datafile = factory.new_met_2d_data_file(replace_path(s));
-
-         if(!datafile) {
-            mlog << Error << "\nPB2NCConfInfo::process_config() -> "
-                 << "the \"" << conf_key_mask_grid << "\" requested ("
-                 << s << ") as named grid or data file is not defined.\n\n";
-            exit(1);
-         }
-
-         // Store the data file's grid
-         grid_mask = datafile->grid();
-      }
-   }
+   parse_grid_mask(s, grid_mask);
 
    // Conf: poly_mask
    s = conf.lookup_string(conf_key_mask_poly);
-
-   // Parse the masking polyline
-   if(s.nonempty()) poly_mask.load(replace_path(s));
+   parse_poly_mask(s, poly_mask, grid_mask, area_mask, mask_name);
 
    // Conf: beg_elev and end_elev
    dict = conf.lookup_dictionary(conf_key_elevation_range);
