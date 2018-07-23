@@ -232,11 +232,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       else if (0 == hdr_field.find(lon_col))  lon_idx = j;
       else if (0 == hdr_field.find(elv_col))  elv_idx = j;
       
-      //if (0 == hdr_field.find(site_name_col)) cout << "   DEBUG HS " << sid_idx << "  " << hdr_field <<"\n";
-      //else if (0 == hdr_field.find(lat_col))  cout << "   DEBUG HS " << lat_idx << "  " << hdr_field <<"\n";
-      //else if (0 == hdr_field.find(lon_col))  cout << "   DEBUG HS " << lon_idx << "  " << hdr_field <<"\n";
-      //else if (0 == hdr_field.find(elv_col))  cout << "   DEBUG HS " << elv_idx << "  " << hdr_field <<"\n";
-
       // Collect variable names and index
       var_name = make_var_name_from_header(hdr_field);
       if (!var_names.has(var_name.c_str(), var_idx)) {
