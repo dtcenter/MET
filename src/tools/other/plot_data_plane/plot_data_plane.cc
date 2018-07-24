@@ -58,6 +58,10 @@ using namespace std;
 #include "vx_plot_util.h"
 #include "data_plane_plot.h"
 
+#ifdef WITH_PYTHON
+#include "global_python.h"
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -226,6 +230,11 @@ int main(int argc, char * argv[])
       //
       // done
       //
+
+#ifdef  WITH_PYTHON
+   GP.finalize();
+#endif
+
    exit (0);
 
 }

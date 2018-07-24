@@ -1065,8 +1065,11 @@ void TableHelper::write_xy1_to_cell (int r, int c,
 check_plot();
 
 const Box box = cell_box(r, c);
+const char * t = 0;
 
-Plot->write_centered_text(1, 1, box.left() + x, box.bottom() + y, u, v, text);
+if ( text )  t = text;
+
+Plot->write_centered_text(1, 1, box.left() + x, box.bottom() + y, u, v, t);
 
    //
    //  done

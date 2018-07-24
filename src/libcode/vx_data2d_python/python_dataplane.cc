@@ -16,6 +16,14 @@
 #include "dataplane_from_numpy_array.h"
 #include "python_dataplane.h"
 
+#include "global_python.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GlobalPython GP;   //  this needs external linkage
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,11 +39,27 @@ PyObject * numpy_array = 0;
 PyObject * attrs_dict  = 0;
 
 
+GP.initialize();
+
+
    //
    //   start up the python interpreter
    //
 
-Py_Initialize();
+// Py_Finalize();
+
+// Py_Initialize();
+
+if ( PyErr_Occurred() )  {
+
+   mlog << Error
+        << "\n\n   an error occurred initializing python\n\n";
+
+   PyErr_PrintEx(1);
+
+   exit ( 1 );
+
+}
 
    //
    //   import the python script as a module
@@ -47,7 +71,7 @@ Py_Initialize();
 if ( PyErr_Occurred() )  {
 
    mlog << Error
-        << "\n\n   an error occurred\n\n";
+        << "\n\n   an error occurred importing module \"" << script_name << "\"\n\n";
 
    PyErr_PrintEx(1);
 
@@ -61,7 +85,7 @@ if ( ! module )  {
         << "python_dataplane() -> error running python script \""
         << script_name << "\"\n\n";
 
-   Py_Finalize();
+   // Py_Finalize();
 
    exit ( 1 );
 
@@ -111,7 +135,7 @@ if ( use_xarray )  {
    //  done
    //
 
-Py_Finalize();
+// Py_Finalize();
 
 return;
 

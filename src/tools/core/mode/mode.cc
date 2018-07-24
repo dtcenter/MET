@@ -71,6 +71,10 @@ using namespace std;
 
 #include "mode_exec.h"
 
+#ifdef WITH_PYTHON
+#include "global_python.h"
+#endif
+
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -160,6 +164,10 @@ mode_exec.clear();
    //
    //  done
    //
+
+#ifdef  WITH_PYTHON
+   GP.finalize();
+#endif
 
 return ( 0 );
 

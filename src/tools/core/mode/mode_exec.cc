@@ -170,17 +170,19 @@ R_index = T_index = 0;
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
 
-   // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
-      exit(1);
-   }
 
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
+      exit(1);
+   }
+
+
+   // Read forecast file
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+      mlog << Error << "\nTrouble reading forecast file \""
+           << fcst_file << "\"\n\n";
       exit(1);
    }
 
@@ -1720,17 +1722,23 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
 
    NcDim  dim;
    NcVar  var;
-   const int N = strlen(text);
+
+   const char * t = 0;
+
+   if ( ! text )  t = "XXX";
+   else           t = text;
+
+   const int N = strlen(t);
 
 
    dim = add_dim(f, dim_name, N);
 
    var = add_var(f, var_name, ncChar, dim);
 
-   if ( ! put_nc_data(&var, text) )  {
+   if ( ! put_nc_data(&var, t) )  {
 
       mlog << Error
-           << " nc_add_string() -> unable to add string variable \"" << text << "\"\n\n";
+           << " nc_add_string() -> unable to add string variable \"" << t << "\"\n\n";
 
       exit ( 1 );
 
