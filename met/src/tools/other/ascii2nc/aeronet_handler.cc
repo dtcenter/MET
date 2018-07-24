@@ -39,9 +39,12 @@ const int AeronetHandler::NUM_OBS_COLS = 45;
 const int version_3_columns[7] = { 113, 81, 53, 33, 41, 259 };
 
 const string site_name_col = "AERONET_Site_Name";
-const string lat_col       = "Site_Latitude";       // "Site_Latitude(Degrees)";
-const string lon_col       = "Site_Longitude";      // "Site_Longitude(Degrees)";
-const string elv_col       = "Site_Elevation";      // "Site_Elevation(m)";
+const string lat_col1      = "Site_Latitude";       // "Site_Latitude(Degrees)";
+const string lon_col1      = "Site_Longitude";      // "Site_Longitude(Degrees)";
+const string elv_col1      = "Site_Elevation";      // "Site_Elevation(m)";
+const string lat_col2      = "Latitude";            // "Latitude(degrees)"
+const string lon_col2      = "Longitude";           // "Longitude(degrees)"
+const string elv_col2      = "Elevation";           // "Elevation(meters)"
 
 const string AeronetHandler::HEADER_TYPE = "";  /////
 
@@ -228,9 +231,9 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     
     if (format_version == 3) {
       if (0 == hdr_field.find(site_name_col)) sid_idx = j;
-      else if (0 == hdr_field.find(lat_col))  lat_idx = j;
-      else if (0 == hdr_field.find(lon_col))  lon_idx = j;
-      else if (0 == hdr_field.find(elv_col))  elv_idx = j;
+      else if (0 == hdr_field.find(lat_col1) || 0 == hdr_field.find(lat_col2))  lat_idx = j;
+      else if (0 == hdr_field.find(lon_col1) || 0 == hdr_field.find(lon_col2))  lon_idx = j;
+      else if (0 == hdr_field.find(elv_col1) || 0 == hdr_field.find(elv_col2))  elv_idx = j;
       
       // Collect variable names and index
       var_name = make_var_name_from_header(hdr_field);
@@ -301,26 +304,32 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         // Get the stationId
         if (elv_idx < 0) {
           mlog << Warning << "AeronetHandler::_readObservations() Can not find header column \""
-               << elv_col << "\". from " << ascii_file.filename() << "\".\n\n";
+               << elv_col2 << "\". from " << ascii_file.filename() << "\".\n\n";
           break;
         }
-        else if ((sid_idx < 0) || (lat_idx < 0) || (lon_idx < 0)) {
-          string field_name = (sid_idx < 0) ? site_name_col
-                            : (lat_idx < 0) ? lat_col : lon_col;
+        else if ((lat_idx < 0) || (lon_idx < 0)) {
+          string field_name = (lat_idx < 0) ? lat_col2 : lon_col2;
           mlog << Error << "AeronetHandler::_readObservations() Can not find header column \""
                << field_name << "\". Skip the input \"" << ascii_file.filename()
                << "\"\n\n";
           break;
         }
-        if (_stationId != data_line[sid_idx]) {
-          mlog << Error << "\nAeronetHandler::_readObservations() The header and data columns don't match."
-               << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
-               << " is different from " << _stationId
-               << ". Skip this input \"" << ascii_file.filename()
-               << "\"\n\n";
-          break;
+        else {
+          if (sid_idx < 0) {
+            mlog << Warning << "AeronetHandler::_readObservations() Can not find header column \""
+                 << site_name_col << "\" from the input \"" << ascii_file.filename()
+                 << "\"\n\n";
+          }
+          else if (_stationId != data_line[sid_idx]) {
+            mlog << Error << "\nAeronetHandler::_readObservations() The header and data columns don't match."
+                 << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
+                 << " is different from " << _stationId
+                 << ". Skip this input \"" << ascii_file.filename()
+                 << "\"\n\n";
+            break;
+          }
         }
-        //_stationId = data_line[sid_idx];
+        
         // Get the stationLat
         _stationLat = atof(data_line[lat_idx]);
         // Get the stationLon
@@ -328,8 +337,9 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         // Get the stationAlt
         if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
         else _stationAlt = bad_data_float;
+        
         mlog << Debug(5) << "AeronetHandler::_readObservations() stationID: "
-             << data_line[sid_idx] << " from index " << sid_idx
+             << ((sid_idx < 0) ? _stationId : data_line[sid_idx]) << " from index " << sid_idx
              << "  lat: " << _stationLat
              << "  lon: " << _stationLon
              << "  elv: " << _stationAlt << " from index " << elv_idx << "\n";
@@ -417,8 +427,14 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line) const
 
   ConcatString date_string(data_line[0]);
   StringArray dateTokens = date_string.split(":");
+  if (1 == dateTokens.n_elements()) {
+    mlog << Error << "\nAeronetHandler::_getValidTime -> "
+         << "Not supported date: \"" << date_string << "\".\n\n";
+    return 0;
+  }
+  
   string mday = dateTokens[0];
-  string mon = dateTokens[1];
+  string mon  = dateTokens[1];
   string year = dateTokens[2];
 
   //
@@ -427,9 +443,6 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line) const
 
   ConcatString time_string(data_line[1]);
   StringArray timeTokens = time_string.split(":");
-  string hour = timeTokens[0];
-  string min = timeTokens[1];
-  string sec = timeTokens[2];
 
   //
   // Set up the time structure
@@ -441,9 +454,15 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line) const
   time_struct.tm_year = atoi(year.c_str()) - 1900;
   time_struct.tm_mon = atoi(mon.c_str()) - 1;
   time_struct.tm_mday = atoi(mday.c_str());
-  time_struct.tm_hour = atoi(hour.c_str());
-  time_struct.tm_min = atoi(min.c_str());
-  time_struct.tm_sec = atoi(sec.c_str());
+  if (3 <= timeTokens.n_elements()) {
+    string hour = timeTokens[0];
+    string min = timeTokens[1];
+    string sec = timeTokens[2];
+    
+    time_struct.tm_hour = atoi(hour.c_str());
+    time_struct.tm_min = atoi(min.c_str());
+    time_struct.tm_sec = atoi(sec.c_str());
+  }
 
   return timegm(&time_struct);
 
