@@ -26,6 +26,8 @@
 #include "dataplane_from_xarray.h"        //  takes an xarray DataArray
 #include "grid_from_python_dict.h"
 
+#include "global_python.h"
+
 
 
 ////////////////////////////////////////////////////////////////////////
