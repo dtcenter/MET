@@ -74,6 +74,10 @@ fcst = {
          name       = "APCP";
          level      = "A24";
          obs_thresh = [ NA, >0, >=2.54 ];
+         obs_error = {
+            flag      = ${OBS_ERROR_FLAG};
+            dist_type = NONE;
+         }
       }
    ];
 }
@@ -98,7 +102,7 @@ skip_const     = ${SKIP_CONST};
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   flag             = ${OBS_ERROR_FLAG};
+   flag             = FALSE;
    dist_type        = NONE;
    dist_parm        = [];
    inst_bias_scale  = 1.0;
