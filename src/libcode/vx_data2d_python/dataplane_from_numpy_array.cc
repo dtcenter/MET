@@ -154,7 +154,17 @@ dp_out.set_valid(t);
 
 j = dict_lookup_int(attrs_dict, "lead");
 
-dp_out.set_lead(t);
+j = 3600*(j/10000) + 60*((j/100)%100) + j%100;
+
+dp_out.set_lead(j);
+
+     ////////////////////
+
+s = dict_lookup_string(attrs_dict, "accum");
+
+t = hhmmss_to_sec(s);
+
+dp_out.set_accum(t);
 
      ////////////////////
 
