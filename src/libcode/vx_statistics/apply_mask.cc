@@ -149,6 +149,10 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
 
 void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name) {
+
+   // Check for empty input string
+   if(mask_grid_str.empty()) return;
+
    Grid mask_grid;
 
    mlog << Debug(4) << "parse_grid_mask() -> "
@@ -186,6 +190,10 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 
 void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
                      MaskPlane &mask, ConcatString &mask_name) {
+
+   // Check for empty input string
+   if(mask_grid_str.empty()) return;
+
    DataPlane dp;
 
    parse_grid_mask(mask_grid_str, grid, dp, mask_name);
@@ -198,6 +206,10 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
 ////////////////////////////////////////////////////////////////////////
 
 void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
+
+   // Check for empty input string
+   if(mask_grid_str.empty()) return;
+
    Met2dDataFileFactory factory;
    Met2dDataFile * datafile = (Met2dDataFile *) 0;
 
@@ -241,12 +253,13 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
 
 void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
                      DataPlane &mask_dp, ConcatString &mask_name) {
-   ConcatString file_name;
-   StringArray tokens;
-   Grid mask_grid;
 
    // Check for empty input string
    if(mask_poly_str.empty()) return;
+
+   ConcatString file_name;
+   StringArray tokens;
+   Grid mask_grid;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask \"" << mask_poly_str << "\"\n";
@@ -290,11 +303,12 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
 void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
                      MaskPlane &mask, ConcatString &mask_name) {
-   DataPlane dp;
 
    // Check for empty input string
    if(mask_poly_str.empty()) return;
-  
+
+   DataPlane dp;
+
    parse_poly_mask(mask_poly_str, grid, dp, mask_name);
 
    mask = dp.mask_plane();
@@ -341,13 +355,14 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
 void parse_poly_mask(const ConcatString &mask_poly_str,
                      MaskPoly &mask_poly, Grid &mask_grid,
                      MaskPlane &mask_plane, ConcatString &mask_name) {
+
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
+
    ConcatString file_name;
    DataPlane mask_dp;
    StringArray tokens;
 
-   // Check for empty input string
-   if(mask_poly_str.empty()) return;
-   
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask \"" << mask_poly_str << "\"\n";
 
@@ -374,14 +389,15 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
 void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
                              Grid &mask_grid, DataPlane &mask_dp,
                              ConcatString &mask_name) {
+
+   // Check for empty input string
+   if(mask_poly_str.empty()) return;
+
    ConcatString file_name, thresh_str;
    StringArray tokens;
    SingleThresh st;
    MetConfig config;
    bool append_level, append_thresh;
-
-   // Check for empty input string
-   if(mask_poly_str.empty()) return;
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
