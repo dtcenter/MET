@@ -566,7 +566,7 @@ if ( (fill_flag != 0) && (fill_flag != 1) )  {
 
 }
 
-if ( ! s )  s = "AAA";
+if ( ! s )  s = na_str;   //  AAA
 
 
 double L, R, B, T;
