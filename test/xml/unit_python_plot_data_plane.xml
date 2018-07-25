@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!-- Depends on unit_pcp_combine.xml and invokes Python script that reads in NUMPY text data -->
+
+  <test name="plot_data_plane_GRIB1">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      test.py \
+      &OUTPUT_DIR;/plot_data_plane/letter.ps \
+      'file_type = PYTHON_NUMPY;'\
+      -plot_range 0.0 255.0\
+      -title "Python enabled plot_data_plane" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/letter.ps</ps>
+    </output>
+  </test>
+
+
+</met_test>
