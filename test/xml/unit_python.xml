@@ -22,11 +22,10 @@
   <test name="python_numpy_PLOT_DATA_PLANE">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <env>
-<!--      <pair><name>PYTHONPATH</name> <value>&MET_DIR;/scripts/python</value></pair> -->
       <pair><name>INPUT_FILE</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
     </env>
     <param> \
-      test.py \
+      &MET_BASE;/scripts/python/test_numpy.py \
       &OUTPUT_DIR;/python/letter.ps \
       'file_type = PYTHON_NUMPY;' \
       -plot_range 0.0 255.0 \
