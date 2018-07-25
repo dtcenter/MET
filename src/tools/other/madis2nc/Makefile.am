@@ -14,34 +14,29 @@ bin_PROGRAMS    = madis2nc
 madis2nc_SOURCES = madis2nc.cc
 madis2nc_CPPFLAGS = ${MET_CPPFLAGS}
 madis2nc_LDFLAGS = ${MET_LDFLAGS}
-madis2nc_LDADD = -lvx_shapedata \
+madis2nc_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_nc_util \
 	-lvx_data2d \
-	-lvx_render \
-	-lvx_plot_util \
-	-lvx_pxm \
-	-lvx_color \
-	-lvx_ps \
-	-lvx_afm \
-	-lvx_pb_util \
-	-lvx_nav \
-	-lvx_gnomon \
-	-lvx_stat_out \
-	-lvx_statistics \
-	-lvx_gsl_prob \
+	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_pb_util \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
+	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 if ENABLE_PYTHON

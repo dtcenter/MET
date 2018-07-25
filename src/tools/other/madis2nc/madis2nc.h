@@ -110,6 +110,7 @@ static int          rec_beg = 0;
 static int          rec_end = 0;
 static ConcatString argv_str;
 static Grid         mask_grid;
+static MaskPlane    mask_area;
 static MaskPoly     mask_poly;
 static StringArray  mask_sid;
 

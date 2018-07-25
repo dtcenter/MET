@@ -30,6 +30,7 @@
 //                                   options to filter spatially.
 //   005    10-01-15  Chaudhuri      Added support for acarsProfiles
 //                                   observation type.
+//   006    07-23-18  Halley Gotway  Support masks from gen_vx_mask.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,6 +56,7 @@ using namespace netCDF;
 #include "madis2nc.h"
 
 #include "data2d_factory.h"
+#include "apply_mask.h"
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_nc_util.h"
@@ -349,7 +351,7 @@ void setup_netcdf_out(int nhdr) {
    init_nc_dims_vars (obs_vars, use_var_id);
    create_nc_hdr_vars(obs_vars, f_out, -1, deflate_level);
    create_nc_obs_vars(obs_vars, f_out, deflate_level, use_var_id);
-   
+
    //
    // Add global attributes
    //
@@ -523,12 +525,12 @@ int process_obs(const int in_gc, const float conversion,
    //
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
-      
+
       ConcatString qty_str;
       if(qty == '\0') qty_str = na_str;
       else            qty_str << qty;
       qty_str.replace(" ", "_", false);
-      
+
       write_nc_observation(obs_vars, nc_data_buffer, obs_arr, qty_str);
       i_obs++;
       processed_count++;
@@ -580,7 +582,17 @@ bool check_masks(double lat, double lon, const char *sid) {
          grid_y < 0 || grid_y >= mask_grid.ny()) {
          rej_grid++;
          return false;
-     }
+      }
+
+      //
+      // Check area mask.
+      //
+      if(mask_area.nx() > 0 || mask_area.ny() > 0) {
+         if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {
+            rej_poly++;
+            return false;
+         }
+      }
    }
 
    //
@@ -754,7 +766,7 @@ void process_madis_metar(NcFile *&f_in) {
 
       nc_buf_size = buf_size * FIELD_COUNT;
       if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
-      
+
       get_nc_data(&in_hdr_vld_var, &tmp_dbl_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, &hdr_lat_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, &hdr_lon_arr[0], buf_size, i_hdr_s);
@@ -853,7 +865,7 @@ void process_madis_metar(NcFile *&f_in) {
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
 
-               
+
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
@@ -1177,7 +1189,7 @@ void process_madis_raob(NcFile *&f_in) {
 
       nc_buf_size = buf_size * FIELD_COUNT;
       if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
-      
+
       cur[0] = i_hdr_s;
 
       dim[0] = buf_size;
@@ -2195,7 +2207,7 @@ void process_madis_maritime(NcFile *&f_in) {
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
    write_nc_header (obs_vars);
-   
+
    print_rej_counts();
 
    //
@@ -3124,52 +3136,44 @@ void set_logfile(const StringArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask_grid(const StringArray & a) {
-  Met2dDataFileFactory factory;
-  Met2dDataFile * datafile = (Met2dDataFile *) 0;
 
-  // List the grid masking file
-  mlog << Debug(1)
-       << "Grid Masking: " << a[0] << "\n";
+   // List the grid masking file
+   mlog << Debug(1)
+        << "Grid Masking: " << a[0] << "\n";
 
-  // First, try to find the grid by name.
-  if(!find_grid_by_name(a[0], mask_grid)) {
+   parse_grid_mask(a[0], mask_grid);
 
-    // If that doesn't work, try to open a data file.
-    datafile = factory.new_met_2d_data_file(replace_path(a[0]));
-
-    if(!datafile) {
-      mlog << Error << "\nset_mask_grid() -> "
-           << "can't open data file \"" << a[0] << "\"\n\n";
-      exit(1);
-    }
-
-    // Store the data file's grid
-    mask_grid = datafile->grid();
-
-    delete datafile; datafile = (Met2dDataFile *) 0;
-  }
-
-  // List the grid mask
-  mlog << Debug(2)
-       << "Parsed Masking Grid: " << mask_grid.name() << " ("
-       << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
+   // List the grid mask
+   mlog << Debug(2)
+        << "Parsed Masking Grid: " << mask_grid.name() << " ("
+        << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask_poly(const StringArray & a) {
+   ConcatString mask_name;
 
-  // List the polyline masking file
-  mlog << Debug(1)
-       << "Polyline Masking File: " << a[0] << "\n";
+   // List the poly masking file
+   mlog << Debug(1)
+        << "Polyline Masking File: " << a[0] << "\n";
 
-  // Parse the polyline file.
-  mask_poly.load(replace_path(a[0]));
+   parse_poly_mask(a[0], mask_poly, mask_grid, mask_area, mask_name);
 
-  // List the polyline mask
-  mlog << Debug(2)
-       << "Parsed Masking Polyline: " << mask_poly.name()
-       << " containing " << mask_poly.n_points() << " points\n";
+   // List the mask information
+   if(mask_poly.n_points() > 0) {
+      mlog << Debug(2)
+           << "Parsed Masking Polyline: " << mask_poly.name()
+           << " containing " <<  mask_poly.n_points() << " points\n";
+   }
+   else {
+      mlog << Debug(2)
+           << "Parsed Masking Area: " << mask_name
+           << " for (" << mask_grid.nx() << " x " << mask_grid.ny()
+           << ") grid\n";
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3183,7 +3187,7 @@ void set_mask_sid(const StringArray & a) {
 
    parse_sid_mask(a[0], mask_sid, mask_name);
 
-   // List the length of the SID mask
+   // List the length of the station ID mask
    mlog << Debug(2)
         << "Parsed Station ID Mask: " << mask_name
         << " containing " << mask_sid.n_elements() << " points\n";
