@@ -156,9 +156,32 @@ bool MetPythonDataFile::open(const char * script_filename)
 {
 
 close();
-ConcatString path = script_filename;
 
-path.chomp(".py");   //  remove possible ".py" suffix from script filename
+ConcatString full_path, path_name, file_name;
+
+full_path = script_filename;
+StringArray sa = full_path.split("/");
+
+   //
+   //  Build the path and store the file name
+   //
+
+if ( sa.n_elements() <= 1 )  {
+   path_name = "./";
+}
+else {
+   for ( int i=0; i<sa.n_elements()-1; i++ )  path_name << "/" << sa[i];
+}
+
+file_name = sa[sa.n_elements() - 1];
+
+   //
+   //  Set the PYTHONPATH
+   //
+
+setenv("PYTHONPATH", path_name, 1);
+
+file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
 bool use_xarray = false;
 
@@ -184,12 +207,12 @@ switch ( Type )  {   //  assumes Type is already set
 
 
 
-Filename = path;
+Filename = file_name;
 
 Raw_Grid = new Grid;
 
 
-python_dataplane(path, use_xarray, Plane, *Raw_Grid);
+python_dataplane(file_name, use_xarray, Plane, *Raw_Grid);
 
 Dest_Grid = new Grid;
 

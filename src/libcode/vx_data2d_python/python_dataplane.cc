@@ -52,8 +52,8 @@ GP.initialize();
 
 if ( PyErr_Occurred() )  {
 
-   mlog << Error
-        << "\n\n   an error occurred initializing python\n\n";
+   mlog << Error << "\npython_dataplane() -> "
+        << "an error occurred initializing python\n\n";
 
    PyErr_PrintEx(1);
 
@@ -70,8 +70,9 @@ if ( PyErr_Occurred() )  {
 
 if ( PyErr_Occurred() )  {
 
-   mlog << Error
-        << "\n\n   an error occurred importing module \"" << script_name << "\"\n\n";
+   mlog << Error << "\npython_dataplane() -> "
+        << "an error occurred importing module \"" << getenv("PYTHONPATH")
+           << "/" << script_name << ".py\"\n\n";
 
    PyErr_PrintEx(1);
 
@@ -81,9 +82,9 @@ if ( PyErr_Occurred() )  {
 
 if ( ! module )  {
 
-   mlog << Error
-        << "python_dataplane() -> error running python script \""
-        << script_name << "\"\n\n";
+   mlog << Error << "\npython_dataplane() -> "
+        << "error running python script \"" << getenv("PYTHONPATH")
+           << "/" << script_name << ".py\"\n\n";
 
    // Py_Finalize();
 
@@ -111,6 +112,17 @@ if ( use_xarray )  {
 
    data_array = PyDict_GetItem (module_dict, key);
 
+   if ( !data_array )  {
+
+      mlog << Error << "\npython_dataplane() -> "
+           << "trouble reading data from \"" << getenv("PYTHONPATH")
+           << "/" << script_name << ".py\"\n\n";
+
+      PyErr_PrintEx(1);
+
+      exit ( 1 );
+   }
+
    dataplane_from_xarray(data_array, met_dp_out, met_grid_out);
 
 } else {    //  numpy array & dict
@@ -118,12 +130,23 @@ if ( use_xarray )  {
       //   look up the data array variable name from the dictionary
 
    key = PyString_FromString (numpy_array_name);
-   
+
    numpy_array = PyDict_GetItem (module_dict, key);
 
    key = PyString_FromString (numpy_dict_name);
-   
+
    attrs_dict = PyDict_GetItem (module_dict, key);
+
+   if ( !numpy_array || !attrs_dict )  {
+
+      mlog << Error << "\npython_dataplane() -> "
+           << "trouble reading data from \"" << getenv("PYTHONPATH")
+           << "/" << script_name << ".py\"\n\n";
+
+      PyErr_PrintEx(1);
+
+      exit ( 1 );
+   }
 
    dataplane_from_numpy_array(numpy_array, attrs_dict, met_dp_out, met_grid_out);
 
