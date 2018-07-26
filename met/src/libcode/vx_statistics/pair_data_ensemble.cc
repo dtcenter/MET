@@ -311,7 +311,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
-   double mean, variance, spread;
+   double mean, variance, spread, p1;
    double crps, ign, pit;
 
    // Check if the ranks have already been computed
@@ -391,10 +391,11 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             spread_oerr_na.add(spread);
 
             // Compute the spread plus observation error variance.
+            p1 = (e->dist_type == DistType_LogNormal ?
+                  log(e->dist_parm[0]) : e->dist_parm[0]);
             spread_plus_oerr_na.add(sqrt(variance +
                                          dist_var(e->dist_type,
-                                                  e->dist_parm[0],
-                                                  e->dist_parm[1])));
+                                                  p1, e->dist_parm[1])));
          }
          // If no observation error specified, store bad data values.
          else {

@@ -674,7 +674,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
       if(v > 0.0) {
          v_new  = log(v);
          v_new += ran_draw(r, e->dist_type,
-                           e->dist_parm[0], e->dist_parm[1]);
+                           log(e->dist_parm[0]), e->dist_parm[1]);
          v_new  = exp(v_new);
       }
    }
