@@ -3166,7 +3166,9 @@ void set_mask_poly(const StringArray & a) {
            << "Parsed Masking Polyline: " << mask_poly.name()
            << " containing " <<  mask_poly.n_points() << " points\n";
    }
-   else {
+
+   // List the area mask information
+   if(mask_area.nx() > 0 || mask_area.ny() > 0) {
       mlog << Debug(2)
            << "Parsed Masking Area: " << mask_name
            << " for (" << mask_grid.nx() << " x " << mask_grid.ny()

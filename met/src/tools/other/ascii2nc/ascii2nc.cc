@@ -111,7 +111,7 @@ static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
 
 static Grid        mask_grid;
-static MaskPlane   mask_plane;
+static MaskPlane   mask_area;
 static MaskPoly    mask_poly;
 static StringArray mask_sid;
 
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
    // Set the masking grid and polyline, if specified.
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) file_handler->setGridMask(mask_grid);
-   if(!mask_plane.is_empty())                   file_handler->setAreaMask(mask_plane);
+   if(!mask_area.is_empty())                    file_handler->setAreaMask(mask_area);
    if(mask_poly.n_points() > 0)                 file_handler->setPolyMask(mask_poly);
    if(mask_sid.n_elements() > 0)                file_handler->setSIDMask(mask_sid);
 
@@ -542,7 +542,7 @@ void set_mask_poly(const StringArray & a) {
    mlog << Debug(1)
         << "Polyline Masking File: " << a[0] << "\n";
 
-   parse_poly_mask(a[0], mask_poly, mask_grid, mask_plane, mask_name);
+   parse_poly_mask(a[0], mask_poly, mask_grid, mask_area, mask_name);
 
    // List the mask information
    if(mask_poly.n_points() > 0) {
@@ -550,7 +550,9 @@ void set_mask_poly(const StringArray & a) {
            << "Parsed Masking Polyline: " << mask_poly.name()
            << " containing " <<  mask_poly.n_points() << " points\n";
    }
-   else {
+
+   // List the area mask information
+   if(mask_area.nx() > 0 || mask_area.ny() > 0) {
       mlog << Debug(2)
            << "Parsed Masking Area: " << mask_name
            << " for (" << mask_grid.nx() << " x " << mask_grid.ny()
