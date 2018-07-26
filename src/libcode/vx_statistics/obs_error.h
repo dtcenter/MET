@@ -176,7 +176,8 @@ struct ObsErrorInfo {
 extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
 
 extern double       add_obs_error_inc(const gsl_rng *, FieldType,
-                                      const ObsErrorEntry *, double);
+                                      const ObsErrorEntry *, const double,
+                                      double);
 extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
                                       const ObsErrorEntry *,
                                       const DataPlane &in_dp,

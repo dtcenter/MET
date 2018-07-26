@@ -1638,7 +1638,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                   if(obs_error_info->flag) {
                      fcst_v = add_obs_error_inc(
                                  obs_error_info->rng_ptr, FieldType_Fcst,
-                                 pd[i][j][k].obs_error_entry[l], fcst_v);
+                                 pd[i][j][k].obs_error_entry[l],
+                                 pd[i][j][k].o_na[l], fcst_v);
                   }
 
                   // Store perturbed ensemble member value
