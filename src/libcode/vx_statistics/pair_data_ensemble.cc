@@ -827,8 +827,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
    // Allocate memory for output pairs and set the ensemble size
    pd.extend(n_obs);
    pd.set_ens_size(n_ens);
-   pd.phist_bin_size = phist_bin_size;
-   pd.ssvar_bin_size = ssvar_bin_size;
+   pd.phist_bin_size  = phist_bin_size;
+   pd.ssvar_bin_size  = ssvar_bin_size;
+   pd.obs_error_entry = obs_error_entry;
+   pd.obs_error_flag  = obs_error_flag;
 
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
