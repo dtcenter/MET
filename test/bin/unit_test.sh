@@ -63,6 +63,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_interp_shape.xml \
           unit_lidar2nc.xml \
           unit_airnow.xml"
+          unit_lidar2nc.xml \
+          unit_python.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
