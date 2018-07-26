@@ -257,11 +257,12 @@ class STATAnalysisJob {
       //
       // Variables used for the stat_job_aggr_mpr job type
       //
-      char        *mask_grid_str;
-      char        *mask_poly_str;
-      char        *mask_sid_str;
+      ConcatString mask_grid_str;
+      ConcatString mask_poly_str;
+      ConcatString mask_sid_str;
 
       Grid         mask_grid;
+      MaskPlane    mask_area;
       MaskPoly     mask_poly;
       StringArray  mask_sid;
 
@@ -316,10 +317,6 @@ class STATAnalysisJob {
       // Variance Inflation Factor flag
       //
       int vif_flag;
-
-      void process_mask_grid();
-      void process_mask_poly();
-      void process_mask_sid ();
 
       int is_in_mask_grid(double, double) const;
       int is_in_mask_poly(double, double) const;

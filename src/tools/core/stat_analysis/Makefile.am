@@ -18,10 +18,10 @@ stat_analysis_SOURCES = stat_analysis.cc \
 stat_analysis_CPPFLAGS = ${MET_CPPFLAGS}
 stat_analysis_LDFLAGS = ${MET_LDFLAGS}
 stat_analysis_LDADD = -lvx_stat_out \
+	-lvx_analysis_util \
 	-lvx_statistics \
 	-lvx_shapedata \
 	-lvx_gsl_prob \
-	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
@@ -30,14 +30,17 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_time_series \
+	-lvx_pb_util \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 if ENABLE_PYTHON

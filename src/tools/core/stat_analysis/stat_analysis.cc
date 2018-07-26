@@ -36,6 +36,7 @@
 //   008    05/03/12  Halley Gotway   Switch to using vx_config library.
 //   009    05/21/12  Halley Gotway   Add support of -fcst_valid_hour
 //                    and -obs_valid_hour job command options.
+//   010    07/26/18  Halley Gotway   Support masks from gen_vx_mask.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -574,10 +575,12 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Parse the job command line options
    //
-   mlog << Debug(4)
-        << "\nAmending Job " << n_job << " with options: \""
-        << jobstring << "\"\n";
-   job.parse_job_command(jobstring);
+   if(jobstring != command_line_job_options) {
+      mlog << Debug(4)
+           << "\nAmending Job " << n_job << " with options: \""
+           << jobstring << "\"\n";
+      job.parse_job_command(jobstring);
+   }
 
    //
    // Special processing for the GO Index job.
@@ -610,10 +613,12 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Amend the current job using any command line options
    //
-   mlog << Debug(4)
-        << "\nAmending Job " << n_job << " with command line options: \""
-        << command_line_job_options << "\"\n";
-   job.parse_job_command(command_line_job_options);
+   if(jobstring != command_line_job_options) {
+      mlog << Debug(4)
+           << "\nAmending Job " << n_job << " with command line options: \""
+           << command_line_job_options << "\"\n";
+      job.parse_job_command(command_line_job_options);
+   }
 
    //
    // Get the full jobstring
