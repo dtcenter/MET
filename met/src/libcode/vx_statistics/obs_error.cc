@@ -662,7 +662,8 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 double add_obs_error_inc(const gsl_rng *r, FieldType t,
-                         const ObsErrorEntry *e, double v) {
+                         const ObsErrorEntry *e, const double obs,
+                         double v) {
    double v_new = v;
 
    // Check for null pointer or bad input value
@@ -690,16 +691,17 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
       if(e->dist_type == DistType_None) {
          mlog << Debug(4)
               << "Applying no observation error update for "
-              << fieldtype_to_string(t) << " value " <<  v << ".\n";
+              << fieldtype_to_string(t) << " value " <<  v
+              << " and OBS value " << obs << ".\n";
       }
       // Print detailed update information
       else {
          mlog << Debug(4)
               << "Applying observation error update from "
               << fieldtype_to_string(t) << " value " << v << " to "
-              << v_new << " for "
+              << v_new << " for OBS value " << obs << " using the "
               << dist_to_string(e->dist_type, e->dist_parm)
-              << " perturbation.\n";
+              << " distribution.\n";
       }
    }
 
@@ -714,7 +716,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
                             const DataPlane &obs_dp,
                             const char *var_name, const char *obtype) {
    int x, y;
-   double v;
+   double obs_v, in_v;
    DataPlane out_dp = in_dp;
    const ObsErrorEntry *e = (ObsErrorEntry *) 0;
 
@@ -731,16 +733,18 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    for(x=0; x<out_dp.nx(); x++) {
       for(y=0; y<out_dp.ny(); y++) {
 
+         // Current observation value
+         obs_v = obs_dp.get(x, y);
+
          // For a NULL pointer, do a table lookup
          e = (in_e ? in_e :
-              obs_error_table.lookup(var_name, obtype,
-                                     obs_dp.get(x,y)));
+              obs_error_table.lookup(var_name, obtype, obs_v));
 
          // Get current data value
-         v = in_dp.get(x, y);
+         in_v = in_dp.get(x, y);
 
          // Store perturbed value
-         out_dp.set(add_obs_error_inc(r, t, e, v), x, y);
+         out_dp.set(add_obs_error_inc(r, t, e, obs_v, in_v), x, y);
       }
    }
 
