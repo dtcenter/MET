@@ -1,13 +1,17 @@
 
 import numpy as np
+import os
 
 ###########################################
 
    ##
    ##  load the data into the numpy array
    ##
+
+# Retrieve the environment variables for the input file
+input_file = os.environ['INPUT_FILE']
 try:
-    met_data = np.loadtxt("/var/autofs/mnt/dakota_d3/projects/MET/MET_test_data/unit_test/python/letter.txt")
+    met_data = np.loadtxt(input_file)
 except NameError:
     print("Can't find the input file")
 
