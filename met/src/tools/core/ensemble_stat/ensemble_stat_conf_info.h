@@ -127,7 +127,7 @@ class EnsembleStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
-                          gsl_rng *, bool, bool);
+                          gsl_rng *, bool, bool, bool);
       void set_vx_pd(EnsembleStatConfInfo *);
 
       // Compute the number of output lines for this task
@@ -138,8 +138,8 @@ class EnsembleStatVxOpt {
       int get_n_mask()      const;
       int get_n_mask_area() const;
 
-      int get_n_o_thresh()   const;
-      int get_n_ci_alpha()   const;
+      int get_n_o_thresh()  const;
+      int get_n_ci_alpha()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ class EnsembleStatConfInfo {
       void clear();
 
       void read_config   (const char *, const char *);
-      void process_config(GrdFileType, GrdFileType, bool, bool);
+      void process_config(GrdFileType, GrdFileType, bool, bool, bool);
       void process_flags ();
       void parse_nc_info ();
       void process_masks (const Grid &);
