@@ -17,6 +17,9 @@
 //   000    04/03/12  Halley Gotway   New
 //   001    07/14/14  Halley Gotway   Generalize rapid intensification.
 //   002    09/28/16  Halley Gotway   Add DESC output column.
+//   003    07/27/18  Halley Gotway   Support masks defined by
+//                    the gen_vx_mask tool.
+
 //
 ////////////////////////////////////////////////////////////////////////
 

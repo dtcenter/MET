@@ -17,20 +17,36 @@ tc_pairs_SOURCES = tc_pairs.cc \
 	tc_pairs_conf_info.cc
 tc_pairs_CPPFLAGS = ${MET_CPPFLAGS}
 tc_pairs_LDFLAGS = ${MET_LDFLAGS}
-tc_pairs_LDADD = -lvx_config \
-	-lvx_data2d_nc_met \
+tc_pairs_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_tc_util \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
+	-lvx_data2d \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_pb_util \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
+	-lvx_color \
 	-lvx_log \
-	-lm \
-	-lnetcdf_c++4 -lnetcdf \
+	-lm -lnetcdf_c++4 -lnetcdf \
 	$(FLIBS)
+
+if ENABLE_PYTHON
+   tc_pairs_CPPFLAGS += ${MET_PYTHON_CC}
+   tc_pairs_LDFLAGS  += $(MET_PYTHON_LD)
+   tc_pairs_LDADD    += -lvx_data2d_python -lvx_python_utils
+endif
 
 EXTRA_DIST = tc_pairs_conf_info.h \
 	tc_pairs.h

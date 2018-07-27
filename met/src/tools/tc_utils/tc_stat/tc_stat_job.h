@@ -213,7 +213,8 @@ class TCStatJob {
 
       virtual StringArray parse_job_command(const char *);
 
-      void set_mask(MaskPoly &, const char *);
+      void set_out_init_mask(const char *);
+      void set_out_valid_mask(const char *);
 
       void open_dump_file();
       void close_dump_file();
@@ -302,8 +303,18 @@ class TCStatJob {
       ConcatString StatFile;        // File name for output statistics
       ofstream    *StatOut;         // Output statistics file stream
 
-      MaskPoly     OutInitMask;     // Polyline masking region
-      MaskPoly     OutValidMask;    // Polyline masking region
+      // Polyline masking regions
+      ConcatString OutInitMaskFile;
+      ConcatString OutInitMaskName;
+      MaskPoly     OutInitPolyMask;
+      Grid         OutInitGridMask;
+      MaskPlane    OutInitAreaMask;
+
+      ConcatString OutValidMaskFile;
+      ConcatString OutValidMaskName;
+      MaskPoly     OutValidPolyMask;
+      Grid         OutValidGridMask;
+      MaskPlane    OutValidAreaMask;
 
       // Only retain TrackPoints in both the ADECK and BDECK tracks
       bool MatchPoints;

@@ -15,22 +15,25 @@ tc_stat_SOURCES = tc_stat.cc \
 	tc_stat_conf_info.cc \
 	tc_stat_files.cc \
 	tc_stat_job.cc
-tc_stat_CPPFLAGS = ${MET_CPPFLAGS} 
+tc_stat_CPPFLAGS = ${MET_CPPFLAGS}
 tc_stat_LDFLAGS = ${MET_LDFLAGS}
 tc_stat_LDADD = -lvx_stat_out \
 	-lvx_statistics \
+	-lvx_shapedata \
 	-lvx_gsl_prob \
+	-lvx_analysis_util \
+	-lvx_tc_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
-	-lvx_analysis_util \
-	-lvx_tc_util \
 	-lvx_nc_util \
+	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_pb_util \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
