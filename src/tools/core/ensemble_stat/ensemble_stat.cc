@@ -901,11 +901,11 @@ void process_point_obs(int i_nc) {
         << " observations from " << (hdr_count)
         << " header messages.\n";
 
-        
+
    int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
    int qty_len      = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
                          (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
-                    
+
    NcHeaderData header_data = get_nc_hdr_data(obs_vars);
    int typ_len = header_data.typ_len;
    int sid_len = header_data.sid_len;
@@ -954,7 +954,7 @@ void process_point_obs(int i_nc) {
             (float *)obs_arr_block, obs_qty_idx_block, (char *)obs_qty_str_block)) {
          exit(1);
       }
-      
+
       // Process each observation in the file
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
          int str_length;
@@ -971,7 +971,7 @@ void process_point_obs(int i_nc) {
          else {
             strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_offset]]);
          }
-         
+
          int headerOffset  = obs_arr[0];
 
          // Range check the header offset
@@ -1370,23 +1370,41 @@ void process_grid_vx() {
          }
          // Otherwise, do a table lookup
          else {
-            oerr_ptr = obs_error_table.lookup(
-               conf_info.vx_opt[i].vx_pd.obs_info->name(),
-               conf_info.obtype);
 
-            // If match was found and includes a value range setting,
-            // reset to NULL and lookup separately for grid point
-            if(oerr_ptr) {
-               if(oerr_ptr->val_range.n() == 0) {
-                  mlog << Debug(3)
-                       << "Observation error for gridded verification is "
-                       << "defined by a single table entry.\n";
-               }
-               else {
-                  mlog << Debug(3)
-                       << "Observation error for gridded verification is "
-                       << "defined by a table lookup for each point.\n";
-                  oerr_ptr = (ObsErrorEntry *) 0;
+            // Check for table entries for this variable and message type
+            if(!obs_error_table.has(
+                  conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                  conf_info.obtype)) {
+               mlog << Warning << "\nprocess_grid_vx() -> "
+                    << "Disabling observation error logic since the "
+                    << "obs error table contains no entry for OBS_VAR("
+                    << conf_info.vx_opt[i].vx_pd.obs_info->name()
+                    << ") and MESSAGE_TYPE(" << conf_info.obtype
+                    << ").\nSpecify a custom obs error table using the "
+                    << "MET_OBS_ERROR_TABLE environment variable.\n\n";
+               conf_info.vx_opt[i].obs_error.flag = false;
+            }
+            else {
+
+               // Do a lookup for this variable and message type
+               oerr_ptr = obs_error_table.lookup(
+                  conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                  conf_info.obtype);
+
+               // If match was found and includes a value range setting,
+               // reset to NULL and lookup separately for grid point
+               if(oerr_ptr) {
+                  if(oerr_ptr->val_range.n() == 0) {
+                     mlog << Debug(3)
+                          << "Observation error for gridded verification is "
+                          << "defined by a single table entry.\n";
+                  }
+                  else {
+                     mlog << Debug(3)
+                          << "Observation error for gridded verification is "
+                          << "defined by a table lookup for each point.\n";
+                     oerr_ptr = (ObsErrorEntry *) 0;
+                  }
                }
             }
          }

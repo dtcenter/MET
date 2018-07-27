@@ -577,6 +577,19 @@ ObsErrorEntry *ObsErrorTable::lookup(
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool ObsErrorTable::has(const char *cur_var_name,
+                        const char *cur_msg_type) {
+
+   for(int i=0; i<N_elements; i++) {
+      if( (e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) &&
+          (e[i].msg_type.n() == 0 || e[i].msg_type.has(cur_msg_type)) ) return(true);
+   }
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for struct ObsErrorInfo struct
 //

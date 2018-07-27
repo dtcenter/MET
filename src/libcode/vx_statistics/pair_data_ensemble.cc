@@ -1489,10 +1489,24 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
       }
       // Otherwise, do a table lookup
       else {
-         oerr_ptr = obs_error_table.lookup(
-            obs_info->name(), hdr_typ_str, hdr_sid_str,
-            hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
-            obs_lvl, obs_hgt, obs_v);
+
+         // Check for table entries for this variable and message type
+         if(!obs_error_table.has(obs_info->name(), hdr_typ_str)) {
+            mlog << Warning << "\nVxPairDataEnsemble::add_obs() -> "
+                 << "Disabling observation error logic since the "
+                 << "obs error table contains no entry for OBS_VAR("
+                 << obs_info->name() << ") and MESSAGE_TYPE("
+                 << hdr_typ_str << ").\nSpecify a custom obs error "
+                 << "table using the MET_OBS_ERROR_TABLE environment "
+                 << "variable.\n\n";
+            obs_error_info->flag = false;
+         }
+         else {
+            oerr_ptr = obs_error_table.lookup(
+               obs_info->name(), hdr_typ_str, hdr_sid_str,
+               hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
+               obs_lvl, obs_hgt, obs_v);
+         }
       }
    }
 
