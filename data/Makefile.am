@@ -33,6 +33,7 @@ top_DATA = \
 EXTRA_DIST = ${top_DATA} \
 	sample_fcst \
 	sample_obs \
+	python \
 	copyright_notice.txt
 
 MAINTAINERCLEANFILES 	= Makefile.in
