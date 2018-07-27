@@ -303,11 +303,11 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::OutInitMask
    poly_file = Conf.lookup_string(conf_key_out_init_mask);
-   if(poly_file.nonempty()) Filter.set_mask(Filter.OutInitMask, poly_file);
+   if(poly_file.nonempty()) Filter.set_out_init_mask(poly_file);
 
    // Conf: TCStatJob::OutValidMask
    poly_file = Conf.lookup_string(conf_key_out_valid_mask);
-   if(poly_file.nonempty()) Filter.set_mask(Filter.OutValidMask, poly_file);
+   if(poly_file.nonempty()) Filter.set_out_valid_mask(poly_file);
 
    // Conf: Jobs
    Jobs = Conf.lookup_string_array(conf_key_jobs);

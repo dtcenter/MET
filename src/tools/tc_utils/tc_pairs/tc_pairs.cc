@@ -29,8 +29,10 @@
 //   007    06/01/16  Halley Gotway   Add support for EDecks.
 //   008    09/29/16  Halley Gotway   Add DESC output column.
 //   009    03/09/17  Halley Gotway   Define BEST track time step.
-//   010    03/02/17  Win             MET-667 Add support for tracks that contain
-//                                    all required lead times.
+//   010    03/02/17  Win             MET-667 Add support for tracks
+//                    that contain all required lead times.
+//   011    07/27/18  Halley Gotway   Support masks defined by
+//                    the gen_vx_mask tool.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -120,6 +122,9 @@ static void   process_prob_files   (const StringArray &,
 static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
+static bool   check_masks          (const MaskPoly &, const Grid &,
+                                    const MaskPlane &,
+                                    double lat, double lon);
 static void   derive_interp12      (TrackInfoArray &);
 static int    derive_consensus     (TrackInfoArray &);
 static int    derive_lag           (TrackInfoArray &);
@@ -836,26 +841,30 @@ void filter_tracks(TrackInfoArray &tracks) {
       }
 
       // Initialization location mask
-      if(conf_info.InitMask.n_points() > 0 &&
-         !conf_info.InitMask.latlon_is_inside_dege(t[i][0].lat(),
-                                                   t[i][0].lon())) {
+      if(conf_info.InitMaskName.nonempty() &&
+         !check_masks(conf_info.InitPolyMask,
+                      conf_info.InitGridMask,
+                      conf_info.InitAreaMask,
+                      t[i][0].lat(), t[i][0].lon())) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for falling outside the "
-              << "initialization polyline: ("
+              << "initialization masking region: ("
               << t[i][0].lat() << ", " << t[i][0].lon() << ")\n";
          n_mask_init++;
          continue;
       }
 
       // Valid location mask
-      if(conf_info.ValidMask.n_points() > 0) {
+      if(conf_info.ValidMaskName.nonempty()) {
 
          // Loop over all the points in the current track
          for(j=0, status=true; j<t[i].n_points(); j++) {
 
             // If the TrackPoint falls outside of the polyline break out
-            if(!conf_info.ValidMask.latlon_is_inside_dege(t[i][j].lat(),
-                                                          t[i][j].lon())) {
+            if(!check_masks(conf_info.ValidPolyMask,
+                            conf_info.ValidGridMask,
+                            conf_info.ValidAreaMask,
+                            t[i][j].lat(), t[i][j].lon())) {
                status = false;
                break;
             }
@@ -864,7 +873,7 @@ void filter_tracks(TrackInfoArray &tracks) {
          if(!status) {
             mlog << Debug(4)
                  << "Discarding track " << i+1 << " for falling outside the "
-                 << "valid polyline: "
+                 << "valid masking region: "
                  << t[i][j].lat() << ", " << t[i][j].lon() << ")\n";
             n_mask_vld++;
             continue;
@@ -918,26 +927,30 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // Initialization location mask
-      if(conf_info.InitMask.n_points() > 0 &&
-         !conf_info.InitMask.latlon_is_inside_dege(p[i]->lat(),
-                                                   p[i]->lon())) {
+      if(conf_info.InitMaskName.nonempty()&&
+         !check_masks(conf_info.InitPolyMask,
+                      conf_info.InitGridMask,
+                      conf_info.InitAreaMask,
+                      p[i]->lat(), p[i]->lon())) {
          mlog << Debug(4)
               << "Discarding probability " << i+1 << " for falling "
-              << "outside the initialization polyline: ("
+              << "outside the initialization masking region: ("
               << p[i]->lat() << ", " << p[i]->lon() << ")\n";
          n_mask_init++;
          continue;
       }
 
       // Valid location mask
-      if(conf_info.ValidMask.n_points() > 0 &&
-         !conf_info.ValidMask.latlon_is_inside_dege(p[i]->lat(),
-                                                    p[i]->lon())) {
+      if(conf_info.ValidMaskName.nonempty() &&
+         !check_masks(conf_info.ValidPolyMask,
+                      conf_info.ValidGridMask,
+                      conf_info.ValidAreaMask,
+                      p[i]->lat(), p[i]->lon())) {
          mlog << Debug(4)
               << "Discarding probability " << i+1 << " for falling "
               << "outside the valid polyline: ("
               << p[i]->lat() << ", " << p[i]->lon() << ")\n";
-         n_mask_init++;
+         n_mask_vld++;
          continue;
       }
 
@@ -954,6 +967,44 @@ void filter_probs(ProbInfoArray &probs) {
         << "Rejected for valid mask  = " << n_mask_vld      << "\n";
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
+                 const MaskPlane &mask_area, double lat, double lon) {
+   double grid_x, grid_y;
+
+   //
+   // Check polyline masking.
+   //
+   if(mask_poly.n_points() > 0) {
+      if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
+         return false;
+      }
+   }
+
+   //
+   // Check grid masking.
+   //
+   if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
+      mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
+      if(grid_x < 0 || grid_x >= mask_grid.nx() ||
+         grid_y < 0 || grid_y >= mask_grid.ny()) {
+         return false;
+      }
+
+      //
+      // Check area mask.
+      //
+      if(mask_area.nx() > 0 || mask_area.ny() > 0) {
+         if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {
+            return false;
+         }
+      }
+   }
+
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1970,9 +2021,9 @@ void write_tracks(const TrackPairInfoArray &p) {
    tchc.set_desc(conf_info.Desc);
 
    // Store masking regions in the header
-   if(conf_info.InitMask.n_points() > 0)  tchc.set_init_mask(conf_info.InitMask.name());
+   if(conf_info.InitMaskName.nonempty())  tchc.set_init_mask(conf_info.InitMaskName);
    else                                   tchc.set_init_mask(na_str);
-   if(conf_info.ValidMask.n_points() > 0) tchc.set_valid_mask(conf_info.ValidMask.name());
+   if(conf_info.ValidMaskName.nonempty()) tchc.set_valid_mask(conf_info.ValidMaskName);
    else                                   tchc.set_valid_mask(na_str);
 
    // Loop through the TrackPairInfo objects
@@ -2048,9 +2099,9 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    tchc.set_desc(conf_info.Desc);
 
    // Store masking regions in the header
-   if(conf_info.InitMask.n_points() > 0)  tchc.set_init_mask(conf_info.InitMask.name());
+   if(conf_info.InitMaskName.nonempty())  tchc.set_init_mask(conf_info.InitMaskName);
    else                                   tchc.set_init_mask(na_str);
-   if(conf_info.ValidMask.n_points() > 0) tchc.set_valid_mask(conf_info.ValidMask.name());
+   if(conf_info.ValidMaskName.nonempty()) tchc.set_valid_mask(conf_info.ValidMaskName);
    else                                   tchc.set_valid_mask(na_str);
 
    // Loop through the ProbRIRWPairInfo objects

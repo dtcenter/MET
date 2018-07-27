@@ -61,8 +61,15 @@ class TCPairsConfInfo {
       unixtime  ValidBeg, ValidEnd;
 
       // Polyline masking regions
-      MaskPoly  InitMask;
-      MaskPoly  ValidMask;
+      ConcatString InitMaskName;
+      MaskPoly     InitPolyMask;
+      Grid         InitGridMask;
+      MaskPlane    InitAreaMask;
+
+      ConcatString ValidMaskName;
+      MaskPoly     ValidPolyMask;
+      Grid         ValidGridMask;
+      MaskPlane    ValidAreaMask;
 
       // Check for duplicate ATCFTrackLines
       bool CheckDup;

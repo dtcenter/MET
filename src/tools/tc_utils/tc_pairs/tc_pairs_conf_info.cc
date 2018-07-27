@@ -20,6 +20,7 @@ using namespace std;
 
 #include "tc_pairs_conf_info.h"
 
+#include "apply_mask.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,8 +69,14 @@ void TCPairsConfInfo::clear() {
    InitBeg = InitEnd = (unixtime) 0;
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
-   InitMask.clear();
-   ValidMask.clear();
+   InitMaskName.clear();
+   InitPolyMask.clear();
+   InitGridMask.clear();
+   InitAreaMask.clear();
+   ValidMaskName.clear();
+   ValidPolyMask.clear();
+   ValidGridMask.clear();
+   ValidAreaMask.clear();
    LeadReq.clear();
    CheckDup = true;
    Interp12 = Interp12Type_Replace;
@@ -165,23 +172,25 @@ void TCPairsConfInfo::process_config() {
    // Conf: LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
    for(i=0; i<sa.n_elements(); i++){
-	   LeadReq.add(timestring_to_sec(sa[i]));
+      LeadReq.add(timestring_to_sec(sa[i]));
    }
 
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask))) {
       poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
       mlog << Debug(2)
-           << "Initialization polyline: " << poly_file << "\n";
-      InitMask.load(poly_file);
+           << "Init Points Masking File: " << poly_file << "\n";
+      parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
+                      InitAreaMask, InitMaskName);
    }
 
    // Conf: ValidMask
    if(nonempty(Conf.lookup_string(conf_key_valid_mask))) {
       poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
       mlog << Debug(2)
-           << "Valid polyline: " << poly_file << "\n";
-      ValidMask.load(poly_file);
+           << "Valid Point Masking File: " << poly_file << "\n";
+      parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
+                      ValidAreaMask, ValidMaskName);
    }
 
    // Conf: CheckDup

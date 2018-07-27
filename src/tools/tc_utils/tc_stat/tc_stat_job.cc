@@ -22,6 +22,7 @@ using namespace std;
 #include "tc_stat_job.h"
 
 #include "met_stats.h"
+#include "apply_mask.h"
 #include "vx_tc_util.h"
 #include "vx_log.h"
 #include "vx_util.h"
@@ -42,6 +43,8 @@ static void         parse_thresh_option(const char *, const char *, map<ConcatSt
 static void         parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
 static void         setup_table        (AsciiTable &, int, int);
 static ConcatString build_map_key      (const char *, const TCStatLine &, const StringArray &);
+static bool         check_masks        (const MaskPoly &, const Grid &, const MaskPlane &,
+                                        double lat, double lon);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -250,8 +253,17 @@ void TCStatJob::clear() {
    EventEqual      = default_event_equal;
    EventEqualSet   = false;
 
-   OutInitMask.clear();
-   OutValidMask.clear();
+   OutInitMaskFile.clear();
+   OutInitMaskName.clear();
+   OutInitPolyMask.clear();
+   OutInitGridMask.clear();
+   OutInitAreaMask.clear();
+
+   OutValidMaskFile.clear();
+   OutValidMaskName.clear();
+   OutValidPolyMask.clear();
+   OutValidGridMask.clear();
+   OutValidAreaMask.clear();
 
    return;
 }
@@ -323,8 +335,17 @@ void TCStatJob::assign(const TCStatJob & j) {
    EventEqualLead = j.EventEqualLead;
    EventEqualCases = j.EventEqualCases;
 
-   OutInitMask = j.OutInitMask;
-   OutValidMask = j.OutValidMask;
+   OutInitMaskFile = j.OutInitMaskFile;
+   OutInitMaskName = j.OutInitMaskName;
+   OutInitPolyMask = j.OutInitPolyMask;
+   OutInitGridMask = j.OutInitGridMask;
+   OutInitAreaMask = j.OutInitAreaMask;
+
+   OutValidMaskFile = j.OutValidMaskFile;
+   OutValidMaskName = j.OutValidMaskName;
+   OutValidPolyMask = j.OutValidPolyMask;
+   OutValidGridMask = j.OutValidGridMask;
+   OutValidAreaMask = j.OutValidAreaMask;
 
    return;
 }
@@ -455,9 +476,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "EventEqualLead ...\n";
    EventEqualLead.dump(out, depth + 1);
 
-   out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name().text() : na_str) << "\n";
+   out << prefix << "OutInitMask = " << (OutInitMaskName ? OutInitMaskName.text() : na_str) << "\n";
 
-   out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name().text() : na_str) << "\n";
+   out << prefix << "OutValidMask = " << (OutValidMaskName ? OutValidMaskName.text() : na_str) << "\n";
 
    out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
 
@@ -522,7 +543,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          keep = false;
          n.RejInitStr += pair.n_points();
       }
-      else if(OutInitMask.n_points() > 0) {
+      else if(OutInitMaskName.nonempty()) {
          keep = false;
          n.RejOutInitMask += pair.n_points();
       }
@@ -567,14 +588,16 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    if(keep == true) {
 
       // A mask has been specified
-      if(OutInitMask.n_points() > 0) {
+      if(OutInitMaskName.nonempty()) {
 
          // Check if ADECK init location falls inside the mask
          if(is_bad_data(pair.adeck()[i_init].lat()) ||
             is_bad_data(pair.adeck()[i_init].lon()) ||
-            !OutInitMask.latlon_is_inside_dege(
-               pair.adeck()[i_init].lat(),
-               pair.adeck()[i_init].lon())) {
+            !check_masks(OutInitPolyMask,
+                         OutInitGridMask,
+                         OutInitAreaMask,
+                         pair.adeck()[i_init].lat(),
+                         pair.adeck()[i_init].lon())) {
             keep = false;
             n.RejOutInitMask += pair.n_points();
          }
@@ -728,12 +751,15 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    }
 
    // Check OutValidMask
-   if(keep == true && OutValidMask.n_points() > 0) {
+   if(keep == true && OutValidMaskName.nonempty()) {
 
       // Check ADECK locations
       if(is_bad_data(alat) ||
          is_bad_data(alon) ||
-         !OutValidMask.latlon_is_inside_dege(alat, alon)) {
+         !check_masks(OutValidPolyMask,
+                      OutValidGridMask,
+                      OutValidAreaMask,
+                      alat, alon)) {
          keep = false;
          n.RejOutValidMask++;
       }
@@ -888,8 +914,8 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1]);                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();       a.shift_down(i, 1); }
       else                                               {                                            b.add(a[i]);        }
@@ -900,11 +926,32 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::set_mask(MaskPoly &p, const char *file) {
+void TCStatJob::set_out_init_mask(const char *poly_file) {
 
-   ConcatString poly_file = replace_path(file);
-   p.clear();
-   p.load(poly_file);
+   if(poly_file) {
+      mlog << Debug(2)
+           << "Init Points Masking File: " << poly_file << "\n";
+      OutInitMaskFile = poly_file;
+      parse_poly_mask(OutInitMaskFile, OutInitPolyMask,
+                      OutInitGridMask, OutInitAreaMask,
+                      OutInitMaskName);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::set_out_valid_mask(const char *poly_file) {
+
+   if(poly_file) {
+      mlog << Debug(2)
+           << "Valid Points Masking File: " << poly_file << "\n";
+      OutValidMaskFile = poly_file;
+      parse_poly_mask(OutValidMaskFile, OutValidPolyMask,
+                      OutValidGridMask, OutValidAreaMask,
+                      OutValidMaskName);
+   }
 
    return;
 }
@@ -1022,9 +1069,9 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
    tchc.set_cyclone(pair.bdeck().cyclone());
    tchc.set_storm_name(pair.bdeck().storm_name());
 
-   if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
+   if(OutInitMaskName.nonempty())  tchc.set_init_mask(OutInitMaskName);
    else                            tchc.set_init_mask(na_str);
-   if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
+   if(OutValidMaskName.nonempty()) tchc.set_valid_mask(OutValidMaskName);
    else                            tchc.set_valid_mask(na_str);
 
    // Write the TrackPairInfo object
@@ -1174,10 +1221,10 @@ ConcatString TCStatJob::serialize() const {
       s << "-event_equal " << bool_to_string(EventEqual) << " ";
    for(i=0; i<EventEqualLead.n_elements(); i++)
       s << "-event_equal_lead " << sec_to_hhmmss(nint(EventEqualLead[i])) << " ";
-   if(OutInitMask.n_points() > 0)
-      s << "-out_init_mask " << OutInitMask.file_name() << " ";
-   if(OutValidMask.n_points() > 0)
-      s << "-out_valid_mask " << OutValidMask.file_name() << " ";
+   if(OutInitMaskFile.nonempty())
+      s << "-out_init_mask " << OutInitMaskFile << " ";
+   if(OutValidMaskFile.nonempty())
+      s << "-out_valid_mask " << OutValidMaskFile << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(StatFile.length() > 0)
@@ -3896,6 +3943,44 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    } // end for i
 
    return(key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
+                 const MaskPlane &mask_area, double lat, double lon) {
+   double grid_x, grid_y;
+
+   //
+   // Check polyline masking.
+   //
+   if(mask_poly.n_points() > 0) {
+      if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
+         return false;
+      }
+   }
+
+   //
+   // Check grid masking.
+   //
+   if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
+      mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
+      if(grid_x < 0 || grid_x >= mask_grid.nx() ||
+         grid_y < 0 || grid_y >= mask_grid.ny()) {
+         return false;
+      }
+
+      //
+      // Check area mask.
+      //
+      if(mask_area.nx() > 0 || mask_area.ny() > 0) {
+         if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {
+            return false;
+         }
+      }
+   }
+
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
