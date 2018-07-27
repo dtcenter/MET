@@ -62,8 +62,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_hira.xml \
           unit_interp_shape.xml \
           unit_lidar2nc.xml \
-          unit_airnow.xml"
-          unit_lidar2nc.xml \
+          unit_airnow.xml \
           unit_python.xml"
 
 # Run each unit test
