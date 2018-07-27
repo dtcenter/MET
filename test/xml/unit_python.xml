@@ -21,9 +21,9 @@
 
   <test name="python_numpy_PLOT_DATA_PLANE">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
-<!--    <env>
+    <env>
       <pair><name>INPUT_FILE</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
-    </env> -->
+    </env> 
     <param> \
       &MET_BASE;/python/test_numpy.py \
       &OUTPUT_DIR;/python/letter.ps \
@@ -36,5 +36,29 @@
       <ps>&OUTPUT_DIR;/python/letter.ps</ps>
     </output>
   </test>
+  <test name="python_numpy_MODE">
+    <exec>&MET_DIR;/bin/mode</exec>
+    <env>
+      <pair><name>INPUT_FILE</name> <value>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc</value></pair>
+      <pair><name>MERGE_FLAG</name>     <value>NONE</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>NONE</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>""</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>NO_MATCH_MERGE</value></pair>
+    </env> 
+    <param> \
+      &MET_BASE;/python/test_numpy.py \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_python \
+      -outdir &OUTPUT_DIR;/mode -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/mode</ps>
+    </output>
+  </test>
+
+  
 
 </met_test>
