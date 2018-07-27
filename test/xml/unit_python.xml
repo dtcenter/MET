@@ -111,4 +111,27 @@
     </output>
    </test>
 
+  <test name="python_wavelet_stat">
+    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <env>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4</value></pair>
+    </env>
+    <param> \
+      &MET_BASE;/python/test_numpy_fcst.py \
+      &MET_BASE;/python/test_numpy_obs.py \
+      &CONFIG_DIR;/WaveletStatConfig_python \
+      -outdir &OUTPUT_DIR;/python_wavelet_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.stat</stat>
+      <txt>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V_isc.txt</txt>
+      <grid_nc>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.nc</grid_nc>
+      <ps>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.ps</ps>
+    </output>
+  </test>
+
+
 </met_test>
