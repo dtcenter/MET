@@ -126,7 +126,8 @@ void EnsembleStatConfInfo::read_config(const char *default_file_name,
 
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
-                                          bool point_vx, bool use_var_id) {
+                                          bool grid_vx, bool point_vx,
+                                          bool use_var_id) {
    int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -149,7 +150,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    model = parse_conf_string(&conf, conf_key_model);
 
    // Conf: obtype
-   obtype = parse_conf_string(&conf, conf_key_obtype);
+   obtype = parse_conf_string(&conf, conf_key_obtype, grid_vx);
 
    // Conf: rng_type and rng_seed
    ConcatString rng_type, rng_seed;
@@ -306,7 +307,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
          // Process the options for this verification task
          vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
-                                  rng_ptr, point_vx, use_var_id);
+                                  rng_ptr, grid_vx, point_vx,
+                                  use_var_id);
+
+         // For no point verification, store obtype as the message type
+         if(!point_vx) {
+            vx_opt[i].msg_typ.clear();
+            vx_opt[i].msg_typ.add(obtype);
+         }
       }
 
       // Summarize output flags across all verification tasks
@@ -604,8 +612,8 @@ void EnsembleStatVxOpt::clear() {
 
 void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
-                                       gsl_rng *rng_ptr, bool point_vx,
-                                       bool use_var_id) {
+                                       gsl_rng *rng_ptr, bool grid_vx,
+                                       bool point_vx, bool use_var_id) {
    int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -686,7 +694,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    mask_sid = odict.lookup_string_array(conf_key_mask_sid);
 
    // Conf: message_type
-   msg_typ = parse_conf_message_type(&odict);
+   msg_typ = parse_conf_message_type(&odict, point_vx);
 
    // Conf: othr_thresh
    othr_ta = odict.lookup_thresh_array(conf_key_obs_thresh);
