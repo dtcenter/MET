@@ -76,4 +76,39 @@
       <nc>&OUTPUT_DIR;/mode_python/mode_120000L_20050807_120000V_120000A_obj.nc</nc>
     </output>
    </test>
+
+
+ <test name="python_numpy_GridStat_mixed">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
+      &MET_BASE;/python/test_numpy_obs.py \
+      &CONFIG_DIR;/GridStatConfig_python_mixed \
+      -outdir &OUTPUT_DIR;/grid_stat_python -v 1
+    </param>
+    <output>
+      <nc>&OUTPUT_DIR;/grid_stat_python/grid_stat_120000L_20120409_120000V_pairs.nc</nc>
+    </output>
+   </test>
+
+ <test name="python_numpy_GridStat">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+    </env>
+    <param> \
+      &MET_BASE;/python/test_numpy_fcst.py \
+      &MET_BASE;/python/test_numpy_obs.py \
+      &CONFIG_DIR;/GridStatConfig_python \
+      -outdir &OUTPUT_DIR;/grid_stat_python -v 1
+    </param>
+    <output>
+      <nc>&OUTPUT_DIR;/grid_stat_python/grid_stat_120000L_20050807_120000V_pairs.nc</nc>
+    </output>
+   </test>
+
 </met_test>
