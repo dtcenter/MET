@@ -9,7 +9,7 @@ import os
    ##
 
 # Retrieve the environment variables for the input file
-input_file = os.environ['INPUT_FILE']
+input_file = os.path.expandvars(os.environ['INPUT_FILE'])
 try:
     met_data = np.loadtxt(input_file)
 except NameError:
