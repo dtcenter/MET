@@ -1133,6 +1133,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile
                  src/tools/core/grid_stat/Makefile
+                 src/tools/core/met_shared/Makefile
                  src/tools/core/mode/Makefile
                  src/tools/core/mode_analysis/Makefile
                  src/tools/core/pcp_combine/Makefile

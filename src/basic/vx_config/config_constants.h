@@ -184,6 +184,7 @@ static const char stat_na_str[]     = "NA";
 struct TimeSummaryInfo {
   bool        flag;        // Flag indicating whether to perform the
                            //   time summary
+  bool        raw_data;    // Flag indicating whether to save the raw data
   int         beg;         // Time (specified as "HHMMSS" in config file) to
                            //   start summaries for each day of data
                            //         timestring_to_sec()
@@ -491,6 +492,7 @@ static const char conf_key_mask_sid[]          = "mask.sid";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
 static const char conf_key_time_summary[]      = "time_summary";
 static const char conf_key_flag[]              = "flag";
+static const char conf_key_raw_data[]          = "raw_data";
 static const char conf_key_step[]              = "step";
 static const char conf_key_grib_code[]         = "grib_code";
 static const char conf_key_vld_freq[]          = "vld_freq";

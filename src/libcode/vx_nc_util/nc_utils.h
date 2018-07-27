@@ -136,6 +136,7 @@ struct NetcdfObsVars {
    bool  attr_pb2nc  ;
    bool  use_var_id  ;
    int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
+   int   obs_cnt     ; // obs. array count (fixed dimension if obs_cnt > 0)
    int   pb_hdr_cnt  ; // PrepBufr header array count
    
    NcDim strl_dim    ; // header string dimension (16 bytes)

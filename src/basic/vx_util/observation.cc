@@ -14,6 +14,7 @@ using namespace std;
 
 
 #include "observation.h"
+#include "vx_math.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,42 @@ Observation::~Observation()
   // Do nothing
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool Observation::hasSameHeader(Observation &obs) const {
+  bool same_header = true;
+  if ( this != &obs ) {
+    if (obs.getHeaderType() != getHeaderType()    ||
+        obs.getStationId()  != getStationId()     ||
+        obs.getValidTime()  != getValidTime()     ||
+        !is_eq(obs.getLatitude(),  getLatitude())  ||
+        !is_eq(obs.getLongitude(), getLongitude()) ||
+        !is_eq(obs.getElevation(), getElevation()) ) {
+      same_header = false;
+    }
+  }
+  return same_header;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool Observation::hasSameHeader(Observation *obs) const {
+  bool same_header = true;
+  if ( this != obs ) {
+    if (obs == 0) {
+      same_header = false;
+    }
+    else if (obs->getHeaderType() != getHeaderType()    ||
+        obs->getStationId()  != getStationId()     ||
+        obs->getValidTime()  != getValidTime()     ||
+        !is_eq(obs->getLatitude(),  getLatitude())  ||
+        !is_eq(obs->getLongitude(), getLongitude()) ||
+        !is_eq(obs->getElevation(), getElevation()) ) {
+      same_header = false;
+    }
+  }
+  return same_header;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Protected/Private Methods

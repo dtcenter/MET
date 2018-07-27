@@ -135,6 +135,9 @@ public:
     return _varName;
   }
   
+  bool hasSameHeader(Observation &other) const;
+  bool hasSameHeader(Observation *other) const;
+  
   ///////////////
   // Operators //
   ///////////////

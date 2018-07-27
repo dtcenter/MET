@@ -18,8 +18,8 @@ pb2nc_SOURCES = pb2nc.cc \
 	closepb.f \
 	readpb.f \
 	dumppb.f
-pb2nc_CPPFLAGS = ${MET_CPPFLAGS}
-pb2nc_LDFLAGS = ${MET_LDFLAGS}
+pb2nc_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
+pb2nc_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
 pb2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -43,6 +43,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
+	-lmet_shared \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(FLIBS)
 

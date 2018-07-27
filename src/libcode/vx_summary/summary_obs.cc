@@ -46,36 +46,59 @@ SummaryObs::~SummaryObs()
 
 long SummaryObs::countHeaders()
 {
+   return countHeaders(&observations);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+long SummaryObs::countHeaders(vector< Observation > *obs_vector_ptr)
+{
    long nhdr = 0;
+   const string method_name = "SummaryObs::countHeaders(vector *)";
+   Observation prev_obs = Observation(
+         "dummy_type", "dummy_sid", -1, -90, -180, -100,
+         na_str, 1, 0, 0, 0, "dummay");
 
-   string prev_header_type = "";
-   string prev_station_id = "";
-   time_t prev_valid_time = 0;
-   double prev_latitude = bad_data_double;
-   double prev_longitude = bad_data_double;
-   double prev_elevation = bad_data_double;
-
-   for (vector< Observation >::iterator obs = observations.begin();
-        obs != observations.end(); ++obs)
+   for (vector< Observation >::iterator obs = obs_vector_ptr->begin();
+        obs != obs_vector_ptr->end(); ++obs)
    {
-      if (obs->getHeaderType() != prev_header_type    ||
-          obs->getStationId()  != prev_station_id     ||
-          obs->getValidTime()  != prev_valid_time     ||
-          !is_eq(obs->getLatitude(),  prev_latitude)  ||
-          !is_eq(obs->getLongitude(), prev_longitude) ||
-          !is_eq(obs->getElevation(), prev_elevation))
+      if (!obs->hasSameHeader(prev_obs))
       {
         nhdr++;
-
-        prev_header_type = obs->getHeaderType();
-        prev_station_id  = obs->getStationId();
-        prev_valid_time  = obs->getValidTime();
-        prev_latitude    = obs->getLatitude();
-        prev_longitude   = obs->getLongitude();
-        prev_elevation   = obs->getElevation();
+        prev_obs = *obs;
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
+   
+   mlog << Debug(5) << "    " << method_name << "  size: "
+        << (int)obs_vector_ptr->size() << " header count: " << nhdr << "\n";
+
+   return nhdr;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+long SummaryObs::countHeaders(vector< Observation > &obs_vector)
+{
+   long nhdr = 0;
+   const string method_name = "SummaryObs::countHeaders(vector &)";
+   Observation prev_obs = Observation(
+         "dummy_type", "dummy_sid", -1, -90, -180, -100,
+         na_str, 1, 0, 0, 0, "dummay");
+
+   for (vector< Observation >::iterator obs = obs_vector.begin();
+        obs != obs_vector.end(); ++obs)
+   {
+      if (!obs->hasSameHeader(prev_obs))
+      {
+        nhdr++;
+        prev_obs = *obs;
+      }
+      obs->setHeaderIndex(nhdr-1);
+   } /* endfor - obs */
+   
+   mlog << Debug(5) << "    " << method_name << "  size: "
+        << (int)obs_vector.size() << " header count: " << nhdr << "\n";
 
    return nhdr;
 }
@@ -85,13 +108,9 @@ long SummaryObs::countHeaders()
 long SummaryObs::countSummaryHeaders()
 {
    long nhdr = 0;
-
-   string prev_header_type = "";
-   string prev_station_id = "";
-   time_t prev_valid_time = 0;
-   double prev_latitude = bad_data_double;
-   double prev_longitude = bad_data_double;
-   double prev_elevation = bad_data_double;
+   Observation prev_obs = Observation(
+         "dummy_type", "dummy_sid", -1, -90, -180, -100,
+         na_str, 1, 0, 0, 0, "dummay");
    const string method_name = "SummaryObs::countSummaryHeaders()";
 
    int obs_count = 0;
@@ -99,24 +118,12 @@ long SummaryObs::countSummaryHeaders()
         obs != summaries.end(); ++obs)
    {
       obs_count++;
-      if (obs->getHeaderType() != prev_header_type    ||
-          obs->getStationId()  != prev_station_id     ||
-          obs->getValidTime()  != prev_valid_time     ||
-          !is_eq(obs->getLatitude(),  prev_latitude)  ||
-          !is_eq(obs->getLongitude(), prev_longitude) ||
-          !is_eq(obs->getElevation(), prev_elevation))
+      if (!obs->hasSameHeader(prev_obs))
       {
         nhdr++;
+        prev_obs = *obs;
         mlog << Debug(9) << "    " << method_name << "  hdrIndex: "
              << nhdr << " at obs " << obs_count << "\n";
-
-
-        prev_header_type = obs->getHeaderType();
-        prev_station_id  = obs->getStationId();
-        prev_valid_time  = obs->getValidTime();
-        prev_latitude    = obs->getLatitude();
-        prev_longitude   = obs->getLongitude();
-        prev_elevation   = obs->getElevation();
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */

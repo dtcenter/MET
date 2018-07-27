@@ -326,7 +326,7 @@ ConcatString s;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool add_nc_header_all (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv)
 {
    bool added = false;
@@ -411,7 +411,7 @@ void write_nc_other_vars (NetcdfObsVars &obs_vars)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void write_nc_header (const NetcdfObsVars &obs_vars)
+void write_nc_buf_headers (const NetcdfObsVars &obs_vars)
 {
    if (0 < nc_data_buffer.hdr_data_idx) {
       write_header_to_nc(obs_vars, nc_data_buffer, nc_data_buffer.hdr_data_idx);
@@ -585,7 +585,10 @@ void create_nc_dimensions(NetcdfObsVars &obs_vars, NcFile *f_out) {
    if (IS_INVALID_NC(obs_vars.hdr_dim) && obs_vars.hdr_cnt > 0) {
       obs_vars.hdr_dim = add_dim(f_out, nc_dim_nhdr, obs_vars.hdr_cnt);
    }
-   if (IS_INVALID_NC(obs_vars.obs_dim))   obs_vars.obs_dim   = add_dim(f_out, nc_dim_nobs);   // unlimited dimension;
+   if (IS_INVALID_NC(obs_vars.obs_dim)) {
+      if (obs_vars.obs_cnt > 0) obs_vars.obs_dim   = add_dim(f_out, nc_dim_nobs, obs_vars.obs_cnt);   // fixed dimension;
+      else                      obs_vars.obs_dim   = add_dim(f_out, nc_dim_nobs);   // unlimited dimension;
+   }
    nc_data_buffer.obs_vars = obs_vars;
 }
 
@@ -663,8 +666,10 @@ void create_nc_pb_hdrs (NetcdfObsVars &obs_vars, NcFile *f_out,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NcDim create_nc_obs_var (NetcdfObsVars &obs_vars, NcFile *f_out, int var_count, const int deflate_level) {
+NcDim create_nc_obs_var (NetcdfObsVars &obs_vars, NcFile *f_out,
+                         int var_count, const int deflate_level) {
    NcDim var_dim  = add_dim(f_out, nc_dim_nvar, var_count);
+   // If the string length is modified, update nc_tools.cc, too.
    if (IS_INVALID_NC(obs_vars.strl2_dim)) obs_vars.strl2_dim = add_dim(f_out, nc_dim_mxstr2, HEADER_STR_LEN2);
    
    obs_vars.obs_var = add_var(f_out, nc_var_obs_var, ncChar, var_dim, obs_vars.strl2_dim, deflate_level);
@@ -674,7 +679,8 @@ NcDim create_nc_obs_var (NetcdfObsVars &obs_vars, NcFile *f_out, int var_count, 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int deflate_level, bool use_var_id) {
+void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
+                         const int deflate_level, bool use_var_id) {
    const char *long_name_str;
    const char *method_name = "  create_nc_obs_vars()";
 
@@ -828,6 +834,7 @@ void init_nc_dims_vars(NetcdfObsVars &obs_vars, bool use_var_id) {
    obs_vars.attr_pb2nc  = false;
    obs_vars.use_var_id  = use_var_id;
    obs_vars.hdr_cnt     = 0;     // header array length (fixed dimension if hdr_cnt > 0)
+   obs_vars.obs_cnt     = 0;     // obs. array length (fixed dimension if obs_cnt > 0)
    //obs_vars.hdr_str_len = 0;    // string length for header (message) type header
    nc_data_buffer.obs_vars = obs_vars;
 }
@@ -958,12 +965,12 @@ void reset_header_buffer(int buf_size, bool reset_all) {
 
 // Saves the headers at NcHeaderData hdr_data
 //
-void write_nc_headers(const NetcdfObsVars &obs_vars)
+void write_nc_arr_headers(const NetcdfObsVars &obs_vars)
 {
    int hdr_str_len, hdr_str_len2;
    int cur_hdr_idx = nc_data_buffer.cur_hdr_idx;
    int buf_size = (cur_hdr_idx > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : cur_hdr_idx;
-   const char *method_name = "  write_nc_headers()";
+   const char *method_name = "  write_nc_arr_headers()";
    
    mlog << Debug(7) << method_name << "  hdr_count: " << cur_hdr_idx << "\n";
 
@@ -1004,7 +1011,7 @@ void write_nc_headers(const NetcdfObsVars &obs_vars)
       }
    }
 
-   write_nc_header(obs_vars);
+   write_nc_buf_headers(obs_vars);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1149,7 +1156,7 @@ void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
 
 int write_nc_observations(const NetcdfObsVars &obs_vars,
                           const vector< Observation > observations,
-                          const bool reset)
+                          const bool use_var_idx, const bool reset)
 {
    int prev_hdr_idx = -1;
    string prev_header_type = "";
@@ -1161,6 +1168,7 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
    const string method_name = "  write_nc_observations()";
 
    int obs_buf_size = observations.size();
+   mlog << Debug(5) << method_name << "  reset: " << reset << "\n";
    mlog << Debug(7) << method_name << "  obs_count: " << obs_buf_size << "\n";
    if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
    
@@ -1188,26 +1196,28 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
               << obs->getHeaderIndex() << " at obs " << nc_data_buffer.processed_count << "\n";
          prev_hdr_idx = obs->getHeaderIndex();
          if (header_to_vector) {
-            add_nc_header_all(obs->getHeaderType().c_str(),
-                              obs->getStationId().c_str(),
-                              obs->getValidTimeString().c_str(),
-                              obs->getLatitude(),
-                              obs->getLongitude(),
-                              obs->getElevation());
+            add_nc_header_to_array(
+                  obs->getHeaderType().c_str(),
+                  obs->getStationId().c_str(),
+                  obs->getValidTimeString().c_str(),
+                  obs->getLatitude(),
+                  obs->getLongitude(),
+                  obs->getElevation());
          }
          else {
-            write_nc_header(obs_vars,
-                            obs->getHeaderType().c_str(),
-                            obs->getStationId().c_str(),
-                            obs->getValidTimeString().c_str(),
-                            obs->getLatitude(),
-                            obs->getLongitude(),
-                            obs->getElevation());
+            write_nc_header(
+               obs_vars,
+                  obs->getHeaderType().c_str(),
+                  obs->getStationId().c_str(),
+                  obs->getValidTimeString().c_str(),
+                  obs->getLatitude(),
+                  obs->getLongitude(),
+                  obs->getElevation());
          }
       }
       
       obs_arr[0] = obs->getHeaderIndex();
-      obs_arr[1] = obs->getVarCode();
+      obs_arr[1] = (use_var_idx ? obs->getVarCode() : obs->getGribCode());
       obs_arr[2] = obs->getPressureLevel();
       obs_arr[3] = obs->getHeight();
       obs_arr[4] = obs->getValue();

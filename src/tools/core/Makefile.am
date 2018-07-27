@@ -26,6 +26,8 @@ if ENABLE_GRID_STAT
   SUBDIRS += grid_stat
 endif
 
+SUBDIRS += met_shared
+
 if ENABLE_MODE
   SUBDIRS += mode
 endif
@@ -54,4 +56,5 @@ if ENABLE_SERIES_ANALYSIS
   SUBDIRS += series_analysis
 endif
 
+  
 MAINTAINERCLEANFILES 	= Makefile.in

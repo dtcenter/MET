@@ -971,7 +971,7 @@ void process_madis_metar(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -1656,7 +1656,7 @@ void process_madis_raob(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -1888,7 +1888,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -2206,7 +2206,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -2663,7 +2663,7 @@ void process_madis_mesonet(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -2974,7 +2974,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    create_nc_other_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_header (obs_vars);
+   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 

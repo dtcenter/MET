@@ -28,6 +28,9 @@ using namespace std;
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
 
+#include "nc_tools.h"
+#include "summary_nc.h"
+
 extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
 extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
 
@@ -155,45 +158,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   // If we were summarizing, add global attributes showing how the
   // summarization was done.
 
-  if (_dataSummarized)
-  {
-    add_att(_ncFile, "time_summary_beg",
-                     _secsToTimeString(_summaryInfo.beg));
-    add_att(_ncFile, "time_summary_end",
-                     _secsToTimeString(_summaryInfo.end));
-
-    char att_string[1024];
-
-    sprintf(att_string, "%d", _summaryInfo.step);
-    add_att(_ncFile, "time_summary_step", att_string);
-
-    sprintf(att_string, "%d", _summaryInfo.width_beg);
-    add_att(_ncFile, "time_summary_width_beg", att_string);
-
-    sprintf(att_string, "%d", _summaryInfo.width_end);
-    add_att(_ncFile, "time_summary_width_end", att_string);
-
-    string grib_code_string;
-    for (int i = 0; i < _summaryInfo.grib_code.n_elements(); ++i)
-    {
-      sprintf(att_string, "%d", _summaryInfo.grib_code[i]);
-      if (i == 0)
-        grib_code_string = string(att_string);
-      else
-        grib_code_string += string(" ") + att_string;
-    }
-    add_att(_ncFile, "time_summary_grib_code", grib_code_string.c_str());
-
-    string type_string;
-    for (int i = 0; i < _summaryInfo.type.n_elements(); ++i)
-    {
-      if (i == 0)
-        type_string = _summaryInfo.type[i];
-      else
-        type_string += string(" ") + _summaryInfo.type[i];
-    }
-    add_att(_ncFile, "time_summary_type", type_string.c_str());
-  }
+  if (_dataSummarized) write_summary_attributes(_ncFile, _summaryInfo);
 
   // Write the headers and observations to the netCDF file.
 
@@ -201,30 +166,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     return false;
 
   // Add variable names
-  if (use_var_id) {
-    add_att(_ncFile, nc_att_use_var_id, "true");
-    if (IS_INVALID_NC(obs_vars.obs_var)) create_nc_obs_var(obs_vars, _ncFile, obs_names.n_elements(), deflate_level);
-
-    int max_name_len = get_nc_string_length(&obs_vars.obs_var);
-    char var_name[max_name_len];
-    long offsets[2] = { 0, 0 };
-    long lengths[2] = { 1, max_name_len } ;
-    for(int i=0; i<obs_names.n_elements(); i++) {
-      int var_len = strlen(obs_names[i]);
-      if (var_len >= max_name_len) var_len = max_name_len -1;
-      strncpy(var_name, obs_names[i], var_len);
-      for(int tIdx=var_len; tIdx<max_name_len; tIdx++) {
-        var_name[tIdx] = bad_data_char;
-      }
-
-      if(!put_nc_data(&obs_vars.obs_var, (char *)var_name, lengths, offsets)) {
-         mlog << Error << "\nwriteNetcdfFile() -> "
-              << "error writing the variable name to the netCDF file\n\n";
-         exit(1);
-      }
-      offsets[0] += 1;
-    } // end for i
-  }
+  if (use_var_id) write_obs_var_names(obs_vars, obs_names);
 
   // Close the netCDF file.
 
@@ -278,6 +220,9 @@ void FileHandler::_countHeaders()
 {
    _nhdr = (do_summary ? summary_obs.countSummaryHeaders()
                        : summary_obs.countHeaders());
+   if (do_summary && _summaryInfo.raw_data) {
+      _nhdr += summary_obs.countHeaders(_observations);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -314,6 +259,11 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    init_nc_dims_vars (obs_vars, use_var_id);
    obs_vars.attr_agl   = true;
 
+   int obs_count = (do_summary ? summary_obs.getSummaries().size()
+                               : summary_obs.getObservations().size());
+   if (do_summary && _summaryInfo.raw_data) obs_count += _observations.size();
+   obs_vars.obs_cnt = obs_count;
+   
    create_nc_hdr_vars(obs_vars, _ncFile, _nhdr, deflate_level);
    create_nc_obs_vars(obs_vars, _ncFile, deflate_level, use_var_id);
 
@@ -429,7 +379,8 @@ bool FileHandler::_addObservations(const Observation &obs)
    }
 
    summary_obs.addObservationObj(obs);
-   //   _observations.push_back(obs);
+   // Save obs because the obs vector is sorted after time summary
+   _observations.push_back(obs);
 
    if (!do_summary) {
       const char *var_name = obs.getVarName().c_str();
@@ -452,62 +403,58 @@ bool FileHandler::_writeObservations()
   double prev_longitude = bad_data_double;
   double prev_elevation = bad_data_double;
 
-  if (do_summary) {
-    write_nc_observations(obs_vars, summary_obs.getSummaries());
-    if (IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var)) {
-      create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data);
-      write_nc_headers(obs_vars);
-    }
-    else {
-      write_nc_header(obs_vars);
-    }
+  if (!_dataSummarized) {
+    write_nc_observations(obs_vars, summary_obs.getObservations(), use_var_id);
   }
-  else {
-    _observations = summary_obs.getObservations();
-
-    for (vector< Observation >::const_iterator obs = _observations.begin();
-         obs != _observations.end(); ++obs)
-    {
-
-      if (obs->getHeaderType() != prev_header_type    ||
-          obs->getStationId()  != prev_station_id     ||
-          obs->getValidTime()  != prev_valid_time     ||
-          !is_eq(obs->getLatitude(),  prev_latitude)  ||
-          !is_eq(obs->getLongitude(), prev_longitude) ||
-          !is_eq(obs->getElevation(), prev_elevation))
-      {
-        if (!_writeHdrInfo(obs->getHeaderType().c_str(),
-                           obs->getStationId().c_str(),
-                           obs->getValidTimeString().c_str(),
-                           obs->getLatitude(),
-                           obs->getLongitude(),
-                           obs->getElevation()))
-          return false;
-
-        prev_header_type = obs->getHeaderType();
-        prev_station_id  = obs->getStationId();
-        prev_valid_time  = obs->getValidTime();
-        prev_latitude    = obs->getLatitude();
-        prev_longitude   = obs->getLongitude();
-        prev_elevation   = obs->getElevation();
-      }
-
-      if (!_writeObsInfo(obs->getGribCode(),
-                         obs->getPressureLevel(),
-                         obs->getHeight(),
-                         obs->getValue(),
-                         obs->getQualityFlag().c_str()))
-        return false;
-
-    } /* endfor - obs */
-
-    write_nc_observation(obs_vars, nc_data_buffer);
-
-    int var_count = 0;
-    int unit_count = 0;
-    create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data, var_count, unit_count, deflate_level);
-    write_nc_header(obs_vars);
+  else if (_summaryInfo.raw_data) {
+    write_nc_observations(obs_vars, _observations, use_var_id);
   }
+
+  if (_dataSummarized) {
+    write_nc_observations(obs_vars, summary_obs.getSummaries(), use_var_id);
+  }
+  
+  write_nc_arr_headers(obs_vars);
+  
+  int unit_count = 0;
+  int var_count = (use_var_id ? obs_names.n_elements() : 0);
+  create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data, var_count, unit_count, deflate_level);
+  write_nc_other_vars(obs_vars);
+
   return true;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void FileHandler::debug_print_observations(vector< Observation > my_observation, string extra_str) {
+  int count = 0;
+  int obs_count = 0;
+  int threshold_count = 10;
+  int prev_hdr_idx = -1;
+  string methd_name = "FileHandler::debug_print_observations()   ";
+  cout << methd_name << extra_str << "  count: " << (int)my_observation.size() << "\n";
+  for (vector< Observation >::const_iterator obs = my_observation.begin();
+       obs != my_observation.end(); ++obs)
+  {
+    obs_count++;
+    if (count > threshold_count && prev_hdr_idx == obs->getHeaderIndex()) continue;
+    cout << methd_name << extra_str << "      obs index: " << (obs_count - 1)
+         << "  header index: " << obs->getHeaderIndex()
+         << "  Sid: " << obs->getStationId()
+         << "  lat: " << obs->getLatitude() << " lon: " << obs->getLongitude()
+         << "  vld time: " << obs->getValidTimeString()
+         << "  GC/VarIdx: " << obs->getGribCode() << "  Value: " << obs->getValue()
+         << "  HeaderType: " << obs->getHeaderType() << "\n";
+    count++;
+    if (threshold_count < obs->getHeaderIndex()) break;
+    prev_hdr_idx = obs->getHeaderIndex();
+  }
+  Observation last_obs = my_observation.at(my_observation.size()-1);
+  cout << methd_name << extra_str << " last obs index: " << (obs_count - 1)
+       << "  header index: " << last_obs.getHeaderIndex()
+       << "  Sid: " << last_obs.getStationId()
+       << "  lat: " << last_obs.getLatitude() << " lon: " << last_obs.getLongitude()
+       << "  vld time: " << last_obs.getValidTimeString()
+       << "  GC/VarIdx: " << last_obs.getGribCode() << "  Value: " << last_obs.getValue()
+       << "  HeaderType: " << last_obs.getHeaderType() << "\n";
+}
