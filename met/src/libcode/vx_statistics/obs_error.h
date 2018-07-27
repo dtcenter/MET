@@ -136,6 +136,8 @@ class ObsErrorTable {
       // for gridded analyses
       ObsErrorEntry * lookup(const char *, const char *,
                              double cur_val = bad_data_double);
+
+      bool has(const char *, const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
