@@ -140,27 +140,6 @@ protected:
 
   bool _writeObservations();
 
-  static string _secsToTimeString(const int secs)
-  {
-    // Get the different fields from the number of seconds
-
-    int remaining_secs = secs;
-    int hour = remaining_secs / 3600;
-    remaining_secs -= hour * 3600;
-    int minute = remaining_secs / 60;
-    remaining_secs -= minute * 60;
-    int second = remaining_secs;
-
-    // Create the string
-
-    char string_buffer[20];
-
-    sprintf(string_buffer, "%02d%02d%02d", hour, minute, second);
-
-    return string(string_buffer);
-  }
-
-
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
   bool _writeHdrInfo(const ConcatString &hdr_typ,
@@ -169,7 +148,7 @@ protected:
                      double lat, double lon, double elv);
   bool _writeObsInfo(int gc, float prs, float hgt, float obs,
                      const ConcatString &qty);
-
+  void debug_print_observations(vector< Observation >, string);
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }

@@ -136,6 +136,7 @@ event_stack_flag    = TOP;
 //
 time_summary = {
   flag = FALSE;
+  raw_data = FALSE;
   beg = "000000";
   end = "235959";
   step = 300;

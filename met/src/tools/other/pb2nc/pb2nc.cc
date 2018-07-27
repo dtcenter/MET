@@ -86,6 +86,8 @@ using namespace std;
 #include "write_netcdf.h"
 
 #include "vx_summary.h"
+#include "nc_tools.h"
+#include "summary_nc.h"
 
 extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
 extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
@@ -338,7 +340,6 @@ static void   set_target_variables(const StringArray & a);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
-static void   set_summary_only(const StringArray &);
 
 static void   display_bufr_variables(const StringArray &, const StringArray &,
                                      const StringArray &, const StringArray &);
@@ -477,8 +478,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
-   // for testing. Ignored if time summary is not enabled
-   cline.add(set_summary_only, "-summary-only",  0);
 
    // Parse the command line
    cline.parse();
@@ -526,6 +525,7 @@ void process_command_line(int argc, char **argv) {
 
    doSummary = conf_info.getSummaryInfo().flag;
    if (!doSummary) save_summary_only = false;
+   else save_summary_only = !conf_info.getSummaryInfo().raw_data;
 
    return;
 }
@@ -1527,8 +1527,8 @@ void process_pbfile(int i_pb) {
       if(n_hdr_obs > 0) {
          unix_to_yyyymmdd_hhmmss(hdr_vld_ut, time_str);
          if (header_to_vector) {
-            add_nc_header_all(modified_hdr_typ, hdr_sid, time_str,
-                              hdr_lat, hdr_lon, hdr_elv);
+            add_nc_header_to_array(modified_hdr_typ, hdr_sid, time_str,
+                                   hdr_lat, hdr_lon, hdr_elv);
          }
          else {
             write_nc_header(obs_vars, modified_hdr_typ, hdr_sid, time_str,
@@ -2061,7 +2061,7 @@ void write_netcdf_hdr_data() {
       // Write out the summary data
       //write_nc_observations(obs_vars, summaryObs->getSummaries(), false);
       if (save_summary_only) reset_header_buffer(pb_hdr_count, true);
-      write_nc_observations(obs_vars, summaryObs->getSummaries(), save_summary_only);
+      write_nc_observations(obs_vars, summaryObs->getSummaries());
       mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
            << (int)summaryObs->getObservations().size()
            << "  summary count: " << (int)summaryObs->getSummaries().size()
@@ -2081,11 +2081,11 @@ void write_netcdf_hdr_data() {
    // Write out the header data
    if (header_to_vector) {
       // Write out the saved header data at vector
-      write_nc_headers(obs_vars);
+      write_nc_arr_headers(obs_vars);
    }
    if (nc_data_buffer.hdr_data_idx > 0) {
       // Write out the remaining header data
-      write_nc_header(obs_vars);
+      write_nc_buf_headers(obs_vars);
    }
 
    int hdr_str_len;
@@ -2128,48 +2128,15 @@ void write_netcdf_hdr_data() {
       }
       nc_var_name_arr.add(var_name);
    } // end for i
-   write_nc_string_array (&obs_vars.obs_var,  nc_var_name_arr, HEADER_STR_LEN);
-   write_nc_string_array (&obs_vars.unit_var, nc_var_unit_arr, HEADER_STR_LEN2);
-   write_nc_string_array (&obs_vars.desc_var, nc_var_desc_arr, HEADER_STR_LEN3);
+   
+   write_obs_var_names (obs_vars,  nc_var_name_arr);
+   write_obs_var_units (obs_vars, nc_var_unit_arr);
+   write_obs_var_descriptions (obs_vars, nc_var_desc_arr);
 
    write_nc_other_vars(obs_vars);
 
    TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
-   if (summaryInfo.flag) {
-
-      add_att(f_out, "time_summary_beg", SummaryObs::secsToTimeString(summaryInfo.beg));
-      add_att(f_out, "time_summary_end", SummaryObs::secsToTimeString(summaryInfo.end));
-
-      char att_string[1024];
-
-      sprintf(att_string, "%d", summaryInfo.step);
-      add_att(f_out, "time_summary_step", att_string);
-
-      sprintf(att_string, "%d", summaryInfo.width_beg);
-      add_att(f_out, "time_summary_width_beg", att_string);
-
-      sprintf(att_string, "%d", summaryInfo.width_end);
-      add_att(f_out, "time_summary_width_end", att_string);
-
-      string grib_code_string;
-      for (int i = 0; i < summaryInfo.grib_code.n_elements(); ++i) {
-        sprintf(att_string, "%d", summaryInfo.grib_code[i]);
-        if (i == 0)
-          grib_code_string = string(att_string);
-        else
-          grib_code_string += string(" ") + att_string;
-      }
-      add_att(f_out, "time_summary_grib_code", grib_code_string.c_str());
-
-      string type_string;
-      for (int i = 0; i < summaryInfo.type.n_elements(); ++i) {
-        if (i == 0)
-          type_string = summaryInfo.type[i];
-        else
-          type_string += string(" ") + summaryInfo.type[i];
-      }
-      add_att(f_out, "time_summary_type", type_string.c_str());
-   }
+   if (summaryInfo.flag) write_summary_attributes(f_out, summaryInfo);
 
    return;
 }
@@ -2673,8 +2640,3 @@ void set_compress(const StringArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void set_summary_only(const StringArray & a) {
-   save_summary_only = true;
-}
-

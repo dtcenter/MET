@@ -699,6 +699,9 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    // Conf: flag
    info.flag = ts_dict->lookup_bool(conf_key_flag);
 
+   // Conf: flag
+   info.raw_data = ts_dict->lookup_bool(conf_key_raw_data);
+
    // Conf: beg
    info.beg = timestring_to_sec(ts_dict->lookup_string(conf_key_beg));
 
