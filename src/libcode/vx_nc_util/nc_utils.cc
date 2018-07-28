@@ -75,6 +75,9 @@ int check_nc_dims_vars(const NetcdfObsVars obs_vars) {
 ////////////////////////////////////////////////////////////////////////
 
 void clear_header_data(NcHeaderData *header_data) {
+   header_data->min_vld_time = -1;
+   header_data->max_vld_time = -1;
+   
    header_data->typ_array.clear();
    header_data->sid_array.clear();
    header_data->vld_array.clear();

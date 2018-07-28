@@ -65,6 +65,7 @@ FileHandler::FileHandler(const string &program_name) :
   _polyMask(0),
   _sidMask(0),
   use_var_id(false),
+  do_monitor(false),
   deflate_level(DEF_DEFLATE_LEVEL),
   _dataSummarized(false)
 {
@@ -284,45 +285,45 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
-                                const ConcatString &hdr_sid,
-                                const ConcatString &hdr_vld,
-                                double lat, double lon, double elv) {
-   //
-   // Increment header count before writing
-   //
-   _hdrNum++;
-   write_nc_header(obs_vars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
-
-   return true;
-}
+//bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
+//                                const ConcatString &hdr_sid,
+//                                const time_t hdr_vld,
+//                                double lat, double lon, double elv) {
+//   //
+//   // Increment header count before writing
+//   //
+//   _hdrNum++;
+//   write_nc_header(obs_vars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
+//
+//   return true;
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
-bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
-                                const ConcatString &qty) {
-   float obs_arr[OBS_ARRAY_LEN];
-   ConcatString obs_qty;
-
-   //
-   // Increment observation count before writing
-   //
-   _obsNum++;
-
-   //
-   // Build the observation array
-   //
-   obs_arr[0] = _hdrNum; // Index of header
-   obs_arr[1] = gc;    // GRIB code corresponding to the observation type
-   obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
-   obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
-   obs_arr[4] = obs;   // Observation value
-
-   obs_qty = (qty.length() == 0 ? na_str : qty.text());
-   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
-
-   return true;
-}
+//bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
+//                                const ConcatString &qty) {
+//   float obs_arr[OBS_ARRAY_LEN];
+//   ConcatString obs_qty;
+//
+//   //
+//   // Increment observation count before writing
+//   //
+//   _obsNum++;
+//
+//   //
+//   // Build the observation array
+//   //
+//   obs_arr[0] = _hdrNum; // Index of header
+//   obs_arr[1] = gc;    // GRIB code corresponding to the observation type
+//   obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
+//   obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
+//   obs_arr[4] = obs;   // Observation value
+//
+//   obs_qty = (qty.length() == 0 ? na_str : qty.text());
+//   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
+//
+//   return true;
+//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -418,7 +419,8 @@ bool FileHandler::_writeObservations()
   
   int unit_count = 0;
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
-  create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data, var_count, unit_count, deflate_level);
+  create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data,
+                        var_count, unit_count, deflate_level);
   write_nc_other_vars(obs_vars);
 
   return true;

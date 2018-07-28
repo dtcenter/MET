@@ -326,28 +326,42 @@ ConcatString s;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
-      const float hdr_lat, const float hdr_lon, const float hdr_elv)
+bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid,
+      const time_t hdr_vld, const float hdr_lat,
+      const float hdr_lon, const float hdr_elv)
 {
    bool added = false;
+   bool new_vld = false;
+   
    // Can't filter duplicated one because header index was
    // assigned before checking
    int hdr_index;
    if (!hdr_data.typ_array.has(hdr_typ, hdr_index)) {
       hdr_index = hdr_data.typ_array.n_elements();
-      hdr_data.typ_array.add(hdr_typ);       // Message type
+      hdr_data.typ_array.add(hdr_typ);          // Message type
    }
-   hdr_data.typ_idx_array.add(hdr_index);    // Index of Message type
+   hdr_data.typ_idx_array.add(hdr_index);       // Index of Message type
+   
    if (!hdr_data.sid_array.has(hdr_sid, hdr_index)) {
       hdr_index = hdr_data.sid_array.n_elements();
-      hdr_data.sid_array.add(hdr_sid);       // Station ID
+      hdr_data.sid_array.add(hdr_sid);          // Station ID
    }
-   hdr_data.sid_idx_array.add(hdr_index);    // Index of Station ID
-   if (!hdr_data.vld_array.has(hdr_vld, hdr_index)) {
+   hdr_data.sid_idx_array.add(hdr_index);       // Index of Station ID
+ 
+   if (hdr_data.min_vld_time == -1 || hdr_data.min_vld_time > hdr_vld) {
+      hdr_data.min_vld_time = hdr_vld;
+      new_vld = true;
+   }
+   else if (hdr_data.max_vld_time < hdr_vld) {
+      hdr_data.max_vld_time = hdr_vld;
+      new_vld = true;
+   }
+   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index)) {
       hdr_index = hdr_data.vld_array.n_elements();
-      hdr_data.vld_array.add(hdr_vld);       // Valid time
+      hdr_data.vld_array.add(unix_to_yyyymmdd_hhmmss(hdr_vld)); // Valid time
+      hdr_data.vld_num_array.add(hdr_vld);   // Valid time
    }
-   hdr_data.vld_idx_array.add(hdr_index);    // Index of Valid time
+   hdr_data.vld_idx_array.add(hdr_index);       // Index of Valid time
    
    hdr_data.lat_array.add(hdr_lat);  // Latitude
    hdr_data.lon_array.add(hdr_lon);  // Longitude
@@ -373,25 +387,45 @@ bool add_nc_header_prepbufr (const int pb_report_type,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool is_same_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
-      const float hdr_lat, const float hdr_lon, const float hdr_elv) {
-   bool new_header =
-         !is_eq(nc_data_buffer.prev_hdr_arr_buf[0],hdr_lat) ||
-         !is_eq(nc_data_buffer.prev_hdr_arr_buf[1], hdr_lon) ||
-         !is_eq(nc_data_buffer.prev_hdr_arr_buf[2], hdr_elv) ||
-         0 != strcmp(nc_data_buffer.prev_hdr_typ_buf, hdr_typ) ||
-         0 != strcmp(nc_data_buffer.prev_hdr_sid_buf, hdr_sid) ||
-         0 != strcmp(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
-   if (new_header) {
-      strcpy(nc_data_buffer.prev_hdr_typ_buf, hdr_typ);
-      strcpy(nc_data_buffer.prev_hdr_sid_buf, hdr_sid);
-      strcpy(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
-      nc_data_buffer.prev_hdr_arr_buf[0] = hdr_lat;
-      nc_data_buffer.prev_hdr_arr_buf[1] = hdr_lon;
-      nc_data_buffer.prev_hdr_arr_buf[2] = hdr_elv;
-   }
-   return new_header;
-}
+//bool is_same_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+//      const float hdr_lat, const float hdr_lon, const float hdr_elv) {
+//   bool new_header =
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[0],hdr_lat) ||
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[1], hdr_lon) ||
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[2], hdr_elv) ||
+//         0 != strcmp(nc_data_buffer.prev_hdr_typ_buf, hdr_typ) ||
+//         0 != strcmp(nc_data_buffer.prev_hdr_sid_buf, hdr_sid) ||
+//         0 != strcmp(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
+//   if (new_header) {
+//      strcpy(nc_data_buffer.prev_hdr_typ_buf, hdr_typ);
+//      strcpy(nc_data_buffer.prev_hdr_sid_buf, hdr_sid);
+//      strcpy(nc_data_buffer.prev_hdr_vld_buf, hdr_vld);
+//      nc_data_buffer.prev_hdr_arr_buf[0] = hdr_lat;
+//      nc_data_buffer.prev_hdr_arr_buf[1] = hdr_lon;
+//      nc_data_buffer.prev_hdr_arr_buf[2] = hdr_elv;
+//   }
+//   return new_header;
+//}
+//
+//bool is_same_header (const char *hdr_typ, const char *hdr_sid, const unixtime hdr_vld,
+//      const float hdr_lat, const float hdr_lon, const float hdr_elv) {
+//   bool new_header =
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[0],hdr_lat) ||
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[1], hdr_lon) ||
+//         !is_eq(nc_data_buffer.prev_hdr_arr_buf[2], hdr_elv) ||
+//         0 != strcmp(nc_data_buffer.prev_hdr_typ_buf, hdr_typ) ||
+//         0 != strcmp(nc_data_buffer.prev_hdr_sid_buf, hdr_sid) ||
+//         !is_eq(nc_data_buffer.prev_hdr_vld, hdr_vld);
+//   if (new_header) {
+//      strcpy(nc_data_buffer.prev_hdr_typ_buf, hdr_typ);
+//      strcpy(nc_data_buffer.prev_hdr_sid_buf, hdr_sid);
+//      nc_data_buffer.prev_hdr_vld = hdr_vld;
+//      nc_data_buffer.prev_hdr_arr_buf[0] = hdr_lat;
+//      nc_data_buffer.prev_hdr_arr_buf[1] = hdr_lon;
+//      nc_data_buffer.prev_hdr_arr_buf[2] = hdr_elv;
+//   }
+//   return new_header;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -422,13 +456,13 @@ void write_nc_buf_headers (const NetcdfObsVars &obs_vars)
 ///////////////////////////////////////////////////////////////////////////////
 
 void write_nc_header (const NetcdfObsVars &obs_vars,
-      const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+      const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv)
 {
    // Can't filter duplicated one because header index was
    // assigned before checking
    int hdr_index;
-   //int hdr_str_len, hdr_str_len2;
+   bool new_vld = false;
    int hdr_data_idx = nc_data_buffer.hdr_data_idx;
 
    // Message type
@@ -446,9 +480,19 @@ void write_nc_header (const NetcdfObsVars &obs_vars,
    nc_data_buffer.hdr_sid_buf[hdr_data_idx] = hdr_index;
    
    // Valid Time
-   if (!hdr_data.vld_array.has(hdr_vld, hdr_index)) {
+   if (hdr_data.min_vld_time == -1 || hdr_data.min_vld_time > hdr_vld) {
+      hdr_data.min_vld_time = hdr_vld;
+      new_vld = true;
+   }
+   else if (hdr_data.max_vld_time < hdr_vld) {
+      hdr_data.max_vld_time = hdr_vld;
+      new_vld = true;
+   }
+   
+   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index)) {
       hdr_index = hdr_data.vld_array.n_elements();
-      hdr_data.vld_array.add(hdr_vld);
+      hdr_data.vld_array.add(unix_to_yyyymmdd_hhmmss(hdr_vld));
+      hdr_data.vld_num_array.add(hdr_vld);
    }
    nc_data_buffer.hdr_vld_buf[hdr_data_idx] = hdr_index;
    
@@ -1199,7 +1243,7 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
             add_nc_header_to_array(
                   obs->getHeaderType().c_str(),
                   obs->getStationId().c_str(),
-                  obs->getValidTimeString().c_str(),
+                  obs->getValidTime(),
                   obs->getLatitude(),
                   obs->getLongitude(),
                   obs->getElevation());
@@ -1209,7 +1253,7 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
                obs_vars,
                   obs->getHeaderType().c_str(),
                   obs->getStationId().c_str(),
-                  obs->getValidTimeString().c_str(),
+                  obs->getValidTime(),
                   obs->getLatitude(),
                   obs->getLongitude(),
                   obs->getElevation());

@@ -640,8 +640,8 @@ void process_madis_metar(NcFile *&f_in) {
    long i_hdr, i_hdr_s;
    int hdr_typ_len, hdr_sid_len, i_idx;
    double tmp_dbl;
-   char tmp_str[max_str_len];
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
 
@@ -860,8 +860,7 @@ void process_madis_metar(NcFile *&f_in) {
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
 
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
+         hdr_vld = (time_t)tmp_dbl;
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
 
@@ -991,8 +990,9 @@ void process_madis_raob(NcFile *&f_in) {
    long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
-   char tmp_str[max_str_len], qty;
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   char qty;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
 
@@ -1315,8 +1315,7 @@ void process_madis_raob(NcFile *&f_in) {
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
 
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
+         hdr_vld = (time_t)tmp_dbl;
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
 
@@ -1676,8 +1675,8 @@ void process_madis_profiler(NcFile *&f_in) {
    long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
-   char tmp_str[max_str_len];
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
 
@@ -1830,8 +1829,7 @@ void process_madis_profiler(NcFile *&f_in) {
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
 
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
+         hdr_vld = (time_t)tmp_dbl;
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
          write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
@@ -1909,7 +1907,8 @@ void process_madis_maritime(NcFile *&f_in) {
    int hdr_sid_len;
    double tmp_dbl;
    char tmp_str[max_str_len];
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
 
@@ -2111,8 +2110,7 @@ void process_madis_maritime(NcFile *&f_in) {
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
 
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
+         hdr_vld = (time_t)tmp_dbl;
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
 
@@ -2225,8 +2223,8 @@ void process_madis_mesonet(NcFile *&f_in) {
    long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
-   char tmp_str[max_str_len];
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
 
@@ -2490,8 +2488,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
+         hdr_vld = (time_t)tmp_dbl;
 
          hdr_idx = nc_data_buffer.cur_hdr_idx;
 
@@ -2684,8 +2681,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    int hdr_sid_len;
    int buf_size;
    double tmp_dbl, tmp_dbl2, tmp_dbl1;
-   char tmp_str[max_str_len], qty;
-   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   char qty;
+   time_t hdr_vld;
+   ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure, wdir, wind, ugrd, vgrd;
 
@@ -2917,8 +2915,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             // Observation Time is relative to time of day
             //
             tmp_dbl = tmp_dbl1+tmp_dbl2-fmod(tmp_dbl1, 86400);
-            unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-            hdr_vld = tmp_str;
+            hdr_vld = (time_t)tmp_dbl;
 
             write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);

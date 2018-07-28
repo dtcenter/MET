@@ -113,6 +113,9 @@ protected:
   bool  use_var_id;
   StringArray obs_names;
   int   deflate_level;
+  
+  bool do_monitor;
+  int start_time, end_time;
 
   ///////////////////////
   // Protected methods //
@@ -139,15 +142,15 @@ protected:
   // netCDF file.
 
   bool _writeObservations();
-
+  
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
-  bool _writeHdrInfo(const ConcatString &hdr_typ,
-                     const ConcatString &hdr_sid,
-                     const ConcatString &hdr_vld,
-                     double lat, double lon, double elv);
-  bool _writeObsInfo(int gc, float prs, float hgt, float obs,
-                     const ConcatString &qty);
+//  bool _writeHdrInfo(const ConcatString &hdr_typ,
+//                     const ConcatString &hdr_sid,
+//                     const time_t hdr_vld,
+//                     double lat, double lon, double elv);
+//  bool _writeObsInfo(int gc, float prs, float hgt, float obs,
+//                     const ConcatString &qty);
   void debug_print_observations(vector< Observation >, string);
 };
 

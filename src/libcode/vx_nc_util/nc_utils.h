@@ -185,10 +185,13 @@ struct NcHeaderData {
    int vld_len;
    int strl_len;  
    int strll_len;
+   int min_vld_time;
+   int max_vld_time;
    
    StringArray typ_array;
    StringArray sid_array;
    StringArray vld_array;
+   IntArray    vld_num_array;
    IntArray    typ_idx_array;
    IntArray    sid_idx_array;
    IntArray    vld_idx_array;
