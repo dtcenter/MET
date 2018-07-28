@@ -106,8 +106,6 @@ protected:
                 const string &summary_type,
                 const int summary_width_secs) const;
 
-  bool is_same_header(const Observation obs1, const Observation obs2) const;
-  
 public:
 
   // Convert the unix time to number of seconds since the beginning of
