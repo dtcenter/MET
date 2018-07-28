@@ -42,6 +42,7 @@ struct NcDataBuffer {
    int   pb_hdr_count;
    int   pb_hdr_data_offset;
 
+   int   prev_hdr_vld;
    char  prev_hdr_typ_buf[HEADER_STR_LEN2];
    char  prev_hdr_sid_buf[HEADER_STR_LEN2];
    char  prev_hdr_vld_buf[HEADER_STR_LEN];
@@ -90,13 +91,16 @@ extern void write_netcdf_var_times  (NcVar *, const unixtime, const unixtime, co
 extern void nc_obs_initialize       ();
 
 extern bool add_nc_header_to_array
-     (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+     (const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv);
 extern bool add_nc_header_prepbufr (const int pb_report_type,
       const int in_report_type, const int instrument_type);
-extern bool is_same_header
-     (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
-      const float hdr_lat, const float hdr_lon, const float hdr_elv);
+//extern bool is_same_header
+//     (const char *hdr_typ, const char *hdr_sid, const unixtime hdr_vld,
+//      const float hdr_lat, const float hdr_lon, const float hdr_elv);
+//extern bool is_same_header
+//     (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+//      const float hdr_lat, const float hdr_lon, const float hdr_elv);
       
 extern long count_nc_headers   (vector< Observation > &observations);
 
@@ -117,7 +121,7 @@ extern void write_nc_other_vars     (NetcdfObsVars &);
 extern void write_nc_arr_headers    (const NetcdfObsVars &);
 extern void write_nc_buf_headers    (const NetcdfObsVars &);
 extern void write_nc_header         (const NetcdfObsVars &,
-                const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+                const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
                 const float hdr_lat, const float hdr_lon, const float hdr_elv);
 extern void write_header_to_nc      (const NetcdfObsVars &, NcDataBuffer &data_buf, const int buf_size, const bool is_pb = false);
 extern void write_nc_obs_buffer     (NcDataBuffer &data_buf, const int buf_size);

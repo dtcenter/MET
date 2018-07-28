@@ -1525,13 +1525,12 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-         unix_to_yyyymmdd_hhmmss(hdr_vld_ut, time_str);
          if (header_to_vector) {
-            add_nc_header_to_array(modified_hdr_typ, hdr_sid, time_str,
+            add_nc_header_to_array(modified_hdr_typ, hdr_sid, hdr_vld_ut,
                                    hdr_lat, hdr_lon, hdr_elv);
          }
          else {
-            write_nc_header(obs_vars, modified_hdr_typ, hdr_sid, time_str,
+            write_nc_header(obs_vars, modified_hdr_typ, hdr_sid, hdr_vld_ut,
                             hdr_lat, hdr_lon, hdr_elv);
          }
          if (is_prepbufr) {

@@ -44,6 +44,7 @@ WwsisHandler::WwsisHandler(const string &program_name) :
   FileHandler(program_name)
 {
   use_var_id = true;
+  //do_monitor = true;
 }
 
 
@@ -164,10 +165,11 @@ time_t WwsisHandler::_initValidTime(const string &filename) const
 
 bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
 {
-  static const string method_name = "WwsisHandler::_readObservations()";
-  
   DataLine data_line;
+  static const string method_name = "WwsisHandler::_readObservations()";
 
+  if (do_monitor) start_time = clock();
+  
   // Read and save the header information
 
   if (!_readHeaderInfo(ascii_file))
@@ -179,8 +181,8 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
   if (valid_time == 0)
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "cannot extract beginning valid time from file name: "
-	 << ascii_file.short_filename() << ".\n\n";
+         << "cannot extract beginning valid time from file name: "
+         << ascii_file.short_filename() << ".\n\n";
     return false;
   }
   
@@ -193,8 +195,8 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
     if (data_line.n_items() != 1)
     {
       mlog << Error << "\n" << method_name << " -> "
-	   << "line number " << data_line.line_number()
-	   << " does not have the correct number of columns  (1).\n\n";
+           << "line number " << data_line.line_number()
+           << " does not have the correct number of columns  (1).\n\n";
       return false;
     }
 
@@ -215,6 +217,11 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
     valid_time += _stepSecs;
      
   }
+  
+  if (do_monitor) {
+    mlog << Debug(3) << " PERF: " << method_name << " "
+         << (int)(clock()-start_time)/double(CLOCKS_PER_SEC) << " seconds for reading obs" << "\n";
+  }
    
   return true;
 }
@@ -234,8 +241,8 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "error reading header line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading header line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -245,8 +252,8 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "error reading station id line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading station id line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -256,8 +263,8 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (data_line.n_items() != 9)
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "error reading station id line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading station id line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -278,8 +285,8 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\n" << method_name << " -> "
-	 << "error reading \"ac\" from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading \"ac\" from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -287,3 +294,4 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
   return true;
 }
 
+////////////////////////////////////////////////////////////////////////
