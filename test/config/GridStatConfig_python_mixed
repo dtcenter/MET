@@ -187,7 +187,7 @@ nc_pairs_flag   = {
 grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
-output_prefix    = "";
+output_prefix    = "python_mixed";
 version          = "V8.0";
 
 ////////////////////////////////////////////////////////////////////////////////

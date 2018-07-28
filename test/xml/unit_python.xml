@@ -47,13 +47,13 @@
       &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
       &MET_BASE;/python/test_numpy_obs.py \
       &CONFIG_DIR;/MODEConfig_python_mixed \
-      -outdir &OUTPUT_DIR;/mode_python -v 1
+      -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/mode_python/mode_300000L_20120410_180000V_060000A.ps</ps>
-      <txt>&OUTPUT_DIR;/mode_python/mode_300000L_20120410_180000V_060000A_cts.txt</txt>
-      <txt>&OUTPUT_DIR;/mode_python/mode_300000L_20120410_180000V_060000A_obj.txt</txt>
-      <nc>&OUTPUT_DIR;/mode_python/mode_300000L_20120410_180000V_060000A_obj.nc</nc>
+      <ps>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A.ps</ps>
+      <txt>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt</txt>
+      <txt>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.txt</txt>
+      <nc>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.nc</nc>
     </output>
   </test>
 
@@ -67,13 +67,13 @@
       &MET_BASE;/python/test_numpy_fcst.py \
       &MET_BASE;/python/test_numpy_obs.py \
       &CONFIG_DIR;/MODEConfig_python \
-      -outdir &OUTPUT_DIR;/mode_python -v 1
+      -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/mode_python/mode_120000L_20050807_120000V_120000A.ps</ps>
-      <txt>&OUTPUT_DIR;/mode_python/mode_120000L_20050807_120000V_120000A_obj.txt</txt>
-      <txt>&OUTPUT_DIR;/mode_python/mode_120000L_20050807_120000V_120000A_cts.txt</txt>
-      <nc>&OUTPUT_DIR;/mode_python/mode_120000L_20050807_120000V_120000A_obj.nc</nc>
+      <ps>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A.ps</ps>
+      <txt>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.txt</txt>
+      <txt>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_cts.txt</txt>
+      <nc>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.nc</nc>
     </output>
    </test>
 
@@ -87,10 +87,10 @@
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
       &MET_BASE;/python/test_numpy_obs.py \
       &CONFIG_DIR;/GridStatConfig_python_mixed \
-      -outdir &OUTPUT_DIR;/grid_stat_python -v 1
+      -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <nc>&OUTPUT_DIR;/grid_stat_python/grid_stat_120000L_20120409_120000V_pairs.nc</nc>
+      <nc>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V_pairs.nc</nc>
     </output>
    </test>
 
@@ -104,10 +104,10 @@
       &MET_BASE;/python/test_numpy_fcst.py \
       &MET_BASE;/python/test_numpy_obs.py \
       &CONFIG_DIR;/GridStatConfig_python \
-      -outdir &OUTPUT_DIR;/grid_stat_python -v 1
+      -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <nc>&OUTPUT_DIR;/grid_stat_python/grid_stat_120000L_20050807_120000V_pairs.nc</nc>
+      <nc>&OUTPUT_DIR;/python/grid_stat_python_120000L_20050807_120000V_pairs.nc</nc>
     </output>
    </test>
 
@@ -123,15 +123,14 @@
       &MET_BASE;/python/test_numpy_fcst.py \
       &MET_BASE;/python/test_numpy_obs.py \
       &CONFIG_DIR;/WaveletStatConfig_python \
-      -outdir &OUTPUT_DIR;/python_wavelet_stat -v 1
+      -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.stat</stat>
-      <txt>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V_isc.txt</txt>
-      <grid_nc>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.nc</grid_nc>
-      <ps>&OUTPUT_DIR;/python_wavelet_stat/wavelet_stat_python_120000L_20050807_120000V.ps</ps>
+      <stat>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.stat</stat>
+      <txt>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V_isc.txt</txt>
+      <grid_nc>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.nc</grid_nc>
+      <ps>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.ps</ps>
     </output>
   </test>
-
 
 </met_test>
