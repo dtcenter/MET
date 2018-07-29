@@ -173,6 +173,9 @@ bool PairDataPoint::add_pair(const NumArray f_in, const NumArray o_in,
       exit(1);
    }
 
+   // Allocate enough memory
+   extend(o_in.n_elements());
+
    f_na.add(f_in);
    o_na.add(o_in);
    cmn_na.add(c_in);
