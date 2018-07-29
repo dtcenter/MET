@@ -653,7 +653,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-         rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
+         // JHG, this doesn't work for MXUPHL rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
+         rec->LvlTyp       = gfld->ipdtmpl[9];
 
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
          //  Reference: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
