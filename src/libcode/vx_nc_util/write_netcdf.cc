@@ -349,6 +349,7 @@ bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid,
    hdr_data.sid_idx_array.add(hdr_index);       // Index of Station ID
  
    if (hdr_data.min_vld_time == -1 || hdr_data.min_vld_time > hdr_vld) {
+      if (hdr_data.min_vld_time == -1) hdr_data.max_vld_time = hdr_vld; 
       hdr_data.min_vld_time = hdr_vld;
       new_vld = true;
    }
