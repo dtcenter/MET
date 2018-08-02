@@ -133,4 +133,48 @@
     </output>
   </test>
 
+
+
+<!--  Fails because stat and txt file are devoid of entries except for header
+  <test name="python_point_stat">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+    </env>
+    <param> \
+      &MET_BASE;/python/test_numpy_fcst.py \
+      &MET_BASE;/python/test_numpy_obs.py \
+      &CONFIG_DIR;/PointStatConfig_python \
+      -outdir &OUTPUT_DIR;/python_point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python_point_stat/point_stat_120000L_20050807_120000V.stat</stat>
+      <txt> &OUTPUT_DIR;/python_point_stat/point_stat_120000L_20050807_120000V_cnt.txt</txt>
+    </output>
+  </test>
+
+
+
+  <test name="python_point_stat_mixed">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+    </env>
+    <param> \
+      &MET_BASE;/python/test_numpy_fcst.py \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_python \
+      -outdir &OUTPUT_DIR;/python_point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python_point_stat/point_stat_120000L_20050807_120000V.stat </stat>
+      <txt> &OUTPUT_DIR;/python_point_stat/point_stat_120000L_20050807_120000V_cnt.txt</txt>
+    </output>
+  </test>
+
+-->
+
+
+
 </met_test>
