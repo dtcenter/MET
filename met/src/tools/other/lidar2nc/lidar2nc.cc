@@ -61,7 +61,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "calipso_5km.h"
-
+#include "nc_tools.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -612,9 +612,9 @@ for (j=0; j<n_data; ++j)  {
 
    write_nc_observation(obs_vars, nc_data_buffer);
    
-   create_nc_other_vars(obs_vars, out, nc_data_buffer, hdr_data);
+   create_nc_table_vars(obs_vars, out, nc_data_buffer, hdr_data);
    
-   write_nc_other_vars(obs_vars);
+   write_nc_table_vars(obs_vars);
 
    //
    //  close hdf file

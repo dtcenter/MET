@@ -32,6 +32,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
+	-lmet_shared \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
@@ -43,7 +44,6 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lmet_shared \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(FLIBS)
 

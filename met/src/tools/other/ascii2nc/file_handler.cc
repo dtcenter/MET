@@ -237,12 +237,10 @@ time_t FileHandler::_getValidTime(const string &time_string) const
 
 bool FileHandler::_openNetcdf(const string &nc_filename)
 {
-   mlog << Debug(1) << "Creating NetCDF Observation file: "
-        << nc_filename << "\n";
-
    //
    // Create the output NetCDF file for writing
    //
+   
    _ncFile = open_ncfile(nc_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(_ncFile)) {
@@ -260,18 +258,21 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    init_nc_dims_vars (obs_vars, use_var_id);
    obs_vars.attr_agl   = true;
 
-   int obs_count = (do_summary ? summary_obs.getSummaries().size()
-                               : summary_obs.getObservations().size());
-   if (do_summary && _summaryInfo.raw_data) obs_count += _observations.size();
-   obs_vars.obs_cnt = obs_count;
-   
-   create_nc_hdr_vars(obs_vars, _ncFile, _nhdr, deflate_level);
-   create_nc_obs_vars(obs_vars, _ncFile, deflate_level, use_var_id);
+   init_netcdf_output(_ncFile, obs_vars, &summary_obs,
+         _observations, _programName, 0, deflate_level);
 
-   //
-   // Add global attributes
-   //
-   write_netcdf_global(_ncFile, nc_filename.c_str(), _programName.c_str());
+//   int obs_count = (do_summary ? summary_obs.getSummaries().size()
+//                               : summary_obs.getObservations().size());
+//   if (do_summary && _summaryInfo.raw_data) obs_count += _observations.size();
+//   obs_vars.obs_cnt = obs_count;
+//   
+//   create_nc_hdr_vars(obs_vars, _ncFile, _nhdr, deflate_level);
+//   create_nc_obs_vars(obs_vars, _ncFile, deflate_level, use_var_id);
+//
+//   //
+//   // Add global attributes
+//   //
+//   write_netcdf_global(_ncFile, nc_filename.c_str(), _programName.c_str());
 
    //
    // Initialize the header and observation record counters
@@ -397,31 +398,14 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  string prev_header_type = "";
-  string prev_station_id = "";
-  time_t prev_valid_time = 0;
-  double prev_latitude = bad_data_double;
-  double prev_longitude = bad_data_double;
-  double prev_elevation = bad_data_double;
-
-  if (!_dataSummarized) {
-    write_nc_observations(obs_vars, summary_obs.getObservations(), use_var_id);
-  }
-  else if (_summaryInfo.raw_data) {
-    write_nc_observations(obs_vars, _observations, use_var_id);
-  }
-
-  if (_dataSummarized) {
-    write_nc_observations(obs_vars, summary_obs.getSummaries(), use_var_id);
-  }
+  write_observations(_ncFile, obs_vars, &summary_obs, _observations, deflate_level);
   
-  write_nc_arr_headers(obs_vars);
-  
-  int unit_count = 0;
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
-  create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data,
-                        var_count, unit_count, deflate_level);
-  write_nc_other_vars(obs_vars);
+  if (var_count > 0) {
+    int unit_count = 0;
+    create_nc_obs_name_vars (obs_vars, _ncFile, var_count, unit_count, deflate_level);
+    write_obs_var_names(obs_vars, obs_names);
+  }
 
   return true;
 }

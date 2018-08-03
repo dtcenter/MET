@@ -17,8 +17,9 @@ lidar2nc_SOURCES = lidar2nc.cc  \
                    calipso_5km.cc  \
                    calipso_5km.h
 lidar2nc_CPPFLAGS = ${MET_CPPFLAGS} \
-     -I../../../libcode/vx_data2d_factory
-lidar2nc_LDFLAGS = ${MET_LDFLAGS}
+	-I${top_builddir}/src/tools/core/met_shared \
+	-I../../../libcode/vx_data2d_factory
+lidar2nc_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
 lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_config  \
 	-lvx_analysis_util \
@@ -26,6 +27,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_data2d_nc_met \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	-lmet_shared \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_render \

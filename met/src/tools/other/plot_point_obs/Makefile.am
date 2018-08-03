@@ -12,14 +12,15 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = plot_point_obs
 plot_point_obs_SOURCES = plot_point_obs.cc
-plot_point_obs_CPPFLAGS = ${MET_CPPFLAGS}
-plot_point_obs_LDFLAGS = ${MET_LDFLAGS}
+plot_point_obs_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
+plot_point_obs_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
 plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	-lmet_shared \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_plot_util \

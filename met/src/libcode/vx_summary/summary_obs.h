@@ -48,6 +48,7 @@ public:
    long countHeaders(vector< Observation > &obs_vector);
    long countSummaryHeaders();
    time_t getValidTime(const string &time_string) const;
+   TimeSummaryInfo getSummaryInfo();
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
    StringArray getObsNames();
 
@@ -252,6 +253,7 @@ inline vector< Observation > SummaryObs::getObservations() { return observations
 inline vector< Observation > SummaryObs::getSummaries()    { return summaries;    }
 inline StringArray           SummaryObs::getObsNames()     { return obs_names;    }
 inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info) { summaryInfo = summary_info;};
+inline TimeSummaryInfo       SummaryObs::getSummaryInfo()  { return summaryInfo;};
 
 ////////////////////////////////////////////////////////////////////////
 
