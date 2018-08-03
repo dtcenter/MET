@@ -145,6 +145,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
    // Initialize the list of summary observations
    StringArray summary_vnames;
+   StringArray printted_var_names;
    //vector< Observation > summary_obs;
 
    // Sort the observations.  This will put them in chronological order, with
@@ -197,9 +198,12 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         // the first observation in this time interval.
 
         if (!isInObsList(summaryInfo, *curr_obs)) {
-           mlog << Debug(10)
-                << "SummaryObs::summarizeObs()  Filtered variable ["
-                << curr_obs->getVarName() << "] (id: " << curr_obs->getVarCode() << ")\n";
+           if (!printted_var_names.has(curr_obs->getVarName().c_str())) {
+              mlog << Debug(10)
+                   << "SummaryObs::summarizeObs()  Filtered variable ["
+                   << curr_obs->getVarName() << "] (id: " << curr_obs->getVarCode() << ")\n";
+              printted_var_names.add(curr_obs->getVarName().c_str());
+           }
         }
         else if (time_interval->isInInterval(curr_obs->getValidTime()))
         {
