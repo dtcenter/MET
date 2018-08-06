@@ -137,7 +137,7 @@ struct NetcdfObsVars {
    bool  use_var_id  ;
    int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
    int   obs_cnt     ; // obs. array count (fixed dimension if obs_cnt > 0)
-   int   pb_hdr_cnt  ; // PrepBufr header array count
+   int   raw_hdr_cnt ; // raw data (PrepBufr) header array count
    
    NcDim strl_dim    ; // header string dimension (16 bytes)
    NcDim strl2_dim   ; // header string dimension (40 bytes)
@@ -414,8 +414,6 @@ extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 
 extern int check_nc_dims_vars(const NetcdfObsVars obs_vars);
 extern void clear_header_data(NcHeaderData *);
-extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars);
-extern void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data);
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
