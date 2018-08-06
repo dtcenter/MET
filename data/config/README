@@ -198,7 +198,10 @@ exit_on_warning = FALSE;
 // tools overrides it.
 // The range is 0 to 9.
 //   - 0 is to disable the compression.
-//   - 1 to 9: Lower number is faster, higher number is better.
+//   - 1 to 9: Lower number is faster, higher number for smaller files.
+// WARNING: Selecting a high compression level may slow down the reading and
+//          writing of NetCDF files within MET significantly. 
+//
 nc_compression = 0;
 
 //
