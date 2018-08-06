@@ -13,8 +13,8 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS    = ensemble_stat
 ensemble_stat_SOURCES = ensemble_stat.cc \
 	ensemble_stat_conf_info.cc
-ensemble_stat_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
-ensemble_stat_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
+ensemble_stat_CPPFLAGS = ${MET_CPPFLAGS}
+ensemble_stat_LDFLAGS = ${MET_LDFLAGS}
 ensemble_stat_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -27,7 +27,6 @@ ensemble_stat_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
-	-lmet_shared \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
