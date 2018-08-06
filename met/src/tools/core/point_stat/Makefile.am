@@ -13,8 +13,8 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS    = point_stat
 point_stat_SOURCES = point_stat.cc \
 	point_stat_conf_info.cc
-point_stat_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
-point_stat_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
+point_stat_CPPFLAGS = ${MET_CPPFLAGS}
+point_stat_LDFLAGS = ${MET_LDFLAGS}
 point_stat_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -27,7 +27,6 @@ point_stat_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
-	-lmet_shared \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
