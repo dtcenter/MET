@@ -130,6 +130,79 @@ static const int exit_code_no_hdr_vars = 2;
 static const int exit_code_no_loc_vars = 3;
 static const int exit_code_no_obs_vars = 4;
 
+
+struct NetcdfObsVars {
+   bool  attr_agl    ;
+   bool  attr_pb2nc  ;
+   bool  use_var_id  ;
+   int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
+   int   obs_cnt     ; // obs. array count (fixed dimension if obs_cnt > 0)
+   int   pb_hdr_cnt  ; // PrepBufr header array count
+   
+   NcDim strl_dim    ; // header string dimension (16 bytes)
+   NcDim strl2_dim   ; // header string dimension (40 bytes)
+   NcDim strl3_dim   ; // header string dimension (80 bytes)
+   NcDim hdr_typ_dim ; // header message type dimension
+   NcDim hdr_sid_dim ; // header station id dimension
+   NcDim hdr_vld_dim ; // header valid time dimension
+   NcDim hdr_arr_dim ; // Header array width (V1.0, not used from V1.2)
+   NcDim obs_arr_dim ; // Observation array width (V1.0, not used from V1.2)
+   NcDim obs_dim     ; // Observation array length (V1.0)
+   NcDim hdr_dim     ; // Header array length (V1.0)
+   NcDim pb_hdr_dim  ; // PrefBufr Header array length (V1.2)
+   
+   NcVar hdr_typ_tbl_var ; // Message type (string) (V1.1)
+   NcVar hdr_sid_tbl_var ; // Station ID (string) (V1.1)
+   NcVar hdr_vld_tbl_var ; // Valid time (string) (V1.1)
+   NcVar obs_qty_tbl_var ; // Quality flag (V1.0)
+   NcVar hdr_typ_var ; // Message type (string to index with V1.2)
+   NcVar hdr_sid_var ; // Station ID   (string to index with V1.2)
+   NcVar hdr_vld_var ; // Valid time   (string to index with V1.2)
+   NcVar hdr_arr_var ; // Header array (V1.0, Removed from V1.2)
+   NcVar hdr_lat_var ; // Header array (latitude)  (V1.2)
+   NcVar hdr_lon_var ; // Header array (longitude) (V1.2)
+   NcVar hdr_elv_var ; // Header array (elevation) (V1.2)
+   NcVar hdr_prpt_typ_var ; // Header array (PB report type) (V1.2)
+   NcVar hdr_irpt_typ_var ; // Header array (In report type) (V1.2)
+   NcVar hdr_inst_typ_var ; // Header array (instrument type) (V1.2)
+   NcVar obs_qty_var ; // Quality flag (unlimited dimension) (V1.2: Changed data type to int - was string)
+   NcVar obs_arr_var ; // Observation array (unlimited dimension) (V1.0, Removed from V1.2)
+   NcVar obs_hid_var ; // Observation header index array (unlimited dimension) (V1.2)
+   NcVar  obs_gc_var ; // Observation GRIB code array (unlimited dimension) (V1.2)
+   NcVar obs_vid_var ; // Observation variable index array (unlimited dimension) (V1.2)
+   NcVar obs_lvl_var ; // Observation level array (unlimited dimension) (V1.2)
+   NcVar obs_hgt_var ; // Observation hight array (unlimited dimension) (V1.2)
+   NcVar obs_val_var ; // Observation value array (unlimited dimension) (V1.2)
+   // Optional variables
+   NcVar obs_var     ; // Observation variable name (V1.1)
+   NcVar unit_var    ; // The unit of the observation variable (V1.1)
+   NcVar desc_var    ; // The description of the observation variable (V1.1)
+};
+
+struct NcHeaderData {
+   int typ_len;
+   int sid_len;
+   int vld_len;
+   int strl_len;  
+   int strll_len;
+   int min_vld_time;
+   int max_vld_time;
+   
+   StringArray typ_array;
+   StringArray sid_array;
+   StringArray vld_array;
+   IntArray    vld_num_array;
+   IntArray    typ_idx_array;
+   IntArray    sid_idx_array;
+   IntArray    vld_idx_array;
+   NumArray    lat_array;
+   NumArray    lon_array;
+   NumArray    elv_array;
+   IntArray    prpt_typ_array;
+   IntArray    irpt_typ_array;
+   IntArray    inst_typ_array;
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 //extern bool find_att(const NcFile *, const ConcatString &, NcGroupAtt &);
@@ -339,10 +412,20 @@ extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 //extern multimap<string,NcDim> get_global_dims(const NcFile *nc, int *dim_count);
 
+extern int check_nc_dims_vars(const NetcdfObsVars obs_vars);
+extern void clear_header_data(NcHeaderData *);
+extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars);
+extern void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data);
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
 extern unixtime get_reference_unixtime(ConcatString);
+
+
+extern bool is_using_var_id(const char * nc_name);
+
+extern bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
+      int qty_len, float *obs_arr, int *qty_idx_arr, char *obs_qty_buf);
 
 ////////////////////////////////////////////////////////////////////////
 
