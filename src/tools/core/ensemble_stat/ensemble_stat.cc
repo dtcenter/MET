@@ -73,7 +73,6 @@ using namespace std;
 #include "vx_data2d_nc_met.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
-#include "nc_tools.h"
 
 ////////////////////////////////////////////////////////////////////////
 
