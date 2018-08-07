@@ -35,7 +35,8 @@ using namespace netCDF;
 #include "observation.h"
 #include "vx_summary.h"
 
-#include "nc_tools.h"
+#include "nc_obs_util.h"
+#include "nc_summary.h"
 
 ////////////////////////////////////////////////////////////////////////
 

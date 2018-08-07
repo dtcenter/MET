@@ -61,7 +61,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "calipso_5km.h"
-#include "nc_tools.h"
+#include "nc_obs_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 

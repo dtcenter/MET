@@ -1114,6 +1114,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_gsl_prob/Makefile
                  src/libcode/vx_nav/Makefile
                  src/libcode/vx_solar/Makefile
+                 src/libcode/vx_nc_obs/Makefile
                  src/libcode/vx_nc_util/Makefile
                  src/libcode/vx_pb_util/Makefile
                  src/libcode/vx_plot_util/Makefile
@@ -1133,7 +1134,6 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile
                  src/tools/core/grid_stat/Makefile
-                 src/tools/core/met_shared/Makefile
                  src/tools/core/mode/Makefile
                  src/tools/core/mode_analysis/Makefile
                  src/tools/core/pcp_combine/Makefile

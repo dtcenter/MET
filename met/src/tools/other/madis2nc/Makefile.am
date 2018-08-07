@@ -12,8 +12,8 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = madis2nc
 madis2nc_SOURCES = madis2nc.cc
-madis2nc_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
-madis2nc_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
+madis2nc_CPPFLAGS = ${MET_CPPFLAGS}
+madis2nc_LDFLAGS = ${MET_LDFLAGS}
 madis2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -26,7 +26,7 @@ madis2nc_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
-	-lmet_shared \
+	-lvx_nc_obs \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
