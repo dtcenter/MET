@@ -213,10 +213,11 @@ void FileHandler::_closeNetcdf()
 
 void FileHandler::_countHeaders()
 {
+   int raw_header_count = summary_obs.countHeaders(_observations);
    _nhdr = (do_summary ? summary_obs.countSummaryHeaders()
-                       : summary_obs.countHeaders());
+                       : raw_header_count);
    if (do_summary && _summaryInfo.raw_data) {
-      _nhdr += summary_obs.countHeaders(_observations);
+      _nhdr += raw_header_count;
    }
 }
 
