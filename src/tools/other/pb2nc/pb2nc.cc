@@ -86,8 +86,8 @@ using namespace std;
 #include "write_netcdf.h"
 
 #include "vx_summary.h"
-#include "nc_tools.h"
-#include "summary_nc.h"
+#include "nc_obs_util.h"
+#include "nc_summary.h"
 
 extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
 extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc

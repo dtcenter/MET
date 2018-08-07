@@ -62,7 +62,7 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_log.h"
 
-#include "nc_tools.h"
+#include "nc_obs_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 

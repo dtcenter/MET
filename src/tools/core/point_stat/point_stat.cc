@@ -108,6 +108,8 @@ using namespace std;
 #include "vx_regrid.h"
 #include "vx_log.h"
 
+#include "nc_obs_util.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 #define BUFFER_SIZE (DEF_NC_BUFFER_SIZE/2)

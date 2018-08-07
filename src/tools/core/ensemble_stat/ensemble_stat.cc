@@ -74,6 +74,8 @@ using namespace std;
 #include "vx_regrid.h"
 #include "vx_log.h"
 
+#include "nc_obs_util.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line  (int, char **);

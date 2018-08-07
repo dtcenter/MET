@@ -19,8 +19,8 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	surfrad_handler.cc surfrad_handler.h \
 	wwsis_handler.cc wwsis_handler.h \
 	aeronet_handler.cc aeronet_handler.h
-ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I${top_builddir}/src/tools/core/met_shared
-ascii2nc_LDFLAGS = ${MET_LDFLAGS} -L${top_builddir}/src/tools/core/met_shared
+ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
+ascii2nc_LDFLAGS = ${MET_LDFLAGS}
 ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
@@ -33,7 +33,7 @@ ascii2nc_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
-	-lmet_shared \
+	-lvx_nc_obs \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \

@@ -60,7 +60,7 @@ using namespace std;
 #include "vx_pxm.h"
 #include "vx_render.h"
 #include "vx_plot_util.h"
-#include "nc_tools.h"
+#include "nc_obs_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //

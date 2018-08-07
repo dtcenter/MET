@@ -28,9 +28,6 @@ using namespace std;
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
 
-#include "nc_tools.h"
-#include "summary_nc.h"
-
 extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
 extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
 
