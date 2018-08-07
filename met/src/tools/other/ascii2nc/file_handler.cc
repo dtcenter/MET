@@ -28,9 +28,6 @@ using namespace std;
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
 
-extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
-extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
-
 const float FileHandler::FILL_VALUE = -9999.f;
 
 const int DEF_DEFALTE_LEVEL = 2;
@@ -395,7 +392,9 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  write_observations(_ncFile, obs_vars, &summary_obs, _observations, deflate_level);
+  bool include_header = true;
+  write_observations(_ncFile, obs_vars, &summary_obs, _observations,
+      include_header, deflate_level);
   
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
   if (var_count > 0) {
