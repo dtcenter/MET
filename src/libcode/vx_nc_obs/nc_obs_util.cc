@@ -1164,6 +1164,7 @@ void write_nc_header (const NetcdfObsVars &obs_vars,
    
    // Valid Time
    if (hdr_data.min_vld_time == -1 || hdr_data.min_vld_time > hdr_vld) {
+      if (hdr_data.min_vld_time == -1) hdr_data.max_vld_time = hdr_vld; 
       hdr_data.min_vld_time = hdr_vld;
       new_vld = true;
    }
