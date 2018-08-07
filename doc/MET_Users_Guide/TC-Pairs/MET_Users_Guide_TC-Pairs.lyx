@@ -627,7 +627,7 @@ init_beg     = "";
 \begin_layout LyX-Code
 
 \series bold
-init_eng     = "";
+init_end     = "";
 \end_layout
 
 \begin_layout LyX-Code
@@ -651,7 +651,7 @@ valid_beg    = "";
 \begin_layout LyX-Code
 
 \series bold
-valid_eng    = "";
+valid_end    = "";
 \end_layout
 
 \begin_layout LyX-Code
