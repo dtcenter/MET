@@ -66,9 +66,6 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
-extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
-
 ////////////////////////////////////////////////////////////////////////
 
 static const int FIELD_COUNT =  50;
@@ -76,6 +73,9 @@ static const int BUFFER_SIZE = OBS_BUFFER_SIZE / FIELD_COUNT;
 
 static int nc_buf_size;
 static NetcdfObsVars obs_vars;
+static vector< Observation > observations;
+
+////////////////////////////////////////////////////////////////////////
 
 static void initialize();
 static void process_command_line(int, char **);
@@ -146,6 +146,17 @@ int main(int argc, char *argv[]) {
    //
    process_madis_file(mdfile);
 
+   bool use_var_id = true;
+   bool do_header = false;
+   int nhdr = get_nc_hdr_cur_index();
+   setup_netcdf_out(nhdr);
+
+   write_nc_observations(obs_vars, observations,
+         use_var_id, do_header);
+   create_nc_table_vars(obs_vars, f_out);
+   write_nc_table_vars(obs_vars);
+   write_nc_arr_headers(obs_vars);
+   
    //
    // Deallocate memory and clean up
    //
@@ -350,8 +361,10 @@ void setup_netcdf_out(int nhdr) {
    if (deflate_level < 0) deflate_level = 0;
 
    bool use_var_id = false;
+   obs_vars.obs_cnt = observations.size();
+   mlog << Debug(1) << "nhdr:\t" << nhdr << "\tobs_vars.obs_cnt:\t" << obs_vars.obs_cnt << "\n";
    init_nc_dims_vars (obs_vars, use_var_id);
-   create_nc_hdr_vars(obs_vars, f_out, -1, deflate_level);
+   create_nc_hdr_vars(obs_vars, f_out, nhdr, deflate_level);
    create_nc_obs_vars(obs_vars, f_out, deflate_level, use_var_id);
 
    //
@@ -526,6 +539,9 @@ int process_obs(const int in_gc, const float conversion,
    // Check for bad data and apply conversion factor
    //
    if(!is_bad_data(obs_arr[4])) {
+      char  var_name[max_str_len];
+      sprintf(var_name, "GRIB_%d", obs_arr[1]);
+      
       obs_arr[4] *= conversion;
 
       ConcatString qty_str;
@@ -533,7 +549,20 @@ int process_obs(const int in_gc, const float conversion,
       else            qty_str << qty;
       qty_str.replace(" ", "_", false);
 
-      write_nc_observation(obs_vars, nc_data_buffer, obs_arr, qty_str);
+      //write_nc_observation(obs_vars, obs_arr, qty_str);
+      Observation obs = Observation(
+            "",
+            "",
+            -9999,
+            -9999, -9999, -9999,
+            qty_str.text(),
+            in_gc,
+            obs_arr[2], obs_arr[3], obs_arr[4],
+            var_name);
+                            
+      obs.setHeaderIndex(get_nc_hdr_cur_index());
+      observations.push_back(obs);
+
       i_obs++;
       processed_count++;
    }
@@ -646,6 +675,8 @@ void process_madis_metar(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
+   int count;
+
 
    //
    // Input header variables
@@ -698,7 +729,7 @@ void process_madis_metar(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nhdr);
+   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing METAR recs\t\t\t\t= " << rec_end - rec_beg << "\n";
 
@@ -823,6 +854,7 @@ void process_madis_metar(NcFile *&f_in) {
          // hdr_arr[2](Elv)           = elevation
          //
 
+         count = 0;
          i_hdr = i_hdr_s + i_idx;
 
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
@@ -864,9 +896,6 @@ void process_madis_metar(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = nc_data_buffer.cur_hdr_idx;
-
-
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
@@ -876,33 +905,33 @@ void process_madis_metar(NcFile *&f_in) {
 
          // Sea Level Pressure
          obs_arr[4] = seaLevelPress[i_idx];
-         process_obs(2, conversion, obs_arr, seaLevelPressQty[i_idx],
+         count += process_obs(2, conversion, obs_arr, seaLevelPressQty[i_idx],
                      seaLevelPress_var);
 
          // Visibility
          obs_arr[4] = visibility[i_idx];
-         process_obs(20, conversion, obs_arr, visibilityQty[i_idx],
+         count += process_obs(20, conversion, obs_arr, visibilityQty[i_idx],
                      visibility_var);
 
          // Temperature
          obs_arr[4] = temperature[i_idx];
-         process_obs(11, conversion, obs_arr, temperatureQty[i_idx],
+         count += process_obs(11, conversion, obs_arr, temperatureQty[i_idx],
                      temperature_var);
 
          // Dewpoint
          obs_arr[4] = dewpoint[i_idx];
-         process_obs(17, conversion, obs_arr, dewpointQty[i_idx],
+         count += process_obs(17, conversion, obs_arr, dewpointQty[i_idx],
                      dewpoint_var);
 
          // Wind Direction
          obs_arr[4] = windDir[i_idx];
-         process_obs(31, conversion, obs_arr, windDirQty[i_idx],
+         count += process_obs(31, conversion, obs_arr, windDirQty[i_idx],
                      windDir_var);
          wdir = obs_arr[4];
 
          // Wind Speed
          obs_arr[4] = windSpeed[i_idx];
-         process_obs(32, conversion, obs_arr, windSpeedQty[i_idx],
+         count += process_obs(32, conversion, obs_arr, windSpeedQty[i_idx],
                      windSpeed_var);
          wind = obs_arr[4];
 
@@ -911,69 +940,67 @@ void process_madis_metar(NcFile *&f_in) {
 
          // Write U-component of wind
          obs_arr[4] = ugrd;
-         process_obs(33, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
+         count += process_obs(33, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
 
          // Write V-component of wind
          obs_arr[4] = vgrd;
-         process_obs(34, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
+         count += process_obs(34, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
 
          // Wind Gust
          obs_arr[4] = windGust[i_idx];
-         process_obs(180, conversion, obs_arr, windGustQty[i_idx],
+         count += process_obs(180, conversion, obs_arr, windGustQty[i_idx],
                      windGust_var);
 
          // Min Temperature - 24 Hour
          obs_arr[4] = minTemp24Hour[i_idx];
-         process_obs(16, conversion, obs_arr, minTemp24HourQty[i_idx],
+         count += process_obs(16, conversion, obs_arr, minTemp24HourQty[i_idx],
                      minTemp24Hour_var);
 
          // Max Temperature - 24 Hour
          obs_arr[4] = maxTemp24Hour[i_idx];
-         process_obs(15, conversion, obs_arr, maxTemp24HourQty[i_idx],
+         count += process_obs(15, conversion, obs_arr, maxTemp24HourQty[i_idx],
                      maxTemp24Hour_var);
 
          conversion = 1000.0;
          // Precipitation - 1 Hour
          obs_arr[2] = 1.0*sec_per_hour;
          obs_arr[4] = precip1Hour[i_idx];
-         process_obs(61, conversion, obs_arr, precip1HourQty[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip1HourQty[i_idx],
                      precip1Hour_var);
 
          // Precipitation - 3 Hour
          obs_arr[2] = 3.0*sec_per_hour;
          obs_arr[4] = precip3Hour[i_idx];
-         process_obs(61, conversion, obs_arr, precip3HourQty[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip3HourQty[i_idx],
                      precip3Hour_var);
 
          // Precipitation - 6 Hour
          obs_arr[2] = 6.0*sec_per_hour;
          obs_arr[4] = precip6Hour[i_idx];
-         process_obs(61, conversion, obs_arr, precip6HourQty[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip6HourQty[i_idx],
                      precip6Hour_var);
 
          // Precipitation - 24 Hour
          obs_arr[2] = 24.0*sec_per_hour;
          obs_arr[4] = precip24Hour[i_idx];
-         process_obs(61, conversion, obs_arr, precip24HourQty[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip24HourQty[i_idx],
                      precip24Hour_var);
 
          conversion = 1.0;
          // Snow Cover
          obs_arr[2] = bad_data_float;
          obs_arr[4] = snowCover[i_idx];
-         process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
+         count += process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
                      snowCover_var);
 
-         write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
-               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         if (count > 0) {
+            add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
+                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+            hdr_idx++;
+         }
       }
 
    } // end for i_hdr
-
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -998,6 +1025,7 @@ void process_madis_raob(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
+   int count;
 
    int maxlvl_manLevel;
    int maxlvl_sigTLevel;
@@ -1091,7 +1119,7 @@ void process_madis_raob(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nhdr);
+   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing RAOB recs\t\t\t= " << rec_end - rec_beg << "\n";
 
@@ -1291,6 +1319,7 @@ void process_madis_raob(NcFile *&f_in) {
          // hdr_arr[2](Elv)           = staElev
          //
 
+         count = 0;
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
@@ -1320,16 +1349,12 @@ void process_madis_raob(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = nc_data_buffer.cur_hdr_idx;
+         hdr_idx = get_nc_hdr_cur_index();
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-
-         write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
-               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-
 
          //
          // Initialize the observation array: hdr_id
@@ -1363,34 +1388,34 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Pressure
             obs_arr[4] = prMan[i_idx][i_lvl];
-            process_obs(1, conversion, obs_arr, prManQty[i_idx][i_lvl],
+            count += process_obs(1, conversion, obs_arr, prManQty[i_idx][i_lvl],
                         prMan_var);
 
             // Height
             obs_arr[4] = htMan[i_idx][i_lvl];
-            process_obs(7, conversion, obs_arr, htManQty[i_idx][i_lvl],
+            count += process_obs(7, conversion, obs_arr, htManQty[i_idx][i_lvl],
                         htMan_var);
 
             // Temperature
             obs_arr[4] = tpMan[i_idx][i_lvl];
-            process_obs(11, conversion, obs_arr, tpManQty[i_idx][i_lvl],
+            count += process_obs(11, conversion, obs_arr, tpManQty[i_idx][i_lvl],
                         tpMan_var);
 
             // Dewpoint
             obs_arr[4] = tdMan[i_idx][i_lvl];
-            process_obs(17, conversion, obs_arr, tdManQty[i_idx][i_lvl],
+            count += process_obs(17, conversion, obs_arr, tdManQty[i_idx][i_lvl],
                         tdMan_var);
 
             // Wind Direction
             obs_arr[4] = wdMan[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, wdManQty[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, wdManQty[i_idx][i_lvl],
                         wdMan_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             qty = wsManQty[i_idx][i_lvl];
             obs_arr[4] = wsMan[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty, wsMan_var);
+            count += process_obs(32, conversion, obs_arr, qty, wsMan_var);
             wind = obs_arr[4];
 
             // Convert the wind direction and speed into U and V components
@@ -1398,11 +1423,11 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, wsMan_var);
+            count += process_obs(33, conversion, obs_arr, qty, wsMan_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, wsMan_var);
+            count += process_obs(34, conversion, obs_arr, qty, wsMan_var);
 
          } // end for i_lvl
 
@@ -1432,12 +1457,12 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Temperature
             obs_arr[4] = tpSigT[i_idx][i_lvl];
-            process_obs(11, conversion, obs_arr, tpSigTQty[i_idx][i_lvl],
+            count += process_obs(11, conversion, obs_arr, tpSigTQty[i_idx][i_lvl],
                         tpSigT_var);
 
             // Dewpoint
             obs_arr[4] = tdSigT[i_idx][i_lvl];
-            process_obs(17, conversion, obs_arr, tdSigTQty[i_idx][i_lvl],
+            count += process_obs(17, conversion, obs_arr, tdSigTQty[i_idx][i_lvl],
                         tdSigT_var);
 
          } // end for i_lvl
@@ -1468,14 +1493,14 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Wind Direction
             obs_arr[4] = wdSigW[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, wdSigWQty[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, wdSigWQty[i_idx][i_lvl],
                         wdSigW_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             qty = wsSigWQty[i_idx][i_lvl];
             obs_arr[4] = wsSigW[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
+            count += process_obs(32, conversion, obs_arr, qty,
                         wsSigW_var);
             wind = obs_arr[4];
 
@@ -1484,11 +1509,11 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, wsSigW_var);
+            count += process_obs(33, conversion, obs_arr, qty, wsSigW_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, wsSigW_var);
+            count += process_obs(34, conversion, obs_arr, qty, wsSigW_var);
 
          } // end for i_lvl
 
@@ -1518,14 +1543,14 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Wind Direction
             obs_arr[4] = wdSigPrW[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, wdSigPrWQty[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, wdSigPrWQty[i_idx][i_lvl],
                         wdSigPrW_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             qty = wsSigPrWQty[i_idx][i_lvl];
             obs_arr[4] = wsSigPrW[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
+            count += process_obs(32, conversion, obs_arr, qty,
                         wsSigPrW_var);
             wind = obs_arr[4];
 
@@ -1534,11 +1559,11 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, wsSigPrW_var);
+            count += process_obs(33, conversion, obs_arr, qty, wsSigPrW_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, wsSigPrW_var);
+            count += process_obs(34, conversion, obs_arr, qty, wsSigPrW_var);
 
          } // end for i_lvl
 
@@ -1568,24 +1593,24 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Temperature
             obs_arr[4] = tpTrop[i_idx][i_lvl];
-            process_obs(11, conversion, obs_arr, tpTropQty[i_idx][i_lvl],
+            count += process_obs(11, conversion, obs_arr, tpTropQty[i_idx][i_lvl],
                         tpTrop_var);
 
             // Dewpoint
             obs_arr[4] = tdTrop[i_idx][i_lvl];
-            process_obs(17, conversion, obs_arr, tdTropQty[i_idx][i_lvl],
+            count += process_obs(17, conversion, obs_arr, tdTropQty[i_idx][i_lvl],
                         tdTrop_var);
 
             // Wind Direction
             obs_arr[4] = wdTrop[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, wdTropQty[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, wdTropQty[i_idx][i_lvl],
                         wdTrop_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             qty = wsTropQty[i_idx][i_lvl];
             obs_arr[4] = wsTrop[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
+            count += process_obs(32, conversion, obs_arr, qty,
                         wsTrop_var);
             wind = obs_arr[4];
 
@@ -1594,11 +1619,11 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, wsTrop_var);
+            count += process_obs(33, conversion, obs_arr, qty, wsTrop_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, wsTrop_var);
+            count += process_obs(34, conversion, obs_arr, qty, wsTrop_var);
 
          } // end for i_lvl
 
@@ -1628,14 +1653,14 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Wind Direction
             obs_arr[4] = wdMaxW[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, wdMaxWQty[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, wdMaxWQty[i_idx][i_lvl],
                         wdMaxW_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             qty = wsMaxWQty[i_idx][i_lvl];
             obs_arr[4] = wsMaxW[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
+            count += process_obs(32, conversion, obs_arr, qty,
                         wsMaxW_var);
             wind = obs_arr[4];
 
@@ -1644,22 +1669,25 @@ void process_madis_raob(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, wsMaxW_var);
+            count += process_obs(33, conversion, obs_arr, qty, wsMaxW_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, wsMaxW_var);
+            count += process_obs(34, conversion, obs_arr, qty, wsMaxW_var);
 
          } // end for i_lvl
 
+         if (count > 0) add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         
       } // end for i_hdr
 
    } // end for i_hdr
 
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
+   //write_nc_observation(obs_vars);
+   //create_nc_table_vars(obs_vars, f_out);
+   //write_nc_table_vars(obs_vars);
+   //write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -1683,6 +1711,7 @@ void process_madis_profiler(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
+   int count;
 
    //
    // Input header variables:
@@ -1715,7 +1744,7 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nhdr);
+   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing PROFILER recs\t\t= " << rec_end - rec_beg << "\n";
 
@@ -1799,6 +1828,7 @@ void process_madis_profiler(NcFile *&f_in) {
          // hdr_arr[2](Elv)           = staElev
          //
 
+         count = 0;
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
@@ -1835,9 +1865,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = nc_data_buffer.cur_hdr_idx;
-         write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
-               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         hdr_idx = get_nc_hdr_cur_index();
 
          //
          // Initialize the observation array: hdr_id
@@ -1874,24 +1902,26 @@ void process_madis_profiler(NcFile *&f_in) {
 
             // Wind U
             obs_arr[4] = uComponent_arr[i_idx][i_lvl];
-            process_obs(33, conversion, obs_arr, uComponentQty_arr[i_idx][i_lvl],
+            count += process_obs(33, conversion, obs_arr, uComponentQty_arr[i_idx][i_lvl],
                         in_uComponent_var);
 
             // Wind V
             obs_arr[4] = vComponent_arr[i_idx][i_lvl];
-            process_obs(34, conversion, obs_arr, vComponentQty_arr[i_idx][i_lvl],
+            count += process_obs(34, conversion, obs_arr, vComponentQty_arr[i_idx][i_lvl],
                         in_vComponent_var);
 
          } // end for i_lvl
 
+         if (count > 0) add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       } // end for i_hdr
 
    } // end for i_hdr
 
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
+   //write_nc_observation(obs_vars);
+   //create_nc_table_vars(obs_vars, f_out);
+   //write_nc_table_vars(obs_vars);
+   //write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -1916,6 +1946,7 @@ void process_madis_maritime(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
+   int count;
 
    //
    // Input header variables:
@@ -1966,7 +1997,7 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nhdr);
+   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing MARITIME recs\t\t= " << rec_end - rec_beg << "\n";
 
@@ -2082,6 +2113,7 @@ void process_madis_maritime(NcFile *&f_in) {
          // hdr_arr[2](Elv)           = staElev
          //
 
+         count = 0;
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
@@ -2117,7 +2149,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = nc_data_buffer.cur_hdr_idx;
+         hdr_idx = get_nc_hdr_cur_index();
 
 
          //
@@ -2143,74 +2175,74 @@ void process_madis_maritime(NcFile *&f_in) {
 
          // Wind Direction
          obs_arr[4] = windDir_arr[i_idx];
-         process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx],
+         count += process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx],
                      in_windDir_var);
 
          // Wind Speed
          obs_arr[4] = windSpeed_arr[i_idx];
-         process_obs(32, conversion, obs_arr, windSpeedQty_arr[i_idx],
+         count += process_obs(32, conversion, obs_arr, windSpeedQty_arr[i_idx],
                      in_windSpeed_var);
 
          // Temperature
          obs_arr[4] = temperature_arr[i_idx];
-         process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
+         count += process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
                      in_temperature_var);
 
          // Dew Point temperature
          obs_arr[4] = dewpoint_arr[i_idx];
-         process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx],
+         count += process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx],
                      in_dewpoint_var);
 
          // Pressure reduced to MSL
          obs_arr[4] = seaLevelPress_arr[i_idx];
-         process_obs(2, conversion, obs_arr, seaLevelPressQty_arr[i_idx],
+         count += process_obs(2, conversion, obs_arr, seaLevelPressQty_arr[i_idx],
                      in_seaLevelPress_var);
 
          // Surface wind gust
          obs_arr[4] = windGust_arr[i_idx];
-         process_obs(180, conversion, obs_arr, windGustQty_arr[i_idx],
+         count += process_obs(180, conversion, obs_arr, windGustQty_arr[i_idx],
                      in_windGust_var);
 
          // APCP_01
          obs_arr[2] = 3600;
          obs_arr[4] = precip1Hour_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip1HourQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip1HourQty_arr[i_idx],
                      in_precip1Hour_var);
 
          // APCP_06
          obs_arr[2] = 21600;
          obs_arr[4] = precip6Hour_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip6HourQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip6HourQty_arr[i_idx],
                      in_precip6Hour_var);
 
          // APCP_12
          obs_arr[2] = 43200;
          obs_arr[4] = precip12Hour_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip12HourQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip12HourQty_arr[i_idx],
                      in_precip12Hour_var);
 
          // APCP_18
          obs_arr[2] = 64800;
          obs_arr[4] = precip18Hour_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip18HourQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip18HourQty_arr[i_idx],
                      in_precip18Hour_var);
 
          // APCP_24
          obs_arr[2] = 86400;
          obs_arr[4] = precip24Hour_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
                      in_precip24Hour_var);
 
-         write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
+         if (count > 0) add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i_hdr
 
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
+   //write_nc_observation(obs_vars);
+   //create_nc_table_vars(obs_vars, f_out);
+   //write_nc_table_vars(obs_vars);
+   //write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -2233,6 +2265,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
+   int count;
 
    //
    // Input header variables
@@ -2301,7 +2334,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nhdr);
+   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing Integrated Mesonet recs\t= " << rec_end - rec_beg << "\n";
 
@@ -2463,6 +2496,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          // hdr_arr[2](Elv)           = elevation
          //
 
+         count = 0;
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
@@ -2496,7 +2530,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          if(is_bad_data(tmp_dbl)) continue;
          hdr_vld = (time_t)tmp_dbl;
 
-         hdr_idx = nc_data_buffer.cur_hdr_idx;
+         hdr_idx = get_nc_hdr_cur_index();
 
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -2505,44 +2539,41 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[2] = bad_data_float;   // Level: accum(sec) or pressure
          obs_arr[3] = 0;                // Height for surface is 0 meters
 
-         write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
-               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-
          // Temperature
          obs_arr[4] = temperature_arr[i_idx];
-         process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
+         count += process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
                      in_temperature_var);
 
          // Dewpoint
          obs_arr[4] = dewpoint_arr[i_idx];
-         process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx],
+         count += process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx],
                      in_dewpoint_var);
 
          // Relative Humidity
          obs_arr[4] = relHumidity_arr[i_idx];
-         process_obs(52, conversion, obs_arr, relHumidityQty_arr[i_idx],
+         count += process_obs(52, conversion, obs_arr, relHumidityQty_arr[i_idx],
                      in_relHumidity_var);
 
          // Station Pressure
          obs_arr[4] = stationPressure_arr[i_idx];
-         process_obs(1, conversion, obs_arr, stationPressureQty_arr[i_idx],
+         count += process_obs(1, conversion, obs_arr, stationPressureQty_arr[i_idx],
                      in_stationPressure_var);
 
          // Sea Level Pressure
          obs_arr[4] = seaLevelPressure_arr[i_idx];
-         process_obs(2, conversion, obs_arr, seaLevelPressureQty_arr[i_idx],
+         count += process_obs(2, conversion, obs_arr, seaLevelPressureQty_arr[i_idx],
                      in_seaLevelPressure_var);
 
          // Wind Direction
          obs_arr[4] = windDir_arr[i_idx];
-         process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx],
+         count += process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx],
                      in_windDir_var);
          wdir = obs_arr[4];
 
          // Wind Speed
          obs_arr[4] = windSpeed_arr[i_idx];
          char qty = windSpeedQty_arr[i_idx];
-         process_obs(32, conversion, obs_arr, qty,
+         count += process_obs(32, conversion, obs_arr, qty,
                      in_windSpeed_var);
          wind = obs_arr[4];
 
@@ -2551,87 +2582,87 @@ void process_madis_mesonet(NcFile *&f_in) {
 
          // Write U-component of wind
          obs_arr[4] = ugrd;
-         process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
+         count += process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
 
          // Write V-component of wind
          obs_arr[4] = vgrd;
-         process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
+         count += process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
 
          // Wind Gust
          obs_arr[4] = windGust_arr[i_idx];
-         process_obs(180, conversion, obs_arr, windGustQty_arr[i_idx],
+         count += process_obs(180, conversion, obs_arr, windGustQty_arr[i_idx],
                      in_windGust_var);
 
          // Visibility
          obs_arr[4] = visibility_arr[i_idx];
-         process_obs(20, conversion, obs_arr, visibilityQty_arr[i_idx],
+         count += process_obs(20, conversion, obs_arr, visibilityQty_arr[i_idx],
                      in_visibility_var);
 
          // Precipitation Rate
          // Convert input meters/second to output millimeters/second
          obs_arr[4] = precipRate_arr[i_idx];
-         process_obs(59, 1000.0, obs_arr, precipRateQty_arr[i_idx],
+         count += process_obs(59, 1000.0, obs_arr, precipRateQty_arr[i_idx],
                      in_precipRate_var);
 
          // Solar Radiation
          obs_arr[4] = solarRadiation_arr[i_idx];
-         process_obs(250, conversion, obs_arr, solarRadiationQty_arr[i_idx],
+         count += process_obs(250, conversion, obs_arr, solarRadiationQty_arr[i_idx],
                      in_solarRadiation_var);
 
          // Sea Surface Temperature
          obs_arr[4] = seaSurfaceTemp_arr[i_idx];
-         process_obs(80, conversion, obs_arr, seaSurfaceTempQty_arr[i_idx],
+         count += process_obs(80, conversion, obs_arr, seaSurfaceTempQty_arr[i_idx],
                      in_seaSurfaceTemp_var);
 
          // Precipitable Water
          // Convert input cm to output mm
          obs_arr[4] = totalColumnPWV_arr[i_idx];
-         process_obs(54, 10.0, obs_arr, totalColumnPWVQty_arr[i_idx],
+         count += process_obs(54, 10.0, obs_arr, totalColumnPWVQty_arr[i_idx],
                      in_totalColumnPWV_var);
 
          // Soil Temperature
          obs_arr[4] = soilTemperature_arr[i_idx];
-         process_obs(85, conversion, obs_arr, soilTemperatureQty_arr[i_idx],
+         count += process_obs(85, conversion, obs_arr, soilTemperatureQty_arr[i_idx],
                      in_soilTemperature_var);
 
          // Minimum Temperature
          obs_arr[4] = minTemp24Hour_arr[i_idx];
-         process_obs(16, conversion, obs_arr, minTemp24HourQty_arr[i_idx],
+         count += process_obs(16, conversion, obs_arr, minTemp24HourQty_arr[i_idx],
                      in_minTemp24Hour_var);
 
          // Maximum Temperature
          obs_arr[4] = maxTemp24Hour_arr[i_idx];
-         process_obs(15, conversion, obs_arr, maxTemp24HourQty_arr[i_idx],
+         count += process_obs(15, conversion, obs_arr, maxTemp24HourQty_arr[i_idx],
                      in_maxTemp24Hour_var);
 
          // Precipitation - 3 Hour
          obs_arr[2] = 3.0*sec_per_hour;
          obs_arr[4] = precip3hr_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip3hrQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip3hrQty_arr[i_idx],
                      in_precip3hr_var);
 
          // Precipitation - 6 Hour
          obs_arr[2] = 6.0*sec_per_hour;
          obs_arr[4] = precip6hr_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip6hrQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip6hrQty_arr[i_idx],
                      in_precip6hr_var);
 
          // Precipitation - 12 Hour
          obs_arr[2] = 12.0*sec_per_hour;
          obs_arr[4] = precip12hr_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip12hrQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip12hrQty_arr[i_idx],
                      in_precip12hr_var);
 
          // Precipitation - 10 minutes
          obs_arr[2] = 600;
          obs_arr[4] = precip10min_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip10minQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip10minQty_arr[i_idx],
                      in_precip10min_var);
 
          // Precipitation - 1 minutes
          obs_arr[2] = 60;
          obs_arr[4] = precip1min_arr[i_idx];
-         process_obs(61, conversion, obs_arr, precip1minQty_arr[i_idx],
+         count += process_obs(61, conversion, obs_arr, precip1minQty_arr[i_idx],
                      in_precip1min_var);
 
          // Set the level to bad data and the height to 10 meters
@@ -2640,14 +2671,14 @@ void process_madis_mesonet(NcFile *&f_in) {
 
          // 10m Wind Direction
          obs_arr[4] = windDir10_arr[i_idx];
-         process_obs(31, conversion, obs_arr, windDir10Qty_arr[i_idx],
+         count += process_obs(31, conversion, obs_arr, windDir10Qty_arr[i_idx],
                      in_windDir10_var);
          wdir = obs_arr[4];
 
          // 10m Wind Speed
          qty = windSpeed10Qty_arr[i_idx];
          obs_arr[4] = windSpeed10_arr[i_idx];
-         process_obs(32, conversion, obs_arr, qty, in_windSpeed10_var);
+         count += process_obs(32, conversion, obs_arr, qty, in_windSpeed10_var);
          wind = obs_arr[4];
 
          // Convert the wind direction and speed into U and V components
@@ -2655,19 +2686,22 @@ void process_madis_mesonet(NcFile *&f_in) {
 
          // Write U-component of 10m wind
          obs_arr[4] = ugrd;
-         process_obs(33, conversion, obs_arr, qty, in_windSpeed10_var);
+         count += process_obs(33, conversion, obs_arr, qty, in_windSpeed10_var);
 
          // Write V-component of 10m wind
          obs_arr[4] = vgrd;
-         process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var);
+         count += process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var);
+         
+         if (0 < count) add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i
 
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
+   //write_nc_observation(obs_vars);
+   //create_nc_table_vars(obs_vars, f_out);
+   //write_nc_table_vars(obs_vars);
+   //write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 
@@ -2693,6 +2727,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure, wdir, wind, ugrd, vgrd;
+   int count;
 
    //
    // Input header variables:
@@ -2766,7 +2801,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   setup_netcdf_out(nlvl1);
+   //setup_netcdf_out(nlvl1);
 
    mlog << Debug(2) << "Processing ACARS Profiles recs\t\t= " << nlvl1 << "\n";
 
@@ -2873,10 +2908,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          //
          for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
+            count = 0;
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            hdr_idx = nc_data_buffer.cur_hdr_idx;
+            hdr_idx = get_nc_hdr_cur_index();
 
             //
             // Use cur to index into the NetCDF variables.
@@ -2924,10 +2960,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             tmp_dbl = tmp_dbl1+tmp_dbl2-fmod(tmp_dbl1, 86400);
             hdr_vld = (time_t)tmp_dbl;
 
-            write_nc_header (obs_vars, hdr_typ, hdr_sid, hdr_vld,
-               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-
-
             //
             // Compute the pressure (hPa) from altitude data
             // Equation obtained from http://www.srh.noaa.gov/
@@ -2941,24 +2973,24 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
             // Temperature
             obs_arr[4] = temperature_arr[i_idx][i_lvl];
-            process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx][i_lvl],
+            count += process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx][i_lvl],
                         in_temperature_var);
 
             // Dewpoint
             obs_arr[4] = dewpoint_arr[i_idx][i_lvl];
-            process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx][i_lvl],
+            count += process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx][i_lvl],
                         in_dewpoint_var);
 
             // Wind Direction
             obs_arr[4] = windDir_arr[i_idx][i_lvl];
-            process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx][i_lvl],
+            count += process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx][i_lvl],
                         in_windDir_var);
             wdir = obs_arr[4];
 
             // Wind Speed
             obs_arr[4] = windSpeed_arr[i_idx][i_lvl];
             qty = windSpeedQty_arr[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
+            count += process_obs(32, conversion, obs_arr, qty,
                         in_windSpeed_var);
             wind = obs_arr[4];
 
@@ -2967,19 +2999,22 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
             // Write U-component of wind
             obs_arr[4] = ugrd;
-            process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
+            count += process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
+            count += process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
+            
+            if (count > 0) add_nc_header_to_array(hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
          } // end for i_lvl
       }
    } // end for i_hdr
 
-   write_nc_observation(obs_vars, nc_data_buffer);
-   create_nc_table_vars(obs_vars, f_out, nc_data_buffer, hdr_data);
-   write_nc_table_vars(obs_vars);
-   write_nc_buf_headers (obs_vars);
+   //write_nc_observation(obs_vars);
+   //create_nc_table_vars(obs_vars, f_out);
+   //write_nc_table_vars(obs_vars);
+   //write_nc_buf_headers (obs_vars);
 
    print_rej_counts();
 

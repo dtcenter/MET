@@ -65,8 +65,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern struct NcHeaderData hdr_data;
-extern struct NcDataBuffer nc_data_buffer;
+struct NcHeaderData *header_data = get_hdr_data_buffer();
 
 static ConcatString program_name;
 
@@ -438,7 +437,7 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-hdr_data.typ_array.add(hdr_typ_string);
+header_data->typ_array.add(hdr_typ_string);
 obs_vars.hdr_typ_var.putVar(ibuf);
 
    //
@@ -447,7 +446,7 @@ obs_vars.hdr_typ_var.putVar(ibuf);
 
 memset(ibuf, 0, n_data*sizeof(int));
 
-hdr_data.sid_array.add(na_str);
+header_data->sid_array.add(na_str);
 obs_vars.hdr_sid_var.putVar(ibuf);
 
    //
@@ -530,7 +529,7 @@ for (j=0; j<n_data; ++j)  {
                 
       v_idx = valid_times.n_elements();
       valid_times.add(t);
-      hdr_data.vld_array.add(junk);
+      header_data->vld_array.add(junk);
    }
    ibuf[j] = v_idx;
 
@@ -610,9 +609,9 @@ for (j=0; j<n_data; ++j)  {
 
 }   //  for j
 
-   write_nc_observation(obs_vars, nc_data_buffer);
+   write_nc_observation(obs_vars);
    
-   create_nc_table_vars(obs_vars, out, nc_data_buffer, hdr_data);
+   create_nc_table_vars(obs_vars, out);
    
    write_nc_table_vars(obs_vars);
 
@@ -654,11 +653,11 @@ void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value)
    //
 
 if ( qc_value < 0 )  {
-   write_nc_observation(obs_vars, nc_data_buffer, f, na_str);
+   write_nc_observation(obs_vars, f, na_str);
 } else {
    char junk[HEADER_STR_LEN];
    snprintf(junk, sizeof(junk), "%d", qc_value);
-   write_nc_observation(obs_vars, nc_data_buffer, f, junk);
+   write_nc_observation(obs_vars, f, junk);
 }
 
 return;

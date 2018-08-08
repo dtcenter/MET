@@ -143,9 +143,6 @@ struct NcDataBuffer {
 
 ////////////////////////////////////////////////////////////////////////
 // extern variables
-extern struct NcDataBuffer nc_data_buffer;
-extern struct NcHeaderData hdr_data;
-extern float  hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -174,10 +171,15 @@ extern void create_nc_obs_name_vars(NetcdfObsVars &, NcFile *,
                                     const int var_count, const int unit_count, const int deflate_level=0);
 extern NcDim create_nc_obs_var_var(NetcdfObsVars &, NcFile *, int var_count, const int deflate_level);
 extern void create_nc_obs_vars (NetcdfObsVars &, NcFile *, const int deflate_level=0, const bool use_var_id=true);
-extern void create_nc_table_vars(NetcdfObsVars &, NcFile *, const NcDataBuffer &data_buf,
-                                 const NcHeaderData &hdr_buf, const int deflate_level=0);
+extern void create_nc_table_vars(NetcdfObsVars &, NcFile *, const int deflate_level=0);
 
 extern void create_nc_pb_hdrs  (NetcdfObsVars &, NcFile *, const int hdr_count, const int deflate_level=0);
+
+extern NcDataBuffer *get_nc_data_buffer();
+extern NcHeaderData *get_hdr_data_buffer();
+
+extern int  get_nc_hdr_cur_index();
+extern int  get_nc_obs_buf_index();
 
 extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars);
 extern void get_nc_pb_hdr_data (NetcdfObsVars obs_vars, NcHeaderData *header_data);
@@ -203,12 +205,12 @@ extern void write_nc_buf_headers    (const NetcdfObsVars &);
 extern void write_nc_header         (const NetcdfObsVars &,
                 const char *hdr_typ, const char *hdr_sid, const time_t hdr_vld,
                 const float hdr_lat, const float hdr_lon, const float hdr_elv);
-extern void write_nc_obs_buffer     (NcDataBuffer &data_buf, const int buf_size);
+extern void write_nc_obs_buffer     (const int buf_size);
 extern int  write_nc_observations   (const NetcdfObsVars &, const vector< Observation > observations,
-                const bool use_var_idx = true, const bool reset = false, const bool include_header = true);
-extern void write_nc_observation    (const NetcdfObsVars &, NcDataBuffer &data_buf,
+                const bool use_var_idx = true, const bool do_header = true);
+extern void write_nc_observation    (const NetcdfObsVars &,
                 const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
-extern void write_nc_observation    (const NetcdfObsVars &, NcDataBuffer &data_buf);
+extern void write_nc_observation    (const NetcdfObsVars &);
 extern int  write_nc_string_array   (NcVar *ncVar, StringArray &strArray, const int str_len);
 
 extern void write_obs_var_names(NetcdfObsVars &, StringArray &);

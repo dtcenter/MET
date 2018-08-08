@@ -30,8 +30,6 @@ static const char  units_att_name         [] = "units";
 static const char  missing_value_att_name [] = "missing_value";
 static const char  fill_value_att_name    [] = "_FillValue";
 
-//float hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
-
 ////////////////////////////////////////////////////////////////////////
 
 void replace_comma_to_underscore(string *var_name) {

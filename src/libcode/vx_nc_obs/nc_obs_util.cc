@@ -132,22 +132,22 @@ int check_nc_dims_vars(const NetcdfObsVars obs_vars) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clear_header_data(NcHeaderData *header_data) {
-   header_data->min_vld_time = -1;
-   header_data->max_vld_time = -1;
+void clear_header_data(NcHeaderData *my_hdr_data) {
+   my_hdr_data->min_vld_time = -1;
+   my_hdr_data->max_vld_time = -1;
    
-   header_data->typ_array.clear();
-   header_data->sid_array.clear();
-   header_data->vld_array.clear();
-   header_data->typ_idx_array.clear();
-   header_data->sid_idx_array.clear();
-   header_data->vld_idx_array.clear();
-   header_data->lat_array.clear();
-   header_data->lon_array.clear();
-   header_data->elv_array.clear();
-   header_data->prpt_typ_array.clear();
-   header_data->irpt_typ_array.clear();
-   header_data->inst_typ_array.clear();
+   my_hdr_data->typ_array.clear();
+   my_hdr_data->sid_array.clear();
+   my_hdr_data->vld_array.clear();
+   my_hdr_data->typ_idx_array.clear();
+   my_hdr_data->sid_idx_array.clear();
+   my_hdr_data->vld_idx_array.clear();
+   my_hdr_data->lat_array.clear();
+   my_hdr_data->lon_array.clear();
+   my_hdr_data->elv_array.clear();
+   my_hdr_data->prpt_typ_array.clear();
+   my_hdr_data->irpt_typ_array.clear();
+   my_hdr_data->inst_typ_array.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -346,16 +346,14 @@ void create_nc_obs_name_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void create_nc_table_vars (NetcdfObsVars &obs_vars, NcFile *f_out, 
-      const NcDataBuffer &data_buf, const NcHeaderData &hdr_buf,
-      const int deflate_level) {
+void create_nc_table_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int deflate_level) {
    const char *method_name = "  create_nc_table_vars()";
    
    // Define netCDF dimensions
-   NcDim hdr_typ_dim = add_dim(f_out, nc_dim_nhdr_typ, hdr_buf.typ_array.n_elements());
-   NcDim hdr_sid_dim = add_dim(f_out, nc_dim_nhdr_sid, hdr_buf.sid_array.n_elements());
-   NcDim hdr_vld_dim = add_dim(f_out, nc_dim_nhdr_vld, hdr_buf.vld_array.n_elements());
-   NcDim obs_qty_dim = add_dim(f_out, nc_dim_nqty,     data_buf.qty_data_array.n_elements());
+   NcDim hdr_typ_dim = add_dim(f_out, nc_dim_nhdr_typ, hdr_data.typ_array.n_elements());
+   NcDim hdr_sid_dim = add_dim(f_out, nc_dim_nhdr_sid, hdr_data.sid_array.n_elements());
+   NcDim hdr_vld_dim = add_dim(f_out, nc_dim_nhdr_vld, hdr_data.vld_array.n_elements());
+   NcDim obs_qty_dim = add_dim(f_out, nc_dim_nqty,     nc_data_buffer.qty_data_array.n_elements());
 
    // Define netCDF header variables
    obs_vars.hdr_typ_tbl_var = add_var(f_out, nc_var_hdr_typ_tbl, ncChar, hdr_typ_dim, obs_vars.strl2_dim, deflate_level);
@@ -393,10 +391,23 @@ void create_nc_pb_hdrs (NetcdfObsVars &obs_vars, NcFile *f_out,
    add_att(&obs_vars.hdr_inst_typ_var, "_FillValue", (int)FILL_VALUE);
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+NcDataBuffer *get_nc_data_buffer() {
+   return &nc_data_buffer;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcHeaderData *get_hdr_data_buffer() {
+   return &hdr_data;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
-   NcHeaderData header_data;
+   NcHeaderData my_hdr_data;
    long nhdr_count  = get_dim_size(&obs_vars.hdr_dim);
    int  strl_len    = get_dim_size(&obs_vars.strl_dim);
    int  strl2_len   = strl_len;
@@ -424,36 +435,36 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
    }
    
-   header_data.typ_len   = typ_len;
-   header_data.sid_len   = sid_len;
-   header_data.vld_len   = vld_len;
-   header_data.strl_len  = strl_len;
-   header_data.strll_len = strl2_len;
+   my_hdr_data.typ_len   = typ_len;
+   my_hdr_data.sid_len   = sid_len;
+   my_hdr_data.vld_len   = vld_len;
+   my_hdr_data.strl_len  = strl_len;
+   my_hdr_data.strll_len = strl2_len;
    if (has_array_vars) {
-      header_data.typ_array.extend(nhdr_count);
-      header_data.sid_array.extend(nhdr_count);
-      header_data.vld_array.extend(nhdr_count);
+      my_hdr_data.typ_array.extend(nhdr_count);
+      my_hdr_data.sid_array.extend(nhdr_count);
+      my_hdr_data.vld_array.extend(nhdr_count);
    }
    else {
-      header_data.typ_idx_array.extend(nhdr_count);
-      header_data.sid_idx_array.extend(nhdr_count);
-      header_data.vld_idx_array.extend(nhdr_count);
+      my_hdr_data.typ_idx_array.extend(nhdr_count);
+      my_hdr_data.sid_idx_array.extend(nhdr_count);
+      my_hdr_data.vld_idx_array.extend(nhdr_count);
 
       int tmp_dim_size;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
-      header_data.typ_array.extend(tmp_dim_size);
+      my_hdr_data.typ_array.extend(tmp_dim_size);
       tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
-      header_data.sid_array.extend(tmp_dim_size);
+      my_hdr_data.sid_array.extend(tmp_dim_size);
       tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
-      header_data.vld_array.extend(tmp_dim_size);
+      my_hdr_data.vld_array.extend(tmp_dim_size);
       mlog << Debug(7)
            << "    tbl dims: messge_type: " << get_dim_size(&obs_vars.hdr_typ_dim)
            << "  station id: " << get_dim_size(&obs_vars.hdr_sid_dim)
            << "  valid_time: " << get_dim_size(&obs_vars.hdr_vld_dim) << "\n";
    }
-   header_data.lat_array.extend(nhdr_count);
-   header_data.lon_array.extend(nhdr_count);
-   header_data.elv_array.extend(nhdr_count);
+   my_hdr_data.lat_array.extend(nhdr_count);
+   my_hdr_data.lon_array.extend(nhdr_count);
+   my_hdr_data.elv_array.extend(nhdr_count);
    
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
         ? NC_BUFFER_SIZE_32K : (nhdr_count));
@@ -535,12 +546,12 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            header_data.typ_array.add(hdr_typ_block[hIndex]);
-            header_data.sid_array.add(hdr_sid_block[hIndex]);
-            header_data.vld_array.add(hdr_vld_block[hIndex]);
-            header_data.lat_array.add(hdr_arr_block[hIndex][0]);
-            header_data.lon_array.add(hdr_arr_block[hIndex][1]);
-            header_data.elv_array.add(hdr_arr_block[hIndex][2]);
+            my_hdr_data.typ_array.add(hdr_typ_block[hIndex]);
+            my_hdr_data.sid_array.add(hdr_sid_block[hIndex]);
+            my_hdr_data.vld_array.add(hdr_vld_block[hIndex]);
+            my_hdr_data.lat_array.add(hdr_arr_block[hIndex][0]);
+            my_hdr_data.lon_array.add(hdr_arr_block[hIndex][1]);
+            my_hdr_data.elv_array.add(hdr_arr_block[hIndex][2]);
          }
       }
       else {
@@ -590,12 +601,12 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            header_data.typ_idx_array.add(hdr_typ_idx_block[hIndex]);
-            header_data.sid_idx_array.add(hdr_sid_idx_block[hIndex]);
-            header_data.vld_idx_array.add(hdr_vld_idx_block[hIndex]);
-            header_data.lat_array.add(hdr_lat_block[hIndex]);
-            header_data.lon_array.add(hdr_lon_block[hIndex]);
-            header_data.elv_array.add(hdr_elv_block[hIndex]);
+            my_hdr_data.typ_idx_array.add(hdr_typ_idx_block[hIndex]);
+            my_hdr_data.sid_idx_array.add(hdr_sid_idx_block[hIndex]);
+            my_hdr_data.vld_idx_array.add(hdr_vld_idx_block[hIndex]);
+            my_hdr_data.lat_array.add(hdr_lat_block[hIndex]);
+            my_hdr_data.lon_array.add(hdr_lon_block[hIndex]);
+            my_hdr_data.elv_array.add(hdr_elv_block[hIndex]);
          }
       }
    }
@@ -621,7 +632,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            header_data.typ_array.add(hdr_typ_block[hIndex]);
+            my_hdr_data.typ_array.add(hdr_typ_block[hIndex]);
          }
       }
       
@@ -643,7 +654,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            header_data.sid_array.add(hdr_sid_block[hIndex]);
+            my_hdr_data.sid_array.add(hdr_sid_block[hIndex]);
          }
       }
 
@@ -665,29 +676,42 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            header_data.vld_array.add(hdr_vld_block[hIndex]);
+            my_hdr_data.vld_array.add(hdr_vld_block[hIndex]);
          }
       }
    }
    if (!IS_INVALID_NC(obs_vars.pb_hdr_dim)) {
-      get_nc_pb_hdr_data(obs_vars, &header_data);
-      int last_prpt_typ = header_data.prpt_typ_array.n_elements() - 1;
-      int last_irpt_typ = header_data.irpt_typ_array.n_elements() - 1; 
-      int last_inst_typ = header_data.inst_typ_array.n_elements() - 1; 
+      get_nc_pb_hdr_data(obs_vars, &my_hdr_data);
+      int last_prpt_typ = my_hdr_data.prpt_typ_array.n_elements() - 1;
+      int last_irpt_typ = my_hdr_data.irpt_typ_array.n_elements() - 1; 
+      int last_inst_typ = my_hdr_data.inst_typ_array.n_elements() - 1; 
       mlog << Debug(10)
-           << "    prpt_typ[0,-1] " << header_data.prpt_typ_array[0]
-           << "," << header_data.prpt_typ_array[last_prpt_typ]
-           << "    irpt_typ[0,-1] " << header_data.irpt_typ_array[0]
-           << "," << header_data.irpt_typ_array[last_irpt_typ]
-           << "    inst_typ[0,-1] " << header_data.inst_typ_array[0]
-           << "," << header_data.inst_typ_array[last_inst_typ] << "\n";
+           << "    prpt_typ[0,-1] " << my_hdr_data.prpt_typ_array[0]
+           << "," << my_hdr_data.prpt_typ_array[last_prpt_typ]
+           << "    irpt_typ[0,-1] " << my_hdr_data.irpt_typ_array[0]
+           << "," << my_hdr_data.irpt_typ_array[last_irpt_typ]
+           << "    inst_typ[0,-1] " << my_hdr_data.inst_typ_array[0]
+           << "," << my_hdr_data.inst_typ_array[last_inst_typ] << "\n";
    }
-   return header_data;
+   return my_hdr_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data) {
+int get_nc_hdr_cur_index() {
+   //return (nc_data_buffer.cur_hdr_idx < 0) ? 0 : nc_data_buffer.cur_hdr_idx;
+   return nc_data_buffer.cur_hdr_idx;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_nc_obs_buf_index() {
+   return nc_data_buffer.obs_data_idx;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *my_hdr_data) {
 
    long offsets[1] = { 0 };
    long lengths[1] = { 1 };
@@ -736,9 +760,9 @@ void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data) {
       }
          
       for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-         header_data->prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
-         header_data->irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
-         header_data->inst_typ_array.add(hdr_inst_typ_block[hIndex]);
+         my_hdr_data->prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
+         my_hdr_data->irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
+         my_hdr_data->inst_typ_array.add(hdr_inst_typ_block[hIndex]);
       }
    }
 }
@@ -1197,40 +1221,40 @@ void write_nc_header (const NetcdfObsVars &obs_vars,
       
 ///////////////////////////////////////////////////////////////////////////////
 
-void write_nc_observation(const NetcdfObsVars &obs_vars, NcDataBuffer &data_buf)
+void write_nc_observation(const NetcdfObsVars &obs_vars)
 {
-   if (0 < data_buf.obs_data_idx){
-      data_buf.obs_vars = obs_vars;
-      write_nc_obs_buffer(data_buf, data_buf.obs_data_idx);
+   if (0 < nc_data_buffer.obs_data_idx){
+      nc_data_buffer.obs_vars = obs_vars;
+      write_nc_obs_buffer(nc_data_buffer.obs_data_idx);
    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void write_nc_observation(const NetcdfObsVars &obs_vars, NcDataBuffer &data_buf,
+void write_nc_observation(const NetcdfObsVars &obs_vars,
       const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty)
 {
    int qty_index;
-   int obs_data_idx = data_buf.obs_data_idx;
-   if (!data_buf.qty_data_array.has(obs_qty, qty_index)) {
-      qty_index = data_buf.qty_data_array.n_elements();
-      data_buf.qty_data_array.add(obs_qty);
+   int obs_data_idx = nc_data_buffer.obs_data_idx;
+   if (!nc_data_buffer.qty_data_array.has(obs_qty, qty_index)) {
+      qty_index = nc_data_buffer.qty_data_array.n_elements();
+      nc_data_buffer.qty_data_array.add(obs_qty);
    }
-   data_buf.qty_idx_buf[obs_data_idx] = qty_index;
+   nc_data_buffer.qty_idx_buf[obs_data_idx] = qty_index;
       
    //for (int idx=0; idx<OBS_ARRAY_LEN; idx++) {
-   //   data_buf.obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+   //   nc_data_buffer.obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
    //}
-   data_buf.obs_hid_buf[obs_data_idx] = obs_arr[0];
-   data_buf.obs_vid_buf[obs_data_idx] = obs_arr[1];
-   data_buf.obs_lvl_buf[obs_data_idx] = obs_arr[2];
-   data_buf.obs_hgt_buf[obs_data_idx] = obs_arr[3];
-   data_buf.obs_val_buf[obs_data_idx] = obs_arr[4];
-   data_buf.obs_data_idx++;
-   data_buf.cur_obs_idx++;
+   nc_data_buffer.obs_hid_buf[obs_data_idx] = obs_arr[0];
+   nc_data_buffer.obs_vid_buf[obs_data_idx] = obs_arr[1];
+   nc_data_buffer.obs_lvl_buf[obs_data_idx] = obs_arr[2];
+   nc_data_buffer.obs_hgt_buf[obs_data_idx] = obs_arr[3];
+   nc_data_buffer.obs_val_buf[obs_data_idx] = obs_arr[4];
+   nc_data_buffer.obs_data_idx++;
+   nc_data_buffer.cur_obs_idx++;
    
-   if (data_buf.obs_data_idx >= OBS_BUFFER_SIZE) {
-      write_nc_obs_buffer(data_buf, OBS_BUFFER_SIZE);
+   if (nc_data_buffer.obs_data_idx >= OBS_BUFFER_SIZE) {
+      write_nc_obs_buffer(OBS_BUFFER_SIZE);
    }
 }
 
@@ -1319,10 +1343,10 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
+void write_nc_obs_buffer(const int buf_size)
 {
-   const NetcdfObsVars &obs_vars = data_buf.obs_vars;
-   long offsets[2] = { data_buf.obs_data_offset, 0 };
+   const NetcdfObsVars &obs_vars = nc_data_buffer.obs_vars;
+   long offsets[2] = { nc_data_buffer.obs_data_offset, 0 };
    long lengths[1] = { buf_size} ;
    const string method_name = "  write_nc_obs_buffer()";
 
@@ -1331,14 +1355,14 @@ void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
    mlog << Debug(7) << "       obs_qty_var:  " << GET_NC_NAME(obs_vars.obs_qty_var) << "\n";
    
    //lengths[1] = HEADER_STR_LEN;
-   if(!put_nc_data((NcVar *)&obs_vars.obs_qty_var, (int*)data_buf.qty_idx_buf, lengths, offsets)) {
+   if(!put_nc_data((NcVar *)&obs_vars.obs_qty_var, (int*)nc_data_buffer.qty_idx_buf, lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the quality flag to the "
            << "netCDF file\n\n";
       exit(1);
    }
    //lengths[1] = OBS_ARRAY_LEN;
-   if(!put_nc_data((NcVar *)&obs_vars.obs_hid_var, (int*)data_buf.obs_hid_buf, lengths, offsets)) {
+   if(!put_nc_data((NcVar *)&obs_vars.obs_hid_var, (int*)nc_data_buffer.obs_hid_buf, lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the observation header index array to the "
            << "netCDF file\n\n";
@@ -1346,8 +1370,8 @@ void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
    }
    bool use_var_id = !IS_INVALID_NC(obs_vars.obs_vid_var);
    bool result = use_var_id
-         ? put_nc_data((NcVar *)&obs_vars.obs_vid_var, (int*)data_buf.obs_vid_buf, lengths, offsets)
-         : put_nc_data((NcVar *)&obs_vars.obs_gc_var,  (int*)data_buf.obs_vid_buf, lengths, offsets);
+         ? put_nc_data((NcVar *)&obs_vars.obs_vid_var, (int*)nc_data_buffer.obs_vid_buf, lengths, offsets)
+         : put_nc_data((NcVar *)&obs_vars.obs_gc_var,  (int*)nc_data_buffer.obs_vid_buf, lengths, offsets);
    if(!result) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the observation "
@@ -1355,70 +1379,68 @@ void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
            << " array to the netCDF file\n\n";
       exit(1);
    }
-   if(!put_nc_data((NcVar *)&obs_vars.obs_lvl_var, (float*)data_buf.obs_lvl_buf, lengths, offsets)) {
+   if(!put_nc_data((NcVar *)&obs_vars.obs_lvl_var, (float*)nc_data_buffer.obs_lvl_buf, lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the observation level array to the "
            << "netCDF file\n\n";
       exit(1);
    }
-   if(!put_nc_data((NcVar *)&obs_vars.obs_hgt_var, (float*)data_buf.obs_hgt_buf, lengths, offsets)) {
+   if(!put_nc_data((NcVar *)&obs_vars.obs_hgt_var, (float*)nc_data_buffer.obs_hgt_buf, lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the observation hight array to the "
            << "netCDF file\n\n";
       exit(1);
    }
-   if(!put_nc_data((NcVar *)&obs_vars.obs_val_var, (float*)data_buf.obs_val_buf, lengths, offsets)) {
+   if(!put_nc_data((NcVar *)&obs_vars.obs_val_var, (float*)nc_data_buffer.obs_val_buf, lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
            << "error writing the observation data array to the "
            << "netCDF file\n\n";
       exit(1);
    }
    
-   data_buf.obs_data_offset += buf_size;
-   data_buf.obs_data_idx = 0;
+   nc_data_buffer.obs_data_offset += buf_size;
+   nc_data_buffer.obs_data_idx = 0;
 }
       
 ///////////////////////////////////////////////////////////////////////////////
 
 int write_nc_observations(const NetcdfObsVars &obs_vars,
                           const vector< Observation > observations,
-                          const bool use_var_id, const bool reset,
-                          const bool include_header)
+                          const bool use_var_id, const bool do_header)
 {
    int prev_hdr_idx = -1;
    string prev_header_type = "";
    string prev_station_id = "";
    ConcatString obs_qty;
    int headerOffset = nc_data_buffer.cur_hdr_idx;
-
    //float obs_arr[obs_arr_len];
    const string method_name = "  write_nc_observations()";
 
    int obs_buf_size = observations.size();
-   mlog << Debug(5) << method_name << "  reset: " << reset << "\n";
    mlog << Debug(7) << method_name << "  obs_count: " << obs_buf_size << "\n";
    if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
    
-   if (reset) {
-      nc_data_buffer.obs_vars = obs_vars;
-      nc_data_buffer.obs_buf_size = obs_buf_size;
-      nc_data_buffer.obs_data_idx = 0;
-      nc_data_buffer.obs_data_offset = 0;
-      nc_data_buffer.hdr_data_idx = 0;
-      nc_data_buffer.hdr_data_offset = 0;
-      
-      nc_data_buffer.processed_count =0;
-   }
+   //if (reset) {
+   //   nc_data_buffer.obs_vars = obs_vars;
+   //   nc_data_buffer.obs_buf_size = obs_buf_size;
+   //   nc_data_buffer.obs_data_idx = 0;
+   //   nc_data_buffer.obs_data_offset = 0;
+   //   nc_data_buffer.hdr_data_idx = 0;
+   //   nc_data_buffer.hdr_data_offset = 0;
+   //   
+   //   nc_data_buffer.processed_count =0;
+   //}
    float obs_arr[OBS_ARRAY_LEN];
-   bool header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var);
-   mlog << Debug(7) << method_name << "  header_to_vector: "
-        << header_to_vector << "  include_header: " << include_header << "\n";
+   bool header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var)
+         || IS_INVALID_NC(obs_vars.hdr_lat_var);
+   mlog << Debug(5) << method_name << "  do_header: " << do_header
+        << "  header_to_vector: " << header_to_vector << "\n";
    for (vector< Observation >::const_iterator obs = observations.begin();
         obs != observations.end(); ++obs)
    {
       nc_data_buffer.processed_count++;
       
-      if (include_header) {
+      if (do_header) {
          if (obs->getHeaderIndex() != prev_hdr_idx) {
             mlog << Debug(9) << method_name << "  obs->getHeaderIndex(): "
                  << obs->getHeaderIndex() << " at obs " << nc_data_buffer.processed_count << "\n";
@@ -1451,18 +1473,14 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
       obs_arr[3] = obs->getHeight();
       obs_arr[4] = obs->getValue();
       obs_qty = (obs->getQualityFlag().length() == 0 ? na_str : obs->getQualityFlag().c_str());
-      if (!reset && include_header) obs_arr[0] += headerOffset;
+      if (do_header) obs_arr[0] += headerOffset;
 
-      write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
-      
-      //if (nc_data_buffer.obs_data_idx >= nc_data_buffer.obs_buf_size) {
-      //   write_nc_obs_buffer(nc_data_buffer, nc_data_buffer.obs_data_idx);
-      //}
+      write_nc_observation(obs_vars, obs_arr, obs_qty.text());
       
    } /* endfor - obs */
    
    if (nc_data_buffer.obs_data_idx > 0) {
-      write_nc_obs_buffer(nc_data_buffer, nc_data_buffer.obs_data_idx);
+      write_nc_obs_buffer(nc_data_buffer.obs_data_idx);
    }
 
    //Caller handles writing headers

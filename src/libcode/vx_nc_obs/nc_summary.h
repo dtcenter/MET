@@ -25,7 +25,7 @@ extern void init_netcdf_output(NcFile *, NetcdfObsVars &obs_vars,
       string program_name, int raw_hdr_cnt=0, int deflate_level = 0);
 
 extern bool write_observations(NcFile *, NetcdfObsVars &, SummaryObs *,
-      vector<Observation>, const bool include_header = true,
+      vector<Observation>, const bool include_header,
       const int deflate_level = 0);
 
 extern void write_summary_attributes(NcFile *, TimeSummaryInfo);
