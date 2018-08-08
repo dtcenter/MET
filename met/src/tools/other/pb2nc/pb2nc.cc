@@ -89,8 +89,7 @@ using namespace std;
 #include "nc_obs_util.h"
 #include "nc_summary.h"
 
-extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
-extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
+////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1180,7 +1179,7 @@ void process_pbfile(int i_pb) {
       //    HDR_ID GC LVL HGT OB
 
       // Store the index to the header data
-      obs_arr[0] = (float) nc_data_buffer.cur_hdr_idx;
+      obs_arr[0] = (float) get_nc_hdr_cur_index();
 
       buf_nlev = nlev;
       if (nlev > mxr8lv) {
@@ -1467,7 +1466,7 @@ void process_pbfile(int i_pb) {
             }
             mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
                  << ", vIdx: " << vIdx << ", obs_data_idx: "
-                 << nc_data_buffer.obs_data_idx << ", nlev: " << nlev << "\n";
+                 << get_nc_obs_buf_index() << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
             for(lv=0; lv<buf_nlev; lv++) {
 
@@ -1572,9 +1571,8 @@ void process_pbfile(int i_pb) {
       }
       mlog << Warning << "\n";
    }
-   if (nc_data_buffer.obs_data_idx > 0) {
-      write_nc_observation(obs_vars, nc_data_buffer);
-   }
+   int obs_buf_index = get_nc_obs_buf_index();
+   if (obs_buf_index > 0) write_nc_obs_buffer(obs_buf_index);
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
@@ -2051,7 +2049,7 @@ void write_netcdf_hdr_data() {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   pb_hdr_count = (long) nc_data_buffer.cur_hdr_idx;
+   pb_hdr_count = (long) get_nc_hdr_cur_index();
    if (obs_to_vector) {
       int deflate_level = compress_level;
       if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
@@ -2111,11 +2109,11 @@ void write_netcdf_hdr_data() {
       }
       
       create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
-      create_nc_table_vars (obs_vars, f_out, nc_data_buffer, hdr_data, deflate_level);
+      create_nc_table_vars(obs_vars, f_out, deflate_level);
 
       // Write out the header data
       write_nc_arr_headers(obs_vars);
-      if (nc_data_buffer.hdr_data_idx > 0) {
+      if (get_nc_hdr_cur_index() > 0) {
          // Write out the remaining header data
          write_nc_buf_headers(obs_vars);
       }
@@ -2174,141 +2172,6 @@ void write_netcdf_hdr_data() {
    return;
 }
 
-//void write_netcdf_hdr_data_new() {
-//   long obs_count, dim_count, hdr_count, pb_hdr_count;
-//   bool is_prepbufr = is_prepbufr_file(&event_names);
-//   static const string method_name = "\nwrite_netcdf_hdr_data()";
-//   int deflate_level = compress_level;
-//   if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-//
-//   if (!obs_to_vector) {
-//      //headers are in vector
-//      pb_hdr_count = (long) nc_data_buffer.cur_hdr_idx;
-//      hdr_count = pb_hdr_count;
-//      if (do_summary) {
-//         int summary_cnt = summary_obs->getSummaries().size();
-//         int summary_hdr_cnt = summary_obs->countSummaryHeaders();
-//         if (save_summary_only) {
-//            obs_count = summary_cnt;
-//            hdr_count = summary_hdr_cnt;
-//         }
-//         else {
-//            obs_count += summary_cnt;
-//            hdr_count += summary_hdr_cnt;
-//         }
-//      }
-//      
-//      // Check for no messages retained
-//      if(hdr_count <= 0) {
-//         mlog << Error << method_name << " -> "
-//              << "No PrepBufr messages retained.  Nothing to write.\n\n";
-//      
-//         // Delete the NetCDF file
-//         if(remove(ncfile) != 0) {
-//            mlog << Error << method_name << " -> "
-//                 << "can't remove output NetCDF file \"" << ncfile
-//                 << "\"\n\n";
-//         }
-//         exit(1);
-//      }
-//      
-//      // Make sure all obs data is processed before handling header
-//      
-//      if (obs_to_vector) {
-//         bool reset = false;
-//         bool include_header = false;
-//         bool use_var_id = true;
-//         obs_vars.obs_cnt = obs_count;
-//         create_nc_obs_vars(obs_vars, f_out, deflate_level);
-//      
-//         if (!save_summary_only) {
-//            summary_obs->countHeaders(observations);    // set header index
-//            write_nc_observations(obs_vars, observations);
-//         }
-//         
-//         if (do_summary)
-//            write_nc_observations(obs_vars, summary_obs->getSummaries());
-//      }
-//      else if (do_summary) {
-//         // Write out the summary data
-//         //write_nc_observations(obs_vars, summary_obs->getSummaries(), false);
-//         if (save_summary_only) reset_header_buffer(pb_hdr_count, true);
-//         write_nc_observations(obs_vars, summary_obs->getSummaries());
-//         mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
-//              << (int)summary_obs->getObservations().size()
-//              << "  summary count: " << (int)summary_obs->getSummaries().size()
-//              << " header count: " << hdr_count
-//              << " summary header count: " << (hdr_count-pb_hdr_count) << "\n";
-//      }
-//      
-//      create_nc_hdr_vars(obs_vars, f_out, hdr_count, deflate_level);
-//   }
-//   if (is_prepbufr) create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
-//
-//   create_nc_table_vars (obs_vars, f_out, nc_data_buffer, hdr_data, deflate_level);
-//
-//   // Write out the header data
-//   write_nc_arr_headers(obs_vars);
-//   if (nc_data_buffer.hdr_data_idx > 0) {
-//      // Write out the remaining header data
-//      write_nc_buf_headers(obs_vars);
-//   }
-//
-//   int hdr_str_len;
-//   long offsets[2] = { 0, 0 };
-//   long lengths[2] = { 1, strl_len } ;
-//   StringArray nc_var_name_arr;
-//   StringArray nc_var_unit_arr;
-//   StringArray nc_var_desc_arr;
-//   map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
-//   for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
-//      int var_index;
-//      const char *var_name;
-//      const char *unit_str;
-//      const char *desc_str;
-//
-//      unit_str = "";
-//      var_name = bufr_obs_name_arr[i];
-//      if (var_names.has(var_name, var_index)) {
-//         unit_str = var_units[var_index];
-//         if (0 == strcmp("DEG C", unit_str)) {
-//            unit_str = "KELVIN";
-//         }
-//         else if (0 == strcmp("MB", unit_str)) {
-//            unit_str = "PASCALS";
-//         }
-//         else if (0 == strcmp("MG/KG", unit_str)) {
-//            unit_str = "KG/KG";
-//         }
-//      }
-//      nc_var_unit_arr.add(unit_str);
-//
-//      desc_str = (tableB_vars.has(var_name, var_index))
-//            ? tableB_descs[var_index]
-//            : "";
-//      nc_var_desc_arr.add(desc_str);
-//
-//      ConcatString grib_name = obs_var_map[var_name];
-//      if (0 < grib_name.length()) {
-//         var_name = grib_name.text();
-//      }
-//      nc_var_name_arr.add(var_name);
-//   } // end for i
-//   
-//   write_obs_var_names (obs_vars,  nc_var_name_arr);
-//   write_obs_var_units (obs_vars, nc_var_unit_arr);
-//   write_obs_var_descriptions (obs_vars, nc_var_desc_arr);
-//
-//   write_nc_table_vars(obs_vars);
-//
-//   dim_count = bufr_obs_name_arr.n_elements();
-//   
-//   TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
-//   if (summaryInfo.flag) write_summary_attributes(f_out, summaryInfo);
-//
-//   return;
-//}
-
 ////////////////////////////////////////////////////////////////////////
 
 void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
@@ -2343,7 +2206,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    }
    else {
       if (!save_summary_only)
-          write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
+          write_nc_observation(obs_vars, obs_arr, obs_qty.text());
       if (do_summary) {
          int var_index = obs_arr[1];
          string var_name = bufr_obs_name_arr[var_index];

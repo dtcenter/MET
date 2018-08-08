@@ -28,6 +28,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////
+
 string _secsToTimeString(const int secs)
 {
   // Get the different fields from the number of seconds
@@ -49,6 +51,7 @@ string _secsToTimeString(const int secs)
 }
 
 ////////////////////////////////////////////////////////////////////////
+// If raw_hdr_cnt is greater than 0, skip updating header index for obs.
 
 void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
       SummaryObs *summary_obs, vector<Observation> observations,
@@ -98,7 +101,7 @@ void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
 
 bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
       SummaryObs *summary_obs, vector<Observation> observations,
-      const bool include_header, const int deflate_level)
+      const bool do_header, const int deflate_level)
 {
   bool reset_idx = false;
   bool use_var_id = obs_vars.use_var_id;
@@ -106,21 +109,31 @@ bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
   TimeSummaryInfo summary_info = summary_obs->getSummaryInfo();
   bool do_summary = summary_info.flag;
 
-  mlog << Debug(5) << method_name << "include_header: " << include_header << "\n";
+  mlog << Debug(5) << method_name << "do_header: " << do_header << "\n";
   
   if (!do_summary || (do_summary && summary_info.raw_data)) {
-    write_nc_observations(obs_vars, observations, use_var_id,
-                          reset_idx, include_header);
+    mlog << Debug(5) << method_name << "write " << (int)observations.size() << " raw data.\n";
+    //if (do_header) summary_obs->countHeaders(observations);
+    write_nc_observations(obs_vars, observations, use_var_id, do_header);
   }
   if (do_summary) {
-    write_nc_observations(obs_vars, summary_obs->getSummaries(), use_var_id);
-  }
-  if (nc_data_buffer.obs_data_idx > 0) {
-    write_nc_obs_buffer(nc_data_buffer, nc_data_buffer.obs_data_idx);
+    mlog << Debug(5) << method_name << "write summary.\n";
+    if (!summary_info.raw_data) {
+      bool hdr_cnt = get_nc_hdr_cur_index();
+      bool reset_array = true;
+      reset_header_buffer(hdr_cnt, reset_array);
+      mlog << Debug(5) << method_name << "reset headers (" << hdr_cnt << ") raw data.\n";
+    }
+    bool tmp_do_header = true;
+    write_nc_observations(obs_vars, summary_obs->getSummaries(), use_var_id, tmp_do_header);
   }
   
-  create_nc_table_vars (obs_vars, nc_file, nc_data_buffer, hdr_data,
-                        deflate_level);
+  int obs_buf_index = get_nc_obs_buf_index();
+  if (obs_buf_index > 0) {
+    write_nc_obs_buffer(obs_buf_index);
+  }
+  
+  create_nc_table_vars (obs_vars, nc_file, deflate_level);
   
   write_nc_arr_headers(obs_vars);
   
