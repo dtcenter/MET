@@ -135,4 +135,17 @@
     </output>
   </test>
 
+  <test name="madis2nc_multiple_inputs">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_20170118.nc \
+      -type metar -rec_beg 5000 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_20170118.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>
