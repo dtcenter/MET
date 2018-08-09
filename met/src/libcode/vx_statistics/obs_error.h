@@ -56,6 +56,10 @@ class ObsErrorEntry {
       DistType    dist_type;
       NumArray    dist_parm;
 
+      // Valid range of perturbed values
+      double      v_min;
+      double      v_max;
+
          //
          //  set stuff
          //

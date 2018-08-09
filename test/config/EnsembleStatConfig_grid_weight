@@ -83,6 +83,8 @@ obs_error = {
    dist_parm        = [];
    inst_bias_scale  = 1.0;
    inst_bias_offset = 0.0;
+   min              = NA;
+   max              = NA;
 }
 
 //

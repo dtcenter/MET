@@ -111,7 +111,7 @@ values and/or define observation bias corrections.
 
 When processing point and gridded observations, Ensemble-Stat searches the table
 to find the entry defining the observation error information.  The table
-consists of 13 columns and includes a header row defining each column.  The
+consists of 15 columns and includes a header row defining each column.  The
 special string "ALL" is interpreted as a wildcard in these files.  The first 6
 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
 and STATION_ID) may be set to a comma-separated list of strings to be matched.
@@ -124,7 +124,11 @@ INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
 which are applied to the observation values.  The DIST_TYPE and DIST_PARM
 columns define the distribution from which random perturbations should be drawn
 and applied to the ensemble member values.  See the obs_error description below
-for details on the supported error distributions.
+for details on the supported error distributions.  The last two columns, MIN and
+MAX, define the bounds for the valid range of the bias-corrected observation
+values and randomly perturbed ensemble member values.  Values less than MIN are
+reset to the mimumum value and values greater than MAX are reset to the maximum
+value. A value of NA indicates that the variable is unbounded.
 
 The MET_GRIB_TABLES environment variable can be set to specify the location of
 custom GRIB tables.  It can either be set to a specific file name or to a
@@ -200,7 +204,7 @@ exit_on_warning = FALSE;
 //   - 0 is to disable the compression.
 //   - 1 to 9: Lower number is faster, higher number for smaller files.
 // WARNING: Selecting a high compression level may slow down the reading and
-//          writing of NetCDF files within MET significantly. 
+//          writing of NetCDF files within MET significantly.
 //
 nc_compression = 0;
 
