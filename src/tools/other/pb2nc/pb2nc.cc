@@ -715,7 +715,7 @@ void open_netcdf() {
    }
 
    // Define netCDF variables
-   init_nc_dims_vars (obs_vars);
+   init_nc_dims_vars_config(obs_vars);
    obs_vars.attr_pb2nc = true;
    
    if (!obs_to_vector) {
