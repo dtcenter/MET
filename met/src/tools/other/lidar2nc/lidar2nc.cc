@@ -368,7 +368,7 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    //
 
    bool use_var_id = false;
-   init_nc_dims_vars (obs_vars, use_var_id);
+   init_nc_dims_vars_config(obs_vars, use_var_id);
    obs_vars.attr_agl = true;
    create_nc_hdr_vars(obs_vars, out, n_data, deflate_level);
    create_nc_obs_vars(obs_vars, out, deflate_level, use_var_id);

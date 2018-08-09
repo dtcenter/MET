@@ -769,7 +769,7 @@ void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *my_hdr_data) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void init_nc_dims_vars(NetcdfObsVars &obs_vars, bool use_var_id) {
+void init_nc_dims_vars_config(NetcdfObsVars &obs_vars, bool use_var_id) {
    obs_vars.attr_agl    = false;
    obs_vars.attr_pb2nc  = false;
    obs_vars.use_var_id  = use_var_id;
@@ -1110,7 +1110,14 @@ void write_nc_arr_headers(const NetcdfObsVars &obs_vars)
    int buf_size = (cur_hdr_idx > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : cur_hdr_idx;
    const char *method_name = "  write_nc_arr_headers()";
    
-   mlog << Debug(7) << method_name << "  hdr_count: " << cur_hdr_idx << "\n";
+   mlog << Debug(5) << method_name << "  hdr_count: " << cur_hdr_idx
+        << ", typ_idx_array: " << hdr_data.typ_idx_array.n_elements()
+        << ", sid_idx_array: " << hdr_data.sid_idx_array.n_elements()
+        << ", vld_idx_array: " << hdr_data.vld_idx_array.n_elements()
+        << ", lat_array: " << hdr_data.lat_array.n_elements()
+        << ", lon_array: " << hdr_data.lon_array.n_elements()
+        << ", elv_array: " << hdr_data.elv_array.n_elements()
+        << "\n";
 
    int hdr_data_idx = 0;
    bool is_pb_hdr = (0 < hdr_data.prpt_typ_array.n_elements())

@@ -184,7 +184,7 @@ extern int  get_nc_obs_buf_index();
 extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars);
 extern void get_nc_pb_hdr_data (NetcdfObsVars obs_vars, NcHeaderData *header_data);
 
-extern void init_nc_dims_vars  (NetcdfObsVars &, bool use_var_id = true);
+extern void init_nc_dims_vars_config(NetcdfObsVars &, bool use_var_id = true);
 extern bool is_using_var_id    (const char * nc_name);
 
 extern void nc_obs_initialize  ();
