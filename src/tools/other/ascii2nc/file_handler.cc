@@ -250,7 +250,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   init_nc_dims_vars (obs_vars, use_var_id);
+   init_nc_dims_vars_config(obs_vars, use_var_id);
    obs_vars.attr_agl   = true;
 
    nc_out_data.processed_hdr_cnt = 0;
