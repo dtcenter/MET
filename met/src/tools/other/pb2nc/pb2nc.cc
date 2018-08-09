@@ -173,6 +173,7 @@ static ConcatString ncfile;
 // Input configuration file
 static ConcatString  config_file;
 static PB2NCConfInfo conf_info;
+static NcObsOutputData nc_out_data;
 
 // Beginning and ending retention times
 static unixtime valid_beg_ut, valid_end_ut;
@@ -2053,8 +2054,14 @@ void write_netcdf_hdr_data() {
    if (obs_to_vector) {
       int deflate_level = compress_level;
       if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-      init_netcdf_output(f_out, obs_vars, summary_obs,
-               observations, program_name, pb_hdr_count, deflate_level);
+   
+      nc_out_data.processed_hdr_cnt = pb_hdr_count;
+      nc_out_data.deflate_level = compress_level;
+      nc_out_data.observations = observations;
+      nc_out_data.summary_obs = summary_obs;
+      nc_out_data.summary_info = conf_info.getSummaryInfo();
+      
+      init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
       dim_count = obs_vars.hdr_cnt;
    }
    else {
@@ -2084,13 +2091,14 @@ void write_netcdf_hdr_data() {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   if (is_prepbufr) create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
+   if (is_prepbufr) {
+      if (!nc_out_data.summary_info.flag || (nc_out_data.summary_info.flag && nc_out_data.summary_info.raw_data))
+         create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
+   }
    
    // Make sure all obs data is processed before handling header
    if (obs_to_vector) {
-      bool include_header = false;
-      write_observations(f_out, obs_vars, summary_obs, observations,
-            include_header, deflate_level);
+      write_observations(f_out, obs_vars, nc_out_data);
    }
    else {
       if (do_summary) {

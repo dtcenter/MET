@@ -195,6 +195,7 @@ extern bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
 extern void read_nc_dims_vars  (NetcdfObsVars &, NcFile *);
 
 extern void reset_header_buffer(int buf_size, bool reset_all=false);
+extern void set_header_buffer(int buf_size, bool reset_all=false);
 
 extern void write_header_to_nc      (const NetcdfObsVars &, NcDataBuffer &data_buf,
                                     const int buf_size, const bool is_pb = false);

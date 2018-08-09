@@ -86,6 +86,7 @@ protected:
 
   NcFile *_ncFile;
   NetcdfObsVars obs_vars;
+  NcObsOutputData nc_out_data;
 
   long _nhdr;
 
