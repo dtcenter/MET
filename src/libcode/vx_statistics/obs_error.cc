@@ -29,7 +29,7 @@ static const char default_obs_error_dir[] = "MET_BASE/table_files";
 static const char met_obs_error_table[] =
    "MET_OBS_ERROR_TABLE";
 
-static const int  n_obs_error_columns = 13;
+static const int  n_obs_error_columns = 15;
 static const char wildcard_str []     = "ALL";
 
 ////////////////////////////////////////////////////////////////////////
@@ -110,6 +110,9 @@ void ObsErrorEntry::clear() {
    dist_type = DistType_None;
    dist_parm.clear();
 
+   v_min = bad_data_double;
+   v_max = bad_data_double;
+
    return;
 }
 
@@ -173,6 +176,8 @@ void ObsErrorEntry::dump(ostream & out, int depth) const {
    out << prefix << "dist_type = " << disttype_to_string(dist_type) << "\n";
    out << prefix << "dist_parm: ";
    dist_parm.dump(out, depth+1);
+   out << prefix << "min = " << v_min << "\n";
+   out << prefix << "max = " << v_max << "\n";
 
    return;
 }
@@ -213,14 +218,14 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    }
 
    // Filtering parameters
-   if(strcasecmp(dl[1],  wildcard_str) != 0)  msg_type.parse_css(dl[1]);
-   if(strcasecmp(dl[5],  wildcard_str) != 0)       sid.parse_css(dl[2]);
-   if(strcasecmp(dl[2],  wildcard_str) != 0) pb_rpt_type.add_css(dl[3]);
-   if(strcasecmp(dl[3],  wildcard_str) != 0) in_rpt_type.add_css(dl[4]);
-   if(strcasecmp(dl[4],  wildcard_str) != 0)   inst_type.add_css(dl[5]);
-   if(strcasecmp(dl[6],  wildcard_str) != 0)   hgt_range.add_css(dl[6]);
-   if(strcasecmp(dl[7],  wildcard_str) != 0)   prs_range.add_css(dl[7]);
-   if(strcasecmp(dl[8],  wildcard_str) != 0)   val_range.add_css(dl[8]);
+   if(strcasecmp(dl[1], wildcard_str) != 0)  msg_type.parse_css(dl[1]);
+   if(strcasecmp(dl[5], wildcard_str) != 0)       sid.parse_css(dl[2]);
+   if(strcasecmp(dl[2], wildcard_str) != 0) pb_rpt_type.add_css(dl[3]);
+   if(strcasecmp(dl[3], wildcard_str) != 0) in_rpt_type.add_css(dl[4]);
+   if(strcasecmp(dl[4], wildcard_str) != 0)   inst_type.add_css(dl[5]);
+   if(strcasecmp(dl[6], wildcard_str) != 0)   hgt_range.add_css(dl[6]);
+   if(strcasecmp(dl[7], wildcard_str) != 0)   prs_range.add_css(dl[7]);
+   if(strcasecmp(dl[8], wildcard_str) != 0)   val_range.add_css(dl[8]);
 
    // Observation error adjustments
    bias_scale = (strcmp(dl[9], na_str) == 0 ?
@@ -242,6 +247,12 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
            << dl.get_file()->filename() << "\n\n";
       exit(1);
    }
+
+   // Valid range of perturbed values
+   v_min = (strcmp(dl[13], na_str) == 0 ?
+            bad_data_double : atof(dl[13]));
+   v_max = (strcmp(dl[14], na_str) == 0 ?
+            bad_data_double : atof(dl[14]));
 
    validate();
 
@@ -664,6 +675,10 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    info.entry.bias_offset = err_dict->lookup_double(
                                conf_key_inst_bias_offset, false);
 
+   // Conf: min and max - optional
+   info.entry.v_min = err_dict->lookup_double(conf_key_min_flag, false);
+   info.entry.v_max = err_dict->lookup_double(conf_key_max_flag, false);
+
    // Store the RNG pointer
    info.rng_ptr = rng_ptr;
 
@@ -696,6 +711,10 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
       v_new += ran_draw(r, e->dist_type,
                         e->dist_parm[0], e->dist_parm[1]);
    }
+
+   // Apply range check
+   if(!is_bad_data(e->v_min) && v_new < e->v_min) v_new = e->v_min;
+   if(!is_bad_data(e->v_max) && v_new > e->v_max) v_new = e->v_max;
 
    // Detailed debug information
    if(mlog.verbosity_level() >= 4) {
@@ -776,6 +795,10 @@ double add_obs_error_bc(const gsl_rng *r, FieldType t,
    // Apply instrument bias correction
    if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
    if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
+
+   // Apply range check
+   if(!is_bad_data(e->v_min) && v_new < e->v_min) v_new = e->v_min;
+   if(!is_bad_data(e->v_max) && v_new > e->v_max) v_new = e->v_max;
 
    // Detailed debug information
    if(mlog.verbosity_level() >= 4) {
