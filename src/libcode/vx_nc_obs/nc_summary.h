@@ -18,15 +18,25 @@ using namespace netCDF;
 #include "nc_utils.h"
 #include "vx_summary.h"
 
+////////////////////////////////////////////////////////////////////////
+// struct definition
+
+struct NcObsOutputData {
+   int  processed_hdr_cnt;
+   int  deflate_level;
+   vector<Observation> observations;
+   SummaryObs *summary_obs;
+   TimeSummaryInfo summary_info;
+};
+
+////////////////////////////////////////////////////////////////////////
+
 extern string _secsToTimeString(const int secs);
 
 extern void init_netcdf_output(NcFile *, NetcdfObsVars &obs_vars,
-      SummaryObs *summary_obs, vector<Observation> observations,
-      string program_name, int raw_hdr_cnt=0, int deflate_level = 0);
+      NcObsOutputData &nc_out_data, string program_name);
 
-extern bool write_observations(NcFile *, NetcdfObsVars &, SummaryObs *,
-      vector<Observation>, const bool include_header,
-      const int deflate_level = 0);
+extern bool write_observations(NcFile *, NetcdfObsVars &, NcObsOutputData &nc_out_data);
 
 extern void write_summary_attributes(NcFile *, TimeSummaryInfo);
 

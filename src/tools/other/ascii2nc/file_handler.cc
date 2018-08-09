@@ -253,8 +253,13 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    init_nc_dims_vars (obs_vars, use_var_id);
    obs_vars.attr_agl   = true;
 
-   init_netcdf_output(_ncFile, obs_vars, &summary_obs,
-         _observations, _programName, 0, deflate_level);
+   nc_out_data.processed_hdr_cnt = 0;
+   nc_out_data.deflate_level = deflate_level;
+   nc_out_data.observations = _observations;
+   nc_out_data.summary_obs = &summary_obs;
+   nc_out_data.summary_info = _summaryInfo;
+   
+   init_netcdf_output(_ncFile, obs_vars, nc_out_data, _programName);
 
 //   int obs_count = (do_summary ? summary_obs.getSummaries().size()
 //                               : summary_obs.getObservations().size());
@@ -394,8 +399,7 @@ bool FileHandler::_addObservations(const Observation &obs)
 bool FileHandler::_writeObservations()
 {
   bool include_header = true;
-  write_observations(_ncFile, obs_vars, &summary_obs, _observations,
-      include_header, deflate_level);
+  write_observations(_ncFile, obs_vars, nc_out_data);
   
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
   if (var_count > 0) {

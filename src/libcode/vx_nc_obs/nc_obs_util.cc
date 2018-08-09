@@ -1005,6 +1005,8 @@ void reset_header_buffer(int buf_size, bool reset_all) {
    if (reset_all) {
       nc_data_buffer.cur_hdr_idx = 0;
       
+      hdr_data.min_vld_time = -1;
+      hdr_data.max_vld_time = -1;
       hdr_data.typ_array.clear();
       hdr_data.sid_array.clear();
       hdr_data.vld_array.clear();
