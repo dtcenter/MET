@@ -33,6 +33,7 @@
 
 time_summary = {
   flag = TRUE;
+  raw_data = FALSE;
   beg = "${BEG_TS}";
   end = "${END_TS}";
   step = ${STEP_TS};
