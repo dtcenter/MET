@@ -1264,8 +1264,10 @@ void write_nc_observation(const NetcdfObsVars &obs_vars,
 
 void write_nc_table_vars (NetcdfObsVars &obs_vars)
 {
-   mlog << Debug(7) << "    write_nc_table_vars() is called. valid hdr_typ_tbl_var: "
+   mlog << Debug(5) << "    write_nc_table_vars() is called. valid hdr_typ_tbl_var: "
         << !IS_INVALID_NC(obs_vars.hdr_typ_tbl_var) << "\n";
+   if (IS_INVALID_NC(obs_vars.hdr_typ_tbl_var))
+      mlog << Warning << "\nwrite_nc_table_vars() is called without creating variables\n\n";
    if (!IS_INVALID_NC(obs_vars.hdr_typ_tbl_var))
       write_nc_string_array (&obs_vars.hdr_typ_tbl_var, hdr_data.typ_array, HEADER_STR_LEN2);
    if (!IS_INVALID_NC(obs_vars.hdr_sid_tbl_var))
