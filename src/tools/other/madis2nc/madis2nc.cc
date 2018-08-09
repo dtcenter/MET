@@ -73,7 +73,8 @@ static const int BUFFER_SIZE = OBS_BUFFER_SIZE / FIELD_COUNT;
 
 static int nc_buf_size;
 static NetcdfObsVars obs_vars;
-static vector< Observation > observations;
+static vector< Observation > obs_vector;
+static vector< ConcatString > md_files;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -141,17 +142,23 @@ int main(int argc, char *argv[]) {
    //
    process_command_line(argc, argv);
 
+   nc_obs_initialize();
+   
    //
    // Process the MADIS file
    //
-   process_madis_file(mdfile);
+   for (vector< ConcatString >::const_iterator mdfile = md_files.begin();
+       mdfile != md_files.end(); ++mdfile)
+   {
+      process_madis_file(*mdfile);
+   }
 
    bool use_var_id = true;
    bool do_header = false;
    int nhdr = get_nc_hdr_cur_index();
    setup_netcdf_out(nhdr);
 
-   write_nc_observations(obs_vars, observations,
+   write_nc_observations(obs_vars, obs_vector,
          use_var_id, do_header);
    create_nc_table_vars(obs_vars, f_out);
    write_nc_table_vars(obs_vars);
@@ -236,13 +243,14 @@ void process_command_line(int argc, char **argv) {
    // Check for error. There should be two arguments left; the
    // madis input filename and the netCDF output filename.
    //
-   if(cline.n() != 2) usage();
+   if(cline.n() < 2) usage();
 
    //
    // Store the input MADIS file name and the output NetCDF file name
    //
-   mdfile = cline[0];
-   ncfile = cline[1];
+   for (int i = 0; i < cline.n() - 1; ++i)
+     md_files.push_back(cline[i]);
+   ncfile = cline[cline.n() - 1];
 
    return;
 }
@@ -250,7 +258,8 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_madis_file(const char *madis_file) {
-
+   MadisType my_mtype = mtype;
+   
    // Print out current file name
    mlog << Debug(1) << "Reading MADIS File:\t" << madis_file << "\n";
 
@@ -268,10 +277,10 @@ void process_madis_file(const char *madis_file) {
       exit(1);
    }
    // If the MADIS type is not already set, try to guess.
-   if(mtype == madis_none) mtype = get_madis_type(f_in);
+   if(my_mtype == madis_none) my_mtype = get_madis_type(f_in);
 
    // Switch on the MADIS type and process accordingly.
-   switch(mtype) {
+   switch(my_mtype) {
       case(madis_metar):
          process_madis_metar(f_in);
          break;
@@ -306,7 +315,7 @@ void process_madis_file(const char *madis_file) {
       case(madis_none):
       default:
          mlog << Error << "\nprocess_madis_file() -> "
-              << "MADIS type (" << mtype
+              << "MADIS type (" << my_mtype
               << ") not currently supported.\n\n";
          exit(1);
          break;
@@ -361,9 +370,10 @@ void setup_netcdf_out(int nhdr) {
    if (deflate_level < 0) deflate_level = 0;
 
    bool use_var_id = false;
-   obs_vars.obs_cnt = observations.size();
-   mlog << Debug(1) << "nhdr:\t" << nhdr << "\tobs_vars.obs_cnt:\t" << obs_vars.obs_cnt << "\n";
-   init_nc_dims_vars (obs_vars, use_var_id);
+   init_nc_dims_vars_config(obs_vars, use_var_id);
+   obs_vars.obs_cnt = obs_vector.size();
+   mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
+        << "\tobs_cnt:\t" << obs_vars.obs_cnt << "\n";
    create_nc_hdr_vars(obs_vars, f_out, nhdr, deflate_level);
    create_nc_obs_vars(obs_vars, f_out, deflate_level, use_var_id);
 
@@ -561,7 +571,7 @@ int process_obs(const int in_gc, const float conversion,
             var_name);
                             
       obs.setHeaderIndex(get_nc_hdr_cur_index());
-      observations.push_back(obs);
+      obs_vector.push_back(obs);
 
       i_obs++;
       processed_count++;
@@ -574,11 +584,20 @@ int process_obs(const int in_gc, const float conversion,
 ////////////////////////////////////////////////////////////////////////
 
 MadisType get_madis_type(NcFile *&f_in) {
-
+   MadisType madis_type = madis_none;
+   ConcatString attr_value;
    //
    // FUTURE WORK: Interrogate the MADIS file and determine it's type.
    //
-   return(madis_none);
+   if (get_global_att(f_in, "id", attr_value)) {
+      if (attr_value == "MADIS_MARITIME")     madis_type = madis_maritime;
+      else if (attr_value == "MADIS_MESONET") madis_type = madis_mesonet;
+      else if (attr_value == "MADIS_METAR")   madis_type = madis_metar;
+   }
+   else if (get_global_att(f_in, "title", attr_value)) {
+      if (attr_value.contents("MADIS ACARS")) madis_type = madis_acarsProfiles;
+   }
+   return(madis_type);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -724,14 +743,14 @@ void process_madis_metar(NcFile *&f_in) {
    hdr_typ_len = get_dim_value(f_in, "maxRepLen");
    hdr_sid_len = get_dim_value(f_in, "maxStaNamLen");
    nhdr        = get_dim_value(f_in, in_recNum_str);
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    //
    // Setup the output NetCDF file
    //
    //setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing METAR recs\t\t\t\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing METAR recs\t\t\t\t= " << my_rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -748,14 +767,13 @@ void process_madis_metar(NcFile *&f_in) {
 
    int hdr_idx = 0;
    processed_count = 0;
-   nc_obs_initialize();
 
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       long *dim2D = new long [2];
-      int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       dim[0] = buf_size;
       cur[0] = i_hdr_s;
 
@@ -1107,7 +1125,7 @@ void process_madis_raob(NcFile *&f_in) {
    //
    hdr_sid_len  = get_dim_value(f_in, "staNameLen");
    nhdr         = get_dim_value(f_in, in_recNum_str);
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    get_dim(f_in, "manLevel", maxlvl_manLevel);
    get_dim(f_in, "sigTLevel", maxlvl_sigTLevel);
@@ -1121,7 +1139,7 @@ void process_madis_raob(NcFile *&f_in) {
    //
    //setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing RAOB recs\t\t\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing RAOB recs\t\t\t= " << my_rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -1138,7 +1156,6 @@ void process_madis_raob(NcFile *&f_in) {
 
    int hdr_idx = 0;
    processed_count = 0;
-   nc_obs_initialize();
 
    //
    // Process the header type.: For RAOB, store as ADPUPA.
@@ -1148,10 +1165,10 @@ void process_madis_raob(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       long *dim2D = new long [2];
       long *dim3D = new long [3];
-      int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
       int nlvl_manLevel[buf_size];
       int nlvl_sigTLevel[buf_size];
@@ -1739,14 +1756,14 @@ void process_madis_profiler(NcFile *&f_in) {
    nlvl         = get_dim_value(f_in, "level");
    hdr_sid_len  = get_dim_value(f_in, "staNamLen");
    nhdr         = get_dim_value(f_in, in_recNum_str);
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    //
    // Setup the output NetCDF file
    //
    //setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing PROFILER recs\t\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing PROFILER recs\t\t= " << my_rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -1764,7 +1781,6 @@ void process_madis_profiler(NcFile *&f_in) {
    //int[] hdr_lat_arr = new int[BUFFER_SIZE];
    int hdr_idx = 0;
    processed_count = 0;
-   nc_obs_initialize();
 
    //
    // Process the header type.
@@ -1775,8 +1791,8 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       float hdr_lat_arr[buf_size];
       float hdr_lon_arr[buf_size];
       float hdr_elv_arr[buf_size];
@@ -1992,14 +2008,14 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    hdr_sid_len  = get_dim_value(f_in, "maxStaNamLen");
    nhdr         = get_dim_value(f_in, in_recNum_str);
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    //
    // Setup the output NetCDF file
    //
    //setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing MARITIME recs\t\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing MARITIME recs\t\t= " << my_rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -2015,7 +2031,6 @@ void process_madis_maritime(NcFile *&f_in) {
    dim[0] = dim[1] = dim[2] = 1;
 
    int hdr_idx = 0;
-   nc_obs_initialize();
 
    //
    // Process the header type.
@@ -2026,8 +2041,8 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       float hdr_lat_arr[buf_size];
       float hdr_lon_arr[buf_size];
       float hdr_elv_arr[buf_size];
@@ -2329,14 +2344,14 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    hdr_sid_len = get_dim_value(f_in, "maxStaIdLen");
    nhdr        = get_dim_value(f_in, in_recNum_str);
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    //
    // Setup the output NetCDF file
    //
    //setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing Integrated Mesonet recs\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing Integrated Mesonet recs\t= " << my_rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -2352,7 +2367,6 @@ void process_madis_mesonet(NcFile *&f_in) {
    dim[0] = 1;
 
    int hdr_idx = 0;
-   nc_obs_initialize();
 
    //
    // Encode the header type as ADPSFC for MESONET observations.
@@ -2362,8 +2376,8 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       float hdr_lat_arr[buf_size];
       float hdr_lon_arr[buf_size];
       float hdr_elv_arr[buf_size];
@@ -2759,7 +2773,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    nhdr         = get_dim_value(f_in, in_recNum_str);
    maxLevels    = get_dim_value(f_in, "maxLevels");
 
-   if(rec_end == 0) rec_end = nhdr;
+   int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
    //
    // Initialize variables for processing observations
@@ -2783,8 +2797,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Obtain the total number of levels
    //
-   //buf_size = ((rec_end - rec_beg) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - rec_beg);
-   buf_size = (rec_end - rec_beg);   // read all
+   //buf_size = ((my_rec_end - rec_beg) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - rec_beg);
+   buf_size = (my_rec_end - rec_beg);   // read all
 
    int  levels[buf_size];
    char levelsQty[buf_size];
@@ -2810,13 +2824,12 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    i_cnt = -1;
    int hdr_idx = 0;
-   nc_obs_initialize();
 
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<rec_end; i_hdr_s+=BUFFER_SIZE) {
-      buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
+   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
       double tmp_dbl_arr[buf_size];
       float hdr_lat_arr[buf_size][maxLevels];
@@ -3033,7 +3046,7 @@ void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
-        << "\tmadis_file\n"
+        << "\tmadis_file [madis_file2 ... madis_filen]\n"
         << "\tout_file\n"
         << "\t-type str\n"
         << "\t[-qc_dd list]\n"
