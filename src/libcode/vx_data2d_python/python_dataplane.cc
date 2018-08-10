@@ -28,7 +28,7 @@ GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-void python_dataplane(const char * script_name, const bool use_xarray, DataPlane & met_dp_out, Grid & met_grid_out)
+void python_dataplane(const char * script_name, const bool use_xarray, DataPlane & met_dp_out, Grid & met_grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -123,7 +123,7 @@ if ( use_xarray )  {
       exit ( 1 );
    }
 
-   dataplane_from_xarray(data_array, met_dp_out, met_grid_out);
+   dataplane_from_xarray(data_array, met_dp_out, met_grid_out, vinfo);
 
 } else {    //  numpy array & dict
 
@@ -148,7 +148,7 @@ if ( use_xarray )  {
       exit ( 1 );
    }
 
-   dataplane_from_numpy_array(numpy_array, attrs_dict, met_dp_out, met_grid_out);
+   dataplane_from_numpy_array(numpy_array, attrs_dict, met_dp_out, met_grid_out, vinfo);
 
 }
 

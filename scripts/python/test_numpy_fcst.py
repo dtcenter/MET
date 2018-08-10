@@ -36,7 +36,10 @@ attrs = {
    'lead':   120000, 
    'accum': '120000', 
 
-   'name': 'Foo', 
+   'name':      'FCST', 
+   'long_name': 'Forecast_Word', 
+   'level':     'Surface', 
+   'units':     'None', 
 
    'grid': {
 

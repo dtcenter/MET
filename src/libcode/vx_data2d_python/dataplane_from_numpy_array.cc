@@ -37,7 +37,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out)
+void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -119,7 +119,6 @@ for (j=0; j<Nxy; ++j)  {
 
    y = ny - 1 - r;
 
-   // value = 0.0;
    value = pp[j];
 
    dp_out.set(value, x, y);
@@ -172,6 +171,12 @@ PyObject * py_grid = dict_lookup_dict(attrs_dict, "grid");
 
 grid_from_python_dict(py_grid, grid_out);
 
+     ////////////////////
+
+vinfo.set_name(dict_lookup_string(attrs_dict, "name"));
+vinfo.set_long_name(dict_lookup_string(attrs_dict, "long_name"));
+vinfo.set_level_name(dict_lookup_string(attrs_dict, "level"));
+vinfo.set_units(dict_lookup_string(attrs_dict, "units"));
 
      ////////////////////
 

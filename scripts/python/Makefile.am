@@ -26,7 +26,6 @@
 pythonscriptsdir = $(pkgdatadir)/python
 
 pythonscripts_DATA = \
-	test_numpy.py \
         test_numpy_fcst.py \
         test_numpy_obs.py 
 
