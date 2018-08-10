@@ -21,13 +21,3 @@ libvx_data2d_grib_a_SOURCES = \
               vx_data2d_grib.h
 libvx_data2d_grib_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-## Generated source files
-#
-#leveltype_to_string.h leveltype_to_string.cc: level_info.h
-#	${ENUM_TO_STRING} -concat_string level_info.h
-#
-## Clean up extra local files
-#
-#clean-local:
-#	-rm -f leveltype_to_string.h
-#	-rm -f leveltype_to_string.cc
