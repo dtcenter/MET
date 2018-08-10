@@ -44,6 +44,8 @@ class MetPythonDataFile : public Met2dDataFile {
 
       DataPlane Plane;
 
+      VarInfoPython VInfo;
+
       GrdFileType Type;   // FileType_Python_Xarray or FileType_Python_Numpy
 
    public:
@@ -88,7 +90,7 @@ class MetPythonDataFile : public Met2dDataFile {
       bool data_plane(VarInfo &, DataPlane &);
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
-      
+
       int index(VarInfo &);
 
 

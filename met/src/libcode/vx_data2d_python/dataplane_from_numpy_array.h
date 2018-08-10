@@ -17,6 +17,7 @@
 
 
 #include "data_plane.h"
+#include "var_info_python.h"
 #include "vx_grid.h"
 
 
@@ -30,7 +31,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * atts_dict, DataPlane & dp_out, Grid & grid_out);
+extern void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * atts_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////

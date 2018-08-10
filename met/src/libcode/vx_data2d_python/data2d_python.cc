@@ -106,6 +106,7 @@ void MetPythonDataFile::python_init_from_scratch()
 {
 
 Plane.clear();
+VInfo.clear();
 
 close();
 
@@ -122,6 +123,7 @@ void MetPythonDataFile::close()
 {
 
 Plane.clear();
+VInfo.clear();
 
 mtddf_clear();   //   base class
 
@@ -212,7 +214,7 @@ Filename = file_name;
 Raw_Grid = new Grid;
 
 
-python_dataplane(file_name, use_xarray, Plane, *Raw_Grid);
+python_dataplane(file_name, use_xarray, Plane, *Raw_Grid, VInfo);
 
 Dest_Grid = new Grid;
 
@@ -328,6 +330,8 @@ if ( ! Raw_Grid )  return ( false );
 
 plane = Plane;
 
+vinfo = VInfo;
+
 return ( true );
 
 }
@@ -353,6 +357,8 @@ if ( ! Raw_Grid )  return ( false );
 plane_array.clear();
 
 plane_array.add(Plane, 0.0, 0.0);
+
+vinfo = VInfo;
 
 return ( true );
 
