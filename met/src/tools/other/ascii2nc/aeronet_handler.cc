@@ -49,16 +49,25 @@ const string elv_col2      = "Elevation";           // "Elevation(meters)"
 const string AeronetHandler::HEADER_TYPE = "";  /////
 
 const int AeronetHandler::AOT_GRIB_CODE = 129;
+// Version 2
 const string AOT_NAME = "AOT";
+// Version 3
 const string AOD_NAME = "AOD";
 const string INPUT_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
+const string NO2_NAME       = "NO2";        // NO2(Dobson)
+const string OPTICAL_AIR_MASS_NAME   = "Optical_Air_Mass";   // Optical_Air_Mass
+const string OZONE_NAME              = "Ozone";              // Ozone(Dobson)
+const string PRECIP_WATER_NAME       = "Precipitable_Water";
+const string PRESSURE_NAME           = "Pressure";           //Pressure(hPa)
+const string SENSOR_TEMP_NAME        = "Sensor_Temperature"; // Sensor_Temperature(Degrees_C)
+const string SOLOR_ZENITH_ANGLE_NAME = "Solar_Zenith_Angle"; // Solar_Zenith_Angle(Degrees)
 const string WAVELENGTHS_AOD_NAME = "Exact_Wavelengths_of_AOD"; // Exact_Wavelengths_of_AOD(um)_865nm
-const string WAVELENGTHS_PW_NAME = "Exact_Wavelengths_of_PW";   // Exact_Wavelengths_of_PW(um)_935nm
-const string TRIPLET_VAR_NAME = "Triplet_Variability";  // Triplet_Variability_1640
-const string TRIPLET_VPW_NAME = "Triplet_Variability_Precipitable_Water";
+const string WAVELENGTHS_PW_NAME  = "Exact_Wavelengths_of_PW";  // Exact_Wavelengths_of_PW(um)_935nm
 const string WAVELENGTHS_INPUT_AOD_NAME = "Exact_Wavelengths_for_Input_AOD";    // Exact_Wavelengths_for_Input_AOD(um)
 
 static int format_version;
+
+const float AERONET_MISSING_VALUE = -999.;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -217,12 +226,19 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     //{
     //  process_flag.add(1);
     //}
+    // version 3
     else if ((0 == hdr_field.find(AOD_NAME))
         || (string::npos != hdr_field.find(INPUT_AOD_NAME))
-        || (string::npos != hdr_field.find(TRIPLET_VAR_NAME))
-        || (string::npos != hdr_field.find(TRIPLET_VPW_NAME))
         || (string::npos != hdr_field.find(WAVELENGTHS_AOD_NAME))
-        || (string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) )
+        || (string::npos != hdr_field.find(WAVELENGTHS_PW_NAME))
+        || (0 == hdr_field.find(NO2_NAME))
+        || (0 == hdr_field.find(OPTICAL_AIR_MASS_NAME))
+        || (0 == hdr_field.find(OZONE_NAME))
+        || (0 == hdr_field.find(PRECIP_WATER_NAME))
+        || (0 == hdr_field.find(PRESSURE_NAME))
+        || (0 == hdr_field.find(SENSOR_TEMP_NAME))
+        || (0 == hdr_field.find(SOLOR_ZENITH_ANGLE_NAME))
+        )
     {
       if (hdr_field.find("Empty") == string::npos) flag = 1;
     }
@@ -394,6 +410,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         var_id   = header_var_index[k];
         var_name = header_var_names[k];
         dheight  = header_heights[k];
+        //if (is_eq(atof(data_line[k]), AERONET_MISSING_VALUE)) continue;
       }
       
       _addObservations(Observation(header_type, _stationId,
@@ -555,15 +572,15 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
 double AeronetHandler::extract_height(string hdr_field) {
   double height;
-
-  size_t offset;
   string height_str = "";
-  string tmp_height;
-  bool with_unit = false;
-  StringArray hdr_names;
 
   if (string::npos == hdr_field.find("Empty")) {
+    size_t offset;
     int token_count = 0;
+    bool with_unit = false;
+    string tmp_height;
+    StringArray hdr_names;
+    
     hdr_names.parse_delim(hdr_field.c_str(), "_");
     // AOD_1640nm-Total,AOD_1640nm-AOD,AOD_1640nm-Rayleigh,AOD_1640nm-O3,
     //   AOD_1640nm-NO2,AOD_1640nm-CO2,AOD_1640nm-CH4,AOD_1640nm-WaterVapor
@@ -584,16 +601,6 @@ double AeronetHandler::extract_height(string hdr_field) {
     else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
       with_unit = true;
       height_str = hdr_names[0];
-    }
-    // Triplet_Variability_Precipitable_Water
-    else if (string::npos != (offset = hdr_field.find(TRIPLET_VPW_NAME)) ) {
-      StringArray tmp_hdr_names;
-      tmp_hdr_names.parse_delim(TRIPLET_VPW_NAME.c_str(), "_");
-      token_count = tmp_hdr_names.n_elements();
-    }
-    // Triplet_Variability_1640
-    else if (string::npos != (offset = hdr_field.find(TRIPLET_VAR_NAME)) ) {
-      height_str = hdr_names[hdr_names.n_elements()-1];
     }
     // Exact_Wavelengths_of_AOD(um)_865nm
     // Exact_Wavelengths_of_PW(um)_935nm
@@ -662,14 +669,6 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
     else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
       var_name = INPUT_AOD_NAME;
     }
-    // Triplet_Variability_Precipitable_Water
-    else if (string::npos != (offset = hdr_field.find(TRIPLET_VPW_NAME))) {
-      var_name = TRIPLET_VPW_NAME;
-    }
-    // Triplet_Variability_1640
-    else if (string::npos != (offset = hdr_field.find(TRIPLET_VAR_NAME))) {
-      var_name = TRIPLET_VAR_NAME;
-    }
     // Exact_Wavelengths_of_AOD(um)_865nm
     else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))) {
       var_name = WAVELENGTHS_AOD_NAME;
@@ -677,6 +676,9 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
     // Exact_Wavelengths_of_PW(um)_935nm
     else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME))) {
       var_name = WAVELENGTHS_PW_NAME;
+    }
+    else if ((hdr_field == OPTICAL_AIR_MASS_NAME)) {
+      var_name = hdr_field;
     }
     else {
       found = false;
@@ -687,6 +689,13 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
       if (hdr_names.n_elements() > 1) {
         var_name += "-";
         var_name += hdr_names[hdr_names.n_elements()-1];
+      }
+    }
+    else {
+      hdr_names.clear();
+      hdr_names.parse_delim(hdr_field.c_str(), "(");
+      if (hdr_names.n_elements() > 1) {
+        var_name = hdr_names[0];
       }
     }
   }
