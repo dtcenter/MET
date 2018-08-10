@@ -1,6 +1,7 @@
 
 import numpy as np
 import os
+import sys
 
 ###########################################
 
@@ -8,19 +9,21 @@ import os
    ##  load the data into the numpy array
    ##
 
-# Retrieve the environment variables for the input file
-input_file = os.path.expandvars(os.environ['FCST_INPUT'])
-try:
-    met_data = np.loadtxt(input_file)
-except NameError:
-    print("Can't find the input file")
+if "FCST_INPUT" in os.environ:
+    # Retrieve the environment variables for the input file
+    input_file = os.path.expandvars(os.environ['FCST_INPUT'])
+    try:
+        met_data = np.loadtxt(input_file)
+        # Print some output to verify that this script ran 
+        print met_data.shape
+        print met_data.dtype
+    except NameError:
+        print("Can't find the input file")
+else:
+    print("FCST_INPUT environment variable not set.")
+    sys.exit(1)
 
 
-print met_data.shape
-
-print met_data.dtype
-
-#print met_data
 
 
 ###########################################
