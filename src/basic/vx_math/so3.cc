@@ -21,7 +21,8 @@ using namespace std;
 
 #include "so3.h"
 
-#include "vx_util.h"
+#include "ascii_table.h"
+#include "fix_float.h"
 #include "trig.h"
 
 
