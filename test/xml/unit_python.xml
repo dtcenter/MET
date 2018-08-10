@@ -18,7 +18,6 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!-- Invokes Python script that reads in NUMPY text data -->
-
   <test name="python_numpy_PLOT_DATA_PLANE">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <env>
@@ -133,4 +132,24 @@
     </output>
   </test>
 
+  <test name="python_wavelet_stat_mixed">
+    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <env>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/python/test_numpy_fcst.py \
+      &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
+      &CONFIG_DIR;/WaveletStatConfig_python_mixed \
+      -outdir &OUTPUT_DIR;/python -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.stat</stat>
+      <txt>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V_isc.txt</txt>
+      <grid_nc>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.nc</grid_nc>
+      <ps>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.ps</ps>
+    </output>
+  </test>
 </met_test>
