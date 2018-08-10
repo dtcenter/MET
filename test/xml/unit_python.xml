@@ -21,10 +21,10 @@
   <test name="python_numpy_PLOT_DATA_PLANE">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <env>
-      <pair><name>INPUT_FILE</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
+      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
     </env> 
     <param> \
-      &MET_BASE;/python/test_numpy.py \
+      &MET_BASE;/python/test_numpy_fcst.py \
       &OUTPUT_DIR;/python/letter.ps \
       'file_type = PYTHON_NUMPY;' \
       -plot_range 0.0 255.0 \
@@ -35,7 +35,6 @@
       <ps>&OUTPUT_DIR;/python/letter.ps</ps>
     </output>
   </test>
-
 
   <test name="python_numpy_MODE_mixed">
     <exec>&MET_DIR;/bin/mode</exec>
@@ -140,7 +139,7 @@
       <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
     </env>
     <param> \
-      &DATA_DIR_MODEL;/python/test_numpy_fcst.py \
+      &MET_BASE;/python/test_numpy_fcst.py \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
       &CONFIG_DIR;/WaveletStatConfig_python_mixed \
       -outdir &OUTPUT_DIR;/python -v 1
@@ -152,4 +151,18 @@
       <ps>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.ps</ps>
     </output>
   </test>
+<test name="python_regrid_data_plane">
+    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <param> \ 
+      &MET_BASE;/python/test_numpy_fcst.py \
+      G130 \
+      &OUTPUT_DIR;/python/regrid_data_plane.nc \
+      -field 'file_type=PYTHON_NUMPY;' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/regrid_data_plane.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
