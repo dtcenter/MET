@@ -23,8 +23,8 @@ if ENABLE_DEVELOPMENT
   SUBDIRS += enum_to_string
 endif
 
-SUBDIRS += vx_math \
-	vx_util \
+SUBDIRS += vx_util \
+	vx_math \
 	vx_config
 
 MAINTAINERCLEANFILES 	= Makefile.in
