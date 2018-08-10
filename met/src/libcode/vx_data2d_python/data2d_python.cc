@@ -330,7 +330,14 @@ if ( ! Raw_Grid )  return ( false );
 
 plane = Plane;
 
-vinfo = VInfo;
+   //
+   //  store the VarInfo metadata without completely overwritting it
+   //
+
+vinfo.set_name(VInfo.name());
+vinfo.set_long_name(VInfo.long_name());
+vinfo.set_level_name(VInfo.level_name());
+vinfo.set_units(VInfo.units());
 
 return ( true );
 
@@ -358,7 +365,14 @@ plane_array.clear();
 
 plane_array.add(Plane, 0.0, 0.0);
 
-vinfo = VInfo;
+   //
+   //  store the VarInfo metadata without completely overwritting it
+   //
+
+vinfo.set_name(VInfo.name());
+vinfo.set_long_name(VInfo.long_name());
+vinfo.set_level_name(VInfo.level_name());
+vinfo.set_units(VInfo.units());
 
 return ( true );
 
