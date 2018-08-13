@@ -22,7 +22,7 @@
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <env>
       <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
-    </env> 
+    </env>
     <param> \
       &MET_BASE;/python/test_numpy_fcst.py \
       &OUTPUT_DIR;/python/letter.ps \
@@ -40,7 +40,7 @@
     <exec>&MET_DIR;/bin/mode</exec>
     <env>
       <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
-    </env> 
+    </env>
     <param> \
       &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
       &MET_BASE;/python/test_numpy_obs.py \
@@ -60,7 +60,7 @@
     <env>
       <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
       <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
-    </env> 
+    </env>
     <param> \
       &MET_BASE;/python/test_numpy_fcst.py \
       &MET_BASE;/python/test_numpy_obs.py \
@@ -73,10 +73,9 @@
       <txt>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_cts.txt</txt>
       <nc>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.nc</nc>
     </output>
-   </test>
+  </test>
 
-
- <test name="python_numpy_GridStat_mixed">
+  <test name="python_numpy_GridStat_mixed">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
@@ -90,9 +89,9 @@
     <output>
       <nc>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V_pairs.nc</nc>
     </output>
-   </test>
+  </test>
 
- <test name="python_numpy_GridStat">
+  <test name="python_numpy_GridStat">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
@@ -107,7 +106,7 @@
     <output>
       <nc>&OUTPUT_DIR;/python/grid_stat_python_120000L_20050807_120000V_pairs.nc</nc>
     </output>
-   </test>
+  </test>
 
   <test name="python_wavelet_stat">
     <exec>&MET_DIR;/bin/wavelet_stat</exec>
@@ -151,9 +150,10 @@
       <ps>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.ps</ps>
     </output>
   </test>
-<test name="python_regrid_data_plane">
+
+  <test name="python_regrid_data_plane">
     <exec>&MET_DIR;/bin/regrid_data_plane</exec>
-    <param> \ 
+    <param> \
       &MET_BASE;/python/test_numpy_fcst.py \
       G130 \
       &OUTPUT_DIR;/python/regrid_data_plane.nc \
