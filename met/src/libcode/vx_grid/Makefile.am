@@ -24,5 +24,6 @@ libvx_grid_a_SOURCES = \
               gaussian_grid.cc gaussian_grid.h \
               st_grid_defs.h \
               st_grid.cc st_grid.h \
+              latlon_xyz.h latlon_xyz.cc \
               vx_grid.h
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
