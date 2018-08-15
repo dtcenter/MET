@@ -135,6 +135,8 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
   DataLine data_line;
   int n_data_hdr;
+  StringArray mappedTypes;
+  StringArray unmappedTypes;
   
   while (ascii_file.read_fwf_line(data_line, lr_rpt_wdth, n_lr_rpt_wdth))
   {
@@ -143,9 +145,9 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     if (!check_reg_exp(lr_rpt_reg_exp, data_line[4]))
     {
       mlog << Error << "\nLittleRHandler::_readObservations() -> "
-	   << "the fifth entry of the little_r report on line "
-	   << data_line.line_number() << " does not match \""
-	   << lr_rpt_reg_exp << "\":\n\"" << data_line[4] << "\"\n\n";
+           << "the fifth entry of the little_r report on line "
+           << data_line.line_number() << " does not match \""
+           << lr_rpt_reg_exp << "\":\n\"" << data_line[4] << "\"\n\n";
       return false;
     }
 
@@ -158,18 +160,24 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     if (_messageTypeMap[concat_string])
     {
       hdr_typ = _messageTypeMap[concat_string];
-      mlog << Debug(5)
-           << "Switching little_r report type \"" << concat_string
-           << "\" to message type \"" << hdr_typ << "\".\n";
+      if (!mappedTypes.has(concat_string)) {
+         mlog << Debug(5)
+              << "Switching little_r report type \"" << concat_string
+              << "\" to message type \"" << hdr_typ << "\".\n";
+         mappedTypes.add(concat_string);
+      }
     }
     else
     {
       hdr_typ = concat_string;
       hdr_typ.replace(" ", "_", false);
       
-      mlog << Warning << "\nLittleRHandler::_processObs() -> "
-	   << "Storing message type as \"" << hdr_typ
-	   << "\" for unexpected report type \"" << concat_string << "\".\n\n";
+      if (!unmappedTypes.has(concat_string)) {
+         mlog << Warning << "\nLittleRHandler::_processObs() -> "
+              << "Storing message type as \"" << hdr_typ
+              << "\" for unexpected report type \"" << concat_string << "\".\n\n";
+         unmappedTypes.add(concat_string);
+      }
     }
 
     // Store the station id
@@ -186,7 +194,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     concat_string.ws_strip();
     hdr_vld_str << cs_erase;
     hdr_vld_str.format("%.8s_%.6s",
-		       concat_string.text(), concat_string.text()+8);
+                       concat_string.text(), concat_string.text()+8);
 
     time_t hdr_vld = _getValidTime(hdr_vld_str.text());
     
@@ -195,7 +203,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     double hdr_lat = atof(data_line[0]);
     double hdr_lon = atof(data_line[1]);
     double hdr_elv = (is_eq(atof(data_line[6]), lr_missing_value) ?
-		      bad_data_float : atof(data_line[6]));
+                      bad_data_float : atof(data_line[6]));
 
     // Store the number of data lines specified in the header
 
@@ -206,7 +214,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     if (!is_eq(atof(data_line[18]), lr_missing_value))
     {
       ConcatString obs_qty = (is_eq(atof(data_line[19]), lr_missing_value) ?
-			      na_str : data_line[19]);
+                              na_str : data_line[19]);
       obs_qty.ws_strip();
 
       // 002	PRMSL	Pressure reduced to MSL	Pa
@@ -232,15 +240,15 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
       // Check for the end of report
 
       if (is_eq(atof(data_line[0]), lr_end_value) &&
-	      is_eq(atof(data_line[2]), lr_end_value))
+              is_eq(atof(data_line[2]), lr_end_value))
         break;
 
       // Retrieve pressure and height
 
       double obs_prs = (is_eq(atof(data_line[0]), lr_missing_value) ?
-			bad_data_float : atof(data_line[0]));
+                        bad_data_float : atof(data_line[0]));
       double obs_hgt = (is_eq(atof(data_line[2]), lr_missing_value) ?
-			bad_data_float : atof(data_line[2]));
+                        bad_data_float : atof(data_line[2]));
 
       // Pressure in Little_R is stored in pascals.  Convert to
       // hectopascals for the header entry.
@@ -254,37 +262,37 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
       for (int i = 0; i < data_line.n_items(); ++i)
       {
-	// Only store valid observation values with a
-	// valid corresponding GRIB code
+        // Only store valid observation values with a
+        // valid corresponding GRIB code
 
-	if (!is_eq(atof(data_line[i]), lr_missing_value) &&
-	    !is_bad_data(lr_grib_codes[i/2]))
-	{
-	  // Observation quality
+        if (!is_eq(atof(data_line[i]), lr_missing_value) &&
+            !is_bad_data(lr_grib_codes[i/2]))
+        {
+          // Observation quality
 
-	  ConcatString obs_qty =
-	    (is_eq(atof(data_line[i+1]), lr_missing_value) ?
-	     na_str : data_line[i+1]);
-	  obs_qty.ws_strip();
+          ConcatString obs_qty =
+            (is_eq(atof(data_line[i+1]), lr_missing_value) ?
+             na_str : data_line[i+1]);
+          obs_qty.ws_strip();
 
-	  // Observation value
+          // Observation value
 
-	  double obs_val = atof(data_line[i]);
+          double obs_val = atof(data_line[i]);
             
-	  // Write the observation info
+          // Write the observation info
 
-	  _addObservations(Observation(hdr_typ.text(), hdr_sid.text(),
-					      hdr_vld,
-					      hdr_lat, hdr_lon, hdr_elv,
-					      obs_qty.text(),
-					      lr_grib_codes[i/2],
-					      obs_prs, obs_hgt, obs_val,
-                          lr_grib_names[i/2]));
-	}
+          _addObservations(Observation(hdr_typ.text(), hdr_sid.text(),
+                                       hdr_vld,
+                                       hdr_lat, hdr_lon, hdr_elv,
+                                       obs_qty.text(),
+                                       lr_grib_codes[i/2],
+                                       obs_prs, obs_hgt, obs_val,
+                                       lr_grib_names[i/2]));
+        }
 
-	// Increment i to skip over the QC entry
+        // Increment i to skip over the QC entry
 
-	i++;
+        i++;
       }
 
       // Increment the data line count
@@ -298,10 +306,10 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     if (n_data_hdr != i_data)
     {
       mlog << Warning << "\nprocess_little_r_obs() -> "
-	   << "the number of data lines specified in the header ("
-	   << n_data_hdr
-	   << ") does not match the number found in the data ("
-	   << i_data << ") on line number " << data_line.line_number() << ".\n\n";
+           << "the number of data lines specified in the header ("
+           << n_data_hdr
+           << ") does not match the number found in the data ("
+           << i_data << ") on line number " << data_line.line_number() << ".\n\n";
     }
 
       // Read the end of report line
