@@ -13,7 +13,7 @@
 \fontencoding global
 \font_roman "default" "default"
 \font_sans "default" "default"
-\font_typewriter "default" "default"
+\font_typewriter "courier" "default"
 \font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
@@ -86,8 +86,141 @@ name "chap:App_F_Python_Embedding"
 
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Standard
+As of release 8.0, a degree of Python embedding has been made available in
+ MET.
+ Users may use Python scripts and whatever associated Python packages they
+ wish in order to prepare 2D gridded data fields for reading by the MET
+ tools.
+ We fully expect that this degree of embedding will increase in the future.
+ In addition, plans are in place in upcoming releases, to extend Python
+ with MET, so that the user may invoke MET tools directly from their Python
+ script.
+ Currently only Python 2.x is supported, but users should be aware that this
+ will soon be changing to Python 3.
+\end_layout
 
+\begin_layout Standard
+In order to use this feature, the user's local Python installation must
+ have the C-language Python header files and libraries.
+ Sometimes these are deleted at the end of the installation process, leaving
+ only the binary executable and any run-time shared object files needed,
+ but they must be present in order to use the MET Python embedding.
+ Assuming the requisite Python files are present, and that the MET Python
+ embedding is enabled when building MET (which is done by passing the 
+\family typewriter
+--enable-python
+\family default
+ option to the 
+\family typewriter
+configure
+\family default
+ command line), the MET C++ code will use these in the compilation process
+ and link to the Python libraries.
+\end_layout
+
+\begin_layout Standard
+In addition to the 
+\family typewriter
+configure
+\family default
+ option mentioned above, two environment variables, 
+\family typewriter
+MET_PYTHON_CC
+\family default
+ and 
+\family typewriter
+MET_PYTHON_LD
+\family default
+ must be set prior to compiling MET.
+ These are used on the compiler command line to enable the compiler to find
+ the requisite Python header files and libraries.
+ Fortunately, Python provides a way to set these variables properly, freeing
+ the user from having to have expert knowledge of the compiling and linking
+ process.
+ Along with the 
+\family typewriter
+python
+\family default
+ executable, there should be another executable called 
+\family typewriter
+python-config, 
+\family default
+whose output can be used to set these environment variables as follows:
+\end_layout
+
+\begin_layout Itemize
+On the command line, run 
+\begin_inset Quotes eld
+\end_inset
+
+ 
+\family typewriter
+python-config --cflags
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, and set the value of 
+\family typewriter
+MET_PYTHON_CC 
+\family default
+to the output of that command.
+\end_layout
+
+\begin_layout Itemize
+Again on the command line, run 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+python-config --ldflags
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, and set the value of 
+\family typewriter
+MET_PYTHON_LD 
+\family default
+to the output of that command.
+\end_layout
+
+\begin_layout Standard
+Make sure these environment variables are set and in effect before building
+ MET.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip 0.1in
+\backslash
+centerline{
+\backslash
+hbox to 3.0in{
+\backslash
+hrulefill}}
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We now turn our attention to the details of how to write Python scripts
+ in order that the MET tools may extract 2D gridded data fields from them.
 \end_layout
 
 \end_body
