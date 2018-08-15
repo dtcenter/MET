@@ -527,12 +527,13 @@ int i, j;
 char buf[max_str_len];
 char c;
 int pos, count;
+int null_char_count;
 
    //
    //  get a line from the file using the specified widths
    //
 
-pos = count = 0;
+null_char_count = pos = count = 0;
 
 for( i=0; i<n_wdth; i++ )  {
 
@@ -561,7 +562,11 @@ for( i=0; i<n_wdth; i++ )  {
      //
      //  check for embedded newline
      //
-     if(buf[j] == '\n') {
+     if(buf[j] == '\0') {
+        Line[(pos-1)] = ' ';
+        null_char_count++;
+     }
+     else if(buf[j] == '\n') {
         mlog << Warning
              << "\nDataLine::read_fwf_line() -> "
              << "Encountered newline while parsing line "
@@ -575,6 +580,13 @@ for( i=0; i<n_wdth; i++ )  {
    Line[pos++] = '\0';
 }
 
+if (null_char_count > 0)
+   mlog << Warning
+        << "\nDataLine::read_fwf_line() -> "
+        << "Encountered " << null_char_count << " null character"
+        << (null_char_count==1?"":"s") << " while parsing line "
+        << ldf->last_line_number() + 1 << ".\n\n";
+   
    //
    //  advance to the end of the line
    //
