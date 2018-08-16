@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 6 (July 9, 2018)
+Model Evaluation Tools METv8.0 BETA 7 (August 16, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,36 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 8.0 BETA 7 Release Notes:
+--------------------------------
+
+- Switch release number from met-7.1 to met-8.0.
+- Add "mask.llpnt" config file option for Point-Stat and Ensemble-Stat to filter
+  point observation lat/lon values directly.
+- Enhance MET tools to read gridded data by calling a Python script which loads
+  data and metadata into a NumPy object.  Must configure using --enable-python
+  for this functionality.  Include example "scripts/python" directory.
+- Initial commits for handling rotated lat/lon grids.
+- Enhance that Ensemble-Stat observation error logic by defining min/max values
+  for each variable to ensure that bias-correction and random perturbations stay
+  within physical limits.
+- Enhance the point pre-processing tools by replacing the UNLIMITED dimension
+  with a fixed dimension, resulting in smaller file sizes.
+- Enhance ascii2nc to support the AERONET version 3 point observation format and
+  support longer observation variable names.
+- Enhance ascii2nc to compute time summaries across multiple input files.
+- Enhance the "time_summary" config file option for ascii2nc and pb2nc by adding
+  a "raw_data" flag to control whether the raw input values are written or only
+  the time summary values.
+- Enhance the ascii2nc, madis2nc, pb2nc, stat_analysis, tc_pairs, and tc_stat
+  to support the "mask.poly" config file option or "-mask_poly" command line
+  option to process masking regions consistently across all the MET tools.
+  They can now process the output of the Gen-Vx-Mask tool.
+- Enhance stat_analysis and tc_stat by adding "-column_union" job command option
+  to summarize values across multiple columns.
+- Add a sample Rscript (scripts/Rscripts/plot_ensemble.R) for plotting ensemble
+  line types.
 
 Version 7.1 BETA 6 Release Notes:
 --------------------------------
