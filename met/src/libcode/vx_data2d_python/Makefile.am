@@ -17,6 +17,7 @@ libvx_data2d_python_a_SOURCES = \
               grid_from_python_dict.h grid_from_python_dict.cc \
               python_dataplane.h python_dataplane.cc \
               data2d_python.h data2d_python.cc \
-              var_info_python.h var_info_python.cc
+              var_info_python.h var_info_python.cc \
+              global_python.h
 libvx_data2d_python_a_CPPFLAGS = ${MET_CPPFLAGS} -I../vx_python_utils ${MET_PYTHON_CC} $(MET_PYTHON_LD)
 
