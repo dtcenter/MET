@@ -194,7 +194,7 @@ bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
       exit(1);
    }
 
-   // Allocate enough memory            
+   // Allocate enough memory
    extend(o_in.n_elements());
 
    f_na.add(f_in);
@@ -652,6 +652,23 @@ void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_mask_llpnt(int i_mask, const char *name,
+                                     MaskLatLon *llpnt_ptr) {
+   int i, j;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_interp; j++) {
+         pd[i][i_mask][j].set_mask_name(name);
+         pd[i][i_mask][j].set_mask_llpnt_ptr(llpnt_ptr);
+      }
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_interp(int i_interp,
@@ -887,6 +904,14 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
          // masking SID list
          else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
             if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) {
+               inc_count(rej_mask, i, j);
+               continue;
+            }
+         }
+         // Otherwise, check observation lat/lon thresholds
+         else if(pd[i][j][0].mask_llpnt_ptr != (MaskLatLon *) 0) {
+            if(!pd[i][j][0].mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
+               !pd[i][j][0].mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
                inc_count(rej_mask, i, j);
                continue;
             }

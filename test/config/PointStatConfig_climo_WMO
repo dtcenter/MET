@@ -100,9 +100,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid    = [];
-   poly    = [ "MET_BASE/poly/CONUS.poly" ];
-   sid     = [];
+   grid  = [];
+   poly  = [ "MET_BASE/poly/CONUS.poly" ];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

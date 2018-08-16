@@ -893,6 +893,27 @@ obs_window = {
 //         For "SID1,SID2", name = MASK_SID and values = SID1 and SID2.
 //       - The "name" of the station ID mask is written to the VX_MASK column
 //         of the MET output files.
+//    - The "llpnt" entry is either a single dictionary or an array of
+//      dictionaries. Each dictionary contains three entries, the "name" for
+//      the masking region, "lat_thresh", and "lon_thresh". The latitude and
+//      longitude thresholds are applied directly to the point observation
+//      latitude and longitude values. Only observations whose latitude and
+//      longitude values meet this threshold criteria are used. A threshold set
+//      to "NA" always evaluates to true.
+//
+// The masking logic for processing point observations in Point-Stat and
+// Ensemble-Stat fall into two cateogries. The "sid" and "llpnt" options apply
+// directly to the point observations. Only those observations for the specified
+// station id's are included in the "sid" masks. Only those observations meeting
+// the latitude and longitude threshold criteria are included in the "llpnt"
+// masks.
+//
+// The "grid" and "poly" mask options are applied to the grid points of the
+// verification domain. Each grid point is determined to be inside or outside
+// the masking region. When processing point observations, their latitude and
+// longitude values are rounded to the nearest grid point of the verification
+// domain. If the nearest grid point is inside the mask, that point observation
+// is included in the mask.
 //
 mask = {
    grid    = [ "FULL" ];
@@ -902,6 +923,12 @@ mask = {
                {name = \"TMP\"; level = \"Z2\";} >273"
              ];
    sid     = [ "CONUS.stations" ];
+   llpnt   = [ { name       = "LAT30TO40";
+                 lat_thresh = >=30&&<=40;
+                 lon_thresh = NA; },
+               { name       = "BOX";
+                 lat_thresh = >=20&&<=40;
+                 lon_thresh = >=-110&&<=-90; } ];
 }
 
 //

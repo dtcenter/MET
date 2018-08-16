@@ -116,9 +116,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "DTC165", "DTC166" ];
-   poly = [ "MET_BASE/poly/LMV.poly" ];
-   sid  = [];
+   grid  = [ "DTC165", "DTC166" ];
+   poly  = [ "MET_BASE/poly/LMV.poly" ];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -244,6 +244,8 @@ class VxPairDataEnsemble {
       void set_msg_typ_vals(int, const StringArray &);
       void set_mask_area(int, const char *, MaskPlane *);
       void set_mask_sid(int, const char *, StringArray *);
+      void set_mask_llpnt(int, const char *, MaskLatLon *);
+
       void set_interp(int i_interp, const char *interp_mthd_str, int width,
                       GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd, int width,

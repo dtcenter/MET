@@ -51,75 +51,75 @@ fcst = {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = NONE;
-	desc = "Obs_Summary:None";
+        duplicate_flag = UNIQUE;
+        obs_summary = NONE;
+        desc = "Obs_Summary:None";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = NEAREST;
-	desc = "Obs_Summary:Nearest";
+        duplicate_flag = UNIQUE;
+        obs_summary = NEAREST;
+        desc = "Obs_Summary:Nearest";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = MIN;
-	desc = "Obs_Summary:Minimum";
+        duplicate_flag = UNIQUE;
+        obs_summary = MIN;
+        desc = "Obs_Summary:Minimum";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = MAX;
-	desc = "Obs_Summary:Maximum";
+        duplicate_flag = UNIQUE;
+        obs_summary = MAX;
+        desc = "Obs_Summary:Maximum";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = UW_MEAN;
-	desc = "Obs_Summary:Unweighted_Mean";
+        duplicate_flag = UNIQUE;
+        obs_summary = UW_MEAN;
+        desc = "Obs_Summary:Unweighted_Mean";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = DW_MEAN;
-	desc = "Obs_Summary:Time_Weighted_Mean";
+        duplicate_flag = UNIQUE;
+        obs_summary = DW_MEAN;
+        desc = "Obs_Summary:Time_Weighted_Mean";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = MEDIAN;
-	desc = "Obs_Summary:Median";
+        duplicate_flag = UNIQUE;
+        obs_summary = MEDIAN;
+        desc = "Obs_Summary:Median";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = PERC;
-	obs_perc_value = 75;
-	desc = "Obs_Summary:75th_Percentile";
+        duplicate_flag = UNIQUE;
+        obs_summary = PERC;
+        obs_perc_value = 75;
+        desc = "Obs_Summary:75th_Percentile";
       },
       {
         name       = "TMP";
         level      = [ "Z2" ];
         cat_thresh = [ <=273, >273 ];
-	duplicate_flag = UNIQUE;
-	obs_summary = PERC;
-	obs_perc_value = 25;
-	desc = "Obs_Summary:25th_Percentile";
+        duplicate_flag = UNIQUE;
+        obs_summary = PERC;
+        obs_perc_value = 25;
+        desc = "Obs_Summary:25th_Percentile";
       }
    ];
 
@@ -142,9 +142,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ ];
-   sid  = [ ];
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

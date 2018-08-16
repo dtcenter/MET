@@ -133,9 +133,10 @@ obs_window = {
 // May be set separately in each "obs.field" entry
 //
 mask = {
-   grid    = [ "FULL" ];
-   poly    = [];
-   sid     = [];
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

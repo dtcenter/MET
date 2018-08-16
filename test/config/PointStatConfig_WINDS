@@ -31,7 +31,7 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
 
-// 
+//
 // Mapping of message type group name to comma-separated list of values.
 //
 message_type_group_map = [
@@ -73,9 +73,10 @@ climo_mean = {
 ////////////////////////////////////////////////////////////////////////////////
 
 mask = {
-   grid = [ "FULL" ];
-   poly = [];
-   sid  = [];
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

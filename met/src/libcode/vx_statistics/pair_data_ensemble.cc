@@ -1254,6 +1254,23 @@ void VxPairDataEnsemble::set_mask_sid(int i_mask, const char *name,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataEnsemble::set_mask_llpnt(int i_mask, const char *name,
+                                        MaskLatLon *llpnt_ptr) {
+   int i, j;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_interp; j++) {
+         pd[i][i_mask][j].set_mask_name(name);
+         pd[i][i_mask][j].set_mask_llpnt_ptr(llpnt_ptr);
+      }
+   }
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataEnsemble::set_interp(int i_interp,
                                     const char *interp_mthd_str,
                                     int width, GridTemplateFactory::GridTemplates shape) {
@@ -1536,6 +1553,13 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
          // masking SID list
          else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
             if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) continue;
+         }
+         // Otherwise, check observation Lat/Lon thresholds
+         else if(pd[i][j][0].mask_llpnt_ptr != (MaskLatLon *) 0) {
+            if(!pd[i][j][0].mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
+               !pd[i][j][0].mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
+               continue;
+            }
          }
 
          // Add the observation for each interpolation method

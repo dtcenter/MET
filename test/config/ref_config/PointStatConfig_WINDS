@@ -91,9 +91,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "${MASK_POLY_FILE}" ];
-   sid  = "";
+   grid  = [ "FULL" ];
+   poly  = [ "${MASK_POLY_FILE}" ];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

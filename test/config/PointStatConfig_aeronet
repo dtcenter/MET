@@ -59,7 +59,7 @@ obs = {
       {
         name       = "AOD";
         level      = [ "L500" ];
-	GRIB1_ptv  = 141;
+        GRIB1_ptv  = 141;
       }
    ];
 }
@@ -130,9 +130,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid    = [ "FULL" ];
-   poly    = [];
-   sid     = [];
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

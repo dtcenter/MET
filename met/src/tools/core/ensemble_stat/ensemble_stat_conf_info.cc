@@ -428,6 +428,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    map<ConcatString,ConcatString> grid_map;
    map<ConcatString,ConcatString> poly_map;
    map<ConcatString,ConcatString>  sid_map;
+   map<ConcatString,MaskLatLon>   point_map;
 
    // Initialize
    mask_area_map.clear();
@@ -493,6 +494,22 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
          // Store the name only for point verification
          vx_opt[i].mask_name.add(sid_map[vx_opt[i].mask_sid[j]]);
+
+      } // end for j
+
+      // Parse the Lat/Lon point masks
+      for(j=0; j<vx_opt[i].mask_llpnt.size(); j++) {
+
+         // Process new point masks -- no real work to do
+         if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
+            mlog << Debug(3)
+                 << "Processing Lat/Lon point mask: "
+                 << vx_opt[i].mask_llpnt[j].name << "\n";
+            point_map[vx_opt[i].mask_llpnt[j].name] = vx_opt[i].mask_llpnt[j];
+         }
+
+         // Store the name for the current Lat/Lon point mask
+         vx_opt[i].mask_name.add(vx_opt[i].mask_llpnt[j].name);
 
       } // end for j
 
@@ -588,6 +605,7 @@ void EnsembleStatVxOpt::clear() {
    mask_grid.clear();
    mask_poly.clear();
    mask_sid.clear();
+   mask_llpnt.clear();
    mask_name.clear();
    mask_name_area.clear();
    msg_typ.clear();
@@ -693,6 +711,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: mask_sid
    mask_sid = odict.lookup_string_array(conf_key_mask_sid);
 
+   // Conf: mask_llpnt
+   mask_llpnt = parse_conf_llpnt_mask(&odict);
+
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict, point_vx);
 
@@ -786,9 +807,10 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    if(n_mask == 0) {
       mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
            << "At least one output masking region must be requested in \""
-           << conf_key_mask_grid << "\", \""
-           << conf_key_mask_poly << "\", or \""
-           << conf_key_mask_sid << "\".\n\n";
+           << conf_key_mask_grid  << "\", \""
+           << conf_key_mask_poly  << "\", \""
+           << conf_key_mask_sid   << "\", or \""
+           << conf_key_mask_llpnt << "\".\n\n";
       exit(1);
    }
 
@@ -835,6 +857,12 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements();
       vx_pd.set_mask_sid(n, mask_name[n],
                          &(conf_info->mask_sid_map[mask_name[n]]));
+   }
+
+   // Define the Lat/Lon point masks
+   for(i=0; i<mask_llpnt.size(); i++) {
+      n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
+      vx_pd.set_mask_llpnt(n, mask_name[n], &mask_llpnt[i]);
    }
 
    // Define the interpolation methods

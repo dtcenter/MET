@@ -134,10 +134,11 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "MET_BASE/poly/NWC.poly",
-            "MET_BASE/poly/GRB.poly" ];
-   sid  = [ ];
+   grid  = [ "FULL" ];
+   poly  = [ "MET_BASE/poly/NWC.poly",
+             "MET_BASE/poly/GRB.poly" ];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

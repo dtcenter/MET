@@ -124,9 +124,10 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ ];
-   poly = [ ];
-   sid  = [ "${CONFIG_DIR}/SID_MESOWEST_OR.txt" ];
+   grid  = [];
+   poly  = [];
+   sid   = [ "${CONFIG_DIR}/SID_MESOWEST_OR.txt" ];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
