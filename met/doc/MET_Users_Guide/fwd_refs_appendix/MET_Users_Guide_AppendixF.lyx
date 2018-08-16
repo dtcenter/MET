@@ -154,7 +154,7 @@ On the command line, run
 \begin_inset Quotes eld
 \end_inset
 
- 
+
 \family typewriter
 python-config --cflags
 \family default
