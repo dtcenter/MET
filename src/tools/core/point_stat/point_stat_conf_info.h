@@ -122,6 +122,9 @@ class PointStatVxOpt {
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
 
+      // Vector of MaskLatLon objects defining Lat/Lon Point masks
+      vector<MaskLatLon> mask_llpnt;
+
       StringArray     mask_name;          // Masking names
 
       NumArray        eclv_points;        // ECLV points

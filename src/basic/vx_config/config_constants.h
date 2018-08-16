@@ -323,6 +323,21 @@ struct PlotInfo {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store masking lat/lon point information
+//
+
+struct MaskLatLon {
+   ConcatString name;       // Mask name
+   SingleThresh lat_thresh; // Threshold for latitudes
+   SingleThresh lon_thresh; // Threshold for longitudes
+
+   void         clear();
+   bool         operator==(const MaskLatLon &) const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for duplicate_flag configuration parameter
 //
 
@@ -489,6 +504,9 @@ static const char conf_key_wind_logic[]        = "wind_logic";
 static const char conf_key_mask_grid[]         = "mask.grid";
 static const char conf_key_mask_poly[]         = "mask.poly";
 static const char conf_key_mask_sid[]          = "mask.sid";
+static const char conf_key_mask_llpnt[]        = "mask.llpnt";
+static const char conf_key_lat_thresh[]        = "lat_thresh";
+static const char conf_key_lon_thresh[]        = "lon_thresh";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
 static const char conf_key_time_summary[]      = "time_summary";
 static const char conf_key_flag[]              = "flag";

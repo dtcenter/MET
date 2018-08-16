@@ -58,8 +58,9 @@ void PairBase::init_from_scratch() {
 void PairBase::clear() {
 
    mask_name.clear();
-   mask_area_ptr = (MaskPlane *)   0;  // Not allocated
-   mask_sid_ptr  = (StringArray *) 0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
+   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -143,6 +144,15 @@ void PairBase::set_mask_area_ptr(MaskPlane *mp_ptr) {
 void PairBase::set_mask_sid_ptr(StringArray *sid_ptr) {
 
    mask_sid_ptr = sid_ptr;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_mask_llpnt_ptr(MaskLatLon *llpnt_ptr) {
+
+   mask_llpnt_ptr = llpnt_ptr;
 
    return;
 }

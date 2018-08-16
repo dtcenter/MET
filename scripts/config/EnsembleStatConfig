@@ -170,13 +170,14 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "MET_BASE/poly/HMT_masks/huc4_1605_poly.nc",
-            "MET_BASE/poly/HMT_masks/huc4_1803_poly.nc",
-            "MET_BASE/poly/HMT_masks/huc4_1804_poly.nc",
-            "MET_BASE/poly/HMT_masks/huc4_1805_poly.nc",
-            "MET_BASE/poly/HMT_masks/huc4_1806_poly.nc" ];
-   sid  = [];
+   grid  = [ "FULL" ];
+   poly  = [ "MET_BASE/poly/HMT_masks/huc4_1605_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1803_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1804_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1805_poly.nc",
+             "MET_BASE/poly/HMT_masks/huc4_1806_poly.nc" ];
+   sid   = [];
+   llpnt = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

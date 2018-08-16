@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "string"
+#include "vector"
 #include "map"
 
 #include "config_constants.h"
@@ -35,6 +36,8 @@ extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
 extern StringArray     parse_conf_message_type(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern StringArray     parse_conf_sid_exc(Dictionary *dict);
 extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
+extern vector<MaskLatLon>
+                       parse_conf_llpnt_mask(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty(Dictionary *dict);
 extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern NumArray        parse_conf_eclv_points(Dictionary *dict);

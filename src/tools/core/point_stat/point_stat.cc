@@ -83,6 +83,7 @@
 //   036    11/01/17  Halley Gotway  Add binned climatologies.
 //   037    02/06/18  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
+//   038    08/15/18  Halley Gotway  Add mask.point type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -707,7 +708,7 @@ void process_obs_file(int i_nc) {
    int obs_count = get_dim_size(&obs_vars.obs_dim);
    int hdr_count = get_dim_size(&obs_vars.hdr_dim);
    int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
-   
+
    mlog << Debug(2)
         << "Searching " << obs_count
         << " observations from " << hdr_count
@@ -740,12 +741,12 @@ void process_obs_file(int i_nc) {
    int qty_len = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
                     (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
 
-   
+
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
    char  obs_qty_block[buf_size][qty_len];
    StringArray obs_qty_array;
-   
+
    if (!IS_INVALID_NC(obs_vars.obs_qty_tbl_var)) {
       if (!get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &obs_qty_array)) {
          mlog << Error << "\nprocess_obs_file() -> "
@@ -767,7 +768,7 @@ void process_obs_file(int i_nc) {
             (float *)obs_arr_block, obs_qty_idx_block, (char *)obs_qty_block)) {
          exit(1);
       }
-      
+
       int hdr_idx;
       char obs_qty[qty_len+1];
       strcpy(obs_qty_str, "");
