@@ -60,7 +60,9 @@ mask = {
    grid  = [];
    poly  = [];
    sid   = [ "KDEN", "${CONFIG_DIR}/SID_CO.txt" ];
-   llpnt = [];
+   llpnt = [ { name = "ALLLATLON"; lat_thresh = NA;   lon_thresh = NA; },
+             { name = "LATGE39";   lat_thresh = >=39; lon_thresh = NA; },
+             { name = "LATLT39";   lat_thresh = <39;  lon_thresh = NA; } ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

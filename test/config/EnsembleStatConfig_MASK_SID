@@ -127,7 +127,9 @@ mask = {
    grid  = [];
    poly  = [];
    sid   = [ "${CONFIG_DIR}/SID_MESOWEST_OR.txt" ];
-   llpnt = [];
+   llpnt = { name       = "LATLONBOX";
+             lat_thresh = >=42.5&&<=43.5;
+             lon_thresh = >=-122&&<=-120; }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
