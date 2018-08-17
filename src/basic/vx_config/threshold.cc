@@ -543,6 +543,10 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
 {
 
+   //  return true when both null and false when only one is null
+
+if ( !node && !(st.node) )  return ( true );
+
 if ( !node || !(st.node) )  return ( false );
 
 return ( node->type() == st.node->type() &&
