@@ -118,14 +118,16 @@ bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
        << ", do_summary: " << (do_summary ? "true" : "false") << "\n";
   
   if (!do_summary || (do_summary && do_save_raw_data)) {
-    mlog << Debug(5) << method_name << "writing " << (int)nc_out_data.observations.size() << " raw data...\n";
+    mlog << Debug(5) << method_name << "writing " 
+         << (int)nc_out_data.observations.size() << " raw data...\n";
     write_nc_observations(obs_vars, nc_out_data.observations, use_var_id, do_header);
   }
   if (do_summary) {
     mlog << Debug(5) << method_name << "writing summary"
-         << (do_save_raw_data ? "" : " (summary only)") << "...\n";
+         << (do_save_raw_data ? " " : " (summary only)") << "...\n";
     bool tmp_do_header = true;
-    write_nc_observations(obs_vars, nc_out_data.summary_obs->getSummaries(), use_var_id, tmp_do_header);
+    write_nc_observations(obs_vars, nc_out_data.summary_obs->getSummaries(),
+                          use_var_id, tmp_do_header);
   }
   
   int obs_buf_index = get_nc_obs_buf_index();
