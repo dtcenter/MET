@@ -167,8 +167,8 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
   _closeNetcdf();
 
-  mlog << Debug(2) << "Finished processing " << _obsNum + 1
-       << " observations for " << _hdrNum + 1 << " headers.\n";
+  mlog << Debug(2) << "Finished processing " << obs_vars.obs_cnt
+       << " observations for " << obs_vars.hdr_cnt << " headers.\n";
 
   return true;
 }
@@ -232,6 +232,9 @@ time_t FileHandler::_getValidTime(const string &time_string) const
 
 bool FileHandler::_openNetcdf(const string &nc_filename)
 {
+   mlog << Debug(1) << "Creating NetCDF Observation file: "
+        << nc_filename << "\n";
+
    //
    // Create the output NetCDF file for writing
    //
@@ -260,19 +263,6 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    nc_out_data.summary_info = _summaryInfo;
    
    init_netcdf_output(_ncFile, obs_vars, nc_out_data, _programName);
-
-//   int obs_count = (do_summary ? summary_obs.getSummaries().size()
-//                               : summary_obs.getObservations().size());
-//   if (do_summary && _summaryInfo.raw_data) obs_count += _observations.size();
-//   obs_vars.obs_cnt = obs_count;
-//   
-//   create_nc_hdr_vars(obs_vars, _ncFile, _nhdr, deflate_level);
-//   create_nc_obs_vars(obs_vars, _ncFile, deflate_level, use_var_id);
-//
-//   //
-//   // Add global attributes
-//   //
-//   write_netcdf_global(_ncFile, nc_filename.c_str(), _programName.c_str());
 
    //
    // Initialize the header and observation record counters
@@ -380,11 +370,10 @@ bool FileHandler::_addObservations(const Observation &obs)
      }
    }
 
-   summary_obs.addObservationObj(obs);
    // Save obs because the obs vector is sorted after time summary
    _observations.push_back(obs);
-
-   if (!do_summary) {
+   if (do_summary) summary_obs.addObservationObj(obs);
+   else {
       const char *var_name = obs.getVarName().c_str();
       if (0 < strlen(var_name) && !obs_names.has(var_name)) {
          obs_names.add(var_name);
