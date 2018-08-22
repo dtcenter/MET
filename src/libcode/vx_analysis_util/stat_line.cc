@@ -321,6 +321,47 @@ return ( Type == stat_header );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool STATLine::has(const char *col_str) const
+
+{
+
+int offset = bad_data_int;
+int dim = bad_data_int;
+
+   //
+   // Parse the variable length dimension
+   //
+
+if ( HdrLine->is_var_length() ) {
+   dim = atoi( get_item(HdrLine->var_index_offset()) );
+}
+
+   //
+   // Search for matching header column
+   //
+
+offset = HdrLine->col_offset(col_str, dim);
+
+   //
+   // If not found, check extra header columns
+   //
+
+if ( is_bad_data(offset) ) {
+   if ( !get_file()->header().has(col_str, offset) ) offset = bad_data_int;
+}
+
+   //
+   // Return whether a valid offset value was found
+   //
+
+return ( !is_bad_data(offset) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString STATLine::get(const char *col_str, bool check_na) const
 
 {
@@ -355,6 +396,7 @@ if ( cs == bad_data_str )  {
 return ( cs );
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
