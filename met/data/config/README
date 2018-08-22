@@ -1589,16 +1589,16 @@ skip_const = FALSE;
 // ensemble member values.  No perturbation is applied to the observation values
 // but the bias scale and offset values, if specified, are applied.
 //
-// The dist_type entry may be set to NONE, NORMAL, LOGNORMAL, EXPONENTIAL,
-// CHISQUARED, GAMMA, UNIFORM, or BETA. The default value of NONE indicates that
-// the observation error table file should be used rather than the configuration
+// The dist_type entry may be set to NONE, NORMAL, EXPONENTIAL, CHISQUARED,
+// GAMMA, UNIFORM, or BETA. The default value of NONE indicates that the
+// observation error table file should be used rather than the configuration
 // file settings.
 //
 // The dist_parm entry is an array of length 1 or 2 specifying the parameters
-// for the distribution selected in dist_type.  The NORMAL, LOGNORMAL,
-// EXPONENTIAL, and CHISQUARED distributions are defined by a single parameter.
-// The GAMMA, UNIFORM, and BETA distributions are defined by two parameters.
-// See the GNU Scientific Library Reference Manual for more information on these
+// for the distribution selected in dist_type.  The NORMAL, EXPONENTIAL, and
+// CHISQUARED distributions are defined by a single parameter. The GAMMA,
+// UNIFORM, and BETA distributions are defined by two parameters. See the GNU
+// Scientific Library Reference Manual for more information on these
 // distributions:
 //    https://www.gnu.org/software/gsl/manual
 //

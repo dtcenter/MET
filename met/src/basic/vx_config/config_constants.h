@@ -645,7 +645,6 @@ static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";
-static const char conf_val_lognormal[]   = "LOGNORMAL";
 static const char conf_val_exponential[] = "EXPONENTIAL";
 static const char conf_val_chisquared[]  = "CHISQUARED";
 static const char conf_val_gamma[]       = "GAMMA";

@@ -697,17 +697,8 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
    // Check for null pointer or bad input value
    if(!e || is_bad_data(v)) return(v);
 
-   // Handle DistType_LogNormal transform
-   if(e->dist_type == DistType_LogNormal) {
-      if(v > 0.0) {
-         v_new  = log(v);
-         v_new += ran_draw(r, e->dist_type,
-                           e->dist_parm[0], e->dist_parm[1]);
-         v_new  = exp(v_new);
-      }
-   }
-   // Apply random perturbation
-   else if(e->dist_type != DistType_None) {
+   // Apply the specified random perturbation
+   if(e->dist_type != DistType_None) {
       v_new += ran_draw(r, e->dist_type,
                         e->dist_parm[0], e->dist_parm[1]);
    }
