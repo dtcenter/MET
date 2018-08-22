@@ -219,7 +219,6 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
    switch(t) {
 
       case(DistType_Normal):
-      case(DistType_LogNormal):
          v = gsl_ran_gaussian(r, p1);
          break;
 
@@ -247,6 +246,7 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
       default:
          v = 0.0;
          break;
+
    }
 
    return(v);
@@ -270,10 +270,6 @@ double dist_var(DistType t, double p1, double p2) {
 
       case(DistType_Normal):
          v = p1*p1;
-         break;
-
-      case(DistType_LogNormal):
-         v = exp(2.0*p1*p1) - exp(p1*p1);
          break;
 
       case(DistType_Exponential):
