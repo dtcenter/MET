@@ -57,7 +57,7 @@ struct MPRData {
    int total, index;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double fcst, obs, climo;
+   double fcst, obs, climo_mean, climo_stdev, climo_cdf;
 };
 
 // Ensemble continuous statistics (ECNT) data structure
