@@ -125,7 +125,7 @@ struct AggrWindInfo {
 struct AggrMPRInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
-   NumArray f_na, o_na, c_na;
+   NumArray f_na, o_na, cmn_na, csd_na, cdf_na;
 };
 
 struct AggrISCInfo {

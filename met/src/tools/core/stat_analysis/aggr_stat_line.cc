@@ -2192,10 +2192,14 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.f_na.clear();
             aggr.o_na.clear();
-            aggr.c_na.clear();
+            aggr.cmn_na.clear();
+            aggr.csd_na.clear();
+            aggr.cdf_na.clear();
             aggr.f_na.add(cur.fcst);
             aggr.o_na.add(cur.obs);
-            aggr.c_na.add(cur.climo);
+            aggr.cmn_na.add(cur.climo_mean);
+            aggr.csd_na.add(cur.climo_stdev);
+            aggr.cdf_na.add(cur.climo_cdf);
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
@@ -2208,7 +2212,9 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
 
             m[key].f_na.add(cur.fcst);
             m[key].o_na.add(cur.obs);
-            m[key].c_na.add(cur.climo);
+            m[key].cmn_na.add(cur.climo_mean);
+            m[key].csd_na.add(cur.climo_stdev);
+            m[key].cdf_na.add(cur.climo_cdf);
 
             //
             // Only aggregate consistent variable names
@@ -3437,14 +3443,14 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    if(j.boot_interval == boot_bca_flag) {
 
       compute_cnt_stats_ci_bca(rng_ptr,
-         info.f_na, info.o_na, info.c_na, w_na,
+         info.f_na, info.o_na, info.cmn_na, w_na,
          precip_flag, j.rank_corr_flag, j.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
 
       compute_cnt_stats_ci_perc(rng_ptr,
-         info.f_na, info.o_na, info.c_na, w_na,
+         info.f_na, info.o_na, info.cmn_na, w_na,
          precip_flag, j.rank_corr_flag, j.n_boot_rep, j.boot_rep_prop,
          cnt_info, tmp_dir);
    }
@@ -3483,7 +3489,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
       //
       f = info.f_na[i];
       o = info.o_na[i];
-      c = info.c_na[i];
+      c = info.cmn_na[i];
 
       f_sum       += f;
       o_sum       += o;
@@ -3559,7 +3565,7 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // Compute the probabilistic counts and statistics
    //
-   compute_pctinfo(info.f_na, info.o_na, info.c_na, pstd_flag, pct_info);
+   compute_pctinfo(info.f_na, info.o_na, info.cmn_na, pstd_flag, pct_info);
 
    return;
 }

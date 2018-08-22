@@ -299,7 +299,19 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
    m_data.obs_elv  = atof(l.get_item("OBS_ELV"));
    m_data.fcst     = atof(l.get_item("FCST"));
    m_data.obs      = atof(l.get_item("OBS"));
-   m_data.climo    = atof(l.get_item("CLIMO"));
+
+   // In met-6.1 and later, CLIMO column was replaced by CLIMO_MEAN
+   if(l.has("CLIMO")) {
+      m_data.climo_mean  = atof(l.get_item("CLIMO"));
+      m_data.climo_stdev = bad_data_double;
+      m_data.climo_cdf   = bad_data_double;
+   }
+   else {
+      m_data.climo_mean  = atof(l.get_item("CLIMO_MEAN"));
+      m_data.climo_stdev = atof(l.get_item("CLIMO_STDEV"));
+      m_data.climo_cdf   = atof(l.get_item("CLIMO_CDF"));
+   }
+
    m_data.obs_qc   = l.get_item("OBS_QC", false);
 
    return;
