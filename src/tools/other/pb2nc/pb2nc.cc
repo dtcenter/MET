@@ -538,12 +538,10 @@ void process_command_line(int argc, char **argv) {
 ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    int len;
    char pid_str[128];
-   ConcatString tbl_filename = conf_info.tmp_dir;
-
-   tbl_filename.add("/tmp_pb2nc_bufr_");
-   sprintf(pid_str, "%d", getpid());
-   tbl_filename.add(pid_str);
-   tbl_filename.add(".tbl");
+   ConcatString tbl_filename, tbl_prefix;
+   
+   tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
+   tbl_filename = make_temp_file_name(tbl_prefix, "tbl");
    len = tbl_filename.length();
    if (file_id > MAX_FORTRAN_FILE_ID || file_id < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\nsave_bufr_table_to_file() -> "
