@@ -72,7 +72,9 @@ extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
-                                  int mthd, const int width, const GridTemplateFactory::GridTemplates shape, double interp_thresh,
+                                  const InterpMthd mthd, const int width,
+                                  const GridTemplateFactory::GridTemplates shape,
+                                  double interp_thresh,
                                   const SingleThresh *cat_thresh = 0);
 
 extern double compute_vert_pinterp(double, double, double, double, double);

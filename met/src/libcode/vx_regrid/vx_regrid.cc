@@ -47,6 +47,10 @@ switch ( info.method )  {
       out = met_regrid_budget (in, from_grid, to_grid, info);
       break;
 
+   case InterpMthd_AW_Mean:
+      out = met_regrid_area_weighted (in, from_grid, to_grid, info);
+      break;
+
    case InterpMthd_Force:
       out = met_regrid_force (in, from_grid, to_grid, info);
       break;
@@ -119,6 +123,109 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
       }
 
       to_data.put(value, xt, yt);
+
+   }   //  for yt
+
+}   //  for xt
+
+   //
+   //  done
+   //
+
+return ( to_data );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DataPlane met_regrid_area_weighted (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+
+{
+
+int xt, yt;
+int xf, yf;
+double value, weight, lat, lon;
+double x_to, y_to;
+DataPlane to_data, wt_data;
+
+   //
+   //  The interpolation width and shape do not apply here.  The output
+   //  value for each to_grid box is computed as a weighted average of
+   //  the from_grid data points falling inside that box, where the
+   //  weights are determined by the area of the from_grid boxes.
+   //
+
+   //
+   //  set output size and initialize to 0
+   //
+
+to_data.set_size(to_grid.nx(), to_grid.ny());
+wt_data.set_size(to_grid.nx(), to_grid.ny());
+
+to_data.set_constant(0.0);
+wt_data.set_constant(0.0);
+
+   //
+   //  copy timing info
+   //
+
+to_data.set_init  (from_data.init());
+to_data.set_valid (from_data.valid());
+to_data.set_lead  (from_data.lead());
+to_data.set_accum (from_data.accum());
+
+   //
+   //  loop over the from grid to accumulate sums and area weights
+   //
+
+for (xf=0; xf<(from_grid.nx()); ++xf)  {
+
+   for (yf=0; yf<(from_grid.ny()); ++yf)  {
+
+      from_grid.xy_to_latlon(xf, yf, lat, lon);
+
+      to_grid.latlon_to_xy(lat, lon, x_to, y_to);
+
+      xt = nint(x_to);
+      yt = nint(y_to);
+
+      if ( (xt < 0) || (xt >= to_grid.nx()) || (yt < 0) || (yt >= to_grid.ny()) )  {
+
+         continue;
+
+      } else {
+
+         if ( is_bad_data(value = from_data(xf, yf)) )  continue;
+         weight = from_grid.calc_area(xf, yf);
+
+         to_data.set(to_data(xt, yt) + value*weight, xt, yt);
+         wt_data.set(wt_data(xt, yt) + weight,       xt, yt);
+
+      }
+
+   }   //  for yf
+
+}   //  for xf
+
+   //
+   //  loop over the to grid to compute the area weighted average
+   //
+
+for (xt=0; xt<(to_grid.nx()); ++xt)  {
+
+   for (yt=0; yt<(to_grid.ny()); ++yt)  {
+
+      if ( is_eq(wt_data(xt, yt), 0.0) )  {
+
+         to_data.set(bad_data_double, xt, yt);
+
+      } else {
+
+         to_data.set(to_data(xt, yt) / wt_data(xt, yt), xt, yt);
+
+      }
 
    }   //  for yt
 

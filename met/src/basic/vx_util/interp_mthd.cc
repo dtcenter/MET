@@ -29,6 +29,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       case(InterpMthd_Median):      out = interpmthd_median_str;      break;
       case(InterpMthd_UW_Mean):     out = interpmthd_uw_mean_str;     break;
       case(InterpMthd_DW_Mean):     out = interpmthd_dw_mean_str;     break;
+      case(InterpMthd_AW_Mean):     out = interpmthd_aw_mean_str;     break;
       case(InterpMthd_LS_Fit):      out = interpmthd_ls_fit_str;      break;
       case(InterpMthd_Nbrhd):       out = interpmthd_nbrhd_str;       break;
       case(InterpMthd_Bilin):       out = interpmthd_bilin_str;       break;
@@ -58,6 +59,7 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_median_str)      == 0) m = InterpMthd_Median;
    else if(strcmp(mthd_str, interpmthd_uw_mean_str)     == 0) m = InterpMthd_UW_Mean;
    else if(strcmp(mthd_str, interpmthd_dw_mean_str)     == 0) m = InterpMthd_DW_Mean;
+   else if(strcmp(mthd_str, interpmthd_aw_mean_str)     == 0) m = InterpMthd_AW_Mean;
    else if(strcmp(mthd_str, interpmthd_ls_fit_str)      == 0) m = InterpMthd_LS_Fit;
    else if(strcmp(mthd_str, interpmthd_nbrhd_str)       == 0) m = InterpMthd_Nbrhd;
    else if(strcmp(mthd_str, interpmthd_bilin_str)       == 0) m = InterpMthd_Bilin;

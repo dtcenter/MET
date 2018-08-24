@@ -84,6 +84,7 @@ LOWER_LEFT     = 16;
 PERC           = 17;
 MIN            = 18;
 MAX            = 19;
+AW_MEAN        = 20;
 
 // Interpolation types
 NONE           = 1;
