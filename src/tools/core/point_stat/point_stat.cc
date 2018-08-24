@@ -83,7 +83,7 @@
 //   036    11/01/17  Halley Gotway  Add binned climatologies.
 //   037    02/06/18  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
-//   038    08/15/18  Halley Gotway  Add mask.point type.
+//   038    08/15/18  Halley Gotway  Add mask.llpnt type.
 //
 ////////////////////////////////////////////////////////////////////////
 
