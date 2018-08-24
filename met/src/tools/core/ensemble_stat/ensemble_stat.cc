@@ -48,7 +48,7 @@
 //                    all options settable for each verification task.
 //   021    03/21/18  Halley Gotway  Add obs_error perturbation.
 //   022    04/05/18  Halley Gotway  Replace -ssvar_mean with -ens_mean.
-//   023    08/15/18  Halley Gotway  Add mask.point type.
+//   023    08/15/18  Halley Gotway  Add mask.llpnt type.
 //
 ////////////////////////////////////////////////////////////////////////
 
