@@ -28,6 +28,7 @@ enum InterpMthd {
    InterpMthd_Median,
    InterpMthd_UW_Mean,
    InterpMthd_DW_Mean,
+   InterpMthd_AW_Mean,
    InterpMthd_LS_Fit,
    InterpMthd_Nbrhd,
    InterpMthd_Bilin,
@@ -50,6 +51,7 @@ static const char interpmthd_max_str[]         = "MAX";
 static const char interpmthd_median_str[]      = "MEDIAN";
 static const char interpmthd_uw_mean_str[]     = "UW_MEAN";
 static const char interpmthd_dw_mean_str[]     = "DW_MEAN";
+static const char interpmthd_aw_mean_str[]     = "AW_MEAN";
 static const char interpmthd_ls_fit_str[]      = "LS_FIT";
 static const char interpmthd_nbrhd_str[]       = "NBRHD";
 static const char interpmthd_bilin_str[]       = "BILIN";

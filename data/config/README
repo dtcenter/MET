@@ -326,6 +326,8 @@ obtype = "ANALYS";
 //         - UW_MEAN     for the unweighted average value
 //         - DW_MEAN     for the distance-weighted average value (weight =
 //                       distance^-2)
+//         - AW_MEAN     for an area-weighted mean when regridding from
+//                       high to low resolution grids
 //         - LS_FIT      for a least-squares fit
 //         - BILIN       for bilinear interpolation (width = 2)
 //         - NEAREST     for the nearest grid point (width = 1)

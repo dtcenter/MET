@@ -650,7 +650,7 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
 
 double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
-                           int mthd, const int width,
+                           const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
                            double interp_thresh,
                            const SingleThresh *cat_thresh) {
@@ -731,8 +731,8 @@ double compute_horz_interp(const DataPlane &dp,
 
       default:
          mlog << Error << "\ncompute_horz_interp() -> "
-              << "unexpected interpolation method encountered: "
-              << mthd << "\n\n";
+              << "unsupported interpolation method encountered: "
+              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
          exit(1);
          break;
    }
@@ -867,13 +867,14 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
          w2 = (use_min ? 0.0 : 1.0);
          break;
 
+      case(InterpMthd_AW_Mean): // Area-Weighted Mean
       case(InterpMthd_Median):  // Median
       case(InterpMthd_LS_Fit):  // Least-squares fit
       case(InterpMthd_Bilin):   // Bilinear interpolation
       default:
          mlog << Error << "\nvalid_time_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "\n\n";
+              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
          exit(1);
          break;
    }

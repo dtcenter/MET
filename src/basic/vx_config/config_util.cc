@@ -55,6 +55,12 @@ void RegridInfo::validate() {
       exit(1);
    }
 
+   // For area-weighted mean the width and shape do not apply
+   if(method == InterpMthd_AW_Mean) {
+      width = bad_data_int;
+      shape = GridTemplateFactory::GridTemplate_None;
+   }
+
    // Check the nearest neighbor special case
    if(width  == 1 &&
       method != InterpMthd_None &&
@@ -1894,6 +1900,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd_Median;
    else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd_UW_Mean;
    else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd_DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd_AW_Mean;
    else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd_LS_Fit;
    else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd_Bilin;
    else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd_Nbrhd;

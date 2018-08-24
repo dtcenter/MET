@@ -71,10 +71,6 @@ static const int n_vld_msg_typ =
 // PrepBufr surface message types
 static const char surface_msg_typ_group_str[] = "SURFACE";
 
-// String containing all interpolation methods
-static const char all_interp_mthd_str[] =
-   "MIN MAX MEDIAN UW_MEAN DW_MEAN LS_FIT BILIN";
-
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
    "[0-9]\\{8,8\\}_[0-9]\\{6,6\\}";

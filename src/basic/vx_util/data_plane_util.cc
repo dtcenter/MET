@@ -138,14 +138,14 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            // Distance-weighted mean, least-squares fit, and bilinear
-            // interpolation are omitted here since they are not
-            // options for gridded data
+            // Distance-weighted mean, area-weighted mean, least-squares
+            // fit, and bilinear interpolation are omitted here since
+            // they are not options for gridded data
 
             default:
                mlog << Error << "\nsmooth_field() -> "
-                    << "unexpected interpolation method encountered: "
-                    << mthd << "\n\n";
+                    << "unsupported interpolation method encountered: "
+                    << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
                exit(1);
                break;
          }
