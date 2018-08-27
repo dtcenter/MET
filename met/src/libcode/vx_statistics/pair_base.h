@@ -180,11 +180,21 @@ extern void find_vert_lvl(const DataPlaneArray &, const double,
 
 extern double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y, const double obs_v,
-                      const InterpMthd method, const int width, const GridTemplateFactory::GridTemplates shape,
+                      const InterpMthd method, const int width,
+                      const GridTemplateFactory::GridTemplates shape,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
                       const SingleThresh *cat_thresh = 0);
+
+extern void get_interp_points(const DataPlaneArray &dpa,
+                      const double obs_x, const double obs_y,
+                      const InterpMthd method, const int width,
+                      const GridTemplateFactory::GridTemplates shape,
+                      const double thresh,
+                      const bool spfh_flag, const LevelType lvl_typ,
+                      const double to_lvl, const int i_blw, const int i_abv,
+                      NumArray &interp_points);
 
 ////////////////////////////////////////////////////////////////////////
 
