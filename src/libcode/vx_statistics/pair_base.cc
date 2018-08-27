@@ -779,7 +779,8 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 
 double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y, const double obs_v,
-                      const InterpMthd method, const int width, const GridTemplateFactory::GridTemplates shape,
+                      const InterpMthd method, const int width,
+                      const GridTemplateFactory::GridTemplates shape,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
@@ -827,6 +828,85 @@ double compute_interp(const DataPlaneArray &dpa,
    }
 
    return(v);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void get_interp_points(const DataPlaneArray &dpa,
+                       const double obs_x, const double obs_y,
+                       const InterpMthd method, const int width,
+                       const GridTemplateFactory::GridTemplates shape,
+                       const double thresh, const bool spfh_flag,
+                       const LevelType lvl_typ, const double to_lvl,
+                       const int i_blw, const int i_abv,
+                       NumArray &interp_pnts) {
+
+   // Initialize
+   interp_pnts.erase();
+
+   // Check for no data
+   if(dpa.n_planes() == 0) return;
+
+   double v;
+   int i, n_vld;
+   NumArray pts_blw, pts_abv;
+   GridTemplateFactory gtf;
+   const GridTemplate* gt = gtf.buildGT(shape, width);
+
+   // Get interpolation points below the observation
+   pts_blw = interp_points(dpa[i_blw], *gt, obs_x, obs_y);
+
+   // For multiple levels, get interpolation points above
+   if(i_blw != i_abv) {
+      pts_abv = interp_points(dpa[i_abv], *gt, obs_x, obs_y);
+
+      if(pts_abv.n() != pts_blw.n()) {
+         mlog << Error << "\nget_interp_points() -> "
+              << "the number of interpolation points above ("
+              << pts_abv.n() << ") and below (" << pts_blw.n()
+              << ") should match!\n\n";
+         exit(1);
+      }
+   }
+
+   // Interpolate each point vertically
+   for(i=0, n_vld=0; i<pts_blw.n(); i++) {
+
+      // Check for a single level
+      if(i_blw == i_abv) {
+         v = pts_blw[i];
+      }
+      // For specific humidity, interpolate in the natural log of q
+      else if(spfh_flag) {
+         v = exp(compute_vert_pinterp(log(pts_blw[i]), dpa.lower(i_blw),
+                                      log(pts_abv[i]), dpa.lower(i_abv),
+                                      to_lvl));
+      }
+      // Vertically interpolate to the observation pressure level
+      else if(lvl_typ == LevelType_Pres) {
+         v = compute_vert_pinterp(pts_blw[i], dpa.lower(i_blw),
+                                  pts_abv[i], dpa.lower(i_abv), to_lvl);
+      }
+      // Vertically interpolate to the observation height
+      else {
+         v = compute_vert_zinterp(pts_blw[i], dpa.lower(i_blw),
+                                  pts_abv[i], dpa.lower(i_abv), to_lvl);
+      }
+
+      // Store valid data values
+      if(!is_bad_data(v)) {
+         n_vld++;
+         interp_pnts.add(v);
+      }
+   } // end for i
+
+   // Check for enough valid data
+   if(((double) n_vld)/((double) gt->size()) < thresh) {
+      interp_pnts.erase();
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
