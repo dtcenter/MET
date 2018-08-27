@@ -721,15 +721,21 @@ name "subsec:PS_HiRA_framework"
 The Point-Stat tool has been enhanced to include the High Resolution Assessment
  (HiRA) verification logic (Mittermaier, 2014).
  HiRA is analogous to neighborhood verification but for point observations.
- The HiRA logic converts scalar forecast values into a fractional coverage
- value which Point-Stat evaluates as if it were a probability forecast.
- For each observation value, the forecast fractional coverage is computed
- as the ratio of forecast values around the observation that meet the categorica
-l forecast threshold criteria.
- If applying HiRA, users should enable matched pair or probabilistic line
- types (MPR, PCT, PSTD, PJC, or PRC) in the output_flag dictionary.
- The number of HiRA output lines is determined by the number of categorical
- forecast thresholds and HiRA neighborhood widths chosen.
+ The HiRA logic interprets the forecast values surrounding each point observatio
+n as an ensemble forecast.
+ These ensemble values are processed in two ways.
+ First, the ensemble continuous statistics (ECNT) line type is computed
+ directly from the ensemble values.
+ Second, for each categorical threshold specified, a fractional coverage
+ value is computed as the ratio of the nearby forecast values that meet
+ the threshold criteria.
+ Point-Stat evaluates those fractional coverage values as if they were a
+ probability forecast.
+ When applying HiRA, users should enable the matched pair (MPR), probabilistic
+ (PCT, PSTD, PJC, or PRC), or continuous ensemble statistics (ECNT) line
+ type in the output_flag dictionary.
+ The number of probabilistic HiRA output lines is determined by the number
+ of categorical forecast thresholds and HiRA neighborhood widths chosen.
 \end_layout
 
 \begin_layout Standard
