@@ -120,6 +120,7 @@ output_flag = {
    pstd   = BOTH;
    pjc    = BOTH;
    prc    = BOTH;
+   ecnt   = NONE;
    eclv   = BOTH;
    mpr    = NONE;
 }

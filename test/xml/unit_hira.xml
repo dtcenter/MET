@@ -34,6 +34,8 @@
       <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_pstd.txt</stat>
       <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_pjc.txt</stat>
       <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_eclv.txt</stat>
       <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_mpr.txt</stat>
     </output>
   </test>

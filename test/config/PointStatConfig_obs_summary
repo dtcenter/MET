@@ -131,6 +131,7 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
+   ecnt   = NONE;
    eclv   = STAT;
    mpr    = BOTH;
 }
