@@ -84,6 +84,7 @@
 //   037    02/06/18  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
 //   038    08/15/18  Halley Gotway  Add mask.llpnt type.
+//   039    08/24/18  Halley Gotway  Add ECNT output for HiRA.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,13 +129,15 @@ static void process_fcst_climo_files();
 static void process_obs_file(int);
 static void process_scores();
 
-static void do_cts  (CTSInfo   *&, int, PairDataPoint *);
-static void do_mcts (MCTSInfo   &, int, PairDataPoint *);
-static void do_cnt  (CNTInfo   *&, int, PairDataPoint *);
-static void do_sl1l2(SL1L2Info *&, int, PairDataPoint *);
-static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *, PairDataPoint *);
-static void do_pct  (PCTInfo   *&, int, PairDataPoint *, int i_bin);
-static void do_hira (              int, PairDataPoint *);
+static void do_cts      (CTSInfo   *&, int, PairDataPoint *);
+static void do_mcts     (MCTSInfo   &, int, PairDataPoint *);
+static void do_cnt      (CNTInfo   *&, int, PairDataPoint *);
+static void do_sl1l2    (SL1L2Info *&, int, PairDataPoint *);
+static void do_vl1l2    (VL1L2Info *&, int, PairDataPoint *, PairDataPoint *);
+static void do_pct      (PCTInfo   *&, int, PairDataPoint *, int i_bin);
+static void do_hira_ens (              int, PairDataPoint *);
+static void do_hira_prob(              int, PairDataPoint *);
+
 
 static void finish_txt_files();
 
@@ -1337,7 +1340,19 @@ void process_scores() {
 
             } // end for l
 
-            // Apply HiRA verification logic
+            // Apply HiRA ensemble verification logic
+            if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
+                conf_info.vx_opt[i].hira_info.flag             &&
+                conf_info.vx_opt[i].output_flag[i_ecnt] != STATOutputType_None) {
+
+               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
+
+               // Appy HiRA verification and write ensemble output
+               do_hira_ens(i, pd_ptr);
+
+            } // end HiRA for probabilities
+
+            // Apply HiRA probabilistic verification logic
             if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
                 conf_info.vx_opt[i].hira_info.flag             &&
                (conf_info.vx_opt[i].output_flag[i_mpr]  != STATOutputType_None ||
@@ -1349,9 +1364,9 @@ void process_scores() {
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
 
                // Appy HiRA verification and write probabilistic output
-               do_hira(i, pd_ptr);
+               do_hira_prob(i, pd_ptr);
 
-            } // end HiRA
+            } // end HiRA for probabilities
 
          } // end for k
       } // end for j
@@ -1684,7 +1699,104 @@ void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_hira(int i_vx, PairDataPoint *pd_ptr) {
+void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
+   PairDataEnsemble hira_pd;
+   int i, j, k, lvl_blw, lvl_abv;
+   NumArray f_ens;
+
+   // Set flag for specific humidity
+   bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
+                    conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
+
+   shc.set_interp_mthd(InterpMthd_Nbrhd,
+                       conf_info.vx_opt[i_vx].hira_info.shape);
+
+   // Loop over the HiRA widths
+   for(i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n_elements(); i++) {
+
+      shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[i]);
+
+      // Determine the number of points in the area
+      GridTemplateFactory gtf;
+      GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
+                                     conf_info.vx_opt[i_vx].hira_info.width[i]);
+
+      // Initialize
+      hira_pd.clear();
+      hira_pd.extend(pd_ptr->n_obs);
+      hira_pd.set_ens_size(gt->size());
+      f_ens.extend(gt->size());
+
+      // Process each observation point
+      for(j=0; j<pd_ptr->n_obs; j++) {
+
+         // Determine the forecast level values
+         find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
+                       pd_ptr->lvl_na[j], lvl_blw, lvl_abv);
+
+         // Get the nearby forecast values
+         get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
+            pd_ptr->x_na[j], pd_ptr->y_na[j],
+            InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
+            conf_info.vx_opt[i_vx].hira_info.shape,
+            conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
+            conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
+            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens);
+
+         // Check for values
+         if(f_ens.n() == 0) continue;
+
+         // Store the observation value
+         hira_pd.add_obs(pd_ptr->sid_sa[j],
+            pd_ptr->lat_na[j], pd_ptr->lon_na[j],
+            pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
+            pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
+            pd_ptr->o_na[j], pd_ptr->o_qc_sa[j],
+            pd_ptr->cmn_na[j], pd_ptr->csd_na[j],
+            pd_ptr->wgt_na[j]);
+
+         // Store the ensemble mean and member values
+         hira_pd.mn_na.add(f_ens.mean());
+         for(k=0; k<f_ens.n(); k++) {
+            hira_pd.add_ens(k, f_ens[k]);
+            hira_pd.add_ens_var_sums(hira_pd.n_obs-1, f_ens[k]);
+         }
+
+      } // end for j
+
+      mlog << Debug(2)
+           << "Processing "
+           << conf_info.vx_opt[i_vx].vx_pd.fcst_info->magic_str()
+           << " versus "
+           << conf_info.vx_opt[i_vx].vx_pd.obs_info->magic_str()
+           << ", for observation type " << pd_ptr->msg_typ
+           << ", over region " << pd_ptr->mask_name
+           << ", for interpolation method HiRA Ensemble NBRHD("
+           << shc.get_interp_pnts_str()
+           << "), using " << hira_pd.n_obs << " pairs.\n";
+
+      // Check for zero matched pairs
+      if(hira_pd.o_na.n_elements() == 0) continue;
+
+      // Compute ensemble statistics
+      hira_pd.compute_pair_vals(rng_ptr);
+      hira_pd.compute_stats();
+
+      // Write out the ECNT line
+      if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
+         write_ecnt_row(shc, &hira_pd,
+            conf_info.vx_opt[i_vx].output_flag[i_ecnt] == STATOutputType_Both,
+            stat_at, i_stat_row,
+            txt_at[i_ecnt], i_txt_row[i_ecnt]);
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_hira_prob(int i_vx, PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    double f_cov, cmn_cov;
@@ -1765,7 +1877,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
               << conf_info.vx_opt[i_vx].ocat_ta[i].get_str()
               << ", for observation type " << pd_ptr->msg_typ
               << ", over region " << pd_ptr->mask_name
-              << ", for interpolation method HiRA NBRHD("
+              << ", for interpolation method HiRA Probability NBRHD("
               << shc.get_interp_pnts_str()
               << "), using " << hira_pd.n_obs << " pairs.\n";
 

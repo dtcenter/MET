@@ -1025,6 +1025,20 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
+      case(i_ecnt):
+         // Number of HiRA ECNT lines =
+         //    Message Types * Masks * Interpolations *
+         //    HiRA widths * Alphas
+         if(hira_info.flag) {
+            n = n_pd * hira_info.width.n_elements() *
+                get_n_ci_alpha();
+         }
+         else {
+            n = 0;
+         }
+
+         break;
+
       case(i_eclv):
          // Number of CTC -> ECLV lines =
          //    Message Types * Masks * Interpolations *

@@ -231,6 +231,7 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
+   ecnt   = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
 }
