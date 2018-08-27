@@ -2283,6 +2283,14 @@ vcnt   = BOTH;
 \begin_layout LyX-Code
 
 \series bold
+   ecnt   = BOTH;
+\series default
+  // Only for HiRA
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    eclv   = BOTH;
 \end_layout
 
@@ -2489,6 +2497,17 @@ PRC
 16.
  
 \series bold
+ECNT
+\series medium
+ for Ensemble Continuous Statistics is only computed for HiRA methodology
+\end_layout
+
+\begin_layout Description
+
+\series medium
+17.
+ 
+\series bold
 ECLV
 \series medium
  for Economic Cost/Loss Relative Value
@@ -2497,7 +2516,7 @@ ECLV
 \begin_layout Description
 
 \series medium
-17.
+18.
  
 \series bold
 MPR
@@ -2623,6 +2642,18 @@ The first set of header columns are common to all of the output files generated
  by the Point-Stat tool.
  Tables describing the contents of the header columns and the contents of
  the additional columns for each line type are listed in the following tables.
+ The 
+\series bold
+ECNT 
+\series default
+line type is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
