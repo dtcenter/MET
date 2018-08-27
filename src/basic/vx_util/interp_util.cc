@@ -32,6 +32,21 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
+NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y) {
+   NumArray points;
+
+   // Search the neighborhood
+   GridPoint *gp = NULL;
+   for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny() );
+        gp != NULL; gp = gt.getNextInGrid()){
+      points.add(dp.get(gp->x, gp->y));
+   }
+
+   return(points);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double interp_min(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
 
    int num_good_points = 0;
