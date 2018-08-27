@@ -41,28 +41,29 @@ static const int dw_mean_pow = 2;
 ///////////////////////////////////////////////////////////////////////////////
 
 // GridTemplate version takes center x/y
-extern double interp_min     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
-extern double interp_max     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
-extern double interp_median  (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
-extern double interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, int x, int y);
+extern double   interp_min     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double   interp_max     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double   interp_median  (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double   interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
 
 // Non-GridTemplate version takes lower-left corner x/y
-extern double interp_min_ll     (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
-extern double interp_max_ll     (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
-extern double interp_median_ll  (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
-extern double interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
+extern double   interp_min_ll     (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
+extern double   interp_max_ll     (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
+extern double   interp_median_ll  (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
+extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
 
 // GridTemplate version takes center x/y
-extern double interp_dw_mean (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t);
-extern double interp_ls_fit  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t);
+extern double   interp_dw_mean (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t);
+extern double   interp_ls_fit  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t);
 
-extern double interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *);
-extern double interp_bilin   (const DataPlane &, double obs_x, double obs_y);
-extern double interp_xy      (const DataPlane &, int x, int y);
+extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *);
+extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y);
+extern double   interp_xy      (const DataPlane &, int x, int y);
 
-extern double interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t);
+extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t);
 
-extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
+extern void     get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
