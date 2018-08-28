@@ -73,6 +73,8 @@ class CRR_Array {
 
       void set_alloc_inc(int = 20);
 
+      void set_all(const T);
+
 
          //
          //  get stuff
@@ -91,6 +93,8 @@ class CRR_Array {
       T & operator[](int) const;
 
       void extend(int);
+
+      void extend(int, const T);
 
       void set_size(int);
 
@@ -153,7 +157,7 @@ void CRR_Array<T>::assign(const CRR_Array<T> & a)
 
 clear();
 
-if ( a.n_elements() == 0 )  return;
+if ( a.n() == 0 )  return;
 
 add(a);
 
@@ -200,6 +204,51 @@ e = u;
 u = (T *) 0;
 
 Nalloc = N;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void CRR_Array<T>::extend(int N, const T _value)
+
+{
+
+if ( N <= Nalloc )  return;
+
+const int n_old  = Nalloc;
+
+extend(N);
+
+int j;
+
+for (j=n_old; j<Nalloc; ++j)  e[j] = _value;
+
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void CRR_Array<T>::set_all(const T _value)
+
+{
+
+int j;
+
+for (j=0; j<Nelements; ++j)  e[j] = _value;
 
 return;
 
@@ -313,9 +362,9 @@ void CRR_Array<T>::add(const CRR_Array<T> & a)
 
 int j;
 
-extend(Nelements + a.n_elements());
+extend(Nelements + a.n());
 
-for (j=0; j<(a.n_elements()); ++j)  {
+for (j=0; j<(a.n()); ++j)  {
 
    add(a[j]);
 

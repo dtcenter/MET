@@ -35,6 +35,31 @@ struct LatLonData {
    int Nlon;
 
    void dump();
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+struct RotatedLatLonData {
+
+   const char * name;   //  not allocated
+
+   double true_lat_ll;
+   double true_lon_ll;
+
+   double delta_new_lat;
+   double delta_new_lon;
+
+   int Nlat;
+   int Nlon;
+
+   double true_lat_north_pole;
+   double true_lon_north_pole;
+
+   // void dump();
+
 };
 
 

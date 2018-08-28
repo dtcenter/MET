@@ -1,8 +1,5 @@
 
 
-////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -15,7 +12,16 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+using namespace std;
+
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cmath>
+
 #include "trig.h"
+#include "vx_log.h"
 
 #include "latlon_xyz.h"
 
@@ -25,11 +31,13 @@
 
 static const double near_pole = 89.9999;
 
+static const double normalize_tol = 1.0e-5;
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void latlon_to_xyz(double lat, double lon, double & x, double & y, double & z)
+void grid_latlon_to_xyz(double lat, double lon, double & x, double & y, double & z)
 
 {
 
@@ -56,7 +64,7 @@ return;
    //
 
 
-void xyz_to_latlon(double x, double y, double z, double & lat, double & lon)
+void grid_xyz_to_latlon(double x, double y, double z, double & lat, double & lon)
 
 {
 
@@ -65,6 +73,35 @@ lat = asind(z);
 if ( fabs(lat) >= near_pole )  lon = 0.0;
 else                           lon = atan2d(x, y);   //  NOT atan2d(y, x)
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void normalize(double & ax, double & ay, double & az)
+
+{
+
+double t = ax*ax + ay*ay + az*az;
+
+if ( fabs(t) < normalize_tol )  {
+
+   mlog << Error
+        << "\n\n  normalize() -> can't normalize zero vector!\n\n";
+
+   exit ( 1 );
+
+}
+
+t = 1.0/sqrt(t);
+
+ax *= t;
+ay *= t;
+az *= t;
 
 return;
 

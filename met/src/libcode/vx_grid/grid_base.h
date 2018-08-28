@@ -63,11 +63,12 @@ class GridInfo {
 
       bool ok() const;
 
-      void set(const LambertData       &);
-      void set(const StereographicData &);
-      void set(const LatLonData        &);
-      void set(const MercatorData      &);
-      void set(const GaussianData      &);
+      void set(const LambertData        &);
+      void set(const StereographicData  &);
+      void set(const LatLonData         &);
+      void set(const RotatedLatLonData  &);
+      void set(const MercatorData       &);
+      void set(const GaussianData       &);
 
       void create_grid(Grid &) const;
 
@@ -78,6 +79,7 @@ class GridInfo {
       const LambertData       * lc;   //  allocated
       const StereographicData * st;   //  allocated
       const LatLonData        * ll;   //  allocated
+      const RotatedLatLonData * rll;  //  allocated
       const MercatorData      * m;    //  allocated
       const GaussianData      * g;    //  allocated
 
@@ -193,6 +195,7 @@ class Grid : public GridInterface {
       Grid(const LambertData       &);
       Grid(const StereographicData &);
       Grid(const LatLonData        &);
+      Grid(const RotatedLatLonData &);
       Grid(const MercatorData      &);
       Grid(const GaussianData      &);
       virtual ~Grid();
@@ -207,6 +210,7 @@ class Grid : public GridInterface {
       void set (const LambertData       &);
       void set (const StereographicData &);
       void set (const LatLonData        &);
+      void set (const RotatedLatLonData &);
       void set (const MercatorData      &);
       void set (const GaussianData      &);
 
@@ -258,7 +262,6 @@ extern bool is_eq(const LambertData *,       const LambertData *);
 extern bool is_eq(const StereographicData *, const StereographicData *);
 extern bool is_eq(const LatLonData *,        const LatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
-
 
 
 ////////////////////////////////////////////////////////////////////////
