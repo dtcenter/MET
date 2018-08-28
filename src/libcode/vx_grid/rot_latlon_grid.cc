@@ -9,8 +9,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -27,21 +25,22 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 #include "vx_log.h"
-#include "latlon_grid.h"
+
+#include "rot_latlon_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class LatLonGrid
+   //  Code for class RotatedLatLonGrid
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-LatLonGrid::LatLonGrid()
+RotatedLatLonGrid::RotatedLatLonGrid()
 
 {
 
@@ -53,7 +52,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-LatLonGrid::~LatLonGrid()
+RotatedLatLonGrid::~RotatedLatLonGrid()
 
 {
 
@@ -65,19 +64,13 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::clear()
+void RotatedLatLonGrid::clear()
 
 {
 
-Name.clear();
+LatLonGrid::clear();
 
-Nx = Ny = 0;
-
-lat_ll = lon_ll = 0.0;
-
-delta_lat = delta_lon = 0.0;
-
-memset(&Data, 0, sizeof(Data));
+memset(&RData, 0, sizeof(RData));
 
 return;
 
@@ -87,11 +80,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-LatLonGrid::LatLonGrid(const LatLonData & data)
+RotatedLatLonGrid::RotatedLatLonGrid(const RotatedLatLonData & rdata)
 
 {
 
-set_from_data(data);
+set_from_rdata(rdata);
 
 }
 
@@ -99,27 +92,55 @@ set_from_data(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::set_from_data(const LatLonData & data)
+void RotatedLatLonGrid::set_from_rdata(const RotatedLatLonData & rdata)
 
 {
 
+LatLonData lld;
+double aux_rotation;
+double rot_lat_ll, rot_lon_ll;
 
 clear();
 
-lat_ll = data.lat_ll;
-lon_ll = data.lon_ll;
+er.set_np(rdata.true_lat_north_pole, rdata.true_lon_north_pole, 0.0);
 
-delta_lat = data.delta_lat;
-delta_lon = data.delta_lon;
+er.latlon_true_to_rot(rdata.true_lat_ll, rdata.true_lon_ll, rot_lat_ll, rot_lon_ll);
 
-Nx = data.Nlon;
 
-Ny = data.Nlat;
 
-Name = data.name;
 
-Data = data;
+lld.name      = rdata.name;
 
+lld.lat_ll    = rot_lat_ll;
+lld.lon_ll    = rot_lon_ll;
+
+lld.delta_lat = rdata.delta_new_lat;
+lld.delta_lon = rdata.delta_new_lon;
+
+lld.Nlat      = rdata.Nlat;
+lld.Nlon      = rdata.Nlon;
+
+LatLonGrid::set_from_data(lld);
+
+RData = rdata;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RotatedLatLonGrid::latlon_to_xy(double lat_true, double lon_true, double &x, double &y) const
+
+{
+
+double lat_rot, lon_rot;
+
+er.latlon_true_to_rot(lat_true, lon_true, lat_true, lon_true);
+
+LatLonGrid::latlon_to_xy(lat_rot, lon_rot, x, y);
 
 
 return;
@@ -130,17 +151,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const
+void RotatedLatLonGrid::xy_to_latlon(double x, double y, double & lat_true, double & lon_true) const
 
 {
-double n;
 
-y = (lat - lat_ll)/delta_lat;
+double lat_rot, lon_rot;
 
-n = lon_ll - lon;
-x = n - 360.0*floor(n/360.0);
-x /= delta_lon;
+LatLonGrid::xy_to_latlon(x, y, lat_rot, lon_rot);
 
+er.latlon_rot_to_true(lat_rot, lon_rot, lat_true, lon_true);
 
 return;
 
@@ -150,52 +169,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::xy_to_latlon(double x, double y, double &lat, double &lon) const
+double RotatedLatLonGrid::calc_area(int x, int y) const
 
 {
 
-lat = lat_ll + delta_lat*y;
-
-lon = lon_ll - delta_lon*x;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double LatLonGrid::calc_area(int x, int y) const
-
-{
-
-double area = 0.0;
-double lat_bottom, lon_left;
-double delta_lon_rad = delta_lon/deg_per_rad;
-double lat_top_rad, lat_bottom_rad;
-
-
-xy_to_latlon((double) x, (double) y, lat_bottom, lon_left);
-
-
-lat_top_rad     = (lat_bottom + delta_lat)/deg_per_rad;
-lat_bottom_rad  = lat_bottom/deg_per_rad;
-
-area = ( sin(lat_top_rad) - sin(lat_bottom_rad) )*delta_lon_rad;
-
-area = fabs(area)*earth_radius_km*earth_radius_km;
-
+double area = LatLonGrid::calc_area(x, y);
 
 return ( area );
 
 }
 
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
-int LatLonGrid::nx() const
+int RotatedLatLonGrid::nx() const
 
 {
 
@@ -207,7 +196,7 @@ return ( Nx );
 ////////////////////////////////////////////////////////////////////////
 
 
-int LatLonGrid::ny() const
+int RotatedLatLonGrid::ny() const
 
 {
 
@@ -219,7 +208,7 @@ return ( Ny );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString LatLonGrid::name() const
+ConcatString RotatedLatLonGrid::name() const
 
 {
 
@@ -231,24 +220,10 @@ return ( Name );
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::dump(ostream & out, int depth) const
+void RotatedLatLonGrid::dump(ostream & out, int depth) const
 
 {
 
-Indent prefix(depth);
-
-out << prefix << "Name         = ";
-
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
-
-out << '\n';
-
-out << prefix << "lat_ll       = " << lat_ll << "\n";
-out << prefix << "lon_ll       = " << lon_ll << "\n";
-
-out << prefix << "delta_lat_ll = " << delta_lat << "\n";
-out << prefix << "delta_lon_ll = " << delta_lon << "\n";
 
    //
    //  done
@@ -264,24 +239,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString LatLonGrid::serialize() const
+ConcatString RotatedLatLonGrid::serialize() const
 
 {
 
 ConcatString a;
-char junk[256];
-
-
-a << "Projection: Lat/Lon";
-
-a << " Nx: " << Nx;
-a << " Ny: " << Ny;
-
-sprintf(junk, " lat_ll: %.3f", lat_ll);   a << junk;
-sprintf(junk, " lon_ll: %.3f", lon_ll);   a << junk;
-
-sprintf(junk, " delta_lat: %.3f", delta_lat);   a << junk;
-sprintf(junk, " delta_lon: %.3f", delta_lon);   a << junk;
 
    //
    //  done
@@ -295,13 +257,13 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-GridInfo LatLonGrid::info() const
+GridInfo RotatedLatLonGrid::info() const
 
 {
 
 GridInfo i;
 
-i.set( Data );
+i.set( RData );
 
 return ( i );
 
@@ -311,7 +273,7 @@ return ( i );
 ////////////////////////////////////////////////////////////////////////
 
 
-double LatLonGrid::rot_grid_to_earth(int x, int y) const
+double RotatedLatLonGrid::rot_grid_to_earth(int x, int y) const
 
 {
 
@@ -329,7 +291,7 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LatLonGrid::is_global() const
+bool RotatedLatLonGrid::is_global() const
 
 {
 
@@ -349,23 +311,32 @@ return ( answer );
 ////////////////////////////////////////////////////////////////////////
 
 
-void LatLonGrid::shift_right(int N)
+void RotatedLatLonGrid::shift_right(int N)
 
 {
 
+
+mlog << Error
+     << "\n\n  RotatedLatLonGrid::shift_right(int) -> not implemented\n\n";
+
+exit ( 1 );
+
+
+/*
 if ( N == 0 )  return;
 
 if ( ! is_global() ) {
 
-   mlog << Error 
-        << "\n\n  LatLonGrid::shift_right(int) -> "
+
+   mlog << Error
+        << "\n\n  RotatedLatLonGrid::shift_right(int) -> "
         << "shifting is not allowed for non-global grids\n\n";
 
    exit ( 1 );
 
 }
 
-mlog << Debug(3)
+mlog << Warning
      << "Shifting global LatLon grid to the right " << N
      << " grid boxes.\n";
 
@@ -383,7 +354,8 @@ double new_lat_ll, new_lon_ll;
 
 lon_ll = new_lon_ll;
 
-Data.lon_ll = new_lon_ll;
+RData.latlon.lon_ll = new_lon_ll;
+*/
 
 return;
 
@@ -393,11 +365,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * LatLonGrid::copy() const
+GridRep * RotatedLatLonGrid::copy() const
 
 {
 
-LatLonGrid * p = new LatLonGrid (Data);
+RotatedLatLonGrid * p = new RotatedLatLonGrid (RData);
 
 return ( p );
 
@@ -415,13 +387,13 @@ return ( p );
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const LatLonData & data)
+Grid::Grid(const RotatedLatLonData & rdata)
 
 {
 
 init_from_scratch();
 
-set(data);
+set(rdata);
 
 }
 
@@ -429,17 +401,18 @@ set(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::set(const LatLonData & data)
+void Grid::set(const RotatedLatLonData & rdata)
 
 {
 
 clear();
 
-rep = new LatLonGrid ( data );
+rep = new RotatedLatLonGrid ( rdata );
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const LatLonData &) -> memory allocation error\n\n";
+   mlog << Error
+        << "\nGrid::set(const RotatedLatLonData &) -> memory allocation error\n\n";
 
    exit ( 1 );
 

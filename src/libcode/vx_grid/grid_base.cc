@@ -226,11 +226,12 @@ void GridInfo::init_from_scratch()
 
 {
 
-lc = (const LambertData *)       0;
-st = (const StereographicData *) 0;
-ll = (const LatLonData *)        0;
-m  = (const MercatorData *)      0;
-g  = (const GaussianData *)      0;
+lc  = (const LambertData *)       0;
+st  = (const StereographicData *) 0;
+ll  = (const LatLonData *)        0;
+rll = (const RotatedLatLonData *) 0;
+m   = (const MercatorData *)      0;
+g   = (const GaussianData *)      0;
 
 clear();
 
@@ -246,11 +247,12 @@ void GridInfo::clear()
 
 {
 
-if ( lc )  { delete lc; lc = (const LambertData *)       0; };
-if ( st )  { delete st; st = (const StereographicData *) 0; };
-if ( ll )  { delete ll; ll = (const LatLonData *)        0; };
-if ( m  )  { delete m;  m  = (const MercatorData *)      0; };
-if ( g  )  { delete g;  g  = (const GaussianData *)      0; };
+if ( lc  )  { delete lc;  lc  = (const LambertData *)       0; };
+if ( st  )  { delete st;  st  = (const StereographicData *) 0; };
+if ( ll  )  { delete ll;  ll  = (const LatLonData *)        0; };
+if ( rll )  { delete rll; rll = (const RotatedLatLonData *) 0; };
+if ( m   )  { delete m;   m   = (const MercatorData *)      0; };
+if ( g   )  { delete g;   g   = (const GaussianData *)      0; };
 
 return;
 
@@ -264,11 +266,12 @@ void GridInfo::assign(const GridInfo & info)
 
 {
 
-if ( info.lc )  set( *(info.lc) );
-if ( info.st )  set( *(info.st) );
-if ( info.ll )  set( *(info.ll) );
-if ( info.m  )  set( *(info.m ) );
-if ( info.g  )  set( *(info.g ) );
+if ( info.lc  )  set( *(info.lc)  );
+if ( info.st  )  set( *(info.st)  );
+if ( info.ll  )  set( *(info.ll)  );
+if ( info.rll )  set( *(info.rll) );
+if ( info.m   )  set( *(info.m )  );
+if ( info.g   )  set( *(info.g )  );
 
 return;
 
@@ -284,11 +287,12 @@ bool GridInfo::ok() const
 
 int count = 0;
 
-if ( lc ) ++count;
-if ( st ) ++count;
-if ( ll ) ++count;
-if ( m  ) ++count;
-if ( g  ) ++count;
+if ( lc  ) ++count;
+if ( st  ) ++count;
+if ( ll  ) ++count;
+if ( rll ) ++count;
+if ( m   ) ++count;
+if ( g   ) ++count;
 
 return ( count == 1 );
 
@@ -310,11 +314,12 @@ if ( !(ok()) )  {
 
 }
 
-     if ( lc )  gg.set( *lc );
-else if ( st )  gg.set( *st );
-else if ( ll )  gg.set( *ll );
-else if ( m  )  gg.set( *m  );
-else if ( g  )  gg.set( *g  );
+     if ( lc  )  gg.set( *lc  );
+else if ( st  )  gg.set( *st  );
+else if ( ll  )  gg.set( *ll  );
+else if ( rll )  gg.set( *rll );
+else if ( m   )  gg.set( *m   );
+else if ( g   )  gg.set( *g   );
 
 return;
 
@@ -381,6 +386,28 @@ D = new LatLonData;
 memcpy(D, &data, sizeof(data));
 
 ll = D;  D = (LatLonData *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const RotatedLatLonData & data)
+
+{
+
+clear();
+
+RotatedLatLonData * D = (RotatedLatLonData *) 0;
+
+D = new RotatedLatLonData;
+
+memcpy(D, &data, sizeof(data));
+
+rll = D;  D = (RotatedLatLonData *) 0;
 
 return;
 

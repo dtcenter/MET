@@ -12,6 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_grid.a
 libvx_grid_a_SOURCES = \
+              earth_rotation.cc earth_rotation.h  \
               find_grid_by_name.cc  find_grid_by_name.h \
               grid_base.cc grid_base.h \
               latlon_grid_defs.h \
@@ -25,5 +26,6 @@ libvx_grid_a_SOURCES = \
               st_grid_defs.h \
               st_grid.cc st_grid.h \
               latlon_xyz.h latlon_xyz.cc \
+              rot_latlon_grid.cc rot_latlon_grid.h \
               vx_grid.h
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}

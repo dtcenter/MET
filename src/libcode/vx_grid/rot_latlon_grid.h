@@ -9,58 +9,51 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __LATLON_GRID_H__
-#define  __LATLON_GRID_H__
+#ifndef  __ROTATED_LATLON_GRID_H__
+#define  __ROTATED_LATLON_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 #include "grid_base.h"
+#include "latlon_grid.h"
+
+#include "earth_rotation.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class LatLonGrid : public GridRep {
+class RotatedLatLonGrid : public LatLonGrid {
 
       friend class Grid;
 
    protected:
 
-      LatLonGrid();
-     ~LatLonGrid();
-      LatLonGrid(const LatLonData &);
+      RotatedLatLonGrid();
+     ~RotatedLatLonGrid();
+      RotatedLatLonGrid(const RotatedLatLonData &);
 
-      double lat_ll;
-      double lon_ll;
-
-      double delta_lat;
-      double delta_lon;
-
-      int Nx;
-      int Ny;
-
-      ConcatString Name;
-
-      LatLonData Data;
 
       void clear();
 
-      void set_from_data(const LatLonData &);
+      void set_from_rdata(const RotatedLatLonData &);
+
+      EarthRotation er;
+
+      RotatedLatLonData RData;
 
          //
          //  grid interface
          //
 
-      virtual void latlon_to_xy(double lat, double lon, double & x, double & y) const;
+      virtual void latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const;
 
-      virtual void xy_to_latlon(double x, double y, double & lat, double & lon) const;
+      virtual void xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const;
 
       virtual double calc_area(int x, int y) const;
 
@@ -91,13 +84,13 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
+inline double RotatedLatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __LATLON_GRID_H__
+#endif   //  __ROTATED_LATLON_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////

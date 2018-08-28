@@ -24,6 +24,7 @@ using namespace std;
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cmath>
 
 #include "set.h"
@@ -35,63 +36,232 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-FcstObsSet::FcstObsSet() {
-   clear();
+
+FcstObsSet::FcstObsSet()
+
+{
+
+init_from_scratch();
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+FcstObsSet::~FcstObsSet()
+
+{
+
+all_clear();
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+FcstObsSet::FcstObsSet(const FcstObsSet & s)
+
+{
+
+init_from_scratch();
+
+assign(s);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FcstObsSet::~FcstObsSet() { }
+
+FcstObsSet & FcstObsSet::operator=(const FcstObsSet & s)
+
+{
+
+if ( this == &s )  return ( * this );
+
+assign(s);
+
+return ( * this );
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FcstObsSet::FcstObsSet(const FcstObsSet &S) {
+
+void FcstObsSet::init_from_scratch()
+
+{
+
+fcst_number = 0;
+
+ obs_number = 0;
+
+all_clear();
+
+extend_fcst (50);
+extend_obs  (50);
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::clear()
+
+{
+
+// if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
+// if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
+
+int j;
+
+for (j=0; j<n_fcst_alloc; ++j)  fcst_number[j] = 0;
+for (j=0; j<n_obs_alloc; ++j)    obs_number[j] = 0;
+
+n_fcst = n_obs = 0;
+
+// n_fcst_alloc = n_obs_alloc = 0;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::all_clear()
+
+{
+
+if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
+if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
+
+n_fcst = n_obs = 0;
+
+n_fcst_alloc = n_obs_alloc = 0;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::assign(const FcstObsSet & s)
+
+{
+
+clear();
+
+int j;
+
+if ( s.fcst_number )  {
+
+   extend_fcst (s.n_fcst_alloc);
+
+   memcpy(fcst_number, s.fcst_number, (s.n_fcst_alloc)*sizeof(int));
+
+}
+
+   
+if ( s.obs_number )   {
+
+   extend_obs  (s.n_obs_alloc);
+
+   memcpy(obs_number,  s.obs_number,  (s.n_obs_alloc)*sizeof(int));
+
+}
+
+
+n_fcst = s.n_fcst;
+n_obs  = s.n_obs;
+
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::extend_fcst(int N)
+
+{
+
+extend(fcst_number, n_fcst_alloc, N);
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::extend_obs(int N)
+
+{
+
+extend(obs_number, n_obs_alloc, N);
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void FcstObsSet::extend(int * & a, int & n_alloc, const int n_new)
+
+{
+
+if ( n_new <= n_alloc )  return;
+
+int j, k;
+int * u = 0;
+
+k = n_new/fcst_obs_set_alloc_inc;
+
+if ( n_new%fcst_obs_set_alloc_inc )  ++k;
+
+k *= fcst_obs_set_alloc_inc;
+
+u = new int [k];
+
+if ( a )  memcpy(u, a, n_alloc);
+
+for (j=n_alloc; j<k; ++j)  u[j] = 0;
+
+if ( a )  { delete [] a;  a = 0; }
+
+a = u;  u = 0;
+
+n_alloc = k;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+int FcstObsSet::has_fcst(int k) const
+
+{
    int j;
-
-   clear();
-
-   n_fcst = S.n_fcst;
-   n_obs = S.n_obs;
 
    for(j=0; j<n_fcst; j++) {
-      fcst_number[j] = S.fcst_number[j];
-   }
-
-   for(j=0; j<n_obs; j++) {
-      obs_number[j] = S.obs_number[j];
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-FcstObsSet & FcstObsSet::operator=(const FcstObsSet &S) {
-   int j;
-
-   if( this == &S ) return(*this);
-
-   clear();
-
-   n_fcst = S.n_fcst;
-   n_obs = S.n_obs;
-
-   for(j=0; j<n_fcst; j++){
-      fcst_number[j] = S.fcst_number[j];
-   }
-
-   for(j=0; j<n_obs; j++) {
-      obs_number[j] = S.obs_number[j];
-   }
-
-   return(*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-int FcstObsSet::has_fcst(int k) const {
-   int j;
-
-   for(j=0; j<n_fcst; j++) {
-      if( fcst_number[j] == k ) return(1);
+      if( fcst_number[j] == k ) return ( 1 );
    }
 
    return(0);
@@ -103,7 +273,7 @@ int FcstObsSet::has_obs(int k) const {
    int j;
 
    for(j=0; j<n_obs; j++) {
-      if( obs_number[j] == k ) return(1);
+      if( obs_number[j] == k ) return ( 1 );
    }
 
    return(0);
@@ -113,8 +283,8 @@ int FcstObsSet::has_obs(int k) const {
 
 void FcstObsSet::add_pair(int fcst, int obs) {
 
-   if( fcst >= 0 )  add_fcst(fcst);
-   if( obs  >= 0 )  add_obs(obs);
+   if( fcst >= 0 )  add_fcst (fcst);
+   if( obs  >= 0 )  add_obs  (obs);
 
    return;
 }
@@ -125,12 +295,7 @@ void FcstObsSet::add_fcst(int k) {
 
    if( has_fcst(k) ) return;
 
-   if( n_fcst >= max_fcst_numbers ) {
-      mlog << Error << "\nFcstObsSet::add_fcst(int) -> "
-           << "too many fcst numbers!\n\n";
-
-      exit(1);
-   }
+   extend_fcst(n_fcst + 1);
 
    fcst_number[n_fcst++] = k;
 
@@ -143,111 +308,237 @@ void FcstObsSet::add_obs(int k) {
 
    if( has_obs(k) ) return;
 
-   if( n_obs >= max_obs_numbers ) {
-      mlog << Error << "\nFcstObsSet::add_obs(int) -> "
-           << "too many obs numbers!\n\n";
-
-      exit(1);
-   }
+   extend_obs(n_obs + 1);
 
    obs_number[n_obs++] = k;
 
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-void FcstObsSet::clear() {
-   int j;
 
-   n_fcst = n_obs = 0;
+   //
+   //  Code for class SetCollection
+   //
 
-   for(j=0; j<max_fcst_numbers; j++) {
-      fcst_number[j] = 0;
-   }
 
-   for(j=0; j<max_obs_numbers; j++) {
-      obs_number[j] = 0;
-   }
+///////////////////////////////////////////////////////////////////////////////
 
-   return;
+
+SetCollection::SetCollection()
+
+{
+
+init_from_scratch();
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Code for class FcstObsSet_collection
-//
+
 ///////////////////////////////////////////////////////////////////////////////
 
-SetCollection::SetCollection() {
 
-   n_sets = 0;
+SetCollection::~SetCollection()
+
+{
+
+all_clear();
+
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-SetCollection::~SetCollection() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SetCollection::SetCollection(const SetCollection &a) {
-   int j;
 
-   clear();
+SetCollection::SetCollection(const SetCollection & a)
 
-   n_sets = a.n_sets;
+{
 
-   for(j=0; j<n_sets; j++) {
-      set[j] = a.set[j];
-   }
+init_from_scratch();
+
+assign(a);
+
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-SetCollection & SetCollection::operator=(const SetCollection &a) {
-   int j;
 
-   if( this == &a ) return(*this);
+SetCollection & SetCollection::operator=(const SetCollection & a)
 
-   clear();
+{
 
-   n_sets = a.n_sets;
+if ( this == &a )  return ( * this );
 
-   for(j=0; j<n_sets; j++) {
-      set[j] = a.set[j];
-   }
+assign(a);
 
-   return(*this);
+return ( * this );
+
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-void SetCollection::add_pair(int fcst, int obs) {
+
+void SetCollection::init_from_scratch()
+
+{
+
+set = 0;
+
+all_clear();
+
+extend(10);
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void SetCollection::clear()
+
+{
+
+// if ( set )  { delete [] set;  set = 0; }
+
+n_sets  = 0;
+
+int j;
+
+for (j=0; j<n_alloc; ++j)  set[j].clear();
+
+// n_alloc = 0;
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void SetCollection::all_clear()
+
+{
+
+if ( set )  { delete [] set;  set = 0; }
+
+n_sets  = 0;
+
+n_alloc = 0;
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void SetCollection::assign(const SetCollection & s)
+
+{
+
+clear();
+
+if ( ! (s.set) )  return;
+
+extend(s.n_alloc);
+
+int j;
+
+n_sets = s.n_sets;
+
+for (j=0; j<n_sets; ++j)  set[j] = s.set[j];
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void SetCollection::extend(int N)
+
+{
+
+if ( N <= n_alloc )  return;
+
+int j, k;
+FcstObsSet * u = 0;
+
+k = N/fcst_obs_set_alloc_inc;
+
+if ( N%fcst_obs_set_alloc_inc )  ++k;
+
+k *= fcst_obs_set_alloc_inc;
+
+u = new FcstObsSet [k];
+
+if ( set )  { 
+
+   for (j=0; j<n_alloc; ++j)  u[j] = set[j];
+
+   delete [] set;  set = 0;
+
+}
+
+set = u;  u = 0;
+
+n_alloc = k;
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void SetCollection::add_pair(int fcst, int obs)
+
+{
+
    int j;
 
-   if( n_sets >= max_fcst_obs_sets ) {
-      mlog << Error << "\nSetCollection::add_pair(int, int) -> "
-           << "too many sets!\n\n";
-
-      exit(1);
-   }
+   extend(n_sets + 1);
 
    set[n_sets].clear();
 
    set[n_sets].add_pair(fcst, obs);
 
-   n_sets++;
+   ++n_sets;
 
    do {
+
       j = merge();
+
    } while( j > 0 );
 
    return;
+
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int SetCollection::merge() {
+int SetCollection::merge()
+
+{
+
    int j, k;
    int jm, km;
    int need_merge;
@@ -277,7 +568,10 @@ int SetCollection::merge() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void SetCollection::merge_two(int index1, int index2) {
+void SetCollection::merge_two(int index1, int index2)
+
+{
+
    int j;
    int imin, imax;
    FcstObsSet a;
@@ -303,7 +597,7 @@ void SetCollection::merge_two(int index1, int index2) {
 
    n_sets++;
 
-   for(j=n_sets; j<max_fcst_obs_sets; j++) {
+   for(j=n_sets; j<n_alloc; j++) {
       set[j].clear();
    }
 
@@ -398,20 +692,6 @@ void SetCollection::clear_empty_sets() {
       }
    } // end for i
    
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void SetCollection::clear() {
-   int j;
-
-   n_sets = 0;
-
-   for(j=0; j<max_fcst_obs_sets; j++) {
-      set[j].clear();
-   }
-
    return;
 }
 

@@ -24,20 +24,47 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int max_fcst_numbers = 100;
-static const int max_obs_numbers  = 100;
+
+static const int fcst_obs_set_alloc_inc  = 50;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 class FcstObsSet {
+
+   protected:
+
+      void init_from_scratch();
+
+      void assign(const FcstObsSet &);
+
+      void extend(int * &, int & n_alloc, const int n_new);
 
    public:
 
-      int fcst_number[max_fcst_numbers];
-      int obs_number[max_obs_numbers];
+         //
+         //  data
+         //
+
+      int * fcst_number;   //  allocated
+      int * obs_number;    //  allocated
 
       int n_fcst;
       int n_obs;
+
+      int n_fcst_alloc;
+      int n_obs_alloc;
+
+         //
+         //  functions
+         //
+
+      void     clear();
+      void all_clear();
+
+      void extend_fcst (int);
+      void extend_obs  (int);
 
       FcstObsSet();
      ~FcstObsSet();
@@ -52,10 +79,11 @@ class FcstObsSet {
       void add_fcst(int);
       void add_obs(int);
 
-      void clear();
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 extern FcstObsSet union_fcst_obs_sets(const FcstObsSet &, const FcstObsSet &);
 
@@ -63,32 +91,57 @@ extern int fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
 
 extern ostream & operator<<(ostream &, const FcstObsSet &);
 
-///////////////////////////////////////////////////////////////////////////////
-
-static const int max_fcst_obs_sets = 300;
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+// static const int max_fcst_obs_sets = 300;
+
+static const int set_alloc_inc = 50;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 class SetCollection {
 
+      void init_from_scratch();
+
+      void assign(const SetCollection &);
+
+      void extend(int);
+
    public:
 
-      FcstObsSet set[max_fcst_obs_sets];
+         //
+         //  data
+         //
+
+      FcstObsSet * set;   //  allocated
 
       int n_sets;
+
+      int n_alloc;
+
+         //
+         //  functions
+         //
 
       SetCollection();
      ~SetCollection();
       SetCollection(const SetCollection &);
       SetCollection & operator=(const SetCollection &);
 
+      void     clear();
+      void all_clear();
+
       int merge();
 
-      int fcst_set_number(int fcst_number) const;
-      int obs_set_number(int obs_number) const;
+      int fcst_set_number (int fcst_number) const;
+      int  obs_set_number (int obs_number)  const;
 
-      int is_fcst_matched(int fcst_number) const;
-      int is_obs_matched(int obs_number) const;
+      int is_fcst_matched (int fcst_number) const;
+      int  is_obs_matched (int obs_number)  const;
 
       void merge_two(int, int);
 
@@ -96,12 +149,14 @@ class SetCollection {
 
       void clear_empty_sets();
 
-      void clear();
 };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 extern ostream & operator<<(ostream &, const SetCollection &);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

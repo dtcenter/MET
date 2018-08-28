@@ -40,13 +40,13 @@ struct InterestInfo {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-typedef CRR_Array<Color> ColorArray;
+typedef CRR_Array<Color>         ColorArray;
 
-typedef CRR_Array<InterestInfo> InterestInfoArray;
+typedef CRR_Array<InterestInfo>  InterestInfoArray;
 
 typedef CRR_Array<SingleFeature> SingleFeatureArray;
 
-typedef CRR_Array<PairFeature> PairFeatureArray;
+typedef CRR_Array<PairFeature>   PairFeatureArray;
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -73,6 +73,8 @@ class SO3 {
 
       void set_axis_angle(double ax, double ay, double az, double angle);
 
+      void set_identity();
+
          //
          //  get stuff
          //
