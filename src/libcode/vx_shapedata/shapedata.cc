@@ -1975,11 +1975,12 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    map<ConcatString,ThreshArray>::const_iterator it;
    double attr_val;
 
-   bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
+   // bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
 
    // Split the field to number the shapes
    sd_split = split(*this, n);
 
+   bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
 
    // Apply attribute filtering logic to each object
    for(i=1; i<=n; i++) {
