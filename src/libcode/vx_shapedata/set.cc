@@ -121,7 +121,7 @@ void FcstObsSet::clear()
 int j;
 
 for (j=0; j<n_fcst_alloc; ++j)  fcst_number[j] = 0;
-for (j=0; j<n_obs_alloc; ++j)    obs_number[j] = 0;
+for (j=0; j<n_obs_alloc;  ++j)   obs_number[j] = 0;
 
 n_fcst = n_obs = 0;
 
@@ -160,9 +160,8 @@ void FcstObsSet::assign(const FcstObsSet & s)
 
 clear();
 
-int j;
 
-if ( s.fcst_number )  {
+if ( s.n_fcst_alloc > 0 )  {
 
    extend_fcst (s.n_fcst_alloc);
 
@@ -171,7 +170,7 @@ if ( s.fcst_number )  {
 }
 
    
-if ( s.obs_number )   {
+if ( s.n_obs_alloc > 0 )   {
 
    extend_obs  (s.n_obs_alloc);
 
@@ -221,24 +220,24 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void FcstObsSet::extend(int * & a, int & n_alloc, const int n_new)
+void FcstObsSet::extend(int * & a, int & n_alloc, const int N)
 
 {
 
-if ( n_new <= n_alloc )  return;
+if ( N <= n_alloc )  return;
 
 int j, k;
 int * u = 0;
 
-k = n_new/fcst_obs_set_alloc_inc;
+k = N/fcst_obs_set_alloc_inc;
 
-if ( n_new%fcst_obs_set_alloc_inc )  ++k;
+if ( N%fcst_obs_set_alloc_inc )  ++k;
 
 k *= fcst_obs_set_alloc_inc;
 
 u = new int [k];
 
-if ( a )  memcpy(u, a, n_alloc);
+if ( a )  memcpy(u, a, n_alloc*sizeof(int));
 
 for (j=n_alloc; j<k; ++j)  u[j] = 0;
 
@@ -255,6 +254,7 @@ return;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 int FcstObsSet::has_fcst(int k) const
 
 {
@@ -267,9 +267,14 @@ int FcstObsSet::has_fcst(int k) const
    return(0);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-int FcstObsSet::has_obs(int k) const {
+
+int FcstObsSet::has_obs(int k) const
+
+{
+
    int j;
 
    for(j=0; j<n_obs; j++) {
@@ -277,9 +282,12 @@ int FcstObsSet::has_obs(int k) const {
    }
 
    return(0);
+
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void FcstObsSet::add_pair(int fcst, int obs) {
 
@@ -289,11 +297,13 @@ void FcstObsSet::add_pair(int fcst, int obs) {
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void FcstObsSet::add_fcst(int k) {
 
-   if( has_fcst(k) ) return;
+   if ( has_fcst(k) ) return;
 
    extend_fcst(n_fcst + 1);
 
@@ -302,17 +312,20 @@ void FcstObsSet::add_fcst(int k) {
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void FcstObsSet::add_obs(int k) {
 
-   if( has_obs(k) ) return;
+   if ( has_obs(k) ) return;
 
    extend_obs(n_obs + 1);
 
    obs_number[n_obs++] = k;
 
    return;
+
 }
 
 
@@ -445,7 +458,7 @@ void SetCollection::assign(const SetCollection & s)
 
 {
 
-clear();
+all_clear();
 
 if ( ! (s.set) )  return;
 
@@ -471,6 +484,8 @@ void SetCollection::extend(int N)
 {
 
 if ( N <= n_alloc )  return;
+
+// cout << "\n  SetCollection::extend() -> N = " << N << "\n";
 
 int j, k;
 FcstObsSet * u = 0;
@@ -678,22 +693,31 @@ int SetCollection::is_obs_matched(int obs_number) const {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void SetCollection::clear_empty_sets() {
-   int i, j;
+
+void SetCollection::clear_empty_sets()
+
+{
+
+int i, j;
    
-   for(i=0; i<n_sets; i++) {
+for(i=0; i<n_sets; i++) {
    
-      if(set[i].n_fcst == 0 || set[i].n_obs == 0) {
+   if(set[i].n_fcst == 0 || set[i].n_obs == 0) {
       
-         for(j=i; j+1<n_sets; j++) set[j] = set[j+1];
+      for(j=i; (j+1)<n_sets; j++) set[j] = set[j+1];
 	 
-	 n_sets--;
-	 i--;
-      }
-   } // end for i
+      n_sets--;
+
+      i--;
+
+   }   //  if 
+
+}  // for i
    
-   return;
+return;
+
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
