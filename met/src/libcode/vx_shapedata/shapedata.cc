@@ -1980,6 +1980,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    // Split the field to number the shapes
    sd_split = split(*this, n);
 
+
    // Apply attribute filtering logic to each object
    for(i=1; i<=n; i++) {
 
