@@ -95,7 +95,9 @@ RectangularTemplate::RectangularTemplate(int height, int width) :
 				{
 					_addOffset(x, y);
 				} /* endfor x = 0 */    
-		} /* endfor y = 0*/  
+		} /* endfor y = 0*/ 
+
+        _setFirstLastRowColOffsets();   
 }
 
 
