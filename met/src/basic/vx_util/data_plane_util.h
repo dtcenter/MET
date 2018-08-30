@@ -51,6 +51,9 @@ extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,
                SingleThresh t, double vld_t);
 
+extern void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
+               int width, SingleThresh t, double vld_t);
+
 extern void apply_mask(const DataPlane &, const MaskPlane &, NumArray &);
 extern void apply_mask(DataPlane &, const MaskPlane &);
 extern void apply_mask(MaskPlane &, const MaskPlane &);

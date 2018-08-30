@@ -184,13 +184,17 @@ DataPlane smooth_field(const DataPlane &dp,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
-                          int width, const GridTemplateFactory::GridTemplates shape, SingleThresh t, double vld_t) {
+void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp, int width,
+        const GridTemplateFactory::GridTemplates shape,SingleThresh t,
+        double vld_t) {
+   GridPoint *gp = NULL;
+   int x, y, n_vld, n_thr;
+   double v;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
-           << "Grid must have at one point in it. \n\n";
+           << "Grid must have at least one point in it. \n\n";
       exit(1);
    }
 
@@ -201,45 +205,68 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    mlog << Debug(3)
         << "Computing fractional coverage field using the " << t.get_str()
         << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
-      << "(" << gt->size() << ")  " << gt->getClassName() << " interpolation method.\n";
-
+        << "(" << gt->size() << ") " << gt->getClassName() << " interpolation method.\n";
 
    // Initialize the fractional coverage field
    frac_dp = dp;
    frac_dp.set_constant(bad_data_double);
 
    // Compute the fractional coverage meeting the threshold criteria
-   for(int x=0; x<dp.nx(); x++) {
-      for(int y=0; y<dp.ny(); y++) {
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
 
-         int count_vld = 0;
-         int count_thr = 0;
+         // For a new column, initialize the grid template and counts.
+         if(y == 0) {
+            n_vld = n_thr = 0;
+            gt->setGrid(x, y, dp.nx(), dp.ny());
 
-         GridPoint *gp = NULL;
-         for(gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny() );
-             gp != NULL; gp = gt->getNextInGrid()){
+            // Sum all the points
+            for(gp = gt->getNextInGrid();
+                gp != NULL;
+                gp = gt->getNextInGrid()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld++;
+               if(t.check(v)) n_thr++;
+            }
+         }
+         // Otherwise, subtract off the last row and add the next row.
+         else {
 
-            double v = dp.get(gp->x,gp->y);
+            // Subtract points from the the last row
+            for(gp = gt->getNextInLastRow();
+                gp != NULL;
+                gp = gt->getNextInLastRow()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld--;
+               if(t.check(v)) n_thr--;
+            }
 
-            if (is_bad_data(v)) continue;
+            // Increment by one row
+            gt->incRow(1);
 
-            count_vld++;
-
-            if(t.check(v)) {
-               count_thr++;
+            // Add points from the the first row
+            for(gp = gt->getNextInFirstRow();
+                gp != NULL;
+                gp = gt->getNextInFirstRow()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld++;
+               if(t.check(v)) n_thr++;
             }
          }
 
-         // Check whether enough valid grid points were found or leave it as bad_data
-         if( static_cast<double>(count_vld)/gt->size() >= vld_t &&
-             count_vld != 0) {
+         // Check whether enough valid grid points were found or leave it as bad data
+         if( (double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
 
             // Compute and store the fractional coverage
-            double frac = (double) count_thr/count_vld;
-            frac_dp.set(frac, x, y);
+            frac_dp.set((double) n_thr/n_vld, x, y);
          }
-      }
-   }
+
+      } // end for y
+
+      // Increment by one column
+      gt->incCol(1);
+
+   } // end for x
 
    delete gt;
 }
@@ -251,8 +278,8 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
-                         int wdth, SingleThresh t, double vld_t) {
+void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
+                                int wdth, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
    int count_vld, count_thr;
@@ -265,7 +292,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
    // Check that width is set to 1 or greater
    if(wdth < 1) {
-      mlog << Error << "\nfractional_coverage() -> "
+      mlog << Error << "\nfractional_coverage_square() -> "
            << "width must be set to a value of 1 or greater.\n\n";
       exit(1);
    }
