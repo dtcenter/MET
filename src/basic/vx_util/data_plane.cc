@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   data2d.cc
+//   Filename:   data_plane.cc
 //
 //   Description:
 //      Contains the definition of the DataPlane class.

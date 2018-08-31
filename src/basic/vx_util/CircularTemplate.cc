@@ -145,7 +145,7 @@ CircularTemplate::CircularTemplate(const int width) :
     
   } /* endfor - y */
 
-  _setFirstLastRowColOffsets();
+  _setEdgeOffsets();
  
 }
 

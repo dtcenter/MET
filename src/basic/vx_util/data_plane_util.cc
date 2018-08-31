@@ -145,7 +145,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
             default:
                mlog << Error << "\nsmooth_field() -> "
                     << "unsupported interpolation method encountered: "
-                    << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+                    << interpmthd_to_string(mthd) << "(" << mthd
+                    << ")\n\n";
                exit(1);
                break;
          }
@@ -184,9 +185,9 @@ DataPlane smooth_field(const DataPlane &dp,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp, int width,
-        const GridTemplateFactory::GridTemplates shape,SingleThresh t,
-        double vld_t) {
+void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
+        int width, const GridTemplateFactory::GridTemplates shape,
+        SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
    int x, y, n_vld, n_thr;
    double v;
@@ -203,9 +204,10 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp, int width,
    GridTemplate* gt = gtf.buildGT(shape, width);
 
    mlog << Debug(3)
-        << "Computing fractional coverage field using the " << t.get_str()
-        << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
-        << "(" << gt->size() << ") " << gt->getClassName() << " interpolation method.\n";
+        << "Computing fractional coverage field using the "
+        << t.get_str() << " threshold and the "
+        << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+        << ") " << gt->getClassName() << " interpolation method.\n";
 
    // Initialize the fractional coverage field
    frac_dp = dp;
@@ -215,60 +217,61 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp, int width,
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
 
-         // For a new column, initialize the grid template and counts.
+         // For a new column, reset the grid template and counts.
          if(y == 0) {
+
+            // Initialize counts
             n_vld = n_thr = 0;
-            gt->setGrid(x, y, dp.nx(), dp.ny());
 
             // Sum all the points
-            for(gp = gt->getNextInGrid();
+            for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
                 gp != NULL;
-                gp = gt->getNextInGrid()) {
+                gp  = gt->getNextInGrid()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
                if(t.check(v)) n_thr++;
             }
          }
-         // Otherwise, subtract off the last row and add the next row.
+         // Subtract off the bottom edge, shift up, and add the top.
          else {
 
-            // Subtract points from the the last row
-            for(gp = gt->getNextInLastRow();
+            // Subtract points from the the bottom edge
+            for(gp  = gt->getFirstInBotEdge();
                 gp != NULL;
-                gp = gt->getNextInLastRow()) {
+                gp  = gt->getNextInBotEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld--;
                if(t.check(v)) n_thr--;
             }
 
-            // Increment by one row
-            gt->incRow(1);
+            // Increment Y
+            gt->incBaseY(1);
 
-            // Add points from the the first row
-            for(gp = gt->getNextInFirstRow();
+            // Add points from the the top edge
+            for(gp  = gt->getFirstInTopEdge();
                 gp != NULL;
-                gp = gt->getNextInFirstRow()) {
+                gp  = gt->getNextInTopEdge()) {
                if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                n_vld++;
                if(t.check(v)) n_thr++;
             }
          }
 
-         // Check whether enough valid grid points were found or leave it as bad data
-         if( (double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
-
-            // Compute and store the fractional coverage
+         // Check for enough valid data and compute fractional coverage
+         if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
             frac_dp.set((double) n_thr/n_vld, x, y);
          }
 
       } // end for y
 
-      // Increment by one column
-      gt->incCol(1);
+      // Increment X
+      gt->incBaseX(1);
 
    } // end for x
 
    delete gt;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -279,15 +282,16 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp, int width,
 ////////////////////////////////////////////////////////////////////////
 
 void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
-                                int wdth, SingleThresh t, double vld_t) {
+        int wdth, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
    int count_vld, count_thr;
    NumArray box_na;
 
    mlog << Debug(3)
-        << "Computing fractional coverage field using the " << t.get_str()
-        << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
+        << "Computing fractional coverage field using the "
+        << t.get_str() << " threshold and the "
+        << interpmthd_to_string(InterpMthd_Nbrhd)
         << "(" << wdth*wdth << ") interpolation method.\n";
 
    // Check that width is set to 1 or greater
@@ -340,7 +344,7 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
                      yy < 0 || yy >= dp.ny()) {
                      k = bad_data_int;
                   }
-                  // Check the value of v to see if it meets the threshold criteria
+                  // Check v to see if it meets the threshold criteria
                   else {
                      v = dp.get(xx, yy);
                      if(is_bad_data(v))  k = bad_data_int;
@@ -386,7 +390,7 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
                   yy < 0 || yy >= dp.ny()) {
                   k = bad_data_int;
                }
-               // Check the value of v to see if it meets the threshold criteria
+               // Check v to see if it meets the threshold criteria
                else {
                   v = dp.get(xx, yy);
                   if(is_bad_data(v))  k = bad_data_int;
@@ -626,7 +630,8 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
    // Range check area value
    if(area <= 0.0 || area >= 1.0) {
       mlog << Error << "\nnormal_cdf_inv() -> "
-           << "requested area (" << area << ") must be between 0 and 1.\n\n";
+           << "requested area (" << area
+           << ") must be between 0 and 1.\n\n";
       exit(1);
    }
 

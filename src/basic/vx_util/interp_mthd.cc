@@ -43,7 +43,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       case(InterpMthd_Lower_Left):  out = interpmthd_lower_left_str;  break;
 
       case(InterpMthd_None):
-      default:                  out = interpmthd_none_str;    break;
+      default:                      out = interpmthd_none_str;        break;
    }   //  switch
 
    return(out);

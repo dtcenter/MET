@@ -84,19 +84,25 @@ class GridTemplate
 
   GridPoint *getFirstInGrid(const int &base_x, const int &base_y,
                             const int &nx, const int &ny) const;
+  GridPoint *getNextInGrid(void) const;
 
-  GridPoint *getNextInGrid(void)     const;
-  GridPoint *getNextInFirstCol(void) const;
-  GridPoint *getNextInLastCol(void)  const;
-  GridPoint *getNextInFirstRow(void) const;
-  GridPoint *getNextInLastRow(void)  const;
+  GridPoint *getFirstInLftEdge(void) const;
+  GridPoint *getNextInLftEdge(void)  const;
+
+  GridPoint *getFirstInRgtEdge(void) const;
+  GridPoint *getNextInRgtEdge(void)  const;
+
+  GridPoint *getFirstInTopEdge(void) const;
+  GridPoint *getNextInTopEdge(void)  const;
+
+  GridPoint *getFirstInBotEdge(void) const;
+  GridPoint *getNextInBotEdge(void)  const;
 
   void       setGrid(const int &base_x, const int &base_y,
                      const int &nx, const int &ny) const;
 
-  void       incRow(const int &row_inc) const;
-
-  void       incCol(const int &col_inc) const;
+  void       incBaseX(const int &x_inc) const;
+  void       incBaseY(const int &y_inc) const;
 
   // Printing methods
 
@@ -137,18 +143,18 @@ class GridTemplate
 
   // The offsets that define the first and last rows and columns
 
-  vector< GridOffset* > _offsetFirstCol; // not allocated
-  vector< GridOffset* > _offsetLastCol;  // not allocated
-  vector< GridOffset* > _offsetFirstRow; // not allocated
-  vector< GridOffset* > _offsetLastRow;  // not allocated
+  vector< GridOffset* > _offsetLftEdge;   // not allocated
+  vector< GridOffset* > _offsetRgtEdge;  // not allocated
+  vector< GridOffset* > _offsetTopEdge;    // not allocated
+  vector< GridOffset* > _offsetBotEdge; // not allocated
 
   // Iterator for finding points within a grid
 
   mutable vector< GridOffset* >::const_iterator _pointInGridIterator;
-  mutable vector< GridOffset* >::const_iterator _pointInFirstColIterator;
-  mutable vector< GridOffset* >::const_iterator _pointInLastColIterator;
-  mutable vector< GridOffset* >::const_iterator _pointInFirstRowIterator;
-  mutable vector< GridOffset* >::const_iterator _pointInLastRowIterator;
+  mutable vector< GridOffset* >::const_iterator _pointInLftEdgeIterator;
+  mutable vector< GridOffset* >::const_iterator _pointInRgtEdgeIterator;
+  mutable vector< GridOffset* >::const_iterator _pointInTopEdgeIterator;
+  mutable vector< GridOffset* >::const_iterator _pointInBotEdgeIterator;
 
   mutable GridPoint _pointInGridBase;
   mutable int _pointInGridNumX;
@@ -161,7 +167,7 @@ class GridTemplate
 
   // Determine the offsets for the First/Last Row/Column
 
-  void _setFirstLastRowColOffsets();
+  void _setEdgeOffsets();
 
 };
 
