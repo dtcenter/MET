@@ -30,11 +30,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void lambert_grid_output       (const GridInfo &, NcFile * ncfile);
-static void latlon_grid_output        (const GridInfo &, NcFile * ncfile);
-static void stereographic_grid_output (const GridInfo &, NcFile * ncfile);
-static void mercator_grid_output      (const GridInfo &, NcFile * ncfile);
-static void gaussian_grid_output      (const GridInfo &, NcFile * ncfile);
+static void lambert_grid_output        (const GridInfo &, NcFile * ncfile);
+static void latlon_grid_output         (const GridInfo &, NcFile * ncfile);
+static void rotated_latlon_grid_output (const GridInfo &, NcFile * ncfile);
+static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
+static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
+static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,11 +54,12 @@ if ( !(info.ok()) )  {
 
 }
 
-     if ( info.lc )  lambert_grid_output       (info, ncfile);
-else if ( info.st )  stereographic_grid_output (info, ncfile);
-else if ( info.ll )  latlon_grid_output        (info, ncfile);
-else if ( info.m  )  mercator_grid_output      (info, ncfile);
-else if ( info.g  )  gaussian_grid_output      (info, ncfile);
+     if ( info.lc  )  lambert_grid_output         (info, ncfile);
+else if ( info.st  )  stereographic_grid_output   (info, ncfile);
+else if ( info.ll  )  latlon_grid_output          (info, ncfile);
+else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
+else if ( info.m   )  mercator_grid_output        (info, ncfile);
+else if ( info.g   )  gaussian_grid_output        (info, ncfile);
 else {
 
    mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
@@ -93,7 +95,7 @@ add_att(ncfile, "Projection", "Lambert Conformal");
    //  hemisphere
    //
 
-sprintf(junk, "%c", data.hemisphere);
+snprintf(junk, sizeof(junk), "%c", data.hemisphere);
 
 ncfile->putAtt("hemisphere", junk);
 
@@ -101,7 +103,7 @@ ncfile->putAtt("hemisphere", junk);
    //  scale_lat_1
    //
 
-sprintf(junk, "%.6f", data.scale_lat_1);
+snprintf(junk, sizeof(junk), "%.6f", data.scale_lat_1);
 
 ncfile->putAtt("scale_lat_1", junk);
 
@@ -109,7 +111,7 @@ ncfile->putAtt("scale_lat_1", junk);
    //  scale_lat_2
    //
 
-sprintf(junk, "%.6f", data.scale_lat_2);
+snprintf(junk, sizeof(junk), "%.6f", data.scale_lat_2);
 
 ncfile->putAtt("scale_lat_2", junk);
 
@@ -118,7 +120,7 @@ ncfile->putAtt("scale_lat_2", junk);
    //  lat_pin
    //
 
-sprintf(junk, "%.6f", data.lat_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.lat_pin);
 
 ncfile->putAtt("lat_pin", junk);
 
@@ -130,7 +132,7 @@ t = data.lon_pin;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%.6f", t);
+snprintf(junk, sizeof(junk), "%.6f", t);
 
 ncfile->putAtt("lon_pin", junk);
 
@@ -138,7 +140,7 @@ ncfile->putAtt("lon_pin", junk);
    //  x_pin
    //
 
-sprintf(junk, "%.6f", data.x_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.x_pin);
 
 ncfile->putAtt("x_pin", junk);
 
@@ -146,7 +148,7 @@ ncfile->putAtt("x_pin", junk);
    //  y_pin
    //
 
-sprintf(junk, "%.6f", data.y_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.y_pin);
 
 ncfile->putAtt("y_pin", junk);
 
@@ -158,7 +160,7 @@ t = data.lon_orient;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%.6f", t);
+snprintf(junk, sizeof(junk), "%.6f", t);
 
 ncfile->putAtt("lon_orient", junk);
 
@@ -166,7 +168,7 @@ ncfile->putAtt("lon_orient", junk);
    //  d_km
    //
 
-sprintf(junk, "%.6f", data.d_km);
+snprintf(junk, sizeof(junk), "%.6f", data.d_km);
 
 ncfile->putAtt("d_km", junk);
 
@@ -174,7 +176,7 @@ ncfile->putAtt("d_km", junk);
    //  r_km
    //
 
-sprintf(junk, "%.6f", data.r_km);
+snprintf(junk, sizeof(junk), "%.6f", data.r_km);
 
 ncfile->putAtt("r_km", junk);
 
@@ -182,7 +184,7 @@ ncfile->putAtt("r_km", junk);
    //  nx
    //
 
-sprintf(junk, "%d", data.nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 ncfile->putAtt("nx", junk);
 
@@ -190,7 +192,7 @@ ncfile->putAtt("nx", junk);
    //  ny
    //
 
-sprintf(junk, "%d grid_points", data.ny);
+snprintf(junk, sizeof(junk), "%d grid_points", data.ny);
 
 ncfile->putAtt("ny", junk);
 
@@ -221,7 +223,7 @@ ncfile->putAtt("Projection", "LatLon");
    //  lat_ll
    //
 
-sprintf(junk, "%f degrees_north", data.lat_ll);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_ll);
 
 ncfile->putAtt("lat_ll", junk);
 
@@ -233,7 +235,7 @@ t = data.lon_ll;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%f degrees_east", t);
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
 ncfile->putAtt("lon_ll", junk);
 
@@ -241,7 +243,7 @@ ncfile->putAtt("lon_ll", junk);
    //  delta_lat
    //
 
-sprintf(junk, "%f degrees", data.delta_lat);
+snprintf(junk, sizeof(junk), "%f degrees", data.delta_lat);
 
 ncfile->putAtt("delta_lat", junk);
 
@@ -253,7 +255,7 @@ t = data.delta_lon;
 
 // if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%f degrees", t);
+snprintf(junk, sizeof(junk), "%f degrees", t);
 
 ncfile->putAtt("delta_lon", junk);
 
@@ -261,7 +263,7 @@ ncfile->putAtt("delta_lon", junk);
    //  Nlat
    //
 
-sprintf(junk, "%d grid_points", data.Nlat);
+snprintf(junk, sizeof(junk), "%d grid_points", data.Nlat);
 
 ncfile->putAtt("Nlat", junk);
 
@@ -269,9 +271,110 @@ ncfile->putAtt("Nlat", junk);
    //  Nlon
    //
 
-sprintf(junk, "%d grid_points", data.Nlon);
+snprintf(junk, sizeof(junk), "%d grid_points", data.Nlon);
 
 ncfile->putAtt("Nlon", junk);
+
+   //
+   // done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void rotated_latlon_grid_output(const GridInfo & info, NcFile * ncfile)
+
+{
+
+char junk[256];
+double t;
+const RotatedLatLonData & data = *(info.rll);
+
+ncfile->putAtt("Projection", rotated_latlon_proj_type);
+
+   //
+   //  true_lat_ll
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_ll);
+
+ncfile->putAtt("true_lat_ll", junk);
+
+   //
+   //  true_lon_ll
+   //
+
+t = data.true_lon_ll;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("true_lon_ll", junk);
+
+   //
+   //  delta_new_lat
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees", data.delta_new_lat);
+
+ncfile->putAtt("delta_new_lat", junk);
+
+   //
+   //  delta_new_lon
+   //
+
+t = data.delta_new_lon;
+
+// if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees", t);
+
+ncfile->putAtt("delta_new_lon", junk);
+
+   //
+   //  Nlat
+   //
+
+snprintf(junk, sizeof(junk), "%d grid_points", data.Nlat);
+
+ncfile->putAtt("Nlat", junk);
+
+   //
+   //  Nlon
+   //
+
+snprintf(junk, sizeof(junk), "%d grid_points", data.Nlon);
+
+ncfile->putAtt("Nlon", junk);
+
+   //
+   //  true_lat_north_pole
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_north_pole);
+
+ncfile->putAtt("true_lat_north_pole", junk);
+
+   //
+   //  true_lon_north_pole
+   //
+
+t = data.true_lon_north_pole;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("true_lon_north_pole", junk);
+
+
+
 
    //
    // done
@@ -300,7 +403,7 @@ ncfile->putAtt("Projection", "Polar Stereographic");
    //  hemisphere
    //
 
-sprintf(junk, "%c", data.hemisphere);
+snprintf(junk, sizeof(junk), "%c", data.hemisphere);
 
 ncfile->putAtt("hemisphere", junk);
 
@@ -308,7 +411,7 @@ ncfile->putAtt("hemisphere", junk);
    //  scale_lat
    //
 
-sprintf(junk, "%f degrees_north", data.scale_lat);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.scale_lat);
 
 ncfile->putAtt("scale_lat", junk);
 
@@ -316,7 +419,7 @@ ncfile->putAtt("scale_lat", junk);
    //  lat_pin
    //
 
-sprintf(junk, "%.6f", data.lat_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.lat_pin);
 
 ncfile->putAtt("lat_pin", junk);
 
@@ -328,7 +431,7 @@ t = data.lon_pin;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%.6f", t);
+snprintf(junk, sizeof(junk), "%.6f", t);
 
 ncfile->putAtt("lon_pin", junk);
 
@@ -336,7 +439,7 @@ ncfile->putAtt("lon_pin", junk);
    //  x_pin
    //
 
-sprintf(junk, "%.6f", data.x_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.x_pin);
 
 ncfile->putAtt("x_pin", junk);
 
@@ -344,7 +447,7 @@ ncfile->putAtt("x_pin", junk);
    //  y_pin
    //
 
-sprintf(junk, "%.6f", data.y_pin);
+snprintf(junk, sizeof(junk), "%.6f", data.y_pin);
 
 ncfile->putAtt("y_pin", junk);
 
@@ -356,7 +459,7 @@ t = data.lon_orient;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%.6f", t);
+snprintf(junk, sizeof(junk), "%.6f", t);
 
 ncfile->putAtt("lon_orient", junk);
 
@@ -364,7 +467,7 @@ ncfile->putAtt("lon_orient", junk);
    //  d_km
    //
 
-sprintf(junk, "%.6f km", data.d_km);
+snprintf(junk, sizeof(junk), "%.6f km", data.d_km);
 
 ncfile->putAtt("d_km", junk);
 
@@ -372,7 +475,7 @@ ncfile->putAtt("d_km", junk);
    //  r_km
    //
 
-sprintf(junk, "%.6f km", data.r_km);
+snprintf(junk, sizeof(junk), "%.6f km", data.r_km);
 
 ncfile->putAtt("r_km", junk);
 
@@ -380,7 +483,7 @@ ncfile->putAtt("r_km", junk);
    //  nx
    //
 
-sprintf(junk, "%d", data.nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 ncfile->putAtt("nx", junk);
 
@@ -388,7 +491,7 @@ ncfile->putAtt("nx", junk);
    //  ny
    //
 
-sprintf(junk, "%d", data.ny);
+snprintf(junk, sizeof(junk), "%d", data.ny);
 
 ncfile->putAtt("ny", junk);
 
@@ -419,7 +522,7 @@ ncfile->putAtt("Projection", "Mercator");
    //  lat_ll
    //
 
-sprintf(junk, "%f degrees_north", data.lat_ll);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_ll);
 
 ncfile->putAtt("lat_ll", junk);
 
@@ -431,7 +534,7 @@ t = data.lon_ll;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%f degrees_east", t);
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
 ncfile->putAtt("lon_ll", junk);
 
@@ -439,7 +542,7 @@ ncfile->putAtt("lon_ll", junk);
    //  lat_ur
    //
 
-sprintf(junk, "%f degrees_north", data.lat_ur);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_ur);
 
 ncfile->putAtt("lat_ur", junk);
 
@@ -451,7 +554,7 @@ t = data.lon_ur;
 
 if ( !west_longitude_positive )  t = -t;
 
-sprintf(junk, "%f degrees_east", t);
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
 ncfile->putAtt("lon_ur", junk);
 
@@ -459,7 +562,7 @@ ncfile->putAtt("lon_ur", junk);
    //  nx
    //
 
-sprintf(junk, "%d", data.nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 ncfile->putAtt("nx", junk);
 
@@ -467,7 +570,7 @@ ncfile->putAtt("nx", junk);
    //  ny
    //
 
-sprintf(junk, "%d", data.ny);
+snprintf(junk, sizeof(junk), "%d", data.ny);
 
 ncfile->putAtt("ny", junk);
 

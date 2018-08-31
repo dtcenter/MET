@@ -46,6 +46,7 @@ static const char full_domain_str[]      = "FULL";
 ////////////////////////////////////////////////////////////////////////
 
 static const char latlon_proj_type         [] = "LatLon";
+static const char rotated_latlon_proj_type [] = "Rotated LatLon";
 static const char mercator_proj_type       [] = "Mercator";
 static const char lambert_proj_type        [] = "Lambert Conformal";
 static const char stereographic_proj_type  [] = "Polar Stereographic";

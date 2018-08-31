@@ -25,18 +25,19 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void read_netcdf_grid_v3       (NcFile *, Grid &);
-static void read_netcdf_grid_v2       (NcFile *, Grid &);
+static void read_netcdf_grid_v3        (NcFile *, Grid &);
+static void read_netcdf_grid_v2        (NcFile *, Grid &);
 
-static void get_latlon_data_v3        (NcFile *, LatLonData &);
-static void get_lambert_data_v3       (NcFile *, LambertData &);
-static void get_stereographic_data_v3 (NcFile *, StereographicData &);
-static void get_mercator_data_v3      (NcFile *, MercatorData &);
+static void get_latlon_data_v3         (NcFile *, LatLonData &);
+static void get_rotated_latlon_data_v3 (NcFile *, RotatedLatLonData &);
+static void get_lambert_data_v3        (NcFile *, LambertData &);
+static void get_stereographic_data_v3  (NcFile *, StereographicData &);
+static void get_mercator_data_v3       (NcFile *, MercatorData &);
 
-static void get_latlon_data_v2        (NcFile *, LatLonData &);
-static void get_lambert_data_v2       (NcFile *, LambertData &);
-static void get_stereographic_data_v2 (NcFile *, StereographicData &);
-static void get_mercator_data_v2      (NcFile *, MercatorData &);
+static void get_latlon_data_v2         (NcFile *, LatLonData &);
+static void get_lambert_data_v2        (NcFile *, LambertData &);
+static void get_stereographic_data_v2  (NcFile *, StereographicData &);
+static void get_mercator_data_v2       (NcFile *, MercatorData &);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,6 +97,12 @@ NcAtt * proj_att = (NcAtt *) 0;
       get_latlon_data_v3(f_in, ll_data);
 
       gr.set(ll_data);
+
+   } else if ( strcmp(proj_att->as_string(0), rotated_latlon_proj_type) == 0 )  {
+
+      get_rotated_latlon_data_v3(f_in, mc_data);
+
+      gr.set(rll_data);
 
    } else if ( strcmp(proj_att->as_string(0), mercator_proj_type) == 0 )  {
 
@@ -289,6 +296,72 @@ return;
 
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+void get_rotated_latlon_data_v3(NcFile * ncfile, RotatedLatLonData & data)
+
+{
+
+NcAtt * att = (NcAtt *) 0;
+double t;
+
+   // Store the grid name
+
+data.name = rotated_latlon_proj_type;
+
+   // Latitude of the bottom left corner
+
+att = get_nc_att(ncfile, , "true_lat_ll");
+data.true_lat_ll = atof(att->as_string(0));
+
+   // Longitude of the bottom left corner
+
+att = get_nc_att(ncfile, "true_lon_ll");
+t = atof(att->as_string(0));
+data.lon_ll = -t;
+
+   // Latitude increment
+
+att = get_nc_att(ncfile, "delta_new_lat");
+data.delta_new_lat = atof(att->as_string(0));
+
+   // Longitude increment
+
+att = get_nc_att(ncfile, "delta_new_lon");
+data.delta_new_lon = atof(att->as_string(0));
+
+   // Number of points in the Latitude (y) direction
+
+att = get_nc_att(ncfile, "Nlat");
+data.Nlat = atoi(att->as_string(0));
+
+   // Number of points in the Longitudinal (x) direction
+
+att = get_nc_att(ncfile, "Nlon");
+data.Nlon = atoi(att->as_string(0));
+
+   // True latitude of the rotated north pole
+
+att = get_nc_att(ncfile, "true_lat_north_pole");
+data.true_lat_north_pole = atof(att->as_string(0));
+
+   // True longitude of the rotated north pole
+
+att = get_nc_att(ncfile, "true_lon_north_pole");
+t = atof(att->as_string(0));
+data.true_lon_north_pole = -t;
+
+
+data.dump();
+
+   //
+   //  done
+   //
+
+return;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
