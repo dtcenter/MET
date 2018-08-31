@@ -247,12 +247,12 @@ void GridInfo::clear()
 
 {
 
-if ( lc  )  { delete lc;  lc  = (const LambertData *)       0; };
-if ( st  )  { delete st;  st  = (const StereographicData *) 0; };
-if ( ll  )  { delete ll;  ll  = (const LatLonData *)        0; };
-if ( rll )  { delete rll; rll = (const RotatedLatLonData *) 0; };
-if ( m   )  { delete m;   m   = (const MercatorData *)      0; };
-if ( g   )  { delete g;   g   = (const GaussianData *)      0; };
+if ( lc  )  { delete lc;   lc  = (const LambertData *)       0; };
+if ( st  )  { delete st;   st  = (const StereographicData *) 0; };
+if ( ll  )  { delete ll;   ll  = (const LatLonData *)        0; };
+if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
+if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
+if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 
 return;
 

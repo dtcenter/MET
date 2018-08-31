@@ -224,6 +224,26 @@ void RotatedLatLonGrid::dump(ostream & out, int depth) const
 
 {
 
+Indent prefix(depth);
+
+out << prefix << "Name                = ";
+
+if ( nonempty(RData.name) )  out << '\"' << RData.name << '\"';
+else                         out << "(nul)\n";
+
+out << prefix << '\n';
+
+out << prefix << "true_lat_ll         = " << RData.true_lat_ll << "\n";
+out << prefix << "true_lon_ll         = " << RData.true_lon_ll << "\n";
+
+out << prefix << "delta_new_lat       = " << RData.delta_new_lat << "\n";
+out << prefix << "delta_new_lon       = " << RData.delta_new_lon << "\n";
+
+out << prefix << "true_lat_north_pole = " << RData.true_lat_north_pole << "\n";
+out << prefix << "true_lon_north_pole = " << RData.true_lon_north_pole << "\n";
+
+
+
 
    //
    //  done
