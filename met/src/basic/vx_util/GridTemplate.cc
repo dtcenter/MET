@@ -77,9 +77,9 @@ GridTemplate::GridTemplate(const GridTemplate& rhs)
         offset_iter != rhs._offsetList.end(); ++offset_iter)
       _offsetList.push_back(new GridOffset(*offset_iter));
 
-   _pointInGridBase = rhs._pointInGridBase;
-   _pointInGridNumX = rhs._pointInGridNumX;
-   _pointInGridNumY = rhs._pointInGridNumY;
+   _pointInGridBase   = rhs._pointInGridBase;
+   _pointInGridNumX   = rhs._pointInGridNumX;
+   _pointInGridNumY   = rhs._pointInGridNumY;
    _pointInGridReturn = rhs._pointInGridReturn;
 }
 
@@ -108,8 +108,9 @@ GridTemplate::~GridTemplate(void)
  * calling routine.
  */
 
-GridPoint *GridTemplate::getFirstInGrid(const int &base_x, const int &base_y,
-                                        const int &nx, const int &ny) const
+GridPoint *GridTemplate::getFirstInGrid(
+                            const int &base_x, const int &base_y,
+                            const int &nx, const int &ny) const
 {
   // Set the grid information
 
@@ -154,21 +155,38 @@ GridPoint *GridTemplate::getNextInGrid(void) const
 }
 
 /**********************************************************************
- * getNextInFirstCol() - Get the next template grid point in the first
- *                       column. Returns NULL when there are no more
- *                       points in the first column.
+ * getFirstInLftEdge() - Get the first template grid point in the left
+ *                       column.
  *
  * Returns a pointer to a static object which must NOT be deleted by the
  * calling routine.
  */
 
-GridPoint *GridTemplate::getNextInFirstCol(void) const
+GridPoint *GridTemplate::getFirstInLftEdge(void) const
 {
-  while (_pointInFirstColIterator != _offsetFirstCol.end())
-  {
-    GridOffset *offset = *_pointInFirstColIterator;
+  // Reset the iterator and send back the first point
 
-    _pointInFirstColIterator++;
+  _pointInLftEdgeIterator = _offsetLftEdge.begin();
+
+  return getNextInLftEdge();
+}
+
+/**********************************************************************
+ * getNextInLftEdge() - Get the next template grid point in the first
+ *                      column. Returns NULL when there are no more
+ *                      points in the first column.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getNextInLftEdge(void) const
+{
+  while (_pointInLftEdgeIterator != _offsetLftEdge.end())
+  {
+    GridOffset *offset = *_pointInLftEdgeIterator;
+
+    _pointInLftEdgeIterator++;
 
     _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
     _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
@@ -187,21 +205,38 @@ GridPoint *GridTemplate::getNextInFirstCol(void) const
 }
 
 /**********************************************************************
- * getNextInFirstRow() - Get the next template grid point in the first
- *                       column. Returns NULL when there are no more
- *                       points in the first column.
+ * getFirstInTopEdge() - Get the first template grid point in the
+ *                       top row.
  *
  * Returns a pointer to a static object which must NOT be deleted by the
  * calling routine.
  */
 
-GridPoint *GridTemplate::getNextInFirstRow(void) const
+GridPoint *GridTemplate::getFirstInTopEdge(void) const
 {
-  while (_pointInFirstRowIterator != _offsetFirstRow.end())
-  {
-    GridOffset *offset = *_pointInFirstRowIterator;
+  // Reset the iterator and send back the first point
 
-    _pointInFirstRowIterator++;
+  _pointInTopEdgeIterator = _offsetTopEdge.begin();
+
+  return getNextInTopEdge();
+}
+
+/**********************************************************************
+ * getNextInTopEdge() - Get the next template grid point in the top
+ *                      row. Returns NULL when there are no more
+ *                      points in the top row.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getNextInTopEdge(void) const
+{
+  while (_pointInTopEdgeIterator != _offsetTopEdge.end())
+  {
+    GridOffset *offset = *_pointInTopEdgeIterator;
+
+    _pointInTopEdgeIterator++;
 
     _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
     _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
@@ -220,21 +255,38 @@ GridPoint *GridTemplate::getNextInFirstRow(void) const
 }
 
 /**********************************************************************
- * getNextInLastCol() - Get the next template grid point in the first
- *                       column. Returns NULL when there are no more
- *                       points in the first column.
+ * getFirstInRgtEdge() - Get the first template grid point in the
+ *                       right column.
  *
  * Returns a pointer to a static object which must NOT be deleted by the
  * calling routine.
  */
 
-GridPoint *GridTemplate::getNextInLastCol(void) const
+GridPoint *GridTemplate::getFirstInRgtEdge(void) const
 {
-  while (_pointInLastColIterator != _offsetLastCol.end())
-  {
-    GridOffset *offset = *_pointInLastColIterator;
+  // Reset the iterator and send back the first point
 
-    _pointInLastColIterator++;
+  _pointInRgtEdgeIterator = _offsetRgtEdge.begin();
+
+  return getNextInRgtEdge();
+}
+
+/**********************************************************************
+ * getNextInRgtEdge() - Get the next template grid point in the right
+ *                      column. Returns NULL when there are no more
+ *                      points in the right column.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getNextInRgtEdge(void) const
+{
+  while (_pointInRgtEdgeIterator != _offsetRgtEdge.end())
+  {
+    GridOffset *offset = *_pointInRgtEdgeIterator;
+
+    _pointInRgtEdgeIterator++;
 
     _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
     _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
@@ -253,21 +305,38 @@ GridPoint *GridTemplate::getNextInLastCol(void) const
 }
 
 /**********************************************************************
- * getNextInLastRow() - Get the next template grid point in the first
- *                       column. Returns NULL when there are no more
- *                       points in the first column.
+ * getFirstInBotEdge() - Get the first template grid point in the
+ *                       bottom row.
  *
  * Returns a pointer to a static object which must NOT be deleted by the
  * calling routine.
  */
 
-GridPoint *GridTemplate::getNextInLastRow(void) const
+GridPoint *GridTemplate::getFirstInBotEdge(void) const
 {
-  while (_pointInLastRowIterator != _offsetLastRow.end())
-  {
-    GridOffset *offset = *_pointInLastRowIterator;
+  // Reset the iterator and send back the first point
 
-    _pointInLastRowIterator++;
+  _pointInBotEdgeIterator = _offsetBotEdge.begin();
+
+  return getNextInBotEdge();
+}
+
+/**********************************************************************
+ * getNextInBotEdge() - Get the next template grid point in the bottom
+ *                      row. Returns NULL when there are no more points
+ *                      in the bottom row.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getNextInBotEdge(void) const
+{
+  while (_pointInBotEdgeIterator != _offsetBotEdge.end())
+  {
+    GridOffset *offset = *_pointInBotEdgeIterator;
+
+    _pointInBotEdgeIterator++;
 
     _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
     _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
@@ -295,12 +364,12 @@ void GridTemplate::setGrid(const int &base_x, const int &base_y,
 {
   // Set up the iterators and save the grid information
 
-  _pointInGridIterator     = _offsetList.begin();
+  _pointInGridIterator    = _offsetList.begin();
 
-  _pointInFirstColIterator = _offsetFirstCol.begin();
-  _pointInLastColIterator  = _offsetLastCol.begin();
-  _pointInFirstRowIterator = _offsetFirstRow.begin();
-  _pointInLastRowIterator  = _offsetLastRow.begin();
+  _pointInLftEdgeIterator = _offsetLftEdge.begin();
+  _pointInRgtEdgeIterator = _offsetRgtEdge.begin();
+  _pointInTopEdgeIterator = _offsetTopEdge.begin();
+  _pointInBotEdgeIterator = _offsetBotEdge.begin();
 
   _pointInGridBase.x = base_x;
   _pointInGridBase.y = base_y;
@@ -312,20 +381,14 @@ void GridTemplate::setGrid(const int &base_x, const int &base_y,
 }
 
 /**********************************************************************
- * incCol() - Increment the column (base_x) location and reset the
- *            offset lists.
+ * incBaseX() - Increment the base_x location and reset the offset
+ *              iterators.
  */
 
-void GridTemplate::incCol(const int &col_inc) const
+void GridTemplate::incBaseX(const int &x_inc) const
 {
 
-  _pointInGridIterator     = _offsetList.begin();
-  _pointInFirstColIterator = _offsetFirstCol.begin();
-  _pointInLastColIterator  = _offsetLastCol.begin();
-  _pointInFirstRowIterator = _offsetFirstRow.begin();
-  _pointInLastRowIterator  = _offsetLastRow.begin();
-
-  _pointInGridBase.x += col_inc;
+  _pointInGridBase.x += x_inc;
 
   _pointInGridBase.x = _pointInGridBase.x % _pointInGridNumX;
 
@@ -333,20 +396,14 @@ void GridTemplate::incCol(const int &col_inc) const
 }
 
 /**********************************************************************
- * incRow() - Increment the row (base_y) location and reset the
- *            offset lists.
+ * incBaseY() - Increment the base_y location and reset the offset
+ *              iterators.
  */
 
-void GridTemplate::incRow(const int &row_inc) const
+void GridTemplate::incBaseY(const int &y_inc) const
 {
 
-  _pointInGridIterator     = _offsetList.begin();
-  _pointInFirstColIterator = _offsetFirstCol.begin();
-  _pointInLastColIterator  = _offsetLastCol.begin();
-  _pointInFirstRowIterator = _offsetFirstRow.begin();
-  _pointInLastRowIterator  = _offsetLastRow.begin();
-
-  _pointInGridBase.y += row_inc;
+  _pointInGridBase.y += y_inc;
 
   _pointInGridBase.y = _pointInGridBase.y % _pointInGridNumY;
 
@@ -362,7 +419,7 @@ void GridTemplate::printOffsetList(FILE *stream)
 {
   vector< GridOffset* >::iterator ol_iterator;
 
-  for (ol_iterator = _offsetList.begin();
+  for (ol_iterator  = _offsetList.begin();
        ol_iterator != _offsetList.end();
        ol_iterator++)
   {
@@ -398,11 +455,11 @@ void GridTemplate::_addOffset(int x_offset, int y_offset)
 }
 
 /**********************************************************************
- * _setFirstLastRowColOffsets() - Process the current offset list and
- *                                determine the edges.
+ * _setEdgeOffsets() - Process the current offset list and find the
+ *                     edges.
  */
 
-void GridTemplate::_setFirstLastRowColOffsets()
+void GridTemplate::_setEdgeOffsets()
 {
   vector< GridOffset* >::iterator v_iterator;
   map< int, GridOffset* >::iterator m_iterator;
@@ -442,36 +499,36 @@ void GridTemplate::_setFirstLastRowColOffsets()
 
   }
 
-  // Store min_x_by_y map as _offsetFirstCol vector
+  // Store min_x_by_y map as _offsetLftEdge vector
   for (m_iterator  = min_x_by_y.begin();
        m_iterator != min_x_by_y.end();
        m_iterator++)
   {
-     _offsetFirstCol.push_back(m_iterator->second);
+     _offsetLftEdge.push_back(m_iterator->second);
   }
 
-  // Store max_x_by_y map as _offsetLastCol vector
+  // Store max_x_by_y map as _offsetRgtEdge vector
   for (m_iterator  = max_x_by_y.begin();
        m_iterator != max_x_by_y.end();
        m_iterator++)
   {
-     _offsetLastCol.push_back(m_iterator->second);
+     _offsetRgtEdge.push_back(m_iterator->second);
   }
 
-  // Store max_y_by_x map as _offsetFirstRow vector
+  // Store max_y_by_x map as _offsetTopEdge vector
   for (m_iterator  = max_y_by_x.begin();
        m_iterator != max_y_by_x.end();
        m_iterator++)
   {
-     _offsetFirstRow.push_back(m_iterator->second);
+     _offsetTopEdge.push_back(m_iterator->second);
   }
 
-  // Store min_y_by_x map as _offsetLastRow vector
+  // Store min_y_by_x map as _offsetBotEdge vector
   for (m_iterator  = min_y_by_x.begin();
        m_iterator != min_y_by_x.end();
        m_iterator++)
   {
-     _offsetLastRow.push_back(m_iterator->second);
+     _offsetBotEdge.push_back(m_iterator->second);
   }
 
   return;
