@@ -156,6 +156,7 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
+   DataPlane dp;
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
@@ -222,6 +223,25 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
+
+   // For python types read the first field to set the grid
+   if(ftype == FileType_Python_Numpy ||
+      ftype == FileType_Python_Xarray) {
+      if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
+         mlog << Error << "\nTrouble reading data from forecast file \""
+              << fcst_file << "\"\n\n";
+         exit(1);
+      }
+   }
+
+   if(otype == FileType_Python_Numpy ||
+      otype == FileType_Python_Xarray) {
+      if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
+         mlog << Error << "\nTrouble reading data from observation file \""
+              << obs_file << "\"\n\n";
+         exit(1);
+      }
+   }
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),

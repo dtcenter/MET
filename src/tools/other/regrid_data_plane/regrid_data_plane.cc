@@ -262,6 +262,34 @@ void process_data_file() {
            << "\"" << InputFilename << "\" not a valid data file\n\n";
       exit(1);
    }
+
+   // Store the input data file types
+   ftype = fr_mtddf->file_type();
+
+   // Setup the VarInfo request object
+   VarInfoFactory v_factory;
+   VarInfo *vinfo;
+   vinfo = v_factory.new_var_info(ftype);
+
+   if(!vinfo) {
+      mlog << Error << "\nprocess_data_file() -> "
+           << "unable to determine file type of \"" << InputFilename
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // For python types read the first field to set the grid
+   if(ftype == FileType_Python_Numpy ||
+      ftype == FileType_Python_Xarray) {
+      config.read_string(FieldSA[0]);
+      vinfo->set_dict(config);
+      if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
+         mlog << Error << "\nTrouble reading data from file \""
+              << InputFilename << "\"\n\n";
+         exit(1);
+      }
+   }
+
    fr_grid = fr_mtddf->grid();
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
 
@@ -278,18 +306,6 @@ void process_data_file() {
 
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
-
-   // Setup the VarInfo request object
-   VarInfoFactory v_factory;
-   VarInfo *vinfo;
-   vinfo = v_factory.new_var_info(fr_mtddf->file_type());
-
-   if(!vinfo) {
-      mlog << Error << "\nprocess_data_file() -> "
-           << "unable to determine file type of \"" << InputFilename
-           << "\"\n\n";
-      exit(1);
-   }
 
    // Open the output file
    open_nc(to_grid, run_cs);
@@ -588,7 +604,7 @@ void process_data_only_file() {
    unixtime init_time, valid_time;
    ConcatString time_unit, tmp_time_unit;
    double *time_values = new double[100];
-   
+
    valid_time = 0;
    time_values[0] = 0;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(_nc_in);
@@ -605,14 +621,14 @@ void process_data_only_file() {
          break;
       }
    }
-   
+
    if (valid_time == 0) {
       mlog << Error << "\n" << method_name << "-> "
            << "trouble finding time variable from \""
            << InputFilename << "\"\n\n";
       exit(1);
    }
-   
+
    init_time = valid_time;
    // time_coverage_start = "2018-05-14T17:02:21.5Z" ;
    //ConcatString att_value;
@@ -624,14 +640,14 @@ void process_data_only_file() {
    to_dp.set_size(to_lon_count, to_lat_count);
    to_dp.set_init(init_time);
    to_dp.set_valid(valid_time);
-   
+
    NcVar var_qc;
    int qc_filtered_count;
    int global_attr_count;
    ConcatString qc_var_name;
 
    global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
-   
+
    // Loop through the requested fields
    bool has_qc_flags = (qc_flags.n_elements() > 0);
    for(int i=0; i<FieldSA.n_elements(); i++) {
@@ -733,7 +749,7 @@ void process_data_only_file() {
                         to_value = (to_value + dataArray[(data_count/2)+1])/2;
                   }
                   else to_value = dataArray.sum() / data_count;
-                  
+
                   to_dp.set(to_value, xIdx, yIdx);
                   if(mlog.verbosity_level() > 7) {
                      if (300 < dataArray.n_elements()) {
@@ -790,7 +806,7 @@ void process_data_only_file() {
 
    for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
          itVar != mapVar.end(); ++itVar) {
-      if ((*itVar).first == "t" 
+      if ((*itVar).first == "t"
             || string::npos != (*itVar).first.find("time")) {
          from_var = (*itVar).second;
          copy_nc_var(nc_out, &from_var);
