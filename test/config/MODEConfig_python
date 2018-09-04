@@ -50,10 +50,8 @@ quilt = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-      file_type = PYTHON_NUMPY;
    field = {
-      name  = "APCP_06";
-      level = "(*,*)";
+      name = "${FCST_COMMAND}";
    }
 
    conv_radius        = 2; // in grid squares
@@ -65,11 +63,10 @@ fcst = {
    merge_flag         = THRESH;
 }
 obs = {
-      file_type = PYTHON_NUMPY;
    field = {
-      name  = "APCP";
-      level = "A06";
+      name = "${OBS_COMMAND}";
    }
+
    conv_radius        = 2; // in grid squares
    conv_thresh        = >=5.0;
    vld_thresh         = 0.5;

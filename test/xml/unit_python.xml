@@ -20,13 +20,10 @@
   <!-- Invokes Python script that reads in NUMPY text data -->
   <test name="python_numpy_PLOT_DATA_PLANE">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
-    <env>
-      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
-    </env>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
+      PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter.ps \
-      'file_type = PYTHON_NUMPY;' \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane" \
       -v 1
@@ -39,11 +36,11 @@
   <test name="python_numpy_MODE_mixed">
     <exec>&MET_DIR;/bin/mode</exec>
     <env>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
+      <pair><name>OBS_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
-      &MET_BASE;/python/test_numpy_obs.py \
+      PYTHON_NUMPY \
       &CONFIG_DIR;/MODEConfig_python_mixed \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -58,12 +55,12 @@
   <test name="python_numpy_MODE">
     <exec>&MET_DIR;/bin/mode</exec>
     <env>
-      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
-      &MET_BASE;/python/test_numpy_obs.py \
+      PYTHON_NUMPY \
+      PYTHON_NUMPY \
       &CONFIG_DIR;/MODEConfig_python \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -78,11 +75,11 @@
   <test name="python_numpy_GridStat_mixed">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
-      &MET_BASE;/python/test_numpy_obs.py \
+      PYTHON_NUMPY \
       &CONFIG_DIR;/GridStatConfig_python_mixed \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -94,12 +91,12 @@
   <test name="python_numpy_GridStat">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
-      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
-      &MET_BASE;/python/test_numpy_obs.py \
+      PYTHON_NUMPY \
+      PYTHON_NUMPY \
       &CONFIG_DIR;/GridStatConfig_python \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -108,17 +105,32 @@
     </output>
   </test>
 
-  <test name="python_wavelet_stat">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+  <test name="python_numpy_PointStat">
+    <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
-      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
     </env>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
-      &MET_BASE;/python/test_numpy_obs.py \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_python \
+      -obs_valid_beg 20120409_113000 -obs_valid_end 20120409_123000 \
+      -outdir &OUTPUT_DIR;/python -v 1
+    </param>
+    <output>
+      <nc>&OUTPUT_DIR;/python/point_stat_python_120000L_20120409_120000V.stat</nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_wavelet_stat">
+    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      PYTHON_NUMPY \
       &CONFIG_DIR;/WaveletStatConfig_python \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -130,15 +142,13 @@
     </output>
   </test>
 
-  <test name="python_wavelet_stat_mixed">
+  <test name="python_numpy_wavelet_stat_mixed">
     <exec>&MET_DIR;/bin/wavelet_stat</exec>
     <env>
-      <pair><name>FCST_INPUT</name> <value>&DATA_DIR_PYTHON;/fcst.txt</value></pair>
-      <pair><name>OBS_INPUT</name> <value>&DATA_DIR_PYTHON;/obs.txt</value></pair>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
     </env>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
+      PYTHON_NUMPY \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
       &CONFIG_DIR;/WaveletStatConfig_python_mixed \
       -outdir &OUTPUT_DIR;/python -v 1
@@ -151,13 +161,13 @@
     </output>
   </test>
 
-  <test name="python_regrid_data_plane">
+  <test name="python_numpy_regrid_data_plane">
     <exec>&MET_DIR;/bin/regrid_data_plane</exec>
     <param> \
-      &MET_BASE;/python/test_numpy_fcst.py \
+      PYTHON_NUMPY \
       G130 \
       &OUTPUT_DIR;/python/regrid_data_plane.nc \
-      -field 'file_type=PYTHON_NUMPY;' \
+      -field 'name="&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
       -v 1
     </param>
     <output>

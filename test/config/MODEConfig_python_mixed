@@ -53,7 +53,6 @@ fcst = {
    field = {
       name  = "APCP_06";
       level = "(*,*)";
-      //file_type = PYTHON_NUMPY;
    }
 
    conv_radius        = 2; // in grid squares
@@ -62,14 +61,14 @@ fcst = {
    filter_attr_name   = [];
    filter_attr_thresh = [];
    merge_thresh       = >=3.5;
-   merge_flag         = THRESH; 
+   merge_flag         = THRESH;
 }
+
 obs = {
-      file_type = PYTHON_NUMPY;
    field = {
-      name  = "APCP";
-      level = "A06";
+      name = "${OBS_COMMAND}";
    }
+
    conv_radius        = 2; // in grid squares
    conv_thresh        = >=5.0;
    vld_thresh         = 0.5;

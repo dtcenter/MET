@@ -48,78 +48,18 @@ eclv_points   = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   file_type = PYTHON_NUMPY;
-
    field = [
-      {
-        name       = "SPFH";
-        level      = [ "P500" ];
-        cat_thresh = [ >80.0 ];
-      },
-
-      {
-        name       = "TMP";
-        level      = [ "P500" ];
-        cat_thresh = [ >273.0 ];
-      },
-
-      {
-        name       = "HGT";
-        level      = [ "P500" ];
-        cat_thresh = [ >0.0 ];
-      },
-
-      {
-        name       = "UGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      },
-
-      {
-        name       = "VGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      }
+      { name = "${FCST_COMMAND}"; },
+      { name = "${OBS_COMMAND}";  }
    ];
-
 }
 
 obs = {
-      file_type = PYTHON_NUMPY;
    field = [
-      {
-        name       = "SPFH";
-        level      = [ "P500" ];
-        cat_thresh = [ >80.0 ];
-      },
-
-      {
-        name       = "TMP";
-        level      = [ "P500" ];
-        cat_thresh = [ >273.0 ];
-      },
-
-      {
-        name       = "HGT";
-        level      = [ "P500" ];
-        cat_thresh = [ >0.0 ];
-      },
-
-      {
-        name       = "UGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      },
-
-      {
-        name       = "VGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      }
+      { name = "TMP"; level = "Z2"; },
+      { name = "TMP"; level = "Z2"; }
    ];
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -127,7 +67,7 @@ obs = {
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type   = [ "ADPUPA" ];
+message_type   = [ "ADPSFC" ];
 sid_exc        = [];
 obs_quality    = [];
 duplicate_flag = NONE;
@@ -241,7 +181,7 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
+   cnt    = NONE;
    sl1l2  = NONE;
    sal1l2 = NONE;
    vl1l2  = NONE;
@@ -252,7 +192,7 @@ output_flag = {
    prc    = NONE;
    ecnt   = NONE;
    eclv   = NONE;
-   mpr    = NONE;
+   mpr    = STAT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

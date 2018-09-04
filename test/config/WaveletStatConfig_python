@@ -39,26 +39,14 @@ regrid = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-   file_type = PYTHON_NUMPY;
+   field = [ { name = "${FCST_COMMAND}"; } ];
+}
 
-   field = [
-      {
-        name       = "APCP";
-        level      = [ "A12" ];
-        cat_thresh = [ >0.0, >=5.0 ];
-      }
-   ];
-}
 obs = {
-   file_type = PYTHON_NUMPY;
-   field = [
-      {
-        name       = "APCP_12";
-        level      = [ "(*,*)" ];
-        cat_thresh = [ >0.0, >=5.0 ];
-      }
-   ];
+   field = [ { name = "${OBS_COMMAND}"; } ];
 }
+
+cat_thresh = [ >0.0, >=5.0 ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
