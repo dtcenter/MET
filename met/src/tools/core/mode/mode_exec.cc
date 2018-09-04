@@ -223,15 +223,6 @@ void ModeExecutive::setup_fcst_obs_data()
    Fcst_sd.clear();
     Obs_sd.clear();
 
-      // Determine the verification grid
-
-   grid = parse_vx_grid(engine.conf_info.fcst_info->regrid(),
-                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
-
-      // Store the grid
-
-   engine.set_grid(&grid);
-
       // Read the gridded data from the input forecast file
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), Fcst_sd.data)) )  {
@@ -240,6 +231,24 @@ void ModeExecutive::setup_fcst_obs_data()
            << "can't get data from file \"" << fcst_file << "\"\n\n";
       exit(1);
    }
+
+   // Read the gridded data from the input observation file
+
+   if ( !(obs_mtddf->data_plane(*(engine.conf_info.obs_info), Obs_sd.data)) )  {
+
+      mlog << Error << "\nsetup_fcst_obs_data() -> "
+           << "can't get data from file \"" << obs_file << "\"\n\n";
+      exit(1);
+   }
+
+      // Determine the verification grid
+
+   grid = parse_vx_grid(engine.conf_info.fcst_info->regrid(),
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+
+      // Store the grid
+
+   engine.set_grid(&grid);
 
       // Regrid, if necessary
 
@@ -251,19 +260,6 @@ void ModeExecutive::setup_fcst_obs_data()
                                 engine.conf_info.fcst_info->regrid());
    }
 
-      // Rescale probabilites from [0, 100] to [0, 1]
-
-   if ( engine.conf_info.fcst_info->p_flag() ) rescale_probability(Fcst_sd.data);
-
-      // Read the gridded data from the input observation file
-
-   if ( !(obs_mtddf->data_plane(*(engine.conf_info.obs_info), Obs_sd.data)) )  {
-
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
-           << "can't get data from file \"" << obs_file << "\"\n\n";
-      exit(1);
-   }
-
       // Regrid, if necessary
 
    if ( !(obs_mtddf->grid() == grid) )  {
@@ -273,6 +269,10 @@ void ModeExecutive::setup_fcst_obs_data()
       Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
                                engine.conf_info.obs_info->regrid());
    }
+
+      // Rescale probabilites from [0, 100] to [0, 1]
+
+   if ( engine.conf_info.fcst_info->p_flag() ) rescale_probability(Fcst_sd.data);
 
       // Rescale probabilites from [0, 100] to [0, 1]
 
