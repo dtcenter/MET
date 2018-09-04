@@ -26,8 +26,7 @@
 pythonscriptsdir = $(pkgdatadir)/python
 
 pythonscripts_DATA = \
-        test_numpy_fcst.py \
-        test_numpy_obs.py 
+        read_ascii_numpy.py
 
 EXTRA_DIST = ${pythonscripts_DATA}
 
