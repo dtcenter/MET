@@ -21,8 +21,6 @@ using namespace std;
 #include "vx_python_utils.h"
 #include "data2d_utils.h"
 #include "grdfiletype_to_string.h"
-#include "file_exists.h"
-#include "temp_file.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
