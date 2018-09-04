@@ -62,7 +62,19 @@ GrdFileType suffix_type = FileType_None;
 GrdFileType data_type   = FileType_None;
 
    //
-   //  first check to see if this file exists
+   //  first check for python strings
+   //
+
+if ( strcasecmp(filename, conf_val_python_numpy) == 0 )  {
+   return ( FileType_Python_Numpy );
+}
+
+else if ( strcasecmp(filename, conf_val_python_xarray) == 0 )  {
+   return ( FileType_Python_Xarray );
+}
+
+   //
+   //  next, check to see if this file exists
    //
 
 if ( ! file_exists(filename) )  {

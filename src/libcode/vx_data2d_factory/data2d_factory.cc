@@ -150,9 +150,16 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
    type = grd_file_type(filename);
 
    //
-   // Create a new data file object and call open if the point is non-zero
+   // Create a new data file object
    //
-   if((mtddf = new_met_2d_data_file(type))) {
+   mtddf = new_met_2d_data_file(type);
+
+   //
+   // Call open for non-python types
+   //
+   if(mtddf &&
+      type != FileType_Python_Numpy &&
+      type != FileType_Python_Xarray) {
       if(!(mtddf->open(filename))) {
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "error opening file \"" << filename << "\"\n\n";
@@ -175,7 +182,18 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
    // Use the file type, if valid
    //
    if(type != FileType_None) {
-      if((mtddf = new_met_2d_data_file(type))) {
+
+      //
+      // Create a new data file object
+      //
+      mtddf = new_met_2d_data_file(type);
+
+      //
+      // Call open for non-python types
+      //
+      if(mtddf &&
+         type != FileType_Python_Numpy &&
+         type != FileType_Python_Xarray) {
          if(!(mtddf->open(filename))) {
             mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
                  << "error opening file \"" << filename << "\"\n\n";
