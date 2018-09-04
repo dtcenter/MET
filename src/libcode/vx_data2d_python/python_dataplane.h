@@ -39,7 +39,11 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void python_dataplane(const char * script_name, const bool use_xarray, DataPlane & dp_out, Grid & g_out, VarInfoPython &vinfo);
+extern void python_dataplane(const char * script_name,
+                             int script_argc, char **script_argv,
+                             const bool use_xarray,
+                             DataPlane & dp_out, Grid & g_out,
+                             VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////

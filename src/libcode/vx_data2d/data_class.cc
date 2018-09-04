@@ -232,7 +232,7 @@ void Met2dDataFile::set_shift_right(int N)
 
 ShiftRight = N;
 
-Dest_Grid->shift_right(ShiftRight);
+if ( Dest_Grid )  Dest_Grid->shift_right(ShiftRight);
 
 return;
 
