@@ -531,15 +531,15 @@ void process_fcst_climo_files() {
    // the forecast and climatological fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      // Read the gridded data from the input forecast file
+      n_fcst = fcst_mtddf->data_plane_array(
+                  *conf_info.vx_opt[i].vx_pd.fcst_info, fcst_dpa);
+
       mlog << Debug(2)
            << "\n" << sep_str << "\n\n"
            << "Reading data for "
            << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
            << ".\n";
-
-      // Read the gridded data from the input forecast file
-      n_fcst = fcst_mtddf->data_plane_array(
-                  *conf_info.vx_opt[i].vx_pd.fcst_info, fcst_dpa);
 
       // Check for zero fields
       if(n_fcst == 0) {
