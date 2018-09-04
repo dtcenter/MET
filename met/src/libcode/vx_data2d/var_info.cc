@@ -383,26 +383,6 @@ void VarInfo::set_dict(Dictionary &dict) {
    na = dict.lookup_num_array(conf_key_censor_val, false);
    if(dict.last_lookup_status()) set_censor_val(na);
 
-      ///////////////////
-
-         //  mostly for python
-
-   // Parse name, if present
-   s = dict.lookup_string(conf_key_name, false);
-   if(dict.last_lookup_status()) set_name(s);
-
-   // Parse units, if present
-   s = dict.lookup_string(conf_key_units, false);
-   if(dict.last_lookup_status()) set_units(s);  
-
-   
-   // Parse level_name, if present
-   // s = dict.lookup_string(conf_key_level, false);
-   // if(dict.last_lookup_status()) set_level_name(s);
-   // cout << "\n\n   setting level name to \"" << s << "\"\n\n";
-
-      ///////////////////
-
    // Check for equal number of censor thresholds and values
    if(ta.n_elements() != na.n_elements()) {
       mlog << Error << "\nVarInfo::set_dict() -> "

@@ -21,6 +21,8 @@ using namespace std;
 #include "vx_python_utils.h"
 #include "data2d_utils.h"
 #include "grdfiletype_to_string.h"
+#include "file_exists.h"
+#include "temp_file.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
@@ -153,26 +155,51 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::open(const char * script_filename)
+bool MetPythonDataFile::open(const char * python_command)
 
 {
 
 close();
 
-ConcatString full_path, path_name, file_name;
+ConcatString cs, full_path, path_name, file_name;
+int i, file_argc;
+char **file_argv = (char **) 0; // allocated
+StringArray sa;
 
-full_path = script_filename;
-StringArray sa = full_path.split("/");
+   //
+   //  python_command consists of a script name followed by arguments
+   //
+
+   //
+   //  parse and store argc and argv
+   //
+
+cs = python_command;
+sa = cs.split(" ");
+
+file_argc = sa.n_elements();
+
+if ( file_argc > 0 )  {
+   file_argv = new char * [ file_argc ];
+   for ( i=0; i<sa.n_elements(); i++ )  {
+      file_argv[i] = new char [ strlen(sa[i]) + 1 ];
+      strcpy(file_argv[i], sa[i]);
+   }
+}
 
    //
    //  Build the path and store the file name
    //
 
+full_path = sa[0];
+
+sa = full_path.split("/");
+
 if ( sa.n_elements() <= 1 )  {
-   path_name = "./";
+   path_name = ".";
 }
 else {
-   for ( int i=0; i<sa.n_elements()-1; i++ )  path_name << "/" << sa[i];
+   for ( i=0; i<sa.n_elements()-1; i++ )  path_name << "/" << sa[i];
 }
 
 file_name = sa[sa.n_elements() - 1];
@@ -206,15 +233,11 @@ switch ( Type )  {   //  assumes Type is already set
 
 }   //  switch
 
-
-
-
 Filename = file_name;
 
 Raw_Grid = new Grid;
 
-
-python_dataplane(file_name, use_xarray, Plane, *Raw_Grid, VInfo);
+python_dataplane(file_name, file_argc, file_argv, use_xarray, Plane, *Raw_Grid, VInfo);
 
 Dest_Grid = new Grid;
 
@@ -222,6 +245,16 @@ Dest_Grid = new Grid;
 
 if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
 
+   //
+   //  cleanup
+   //
+
+if ( file_argv )  {
+   for ( i=1; i<file_argc; i++ )  {
+      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) 0; }
+   }
+   delete [] file_argv; file_argv = (char **) 0;
+}
 
    //
    //  done
@@ -319,10 +352,16 @@ bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
 
    //
-   //  is the file even open?
+   //  close the file in case it's already open
    //
 
-if ( ! Raw_Grid )  return ( false );
+close();
+
+   //
+   //  open the file using the command specified by VarInfo::Name
+   //
+
+open(vinfo.req_name());
 
    //
    //  ok
@@ -338,6 +377,7 @@ vinfo.set_name(VInfo.name());
 vinfo.set_long_name(VInfo.long_name());
 vinfo.set_level_name(VInfo.level_name());
 vinfo.set_units(VInfo.units());
+vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );
 
@@ -352,10 +392,16 @@ int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_ar
 {
 
    //
-   //  is the file even open?
+   //  close the file in case it's already open
    //
 
-if ( ! Raw_Grid )  return ( false );
+close();
+
+   //
+   //  open the file using the command specified by VarInfo::Name
+   //
+
+open(vinfo.req_name());
 
    //
    //  ok
@@ -373,6 +419,7 @@ vinfo.set_name(VInfo.name());
 vinfo.set_long_name(VInfo.long_name());
 vinfo.set_level_name(VInfo.level_name());
 vinfo.set_units(VInfo.units());
+vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );
 

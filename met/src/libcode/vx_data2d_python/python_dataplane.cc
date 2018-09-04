@@ -28,7 +28,10 @@ GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-void python_dataplane(const char * script_name, const bool use_xarray, DataPlane & met_dp_out, Grid & met_grid_out, VarInfoPython &vinfo)
+void python_dataplane(const char * script_name,
+                      int script_argc, char ** script_argv,
+                      const bool use_xarray, DataPlane & met_dp_out,
+                      Grid & met_grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -46,10 +49,6 @@ GP.initialize();
    //   start up the python interpreter
    //
 
-// Py_Finalize();
-
-// Py_Initialize();
-
 if ( PyErr_Occurred() )  {
 
    mlog << Error << "\npython_dataplane() -> "
@@ -62,11 +61,27 @@ if ( PyErr_Occurred() )  {
 }
 
    //
-   //   import the python script as a module
+   //  set the arguments
    //
 
-   module = PyImport_ImportModule        (script_name);
-// module = PyImport_ImportModuleNoBlock (script_name);
+if ( script_argc > 0 )  {
+
+   PySys_SetArgv (script_argc, script_argv);
+
+}
+
+   //
+   //  import the python script as a module
+   //
+
+module = PyImport_ImportModule (script_name);
+
+   //
+   //  if this script has already been run, must reload to
+   //  rerun with new arguments
+   //
+
+module = PyImport_ReloadModule (module);
 
 if ( PyErr_Occurred() )  {
 
@@ -85,9 +100,6 @@ if ( ! module )  {
    mlog << Error << "\npython_dataplane() -> "
         << "error running python script \"" << getenv("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
-
-   // Py_Finalize();
-
    exit ( 1 );
 
 }
@@ -152,13 +164,9 @@ if ( use_xarray )  {
 
 }
 
-
-
    //
    //  done
    //
-
-// Py_Finalize();
 
 return;
 

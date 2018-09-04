@@ -78,9 +78,7 @@ class MetPythonDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * script_filename);
-
-      bool open(const char * script_filename, GrdFileType);
+      bool open(const char * python_command);
 
       void close();
 
@@ -92,7 +90,6 @@ class MetPythonDataFile : public Met2dDataFile {
       int data_plane_array(VarInfo &, DataPlaneArray &);
 
       int index(VarInfo &);
-
 
       bool data_plane(DataPlane &);
 
