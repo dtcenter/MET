@@ -39,11 +39,12 @@ static const int gaussian_type       = 4;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void gds_to_latlon        (const Section2_Header & gds, LatLonData &);
-static void gds_to_mercator      (const Section2_Header & gds, MercatorData &);
-static void gds_to_lambert       (const Section2_Header & gds, LambertData &);
-static void gds_to_stereographic (const Section2_Header & gds, StereographicData &);
-static void gds_to_gaussian      (const Section2_Header & gds, GaussianData &);
+static void gds_to_latlon         (const Section2_Header & gds, LatLonData &);
+static void gds_to_rotated_latlon (const Section2_Header & gds, RotatedLatLonData &);
+static void gds_to_mercator       (const Section2_Header & gds, MercatorData &);
+static void gds_to_lambert        (const Section2_Header & gds, LambertData &);
+static void gds_to_stereographic  (const Section2_Header & gds, StereographicData &);
+static void gds_to_gaussian       (const Section2_Header & gds, GaussianData &);
 
 static void scan_flag_to_order(const unsigned char scan_flag, int & xdir, int & ydir, int & order);
 
@@ -60,16 +61,18 @@ void gds_to_grid(const Section2_Header & gds, Grid & gr)
 {
 
    // Structures to store projection info
-LambertData       lc_data;
-StereographicData st_data;
-LatLonData        ll_data;
-MercatorData      mc_data;
-GaussianData       g_data;
+LambertData         lc_data;
+StereographicData   st_data;
+LatLonData          ll_data;
+RotatedLatLonData  rll_data;
+MercatorData        mc_data;
+GaussianData         g_data;
 
    //
    // Check GDS for the grid type.
    // The following Projection types are supported:
    //    - Lat/Lon
+   //    - Rotated Lat/Lon
    //    - Mercator
    //    - Lambert Conformal
    //    - Polar Stereographic
@@ -82,6 +85,12 @@ if ( gds.type == latlon_type )  {
    gds_to_latlon(gds, ll_data);
 
    gr.set(ll_data);
+
+// else if ( gds.type == rotated_latlon_type )  {
+// 
+//    gds_to_rotated_latlon(gds, rll_data);
+// 
+//    gr.set(rll_data);
 
 } else if ( gds.type == mercator_type )  {
 
@@ -248,6 +257,23 @@ data.dump();
    //
    //  done
    //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void gds_to_rotated_latlon(const Section2_Header & gds, RotatedLatLonData & data)
+
+{
+
+mlog << Error
+     << "gds_to_rotated_latlon() -> Rotated Lat/Lon grids are not supported in Grib Version 1.\n\n";
+
+exit ( 1 );
 
 return;
 

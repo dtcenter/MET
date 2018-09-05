@@ -282,6 +282,7 @@ struct Gaussian {
 union GridType {
 
    struct LatLon        latlon_grid;         //   Latitude/Longitude Grid
+   // struct RotLatLon     rot_latlon_grid;     //   Rotated Latitude/Longitude Grid
    struct Mercator      mercator;            //   Mercator Grid
    struct LambertConf   lambert_conf;        //   Lambert Conformal Secant Grid
    struct Stereographic stereographic;       //   Stereographic Grid
