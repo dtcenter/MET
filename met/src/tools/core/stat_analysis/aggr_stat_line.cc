@@ -2509,7 +2509,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
    ECNTData cur;
    ConcatString key;
    int i;
-   double crps_fcst, crps_climo;
+   double crps_fcst, crps_climo, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2577,9 +2577,13 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
          // Store the summary statistics
          //
          m[key].me_na.add(cur.me);
-         m[key].mse_na.add(cur.rmse * cur.rmse);
+         m[key].mse_na.add((is_bad_data(cur.rmse) ?
+                            bad_data_double :
+                            cur.rmse * cur.rmse));
          m[key].me_oerr_na.add(cur.me_oerr);
-         m[key].mse_oerr_na.add(cur.me_oerr * cur.me_oerr);
+         m[key].mse_oerr_na.add((is_bad_data(cur.me_oerr) ?
+                                 bad_data_double :
+                                 cur.me_oerr * cur.me_oerr));
 
          //
          // Compute and store climatological CRPS
@@ -2608,13 +2612,15 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
    for(it = m.begin(); it != m.end(); it++) {
 
       // Set n_obs as the sum of the TOTAL column
-      it->second.ens_pd.n_obs     = it->second.ens_pd.wgt_na.sum();
+      it->second.ens_pd.n_pair    = it->second.ens_pd.wgt_na.sum();
 
       // Compute ME and RMSE as weighted averages
-      it->second.ens_pd.me        =      it->second.me_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse      = sqrt(it->second.mse_na.wmean(it->second.ens_pd.wgt_na));
-      it->second.ens_pd.me_oerr   =      it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse_oerr = sqrt(it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na));
+      it->second.ens_pd.me        = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
+      v                           = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse      = (is_bad_data(v) ? bad_data_double : sqrt(v));
+      it->second.ens_pd.me_oerr   = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      v                           = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
       crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
       crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
