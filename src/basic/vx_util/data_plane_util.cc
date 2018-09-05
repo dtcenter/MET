@@ -265,7 +265,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       } // end for y
 
       // Increment X
-      gt->incBaseX(1);
+      if(x < (dp.nx() - 1)) gt->incBaseX(1);
 
    } // end for x
 
