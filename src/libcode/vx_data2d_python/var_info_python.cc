@@ -130,49 +130,53 @@ void VarInfoPython::set_file_type(const GrdFileType t)
 
 {
 
-if ( (t == FileType_Python_Numpy) || (t == FileType_Python_Xarray) )  {
+   if ( (t == FileType_Python_Numpy) || (t == FileType_Python_Xarray) ) {
 
-   Type = t;
+      Type = t;
+
+      return;
+
+   }
+
+   mlog << Error
+        << "VarInfoPython::set_file_type(const GrdFileType) -> bad type ... "
+        << grdfiletype_to_string(t) << "\n\n";
 
    return;
-
-}
-
-mlog << Error
-     << "VarInfoPython::set_file_type(const GrdFileType) -> bad type ... "
-     << grdfiletype_to_string(t) << "\n\n";
-
-return;
-
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_dict(Dictionary & dict)
+void VarInfoPython::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
-{
+   // Validate the magic_string
+   VarInfo::set_magic(nstr, lstr);
 
-VarInfo::set_dict(dict);
+   // Store the magic string
+   MagicStr << cs_erase << nstr << "/" << lstr;
+
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void VarInfoPython::set_dict(Dictionary & dict) {
+
+   VarInfo::set_dict(dict);
 
    //
    //  the "name" entry is required and specifies the python command to be run
    //  store it as the ReqName
    //
 
-ReqName = dict.lookup_string(conf_key_name, true);
+   ReqName = dict.lookup_string(conf_key_name, true);
 
-   //
-   //  Store the command as the magic string as well
-   //
-
-MagicStr = ReqName;
-
-return;
-
+   return;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-

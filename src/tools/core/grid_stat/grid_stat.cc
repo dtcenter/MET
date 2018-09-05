@@ -659,13 +659,13 @@ void process_scores() {
    // Compute scores for each verification task and write output_flag
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      mlog << Debug(3)
-           << "Reading forecast data for "
-           << conf_info.vx_opt[i].fcst_info->magic_str() << ".\n";
-
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
                           fcst_dp, fcst_mtddf, fcst_file)) continue;
+
+      mlog << Debug(3)
+           << "Reading forecast data for "
+           << conf_info.vx_opt[i].fcst_info->magic_str() << ".\n";
 
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
@@ -674,13 +674,13 @@ void process_scores() {
       shc.set_fcst_valid_beg(fcst_dp.valid());
       shc.set_fcst_valid_end(fcst_dp.valid());
 
-      mlog << Debug(3)
-           << "Reading observation data for "
-           << conf_info.vx_opt[i].obs_info->magic_str() << ".\n";
-
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.vx_opt[i].obs_info,
                           obs_dp, obs_mtddf, obs_file)) continue;
+
+      mlog << Debug(3)
+           << "Reading observation data for "
+           << conf_info.vx_opt[i].obs_info->magic_str() << ".\n";
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
