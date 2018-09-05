@@ -2581,9 +2581,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
                             bad_data_double :
                             cur.rmse * cur.rmse));
          m[key].me_oerr_na.add(cur.me_oerr);
-         m[key].mse_oerr_na.add((is_bad_data(cur.me_oerr) ?
+         m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
                                  bad_data_double :
-                                 cur.me_oerr * cur.me_oerr));
+                                 cur.rmse_oerr * cur.rmse_oerr));
 
          //
          // Compute and store climatological CRPS
