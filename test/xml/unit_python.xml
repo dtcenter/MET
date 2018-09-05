@@ -18,7 +18,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!-- Invokes Python script that reads in NUMPY text data -->
-  <test name="python_numpy_PLOT_DATA_PLANE">
+  <test name="python_numpy_plot_data_plane">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
@@ -33,7 +33,7 @@
     </output>
   </test>
 
-  <test name="python_numpy_MODE_mixed">
+  <test name="python_numpy_mode_mixed">
     <exec>&MET_DIR;/bin/mode</exec>
     <env>
       <pair><name>OBS_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
@@ -52,7 +52,7 @@
     </output>
   </test>
 
-  <test name="python_numpy_MODE">
+  <test name="python_numpy_mode">
     <exec>&MET_DIR;/bin/mode</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
@@ -72,7 +72,7 @@
     </output>
   </test>
 
-  <test name="python_numpy_GridStat_mixed">
+  <test name="python_numpy_grid_stat_mixed">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
@@ -88,7 +88,7 @@
     </output>
   </test>
 
-  <test name="python_numpy_GridStat">
+  <test name="python_numpy_grid_stat">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
@@ -105,7 +105,7 @@
     </output>
   </test>
 
-  <test name="python_numpy_PointStat">
+  <test name="python_numpy_point_stat">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
