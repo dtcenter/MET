@@ -390,7 +390,13 @@ void GridTemplate::incBaseX(const int &x_inc) const
 
   _pointInGridBase.x += x_inc;
 
-  _pointInGridBase.x = _pointInGridBase.x % _pointInGridNumX;
+  if (_pointInGridBase.x < 0 ||
+      _pointInGridBase.x >= _pointInGridNumX ) {
+     mlog << Error << "\nGridTemplate::incBaseX() -> "
+          << "x (" << _pointInGridBase.x << ") out of range (0, "
+          << _pointInGridNumX << ").\n\n";
+     exit(1);
+  }
 
   return;
 }
@@ -405,7 +411,13 @@ void GridTemplate::incBaseY(const int &y_inc) const
 
   _pointInGridBase.y += y_inc;
 
-  _pointInGridBase.y = _pointInGridBase.y % _pointInGridNumY;
+  if (_pointInGridBase.y < 0 ||
+      _pointInGridBase.y >= _pointInGridNumY ) {
+    mlog << Error << "\nGridTemplate::incBaseY() -> "
+         << "y (" << _pointInGridBase.y << ") out of range (0, "
+         << _pointInGridNumY << ").\n\n";
+    exit(1);
+  }
 
   return;
 }
@@ -560,7 +572,7 @@ GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string targe
       }
    }
    mlog << Error << "\nGridTemplateFactory::string2Enum() -> "
-        " Unexpected target value of " << target << ".\n\n";
+        << "Unexpected target value of " << target << ".\n\n";
    exit(1);
 }
 
