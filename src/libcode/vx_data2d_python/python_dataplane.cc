@@ -42,12 +42,11 @@ PyObject * numpy_array = 0;
 PyObject * attrs_dict  = 0;
 
    //
-   //   if the global python object has already been initialized, we
-   //   need to import and then reload the python script to parse new
-   //   arguments to the script
+   //  if the global python object has already been initialized,
+   //  we need to reload the module
    //
 
-bool need_reload = ( GP.is_initialized && script_argc > 0 );
+bool do_reload = GP.is_initialized;
 
 GP.initialize();
 
@@ -83,10 +82,10 @@ if ( script_argc > 0 )  {
 module = PyImport_ImportModule (script_name);
 
    //
-   //  reload the module to rerun with new arguments
+   //  if needed, reload the module
    //
 
-if ( need_reload )  {
+if ( do_reload )  {
 
    module = PyImport_ReloadModule (module);
 
