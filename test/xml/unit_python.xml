@@ -84,6 +84,7 @@
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
+      <txt>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V.stat</txt>
       <nc>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V_pairs.nc</nc>
     </output>
   </test>

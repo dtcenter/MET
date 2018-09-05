@@ -53,11 +53,13 @@ eclv_points   = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   field = [ { name = "${FCST_COMMAND}"; } ];
+   field = [ { name = "${FCST_COMMAND}"; },
+             { name = "${OBS_COMMAND}";  } ];
 }
 
 obs = {
-   field = [ { name = "${OBS_COMMAND}"; } ];
+   field = [ { name = "${OBS_COMMAND}";  },
+             { name = "${FCST_COMMAND}"; } ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +140,7 @@ output_flag = {
    mctc   = NONE;
    mcts   = NONE;
    cnt    = NONE;
-   sl1l2  = NONE;
+   sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
@@ -158,15 +160,15 @@ output_flag = {
 // NetCDF matched pairs output file
 //
 nc_pairs_flag   = {
-   latlon     = TRUE;
+   latlon     = FALSE;
    raw        = TRUE;
    diff       = TRUE;
-   climo      = TRUE;
+   climo      = FALSE;
    weight     = FALSE;
    nbrhd      = FALSE;
    fourier    = FALSE;
    gradient   = FALSE;
-   apply_mask = TRUE;
+   apply_mask = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
