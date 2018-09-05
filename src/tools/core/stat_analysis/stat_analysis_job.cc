@@ -1924,7 +1924,7 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
       //
       // ECNT output line
       //
-      at.set_entry(r, c++, "GRAD:");
+      at.set_entry(r, c++, "ECNT:");
       write_case_cols(it->first, at, r, c);
       write_ecnt_cols(&(it->second.ens_pd), at, r, c);
       if(j.stat_out) write_ecnt_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
