@@ -380,6 +380,7 @@ vinfo.set_name(VInfo.name());
 vinfo.set_long_name(VInfo.long_name());
 vinfo.set_level_name(VInfo.level_name());
 vinfo.set_units(VInfo.units());
+vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );
 
@@ -422,6 +423,7 @@ vinfo.set_name(VInfo.name());
 vinfo.set_long_name(VInfo.long_name());
 vinfo.set_level_name(VInfo.level_name());
 vinfo.set_units(VInfo.units());
+vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );
 
@@ -475,6 +477,3 @@ return ( 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
