@@ -105,6 +105,7 @@ void MetPythonDataFile::python_init_from_scratch()
 
 {
 
+PythonCommand.clear();
 Plane.clear();
 VInfo.clear();
 
@@ -129,6 +130,7 @@ mtddf_clear();   //   base class
 
    //
    //  Don't reset the Type field
+   //  Don't reset the PythonCommand
    //
 
 return;
@@ -153,27 +155,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::open(const char * python_command)
+bool MetPythonDataFile::open(const char * cur_command)
 
 {
 
 close();
 
-ConcatString cs, full_path, path_name, file_name;
+ConcatString full_path, path_name, file_name;
 int i, file_argc;
 char **file_argv = (char **) 0; // allocated
 StringArray sa;
 
+
    //
-   //  python_command consists of a script name followed by arguments
+   //  Store the PythonCommand that is being run
    //
+
+PythonCommand = cur_command;
 
    //
    //  parse and store argc and argv
    //
 
-cs = python_command;
-sa = cs.split(" ");
+sa = PythonCommand.split(" ");
 
 file_argc = sa.n_elements();
 
@@ -350,16 +354,17 @@ bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
 
    //
-   //  close the file in case it's already open
+   //  the python command is specified by VarInfo::Name
+   //  only open if the python command is empty or has changed
    //
 
-close();
+if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
-   //
-   //  open the file using the command specified by VarInfo::Name
-   //
+   close();
 
-open(vinfo.req_name());
+   open(vinfo.req_name());
+
+}
 
    //
    //  ok
@@ -389,16 +394,17 @@ int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_ar
 {
 
    //
-   //  close the file in case it's already open
+   //  the python command is specified by VarInfo::Name
+   //  only open if the python command is empty or has changed
    //
 
-close();
+if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
-   //
-   //  open the file using the command specified by VarInfo::Name
-   //
+   close();
 
-open(vinfo.req_name());
+   open(vinfo.req_name());
+
+}
 
    //
    //  ok

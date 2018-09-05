@@ -42,6 +42,8 @@ class MetPythonDataFile : public Met2dDataFile {
       MetPythonDataFile(const MetPythonDataFile &);
       MetPythonDataFile & operator=(const MetPythonDataFile &);
 
+      ConcatString PythonCommand;
+
       DataPlane Plane;
 
       VarInfoPython VInfo;
@@ -78,7 +80,7 @@ class MetPythonDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * python_command);
+      bool open(const char * cur_command);
 
       void close();
 
