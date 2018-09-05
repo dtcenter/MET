@@ -77,6 +77,32 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void RotatedLatLonData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+
+     << "\nRotated Latitude/Longitude Grid Data:\n"
+
+     << "           true_lat_ll: " << true_lat_ll << "\n"
+     << "           true_lon_ll: " << true_lon_ll << "\n"
+
+     << "         delta_new_lat: " << delta_new_lat << "\n"
+     << "         delta_new_lon: " << delta_new_lon << "\n"
+
+     << "                  Nlat: " << Nlat << "\n"
+     << "                  Nlon: " << Nlon << "\n"
+
+     << "   true_lat_north_pole: " << true_lat_north_pole << "\n"
+     << "   true_lon_north_pole: " << true_lon_north_pole << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void MercatorData::dump()
 
 {

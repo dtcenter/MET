@@ -58,7 +58,7 @@ struct RotatedLatLonData {
    double true_lat_north_pole;
    double true_lon_north_pole;
 
-   // void dump();
+   void dump();
 
 };
 
