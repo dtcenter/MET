@@ -150,24 +150,6 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-
-   // Validate the magic_string
-
-VarInfo::set_magic(nstr, lstr);
-
-   // Store the magic string
-
-MagicStr << cs_erase << nstr << "/" << lstr;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 void VarInfoPython::set_dict(Dictionary & dict)
 
 {
@@ -179,7 +161,13 @@ VarInfo::set_dict(dict);
    //  store it as the ReqName
    //
 
-   ReqName = dict.lookup_string(conf_key_name, true);
+ReqName = dict.lookup_string(conf_key_name, true);
+
+   //
+   //  Store the command as the magic string as well
+   //
+
+MagicStr = ReqName;
 
 return;
 

@@ -53,7 +53,6 @@ class VarInfoPython : public VarInfo
          //
 
       void set_file_type(const GrdFileType);
-      void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &);
 
          //
