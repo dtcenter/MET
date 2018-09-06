@@ -38,7 +38,7 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const string &var_name = "");
-  
+
   Observation(const string &header_type, const string &station_id,
               const time_t start_time, const time_t end_time,
               const double latitude, const double longitude,
@@ -47,7 +47,7 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const string &var_name = "");
-  
+
   virtual ~Observation();
 
 
@@ -59,47 +59,47 @@ public:
   {
     return hdrIndex;
   }
-  
+
   void setHeaderIndex(long headerIndex)
   {
     hdrIndex = headerIndex;
   }
-  
+
   string getHeaderType() const
   {
     return _headerType;
   }
-  
+
   string getStationId() const
   {
     return _stationId;
   }
-  
+
   time_t getValidTime() const
   {
     return _validTime;
   }
-  
+
   string getValidTimeString() const
   {
     return _getTimeString(_validTime);
   }
-  
+
   double getLatitude() const
   {
     return _latitude;
   }
-  
+
   double getLongitude() const
   {
     return _longitude;
   }
-  
+
   double getElevation() const
   {
     return _elevation;
   }
-  
+
   string getQualityFlag() const
   {
     return _qualityFlag;
@@ -109,35 +109,35 @@ public:
   {
     return varCode;
   }
-  
+
   int getVarCode() const
   {
     return varCode;
   }
-  
+
   double getPressureLevel() const
   {
     return _pressureLevel;
   }
-  
+
   double getHeight() const
   {
     return _height;
   }
-  
+
   double getValue() const
   {
     return _value;
   }
-  
+
   string getVarName() const
   {
     return _varName;
   }
-  
+
   bool hasSameHeader(Observation &other) const;
   bool hasSameHeader(Observation *other) const;
-  
+
   ///////////////
   // Operators //
   ///////////////
@@ -148,17 +148,17 @@ public:
 
     if (_validTime != other._validTime)
       return _validTime < other._validTime;
-    
+
     // Second sort on header type
 
     if (_headerType != other._headerType)
       return _headerType < other._headerType;
-    
+
     // Third sort on station id
 
     if (_stationId != other._stationId)
       return _stationId < other._stationId;
-    
+
     // Final sort on grib code
 
     if (varCode != other.varCode)
@@ -167,9 +167,9 @@ public:
     // Final sort on variable name
     //if (_varName != other._varName)
     return _varName.compare(other._varName);
-    
+
   }
-  
+
 protected:
 
   ///////////////////////
@@ -178,20 +178,19 @@ protected:
 
   string _headerType;
   string _stationId;
-  string _varName;
   time_t _validTime;
   double _latitude;
   double _longitude;
   double _elevation;
-  
   string _qualityFlag;
-  long hdrIndex;
+  string _varName;
   int  varCode;
+  long hdrIndex;
   double _pressureLevel;
   double _height;
   double _value;
-  
-  
+
+
   ///////////////////////
   // Protected methods //
   ///////////////////////
@@ -199,28 +198,28 @@ protected:
   static string _getTimeString(const time_t &unix_time)
   {
     struct tm *time_struct = gmtime(&unix_time);
-  
+
     char time_string[80];
-  
+
     sprintf(time_string, "%04d%02d%02d_%02d%02d%02d",
-	    time_struct->tm_year + 1900, time_struct->tm_mon + 1,
-	    time_struct->tm_mday,
-	    time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
-  
+            time_struct->tm_year + 1900, time_struct->tm_mon + 1,
+            time_struct->tm_mday,        time_struct->tm_hour,
+            time_struct->tm_min,         time_struct->tm_sec);
+
     return string(time_string);
   }
 
   static string _getTimeString(const time_t &start_time,
-			       const time_t &end_time)
+                               const time_t &end_time)
   {
     string start_time_string = _getTimeString(start_time);
     string end_time_string = _getTimeString(end_time);
-  
+
     char time_string[80];
-  
+
     sprintf(time_string, "%s-%s",
-	    start_time_string.c_str(), end_time_string.c_str());
-  
+            start_time_string.c_str(), end_time_string.c_str());
+
     return string(time_string);
   }
 

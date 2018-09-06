@@ -193,10 +193,10 @@ void ThreshArray::add(const SingleThresh &st) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::add(const double thresh, const ThreshType type) {
+void ThreshArray::add(const double val, const ThreshType type) {
    SingleThresh st;
 
-   st.set(thresh, type);
+   st.set(val, type);
 
    extend(Nelements + 1);
 

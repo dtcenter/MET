@@ -267,27 +267,28 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::extend(int n)
+void CRC_Array<T>::extend(int len)
 
 {
 
-if ( Nalloc >= n )  return;
+if ( Nalloc >= len )  return;
 
 int k;
 
-k = n/crc_array_alloc_inc;
+k = len/crc_array_alloc_inc;
 
-if ( n%crc_array_alloc_inc )  ++k;
+if ( len%crc_array_alloc_inc )  ++k;
 
-n = k*crc_array_alloc_inc;
+len = k*crc_array_alloc_inc;
 
 T * u = (T *) 0;
 
-u = new T [n];
+u = new T [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid CRC_Array::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid CRC_Array::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -295,7 +296,7 @@ if ( !u )  {
 
 int j;
 
-memset(u, 0, n*sizeof(T));
+memset(u, 0, len*sizeof(T));
 
 if ( e )  {
 
@@ -311,8 +312,7 @@ if ( e )  {
 
 e = u;   u = (T *) 0;
 
-Nalloc = n;
-
+Nalloc = len;
 
 
 return;
@@ -342,9 +342,6 @@ for (j=0; j<Nelements; ++j)  {
    out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
 }
-
-
-
 
    //
    //  done
@@ -391,14 +388,22 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
 template <typename T>
+
 void CRC_Array<T>::set(int ix, const T & elem)
+
 {
-	if ( (ix < 0) || (ix >= Nelements) )  {
-		mlog << Error << "\nCRC_Array::set(int, T) const -> range check error\n\n";
-		exit ( 1 );
-	}
-	e[ix] = elem;
+   if ( (ix < 0) || (ix >= Nelements) )  {
+
+      mlog << Error << "\nCRC_Array::set(int, T) const -> "
+           << "range check error\n\n";
+
+      exit ( 1 );
+
+   }
+   e[ix] = elem;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -406,19 +411,20 @@ void CRC_Array<T>::set(int ix, const T & elem)
 
 template <typename T>
 
-T CRC_Array<T>::operator[](int n) const
+T CRC_Array<T>::operator[](int i) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (i < 0) || (i >= Nelements) )  {
 
-   mlog << Error << "\nCRC_Array::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\nCRC_Array::operator[](int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
 }
 
-return ( e[n] );
+return ( e[i] );
 
 }
 
