@@ -350,13 +350,13 @@ void TimeArray::add_css(const char *text)
 StringArray sa;
 
 sa.parse_css(text);
-   
+
 extend(Nelements + sa.n_elements());
 
 int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
-   
+
    add(timestring_to_unix(sa[j]));
 
 }
@@ -436,7 +436,7 @@ return(u);
 void TimeArray::sort_array()
 
 {
-  
+
 if ( Nelements <= 1 )  return;
 
 qsort(e, Nelements, sizeof(unixtime), compare_unixtime);
@@ -470,7 +470,7 @@ if ( Nelements == 0 )  return;
 
 // Use first point to begin first segment
 beg.add(e[0]);
-   
+
 for(i=1, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
    cur_dt = e[i] - e[i-1];
    if(new_ts) {
@@ -501,7 +501,7 @@ TimeArray TimeArray::subset(int beg, int end) const
 
 {
 
-TimeArray subset;
+TimeArray subset_ta;
 
 // Check bounds
 if ( beg < 0 || beg >= Nelements ||
@@ -513,9 +513,9 @@ if ( beg < 0 || beg >= Nelements ||
 }
 
 // Store subset
-for(int i=beg; i<=end; i++) subset.add(e[i]);
+for(int i=beg; i<=end; i++) subset_ta.add(e[i]);
 
-return ( subset );
+return ( subset_ta );
 
 }
 
