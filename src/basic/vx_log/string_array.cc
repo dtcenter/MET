@@ -243,27 +243,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::extend(int n)
+void StringArray::extend(int len)
 
 {
 
-if ( n <= Nalloc )  return;
+if ( len <= Nalloc )  return;
 
 int k;
 
-k = n/stringarray_alloc_inc;
+k = len/stringarray_alloc_inc;
 
-if ( n%stringarray_alloc_inc )  ++k;
+if ( len%stringarray_alloc_inc )  ++k;
 
-n = k*stringarray_alloc_inc;
+len = k*stringarray_alloc_inc;
 
 char ** u = (char **) 0;
 
-u = new char * [n];
+u = new char * [len];
 
 int j;
 
-for (j=0; j<n; ++j)  u[j] = (char *) 0;
+for (j=0; j<len; ++j)  u[j] = (char *) 0;
 
 if ( s )  {
 
@@ -276,7 +276,7 @@ if ( s )  {
 s = u;  u = (char **) 0;
 
 
-Nalloc = n;
+Nalloc = len;
 
 return;
 
@@ -286,11 +286,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * StringArray::operator[](int n) const
+const char * StringArray::operator[](int len) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (len < 0) || (len >= Nelements) )  {
 
    mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
 
@@ -300,7 +300,7 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 
 
-return ( s[n] );
+return ( s[len] );
 
 }
 
@@ -331,15 +331,15 @@ extend(Nelements + 1);
 // Add an empty string for a null pointer
 if ( !text ) text = "";
 
-int n = strlen(text);
+int len = strlen(text);
 
-if ( n > MaxLength )  MaxLength = n;
+if ( len > MaxLength )  MaxLength = len;
 
-s[Nelements] = new char [1 + n];
+s[Nelements] = new char [1 + len];
 
 strcpy(s[Nelements], text);
 
-s[Nelements][n] = (char) 0;
+s[Nelements][len] = (char) 0;
 
 ++Nelements;
 
@@ -422,17 +422,17 @@ if ( (i < 0) || (i >= Nelements) )  {
 
 }
 
-int n = strlen(text);
+int len = strlen(text);
 
-if ( n > MaxLength )  MaxLength = n;
+if ( len > MaxLength )  MaxLength = len;
 
 if ( s[i] )  { delete [] s[i];  s[i] = (char *) 0; }
 
-s[i] = new char [1 + n];
+s[i] = new char [1 + len];
 
 strcpy(s[i], text);
 
-s[i][n] = (char) 0;
+s[i][len] = (char) 0;
 
 
 return;
@@ -455,9 +455,9 @@ if ( (i < 0) || (i > Nelements) )  {
 
 }
 
-int n = strlen(text);
+int len = strlen(text);
 
-if ( n > MaxLength )  MaxLength = n;
+if ( len > MaxLength )  MaxLength = len;
 
 extend(Nelements + 1);
 
@@ -569,13 +569,13 @@ if ( !text ) return;
 char * line = (char *) 0;
 char * c    = (char *) 0;
 char * lp   = (char *) 0;
-const int n = strlen(text);
+const int len = strlen(text);
 
 clear();
 
-line = new char [1 + n];
+line = new char [1 + len];
 
-memset(line, 0, 1 + n);
+memset(line, 0, 1 + len);
 
 strcpy(line, text);
 
