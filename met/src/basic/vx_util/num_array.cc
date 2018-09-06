@@ -174,27 +174,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::extend(int n)
+void NumArray::extend(int len)
 
 {
 
-if ( Nalloc >= n )  return;
+if ( Nalloc >= len )  return;
 
 int k;
 
-k = n/num_array_alloc_inc;
+k = len/num_array_alloc_inc;
 
-if ( n%num_array_alloc_inc )  ++k;
+if ( len%num_array_alloc_inc )  ++k;
 
-n = k*num_array_alloc_inc;
+len = k*num_array_alloc_inc;
 
 double * u = (double *) 0;
 
-u = new double [n];
+u = new double [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid NumArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid NumArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -202,7 +203,7 @@ if ( !u )  {
 
 int j;
 
-memset(u, 0, n*sizeof(double));
+memset(u, 0, len*sizeof(double));
 
 if ( e )  {
 
@@ -218,7 +219,7 @@ if ( e )  {
 
 e = u; u = (double *) 0;
 
-Nalloc = n;
+Nalloc = len;
 
 
 return;
@@ -262,11 +263,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::operator[](int n) const
+double NumArray::operator[](int i) const
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (i < 0) || (i >= Nelements) )  {
 
    mlog << Error << "\nNumArray::operator[](int) const -> "
        << "range check error\n\n";
@@ -275,7 +276,7 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 }
 
-return ( e[n] );
+return ( e[i] );
 
 }
 
@@ -429,11 +430,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::set(int n, int k)
+void NumArray::set(int i, int k)
 
 {
 
-set(n, (double) k);
+set(i, (double) k);
 
 Sorted = false;
 
@@ -445,19 +446,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::set(int n, double d)
+void NumArray::set(int i, double d)
 
 {
 
-if ( (n < 0) || (n >= Nelements) )  {
+if ( (i < 0) || (i >= Nelements) )  {
 
-   mlog << Error << "\nNumArray::set(int, double) -> range check error\n\n";
+   mlog << Error << "\nNumArray::set(int, double) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
 }
 
-e[n] = d;
+e[i] = d;
 
 Sorted = false;
 
@@ -531,7 +533,7 @@ int NumArray::rank_array(int &ties)
 
 {
 
-int n, i;
+int n_vld, i;
 
 double *data      = (double *) 0;
 int    *data_loc  = (int *) 0;
@@ -548,7 +550,8 @@ data_rank = new double [Nelements];
 
 if ( !data || !data_loc || !data_rank )  {
 
-   mlog << Error << "\nint NumArray::rank_array() -> memory allocation error\n\n";
+   mlog << Error << "\nint NumArray::rank_array() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -557,13 +560,12 @@ if ( !data || !data_loc || !data_rank )  {
 //
 // Search the data array for valid data and keep track of its location
 //
-n = 0;
-for(i=0; i<Nelements; i++) {
+for(i=0, n_vld=0; i<Nelements; i++) {
 
    if(!is_bad_data(e[i])) {
-      data[n]     = e[i];
-      data_loc[n] = i;
-      n++;
+      data[n_vld]     = e[i];
+      data_loc[n_vld] = i;
+      n_vld++;
    }
 }
 
@@ -571,12 +573,12 @@ for(i=0; i<Nelements; i++) {
 // Compute the rank of the data and store the ranks in the data_rank array
 // Keep track of the number of ties in the ranks.
 //
-ties = do_rank(data, data_rank, n);
+ties = do_rank(data, data_rank, n_vld);
 
 //
 // Store the data_rank values
 //
-for(i=0; i<n; i++) e[data_loc[i]] = data_rank[i];
+for(i=0; i<n_vld; i++) e[data_loc[i]] = data_rank[i];
 
 //
 // Deallocate memory
@@ -587,7 +589,7 @@ if(data_rank) { delete [] data_rank; data_rank = (double *) 0; }
 
 Sorted = false;
 
-return ( n );
+return ( n_vld );
 
 }
 
@@ -822,13 +824,13 @@ int NumArray::n_valid() const
 
 {
 
-int j, n;
+int j, n_vld;
 
-for(j=0, n=0; j<Nelements; j++) {
-   if(!is_bad_data(e[j])) n++;
+for(j=0, n_vld=0; j<Nelements; j++) {
+   if(!is_bad_data(e[j])) n_vld++;
 }
 
-return(n);
+return(n_vld);
 
 }
 
@@ -860,7 +862,7 @@ NumArray NumArray::subset(int beg, int end) const
 
 {
 
-NumArray subset;
+NumArray subset_na;
 
 // Check bounds
 if ( beg < 0 || beg >= Nelements ||
@@ -872,9 +874,9 @@ if ( beg < 0 || beg >= Nelements ||
 }
 
 // Store subset
-for(int i=beg; i<=end; i++) subset.add(e[i]);
+for(int i=beg; i<=end; i++) subset_na.add(e[i]);
 
-return ( subset );
+return ( subset_na );
 
 }
 
@@ -887,7 +889,7 @@ NumArray NumArray::subset(const NumArray &keep) const
 
 {
 
-NumArray subset;
+NumArray subset_na;
 
 // Check bounds
 if ( keep.n_elements() != Nelements )  {
@@ -898,10 +900,10 @@ if ( keep.n_elements() != Nelements )  {
 
 // Store subset
 for(int i=0; i<=Nelements; i++)  {
-   if(keep[i])  subset.add(e[i]);
+   if(keep[i])  subset_na.add(e[i]);
 }
 
-return ( subset );
+return ( subset_na );
 
 }
 

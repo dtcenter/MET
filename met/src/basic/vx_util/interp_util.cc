@@ -340,8 +340,8 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
-      int x = gp->x;
-      int y = gp->y;
+      x = gp->x;
+      y = gp->y;
       double data = dp.get(x, y);
 
       if(is_bad_data(data)) continue;

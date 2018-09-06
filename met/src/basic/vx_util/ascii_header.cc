@@ -392,7 +392,7 @@ void AsciiHeader::clear() {
 void AsciiHeader::read(const char *version) {
    ConcatString file_name;
    DataLine line;
-   AsciiHeaderLine header;
+   AsciiHeaderLine header_line;
    LineDataFile in;
 
    // Set the delimiter for parsing this data
@@ -430,14 +430,14 @@ void AsciiHeader::read(const char *version) {
          }
 
          // Process data from the current line
-         header.clear();
-         header.set_version  (line[0]);
-         header.set_data_type(line[1]);
-         header.set_line_type(line[2]);
-         header.set_col_names(line[3]);
+         header_line.clear();
+         header_line.set_version  (line[0]);
+         header_line.set_data_type(line[1]);
+         header_line.set_line_type(line[2]);
+         header_line.set_col_names(line[3]);
 
          // Store the current line
-         Headers.push_back(header);
+         Headers.push_back(header_line);
       }
 
       // Store the version we just loaded

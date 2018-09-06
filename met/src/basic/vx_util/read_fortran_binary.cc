@@ -50,8 +50,8 @@ static bool try_fb(int fd, const off_t file_size, const unsigned int test_pad_le
 ////////////////////////////////////////////////////////////////////////
 
 
-long long read_fortran_binary(const int fd, void * buf, const int buf_size, 
-                              const int rec_pad_length, 
+long long read_fortran_binary(const int fd, void * buf, const int buf_size,
+                              const int rec_pad_length,
                               const bool swap_endian)
 
 {
@@ -155,8 +155,8 @@ return ( rec_size_1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-long long read_fortran_binary_realloc(const int fd, void * & buf, int & buf_size, 
-                                      const int rec_pad_length, 
+long long read_fortran_binary_realloc(const int fd, void * & buf, int & buf_size,
+                                      const int rec_pad_length,
                                       const bool swap_endian)
 
 {
@@ -281,11 +281,11 @@ long long peek_record_size(int fd, const int rec_pad_length, const bool swap_end
 {
 
 int n_read;
-unsigned char local_buf[16];
+unsigned char peek_buf[16];
 long long size;
 
 
-if ( rec_pad_length >= (int) sizeof(local_buf) )  {
+if ( rec_pad_length >= (int) sizeof(peek_buf) )  {
 
    mlog << Error << "\n\n  peek_record_size(int fd) -> local buffer too small\n\n";
 
@@ -293,18 +293,18 @@ if ( rec_pad_length >= (int) sizeof(local_buf) )  {
 
 }
 
-n_read = read(fd, local_buf, rec_pad_length);
+n_read = read(fd, peek_buf, rec_pad_length);
 
 if ( n_read == 0 )  return ( 0LL );
 
 switch ( rec_pad_length )  {
 
-   case 4:            
-      if ( swap_endian ) shuffle_4(local_buf);
+   case 4:
+      if ( swap_endian ) shuffle_4(peek_buf);
       break;
 
    case 8:
-      if ( swap_endian ) shuffle_8(local_buf);
+      if ( swap_endian ) shuffle_8(peek_buf);
       break;
 
    default:
@@ -314,7 +314,7 @@ switch ( rec_pad_length )  {
 
 }   //  switch
 
-size = get_rec_size(local_buf, rec_pad_length);
+size = get_rec_size(peek_buf, rec_pad_length);
 
    //
    //  put the read pointer back

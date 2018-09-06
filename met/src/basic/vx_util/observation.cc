@@ -29,13 +29,13 @@ using namespace std;
 
 
 Observation::Observation(const string &header_type, const string &station_id,
-			 const time_t valid_time,
-			 const double latitude, const double longitude,
-			 const double elevation,
-			 const string &quality_flag,
-			 const int var_code, const double pressure_level_hpa,
-			 const double height_m, const double value,
-             const string &var_name) :
+                         const time_t valid_time,
+                         const double latitude, const double longitude,
+                         const double elevation,
+                         const string &quality_flag,
+                         const int var_code, const double pressure_level_hpa,
+                         const double height_m, const double value,
+                         const string &var_name) :
   _headerType(header_type),
   _stationId(station_id),
   _validTime(valid_time),
@@ -52,7 +52,7 @@ Observation::Observation(const string &header_type, const string &station_id,
 {
 }
 
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 
