@@ -97,7 +97,6 @@ void RotatedLatLonGrid::set_from_rdata(const RotatedLatLonData & rdata)
 {
 
 LatLonData lld;
-double aux_rotation;
 double rot_lat_ll, rot_lon_ll;
 
 clear();
@@ -138,7 +137,7 @@ void RotatedLatLonGrid::latlon_to_xy(double lat_true, double lon_true, double &x
 
 double lat_rot, lon_rot;
 
-er.latlon_true_to_rot(lat_true, lon_true, lat_true, lon_true);
+er.latlon_true_to_rot(lat_true, lon_true, lat_rot, lon_rot);
 
 LatLonGrid::latlon_to_xy(lat_rot, lon_rot, x, y);
 
