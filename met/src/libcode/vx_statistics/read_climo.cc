@@ -27,7 +27,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void read_climo_file(
-          const char *, GrdFileType, Dictionary *, unixtime, bool, int,
+          const char *, GrdFileType, Dictionary *, unixtime,
+          bool, bool, int,
           const Grid &, const RegridInfo &, DataPlaneArray &dpa);
 
 static DataPlaneArray climo_time_interp(
@@ -69,7 +70,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    RegridInfo regrid_info;
    InterpMthd time_interp;
    GrdFileType ctype;
-   bool match_day;
+   bool match_month, match_day;
    int i, time_step;
 
    // Check for null
@@ -90,6 +91,9 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    // Time interpolation
    time_interp = int_to_interpmthd(i_dict.lookup_int(conf_key_time_interp_method));
 
+   // Match month flag
+   match_month = i_dict.lookup_bool(conf_key_match_month);
+
    // Match day flag
    match_day = i_dict.lookup_bool(conf_key_match_day);
 
@@ -102,7 +106,8 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    // Search the files for the requested records
    for(i=0; i<climo_files.n_elements(); i++) {
       read_climo_file(climo_files[i], ctype, &i_dict, vld_ut,
-                      match_day, time_step, vx_grid, regrid_info, dpa);
+                      match_month, match_day, time_step,
+                      vx_grid, regrid_info, dpa);
    }
 
    // Time interpolation for mean fields
@@ -118,8 +123,9 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
 
 void read_climo_file(const char *climo_file, GrdFileType ctype,
                      Dictionary *dict, unixtime vld_ut,
-                     bool match_day, int time_step, const Grid &vx_grid,
-                     const RegridInfo &regrid_info, DataPlaneArray &dpa) {
+                     bool match_month, bool match_day, int time_step,
+                     const Grid &vx_grid, const RegridInfo &regrid_info,
+                     DataPlaneArray &dpa) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -159,22 +165,26 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       unix_to_mdyhms(cur_dpa[i].valid(), month, day, year, hour, minute, second);
 
       // Check for matching month
-      if(month != vld_month) {
+      if(match_month && month != vld_month) {
          mlog << Debug(3)
-              << "Skipping climatology field whose month (" << month
-              << ") does not match the month of the forecast valid time ("
-              << vld_month << ") from file: " << climo_file << "\n"; 
+              << "Skipping climatology field since \""
+              << conf_key_match_month << "\" is TRUE but the forecast ("
+              << unix_to_yyyymmdd_hhmmss(vld_ut) << ") and climatology ("
+              << unix_to_yyyymmdd_hhmmss(cur_dpa[i].valid())
+              << ") months do not match for file: " << climo_file
+              << "\n";
          continue;
       }
 
-      // Check for matching month and day
+      // Check for matching day
       if(match_day && day != vld_day) {
          mlog << Debug(3)
-              << "Skipping climatology field since \"" << conf_key_match_day
-              << "\" is TRUE but the month (" << month << ") and day (" << day
-              << ") do not match the month (" << vld_month << ") and day ("
-              << vld_day << ") of the forecast valid time from file: "
-              << climo_file << "\n";
+              << "Skipping climatology field since \""
+              << conf_key_match_day << "\" is TRUE but the forecast ("
+              << unix_to_yyyymmdd_hhmmss(vld_ut) << ") and climatology ("
+              << unix_to_yyyymmdd_hhmmss(cur_dpa[i].valid())
+              << ") days do not match for file: " << climo_file
+              << "\n";
          continue;
       }
 

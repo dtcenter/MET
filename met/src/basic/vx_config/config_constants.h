@@ -581,6 +581,7 @@ static const char conf_key_climo_mean_field[]   = "climo_mean.field";
 static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
 static const char conf_key_climo_cdf_bins[]     = "climo_cdf_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
+static const char conf_key_match_month[]        = "match_month";
 static const char conf_key_match_day[]          = "match_day";
 static const char conf_key_time_step[]          = "time_step";
 

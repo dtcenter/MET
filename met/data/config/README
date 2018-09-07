@@ -730,10 +730,15 @@ obs = fcst;
 //      - UW_MEAN for average of data before and after
 //      - DW_MEAN for linear interpolation in time of data before and after
 //
-//   - The "match_day" entry may be set to TRUE or FALSE.  When searching
-//     climatology data, only consider times where the month matches the
-//     forecast valid month.  Set match_day to TRUE or FALSE to define whether
-//     the climatology day must also match.
+//   - The "match_month" entry may be set to TRUE or FALSE.  Set to TRUE to
+//     only consider data where the climatology month matches the forecast
+//     valid month.
+//      - match_month = FALSE to use a persistence forecast
+//      - match_month = TRUE  for typical climatology data
+//
+//   - The "match_day" entry may be set to TRUE or FALSE.  Set to TRUE to
+//     only consider data where the climatology day matches the forecast
+//     valid day.
 //      - match_day = FALSE for monthly climatology
 //      - match_day = TRUE  for daily climatology
 //
@@ -753,6 +758,7 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
+   match_month        = TRUE;
    match_day          = FALSE;
    time_step          = 21600;
 }
