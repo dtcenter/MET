@@ -729,8 +729,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
    // When -column_union is true, store a list of unique line types and columns
    //
    if(j.column_union) {
-      ConcatString cs;
-      cs << write_css(req_lty.uniq()) << ":" << write_css(req_col.uniq());
+      cs << cs_erase << write_css(req_lty.uniq()) << ":" << write_css(req_col.uniq());
       req_stat.set(0, cs);
    }
 
@@ -2508,7 +2507,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   int i;
    double crps_fcst, crps_climo, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 

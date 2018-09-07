@@ -33,7 +33,7 @@ public:
              const int var_code,
              const double height_m, const double pressure_level,
              const string &var_name = "");
-  
+
   virtual ~SummaryKey();
 
 
@@ -45,42 +45,42 @@ public:
   {
     return _headerType;
   }
-  
+
   string getStationId() const
   {
     return _stationId;
   }
-  
+
   double getLatitude() const
   {
     return _latitude;
   }
-  
+
   double getLongitude() const
   {
     return _longitude;
   }
-  
+
   double getElevation() const
   {
     return _elevation;
   }
-  
+
   int getGribCode() const
   {
     return _varCode;
   }
-  
+
   int getVarCode() const
   {
     return _varCode;
   }
-  
+
   void setHeaderIndex(int headerIndex)
   {
     hdrIndex = headerIndex;
   }
-  
+
   double getHeight() const
   {
     return _height;
@@ -95,7 +95,7 @@ public:
   {
     return _varName;
   }
-  
+
   ///////////////
   // Operators //
   ///////////////
@@ -109,12 +109,12 @@ public:
 
     if (_headerType != other._headerType)
       return _headerType < other._headerType;
-    
+
     // Station id
 
     if (_stationId != other._stationId)
       return _stationId < other._stationId;
-    
+
     // Location.
     // This should be taken care of by the station id, but is in here just
     // in case we somehow have 2 stations with the same ID but different
@@ -122,13 +122,13 @@ public:
 
     if (_latitude != other._latitude)
       return _latitude < other._latitude;
-    
+
     if (_longitude != other._longitude)
       return _longitude < other._longitude;
-    
+
     if (_elevation != other._elevation)
       return _elevation < other._elevation;
-    
+
     // Height
 
     if (_height != other._height)
@@ -142,12 +142,12 @@ public:
     // Var name
     if (_varName != other._varName)
       return _varName < other._varName;
-    
+
     // Grib code
 
     return _varCode < other._varCode;
   }
-  
+
 protected:
 
   ///////////////////////
@@ -156,7 +156,6 @@ protected:
 
   string _headerType;
   string _stationId;
-  string _varName;
   double _latitude;
   double _longitude;
   double _elevation;
@@ -164,6 +163,7 @@ protected:
   int hdrIndex;
   double _height;
   double _pressureLevel;
+  string _varName;
 
 };
 

@@ -1432,8 +1432,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     exit(1);
   }
 
-  if (get_data_size(_xCoordVar) != GET_NC_SIZE_P(_xDim) ||
-      get_data_size(_yCoordVar) != GET_NC_SIZE_P(_yDim))
+  if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
+      get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
@@ -1973,8 +1973,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     exit(1);
   }
 
-  if (get_data_size(_xCoordVar) != GET_NC_SIZE_P(_xDim) ||
-      get_data_size(_yCoordVar) != GET_NC_SIZE_P(_yDim))
+  if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
+      get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
@@ -2199,24 +2199,24 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
 
     StringArray dimNames;
     get_dim_names(_xCoordVar, &dimNames);
-    NcDim xDim, yDim;
+    NcDim cur_xDim, cur_yDim;
     int dim_count = dimNames.n_elements();
     if (dim_count == 2) {
       x_dim_var_name = dimNames[dim_count-1];
       y_dim_var_name = dimNames[dim_count-2];
-      xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
-      yDim = get_nc_dim(_xCoordVar, string(y_dim_var_name));
+      cur_xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
+      cur_yDim = get_nc_dim(_xCoordVar, string(y_dim_var_name));
     }
     else {
       x_dim_var_name = dimNames[0];
-      if (dimNames.n_elements() == 1) xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
+      if (dimNames.n_elements() == 1) cur_xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
       get_dim_names(_yCoordVar, &dimNames);
       y_dim_var_name = dimNames[0];
-      if (dimNames.n_elements() == 1) yDim = get_nc_dim(_yCoordVar, string(y_dim_var_name));
+      if (dimNames.n_elements() == 1) cur_yDim = get_nc_dim(_yCoordVar, string(y_dim_var_name));
     }
 
-    long lat_counts = GET_NC_SIZE(yDim);
-    long lon_counts = GET_NC_SIZE(xDim);
+    long lat_counts = GET_NC_SIZE(cur_yDim);
+    long lon_counts = GET_NC_SIZE(cur_xDim);
     bool two_dim_corrd = false;
 
     if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||

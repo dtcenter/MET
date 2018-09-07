@@ -292,10 +292,10 @@ int ATCFLineBase::lead() const {
 ConcatString ATCFLineBase::storm_id() const {
 
    unixtime ut = valid();
-   ConcatString storm_id = define_storm_id(warning_time(), ut, ut,
-                                           basin(), cyclone_number());
+   ConcatString cs = define_storm_id(warning_time(), ut, ut,
+                                     basin(), cyclone_number());
 
-   return(storm_id);
+   return(cs);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -707,9 +707,8 @@ bool get_global_att_double(const NcFile *nc, const ConcatString &att_name,
 int get_version_no(const NcFile *nc) {
    int version_no = 0;
    float att_version_no;
-   bool status = get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);
-   //cout << "    att_version_no: " << att_version_no << "  version_no: " << version_no << endl;
    return version_no;
 }
 
@@ -718,7 +717,7 @@ int get_version_no(const NcFile *nc) {
 bool is_version_less_than_1_02(const NcFile *nc) {
    int version_no = get_version_no(nc);
    float att_version_no;
-   bool status = get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);
    return (version_no < 102);
 }
@@ -2360,7 +2359,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt from_att) {
 NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
-   for(int idx; idx<dims.size(); idx++) {
+   for(unsigned int idx; idx<dims.size(); idx++) {
       NcDim dim = dims[idx];
       if (!has_dim(to_nc, GET_NC_NAME(dim).c_str())) {
          add_dim(to_nc, GET_NC_NAME(dim), dim.getSize());

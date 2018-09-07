@@ -58,14 +58,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int buf_size = (1 << 21);
-
-static unsigned char buf [buf_size];
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 static void get_shapefile_outline(ShpPolyRecord & shape);
 
 
@@ -1512,7 +1504,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_shapefile_outline(ShpPolyRecord & shape)
+void get_shapefile_outline(ShpPolyRecord & cur_shape)
 
 {
 
@@ -1520,7 +1512,7 @@ void get_shapefile_outline(ShpPolyRecord & shape)
 int j;
 const char * const shape_filename = mask_filename;
 ShpFile f;
-ShpPolyRecord & pr = shape;
+ShpPolyRecord & pr = cur_shape;
 
 
    //

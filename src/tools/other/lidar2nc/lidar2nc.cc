@@ -301,12 +301,9 @@ void process_calipso_file(NcFile * out, const char * filename)
 int j;
 int hdf_sd_id;
 int n_data;
-int hdf_stride[MAX_VAR_DIMS], hdf_edge[MAX_VAR_DIMS];
 NcDim nc_dim;
 NcVar nc_lat_var, nc_lon_var, nc_data_var, nc_time_var;
 
-
-for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_stride[j] = hdf_edge[j] = 0;
 
    //
    //  open hdf file
@@ -343,11 +340,10 @@ const int nhdr_dim_size = n_data;
    //
 
 const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN2;
-const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN2;
 const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN2;
 const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 
-int buf_size      = hdr_typ_bytes;
+int buf_size = hdr_typ_bytes;
 
 buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
@@ -373,22 +369,12 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    create_nc_hdr_vars(obs_vars, out, n_data, deflate_level);
    create_nc_obs_vars(obs_vars, out, deflate_level, use_var_id);
 
-   int strl_len = get_dim_size(&obs_vars.strl_dim);
-   int typ_len = strl_len;
-   int sid_len = strl_len;
-   int vld_len = strl_len;
    if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
       NcDim str_dim;
       string dim_name = GET_NC_NAME(obs_vars.strl2_dim);
-      int strl2_len = get_dim_size(&obs_vars.strl2_dim);
       str_dim = get_nc_dim(&obs_vars.hdr_typ_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) typ_len = get_dim_size(&str_dim);
-      str_dim = get_nc_dim(&obs_vars.hdr_sid_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) sid_len = get_dim_size(&str_dim);
-      str_dim = get_nc_dim(&obs_vars.hdr_vld_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) vld_len = get_dim_size(&str_dim);
    }
-   
+
    //
    //  global attributes for netcdf output file
    //
@@ -423,8 +409,6 @@ else                                            s << " on host " << junk;
 unsigned char * buf   = 0;
 
 buf   = new unsigned char [buf_size];
-
-float * const fbuf = (float *) buf;
 
 int   * const ibuf = new int [n_data];
 
@@ -468,7 +452,6 @@ obs_qty_var.putVar(cbuf);
    //
 
 float ff[2];
-int hdr_offset = 0;
 
 float *fhdr_lat_buf = new float[n_data];
 float *fhdr_lon_buf = new float[n_data];
@@ -485,10 +468,9 @@ for (j=0; j<n_data; ++j)  {
    fhdr_lat_buf[j] = ff[0];   //  latitude
    fhdr_lon_buf[j] = ff[1];   //  longitude
    fhdr_elv_buf[j] = FILL_VALUE;
-   
+
 }   //  for j
 
-//obs_vars.hdr_arr_var.putVar(fbuf);
 obs_vars.hdr_lat_var.putVar(fhdr_lat_buf);
 obs_vars.hdr_lon_var.putVar(fhdr_lon_buf);
 obs_vars.hdr_elv_var.putVar(fhdr_elv_buf);
@@ -504,14 +486,8 @@ int layer;
 unixtime t;
 
 
-
 get_hdf_var_info(hdf_sd_id, hdf_time_name, info);
 
-hdf_stride[0] = 1;
-hdf_stride[1] = 1;
-
-hdf_edge[0] = 1;
-hdf_edge[1] = 1;
 
 memset(ibuf, 0, n_data*sizeof(int));
 
@@ -526,7 +502,7 @@ for (j=0; j<n_data; ++j)  {
       snprintf(junk, sizeof(junk),
                "%04d%02d%02d_%02d%02d%02d",
                 year, month, day, hour, minute, second);
-                
+
       v_idx = valid_times.n_elements();
       valid_times.add(t);
       header_data->vld_array.add(junk);
@@ -610,9 +586,9 @@ for (j=0; j<n_data; ++j)  {
 }   //  for j
 
    write_nc_observation(obs_vars);
-   
+
    create_nc_table_vars(obs_vars, out);
-   
+
    write_nc_table_vars(obs_vars);
 
    //

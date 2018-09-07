@@ -254,7 +254,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int tab_match = -1;
    Grib2TableEntry tab;
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
-   ConcatString ens        = dict.lookup_string(conf_key_GRIB_ens,        false);
+   ConcatString ens_str    = dict.lookup_string(conf_key_GRIB_ens,        false);
    int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,      false);
    int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat,  false);
    int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,      false);
@@ -315,10 +315,10 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       field_name = tab.parm_name;
    }
 
-   set_ens         (ens);
+   set_ens          (ens_str);
    //  set the matched parameter lookup information
-   set_name      ( field_name    );
-   set_req_name  ( field_name    );
+   set_name         ( field_name    );
+   set_req_name     ( field_name    );
    if( field_name != "PROB" ){
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );

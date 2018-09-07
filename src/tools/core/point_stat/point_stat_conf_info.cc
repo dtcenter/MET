@@ -98,7 +98,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_config(GrdFileType ftype,
-        bool use_var_id) {
+        bool cur_use_var_id) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
@@ -170,7 +170,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
       i_odict = parse_conf_i_vx_dict(odict, i);
 
       // Process the options for this verification task
-      vx_opt[i].process_config(ftype, i_fdict, i_odict, use_var_id);
+      vx_opt[i].process_config(ftype, i_fdict, i_odict, cur_use_var_id);
    }
 
    // Summarize output flags across all verification tasks
@@ -350,7 +350,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<vx_opt[i].mask_llpnt.size(); j++) {
+      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
 
          // Process new point masks -- no real work to do
          if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
@@ -608,7 +608,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::process_config(GrdFileType ftype,
-        Dictionary &fdict, Dictionary &odict, bool use_var_id) {
+        Dictionary &fdict, Dictionary &odict, bool cur_use_var_id) {
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -626,7 +626,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    vx_pd.obs_info->set_dict(odict);
 
    // Set the GRIB code for point observations
-   if(!use_var_id) vx_pd.obs_info->add_grib_code(odict);
+   if(!cur_use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
@@ -887,7 +887,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    }
 
    // Define the Lat/Lon point masks
-   for(i=0; i<mask_llpnt.size(); i++) {
+   for(i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
       vx_pd.set_mask_llpnt(n, mask_name[n], &mask_llpnt[i]);
    }

@@ -1518,8 +1518,7 @@ void process_scores() {
          }
 
          // Build string for INTERP_MTHD column
-         ConcatString cs;
-         cs << "WV1_" << conf_info.vx_opt[i].wave_1d_beg[j];
+         cs << cs_erase << "WV1_" << conf_info.vx_opt[i].wave_1d_beg[j];
          if(conf_info.vx_opt[i].wave_1d_beg[j] !=
             conf_info.vx_opt[i].wave_1d_end[j]) {
             cs << "-" << conf_info.vx_opt[i].wave_1d_end[j];

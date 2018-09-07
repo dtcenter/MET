@@ -139,7 +139,6 @@ void process_binary() {
    StringArray grid_spec;
    int i, j, x, y, nxy, fd;
    double cdf_y;
-   long long n_read_bytes;
    const int buf_size = 512;
    const int n_read_bin = 101;
    unsigned char buf[buf_size];
@@ -184,7 +183,7 @@ void process_binary() {
    // Loop over grid points
    for(i=0; i<nxy; i++) {
       one_to_two_0_0_0(grid.nx(), grid.ny(), i, x, y);
-      n_read_bytes = read_fortran_binary(fd, buf, buf_size, 4, true);
+      read_fortran_binary(fd, buf, buf_size, 4, true);
 
       // Loop over climo bins, skipping the first and last points
       for(j=0; j<(n_bin-1); j++) {

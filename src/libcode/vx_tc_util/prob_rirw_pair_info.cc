@@ -205,55 +205,56 @@ void ProbRIRWPairInfo::assign(const ProbRIRWPairInfo &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw, const TrackInfo &bdeck) {
+bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw_info,
+                           const TrackInfo &bdeck_info) {
    int i, i_beg, i_end;
 
    clear();
 
    // Check for bad data
-   if(prob_rirw.init() == (unixtime) 0  ||
-      is_bad_data(prob_rirw.rirw_beg()) ||
-      is_bad_data(prob_rirw.rirw_end())) return(false);
+   if(prob_rirw_info.init() == (unixtime) 0  ||
+      is_bad_data(prob_rirw_info.rirw_beg()) ||
+      is_bad_data(prob_rirw_info.rirw_end())) return(false);
 
    // Define begin and end times
-   unixtime beg_ut = prob_rirw.init() + (prob_rirw.rirw_beg() * sec_per_hour);
-   unixtime end_ut = prob_rirw.init() + (prob_rirw.rirw_end() * sec_per_hour);
+   unixtime beg_ut = prob_rirw_info.init() + (prob_rirw_info.rirw_beg() * sec_per_hour);
+   unixtime end_ut = prob_rirw_info.init() + (prob_rirw_info.rirw_end() * sec_per_hour);
 
    // Find matching BEST BEST track points
-   for(i=0,i_beg=-1,i_end=-1; i<bdeck.n_points(); i++) {
-      if(bdeck[i].valid() == beg_ut) i_beg = i;
-      if(bdeck[i].valid() == end_ut) i_end = i;
+   for(i=0,i_beg=-1,i_end=-1; i<bdeck_info.n_points(); i++) {
+      if(bdeck_info[i].valid() == beg_ut) i_beg = i;
+      if(bdeck_info[i].valid() == end_ut) i_end = i;
    }
 
    // Check for matching points
    if(i_beg < 0 || i_end < 0) return(false);
 
    // Store the paired information
-   ProbRIRW = prob_rirw;
-   BDeck    = &bdeck;
+   ProbRIRW = prob_rirw_info;
+   BDeck    = &bdeck_info;
 
-   StormName = bdeck.storm_name();
-   BModel    = bdeck.technique();
+   StormName = bdeck_info.storm_name();
+   BModel    = bdeck_info.technique();
 
-   BLat  = bdeck[i_end].lat();
-   BLon  = bdeck[i_end].lon();
+   BLat  = bdeck_info[i_end].lat();
+   BLon  = bdeck_info[i_end].lon();
 
-   BBegV = bdeck[i_beg].v_max();
-   BEndV = bdeck[i_end].v_max();
+   BBegV = bdeck_info[i_beg].v_max();
+   BEndV = bdeck_info[i_end].v_max();
 
    // Compute the min and max wind speeds in the time window
    BMinV = BBegV;
    BMaxV = BBegV;
    for(i=i_beg; i<=i_end; i++) {
-      if(bdeck[i].v_max() < BMinV) BMinV = bdeck[i].v_max();
-      if(bdeck[i].v_max() > BMaxV) BMaxV = bdeck[i].v_max();
+      if(bdeck_info[i].v_max() < BMinV) BMinV = bdeck_info[i].v_max();
+      if(bdeck_info[i].v_max() > BMaxV) BMaxV = bdeck_info[i].v_max();
    }
 
    BBegLev = wind_speed_to_cyclonelevel(BBegV);
    BEndLev = wind_speed_to_cyclonelevel(BEndV);
 
    // Compute track errors
-   latlon_to_xytk_err(prob_rirw.lat(), prob_rirw.lon(), BLat, BLon,
+   latlon_to_xytk_err(prob_rirw_info.lat(), prob_rirw_info.lon(), BLat, BLon,
                       XErr, YErr, TrackErr);
 
    return(true);
@@ -418,7 +419,7 @@ void ProbRIRWPairInfoArray::assign(const ProbRIRWPairInfoArray &p) {
 const ProbRIRWPairInfo & ProbRIRWPairInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= Pairs.size())) {
+   if((n < 0) || (n >= (int) Pairs.size())) {
       mlog << Error
            << "\nProbRIRWPairInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";

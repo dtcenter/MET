@@ -275,15 +275,15 @@ double ShapeData::area() const {
 
 double ShapeData::area_thresh(const ShapeData *raw_ptr,
                               const SingleThresh &obj_thresh) const {
-   int i, area;
+   int i, cur_area;
    const int Nxy = data.nx()*data.ny();
 
    // Number of points inside the object that meet the threshold criteria
-   for(i=0, area=0; i<Nxy; i++) {
-      if(data.buf()[i] > 0 && obj_thresh.check(raw_ptr->data.buf()[i])) area++;
+   for(i=0, cur_area=0; i<Nxy; i++) {
+      if(data.buf()[i] > 0 && obj_thresh.check(raw_ptr->data.buf()[i])) cur_area++;
    }
 
-   return(area);
+   return(cur_area);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -677,7 +677,6 @@ Polyline ShapeData::convex_hull_new() const
 int j, k, y;
 int n_in, n_out;
 Polyline hull_poly;
-const int N = nint(area());
 IntPoint * in = new IntPoint [2*(data.ny() + 1)];
 
 

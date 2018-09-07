@@ -444,7 +444,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_icodevector (const IcodeVector & icv)
+void DictionaryEntry::set_icodevector (const IcodeVector & _icv)
 
 {
 
@@ -452,7 +452,7 @@ if ( v )  { delete v;  v = 0; }
 
 v = new IcodeVector;
 
-(*v) = icv;
+(*v) = _icv;
 
 return;
 
@@ -483,13 +483,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_variable (const char * _name, const IcodeVector & icv)
+void DictionaryEntry::set_variable (const char * _name, const IcodeVector & _icv)
 
 {
 
 set_name(_name);
 
-set_icodevector(icv);
+set_icodevector(_icv);
 
 return;
 

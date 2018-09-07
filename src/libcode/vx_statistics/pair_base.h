@@ -41,8 +41,6 @@ struct station_values_t {
   vector<ob_val_t> obs;
 };
 
-static bool sort_obs(ob_val_t a, ob_val_t b) { return a.val<b.val; }
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Base class for matched pair data

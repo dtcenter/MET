@@ -545,13 +545,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calculator::do_user_func(const DictionaryEntry * e)
+void Calculator::do_user_func(const DictionaryEntry * cur_e)
 
 {
 
 int j;
 Number locals [max_user_function_args];
-const int n_args = e->n_args();
+const int n_args = cur_e->n_args();
 
    //
    //  local variables should already be loaded onto the stack
@@ -565,7 +565,7 @@ for (j=0; j<n_args; ++j)  {
 
 }
 
-const IcodeVector * V = e->icv();
+const IcodeVector * V = cur_e->icv();
 
 run(*V, locals);
 
@@ -667,7 +667,7 @@ while ( pos < (v.length()) )  {
 
 
       default:
-         cerr << "\n\n  Calculator::run(const IcodeVector &) -> bad icode cell type ... \"" 
+         cerr << "\n\n  Calculator::run(const IcodeVector &) -> bad icode cell type ... \""
               << celltype_to_string(cell.type)
               << "\"\n\n";
          exit ( 1 );

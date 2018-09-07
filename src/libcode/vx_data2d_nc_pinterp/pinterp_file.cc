@@ -567,7 +567,6 @@ if ( dim_count >= max_pinterp_args )  {
 
 }
 
-int j;
 bool status;
 int i;
 short s;

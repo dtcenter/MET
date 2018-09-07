@@ -855,11 +855,10 @@ void process_point_obs(int i_nc) {
    NetcdfObsVars obs_vars;
    read_nc_dims_vars(obs_vars, obs_in);
 
-   int var_num = 0;
    bool use_var_id = obs_vars.use_var_id;
    if (use_var_id) {
       NcDim var_dim = get_nc_dim(obs_in,nc_dim_nvar);
-      var_num       = get_dim_size(&var_dim);
+      get_dim_size(&var_dim);
    }
 
    int exit_code = check_nc_dims_vars(obs_vars);
@@ -941,7 +940,6 @@ void process_point_obs(int i_nc) {
       }
    }
 
-   char obs_qty[qty_len+1];
    if (!IS_INVALID_NC(obs_vars.obs_qty_tbl_var)) {
       if (!get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &obs_qty_array)) {
          mlog << Error << "\nprocess_point_obs() -> "

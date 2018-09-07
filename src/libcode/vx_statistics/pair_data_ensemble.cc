@@ -452,7 +452,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_stats() {
-   int i, j;
+   int i;
    double w, w_sum;
    double crps, crps_climo;
    double fbar, obar, ffbar, oobar, fobar;

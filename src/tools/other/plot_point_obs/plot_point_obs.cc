@@ -405,8 +405,6 @@ int main(int argc, char *argv[]) {
    long lengths[2] = { 1, 1 };
    long offsets_1D[1] = { 0 };
    long lengths_1D[1] = { 1 };
-   int zzz_count = 0;
-   
 
    if (use_var_id) {
       NcDim bufr_var_dim = get_nc_dim(f_in, nc_dim_nvar);

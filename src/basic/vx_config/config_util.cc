@@ -233,11 +233,11 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
    }
 
    // Make sure the map is the expected size
-   if((signed int) output_map.size() != n_lty) {
+   if((int) output_map.size() != n_lty) {
       mlog << Error << "\nparse_conf_output_flag() -> "
            << "Unexpected number of entries found in \""
            << conf_key_output_flag << "\" ("
-           << (signed int) output_map.size()
+           << (int) output_map.size()
            << " != " << n_lty << ").\n\n";
       exit(1);
    }
@@ -1107,7 +1107,7 @@ void InterpInfo::clear() {
 
 void InterpInfo::validate() {
 
-   for(unsigned int i=0; i<n_interp; i++) {
+   for(int i=0; i<n_interp; i++) {
 
       InterpMthd methodi = string_to_interpmthd(method[i]);
 

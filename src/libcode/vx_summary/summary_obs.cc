@@ -69,7 +69,7 @@ long SummaryObs::countHeaders(vector< Observation > *obs_vector_ptr)
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
-   
+
    mlog << Debug(5) << "    " << method_name << "  size: "
         << (int)obs_vector_ptr->size() << " header count: " << nhdr << "\n";
 
@@ -96,7 +96,7 @@ long SummaryObs::countHeaders(vector< Observation > &obs_vector)
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
-   
+
    mlog << Debug(5) << "    " << method_name << "  size: "
         << (int)obs_vector.size() << " header count: " << nhdr << "\n";
 
@@ -141,7 +141,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    const char *var_name = 0;
 
    //_dataSummarized = true;
-   TimeSummaryInfo summaryInfo = summary_info;
+   TimeSummaryInfo inputSummaryInfo = summary_info;
 
    // Initialize the list of summary observations
    StringArray summary_vnames;
@@ -197,7 +197,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         // It also allows us to go back one observation too far when looking for
         // the first observation in this time interval.
 
-        if (!isInObsList(summaryInfo, *curr_obs)) {
+        if (!isInObsList(inputSummaryInfo, *curr_obs)) {
            if (!printted_var_names.has(curr_obs->getVarName().c_str())) {
               mlog << Debug(10)
                    << "SummaryObs::summarizeObs()  Filtered variable ["
