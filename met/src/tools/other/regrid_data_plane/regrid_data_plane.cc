@@ -441,15 +441,15 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_grid_mapping(const ConcatString coord_name, Grid to_grid,
+void get_grid_mapping(const ConcatString cur_coord_name, Grid to_grid,
       IntArray *cellMapping, int &from_lat_count, int &from_lon_count) {
    static const char *method_name = "get_grid_mapping()";
    DataPlane from_dp;
    DataPlane to_dp;
 
    // Determine the "from" grid
-   mlog << Debug(2)  << method_name << " Reading coord file: " << coord_name << "\n";
-   NcFile *_nc = open_ncfile(coord_name);
+   mlog << Debug(2)  << method_name << " Reading coord file: " << cur_coord_name << "\n";
+   NcFile *_nc = open_ncfile(cur_coord_name);
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
 
@@ -489,10 +489,9 @@ void get_grid_mapping(const ConcatString coord_name, Grid to_grid,
          }
       }
       else {
-         bool result;
-         FILE *pFile = fopen ( coord_name, "rb" );
-         result = fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
-         result = fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
+         FILE *pFile = fopen ( cur_coord_name, "rb" );
+         fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
+         fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
          fclose (pFile);
       }
       check_lat_lon(data_size, latitudes, longitudes);
@@ -501,9 +500,7 @@ void get_grid_mapping(const ConcatString coord_name, Grid to_grid,
 
       //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
       for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
-         int lat_offset = from_lon_count * xIdx;
          for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
-            int offset = lat_offset + yIdx;
             coord_offset = from_dp.two_to_one(yIdx, xIdx);
             lat = latitudes[coord_offset];
             lon = longitudes[coord_offset];
@@ -533,7 +530,6 @@ void get_grid_mapping(const ConcatString coord_name, Grid to_grid,
 void process_data_only_file() {
    DataPlane to_dp;
    Grid fr_grid, to_grid;
-   GrdFileType ftype;
    double dmin, dmax;
    ConcatString run_cs, vname;
    static const char *method_name = "process_data_only_file() ";
@@ -544,9 +540,6 @@ void process_data_only_file() {
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = config.nc_compression();
-
-   // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
 
    if ((RGInfo.method != InterpMthd_Min)
          && (RGInfo.method != InterpMthd_Max)
@@ -654,7 +647,6 @@ void process_data_only_file() {
 
       // Regrid the data plane
       int offset;
-      int to_offset;
       int valid_count;
       int censored_count;
       int missing_count = 0;
@@ -718,7 +710,7 @@ void process_data_only_file() {
                   //Filter by QC flag
                   if (!has_qc_var || !has_qc_flags
                        || qc_flags.has(qc_data[cellArray[dIdx]])) {
-                     for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+                     for(i=0; i<vinfo->censor_thresh().n_elements(); i++) {
                         // Break out after the first match.
                         if(vinfo->censor_thresh()[i].check(data_value)) {
                            data_value = vinfo->censor_val()[i];
@@ -777,7 +769,7 @@ void process_data_only_file() {
          if (censored_count > 0) {
             sprintf (censored_info, " censored count: %d", censored_count);
          }
-         else sprintf (censored_info, "");
+         else strcpy (censored_info, "");
          mlog << Debug(2)
               << "Range of regridded data (" << vinfo->name() << ") is "
               << dmin << " to " << dmax << ".\n";

@@ -149,11 +149,11 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
       // Calculate the end point of this ramp
 
       double slope = (top_slope + bottom_slope) / 2.0;
-      double end_value = start_value + slope * time_diff;
+      double end_ramp_value = start_value + slope * time_diff;
 
       // Save the end point of the previous corridor
 
-      SDObservation ramp_end(end_time, end_value);
+      SDObservation ramp_end(end_time, end_ramp_value);
       ramps.push_back(pair< SDObservation, SDObservation >(ramp_start, ramp_end));
 
       // Save the values for the next corridor

@@ -346,7 +346,7 @@ simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
 number : INTEGER { set_number_string(); }
        | FLOAT   { set_number_string(); }
        ;
-    
+
 
 boolean_list : BOOLEAN                   { do_boolean($1); }
             | boolean_list ',' BOOLEAN   { do_boolean($3); }
@@ -910,16 +910,16 @@ void store_exp()
 // DictionaryEntry e;
 // IcodeVector v;
 // Number n;
-// 
+//
 // v = icvs.pop();
-// 
+//
 // hp.run(v);
-// 
+//
 // n = hp.pop();
-// 
+//
 // if ( n.is_int )  e.set_int    (0, n.i);
 // else             e.set_double (0, n.d);
-// 
+//
 // dict_stack->store(e);
 
 
@@ -939,7 +939,7 @@ if ( test_mode )  {
 
    result = node;
 
-} 
+}
 
 else {
 
@@ -1170,7 +1170,7 @@ ThreshNode * do_fortran_thresh(const char * text)
 
 ThreshType op  = no_thresh_type;
 const char * p = text + 2;         //  we know that all the prefixes
-                                   //  (like "le" or "gt") are two  
+                                   //  (like "le" or "gt") are two
                                    //  characters long
 
      if ( strncmp(text, "le", 2) == 0 )  op = thresh_le;
@@ -1398,7 +1398,7 @@ if ( is_function_def )  {
    ///////////////////////////////////////
 
 Number n[max_builtin_args];
-Number result;
+Number cur_result;
 
    //
    //  pop the args (in reverse order) from the icodevector stack
@@ -1444,10 +1444,10 @@ if ( ! (v.is_mark()) )  {
 
 hp.do_builtin(which, n);
 
-result = hp.pop();
+cur_result = hp.pop();
 
-if ( result.is_int )  cell.set_integer (result.i);
-else                  cell.set_double  (result.d);
+if ( cur_result.is_int )  cell.set_integer (cur_result.i);
+else                      cell.set_double  (cur_result.d);
 
 v.clear();
 
@@ -1512,7 +1512,7 @@ if ( is_function_def )  {
    //////////////////////////////////////
 
 Number n[max_user_function_args];
-Number result;
+Number cur_result;
 
    //
    //  pop the args (in reverse order) from the icodevector stack
@@ -1547,10 +1547,10 @@ if ( icvs.top_is_mark(fcm) )  icvs.toss();
 
 hp.run(*(e->icv()), n);
 
-result = hp.pop();
+cur_result = hp.pop();
 
-if ( result.is_int )  cell.set_integer (result.i);
-else                  cell.set_double  (result.d);
+if ( cur_result.is_int )  cell.set_integer (cur_result.i);
+else                      cell.set_double  (cur_result.d);
 
 v.clear();
 

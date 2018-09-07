@@ -107,7 +107,6 @@ void init_netcdf_output(NcFile *nc_file, NetcdfObsVars &obs_vars,
 bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
       NcObsOutputData &nc_out_data)
 {
-  bool reset_idx = false;
   bool use_var_id = obs_vars.use_var_id;
   string method_name = "write_observations() ";
   bool do_summary = nc_out_data.summary_info.flag;

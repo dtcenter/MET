@@ -537,9 +537,8 @@ void process_command_line(int argc, char **argv) {
 
 ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    int len;
-   char pid_str[128];
    ConcatString tbl_filename, tbl_prefix;
-   
+
    tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
    tbl_filename = make_temp_file_name(tbl_prefix, "tbl");
    len = tbl_filename.length();
@@ -566,8 +565,6 @@ bool is_prepbufr_file(StringArray *events) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_variable_info(const char* tbl_filename) {
-   static const int maximumLineLength = 128;
-   char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
    static const char *method_name = "get_variable_info()";
 
    FILE * fp;
@@ -715,7 +712,7 @@ void open_netcdf() {
    // Define netCDF variables
    init_nc_dims_vars_config(obs_vars);
    obs_vars.attr_pb2nc = true;
-   
+
    if (!obs_to_vector) {
       int deflate_level = compress_level;
       if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
@@ -746,7 +743,7 @@ void process_pbfile(int i_pb) {
    unixtime msg_ut, beg_ut, end_ut;
    unixtime min_msg_ut, max_msg_ut;
 
-   ConcatString file_name, blk_prefix, blk_file;
+   ConcatString file_name, blk_prefix, blk_file, log_message;
    char     prefix[max_str_len];
    char     time_str[max_str_len];
    char     start_time_str[max_str_len], end_time_str[max_str_len];
@@ -875,7 +872,7 @@ void process_pbfile(int i_pb) {
       start_t = clock();
    }
 
-   ConcatString log_message = (is_prepbufr ? " PrepBufr" : " Bufr");
+   log_message = (is_prepbufr ? " PrepBufr" : " Bufr");
    log_message.add(" messages");
    if (npbmsg != npbmsg_total) {
       log_message << " (out of " << unixtime_to_string(npbmsg_total) << ")";
@@ -891,7 +888,7 @@ void process_pbfile(int i_pb) {
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
-   
+
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
 
@@ -923,7 +920,7 @@ void process_pbfile(int i_pb) {
       // from one PrepBufr message to the next
       if(file_ut == (unixtime) 0) {
          adjusted_file_ut = file_ut = msg_ut;
-         
+
          // Get minutes offset by calling IUPVS01(unit, "MINU")
          // It's not changed per message
          get_tmin_(&unit, &cycle_minute);
@@ -976,11 +973,9 @@ void process_pbfile(int i_pb) {
 
       if (!is_prepbufr) {
          int index;
-         int length;
          char tmp_str[mxr8lv*mxr8pm];
 
          //Read header (station id, lat, lon, ele, time)
-         length = bufr_hdrs.length();
          strcpy(tmp_str, bufr_hdrs.text());
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
                     &bufr_hdr_length, &use_small_buffer );
@@ -1616,7 +1611,7 @@ void process_pbfile(int i_pb) {
 
       int debug_level = 5;
       if(mlog.verbosity_level() >= debug_level) {
-         ConcatString log_message = "Filtered time:";
+         log_message = "Filtered time:";
          for (kk=0; kk<filtered_times.n_elements();kk++) {
             log_message.add((0 == (kk % 3)) ? "\n\t" : "  ");
             log_message.add(unix_to_yyyymmdd_hhmmss(filtered_times[kk]));
@@ -1730,9 +1725,7 @@ void process_pbfile_metadata(int i_pb) {
    }
 
    // Initialize counts
-   i_ret   =  i_msg     = 0;
-
-   bool is_prepbufr = is_prepbufr_file(&event_names);
+   i_ret = i_msg = 0;
 
    StringArray headers;
    StringArray tmp_hdr_array;
@@ -1743,7 +1736,6 @@ void process_pbfile_metadata(int i_pb) {
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
    headers.add(tmp_hdr_array);
-   //headers.dump(cout);
 
    StringArray unchecked_var_list;
    if (check_all) {
@@ -2052,13 +2044,13 @@ void write_netcdf_hdr_data() {
    if (obs_to_vector) {
       int deflate_level = compress_level;
       if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   
+
       nc_out_data.processed_hdr_cnt = pb_hdr_count;
       nc_out_data.deflate_level = compress_level;
       nc_out_data.observations = observations;
       nc_out_data.summary_obs = summary_obs;
       nc_out_data.summary_info = conf_info.getSummaryInfo();
-      
+
       init_netcdf_output(f_out, obs_vars, nc_out_data, program_name);
       dim_count = obs_vars.hdr_cnt;
    }
@@ -2093,7 +2085,7 @@ void write_netcdf_hdr_data() {
       if (!nc_out_data.summary_info.flag || (nc_out_data.summary_info.flag && nc_out_data.summary_info.raw_data))
          create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
    }
-   
+
    // Make sure all obs data is processed before handling header
    if (obs_to_vector) {
       write_observations(f_out, obs_vars, nc_out_data);
@@ -2109,11 +2101,11 @@ void write_netcdf_hdr_data() {
               << "  summary count: " << (int)summary_obs->getSummaries().size()
               << " header count: " << dim_count
               << " summary header count: " << (dim_count-pb_hdr_count) << "\n";
-              
+
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
          if (summaryInfo.flag) write_summary_attributes(f_out, summaryInfo);
       }
-      
+
       create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
       create_nc_table_vars(obs_vars, f_out, deflate_level);
 
@@ -2123,13 +2115,10 @@ void write_netcdf_hdr_data() {
          // Write out the remaining header data
          write_nc_buf_headers(obs_vars);
       }
-      
+
       //write_nc_table_vars(obs_vars);
    }
 
-   int hdr_str_len;
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, strl_len } ;
    StringArray nc_var_name_arr;
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
@@ -2166,9 +2155,9 @@ void write_netcdf_hdr_data() {
          var_name = grib_name.text();
       }
       nc_var_name_arr.add(var_name);
-      
+
    } // end for i
-   
+
    dim_count = bufr_obs_name_arr.n_elements();
    create_nc_obs_name_vars (obs_vars, f_out, dim_count, dim_count, deflate_level);
    write_obs_var_names (obs_vars,  nc_var_name_arr);

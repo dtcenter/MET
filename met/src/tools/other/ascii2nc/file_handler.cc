@@ -238,7 +238,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Create the output NetCDF file for writing
    //
-   
+
    _ncFile = open_ncfile(nc_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(_ncFile)) {
@@ -261,7 +261,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    nc_out_data.observations = _observations;
    nc_out_data.summary_obs = &summary_obs;
    nc_out_data.summary_info = _summaryInfo;
-   
+
    init_netcdf_output(_ncFile, obs_vars, nc_out_data, _programName);
 
    //
@@ -387,9 +387,8 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  bool include_header = true;
   write_observations(_ncFile, obs_vars, nc_out_data);
-  
+
   int var_count = (use_var_id ? obs_names.n_elements() : 0);
   if (var_count > 0) {
     int unit_count = 0;

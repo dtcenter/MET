@@ -147,10 +147,10 @@ int main(int argc, char *argv[]) {
    //
    // Process the MADIS file
    //
-   for (vector< ConcatString >::const_iterator mdfile = md_files.begin();
-       mdfile != md_files.end(); ++mdfile)
+   for (vector< ConcatString >::const_iterator it_mdfile = md_files.begin();
+       it_mdfile != md_files.end(); ++it_mdfile)
    {
-      process_madis_file(*mdfile);
+      process_madis_file(*it_mdfile);
    }
 
    bool use_var_id = true;
@@ -248,7 +248,7 @@ void process_command_line(int argc, char **argv) {
    //
    // Store the input MADIS file name and the output NetCDF file name
    //
-   for (int i = 0; i < cline.n() - 1; ++i)
+   for (i = 0; i < cline.n() - 1; ++i)
      md_files.push_back(cline[i]);
    ncfile = cline[cline.n() - 1];
 
@@ -532,11 +532,11 @@ void check_quality_control_flag(float &value, const char qty, const char *var_na
 
 int process_obs(const int in_gc, const float conversion,
                 float *obs_arr, char qty, const NcVar &nc_var) {
-   int processed_count = 0;
+   int cur_processed_count = 0;
    //
    // Check that the input variable contains valid data.
    //
-   if(IS_INVALID_NC(nc_var)) return processed_count;
+   if(IS_INVALID_NC(nc_var)) return cur_processed_count;
 
    check_quality_control_flag(obs_arr[4], qty, GET_NC_NAME(nc_var).c_str());
 
@@ -550,7 +550,7 @@ int process_obs(const int in_gc, const float conversion,
    //
    if(!is_bad_data(obs_arr[4])) {
       char  var_name[max_str_len];
-      sprintf(var_name, "GRIB_%d", obs_arr[1]);
+      sprintf(var_name, "GRIB_%d", (int) obs_arr[1]);
       
       obs_arr[4] *= conversion;
 
@@ -574,10 +574,10 @@ int process_obs(const int in_gc, const float conversion,
       obs_vector.push_back(obs);
 
       i_obs++;
-      processed_count++;
+      cur_processed_count++;
    }
 
-   return processed_count;
+   return cur_processed_count;
 }
 
 
@@ -1957,7 +1957,6 @@ void process_madis_maritime(NcFile *&f_in) {
    long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
-   char tmp_str[max_str_len];
    time_t hdr_vld;
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;

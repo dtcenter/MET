@@ -149,7 +149,7 @@ void GridClosedPoly::add_point(double uu, double vv)
 
 {
 
-if ( n_points == 0 )  { 
+if ( n_points == 0 )  {
 
    u_min = u_max = uu;  v_min = v_max = vv;
 
@@ -241,7 +241,7 @@ void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid)
 
 clear();
 
-int j, k, m, n;
+int i, j, k, m;
 int start, stop;
 double lat, lon;
 double x, y;
@@ -259,11 +259,11 @@ for (j=0; j<(r.n_parts); ++j)  {
 
    stop  = r.stop_index(j);
 
-   n = stop - start + 1;
+   i = stop - start + 1;
 
    // g.extend(stop - start + 1);
 
-   for (k=0; k<n; ++k)  {
+   for (k=0; k<i; ++k)  {
 
       m = start + k;
 

@@ -498,7 +498,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<vx_opt[i].mask_llpnt.size(); j++) {
+      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
 
          // Process new point masks -- no real work to do
          if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
@@ -860,7 +860,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    }
 
    // Define the Lat/Lon point masks
-   for(i=0; i<mask_llpnt.size(); i++) {
+   for(i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
       vx_pd.set_mask_llpnt(n, mask_name[n], &mask_llpnt[i]);
    }

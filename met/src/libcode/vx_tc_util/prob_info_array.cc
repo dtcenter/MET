@@ -159,7 +159,7 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
 const ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) const {
 
    // Check range
-   if((n < 0) || (n >= ProbRIRW.size())) {
+   if((n < 0) || (n >= (int) ProbRIRW.size())) {
       mlog << Error
            << "\nProbRIRWInfo & ProbInfoArray::prob_rirw(int) -> "
            << "range check error for index value " << n << "\n\n";

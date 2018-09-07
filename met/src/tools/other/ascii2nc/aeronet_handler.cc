@@ -169,7 +169,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     //string tmp_str = string(data_line[1]);
     string tmp_str = string(data_line.get_line());
     int offset = tmp_str.find(":");
-    if (offset != string::npos)
+    if (offset != (int) string::npos)
       header_type += tmp_str.substr(0, offset);
     mlog << Debug(5) << "_readObservations() message_type: [" << header_type << "]\n";
   }
@@ -372,7 +372,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       return false;
 
     int var_id = AOT_GRIB_CODE;
-    string var_name = AOT_NAME;
+    var_name = AOT_NAME;
     //
     // Save the desired observations from the line
     //
@@ -401,7 +401,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
       if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
 
-      string var_name = AOT_NAME;
+      var_name = AOT_NAME;
       
       double dlevel = bad_data_double;
       double dheight = atoi(height.c_str());
@@ -666,15 +666,15 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
       var_name = WAVELENGTHS_INPUT_AOD_NAME;
     }
     // const string Input_AOD_NAME = "Input_AOD";  // 870nm_Input_AOD
-    else if (string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
+    else if ((int) string::npos != (offset = hdr_field.find(INPUT_AOD_NAME))) {
       var_name = INPUT_AOD_NAME;
     }
     // Exact_Wavelengths_of_AOD(um)_865nm
-    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))) {
+    else if ((int) string::npos != (offset = hdr_field.find(WAVELENGTHS_AOD_NAME))) {
       var_name = WAVELENGTHS_AOD_NAME;
     }
     // Exact_Wavelengths_of_PW(um)_935nm
-    else if (string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME))) {
+    else if ((int) string::npos != (offset = hdr_field.find(WAVELENGTHS_PW_NAME))) {
       var_name = WAVELENGTHS_PW_NAME;
     }
     else if ((hdr_field == OPTICAL_AIR_MASS_NAME)) {

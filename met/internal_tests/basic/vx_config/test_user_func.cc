@@ -95,7 +95,6 @@ if ( dup2(1, 2) < 0 )  {
 config.set_debug(debug);
 
 int j;
-int n_args;
 double x, y;
 bool status = false;
 ConcatString function_name;
@@ -120,7 +119,7 @@ for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here, not zero
 
 function_name = cline[j++];
 
-n_args = argc - j;
+// int n_args = argc - j;
 
 x = atof(cline[j]);
 
@@ -151,14 +150,14 @@ UserFunc_1Arg f;
 f.set(e);
 
 // if ( f.n_args() != n_args )  {
-// 
+//
 //    cout << "\n\n  " << program_name << ": expected "
 //         << (f.n_args()) << " argument(s) for function \""
 //         << function_name << "\" ... got " << n_args
 //         << "\n\n";
-// 
+//
 //    exit ( 1 );
-// 
+//
 // }
 
 y = f(x);

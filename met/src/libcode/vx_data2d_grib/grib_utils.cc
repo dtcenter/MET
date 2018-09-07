@@ -64,7 +64,7 @@ void gds_to_grid(const Section2_Header & gds, Grid & gr)
 LambertData         lc_data;
 StereographicData   st_data;
 LatLonData          ll_data;
-RotatedLatLonData  rll_data;
+//RotatedLatLonData  rll_data;
 MercatorData        mc_data;
 GaussianData         g_data;
 

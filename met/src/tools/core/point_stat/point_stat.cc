@@ -666,11 +666,10 @@ void process_obs_file(int i_nc) {
    NetcdfObsVars obs_vars;
    read_nc_dims_vars(obs_vars, obs_in);
 
-   int var_num = 0;
    bool use_var_id = obs_vars.use_var_id;
    if (use_var_id) {
       NcDim var_dim = get_nc_dim(obs_in,nc_dim_nvar);
-      var_num       = get_dim_size(&var_dim);
+      get_dim_size(&var_dim);
    }
 
    int exit_code = check_nc_dims_vars(obs_vars);
@@ -717,11 +716,6 @@ void process_obs_file(int i_nc) {
         << " observations from " << hdr_count
         << " messages.\n";
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-   long offsets_1D[1] = { 0 };
-   long lengths_1D[1] = { 1 };
-
    StringArray var_names;
    char var_name[var_name_len+1];
    strcpy(var_name, "");
@@ -760,7 +754,6 @@ void process_obs_file(int i_nc) {
    }
 
    int str_length;
-   int prev_hdr_offset = -1;
    int block_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
    // Process each observation in the file
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=block_size) {
@@ -773,7 +766,6 @@ void process_obs_file(int i_nc) {
       }
 
       int hdr_idx;
-      char obs_qty[qty_len+1];
       strcpy(obs_qty_str, "");
       for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
          i_obs = i_block_start_idx + i_block_idx;

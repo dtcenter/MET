@@ -422,14 +422,14 @@ void ObsErrorTable::assign(const ObsErrorTable & f) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorTable::extend(int n) {
+void ObsErrorTable::extend(int len) {
 
-   if(n <= N_alloc )  return;
+   if(len <= N_alloc )  return;
 
    int i;
    ObsErrorEntry * u = (ObsErrorEntry *) 0;
 
-   u = new ObsErrorEntry [n];
+   u = new ObsErrorEntry [len];
 
    for(i=0; i<N_elements; i++) u[i] = e[i];
 
@@ -437,7 +437,7 @@ void ObsErrorTable::extend(int n) {
 
    u = (ObsErrorEntry *) 0;
 
-   N_alloc = n;
+   N_alloc = len;
 
    return;
 }

@@ -162,7 +162,7 @@ long count_nc_headers(vector< Observation > &observations)
    double prev_latitude = bad_data_double;
    double prev_longitude = bad_data_double;
    double prev_elevation = bad_data_double;
-   const char *method_name = "  count_nc_headers()";
+   const string method_name = "  count_nc_headers()";
 
    for (vector< Observation >::iterator obs = observations.begin();
         obs != observations.end(); ++obs)
@@ -196,7 +196,7 @@ long count_nc_headers(vector< Observation > &observations)
 ///////////////////////////////////////////////////////////////////////////////
 
 void create_nc_dimensions(NetcdfObsVars &obs_vars, NcFile *f_out) {
-   const char *method_name = "  create_nc_dimensions()";
+   const string method_name = "  create_nc_dimensions()";
    mlog << Debug(7) << method_name << "  is called" << "\n";
    // Define netCDF dimensions
    if (IS_INVALID_NC(obs_vars.strl_dim))   obs_vars.strl_dim = add_dim(f_out, nc_dim_mxstr,  HEADER_STR_LEN);
@@ -216,7 +216,7 @@ void create_nc_dimensions(NetcdfObsVars &obs_vars, NcFile *f_out) {
 
 void create_nc_hdr_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
       const int hdr_count, const int deflate_level) {
-   const char *method_name = "  create_nc_hdr_vars()";
+   const string method_name = "  create_nc_hdr_vars()";
    mlog << Debug(7) << method_name << "  hdr_count: " << hdr_count << "\n";
    
    // Define netCDF dimensions
@@ -279,7 +279,7 @@ NcDim create_nc_obs_var_var (NetcdfObsVars &obs_vars, NcFile *f_out,
 void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
                          const int deflate_level, bool use_var_id) {
    const char *long_name_str;
-   const char *method_name = "  create_nc_obs_vars()";
+   const string method_name = "  create_nc_obs_vars()";
 
    // Define netCDF dimensions
    create_nc_dimensions(obs_vars, f_out);
@@ -330,7 +330,7 @@ void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
 
 void create_nc_obs_name_vars (NetcdfObsVars &obs_vars, NcFile *f_out, 
       const int var_count, const int unit_count, const int deflate_level) {
-   const char *method_name = "  create_nc_other_vars()";
+   const string method_name = "  create_nc_other_vars()";
    
    if (var_count > 0) {
       NcDim var_dim = create_nc_obs_var_var(obs_vars, f_out, var_count, deflate_level);
@@ -347,7 +347,7 @@ void create_nc_obs_name_vars (NetcdfObsVars &obs_vars, NcFile *f_out,
 ///////////////////////////////////////////////////////////////////////////////
 
 void create_nc_table_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int deflate_level) {
-   const char *method_name = "  create_nc_table_vars()";
+   const string method_name = "  create_nc_table_vars()";
    
    // Define netCDF dimensions
    NcDim hdr_typ_dim = add_dim(f_out, nc_dim_nhdr_typ, hdr_data.typ_array.n_elements());
@@ -373,7 +373,7 @@ void create_nc_table_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int def
 
 void create_nc_pb_hdrs (NetcdfObsVars &obs_vars, NcFile *f_out,
       const int hdr_count, const int deflate_level) {
-   const char *method_name = "  create_nc_pb_hdrs()";
+   const string method_name = "  create_nc_pb_hdrs()";
    mlog << Debug(7) << method_name << "  hdr_count: " << hdr_count << "\n";
    
    // Define netCDF dimensions
@@ -472,9 +472,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    //
    // Allocate space to store the data
    //
-   char hdr_typ_str[typ_len+1];
-   char hdr_sid_str[sid_len+1];
-   char hdr_vld_str[vld_len+1];
    char hdr_typ_block[buf_size][typ_len];
    char hdr_sid_block[buf_size][sid_len];
    char hdr_vld_block[buf_size][vld_len];
@@ -660,8 +657,8 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
 
       lengths[1] = vld_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
-      int buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
-           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
+      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
+            ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
       for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
          buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
                ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
@@ -903,7 +900,6 @@ bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
 void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
    
    NcVar ncVar;
-   bool version_less_than_1_02 = is_version_less_than_1_02(f_in);
    // Define netCDF dimensions
    //obs_vars.hdr_cnt     ; // header array length (fixed dimension if hdr_cnt > 0)
    obs_vars.strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);       // header string dimension
@@ -1029,7 +1025,7 @@ void write_header_to_nc(const NetcdfObsVars &obs_vars,
 {
    long offsets[2] = { data_buf.hdr_data_offset, 0 };
    long lengths[1] = { buf_size } ;
-   const char *method_name = "  write_header_to_nc()";
+   const string method_name = "  write_header_to_nc()";
 
    mlog << Debug(7) << method_name << "  buf_size: " << buf_size << "\n";
    
@@ -1105,10 +1101,9 @@ void write_header_to_nc(const NetcdfObsVars &obs_vars,
 //
 void write_nc_arr_headers(const NetcdfObsVars &obs_vars)
 {
-   int hdr_str_len, hdr_str_len2;
    int cur_hdr_idx = nc_data_buffer.cur_hdr_idx;
    int buf_size = (cur_hdr_idx > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : cur_hdr_idx;
-   const char *method_name = "  write_nc_arr_headers()";
+   const string method_name = "  write_nc_arr_headers()";
    
    mlog << Debug(5) << method_name << "  hdr_count: " << cur_hdr_idx
         << ", typ_idx_array: " << hdr_data.typ_idx_array.n_elements()

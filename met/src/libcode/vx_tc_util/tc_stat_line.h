@@ -36,9 +36,9 @@ extern ConcatString   tcstatlinetype_to_string(const TCStatLineType);
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *TCStatLineType_TCMPR_Str    = "TCMPR";
-static const char *TCStatLineType_ProbRIRW_Str = "PROBRIRW";
-static const char *TCStatLineType_Header_Str   = "LINE_TYPE";
+static const char TCStatLineType_TCMPR_Str[]    = "TCMPR";
+static const char TCStatLineType_ProbRIRW_Str[] = "PROBRIRW";
+static const char TCStatLineType_Header_Str[]   = "LINE_TYPE";
 
 ////////////////////////////////////////////////////////////////////////
 

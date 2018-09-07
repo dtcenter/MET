@@ -292,7 +292,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
 
-   ConcatString ens        = dict.lookup_string (conf_key_GRIB_ens, false);
+   ConcatString ens_str    = dict.lookup_string (conf_key_GRIB_ens, false);
 
    if( !field_name.empty() ){
       set_name     ( field_name );
@@ -302,7 +302,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    set_center      (field_center);
    set_subcenter   (field_subcenter);
    set_ptv         (field_ptv);
-   set_ens         (ens);
+   set_ens         (ens_str);
 
    //  call the parent to set the level information
    set_level_info_grib(dict);

@@ -105,20 +105,21 @@ protected:
 
   map<ConcatString, ConcatString> _messageTypeMap;
 
-  bool _dataSummarized;
-  bool do_summary;
-  TimeSummaryInfo _summaryInfo;
-  SummaryObs summary_obs;
-
   // List of observations read from the ascii files
 
   vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
-  int   deflate_level;
-  
+
   bool do_monitor;
   int start_time, end_time;
+
+  int deflate_level;
+
+  bool _dataSummarized;
+  bool do_summary;
+  TimeSummaryInfo _summaryInfo;
+  SummaryObs summary_obs;
 
   ///////////////////////
   // Protected methods //
@@ -145,7 +146,7 @@ protected:
   // netCDF file.
 
   bool _writeObservations();
-  
+
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
 //  bool _writeHdrInfo(const ConcatString &hdr_typ,

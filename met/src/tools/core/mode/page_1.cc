@@ -742,10 +742,10 @@ roman();
       // Object Filters
       //
 
-      snprintf(junk, sizeof(junk), "%i", eng.conf_info.fcst_filter_attr_map.size());
+      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.fcst_filter_attr_map.size());
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
 
-      snprintf(junk, sizeof(junk), "%i", eng.conf_info.obs_filter_attr_map.size());
+      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.obs_filter_attr_map.size());
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
 
       ++r;

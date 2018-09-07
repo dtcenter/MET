@@ -133,7 +133,7 @@ void solar_radec(unixtime gmt, double & Ra, double & Dec)
 
 {
 
-double t, lzero, m, ecc, eps;
+double t, lzero, m, eps;
 double omega, lambda;
 double x, y, z, d, c, theta;
 const double tol = 1.0e-6;
@@ -172,7 +172,7 @@ eps = 23.439291111111 - (46.815*t + 0.00059*t*t - 0.001813*t*t*t)/3600.0;
    //  the eccentricity of the earth's orbit
    //
 
-ecc = 0.016708617 - 0.000042037*t - 0.0000001236*t*t;
+// double ecc = 0.016708617 - 0.000042037*t - 0.0000001236*t*t;
 
    //
    //  the sun's equation of center

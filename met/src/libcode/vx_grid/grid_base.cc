@@ -694,8 +694,8 @@ bool Grid::get_swap_to_north() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void Grid::set_swap_to_north(bool swap_to_north) {
-   this->swap_to_north = swap_to_north;
+void Grid::set_swap_to_north(bool cur_swap_to_north) {
+   this->swap_to_north = cur_swap_to_north;
 }
 
 ////////////////////////////////////////////////////////////////////////
