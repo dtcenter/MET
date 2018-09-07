@@ -98,14 +98,8 @@ climo_mean = {
    //
    time_interp_method = DW_MEAN;
 
-   //
-   // When searching climatology data, only consider times where the month
-   // matches the forecast month.  Set match_day to TRUE or FALSE to define
-   // whether the climatology day must also match.
-   //    match_day = FALSE for monthly climatology
-   //    match_day = TRUE  for daily climatology
-   //
-   match_day = FALSE;
+   match_month = TRUE;
+   match_day   = FALSE;
 
    //
    // Time step of the climatology data in seconds.  Set to 60*60*6 for

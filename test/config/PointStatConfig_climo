@@ -102,6 +102,7 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
+   match_month        = TRUE;
    match_day          = ${MATCH_DAY};
    time_step          = 21600;
 }
