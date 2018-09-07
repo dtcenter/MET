@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.0 BETA 7 (August 16, 2018)
+Model Evaluation Tools METv8.0 BETA 8 (September 10, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,27 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 8.0 BETA 8 Release Notes:
+--------------------------------
+
+- Add the match_month flag to the climo_mean and climo_stdev config file
+  dictionaries.  Setting this to FALSE allows for the use of persistence to
+  define the climatology.
+- Remove many compilation warnings found by compiling with -Wall and -Wshadow.
+- Fix bug in ECNT aggregation logic in STAT-Analysis.
+- Refine logic for MET to call python scripts to read two dimensional fields
+  of data to allow for the reuse of python scripts and support command line
+  arguments.
+- Fix the very slow computation of neighborhood methods fractional coverage
+  fields in Grid-Stat.  This was also posted as a bugfix for met-7.0.
+- Enhance Point-Stat to compute the ECNT line type in it's application of the
+  HiRA methodology.  Nearby grid points are treated as ensemble member values.
+- Add support for area-weighted (AW_MEAN) regridding logic.
+- Remove support for LOGNORMAL distribution for observation error logic in
+  Ensemble-Stat since its implementation is problematic.
+- Add support for Rotated Lat/Lon projections (in progress).
+- Enhance PB2NC to derive CAPE (in progress).
 
 Version 8.0 BETA 7 Release Notes:
 --------------------------------
