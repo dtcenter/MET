@@ -24,6 +24,7 @@
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_2.5DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590415</value></pair>
+      <pair><name>MATCH_MONTH</name>      <value>TRUE</value></pair>
       <pair><name>MATCH_DAY</name>        <value>FALSE</value></pair>
     </env>
     <param> \
@@ -47,6 +48,7 @@
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
+      <pair><name>MATCH_MONTH</name>      <value>TRUE</value></pair>
       <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
     </env>
     <param> \
@@ -61,6 +63,30 @@
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="climatology_POINT_STAT_GFS_MATCH_MONTH_FALSE">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_MATCH_MONTH_FALSE</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790309</value></pair>
+      <pair><name>MATCH_MONTH</name>      <value>FALSE</value></pair>
+      <pair><name>MATCH_DAY</name>        <value>FALSE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_climo \
+      -outdir &OUTPUT_DIR;/climatology -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
