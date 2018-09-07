@@ -164,12 +164,16 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
-                          int width, const GridTemplateFactory::GridTemplates shape, SingleThresh t, double vld_t) {
+        int width, const GridTemplateFactory::GridTemplates shape,
+        SingleThresh t, double vld_t) {
+   GridPoint *gp = NULL;
+   int x, y, n_vld, n_thr;
+   double v;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
-           << "Grid must have at one point in it. \n\n";
+           << "Grid must have at least one point in it. \n\n";
       exit(1);
    }
 
@@ -178,49 +182,74 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    GridTemplate* gt = gtf.buildGT(shape, width);
 
    mlog << Debug(3)
-        << "Computing fractional coverage field using the " << t.get_str()
-        << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
-      << "(" << gt->size() << ")  " << gt->getClassName() << " interpolation method.\n";
-
+        << "Computing fractional coverage field using the "
+        << t.get_str() << " threshold and the "
+        << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+        << ") " << gt->getClassName() << " interpolation method.\n";
 
    // Initialize the fractional coverage field
    frac_dp = dp;
    frac_dp.set_constant(bad_data_double);
 
    // Compute the fractional coverage meeting the threshold criteria
-   for(int x=0; x<dp.nx(); x++) {
-      for(int y=0; y<dp.ny(); y++) {
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
 
-         int count_vld = 0;
-         int count_thr = 0;
+         // For a new column, reset the grid template and counts.
+         if(y == 0) {
 
-         GridPoint *gp = NULL;
-         for(gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny() );
-             gp != NULL; gp = gt->getNextInGrid()){
+            // Initialize counts
+            n_vld = n_thr = 0;
 
-            double v = dp.get(gp->x,gp->y);
+            // Sum all the points
+            for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
+                gp != NULL;
+                gp  = gt->getNextInGrid()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld++;
+               if(t.check(v)) n_thr++;
+            }
+         }
+         // Subtract off the bottom edge, shift up, and add the top.
+         else {
 
-            if (is_bad_data(v)) continue;
+            // Subtract points from the the bottom edge
+            for(gp  = gt->getFirstInBotEdge();
+                gp != NULL;
+                gp  = gt->getNextInBotEdge()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld--;
+               if(t.check(v)) n_thr--;
+            }
 
-            count_vld++;
+            // Increment Y
+            gt->incBaseY(1);
 
-            if(t.check(v)) {
-               count_thr++;
+            // Add points from the the top edge
+            for(gp  = gt->getFirstInTopEdge();
+                gp != NULL;
+                gp  = gt->getNextInTopEdge()) {
+               if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
+               n_vld++;
+               if(t.check(v)) n_thr++;
             }
          }
 
-         // Check whether enough valid grid points were found or leave it as bad_data
-         if( static_cast<double>(count_vld)/gt->size() >= vld_t &&
-             count_vld != 0) {
-
-            // Compute and store the fractional coverage
-            double frac = (double) count_thr/count_vld;
-            frac_dp.set(frac, x, y);
+         // Check for enough valid data and compute fractional coverage
+         if((double)(n_vld)/gt->size() >= vld_t && n_vld != 0) {
+            frac_dp.set((double) n_thr/n_vld, x, y);
          }
-      }
-   }
+
+      } // end for y
+
+      // Increment X
+      if(x < (dp.nx() - 1)) gt->incBaseX(1);
+
+   } // end for x
 
    delete gt;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

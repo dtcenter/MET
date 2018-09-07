@@ -144,7 +144,9 @@ CircularTemplate::CircularTemplate(const int width) :
     } /* endfor - x */
     
   } /* endfor - y */
-  
+
+  _setEdgeOffsets();
+ 
 }
 
 
@@ -166,7 +168,7 @@ CircularTemplate::~CircularTemplate(void)
 void CircularTemplate::printOffsetList(FILE *stream)
 {
   fprintf(stream, "\n\n");
-  fprintf(stream, "Circular template with width %f grid spaces:\n",
+  fprintf(stream, "Circular template with width %d grid spaces:\n",
 	  _width);
   
   GridTemplate::printOffsetList(stream);
