@@ -227,10 +227,8 @@ Indent prefix(depth);
 
 out << prefix << "Name                = ";
 
-if ( nonempty(RData.name) )  out << '\"' << RData.name << '\"';
+if ( nonempty(RData.name) )  out << '\"' << RData.name << "\"\n";
 else                         out << "(nul)\n";
-
-out << prefix << '\n';
 
 out << prefix << "true_lat_ll         = " << RData.true_lat_ll << "\n";
 out << prefix << "true_lon_ll         = " << RData.true_lon_ll << "\n";

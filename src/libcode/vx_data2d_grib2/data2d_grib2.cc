@@ -982,7 +982,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       data.true_lat_north_pole = -s_lat;   //  north pole lat is negative of south pole lat
 
-      data.true_lat_north_pole = n_lon;
+      data.true_lon_north_pole = n_lon;
 
          //
          //  if y scan order is -y, move lat_ll
