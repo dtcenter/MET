@@ -28,7 +28,7 @@ class SO3 {
 
       friend SO3 operator*(const SO3 &, const SO3 &);
 
-   private:
+   protected:
 
       void init_from_scratch();
 
@@ -95,8 +95,19 @@ class SO3 {
 
       void invert();
 
+         //
+         //  As you look down the axis vector from the tip to the origin,
+         //
+         //  "forward" rotated points CCW about the axis
+         //
+         //  "reverse" rotated points CW about the axis
+         //
+
       bool forward(double u, double v, double w, double & x, double & y, double & z) const;
       bool reverse(double x, double y, double z, double & u, double & v, double & w) const;
+
+      bool ccw (double u, double v, double w, double & x, double & y, double & z) const;
+      bool  cw (double x, double y, double z, double & u, double & v, double & w) const;
 
             //
             //  pre-multiply by the given rotation

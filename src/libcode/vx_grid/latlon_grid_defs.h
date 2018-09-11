@@ -14,6 +14,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <iostream>
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #ifndef  __LATLON_GRID_DEFINITIONS_H__
 #define  __LATLON_GRID_DEFINITIONS_H__
 
@@ -46,19 +52,25 @@ struct RotatedLatLonData {
 
    const char * name;   //  not allocated
 
-   double true_lat_ll;
-   double true_lon_ll;
+   double rot_lat_ll;
+   double rot_lon_ll;
 
-   double delta_new_lat;
-   double delta_new_lon;
+   double delta_rot_lat;
+   double delta_rot_lon;
 
    int Nlat;
    int Nlon;
 
-   double true_lat_north_pole;
-   double true_lon_north_pole;
+   double true_lat_south_pole;
+   double true_lon_south_pole;
 
-   void dump();
+   double aux_rotation;
+
+      //////////
+
+   void dump() const;   //  doesn't work if verbosity level < 4
+
+   void dump(ostream &, int depth) const;
 
 };
 
