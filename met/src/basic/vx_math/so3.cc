@@ -450,6 +450,36 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool SO3::ccw(double u, double v, double w, double & x, double & y, double & z) const
+
+{
+
+bool status = forward(u, v, w, x, y, z);
+
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool SO3::cw(double x, double y, double z, double & u, double & v, double & w) const
+
+{
+
+bool status = reverse(x, y, z, u, v, w);
+
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool SO3::is_identity() const
 
 {

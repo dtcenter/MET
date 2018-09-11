@@ -107,7 +107,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void EarthRotation::set_np(double true_lat_north_pole, double true_lon_north_pole, double aux_rotation)
+void EarthRotation::set_true_np(double true_lat_north_pole, double true_lon_north_pole, double aux_rotation)
 
 {
 

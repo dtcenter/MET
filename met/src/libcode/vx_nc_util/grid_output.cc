@@ -297,45 +297,46 @@ const RotatedLatLonData & data = *(info.rll);
 
 ncfile->putAtt("Projection", rotated_latlon_proj_type);
 
-   //
-   //  true_lat_ll
-   //
-
-snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_ll);
-
-ncfile->putAtt("true_lat_ll", junk);
 
    //
-   //  true_lon_ll
+   //  rot_lat_ll
    //
 
-t = data.true_lon_ll;
+snprintf(junk, sizeof(junk), "%f degrees_north", data.rot_lat_ll);
+
+ncfile->putAtt("rot_lat_ll", junk);
+
+   //
+   //  rot_lon_ll
+   //
+
+t = data.rot_lon_ll;
 
 if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
-ncfile->putAtt("true_lon_ll", junk);
+ncfile->putAtt("rot_lon_ll", junk);
 
    //
-   //  delta_new_lat
+   //  delta_rot_lat
    //
 
-snprintf(junk, sizeof(junk), "%f degrees", data.delta_new_lat);
+snprintf(junk, sizeof(junk), "%f degrees", data.delta_rot_lat);
 
-ncfile->putAtt("delta_new_lat", junk);
+ncfile->putAtt("delta_rot_lat", junk);
 
    //
-   //  delta_new_lon
+   //  delta_rot_lon
    //
 
-t = data.delta_new_lon;
+t = data.delta_rot_lon;
 
 // if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees", t);
 
-ncfile->putAtt("delta_new_lon", junk);
+ncfile->putAtt("delta_rot_lon", junk);
 
    //
    //  Nlat
@@ -354,26 +355,32 @@ snprintf(junk, sizeof(junk), "%d grid_points", data.Nlon);
 ncfile->putAtt("Nlon", junk);
 
    //
-   //  true_lat_north_pole
+   //  true_lat_south_pole
    //
 
-snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_north_pole);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_south_pole);
 
 ncfile->putAtt("true_lat_north_pole", junk);
 
    //
-   //  true_lon_north_pole
+   //  true_lon_south_pole
    //
 
-t = data.true_lon_north_pole;
+t = data.true_lon_south_pole;
 
 if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
-ncfile->putAtt("true_lon_north_pole", junk);
+ncfile->putAtt("true_lon_south_pole", junk);
 
+   //
+   //  auxilliary rotation
+   //
 
+snprintf(junk, sizeof(junk), "%f degrees", data.aux_rotation);
+
+ncfile->putAtt("aux_rotation", junk);
 
 
    //

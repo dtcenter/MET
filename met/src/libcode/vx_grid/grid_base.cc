@@ -77,7 +77,7 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void RotatedLatLonData::dump()
+void RotatedLatLonData::dump() const
 
 {
 
@@ -85,17 +85,56 @@ mlog << Debug(grid_debug_level)
 
      << "\nRotated Latitude/Longitude Grid Data:\n"
 
-     << "           true_lat_ll: " << true_lat_ll << "\n"
-     << "           true_lon_ll: " << true_lon_ll << "\n"
+     << "            rot_lat_ll: " << rot_lat_ll << "\n"
+     << "            rot_lon_ll: " << rot_lon_ll << "\n"
 
-     << "         delta_new_lat: " << delta_new_lat << "\n"
-     << "         delta_new_lon: " << delta_new_lon << "\n"
+     << "         delta_rot_lat: " << delta_rot_lat << "\n"
+     << "         delta_rot_lon: " << delta_rot_lon << "\n"
 
      << "                  Nlat: " << Nlat << "\n"
      << "                  Nlon: " << Nlon << "\n"
 
-     << "   true_lat_north_pole: " << true_lat_north_pole << "\n"
-     << "   true_lon_north_pole: " << true_lon_north_pole << "\n\n";
+     << "   true_lat_south_pole: " << true_lat_south_pole << "\n"
+     << "   true_lon_south_pole: " << true_lon_south_pole << "\n"
+
+     << "          aux_rotation: " << aux_rotation << "\n\n";
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RotatedLatLonData::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+// out << Debug(grid_debug_level)
+
+out << prefix << "\nRotated Latitude/Longitude Grid Data:\n"
+
+    << prefix << "            rot_lat_ll: " << rot_lat_ll << "\n"
+    << prefix << "            rot_lon_ll: " << rot_lon_ll << "\n"
+
+    << prefix << "         delta_rot_lat: " << delta_rot_lat << "\n"
+    << prefix << "         delta_rot_lon: " << delta_rot_lon << "\n"
+
+    << prefix << "                  Nlat: " << Nlat << "\n"
+    << prefix << "                  Nlon: " << Nlon << "\n"
+
+    << prefix << "   true_lat_south_pole: " << true_lat_south_pole << "\n"
+    << prefix << "   true_lon_south_pole: " << true_lon_south_pole << "\n"
+
+    << prefix << "          aux_rotation: " << aux_rotation << "\n\n";
+
+out.flush();
+
+return;
 
 }
 

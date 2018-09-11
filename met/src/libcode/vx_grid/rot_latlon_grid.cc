@@ -97,24 +97,23 @@ void RotatedLatLonGrid::set_from_rdata(const RotatedLatLonData & rdata)
 {
 
 LatLonData lld;
-double rot_lat_ll, rot_lon_ll;
+
 
 clear();
 
-er.set_np(rdata.true_lat_north_pole, rdata.true_lon_north_pole, 0.0);
-
-er.latlon_true_to_rot(rdata.true_lat_ll, rdata.true_lon_ll, rot_lat_ll, rot_lon_ll);
 
 
-
+   //
+   //  set the parent projection
+   //
 
 lld.name      = rdata.name;
 
-lld.lat_ll    = rot_lat_ll;
-lld.lon_ll    = rot_lon_ll;
+lld.lat_ll    = rdata.rot_lat_ll;
+lld.lon_ll    = rdata.rot_lon_ll;
 
-lld.delta_lat = rdata.delta_new_lat;
-lld.delta_lon = rdata.delta_new_lon;
+lld.delta_lat = rdata.delta_rot_lat;
+lld.delta_lon = rdata.delta_rot_lon;
 
 lld.Nlat      = rdata.Nlat;
 lld.Nlon      = rdata.Nlon;
@@ -122,6 +121,58 @@ lld.Nlon      = rdata.Nlon;
 LatLonGrid::set_from_data(lld);
 
 RData = rdata;
+
+   //
+   //  determine the Earth Rotation
+   //
+
+double rlat, rlon;
+double angle;
+
+    ////////////////////
+
+angle = rdata.true_lon_south_pole;
+
+// angle = -angle;
+
+er.set_rotz(angle);   // cout << "rotz by " << angle << "\n";
+
+// er.latlon_true_to_rot(40.0, 0.0, rlat, rlon);
+// 
+// cout << "rlat = " << rlat << " ... rlon = " << rlon << "\n";
+
+    ////////////////////
+
+angle = 90.0 + rdata.true_lat_south_pole;
+
+angle = -angle;
+
+er.pre_rotx(angle);   // cout << "pre rotx by " << angle << "\n";
+
+
+
+// er.latlon_rot_to_true(-90.0, 100.0, rlat, rlon);
+// 
+// cout << "  south pole is at rlat = " << rlat << " ... rlon = " << rlon << "\n";
+
+
+   //
+   //  auilliary rotation, if any
+   //
+
+if ( rdata.aux_rotation != 0.0 )  {
+
+   angle = rdata.aux_rotation;
+
+   angle = -angle;
+
+   er.post_rotz(angle);
+
+}
+
+   //
+   //  done
+   //
 
 return;
 
@@ -223,22 +274,7 @@ void RotatedLatLonGrid::dump(ostream & out, int depth) const
 
 {
 
-Indent prefix(depth);
-
-out << prefix << "Name                = ";
-
-if ( nonempty(RData.name) )  out << '\"' << RData.name << "\"\n";
-else                         out << "(nul)\n";
-
-out << prefix << "true_lat_ll         = " << RData.true_lat_ll << "\n";
-out << prefix << "true_lon_ll         = " << RData.true_lon_ll << "\n";
-
-out << prefix << "delta_new_lat       = " << RData.delta_new_lat << "\n";
-out << prefix << "delta_new_lon       = " << RData.delta_new_lon << "\n";
-
-out << prefix << "true_lat_north_pole = " << RData.true_lat_north_pole << "\n";
-out << prefix << "true_lon_north_pole = " << RData.true_lon_north_pole << "\n";
-
+RData.dump(out, depth);
 
 
 

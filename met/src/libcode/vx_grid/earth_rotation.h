@@ -39,11 +39,16 @@ class EarthRotation : public SO3 {
       EarthRotation();
      ~EarthRotation();
 
+      EarthRotation & operator=(const EarthRotation &);
+
          //
          //  set stuff
          //
 
-    void set_np(double true_lat_north_pole, double true_lon_north_pole, double aux_rotation);
+    void set_true_np (double true_lat_north_pole, double true_lon_north_pole, double aux_rotation);
+
+    void set_rot_sp  (double rot_lat_south_pole, double rot_lon_south_pole, double aux_rotation, 
+                      double rot_lat_ll, double rot_lon_ll);
 
          //
          //  get stuff
@@ -60,6 +65,22 @@ class EarthRotation : public SO3 {
       void latlon_true_to_rot(double lat_true, double lon_true, double & lat_rot, double & lon_rot) const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline EarthRotation & EarthRotation::operator=(const EarthRotation & r)
+
+{
+
+if ( this == &r )  return ( * this );
+
+SO3::assign(r);
+
+return ( * this );
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
