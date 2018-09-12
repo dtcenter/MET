@@ -771,8 +771,7 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 
       mlog << Error << "\nfind_vert_lvl() -> "
            << "could not find a level above and/or below the "
-           << "observation level of " << obs_lvl << ".\n\n"
-          ;
+           << "observation level of " << obs_lvl << ".\n\n";
       exit(1);
    }
 
