@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.0 BETA 8 (September 10, 2018)
+Model Evaluation Tools METv8.0 BETA 8 (September 12, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -316,8 +316,7 @@ Version 8.0 BETA 8 Release Notes:
 - Add support for area-weighted (AW_MEAN) regridding logic.
 - Remove support for LOGNORMAL distribution for observation error logic in
   Ensemble-Stat since its implementation is problematic.
-- Add support for Rotated Lat/Lon projections (in progress).
-- Enhance PB2NC to derive CAPE (in progress).
+- Add support for Rotated Lat/Lon projections.
 
 Version 8.0 BETA 7 Release Notes:
 --------------------------------
