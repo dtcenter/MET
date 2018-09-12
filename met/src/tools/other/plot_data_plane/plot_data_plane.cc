@@ -194,7 +194,6 @@ int main(int argc, char * argv[])
       //
    grid = met_ptr->grid();
 
-
       //
       // read in the color table file and scale the color table to fit
       // the data
