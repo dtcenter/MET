@@ -31,6 +31,7 @@ static void read_netcdf_grid_v3       (NcFile *, Grid &);
 static void read_netcdf_grid_v2       (NcFile *, Grid &);
 
 static void get_latlon_data_v3        (NcFile *, LatLonData &);
+static void get_rot_latlon_data_v3    (NcFile *, RotatedLatLonData &);
 static void get_lambert_data_v3       (NcFile *, LambertData &);
 static void get_stereographic_data_v3 (NcFile *, StereographicData &);
 static void get_mercator_data_v3      (NcFile *, MercatorData &);
@@ -75,11 +76,12 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
    NcGroupAtt proj_att;
 
    // Structures to store projection info
-   LambertData       lc_data;
-   StereographicData st_data;
-   LatLonData        ll_data;
-   MercatorData      mc_data;
-   GaussianData       g_data;
+   LambertData        lc_data;
+   StereographicData  st_data;
+   LatLonData         ll_data;
+   RotatedLatLonData rll_data;
+   MercatorData       mc_data;
+   GaussianData        g_data;
 
    //
    // Parse the grid specification out of the global attributes
@@ -104,6 +106,11 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
       if ( strcasecmp(proj_att_name, latlon_proj_type) == 0 )  {
 
          get_latlon_data_v3(f_in, ll_data);
+         gr.set(ll_data);
+
+      } else if ( strcasecmp(proj_att_name, rotated_latlon_proj_type) == 0 )  {
+
+         get_rot_latlon_data_v3(f_in, rll_data);
          gr.set(ll_data);
 
       } else if ( strcasecmp(proj_att_name, mercator_proj_type) == 0 )  {
@@ -256,6 +263,57 @@ get_global_att(ncfile, "Nlat", data.Nlat);
 
    // Number of points in the Longitudinal (x) direction
 get_global_att(ncfile, "Nlon", data.Nlon);
+
+data.dump();
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_rot_latlon_data_v3(NcFile * ncfile, RotatedLatLonData & data)
+{
+
+   // Store the grid name
+data.name = latlon_proj_type;
+
+   // Latitude of the bottom left corner
+get_global_att(ncfile, "rot_lat_ll", data.rot_lat_ll);
+
+   // Longitude of the bottom left corner
+get_global_att(ncfile, "rot_lon_ll", data.rot_lon_ll);
+data.rot_lon_ll *= -1.0;
+
+   // Latitude increment
+get_global_att(ncfile, "delta_rot_lat", data.delta_rot_lat);
+
+   // Longitude increment
+get_global_att(ncfile, "delta_rot_lon", data.delta_rot_lon);
+
+   // Number of points in the Latitude (y) direction
+get_global_att(ncfile, "Nlat", data.Nlat);
+
+   // Number of points in the Longitudinal (x) direction
+get_global_att(ncfile, "Nlon", data.Nlon);
+
+   //  true lat/lon of south pole
+
+get_global_att(ncfile, "true_lat_south_pole", data.true_lat_south_pole);
+get_global_att(ncfile, "true_lon_south_pole", data.true_lon_south_pole);
+if ( !west_longitude_positive )  data.true_lon_south_pole *= -1.0;
+
+   //  auxilliary rotation
+
+get_global_att(ncfile, "aux_rotation", data.aux_rotation);
+
+
 
 data.dump();
 
