@@ -130,17 +130,17 @@ RData = rdata;
       //    From http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp3-1.shtml
       //
       //
-      //   2.  Three parameters define a general latitude/longitude coordinate system, formed by a 
+      //   2.  Three parameters define a general latitude/longitude coordinate system, formed by a
       //       general rotation of the sphere. One choice for these parameters is:
-      //       (a) The geographic latitude in degrees of the southern pole of the 
+      //       (a) The geographic latitude in degrees of the southern pole of the
       //           coordinate system,06 for example.
-      //       (b) The geographic longitude in degrees of the southern pole of 
+      //       (b) The geographic longitude in degrees of the southern pole of
       //           the coordinate system,#p for example.
-      //       (c) The angle of rotation in degrees about the new polar axis 
-      //           (measured clockwise when looking from the southern to the northern pole) 
-      //           of the coordinate system, assuming the new axis to have been obtained by 
-      //           first rotating the sphere through lon_p degrees about the geographic polar 
-      //           axis and then rotating through (90 + lat_p) degrees so that the southern pole 
+      //       (c) The angle of rotation in degrees about the new polar axis
+      //           (measured clockwise when looking from the southern to the northern pole)
+      //           of the coordinate system, assuming the new axis to have been obtained by
+      //           first rotating the sphere through lon_p degrees about the geographic polar
+      //           axis and then rotating through (90 + lat_p) degrees so that the southern pole
       //           moved along the (previously rotated) Greenwich meridian.
       //
 
@@ -158,7 +158,7 @@ angle = rdata.true_lon_south_pole;
 er.set_rotz(angle);   // cout << "rotz by " << angle << "\n";
 
 // er.latlon_true_to_rot(40.0, 0.0, rlat, rlon);
-// 
+//
 // cout << "rlat = " << rlat << " ... rlon = " << rlon << "\n";
 
     ////////////////////
@@ -172,7 +172,7 @@ er.pre_rotx(angle);   // cout << "pre rotx by " << angle << "\n";
 
 
 // er.latlon_rot_to_true(-90.0, 100.0, rlat, rlon);
-// 
+//
 // cout << "  south pole is at rlat = " << rlat << " ... rlon = " << rlon << "\n";
 
 
@@ -296,8 +296,6 @@ void RotatedLatLonGrid::dump(ostream & out, int depth) const
 
 RData.dump(out, depth);
 
-
-
    //
    //  done
    //
@@ -317,6 +315,24 @@ ConcatString RotatedLatLonGrid::serialize() const
 {
 
 ConcatString a;
+char junk[256];
+
+
+a << "Projection: Rotated Lat/Lon";
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
+
+sprintf(junk, " rot_lat_ll: %.3f", RData.rot_lat_ll);   a << junk;
+sprintf(junk, " rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk;
+
+sprintf(junk, " delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk;
+sprintf(junk, " delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk;
+
+sprintf(junk, " true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk;
+sprintf(junk, " true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk;
+
+sprintf(junk, " aux_rotation: %.3f", RData.aux_rotation);   a << junk;
 
    //
    //  done
