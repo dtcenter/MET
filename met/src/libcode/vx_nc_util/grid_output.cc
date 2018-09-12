@@ -360,7 +360,7 @@ ncfile->putAtt("Nlon", junk);
 
 snprintf(junk, sizeof(junk), "%f degrees_north", data.true_lat_south_pole);
 
-ncfile->putAtt("true_lat_north_pole", junk);
+ncfile->putAtt("true_lat_south_pole", junk);
 
    //
    //  true_lon_south_pole
