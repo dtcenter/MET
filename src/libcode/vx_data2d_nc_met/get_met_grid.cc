@@ -111,7 +111,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
       } else if ( strcasecmp(proj_att_name, rotated_latlon_proj_type) == 0 )  {
 
          get_rot_latlon_data_v3(f_in, rll_data);
-         gr.set(ll_data);
+         gr.set(rll_data);
 
       } else if ( strcasecmp(proj_att_name, mercator_proj_type) == 0 )  {
 
