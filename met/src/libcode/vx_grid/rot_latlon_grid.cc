@@ -126,7 +126,27 @@ RData = rdata;
    //  determine the Earth Rotation
    //
 
-double rlat, rlon;
+      //
+      //    From http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp3-1.shtml
+      //
+      //
+      //   2.  Three parameters define a general latitude/longitude coordinate system, formed by a 
+      //       general rotation of the sphere. One choice for these parameters is:
+      //       (a) The geographic latitude in degrees of the southern pole of the 
+      //           coordinate system,06 for example.
+      //       (b) The geographic longitude in degrees of the southern pole of 
+      //           the coordinate system,#p for example.
+      //       (c) The angle of rotation in degrees about the new polar axis 
+      //           (measured clockwise when looking from the southern to the northern pole) 
+      //           of the coordinate system, assuming the new axis to have been obtained by 
+      //           first rotating the sphere through lon_p degrees about the geographic polar 
+      //           axis and then rotating through (90 + lat_p) degrees so that the southern pole 
+      //           moved along the (previously rotated) Greenwich meridian.
+      //
+
+
+
+// double rlat, rlon;
 double angle;
 
     ////////////////////
