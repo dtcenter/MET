@@ -86,8 +86,707 @@ name "chap:App_G-Vectors-and-Vector-Statistics"
 
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Standard
+In this appendix, we discuss some basic properties of vectors, concentrating
+ on the two-dimensional case.
+ To make things simple, we'll assume we're using a Cartesian coordinate
+ system.
+ 
+\begin_inset ERT
+status open
 
+\begin_layout Plain Layout
+
+
+\backslash
+def
+\backslash
+vec#1{
+\backslash
+hbox{
+\backslash
+bf #1}}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Traditionally, vectors have been defined as quantities having both magnitude
+ and direction, exemplified by a directed line segment.
+ The magnitude of the vector is shown by the length of the segment, and
+ the direction of the vector is usually shown by drawing an arrowhead on
+ one end of the segment.
+ Computers (and, in the author's experience, people) are usually more comfortabl
+e working with numbers, and so instead of the usual graphical definition
+ of a vector, we'll take the definition used in analytic geometry: A (two-dimens
+ional) vector is an ordered pair of numbers.
+ We'll use boldface type to denote vectors, and so we can write 
+\begin_inset Formula 
+\[
+\vec{v}=(a,b)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+to show that the vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ consists of the ordered pair of numbers 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$a$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$b$
+\end_layout
+
+\end_inset
+
+.
+ The number 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$a$
+\end_layout
+
+\end_inset
+
+ is called the first (or 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x$
+\end_layout
+
+\end_inset
+
+) component of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$b$
+\end_layout
+
+\end_inset
+
+ is called the second (or 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$y$
+\end_layout
+
+\end_inset
+
+) component.
+ Vector addition is performed component-wise: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(a, b) + (c, d) = (a + c, b + d)$
+\end_layout
+
+\end_inset
+
+, and similarly for subtraction.
+ If 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+ is a scalar, then we define multiplication by the scalar 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+ as 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+alpha (a, b) = (
+\backslash
+alpha a, 
+\backslash
+alpha b)$
+\end_layout
+
+\end_inset
+
+, and similarly for division by a (nonzero!) scalar.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it norm}
+\end_layout
+
+\end_inset
+
+ (or length, or magnitude) of a vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+vec{v} = (a, b)$
+\end_layout
+
+\end_inset
+
+, is
+\begin_inset Formula 
+\[
+\left|\vec{v}\right|=\sqrt{a^{2}+b^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+left|
+\backslash
+vec{v}
+\backslash
+right| = 0$
+\end_layout
+
+\end_inset
+
+ if and only if 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$a = b = 0$
+\end_layout
+
+\end_inset
+
+, in which case we say that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ is the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it zero vector}
+\end_layout
+
+\end_inset
+
+.
+ If 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+ is a scalar, then 
+\begin_inset Formula 
+\[
+\left|\alpha\vec{v}\right|=\left|\alpha\right|\left|\vec{v}\right|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The most important relation between vectors and their norms is given by
+ the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it triangle inequality}
+\end_layout
+
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\left|\vec{v}+\vec{w}\right|\leq\left|\vec{v}\right|+\left|\vec{w}\right|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In some cases, only the direction of a vector is of interest, and in such
+ cases we can replace a nonzero vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ by the unique vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N(
+\backslash
+vec{v})$
+\end_layout
+
+\end_inset
+
+ that has the same direction as 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+, but has norm 1:
+\begin_inset Formula 
+\[
+N(\vec{v})=\frac{\vec{v}}{\left|\vec{v}\right|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N(
+\backslash
+vec{v})$
+\end_layout
+
+\end_inset
+
+ will be called the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it unit vector}
+\end_layout
+
+\end_inset
+
+ corresponding to 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+, or more simply the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it direction}
+\end_layout
+
+\end_inset
+
+ of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+.
+ Note that the zero vector has no direction.
+\end_layout
+
+\begin_layout Standard
+Since vectors are characterized by magnitude (norm) and direction, this
+ gives two ways to compare vectors: we can compare their magnitudes or their
+ directions.
+ If 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{w}
+\end_layout
+
+\end_inset
+
+ are vectors, then we can compare their norms by either taking the norm
+ of the difference 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+left|
+\backslash
+vec{v} - 
+\backslash
+vec{w}
+\backslash
+right|$
+\end_layout
+
+\end_inset
+
+ or the difference of the norms 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+left|
+\backslash
+vec{v}
+\backslash
+right| - 
+\backslash
+left|
+\backslash
+vec{w}
+\backslash
+right|$
+\end_layout
+
+\end_inset
+
+.
+ It's not always made clear in verification studies which of these is meant,
+ and in general they will be different, although by making use of the triangle
+ inequality it can be shown that there is a relation between them.
+ To derive this, let 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+vec{z} = 
+\backslash
+vec{v} - 
+\backslash
+vec{w} $
+\end_layout
+
+\end_inset
+
+, from which we get 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+vec{v} = 
+\backslash
+vec{w} + 
+\backslash
+vec{z} $
+\end_layout
+
+\end_inset
+
+.
+ Now taking norms and using the triangle inequality, 
+\begin_inset Formula 
+\[
+\left|\vec{v}\right|=\left|\vec{w}+\vec{z}\right|\leq\left|\vec{w}\right|+\left|\vec{z}\right|=\left|\vec{w}\right|+\left|\vec{v}-\vec{w}\right|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which gives 
+\begin_inset Formula 
+\[
+\left|\vec{v}\right|-\left|\vec{w}\right|\leq\left|\vec{v}-\vec{w}\right|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reversing the roles of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{w}
+\end_layout
+
+\end_inset
+
+ now gives the result: 
+\begin_inset Formula 
+\[
+\bigl|\,\left|\vec{v}\right|-\left|\vec{w}\right|\,\bigr|\leq\left|\vec{v}-\vec{w}\right|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the same manner, we can compare the directions of two different nonzero
+ vectors 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{v}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vec{w}
+\end_layout
+
+\end_inset
+
+ by either the direction of the difference 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N(
+\backslash
+vec{v} - 
+\backslash
+vec{w})$
+\end_layout
+
+\end_inset
+
+, or by the difference in the directions 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N(
+\backslash
+vec{v}) - N(
+\backslash
+vec{w})$
+\end_layout
+
+\end_inset
+
+.
+ Unlike the case for magnitudes, however, there is in general no relationship
+ at all between these two measures of direction difference.
 \end_layout
 
 \end_body
