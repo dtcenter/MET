@@ -184,6 +184,16 @@ sub-directory, or the MET Online Tutorial:
      and library files.  These are used instead of $MET_GRIB2C since the main
      GRIB2C directory does not contain include and lib subdirectories.
 
+   - If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD
+     to specify the compiler (-I) and linker (-L) flags required for python.
+     Set $MET_PYTHON_CC for the directory containing the "Python.h" header file.
+     Set $MET_PYTHON_LD for the directory containing the python library file
+     and indicate the name of that file.  For example:
+     MET_PYTHON_CC='-I/usr/include/python2.7'
+     MET_PYTHON_LD='-L/usr/lib/python2.7/config-x86_64-linux-gnu -lpython2.7'
+     For more information about Python support in MET, please refer to Appendix F
+     of the MET User's Guide.
+
    - If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
      or set $MET_HDFINC to point to the directory with the HDF include files
      and set $MET_HDFLIB to point to the directory with the HDF library files.
@@ -216,26 +226,35 @@ sub-directory, or the MET Online Tutorial:
 
   --enable and --disable options for each of the MET tools.
 
-  By default, compilation of GRIB2 support, the MODIS-Regrid tool, the Lidar2NC
-  tool,and MODE-Graphics are disabled.  Use the following options to enable them:
+  By default, compilation of GRIB2 support, Python support, the MODIS-Regrid tool,i
+  the Lidar2NC tool,and MODE-Graphics are disabled.
+  Use the following options to enable them:
 
   --enable-grib2
       Enable compilation of utilities using GRIB2
+      Requires $MET_GRIB2C
+
+  --enable-python
+      Enable compilation of python interface
+      Requires $MET_PYTHON_CC and $MET_PYTHON_LD
 
   --enable-modis
       Enable compilation of modis
+      Requires $MET_HDF and $MET_HDFEOS
 
   --enable-mode_graphics
       Enable compilation of mode_graphics
+      Requires $MET_CAIRO, $MET_FREETYPE, and $MET_FONT_DIR
 
   --enable-lidar2nc
       Enable compilation of lidar2nc
+      Requires $MET_HDF
 
   To configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
 
-  ./configure --prefix=`pwd` --enable-grib2 --enable-modis \
-              --enable-mode_graphics --enable-lidar2nc
+  ./configure --prefix=`pwd` --enable-grib2 --enable-python \
+              --enable-modis --enable-mode_graphics --enable-lidar2nc
 
 - Type 'make install >& make_install.log &'
 

@@ -147,6 +147,15 @@ if test -n "$MET_GRIB2CLIB"; then
 fi
 
 #
+# Look for the PYTHON library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>.])
+AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>.])
+
+#
 # Look for the GSL library
 #
 
@@ -1024,7 +1033,6 @@ AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sq
 #          echo "Check your MET_GRIB2C environment variable settings and try again."
 #          exit -1
 #          ])
-#fi
 #
 #AC_CHECK_LIB([m],[cos])
 #AC_CHECK_LIB([gslcblas],[cblas_dgemm])
