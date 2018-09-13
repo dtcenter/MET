@@ -789,5 +789,216 @@ vec{w})$
  at all between these two measures of direction difference.
 \end_layout
 
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vecf{{
+\backslash
+vec{F}}}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+veco{{
+\backslash
+vec{O}}}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vecfi{{
+\backslash
+vec{F}}_i}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vecoi{{
+\backslash
+vec{O}}_i}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+uf{u_f}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vf{v_f}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+uo{u_o}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vo{v_o}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+ufi{u_{fi}}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vfi{v_{fi}}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+uoi{u_{oi}}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+voi{v_{oi}}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+sf{s_f}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+so{s_o}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+sfi{s_{fi}}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+soi{s_{oi}}%
+\end_layout
+
+\begin_layout Plain Layout
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+def
+\backslash
+vlot{VL1L2}%
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centerline{
+\backslash
+hbox to 3.0in{
+\backslash
+hrulefill}}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now let's specialize this discussion of vectors to verification of wind
+ vector data.
+\end_layout
+
 \end_body
 \end_document
