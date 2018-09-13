@@ -998,6 +998,79 @@ hrulefill}}
 \begin_layout Standard
 Now let's specialize this discussion of vectors to verification of wind
  vector data.
+ We'll denote the forecast wind vector by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vecf
+\end_layout
+
+\end_inset
+
+, and the observed wind vector by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+veco
+\end_layout
+
+\end_inset
+
+.
+ These are two-dimensional horizontal vectors with 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$u$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$v$
+\end_layout
+
+\end_inset
+
+ components like so:
+\begin_inset Formula 
+\[
+\vecf=(\uf,\vf)\hbox to1.0in{\hfill and\hfill}\veco=(\uo,\vo)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We'll assume that we have 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N$
+\end_layout
+
+\end_inset
+
+ observations of forecast and observed wind:
 \end_layout
 
 \end_body
