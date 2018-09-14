@@ -37,8 +37,3 @@ plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf
-
-if ENABLE_PYTHON
-   plot_data_plane_CPPFLAGS += ${MET_PYTHON_CC}
-   plot_data_plane_LDFLAGS  += $(MET_PYTHON_LD)
-endif

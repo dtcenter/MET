@@ -39,10 +39,5 @@ ensemble_stat_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   ensemble_stat_CPPFLAGS += ${MET_PYTHON_CC}
-   ensemble_stat_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = ensemble_stat.h \
 	ensemble_stat_conf_info.h

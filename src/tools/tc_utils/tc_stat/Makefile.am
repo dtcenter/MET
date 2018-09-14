@@ -27,6 +27,7 @@ tc_stat_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -40,12 +41,6 @@ tc_stat_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
-
-if ENABLE_PYTHON
-   tc_stat_CPPFLAGS += ${MET_PYTHON_CC}
-   tc_stat_LDFLAGS  += $(MET_PYTHON_LD)
-   tc_stat_LDADD    += -lvx_data2d_python -lvx_python_utils
-endif
 
 EXTRA_DIST = tc_stat_conf_info.h \
 	tc_stat_files.h \

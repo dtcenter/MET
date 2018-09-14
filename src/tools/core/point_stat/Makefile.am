@@ -39,10 +39,5 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   point_stat_CPPFLAGS += ${MET_PYTHON_CC}
-   point_stat_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = point_stat.h \
 	point_stat_conf_info.h

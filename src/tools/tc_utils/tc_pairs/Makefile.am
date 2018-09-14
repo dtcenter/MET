@@ -27,6 +27,7 @@ tc_pairs_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
+	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -41,12 +42,6 @@ tc_pairs_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf \
 	$(FLIBS)
-
-if ENABLE_PYTHON
-   tc_pairs_CPPFLAGS += ${MET_PYTHON_CC}
-   tc_pairs_LDFLAGS  += $(MET_PYTHON_LD)
-   tc_pairs_LDADD    += -lvx_data2d_python -lvx_python_utils
-endif
 
 EXTRA_DIST = tc_pairs_conf_info.h \
 	tc_pairs.h

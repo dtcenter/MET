@@ -44,11 +44,6 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_log \
 	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   wavelet_stat_CPPFLAGS += ${MET_PYTHON_CC}
-   wavelet_stat_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = wavelet_stat.h \
 	wavelet_stat_conf_info.h
 

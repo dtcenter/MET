@@ -43,11 +43,6 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   stat_analysis_CPPFLAGS += ${MET_PYTHON_CC}
-   stat_analysis_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = stat_analysis.h \
 	parse_stat_line.h \
 	aggr_stat_line.h \

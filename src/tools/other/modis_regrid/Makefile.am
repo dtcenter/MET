@@ -54,11 +54,6 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lz \
 	-lm
 
-if ENABLE_PYTHON
-   modis_regrid_CPPFLAGS += ${MET_PYTHON_CC}
-   modis_regrid_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = cloudsat_swath_file.h \
 	data_averager.h \
 	data_plane_to_netcdf.h \

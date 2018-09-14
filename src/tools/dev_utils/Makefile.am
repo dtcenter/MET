@@ -131,11 +131,6 @@ gen_climo_bin_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   gen_climo_bin_CPPFLAGS += ${MET_PYTHON_CC}
-   gen_climo_bin_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 # Build chk4copyright when making a distribution so that we can
 #  add missing copyrights to the source files
 

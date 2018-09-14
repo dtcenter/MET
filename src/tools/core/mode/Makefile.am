@@ -51,11 +51,6 @@ mode_LDADD = -lvx_pxm \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
-if ENABLE_PYTHON
-   mode_CPPFLAGS += ${MET_PYTHON_CC}
-   mode_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = mode_exec.h \
 	mode_ps_file.h \
 	mode_ps_table_defs.h

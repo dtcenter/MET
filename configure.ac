@@ -155,6 +155,14 @@ fi
 AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>.])
 AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>.])
 
+if test -n "$MET_PYTHON_CC"; then
+   CPPFLAGS="${CPPFLAGS} ${MET_PYTHON_CC}"
+fi
+
+if test -n "$MET_PYTHON_LD"; then
+   LDFLAGS="${LDFLAGS} ${MET_PYTHON_LD}"
+fi
+
 #
 # Look for the GSL library
 #
@@ -933,8 +941,6 @@ else
 fi
 AC_SUBST([GRIB2_LIBS])
 
-
-########################################################################
 # Python
 
 AC_ARG_ENABLE(python,
@@ -952,7 +958,7 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=

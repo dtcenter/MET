@@ -50,11 +50,6 @@ plot_mode_field_LDADD = -lvx_cgraph \
 	-lm  \
 	-lz
 
-if ENABLE_PYTHON
-   plot_mode_field_CPPFLAGS += ${MET_PYTHON_CC}
-   plot_mode_field_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these
 # in a distribution because the enum_to_string utility isn't available.

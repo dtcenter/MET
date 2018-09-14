@@ -31,9 +31,3 @@ pcp_combine_LDADD = -lvx_data2d \
 	-lvx_log \
 	-lvx_color \
 	-lm -lnetcdf_c++4 -lnetcdf
-
-
-if ENABLE_PYTHON
-   pcp_combine_CPPFLAGS += ${MET_PYTHON_CC}
-   pcp_combine_LDFLAGS  += $(MET_PYTHON_LD)
-endif

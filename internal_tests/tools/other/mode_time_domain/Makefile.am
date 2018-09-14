@@ -68,8 +68,3 @@ test_velocity_LDADD = \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
-
-if ENABLE_PYTHON
-   test_velocity_CPPFLAGS += ${MET_PYTHON_CC}
-   test_velocity_LDFLAGS  += $(MET_PYTHON_LD)
-endif
