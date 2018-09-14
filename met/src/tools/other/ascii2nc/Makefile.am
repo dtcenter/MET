@@ -46,8 +46,3 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
-
-if ENABLE_PYTHON
-   ascii2nc_CPPFLAGS += ${MET_PYTHON_CC}
-   ascii2nc_LDFLAGS  += $(MET_PYTHON_LD)
-endif

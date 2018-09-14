@@ -38,9 +38,4 @@ mode_analysis_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   mode_analysis_CPPFLAGS += ${MET_PYTHON_CC}
-   mode_analysis_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = config_to_att.h

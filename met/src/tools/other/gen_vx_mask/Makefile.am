@@ -48,10 +48,5 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   gen_vx_mask_CPPFLAGS += ${MET_PYTHON_CC}
-   gen_vx_mask_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = gen_vx_mask.h \
 	grid_closed_poly.h

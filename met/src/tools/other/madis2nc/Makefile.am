@@ -40,9 +40,4 @@ madis2nc_LDADD = -lvx_stat_out \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   madis2nc_CPPFLAGS += ${MET_PYTHON_CC}
-   madis2nc_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = madis2nc.h

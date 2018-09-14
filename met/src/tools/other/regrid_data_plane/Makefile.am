@@ -33,8 +33,3 @@ regrid_data_plane_LDADD = -lvx_statistics \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
-
-if ENABLE_PYTHON
-   regrid_data_plane_CPPFLAGS += ${MET_PYTHON_CC}
-   regrid_data_plane_LDFLAGS  += $(MET_PYTHON_LD)
-endif

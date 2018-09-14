@@ -38,10 +38,5 @@ series_analysis_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-if ENABLE_PYTHON
-   series_analysis_CPPFLAGS += ${MET_PYTHON_CC}
-   series_analysis_LDFLAGS  += $(MET_PYTHON_LD)
-endif
-
 EXTRA_DIST = series_analysis.h \
 	series_analysis_conf_info.h
