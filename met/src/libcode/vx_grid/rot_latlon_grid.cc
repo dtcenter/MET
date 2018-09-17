@@ -27,6 +27,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "rot_latlon_grid.h"
+#include "latlon_xyz.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +180,7 @@ er.pre_rotx(angle);   // cout << "pre rotx by " << angle << "\n";
    //
    //  auilliary rotation, if any
    //
-
+/*
 if ( rdata.aux_rotation != 0.0 )  {
 
    angle = rdata.aux_rotation;
@@ -187,6 +188,26 @@ if ( rdata.aux_rotation != 0.0 )  {
    angle = -angle;
 
    er.post_rotz(angle);
+
+}
+*/
+
+if ( rdata.aux_rotation != 0.0 )  {   //  rotate about grid center
+
+   double lat, lon;
+   double x, y, z;
+
+   xy_to_latlon((rdata.Nlon)/2, (rdata.Nlat)/2, lat, lon);
+
+   // cout << "\n\n     (lat, lon) = (" << lat << ", " << lon << ")\n\n";
+
+   grid_latlon_to_xyz(lat, lon, x, y, z);
+
+   angle = rdata.aux_rotation;
+
+   angle = -angle;
+
+   er.post_axis_angle(x, y, z, angle);
 
 }
 
