@@ -795,6 +795,7 @@ status open
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -805,6 +806,7 @@ vec{F}}}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -814,10 +816,12 @@ vec{O}}}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -829,6 +833,7 @@ vec{F}}_i}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -838,10 +843,12 @@ vec{O}}_i}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -851,6 +858,7 @@ uf{u_f}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -858,10 +866,12 @@ vf{v_f}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -871,6 +881,7 @@ uo{u_o}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -878,10 +889,12 @@ vo{v_o}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -891,6 +904,7 @@ ufi{u_{fi}}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -898,10 +912,12 @@ vfi{v_{fi}}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -911,6 +927,7 @@ uoi{u_{oi}}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -918,10 +935,12 @@ voi{v_{oi}}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -931,6 +950,7 @@ sf{s_f}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -938,10 +958,12 @@ so{s_o}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -951,6 +973,7 @@ sfi{s_{fi}}%
 
 \begin_layout Plain Layout
 
+
 \backslash
 def
 \backslash
@@ -958,10 +981,12 @@ soi{s_{oi}}%
 \end_layout
 
 \begin_layout Plain Layout
+
 %
 \end_layout
 
 \begin_layout Plain Layout
+
 
 \backslash
 def
@@ -1071,6 +1096,962 @@ $N$
 \end_inset
 
  observations of forecast and observed wind:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\vecfi=(\ufi,\vfi)\hbox to1.0in{\hfill and\hfill}\vecoi=(\uoi,\voi)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$1 
+\backslash
+leq i 
+\backslash
+leq N$
+\end_layout
+
+\end_inset
+
+.
+ We also have the forecast and observed wind 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it speeds:}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+sf = 
+\backslash
+left| 
+\backslash
+vecf 
+\backslash
+right| = 
+\backslash
+sqrt{
+\backslash
+uf^2 + 
+\backslash
+vf^2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox to 1.0in{
+\backslash
+hfill and
+\backslash
+hfill}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+so = 
+\backslash
+left| 
+\backslash
+veco 
+\backslash
+right| = 
+\backslash
+sqrt{
+\backslash
+uo^2 + 
+\backslash
+vo^2}  
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and, at each data point,
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+sfi = 
+\backslash
+left| 
+\backslash
+vecfi 
+\backslash
+right| = 
+\backslash
+sqrt{
+\backslash
+ufi^2 + 
+\backslash
+vfi^2}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox to 1.0in{
+\backslash
+hfill and
+\backslash
+hfill}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+soi = 
+\backslash
+left| 
+\backslash
+vecoi 
+\backslash
+right| = 
+\backslash
+sqrt{
+\backslash
+uoi^2 + 
+\backslash
+voi^2}  
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It'll be convenient to denote the average forecast and observed wind vectors
+ by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+vecf_a$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+veco_a$
+\end_layout
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+vecf_a = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+vecfi
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox to 1.0in{
+\backslash
+hfill and
+\backslash
+hfill}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+veco_a = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+vecoi
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now let's look at the definitions of the vector statistics produced by MET:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+def
+\backslash
+mysep{
+\backslash
+vskip 0.1in
+\backslash
+centerline{
+\backslash
+hbox to 5.0in{
+\backslash
+hrulefill}}}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+FBAR asnd OBAR are the average values of the forecast and observed wind
+ speed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FBAR} = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+sfi
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OBAR} = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+soi
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+FS_RMS and OS_RMS are the root-mean-square values of the forecast and observed
+ wind speeds.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FS
+\backslash
+_RMS} = 
+\backslash
+left[ {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+sfi^2 
+\backslash
+right]^{1/2}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OS
+\backslash
+_RMS} = 
+\backslash
+left[ {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+soi^2 
+\backslash
+right]^{1/2}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+These are the mean squared (and root mean squared) lengths of the vector
+ difference between the forecast and observed wind vectors.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{MSVE} = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+left| 
+\backslash
+vecfi - 
+\backslash
+vecoi 
+\backslash
+right|^2
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{RMSVE} = 
+\backslash
+sqrt{
+\backslash
+hbox{MSVE}}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+FSTDEV and OSTDEV are the standard deviations of the forecast and observed
+ wind speeds.
+ In these equations, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+mu_f$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+mu_o$
+\end_layout
+
+\end_inset
+
+ are the average forecast and obxserved wind speeds
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FSTDEV} = {1 
+\backslash
+over N } 
+\backslash
+sum_i 
+\backslash
+left( 
+\backslash
+sfi - 
+\backslash
+hbox{FBAR} 
+\backslash
+right)^2 = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+sfi^2 - {
+\backslash
+hbox{FBAR}}^2
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OSTDEV} = {1 
+\backslash
+over N } 
+\backslash
+sum_i 
+\backslash
+left( 
+\backslash
+soi - 
+\backslash
+hbox{OBAR} 
+\backslash
+right)^2 = {1 
+\backslash
+over N} 
+\backslash
+sum_i 
+\backslash
+soi^2 - {
+\backslash
+hbox{OBAR}}^2
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Direction (angle) of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+vecf_a$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+veco_a$
+\end_layout
+
+\end_inset
+
+ with respect to the grid directions.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FDIR} = 
+\backslash
+hbox{direction angle of
+\backslash
+ }
+\backslash
+vecf_a
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{ODIR} = 
+\backslash
+hbox{direction angle of
+\backslash
+ }
+\backslash
+veco_a
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed
+ wind vectors.
+ Note that this is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it not}
+\end_layout
+
+\end_inset
+
+ the same as the average forecast and observed wind speeds (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it ie.,}
+\end_layout
+
+\end_inset
+
+ the length of an average vector 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+neq$
+\end_layout
+
+\end_inset
+
+ the average length of the vector).
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FBAR
+\backslash
+_SPEED} = 
+\backslash
+left| 
+\backslash
+vecf_a 
+\backslash
+right|
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OBAR
+\backslash
+_SPEED} = 
+\backslash
+left| 
+\backslash
+veco_a 
+\backslash
+right|
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \end_body
