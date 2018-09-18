@@ -253,8 +253,6 @@ ncfile->putAtt("delta_lat", junk);
 
 t = data.delta_lon;
 
-// if ( !west_longitude_positive )  t = -t;
-
 snprintf(junk, sizeof(junk), "%f degrees", t);
 
 ncfile->putAtt("delta_lon", junk);
@@ -331,8 +329,6 @@ ncfile->putAtt("delta_rot_lat", junk);
    //
 
 t = data.delta_rot_lon;
-
-// if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees", t);
 
