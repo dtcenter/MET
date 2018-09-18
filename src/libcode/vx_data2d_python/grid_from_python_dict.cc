@@ -24,19 +24,21 @@
    //  taken from src/libcode/vx_nc_util/grid_output.cc
    //
 
-static const char     lc_string [] = "Lambert Conformal";
-static const char     st_string [] = "Polar Stereographic";
-static const char   merc_string [] = "Mercator";
-static const char latlon_string [] = "LatLon";
+static const char             lc_string [] = "Lambert Conformal";
+static const char             st_string [] = "Polar Stereographic";
+static const char           merc_string [] = "Mercator";
+static const char         latlon_string [] = "LatLon";
+static const char rotated_latlon_string [] = "Rotated LatLon";
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static void get_lc_grid     (PyObject * dict, Grid & g);
-static void get_st_grid     (PyObject * dict, Grid & g);
-static void get_merc_grid   (PyObject * dict, Grid & g);
-static void get_latlon_grid (PyObject * dict, Grid & g);
+static void get_lc_grid             (PyObject * dict, Grid & g);
+static void get_st_grid             (PyObject * dict, Grid & g);
+static void get_merc_grid           (PyObject * dict, Grid & g);
+static void get_latlon_grid         (PyObject * dict, Grid & g);
+static void get_rotated_latlon_grid (PyObject * dict, Grid & g);
 
 static void set_string(const char * & dest, const ConcatString & src);
 
@@ -64,14 +66,15 @@ g.clear();
 
 proj_type = dict_lookup_string(dict, "type");
 
-     if ( proj_type ==     lc_string )  get_lc_grid     (dict, g);
-else if ( proj_type ==     st_string )  get_st_grid     (dict, g);
-else if ( proj_type ==   merc_string )  get_merc_grid   (dict, g);
-else if ( proj_type == latlon_string )  get_latlon_grid (dict, g);
+     if ( proj_type ==             lc_string )  get_lc_grid             (dict, g);
+else if ( proj_type ==             st_string )  get_st_grid             (dict, g);
+else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g);
+else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
+else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
 else {
 
    mlog << Error
-        << "grid_from_python_dict() -> bad projection type: \""
+        << "\ngrid_from_python_dict() -> bad projection type: \""
         << proj_type << "\"\n\n";
 
    exit ( 1 );
@@ -324,6 +327,12 @@ data.delta_lon = dict_lookup_double(dict, "delta_lon");
 data.Nlat = dict_lookup_int(dict, "Nlat");
 data.Nlon = dict_lookup_int(dict, "Nlon");
 
+if ( ! west_longitude_positive )  {
+
+   toggle_sign(data.lon_ll);
+
+}
+
    //
    //  done
    //
@@ -340,7 +349,68 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  the fact that our destination is "const char *" rather than 
+   // name                                      (string)
+   //
+   // rot_lat_ll, rot_lon_ll                    (double)
+   //
+   // delta_rot_lat, delta_rot_lon              (double)
+   //
+   // Nlat, Nlon                                (int)
+   //
+   // true_lat_south_pole, true_lon_south_pole  (double)
+   //
+   // aux_rotation                              (double)
+   //
+
+void get_rotated_latlon_grid (PyObject * dict, Grid & g)
+
+{
+
+RotatedLatLonData data;
+ConcatString s;
+
+s = dict_lookup_string(dict, "name");
+
+set_string(data.name, s);
+
+data.rot_lat_ll = dict_lookup_double(dict, "rot_lat_ll");
+data.rot_lon_ll = dict_lookup_double(dict, "rot_lon_ll");
+
+data.delta_rot_lat = dict_lookup_double(dict, "delta_rot_lat");
+data.delta_rot_lon = dict_lookup_double(dict, "delta_rot_lon");
+
+data.Nlat = dict_lookup_int(dict, "Nlat");
+data.Nlon = dict_lookup_int(dict, "Nlon");
+
+data.true_lat_south_pole = dict_lookup_double(dict, "true_lat_south_pole");
+data.true_lon_south_pole = dict_lookup_double(dict, "true_lon_south_pole");
+
+data.aux_rotation = dict_lookup_double(dict, "aux_rotation");
+
+if ( ! west_longitude_positive )  {
+
+   toggle_sign(data.rot_lon_ll);
+   toggle_sign(data.true_lon_south_pole);
+
+}
+
+   //
+   //  done
+   //
+
+g.set(data);
+
+if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  the fact that our destination is "const char *" rather than
    //
    //    just "char *" is the only thing that makes this tricky
    //
