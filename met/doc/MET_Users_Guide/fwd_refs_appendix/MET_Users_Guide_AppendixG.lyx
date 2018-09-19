@@ -2051,6 +2051,518 @@ mysep
 \end_layout
 
 \begin_layout Standard
+VDIFF_SPEED is the length (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it ie.~speed}
+\end_layout
+
+\end_inset
+
+ of the vector difference between the average forecast and average observed
+ wind vectors.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{VDIFF
+\backslash
+_SPEED} = 
+\backslash
+left| 
+\backslash
+vecf_a - 
+\backslash
+veco_a 
+\backslash
+right|
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that this is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it not}
+\end_layout
+
+\end_inset
+
+ the same as the difference in lengths (speeds) of the average forecast
+ and observed wind vectors.
+ That quantity is called SPEED_ERR (see below).
+ There is a relationshop between these two statisics however: using some
+ of the results obtained in the introduction to this appendix, we can say
+ that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+bigl|
+\backslash
+,
+\backslash
+left|
+\backslash
+vecf_a
+\backslash
+right| - 
+\backslash
+left|
+\backslash
+veco_a
+\backslash
+right|
+\backslash
+,
+\backslash
+bigr|
+\backslash
+leq
+\backslash
+left| 
+\backslash
+vecf_a - 
+\backslash
+veco_a  
+\backslash
+right|$
+\end_layout
+
+\end_inset
+
+ or , equivalently, that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+left| 
+\backslash
+hbox{SPEED
+\backslash
+_ERR} 
+\backslash
+right| 
+\backslash
+leq 
+\backslash
+hbox{VDIFF
+\backslash
+_SPEED}$
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+VDIFF_DIR is the direction of the vector difference of the average forecast
+ and average observed wind vectors.
+ Note that this is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+it not}
+\end_layout
+
+\end_inset
+
+ the same as the difference in direction of the average forecast and average
+ observed wind vectors.
+ This latter quantity would be 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{FDIR} - 
+\backslash
+hbox{ODIR}$
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{VDIFF
+\backslash
+_DIR} = 
+\backslash
+hbox{direction of } 
+\backslash
+left( 
+\backslash
+vecf_a - 
+\backslash
+veco_a 
+\backslash
+right)
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The difference in the lengths (speeds) of the average forecast and average
+ observed wind vectors.
+ (See the discussion of VDIFF_SPEED above.)
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{SPEED
+\backslash
+_ERR} = 
+\backslash
+left| 
+\backslash
+vecf_a 
+\backslash
+right| - 
+\backslash
+left| 
+\backslash
+veco_a 
+\backslash
+right| = 
+\backslash
+hbox{FBAR
+\backslash
+_SPEED} - 
+\backslash
+hbox{OBAR
+\backslash
+_SPEED}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SPEED_ABSERR is the absolute value of SPEED_ERR.
+ Note that we have 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{SPEED
+\backslash
+_ABSERR} 
+\backslash
+leq 
+\backslash
+hbox{VDIFF
+\backslash
+_SPEED}$
+\end_layout
+
+\end_inset
+
+ (see the discussion of VDIFF_SPEED above).
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{SPEED
+\backslash
+_ABSERR} = 
+\backslash
+left| 
+\backslash
+hbox{SPEED
+\backslash
+_ERR} 
+\backslash
+right|
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+DIR_ERR is the signed angle between the directions of the average forecast
+ and average observed wind vectors.
+ Positive if the forecast vector is counterclockwise from the observed vector.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{DIR
+\backslash
+_ERR} = 
+\backslash
+hbox{direction between } N(
+\backslash
+vecf_a) 
+\backslash
+hbox{ and } N(
+\backslash
+veco_a)
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+DIR_ABSERR is the absolute value of DIR_ERR.
+ In other words, it's an unsigned angle rather than a signed angle.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{DIR
+\backslash
+_ABSERR} = 
+\backslash
+left| 
+\backslash
+hbox{DIR
+\backslash
+_ERR} 
+\backslash
+right|
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mysep
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 
 \end_layout
 
