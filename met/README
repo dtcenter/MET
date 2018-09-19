@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.0 BETA 8 (September 14, 2018)
+Model Evaluation Tools METv8.0 (September 25, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -64,8 +64,8 @@ USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
    Agreement.  You may terminate this Agreement at any time by destroying the
    Software and any related documentation and any complete or partial copies
    thereof.  Upon termination, all rights granted under this Agreement shall
-   terminate.  The following provisions shall survive termination: Sections 2, 3,
-   6 and 9.
+   terminate.  The following provisions shall survive termination: Sections 2,
+   3, 6 and 9.
 
 8. Complete Agreement.  This Agreement constitutes the entire agreement between
    the parties with respect to the use of the Software and supersedes all prior
@@ -121,6 +121,7 @@ Dependencies
    - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
       - jasperlib, libpng, and zlib also required for GRIB2 support
       - http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
+   - Python, if wishing to compile Python support
    - HDF4 and HDF-EOS2 libraries, if wishing to compile MODIS-Regrid
       - http://www.hdfgroup.org/products/hdf4
       - http://www.hdfgroup.org/hdfeos.html
@@ -146,8 +147,8 @@ sub-directory, or the MET Online Tutorial:
 
 - Set the $CXX and $F77 environment variables to specify the C++ and FORTRAN
   compilers to be used.  If not set, configure will search for compilers and the
-  ones if finds may or may not be compatible with those used to compile the needed
-  third party libraries.
+  ones if finds may or may not be compatible with those used to compile the
+  needed third party libraries.
 
 - If compiling on a big endian machine set the $CXXFLAGS environment variable to
   include '-DBIGENDIAN'.
@@ -155,13 +156,13 @@ sub-directory, or the MET Online Tutorial:
 - Set environment variables to point to the locations of the needed third party
   libraries.  For each library, there are three possible environment variables.
   If the library is installed in one location with an "include" subdirectory
-  containing the include files and a "lib" directory containing the library files,
-  the $MET_<lib> environment should be set to point to that main directory.
-  If the include and library files files are installed in any other way, the
-  $MET_<lib>INC and $MET_<lib>INC environment variables should both be set, with
-  $MET_<lib>INC pointing to the directory with the include files and $MET_<lib>LIB
-  pointing to the directory with the library files.  If $MET_<lib>INC and
-  $MET_<lib>LIB are defined, then $MET_<lib> is ignored.
+  containing the include files and a "lib" directory containing the library
+  files, the $MET_<lib> environment should be set to point to that main
+  directory. If the include and library files files are installed in any other
+  way, the $MET_<lib>INC and $MET_<lib>INC environment variables should both be
+  set, with $MET_<lib>INC pointing to the directory with the include files and
+  $MET_<lib>LIB pointing to the directory with the library files.  If
+  $MET_<lib>INC and $MET_<lib>LIB are defined, then $MET_<lib> is ignored.
 
    - Set $MET_NETCDF to point to the main NetCDF directory, or set
      $MET_NETCDFINC to point to the directory with the NetCDF include files
@@ -191,8 +192,8 @@ sub-directory, or the MET Online Tutorial:
      and indicate the name of that file.  For example:
      MET_PYTHON_CC='-I/usr/include/python2.7'
      MET_PYTHON_LD='-L/usr/lib/python2.7/config-x86_64-linux-gnu -lpython2.7'
-     For more information about Python support in MET, please refer to Appendix F
-     of the MET User's Guide.
+     For more information about Python support in MET, please refer to Appendix
+     F of the MET User's Guide.
 
    - If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
      or set $MET_HDFINC to point to the directory with the HDF include files
@@ -226,8 +227,8 @@ sub-directory, or the MET Online Tutorial:
 
   --enable and --disable options for each of the MET tools.
 
-  By default, compilation of GRIB2 support, Python support, the MODIS-Regrid tool,i
-  the Lidar2NC tool,and MODE-Graphics are disabled.
+  By default, compilation of GRIB2 support, Python support, the MODIS-Regrid
+  tool, the Lidar2NC tool,and MODE-Graphics are disabled.
   Use the following options to enable them:
 
   --enable-grib2
@@ -317,146 +318,132 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
-Version 8.0 BETA 8 Release Notes:
---------------------------------
+Version 8.0 Release Notes:
+-------------------------
 
-- Add the match_month flag to the climo_mean and climo_stdev config file
-  dictionaries.  Setting this to FALSE allows for the use of persistence to
-  define the climatology.
-- Remove many compilation warnings found by compiling with -Wall and -Wshadow.
-- Fix bug in ECNT aggregation logic in STAT-Analysis.
-- Refine logic for MET to call python scripts to read two dimensional fields
-  of data to allow for the reuse of python scripts and support command line
-  arguments.
-- Fix the very slow computation of neighborhood methods fractional coverage
-  fields in Grid-Stat.  This was also posted as a bugfix for met-7.0.
-- Enhance Point-Stat to compute the ECNT line type in it's application of the
-  HiRA methodology.  Nearby grid points are treated as ensemble member values.
-- Add support for area-weighted (AW_MEAN) regridding logic.
-- Remove support for LOGNORMAL distribution for observation error logic in
-  Ensemble-Stat since its implementation is problematic.
-- Add support for Rotated Lat/Lon projections.
+- What's New:
+   - Major Enhancements: python embedding, observation error logic, shapefiles
+     for masking regions, point observation format overhaul, and rotated lat/lon
+     projections
+   - New Tools: Three new utilities to dump shapefile information
+     (gis_dump_dbf, gis_dump_shp, and gis_dump_shx)
 
-Version 8.0 BETA 7 Release Notes:
---------------------------------
+- Changes to output formats:
+   - Add new Ensemble Continuous Statistics line type (ECNT) for Ensemble-Stat
+     and Point-Stat HiRA.
+   - Remove CRPS, IGN, CRPSS, and SPREAD columns from the RHIST line type and
+     move them to the new ECNT line type.
+   - Add ENS_MEAN_OERR, SPREAD_OERR, SPREAD_PLUS_OERR columns to the ORANK line
+     type.
+   - Add ASPECT_DIFF and CURVATURE_RATIO columns to the MODE output.
 
-- Switch release number from met-7.1 to met-8.0.
-- Add "mask.llpnt" config file option for Point-Stat and Ensemble-Stat to filter
-  point observation lat/lon values directly.
-- Enhance MET tools to read gridded data by calling a Python script which loads
-  data and metadata into a NumPy object.  Must configure using --enable-python
-  for this functionality.  Include example "scripts/python" directory.
-- Initial commits for handling rotated lat/lon grids.
-- Enhance that Ensemble-Stat observation error logic by defining min/max values
-  for each variable to ensure that bias-correction and random perturbations stay
-  within physical limits.
-- Enhance the point pre-processing tools by replacing the UNLIMITED dimension
-  with a fixed dimension, resulting in smaller file sizes.
-- Enhance ascii2nc to support the AERONET version 3 point observation format and
-  support longer observation variable names.
-- Enhance ascii2nc to compute time summaries across multiple input files.
-- Enhance the "time_summary" config file option for ascii2nc and pb2nc by adding
-  a "raw_data" flag to control whether the raw input values are written or only
-  the time summary values.
-- Enhance the ascii2nc, madis2nc, pb2nc, stat_analysis, tc_pairs, and tc_stat
-  to support the "mask.poly" config file option or "-mask_poly" command line
-  option to process masking regions consistently across all the MET tools.
-  They can now process the output of the Gen-Vx-Mask tool.
-- Enhance stat_analysis and tc_stat by adding "-column_union" job command option
-  to summarize values across multiple columns.
-- Add a sample Rscript (scripts/Rscripts/plot_ensemble.R) for plotting ensemble
-  line types.
-
-Version 7.1 BETA 6 Release Notes:
---------------------------------
-
-- Continue development on calling python scripts from MET config files.
-- Enhance PB2NC to compute time summaries across multiple BUFR or PrepBUFR
-  input files.
-- Round timestamps in PB2NC to the nearest second instead of truncating.
-- In MODE, replace the area_thresh and inten_perc_thresh config file options
-  with the more generic filter_attr_name and filter_attr_thresh options.
-- In MODE, add aspect_diff and curvature_ratio as new inputs to the fuzzy logic
-  engine and add corresponding columns to the output file.
-- Enhance Regrid-Data-Plane to read GOES-16 AOD data using the new -coord and
-  -qc command line options.
-- Fix bug in Ensemble-Stat when filtering out missing data values to ensure that
-  the ECNT line type contains the same number of matched pairs as the others.
-- Enhance the observation error logic in Ensemble-Stat.  Replace the
-  obs_error.field config option with obs_error.flag.  When enabled, apply
-  peturbations to ensemble member values and bias correction to observation
-  values.
-- Switch from using double precision to booleans for storing mask fields in
-  Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and Series-Analysis. When
-  processing many masking regions, this will run faster and consume less memory.
-- Fix memory allocation issue in Grid-Stat, leading to faster run times.
-
-Version 7.1 BETA 5 Release Notes:
---------------------------------
-
-- Enhance PB2NC to read timestamps down to the minute.
-- Enhance PB2NC to specify the number of messages to be processed as an exact
-  value (-nmsg 25) or percentage (-nmsg 25%).
-- Explicitly set the level value of AIRNOW message types to 0.
-- Add debug messages to Series-Analysis to inform the user about missing data.
-- Fix bug in dump_dbf utility.
-
-Version 7.1 BETA 4 Release Notes:
---------------------------------
-
-- Incorporate recent bugfixes.
-  - When applying multiple censoring thresholds, only use the first match.
-  - When sizing output tables in Point-Stat and Grid-Stat for probabilities.
-  - When allocating memory in Ensemble-Stat to make it run faster.
-  - When applying interp12 logic in tc_pairs for ATCF ID's ending with "32".
-- Enhance gen_vx_mask to resize data buffer as needed for shapefiles.
-- Generalize the time_summary.width config file option to an integer for
-  centered time windows (existing) or a dictionary with begin and end time
-  offsets for uncentered windows (new).
-- Update MRMS GRIB2 table.
-
-Version 7.1 BETA 3 Release Notes:
---------------------------------
-
-- In Point-Stat, Grid-Stat, Ensemble-Stat, and Wavelet-Stat, change default
-  config file output_flag settings from BOTH to NONE.
-- In Ensemble-Stat, rename -ssvar_mean command line option as -ens_mean, but
-  still quietly support -ssvar_mean.
-- In Ensemble-Stat, split the RHIST line type out into RHIST and ECNT, for
-  continuous ensemble statistics.
-- Continue observation error development in Ensemble-Stat.  Finalize updated
-  contents of the ORANK, ECNT, and RHIST line types.  Support the definition of
-  multiple observation error distribution types.
-- Enhance STAT-Analysis to aggregate the ECNT line type and derive it from
-  input ORANK lines.
-- Enhance gen_vx_mask to define masking regions using shapefiles (-type shape).
-- Add three utilities to dump shapefile information:
-     gis_dump_dbf, gis_dump_shp, and gis_dump_shx
-- Major change to the NetCDF point observation format written by PB2NC,
-  ASCII2NC, MADIS2NC, and LIDAR2NC.  Split data out into multiple 1D arrays.
-- Enhance PB2NC to dump the PrepBufr report type, input report type, and
-  instrument for use in the observation error table lookup.
-- Update computation of MSVE statistic in the VCNT line type to be done using
-  partial sums rather than matched pair values.  This enables it to be
-  computed from VL1L2 lines in STAT-Analysis.
-
-Version 7.1 BETA 2 Release Notes:
---------------------------------
-
-- Add special handling for ANOWPM message types to PB2NC.
-- Fix bug in STAT-Analysis for VL1L2 to VCNT conversion.
-- Initial development for observation error handling in Ensemble-Stat.
-
-Version 7.1 BETA 1 Release Notes:
---------------------------------
-
-- Make logic for finding matching UGRD/VGRD verification tasks more robust in
-  Point-Stat and Grid-Stat.
-- Fix PB2NC's computation of valid time for AIRNOW observations.
-- Minor bugfix for Series-Analysis when computing min/max timing info for
-  series with some missing input files.
-- Enable vld_thresh = 0 in Ensemble-Stat and Series-Analysis.
-- Update pntnc2ascii.R Rscript to handle obs_var variable.
+- Enhancements to Existing Tools:
+   - Distribute the latest set of bugfixes, details not listed here.
+   - Remove many compilation warnings from "-Wall -Wshadow" compiler flags.
+   - Python embedding
+      - Enhance MET tools to read gridded data by calling a Python script which
+        loads data and metadata into a NumPy object.
+      - Must configure MET using "--enable-python" for this functionality.
+      - Include example "scripts/python" directory.
+      - See Appendix F of the MET User's Guide for more information.
+   - Common Libraries
+      - Add support for Rotated Lat/Lon projections.
+      - Update MRMS GRIB2 table.
+   - Point pre-processing tools
+      - Major change to the NetCDF point observation format written by PB2NC,
+        ASCII2NC, MADIS2NC, and LIDAR2NC.  Split data out into multiple
+        1-dimensional arrays.  Create "table" variables to store unique strings
+        and for each observation store the indices for those tables.
+      - Update the NetCDF point observation format by replacing the UNLIMITED
+        dimension with a fixed dimension, resulting in smaller file sizes.
+   - Multiple tools
+      - For the statistics tools, change the default config file "output_flag"
+        settings from BOTH to NONE.
+      - For climatologies, add the "match_month" flag to the "climo_mean" and
+        "climo_stdev" config file dictionaries.  Setting this to FALSE allows
+        for the use of persistence to define the climatology.
+      - Add support for area-weighted (AW_MEAN) regridding logic.
+      - Enhance the ASCII2NC, MADIS2NC, PB2NC, STAT-Analysis, TC-Pairs, and
+        TC-STAT to support the "mask.poly" config file option or "-mask_poly"
+        command line option to process masking regions consistently across all
+        the MET tools. They can now process the output of the Gen-Vx-Mask tool.
+      - Enable "vld_thresh = 0" in Ensemble-Stat and Series-Analysis config
+        files.
+      - Switch from using double precision to booleans for storing mask fields
+        in Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and
+        Series-Analysis. When processing many masking regions, this will run
+        faster and consume less memory.
+      - Make logic for finding matching UGRD/VGRD verification tasks more robust
+        in Point-Stat and Grid-Stat.
+   - Gen-Vx-Mask
+      - Define masking regions using shapefiles (-type shape).
+      - Resize the data buffer as needed for shapefiles.
+   - Regrid-Data-Plane
+      - Read GOES-16 AOD data using the new "-coord" and "-qc" command line
+        options.
+   - ASCII2NC
+      - Add support for AERONET version 3 point observation format and support
+        longer observation variable names.
+   - PB2NC
+      - Enhance to dump the PrepBufr report type, input report type, and
+        instrument for use in the observation error table lookup.
+      - Fix the computation of valid time for AIRNOW observations.
+      - Add special handling for ANOWPM message types.
+      - Round timestamps to the nearest second instead of truncating.
+      - Specify the number of messages to be processed as an exact value (-nmsg
+        25) or percentage (-nmsg 25%).
+   - Time Summaries
+      - Compute time summaries across multiple input files for ASCII2NC and
+        PB2NC.
+      - Enhance the "time_summary" config file option by adding a "raw_data"
+        flag to control whether the raw input values are written or only the
+        time summary values.
+      - Generalize the "time_summary.width" config file option to an integer for
+        centered time windows (existing) or a dictionary with begin and end time
+        offsets for uncentered windows (new).
+   - Grid-Stat
+      - Fix the very slow computation of neighborhood methods fractional
+        coverage fields introduced in met-7.0 when supporting circular
+        neighborhoods.  Also posted as a bugfix for met-7.0.
+      - Fix memory allocation issue, leading to faster run times.
+   - Point-Stat
+      - Compute the ECNT line type when applying the HiRA methodology treating
+        nearby grid points as ensemble member values.
+   - Point-Stat and Ensemble-Stat
+      - Add "mask.llpnt" config file option to appply thresholds to filter point
+        observations by applying thresholds to their lat/lon values directly.
+   - Ensemble-Stat
+      - Add support for observation error perturbations.  Add default lookup
+        table in "data/table_files/obs_error_table.txt" but support the
+        MET_OBS_ERROR_TABLE environment variable for user-specified table.
+      - Add "obs_error" dictionary to the config file to specify how
+        observation error perturbations should be applied.
+      - Write statistics for perturbed and unperturbed data to the new ECNT
+        line type.
+      - Remove columns from the RHIST line type that were moved to ECNT.
+      - See "data/config/README" for details on these settings.
+      - Rename "-ssvar_mean" command line option as "-ens_mean", but still
+        quietly support "-ssvar_mean".
+   - MODE
+      - Replace the "area_thresh" and "inten_perc_thresh" config file options
+        with the more generic "filter_attr_name" and "filter_attr_thresh"
+        options.
+      - Add "aspect_diff" and "curvature_ratio" as new inputs to the fuzzy logic
+        engine and add corresponding columns to the output file.
+   - Series-Analysis
+      - Add debug messages to inform the user about missing data.
+   - STAT-Analysis
+      - Aggregate the ECNT line type and derive it from input ORANK lines.
+   - STAT-Analysis and TC-STAT
+      - Add "-column_union" job command option to summarize values across
+        multiple columns.
+      - Update computation of MSVE statistic in the VCNT line type to be done
+        using partial sums rather than matched pair values.  This enables it to
+        be computed from VL1L2 lines in STAT-Analysis.
+   - Scripting
+      - Add a sample Rscript (scripts/Rscripts/plot_ensemble.R) for plotting
+        ensemble line types.
+      - Update pntnc2ascii.R Rscript to handle obs_var variable.
 
 Version 7.0 Release Notes:
 -------------------------
