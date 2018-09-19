@@ -103,7 +103,7 @@ This user's guide is provided as an aid to users of the Model Evaluation
 \series medium
 It is important to note here that MET is an evolving software package.
  Previous releases of MET have occurred each year since 2008.
- This documentation describes the 7.0 release from March 2018.
+ This documentation describes the 8.0 release from September 2018.
  Intermediate releases may include bug fixes.
  MET is also be able to accept new modules contributed by the community.
  If you have code you would like to contribute, we will gladly consider
@@ -133,7 +133,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v7.0
+New for MET v8.0
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -146,9 +146,37 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-METv7.0 includes some major enhancements, including the addition of vector
- statistics for winds, finer control of configuration options, message type
- groups, and WMO mean summary statistics.
+METv8.0 includes some major enhancements, including python embedding, observation
+ error logic, shapefiles for masking regions, point observation format overhaul,
+ and rotated lat/lon projections.
+\end_layout
+
+\begin_layout Standard
+Three new utilities we added to dump shapefile information (gis_dump_dbf,
+ gis_dump_shp, and gis_dump_shx).
+\end_layout
+
+\begin_layout Subsection*
+Changes to output formats:
+\end_layout
+
+\begin_layout Itemize
+Add new Ensemble Continuous Statistics line type (ECNT) for Ensemble-Stat
+ and Point-Stat HiRA.
+\end_layout
+
+\begin_layout Itemize
+Remove CRPS, IGN, CRPSS, and SPREAD columns from the RHIST line type and
+ move them to the new ECNT line type.
+\end_layout
+
+\begin_layout Itemize
+Add ENS_MEAN_OERR, SPREAD_OERR, SPREAD_PLUS_OERR columns to the ORANK line
+ type.
+\end_layout
+
+\begin_layout Itemize
+Add ASPECT_DIFF and CURVATURE_RATIO columns to the MODE output.
 \end_layout
 
 \begin_layout Subsection*
@@ -162,80 +190,196 @@ Distribute the latest set of bugfixes, details not listed here.
 \end_layout
 
 \begin_layout Itemize
-Vector statistics for winds
+
+\series medium
+Remove many compilation warnings from "-Wall -Wshadow" compiler flags.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Python embedding
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add vector wind speeds to the existing VL1L2 line type (F_SPEED_BAR and
- O_SPEED_BAR)
+Enhance MET tools to read gridded data by calling a Python script which
+ loads data and metadata into a NumPy object.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add a new VCNT line type containing statistics for wind vectors.
+Must configure MET using "--enable-python" for this functionality.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Enhance STAT-Analysis to parse the updated VL1L2 line type, parse the new
- VCNT line type, and derive VCNT statistics from input VL1L2 lines.
+Include example "scripts/python" directory.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Enhance STAT-Analysis to read U/V matched pair (MPR) lines and derive VL1L2
- or VCNT output lines.
+See Appendix F of the MET User's Guide for more information.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Config file options
+Common Libraries
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Refactor config file logic for Point-Stat, Grid-Stat, and Ensemble-Stat.
+Add support for Rotated Lat/Lon projections.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Whenever possible, parse config file options separately for each verification
- task rather than parsing from the top level.
+Update MRMS GRIB2 table.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Point pre-processing tools
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Major change to the NetCDF point observation format written by PB2NC, ASCII2NC,
+ MADIS2NC, and LIDAR2NC.
+ Split data out into multiple 1-dimensional arrays.
+ Create "table" variables to store unique strings and for each observation
+ store the indices for those tables.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-See default config files for the list of options which may be specified
- separately for each "obs.field" entry.
+Update the NetCDF point observation format by replacing the UNLIMITED dimension
+ with a fixed dimension, resulting in smaller file sizes.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Multiple tools
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+For the statistics tools, change the default config file "output_flag" settings
+ from BOTH to NONE.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Parse the "regrid" option separately for each field so that regridding logic
- can be customized for each field (e.g.
- use BUDGET for precipitation and BILIN for temperature).
+For climatologies, add the "match_month" flag to the "climo_mean" and "climo_std
+ev" config file dictionaries.
+ Setting this to FALSE allows for the use of persistence to define the climatolo
+gy.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add "message_type_group" config file option to define message types that
- should be processed together as a group.
- Enhance PB2NC, Point-Stat, and Ensemble-Stat to parse and process groups
- of message types.
+Add support for area-weighted (AW_MEAN) regridding logic.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhance the ASCII2NC, MADIS2NC, PB2NC, STAT-Analysis, TC-Pairs, and TC-STAT
+ to support the "mask.poly" config file option or "-mask_poly" command line
+ option to process masking regions consistently across all the MET tools.
+ They can now process the output of the Gen-Vx-Mask tool.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enable "vld_thresh = 0" in Ensemble-Stat and Series-Analysis config files.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Switch from using double precision to booleans for storing mask fields in
+ Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and Series-Analysis.
+ When processing many masking regions, this will run faster and consume
+ less memory.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Make logic for finding matching UGRD/VGRD verification tasks more robust
+ in Point-Stat and Grid-Stat.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Gen-Vx-Mask
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Define masking regions using shapefiles (-type shape).
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Resize the data buffer as needed for shapefiles.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Regrid-Data-Plane
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Read GOES-16 AOD data using the new "-coord" and "-qc" command line options.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+ASCII2NC
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add support for AERONET version 3 point observation format and support longer
+ observation variable names.
 \end_layout
 
 \end_deeper
@@ -249,75 +393,63 @@ PB2NC
 \begin_layout Itemize
 
 \series medium
-Add specialized processing for AIRNOW message types to use the TPHR value
- as the accumulation interval and the QCIND value as the quality control
- value.
+Enhance to dump the PrepBufr report type, input report type, and instrument
+ for use in the observation error table lookup.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Fix the computation of valid time for AIRNOW observations.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add special handling for ANOWPM message types.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Round timestamps to the nearest second instead of truncating.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Specify the number of messages to be processed as an exact value (-nmsg
+ 25) or percentage (-nmsg 25%).
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-STAT-Analysis
+Time Summaries
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Enhance the existing summary job type.
+Compute time summaries across multiple input files for ASCII2NC and PB2NC.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Print debug messages and warnings when summary includes multiple values
- for each header column.
+Enhance the "time_summary" config file option by adding a "raw_data" flag
+ to control whether the raw input values are written or only the time summary
+ values.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add three new output columns for WMO-approved means of daily scores (WMO_TYPE,
- WMO_MEAN, and WMO_WEIGHTED_MEAN).
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Process columns of data from multiple input line types when the following
- format is used 
-\begin_inset Quotes eld
-\end_inset
-
--column LINE_TYPE:COLUMN
-\begin_inset Quotes erd
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add -derive job command option to automatically compute statistics on the
- fly from input partial sums (SL1L2/SAL1L2 -> CNT, VL1L2 -> VCNT, and CTC
- -> CTS).
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-
-\series medium
-Point-Stat
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Append the shape to the INTERP_MTHD column but omit it for NEAREST, BILIN,
- and BUDGET methods.
+Generalize the "time_summary.width" config file option to an integer for
+ centered time windows (existing) or a dictionary with begin and end time
+ offsets for uncentered windows (new).
 \end_layout
 
 \end_deeper
@@ -331,9 +463,45 @@ Grid-Stat
 \begin_layout Itemize
 
 \series medium
-Add "nbrhd.field" config file option to control the computation of fractional
- coverage fields.
- 
+Fix the very slow computation of neighborhood methods fractional coverage
+ fields introduced in met-7.0 when supporting circular neighborhoods.
+ Also posted as a bugfix for met-7.0.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Fix memory allocation issue, leading to faster run times.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Point-Stat
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Compute the ECNT line type when applying the HiRA methodology treating nearby
+ grid points as ensemble member values.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Point-Stat and Ensemble-Stat
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add "mask.llpnt" config file option to appply thresholds to filter point
+ observations by applying thresholds to their lat/lon values directly.
 \end_layout
 
 \end_deeper
@@ -347,111 +515,137 @@ Ensemble-Stat
 \begin_layout Itemize
 
 \series medium
-Add "nc_var_str" config file option to customize NetCDF variable names.
+Add support for observation error perturbations.
+ Add default lookup table in "data/table_files/obs_error_table.txt" but support
+ the MET_OBS_ERROR_TABLE environment variable for user-specified table.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add "ensemble_flag.latlon" config file option.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-
-\series medium
-MTD
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Rename output files using a more explicit naming convention:
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Rename *_3d_ss.txt to *_3d_simple_single.txt.
+Add "obs_error" dictionary to the config file to specify how observation
+ error perturbations should be applied.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Rename *_3d_sc.txt to *_3d_simple_cluster.txt.
+Write statistics for perturbed and unperturbed data to the new ECNT line
+ type.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Rename *_3d_ps.txt to *_3d_pair_single.txt.
+Remove columns from the RHIST line type that were moved to ECNT.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Rename *_3d_pc.txt to *_3d_pair_cluser.txt.
+See "data/config/README" for details on these settings.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Rename "-ssvar_mean" command line option as "-ens_mean", but still quietly
+ support "-ssvar_mean".
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Update output file conventions to match the logic of MODE:
+MODE
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Rename the "OBJ_ID" column to "OBJECT_ID".
+Replace the "area_thresh" and "inten_perc_thresh" config file options with
+ the more generic "filter_attr_name" and "filter_attr_thresh" options.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Rename the "CLUSTER_ID" column to "OBJECT_CAT".
+Add "aspect_diff" and "curvature_ratio" as new inputs to the fuzzy logic
+ engine and add corresponding columns to the output file.
+ 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Change object naming conventions for "OBJECT_ID" and "OBJECT_CAT":
+Series-Analysis
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-FROM: F_#, O_#, F_#_O_#, CF_#, CO_#, and CF_#_CF_#
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-TO: F###, O###, F###_O###, CF###, CO###, and CF###_CO###
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Where ### is a 3-digit object number with leading 0's.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Indicate unmatched objects with a 3-digit "000" object number.
+Add debug messages to inform the user about missing data.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Only write pair information to *_pair_cluster.txt for matches.
+STAT-Analysis
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Aggregate the ECNT line type and derive it from input ORANK lines.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+STAT-Analysis and TC-STAT
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add "-column_union" job command option to summarize values across multiple
+ columns.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Update computation of MSVE statistic in the VCNT line type to be done using
+ partial sums rather than matched pair values.
+ This enables it to be computed from VL1L2 lines in STAT-Analysis.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Scripting
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add a sample Rscript (scripts/Rscripts/plot_ensemble.R) for plotting ensemble
+ line types.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Update pntnc2ascii.R Rscript to handle obs_var variable.
 \end_layout
 
 \end_deeper
@@ -622,16 +816,15 @@ Complete Agreement
  understandings regarding such subject matter.
  No amendment to or modification of this Agreement will be binding unless
  in writing and signed by UCAR.
- 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 9.
  
 \series bold
-Notices and Additional Terms
+Notices and Additional Terms.
+
 \series default
-.
  Copyright in Software is held by UCAR.
  You must include, with each copy of the Software and associated documentation,
  a copy of this Agreement and the following notice:
@@ -646,7 +839,7 @@ Notices and Additional Terms
 The source of this material is the Research Applications Laboratory at the
  National Center for Atmospheric Research, a program of the University Corporati
 on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
- the National Science Foundation; ©2007-2017 University Corporation for
+ the National Science Foundation; ©2007-2018 University Corporation for
  Atmospheric Research.
  All Rights Reserved." 
 \begin_inset Newline newline
@@ -706,22 +899,22 @@ The citation for this User's Guide should be:
 \end_layout
 
 \begin_layout Standard
-T.
- Fowler, J.
+J.
  Halley Gotway, K.
  Newman, T.
- Jensen, Brown, B., and R.
- Bullock, 2017:
+ Jensen, Brown, B., R.
+ Bullock, and T.
+ Fowler, 2018:
 \begin_inset Newline newline
 \end_inset
 
-The Model Evaluation Tools v7.0 (METv7.0) User’s Guide.
+The Model Evaluation Tools v8.0 (METv8.0) User’s Guide.
  Developmental Testbed Center.
 \begin_inset Newline newline
 \end_inset
 
 Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_v
-7.0.pdf.
+8.0.pdf.
  407 pp.
 \end_layout
 
