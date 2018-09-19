@@ -2300,8 +2300,8 @@ mysep
 \end_layout
 
 \begin_layout Standard
-The difference in the lengths (speeds) of the average forecast and average
- observed wind vectors.
+SPEED_ERR is the difference in the lengths (speeds) of the average forecast
+ and average observed wind vectors.
  (See the discussion of VDIFF_SPEED above.)
 \end_layout
 
@@ -2559,10 +2559,6 @@ mysep
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
