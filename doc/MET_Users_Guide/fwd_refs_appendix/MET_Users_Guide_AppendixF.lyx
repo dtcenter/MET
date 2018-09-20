@@ -449,8 +449,11 @@ met_data
 \family default
 .
  When one of the MET tools runs the python script, it will look for an Xarray
- object named met_data, and will retrieve the data and metadata from the
- 
+ object named 
+\family typewriter
+met_data
+\family default
+, and will retrieve the data and metadata from the 
 \family typewriter
 values
 \family default
@@ -463,7 +466,7 @@ attrs
 \family typewriter
 attrs
 \family default
- dictionary is loaded in the same way as for the NumPy interface.
+ dictionary is populated in the same way as for the NumPy interface.
  The 
 \family typewriter
 values
