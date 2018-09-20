@@ -599,6 +599,18 @@ input_file
 .
 \end_layout
 
+\begin_layout Itemize
+For 
+\begin_inset Quotes eld
+\end_inset
+
+shape
+\begin_inset Quotes erd
+\end_inset
+
+ masking, specify an ESRI shapefile (.shp).
+\end_layout
+
 \end_deeper
 \begin_layout Description
 
@@ -1183,38 +1195,10 @@ shape
 \series medium
 ) masking uses a closed polygon taken from an ESRI shapefile to define the
  masking region.
- Currently, only the main (
-\series default
-\emph on
-i.e.
-\series medium
-\emph default
-, file suffix 
-\begin_inset Quotes eld
-\end_inset
-
-.shp
-\begin_inset Quotes erd
-\end_inset
-
-) shapefiles are supported as inputs to gen_vx_mask.
- Support for other types of shapefile (index file, suffix 
-\begin_inset Quotes eld
-\end_inset
-
-.shx
-\begin_inset Quotes erd
-\end_inset
-
-, and dBASE file, suffix 
-\begin_inset Quotes eld
-\end_inset
-
-.dbf
-\begin_inset Quotes erd
-\end_inset
-
-) will be available in the next general release of MET.
+ Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the
+ latitude and longitudes of the vertices.
+ The other types of shapefiles (index file, suffix “.shx”, and dBASE file,
+ suffix “.dbf”) are not currently used.
  The shapefile must consist of closed polygons rather than polylines, points,
  or any of the other data types that shapefiles support.
  Shapefiles usually contain more than one polygon, and the 
