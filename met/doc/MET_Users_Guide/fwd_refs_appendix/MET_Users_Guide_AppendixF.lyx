@@ -103,11 +103,12 @@ As of release 8.0, a degree of Python embedding has been made available in
 \begin_layout Standard
 In order to use this feature, the user's local Python installation must
  have the C-language Python header files and libraries.
- Sometimes these are deleted at the end of the installation process, leaving
- only the binary executable and any run-time shared object files needed,
- but they must be present in order to use the MET Python embedding.
- Assuming the requisite Python files are present, and that the MET Python
- embedding is enabled when building MET (which is done by passing the 
+ Sometimes when Python is installed locally, these header files and libraries
+ are deleted at the end of the installation process, leaving only the binary
+ executable and any run-time shared object files needed, but they must be
+ present in order to use the MET Python embedding.
+ Assuming the requisite Python files are present, and that Python embedding
+ is enabled when building MET (which is done by passing the 
 \family typewriter
 --enable-python
 \family default
@@ -116,7 +117,7 @@ In order to use this feature, the user's local Python installation must
 configure
 \family default
  command line), the MET C++ code will use these in the compilation process
- and link to the Python libraries.
+ to link directly to the Python libraries.
 \end_layout
 
 \begin_layout Standard
@@ -132,15 +133,16 @@ MET_PYTHON_CC
 \family typewriter
 MET_PYTHON_LD
 \family default
- must be set prior to compiling MET.
- These are used on the compiler command line to enable the compiler to find
- the requisite Python header files and libraries.
+ must be set prior to compiling MET when Python embedding is used.
+ These variables are used on the compiler command line to enable the compiler
+ to find the requisite Python header files and libraries in the user's local
+ filesystem.
  Fortunately, Python provides a way to set these variables properly, freeing
- the user from having to have expert knowledge of the compiling and linking
- process.
+ the user from the necessity of having any expert knowledge of the compiling
+ and linking process.
  Along with the 
 \family typewriter
-python
+Python
 \family default
  executable, there should be another executable called 
 \family typewriter
@@ -221,6 +223,302 @@ vskip 0.1in
 \begin_layout Standard
 We now turn our attention to the details of how to write Python scripts
  in order that the MET tools may extract 2D gridded data fields from them.
+ Currently, MET offers two ways to interact with Python scripts: by using
+ NumPy arrays or by using Xarray objects.
+ The user specifies on the command line (more on this later) which interface
+ is to be used in the Python script.
+ The user's scripts can use any Python libraries that are supported by the
+ local Python installation, or any personal or institutional libraries or
+ code that is desired in order to implement the Python script, but at the
+ end of the script, the data must have been loaded into either a NumPy array
+ or an Xarray object.
+ This offers advantages when using data file formats that MET does not directly
+ support: If there is Python code to read the data format, the the user
+ can use those tools to read the data, and then copy the data into a NumPy
+ array or an Xarray object.
+ MET can then ingest the data via the Python script.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Using NumPy
+\series default
+.
+ The data must be loaded into a 2D NumPy array named 
+\family typewriter
+met_data
+\family default
+.
+ In addition there must be a Python dictionary named 
+\family typewriter
+attrs
+\family default
+ which contains metadata such as timestamps, grid projection and other informati
+on.
+ Here is an example 
+\family typewriter
+attrs
+\family default
+ dictionary:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+attrs = {
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   'valid': '20050807_120000',
+\end_layout
+
+\begin_layout Plain Layout
+
+   'init':  '20050807_000000',
+\end_layout
+
+\begin_layout Plain Layout
+
+   'lead':   120000,
+\end_layout
+
+\begin_layout Plain Layout
+
+   'accum': '120000',
+\end_layout
+
+\begin_layout Plain Layout
+
+   'name': 'Foo',
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   'grid': {
+\end_layout
+
+\begin_layout Plain Layout
+
+      'type': 'Lambert Conformal',
+\end_layout
+
+\begin_layout Plain Layout
+
+      'hemisphere': 'N',
+\end_layout
+
+\begin_layout Plain Layout
+
+      'name': 'FooGrid',
+\end_layout
+
+\begin_layout Plain Layout
+
+      'scale_lat_1': 25.0,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'scale_lat_2': 25.0,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'lat_pin': 12.19,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'lon_pin': -135.459,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'x_pin': 0.0,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'y_pin': 0.0,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'lon_orient': -95.0,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'd_km': 40.635,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'r_km': 6371.2,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'nx': 185,
+\end_layout
+
+\begin_layout Plain Layout
+
+      'ny': 129,
+\end_layout
+
+\begin_layout Plain Layout
+
+   }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Valid time, intitialization time, lead time and accumulation time (if any)
+ are indicated by strings and/or numbers.
+ Lead and accumulation times are given in HHMMSS format.
+ Also included is a 
+\family typewriter
+name
+\family default
+ for the data field.
+ The rest of the 
+\family typewriter
+attrs
+\family default
+ dictionary gives the grid size and projection information in the same format
+ as in the netCDF files written out by the MET tools.
+ Note that the 
+\family typewriter
+grid
+\family default
+ entry in the 
+\family typewriter
+attrs
+\family default
+ dictionary is itself a dictionary.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Using Xarray Objects
+\series default
+.
+ For Xarray objects, things are very similar to the NumPy case.
+ An Xarray object has a NumpyArray called 
+\family typewriter
+values
+\family default
+, and an attributes dictionary called 
+\family typewriter
+attrs
+\family default
+.
+ The user must name the Xarray object to be 
+\family typewriter
+met_data
+\family default
+.
+ When one of the MET tools runs the python script, it will look for an Xarray
+ object named met_data, and will retrieve the data and metadata from the
+ 
+\family typewriter
+values
+\family default
+ and 
+\family typewriter
+attrs
+\family default
+ parts, respectively, of the Xarray object.
+ The Xarray 
+\family typewriter
+attrs
+\family default
+ dictionary is loaded in the same way as for the NumPy interface.
+ The 
+\family typewriter
+values
+\family default
+ Numpy array part of the Xarray object is also populated in the same way
+ as the NumPy case.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip 0.1in
+\backslash
+centerline{
+\backslash
+hbox to 3.0in{
+\backslash
+hrulefill}}
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It remains to discuss command lines and config files.
+ On the command line for any of the MET tools which will be obtaining its
+ data from a Python script rather than directly from a data file, the user
+ should specify either PYHON_NUMPY or PTHON_XARRAY wherever a (forecast
+ or obs) data file name would normally be given.
+ Then in the 
+\family typewriter
+name
+\family default
+ entry of the config file dictionaries for the forecast or observed data,
+ the user should give the file name of the Python script to be run.
+ (Note that for tools like MODE that take two data files, it would be entirely
+ possible to use the Numpy interface for one file and the Xarry interface
+ for the other.) The only exception to this is the 
+\family typewriter
+plot_data_plane
+\family default
+ tool, where the 
+\family typewriter
+name
+\family default
+ is specified on the command line rather than in a config file.
 \end_layout
 
 \end_body
