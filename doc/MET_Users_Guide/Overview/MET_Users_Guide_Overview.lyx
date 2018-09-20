@@ -455,7 +455,7 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 
 \series medium
 The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
- Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble Stat tools.
+ Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble-Stat tools.
  The PB2NC tool is used to create NetCDF files from input PrepBufr files
  containing point observations.
  Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII
@@ -479,8 +479,8 @@ The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
  time interval than is included in their forecast or observational dataset.
  The Ensemble-Stat tool will combine many forecasts into an ensemble mean
  or probability forecast.
- Additionally, if observations are included ensemble rank histogram and
- probability integral transform information is produced.
+ Additionally, if observations are included, ensemble verification statistics
+ are produced.
  
 \series bold
 
@@ -494,7 +494,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename ../Flowchart/MET_flowchart_v7.0.png
+	filename /d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Flowchart/MET_flowchart_v8.0.png
 	scale 60
 
 \end_inset
@@ -509,8 +509,11 @@ status open
 
 \begin_layout Plain Layout
 Basic representation of current MET structure and modules.
- Colored areas represent software and modules included in MET, and gray
- areas represent input and output files.
+ Gray areas represent input and output files.
+ Dark green areas represent reformating and pre-processing tools.
+ Light green areas represent plotting utilities.
+ Blue areas represent statistical tools.
+ Yellow areas represent aggregation and analysis tools.
 \end_layout
 
 \end_inset
@@ -535,14 +538,14 @@ name "Fig_Overview_MET_Overview_Flowchart"
 \series medium
 Several optional plotting utilities are provided to assist users in checking
  their output from the data preprocessing step.
- Plot point obs will create a postscript plot showing the locations of point
+ Plot-Point-Obs creates a postscript plot showing the locations of point
  observations.
  This can be quite useful for assessing whether the latitude and longitude
  of observation stations was specified correctly.
- Plot data plane produces a similar plot for gridded data.
- For users of the MODE object based verification methods, the plot_mode_field
+ Plot-Data-Plane produces a similar plot for gridded data.
+ For users of the MODE object based verification methods, the Plot-MODE-Field
  utility will create graphics of the MODE object output.
- Finally, WWMCA plot produces a plot of the raw WWMCA data file.
+ Finally, WWMCA-Plot produces a plot of the raw WWMCA data file.
  
 \end_layout
 
