@@ -1222,6 +1222,34 @@ The following environment variables should also be set:
 \end_layout
 
 \begin_layout Standard
+- If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD
+ to specify the compiler (-I) and linker (-L) flags required for python.
+ Set $MET_PYTHON_CC for the directory containing the "Python.h" header file.
+ Set $MET_PYTHON_LD for the directory containing the python library file
+ and indicate the name of that file.
+ For example:
+\end_layout
+
+\begin_layout Standard
+MET_PYTHON_CC='-I/usr/include/python2.7'
+\end_layout
+
+\begin_layout Standard
+MET_PYTHON_LD='-L/usr/lib/python2.7/config-x86_64-linux-gnu -lpython2.7'
+\end_layout
+
+\begin_layout Standard
+For more information about Python support in MET, please refer to 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_F_Python_Embedding"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 - If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the
@@ -1279,7 +1307,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 
 \series medium
 1.
- ./configure --prefix=`pwd` --enable-grib2 --enable-modis 
+ ./configure --prefix=`pwd` --enable-grib2 --enable-python 
 \backslash
 
 \end_layout
@@ -1287,7 +1315,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 \begin_layout LyX-Code
 
 \series medium
-               --enable-mode_graphics --enable-lidar2nc
+               --enable-modis --enable-mode_graphics --enable-lidar2nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -1316,7 +1344,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 \series medium
 If all tools are enabled and the build is successful, the "<prefix>/bin"
  directory (where <prefix> is the prefix you specified on your configure
- command line) will contain 27 executables:
+ command line) will contain 31 executables:
 \end_layout
 
 \begin_layout LyX-Code
@@ -1341,6 +1369,18 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 
 \series medium
 - grid_stat
+\end_layout
+
+\begin_layout LyX-Code
+- gis_dump_dbf
+\end_layout
+
+\begin_layout LyX-Code
+- gis_dump_shp
+\end_layout
+
+\begin_layout LyX-Code
+- gis_dump_shx
 \end_layout
 
 \begin_layout LyX-Code
@@ -1529,7 +1569,19 @@ By default, MET will install all the files in "/usr/local/bin".
 \begin_layout Standard
 
 \series medium
-Enable compilation of utilities using GRIB2
+Enable compilation of utilities using GRIB2.
+ Requires $MET_GRIB2C.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+--enable-python
+\end_layout
+
+\begin_layout Standard
+Enable compilation of python interface.
+ Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
 \end_layout
 
 \begin_layout Standard
@@ -1614,7 +1666,8 @@ Disable compilation of grid_stat
 \begin_layout Standard
 
 \series medium
-Enable compilation of lidar2nc
+Enable compilation of lidar2nc.
+ Requires $MET_HDF.
 \end_layout
 
 \begin_layout Standard
@@ -1806,7 +1859,8 @@ Disable compilation of wwmca
 \begin_layout Standard
 
 \series medium
-Enable compilation of modis
+Enable compilation of modis.
+ Requires $MET_HDF and $MET_HDFEOS.
 \end_layout
 
 \begin_layout Standard
@@ -1818,7 +1872,8 @@ Enable compilation of modis
 \begin_layout Standard
 
 \series medium
-Enable compilation of mode_graphics
+Enable compilation of mode_graphics.
+ Requires $MET_CARIO, $MET_FREETYPE, $MET_FONT_DIR.
 \end_layout
 
 \begin_layout Standard

@@ -322,7 +322,7 @@ PB2NC
  This tool stratifies the observations as requested in a configuration file
  and writes out the remaining observations in a NetCDF format.
  The NetCDF output of the PB2NC tool is used as input to the verification
- step performed in the Point-Stat tool.
+ step performed in the Point-Stat or Ensemble-Stat tools.
 \end_layout
 
 \begin_layout Standard
