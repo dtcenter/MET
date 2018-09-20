@@ -19,7 +19,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char data_attr_name  [] = "data";
+// static const char data_attr_name  [] = "data";
+static const char  data_attr_name  [] = "values";
 static const char attrs_attr_name [] = "attrs";
 
 
