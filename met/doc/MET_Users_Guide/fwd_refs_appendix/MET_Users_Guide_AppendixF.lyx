@@ -509,7 +509,7 @@ name
  entry of the config file dictionaries for the forecast or observed data,
  the user should give the file name of the Python script to be run.
  (Note that for tools like MODE that take two data files, it would be entirely
- possible to use the Numpy interface for one file and the Xarry interface
+ possible to use the Numpy interface for one file and the Xarray interface
  for the other.) The only exception to this is the 
 \family typewriter
 plot_data_plane
