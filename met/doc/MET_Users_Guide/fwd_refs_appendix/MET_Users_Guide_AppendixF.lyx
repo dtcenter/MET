@@ -500,7 +500,7 @@ vskip 0.1in
 It remains to discuss command lines and config files.
  On the command line for any of the MET tools which will be obtaining its
  data from a Python script rather than directly from a data file, the user
- should specify either PYHON_NUMPY or PTHON_XARRAY wherever a (forecast
+ should specify either PYTHON_NUMPY or PYTHON_XARRAY wherever a (forecast
  or obs) data file name would normally be given.
  Then in the 
 \family typewriter
