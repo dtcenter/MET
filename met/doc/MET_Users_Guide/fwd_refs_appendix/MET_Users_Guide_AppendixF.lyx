@@ -87,26 +87,25 @@ name "chap:App_F_Python_Embedding"
 \end_layout
 
 \begin_layout Standard
-As of release 8.0, a degree of Python embedding has been made available in
- MET.
+As of release 8.0, MET incluodes the ability to embed Python to a limited
+ degree.
  Users may use Python scripts and whatever associated Python packages they
  wish in order to prepare 2D gridded data fields for reading by the MET
  tools.
  We fully expect that this degree of embedding will increase in the future.
- In addition, plans are in place in upcoming releases, to extend Python
- with MET, so that the user may invoke MET tools directly from their Python
- script.
- Currently only Python 2.x is supported, but users should be aware that this
- will soon be changing to Python 3.
+ In addition, plans are in place to extend Python with MET in upcoming realeases
+, allowing users to invoke MET tools directly from their Python script.
+ Currently MET only embedding of Python 2.x is supported, but users should
+ be aware that this will soon be changing to Python 3.
 \end_layout
 
 \begin_layout Standard
-In order to use this feature, the user's local Python installation must
+In order to use Python embedding, the user's local Python installation must
  have the C-language Python header files and libraries.
  Sometimes when Python is installed locally, these header files and libraries
  are deleted at the end of the installation process, leaving only the binary
- executable and any run-time shared object files needed, but they must be
- present in order to use the MET Python embedding.
+ executable and any run-time shared object files needed, but these files
+ must be present in order to use the MET Python embedding.
  Assuming the requisite Python files are present, and that Python embedding
  is enabled when building MET (which is done by passing the 
 \family typewriter
@@ -134,12 +133,12 @@ MET_PYTHON_CC
 MET_PYTHON_LD
 \family default
  must be set prior to compiling MET when Python embedding is used.
- These variables are used on the compiler command line to enable the compiler
- to find the requisite Python header files and libraries in the user's local
- filesystem.
- Fortunately, Python provides a way to set these variables properly, freeing
- the user from the necessity of having any expert knowledge of the compiling
- and linking process.
+ These constants are used on the compiler command line when building MET
+ to enable the compiler to find the requisite Python header files and libraries
+ in the user's local filesystem.
+ Fortunately, Python provides a way to set these variables properly.
+ This frees the user from the necessity of having any expert knowledge of
+ the compiling and linking process.
  Along with the 
 \family typewriter
 Python
@@ -164,7 +163,8 @@ python-config --cflags
 \begin_inset Quotes erd
 \end_inset
 
-, and set the value of 
+.
+ Set the value of 
 \family typewriter
 MET_PYTHON_CC 
 \family default
@@ -184,7 +184,8 @@ python-config --ldflags
 \begin_inset Quotes erd
 \end_inset
 
-, and set the value of 
+.
+ Set the value of 
 \family typewriter
 MET_PYTHON_LD 
 \family default
@@ -192,8 +193,8 @@ to the output of that command.
 \end_layout
 
 \begin_layout Standard
-Make sure these environment variables are set and in effect before building
- MET.
+Make sure that these environment variables are set and in effect before
+ building MET.
 \end_layout
 
 \begin_layout Standard
@@ -221,17 +222,17 @@ vskip 0.1in
 \end_layout
 
 \begin_layout Standard
-We now turn our attention to the details of how to write Python scripts
- in order that the MET tools may extract 2D gridded data fields from them.
+We now describe how to write Python scripts so that the MET tools may extract
+ 2D gridded data fields from them.
  Currently, MET offers two ways to interact with Python scripts: by using
  NumPy arrays or by using Xarray objects.
- The user specifies on the command line (more on this later) which interface
- is to be used in the Python script.
+ The interface to be used (NumPy or Xarray) is specified on the command
+ line (more on this later).
  The user's scripts can use any Python libraries that are supported by the
  local Python installation, or any personal or institutional libraries or
- code that is desired in order to implement the Python script, but at the
- end of the script, the data must have been loaded into either a NumPy array
- or an Xarray object.
+ code that are desired in order to implement the Python script, so long
+ as at the data has been loaded into either a NumPy array or an Xarray object
+ by the end of the script.
  This offers advantages when using data file formats that MET does not directly
  support: If there is Python code to read the data format, the the user
  can use those tools to read the data, and then copy the data into a NumPy
@@ -402,10 +403,10 @@ attrs = {
 \end_layout
 
 \begin_layout Standard
-Valid time, intitialization time, lead time and accumulation time (if any)
- are indicated by strings and/or numbers.
- Lead and accumulation times are given in HHMMSS format.
- Also included is a 
+IN the dictionary, valid time, intitialization time, lead time and accumulation
+ time (if any) must be indicated by strings and/or numbers.
+ Lead and accumulation times must be given in HHMMSS format.
+ The dictionary must also included 
 \family typewriter
 name
 \family default
@@ -415,7 +416,7 @@ name
 attrs
 \family default
  dictionary gives the grid size and projection information in the same format
- as in the netCDF files written out by the MET tools.
+ that is used in the netCDF files written out by the MET tools.
  Note that the 
 \family typewriter
 grid
@@ -433,7 +434,7 @@ attrs
 Using Xarray Objects
 \series default
 .
- For Xarray objects, things are very similar to the NumPy case.
+ To use Xarray objects, a similar procecure to the NumPy case is followed.
  An Xarray object has a NumpyArray called 
 \family typewriter
 values
@@ -448,7 +449,7 @@ attrs
 met_data
 \family default
 .
- When one of the MET tools runs the python script, it will look for an Xarray
+ When one of the MET tools runs the Python script, it will look for an Xarray
  object named 
 \family typewriter
 met_data
