@@ -89,8 +89,8 @@ name "chap:App_G-Vectors-and-Vector-Statistics"
 \begin_layout Standard
 In this appendix, we discuss some basic properties of vectors, concentrating
  on the two-dimensional case.
- To make things simple, we'll assume we're using a Cartesian coordinate
- system.
+ To keep the discussion simple, we will assume we are using a Cartesian
+ coordinate system.
  
 \begin_inset ERT
 status open
@@ -121,9 +121,9 @@ Traditionally, vectors have been defined as quantities having both magnitude
  one end of the segment.
  Computers (and, in the author's experience, people) are usually more comfortabl
 e working with numbers, and so instead of the usual graphical definition
- of a vector, we'll take the definition used in analytic geometry: A (two-dimens
-ional) vector is an ordered pair of numbers.
- We'll use boldface type to denote vectors, and so we can write 
+ of a vector, we will take the definition used in analytic geometry: A (two-dime
+nsional) vector is an ordered pair of numbers.
+ We will use boldface type to denote vectors, and so we can write 
 \begin_inset Formula 
 \[
 \vec{v}=(a,b)
@@ -555,8 +555,8 @@ vec{v}
 
 \begin_layout Standard
 Since vectors are characterized by magnitude (norm) and direction, this
- gives two ways to compare vectors: we can compare their magnitudes or their
- directions.
+ gives two ways to compare vectors: we can compare either their magnitudes
+ or their directions.
  If 
 \begin_inset ERT
 status open
@@ -628,8 +628,9 @@ right|$
 
 .
  It's not always made clear in verification studies which of these is meant,
- and in general they will be different, although by making use of the triangle
- inequality it can be shown that there is a relation between them.
+ and in general these two quantities will be different.
+ However, by making use of the triangle inequality it can be shown that
+ there is a relation between them.
  To derive this, let 
 \begin_inset ERT
 status open
@@ -1021,9 +1022,9 @@ hrulefill}}
 \end_layout
 
 \begin_layout Standard
-Now let's specialize this discussion of vectors to verification of wind
+Now let us specialize this discussion of vectors to verification of wind
  vector data.
- We'll denote the forecast wind vector by 
+ We will denote the forecast wind vector by 
 \begin_inset ERT
 status open
 
@@ -1072,7 +1073,7 @@ $v$
 
 \end_inset
 
- components like so:
+ components as follows:
 \begin_inset Formula 
 \[
 \vecf=(\uf,\vf)\hbox to1.0in{\hfill and\hfill}\veco=(\uo,\vo)
@@ -1084,7 +1085,7 @@ $v$
 \end_layout
 
 \begin_layout Standard
-We'll assume that we have 
+We will assume that we have 
 \begin_inset ERT
 status open
 
@@ -1283,7 +1284,7 @@ $$
 \end_layout
 
 \begin_layout Standard
-It'll be convenient to denote the average forecast and observed wind vectors
+It will be convenient to denote the average forecast and observed wind vectors
  by 
 \begin_inset ERT
 status open
@@ -1370,7 +1371,8 @@ $$
 \end_layout
 
 \begin_layout Standard
-Now let's look at the definitions of the vector statistics produced by MET:
+Now let us look at the definitions of the vector statistics produced by
+ MET:
 \end_layout
 
 \begin_layout Standard
@@ -1595,8 +1597,9 @@ mysep
 \end_layout
 
 \begin_layout Standard
-These are the mean squared (and root mean squared) lengths of the vector
- difference between the forecast and observed wind vectors.
+MSVE and RMSVE are, respectively, the mean squared, and root mean squared,
+ lengths of the vector difference between the forecast and observed wind
+ vectors.
 \end_layout
 
 \begin_layout Standard
@@ -1818,7 +1821,7 @@ mysep
 \end_layout
 
 \begin_layout Standard
-Direction (angle) of 
+FDIR and ODIR are the direction (angle) of 
 \begin_inset ERT
 status open
 
