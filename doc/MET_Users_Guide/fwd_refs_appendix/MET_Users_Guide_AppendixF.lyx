@@ -238,6 +238,8 @@ We now describe how to write Python scripts so that the MET tools may extract
  can use those tools to read the data, and then copy the data into a NumPy
  array or an Xarray object.
  MET can then ingest the data via the Python script.
+ Note that whether a NumPy array or an Xarray object is used, the data should
+ be stored as double precision floating point numbers.
 \end_layout
 
 \begin_layout Standard
