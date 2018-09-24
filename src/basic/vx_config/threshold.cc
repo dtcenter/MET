@@ -543,10 +543,28 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
 {
 
+   //  return true when both null and false when only one is null
+
+if ( !node && !(st.node) )  return ( true );
+
 if ( !node || !(st.node) )  return ( false );
 
-return ( node->type() == st.node->type() &&
-         is_eq(node->value(), st.node->value()) );
+   //  for complex thresholds, check the string representation
+
+if (    node->type() == thresh_complex ||
+     st.node->type() == thresh_complex )  {
+
+   return ( get_str() == st.get_str() );
+
+}
+
+   //  for simple thresholds, check the type and value
+
+else  {
+
+   return ( node->type() == st.node->type() &&
+            is_eq(node->value(), st.node->value()) );
+}
 
 }
 
