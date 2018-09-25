@@ -102,10 +102,10 @@ name "sec:Purpose-and-organization"
 
 \series medium
 The goal of this User's Guide is to provide basic information for users
- of the Model Evaluation Tools (MET) to enable users to apply MET to their
+ of the Model Evaluation Tools (MET) to enable them to apply MET to their
  datasets and evaluation studies.
- MET has been specifically designed for application to the Weather Research
- and Forecasting (WRF) model (see 
+ MET was originally designed for application to the post-processed output
+ of the Weather Research and Forecasting (WRF) model (see 
 \begin_inset Flex URL
 status open
 
@@ -407,6 +407,21 @@ The MET package has been designed to be modular and adaptable.
  and user interfaces.
  Currently, the MET package is a set of tools that can easily be applied
  by any user on their own computer platform.
+ A suite of Python scripts for low-level automation of verification workflows
+ and plotting has been developed to assist users with setting up their MET-based
+ verification.
+ It is called METplus and may be obtained at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/NCAR/METplus
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -494,7 +509,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename /d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Flowchart/MET_flowchart_v8.0.png
+	filename C:/d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Flowchart/MET_flowchart_v8.0.png
 	scale 60
 
 \end_inset
