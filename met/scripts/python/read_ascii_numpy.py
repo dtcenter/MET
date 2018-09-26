@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 import numpy as np
 import os
@@ -15,12 +16,12 @@ if len(sys.argv) == 3:
     input_file = os.path.expandvars(sys.argv[1])
     data_name  = sys.argv[2]
     try:
-        print("Input File: ", input_file)
-        print("Data Name : ", data_name)
-        met_data = np.loadtxt(input_file)
         # Print some output to verify that this script ran
-        print met_data.shape
-        print met_data.dtype
+        print("Input File: " + repr(input_file))
+        print("Data Name : " + repr(data_name))
+        met_data = np.loadtxt(input_file)
+        print("Data Shape: " + repr(met_data.shape))
+        print("Data Type:  " + repr(met_data.dtype))
     except NameError:
         print("Can't find the input file")
 else:
@@ -46,8 +47,6 @@ attrs = {
    'units':     'None',
 
    'grid': {
-
-
       'type': 'Lambert Conformal',
       'hemisphere': 'N',
 
@@ -69,10 +68,8 @@ attrs = {
 
       'nx': 185,
       'ny': 129,
-
-
    }
 
 }
 
-print attrs
+print("Attributes: " + repr(attrs))
