@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -18,10 +17,9 @@
 
 
   <test name="wavelet_stat_GRIB1_NAM_STAGE4">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <exec>&MET_BIN;/wavelet_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GRIB1_NAM_STAGE4</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \

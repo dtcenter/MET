@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
+  <!ENTITY MET_SCRIPTS    "${MET_BUILD_BASE}/scripts">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}/met_test_scripts">
@@ -25,9 +27,9 @@
   <!--                                                                  -->
 
   <test name="test_all_gen_vx_mask_1">
-    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <exec>&MET_BIN;/gen_vx_mask</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/CONUS.poly \
       &OUTPUT_DIR;/gen_vx_mask/CONUS_poly.nc \
       -v 2
@@ -38,9 +40,9 @@
   </test>
 
   <test name="test_all_gen_vx_mask_2">
-    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <exec>&MET_BIN;/gen_vx_mask</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
       &OUTPUT_DIR;/gen_vx_mask/CONUS_circles.nc \
       -type circle -thresh le150 -v 2
@@ -55,11 +57,11 @@
   <!--                                                                  -->
 
   <test name="test_all_pcp_combine_1">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       20050807_000000 3 20050807_120000 12 \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
-      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+      -pcpdir &MET_DATA;/sample_fcst/2005080700
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc</grid_nc>
@@ -67,11 +69,11 @@
   </test>
 
   <test name="test_all_pcp_combine_2">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       20050807_000000 3 20050808_000000 12 \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc \
-      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+      -pcpdir &MET_DATA;/sample_fcst/2005080700
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc</grid_nc>
@@ -79,11 +81,11 @@
   </test>
 
   <test name="test_all_pcp_combine_3">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       20050807_000000 3 20050807_240000 24 \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_24L_2005080800V_24A.nc \
-      -pcpdir &MET_DIR;/data/sample_fcst/2005080700
+      -pcpdir &MET_DATA;/sample_fcst/2005080700
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_fcst_24L_2005080800V_24A.nc</grid_nc>
@@ -91,11 +93,11 @@
   </test>
 
   <test name="test_all_pcp_combine_4">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       00000000_000000 1 20050807_120000 12 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080712V_12A.nc \
-      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+      -pcpdir &MET_DATA;/sample_obs/ST2ml
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_obs_2005080712V_12A.nc</grid_nc>
@@ -103,11 +105,11 @@
   </test>
 
   <test name="test_all_pcp_combine_5">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       00000000_000000 1 20050808_000000 12 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_12A.nc \
-      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+      -pcpdir &MET_DATA;/sample_obs/ST2ml
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_12A.nc</grid_nc>
@@ -115,11 +117,11 @@
   </test>
 
   <test name="test_all_pcp_combine_6">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       00000000_000000 1 20050808_000000 24 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_24A.nc \
-      -pcpdir &MET_DIR;/data/sample_obs/ST2ml
+      -pcpdir &MET_DATA;/sample_obs/ST2ml
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_24A.nc</grid_nc>
@@ -131,11 +133,11 @@
   <!--                                                                  -->
 
   <test name="test_all_mode_1">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <param> \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080712V_12A.nc \
-      &MET_DIR;/scripts/config/MODEConfig_APCP_12 \
+      &MET_SCRIPTS;/config/MODEConfig_APCP_12 \
       -outdir &OUTPUT_DIR;/mode \
       -v 2
     </param>
@@ -148,11 +150,11 @@
   </test>
 
   <test name="test_all_mode_2">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_24A.nc \
-      &MET_DIR;/scripts/config/MODEConfig_APCP_24 \
+      &MET_SCRIPTS;/config/MODEConfig_APCP_24 \
       -outdir &OUTPUT_DIR;/mode \
       -v 2
     </param>
@@ -165,11 +167,11 @@
   </test>
 
   <test name="test_all_mode_3">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-      &MET_DIR;/data/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
-      &MET_DIR;/scripts/config/MODEConfig_RH \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
+      &MET_SCRIPTS;/config/MODEConfig_RH \
       -outdir &OUTPUT_DIR;/mode \
       -v 2
     </param>
@@ -186,14 +188,14 @@
   <!--                                                                  -->
 
   <test name="test_all_grid_stat_1">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>TEST_OUT_DIR</name> <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080712V_12A.nc \
-      &MET_DIR;/scripts/config/GridStatConfig_APCP_12 \
+      &MET_SCRIPTS;/config/GridStatConfig_APCP_12 \
       -outdir &OUTPUT_DIR;/grid_stat \
       -v 2
     </param>
@@ -212,11 +214,11 @@
   </test>
 
   <test name="test_all_grid_stat_2">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080312/pop5km_2005080312F096.grib_G212 \
+      &MET_DATA;/sample_fcst/2005080312/pop5km_2005080312F096.grib_G212 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_12A.nc \
-      &MET_DIR;/scripts/config/GridStatConfig_POP_12 \
+      &MET_SCRIPTS;/config/GridStatConfig_POP_12 \
       -outdir &OUTPUT_DIR;/grid_stat \
       -v 2
     </param>
@@ -231,14 +233,14 @@
   </test>
 
   <test name="test_all_grid_stat_3">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>TEST_OUT_DIR</name> <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_24A.nc \
-      &MET_DIR;/scripts/config/GridStatConfig_APCP_24 \
+      &MET_SCRIPTS;/config/GridStatConfig_APCP_24 \
       -outdir &OUTPUT_DIR;/grid_stat \
       -v 2
     </param>
@@ -259,14 +261,14 @@
   </test>
 
   <test name="test_all_grid_stat_4">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>TEST_OUT_DIR</name> <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
-      &MET_DIR;/data/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
-      &MET_DIR;/scripts/config/GridStatConfig_all \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
+      &MET_SCRIPTS;/config/GridStatConfig_all \
       -outdir &OUTPUT_DIR;/grid_stat \
       -v 2
     </param>
@@ -290,11 +292,11 @@
   <!--                                                                  -->
 
   <test name="test_all_pb2nc">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <param> \
-      &MET_DIR;/data/sample_obs/prepbufr/ndas.t00z.prepbufr.tm12.20070401.nr \
+      &MET_DATA;/sample_obs/prepbufr/ndas.t00z.prepbufr.tm12.20070401.nr \
       &OUTPUT_DIR;/pb2nc/sample_pb.nc \
-      &MET_DIR;/scripts/config/PB2NCConfig_G212 \
+      &MET_SCRIPTS;/config/PB2NCConfig_G212 \
       -v 2
     </param>
     <output>
@@ -307,7 +309,7 @@
   <!--                                                                  -->
 
   <test name="test_all_plot_point_obs">
-    <exec>&MET_DIR;/bin/plot_point_obs</exec>
+    <exec>&MET_BIN;/plot_point_obs</exec>
     <param> \
       &OUTPUT_DIR;/pb2nc/sample_pb.nc \
       &OUTPUT_DIR;/plot_point_obs/sample_pb.ps
@@ -322,9 +324,9 @@
   <!--                                                                  -->
 
   <test name="test_all_ascii2nc_1">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      &MET_DIR;/data/sample_obs/ascii/sample_ascii_obs.txt \
+      &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt \
       &OUTPUT_DIR;/ascii2nc/sample_ascii.nc \
       -v 2
     </param>
@@ -334,9 +336,9 @@
   </test>
 
   <test name="test_all_ascii2nc_2">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      &MET_DIR;/data/sample_obs/ascii/precip24_2010010112.ascii \
+      &MET_DATA;/sample_obs/ascii/precip24_2010010112.ascii \
       &OUTPUT_DIR;/ascii2nc/precip24_2010010112.nc \
       -v 2
     </param>
@@ -350,9 +352,9 @@
   <!--                                                                  -->
 
   <test name="test_all_madis2nc">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
-      &MET_DIR;/data/sample_obs/madis/metar/metar_2012040912_F000.nc \
+      &MET_DATA;/sample_obs/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
       -type metar -rec_beg 2000 -rec_end 6000 -v 2
     </param>
@@ -366,11 +368,11 @@
   <!--                                                                  -->
 
   <test name="test_all_point_stat">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
+      &MET_DATA;/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
       &OUTPUT_DIR;/pb2nc/sample_pb.nc \
-      &MET_DIR;/scripts/config/PointStatConfig \
+      &MET_SCRIPTS;/config/PointStatConfig \
       -outdir &OUTPUT_DIR;/point_stat \
       -v 2
     </param>
@@ -391,11 +393,11 @@
   <!--                                                                  -->
 
   <test name="test_all_wavelet_stat_1">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <exec>&MET_BIN;/wavelet_stat</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080712V_12A.nc \
-      &MET_DIR;/scripts/config/WaveletStatConfig_APCP_12 \
+      &MET_SCRIPTS;/config/WaveletStatConfig_APCP_12 \
       -outdir &OUTPUT_DIR;/wavelet_stat \
       -v 2
     </param>
@@ -408,11 +410,11 @@
   </test>
 
   <test name="test_all_wavelet_stat_2">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <exec>&MET_BIN;/wavelet_stat</exec>
     <param> \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080800V_12A.nc \
       &OUTPUT_DIR;/pcp_combine/sample_obs_2005080800V_12A.nc \
-      &MET_DIR;/scripts/config/WaveletStatConfig_APCP_12_NC \
+      &MET_SCRIPTS;/config/WaveletStatConfig_APCP_12_NC \
       -outdir &OUTPUT_DIR;/wavelet_stat \
       -v 2
     </param>
@@ -429,12 +431,12 @@
   <!--                                                                  -->
 
   <test name="test_all_ensemble_stat">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <param> \
       6 \
-      &MET_DIR;/data/sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
-      &MET_DIR;/scripts/config/EnsembleStatConfig \
-      -grid_obs &MET_DIR;/data/sample_obs/ST4/ST4.2010010112.24h \
+      &MET_DATA;/sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
+      &MET_SCRIPTS;/config/EnsembleStatConfig \
+      -grid_obs &MET_DATA;/sample_obs/ST4/ST4.2010010112.24h \
       -point_obs &OUTPUT_DIR;/ascii2nc/precip24_2010010112.nc \
       -outdir &OUTPUT_DIR;/ensemble_stat \
       -v 2
@@ -455,12 +457,12 @@
   <!--                                                                  -->
 
   <test name="test_all_stat_analysis">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <env>
       <pair><name>TEST_OUT_DIR</name> <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
-      -config &MET_DIR;/scripts/config/STATAnalysisConfig \
+      -config &MET_SCRIPTS;/config/STATAnalysisConfig \
       -lookin &OUTPUT_DIR;/grid_stat \
       -lookin &OUTPUT_DIR;/wavelet_stat \
       -lookin &OUTPUT_DIR;/ensemble_stat \
@@ -490,12 +492,12 @@
   <!--                                                                  -->
 
   <test name="test_all_mode_analysis_1">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
       -summary \
       -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 -fcst \
-      -config &MET_DIR;/scripts/config/MODEAnalysisConfig \
+      -config &MET_SCRIPTS;/config/MODEAnalysisConfig \
       -dump_row &OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_fcst.txt \
       -out &OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_fcst.out \
       -v 2
@@ -507,12 +509,12 @@
   </test>
 
   <test name="test_all_mode_analysis_2">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
       -summary \
       -column AREA -column LENGTH -column WIDTH -column CURVATURE -column INTENSITY_50 -obs \
-      -config &MET_DIR;/scripts/config/MODEAnalysisConfig \
+      -config &MET_SCRIPTS;/config/MODEAnalysisConfig \
       -dump_row &OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_obs.txt \
       -out &OUTPUT_DIR;/mode_analysis/job_summary_APCP_12_simple_obs.out \
       -v 2
@@ -524,7 +526,7 @@
   </test>
 
   <test name="test_all_mode_analysis_3">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_120000L_20050807_120000V_120000A_obj.txt \
       -lookin &OUTPUT_DIR;/mode/mode_240000L_20050808_000000V_240000A_obj.txt \
@@ -544,9 +546,9 @@
   <!--                                                                  -->
 
   <test name="test_all_plot_data_plane_1">
-    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
-      &MET_DIR;/data/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
+      &MET_DATA;/sample_fcst/2007033000/nam.t00z.awip1236.tm00.20070330.grb \
       &OUTPUT_DIR;/plot_data_plane/nam.t00z.awip1236.tm00.20070330_TMPZ2.ps \
       'name="TMP"; level="Z2";' \
       -title "GRIB1 NAM Z2 TMP" \
@@ -558,7 +560,7 @@
   </test>
 
   <test name="test_all_plot_data_plane_2">
-    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       &OUTPUT_DIR;/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
       &OUTPUT_DIR;/plot_data_plane/sample_fcst_12L_2005080712V_12A_APCP12_NC_MET.ps \

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
 
   <!-- Depends on unit_pb2nc.xml -->
   <test name="climatology_POINT_STAT_GFS_2.5DEG">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_2.5DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
@@ -43,7 +42,7 @@
   </test>
 
   <test name="climatology_POINT_STAT_GFS_1.0DEG">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
@@ -67,7 +66,7 @@
   </test>
 
   <test name="climatology_POINT_STAT_GFS_MATCH_MONTH_FALSE">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_MATCH_MONTH_FALSE</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309</value></pair>
@@ -91,7 +90,7 @@
   </test>
 
   <test name="climatology_POINT_STAT_WMO_1.5DEG">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name> <value>WMO_CLIMO_1.5DEG</value></pair>
       <pair><name>CLIMO_DIR</name>     <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
@@ -112,7 +111,7 @@
   </test>
 
   <test name="climatology_GRID_STAT_WMO_1.5DEG">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name> <value>WMO_CLIMO_1.5DEG</value></pair>
       <pair><name>CLIMO_DIR</name>     <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
@@ -130,7 +129,7 @@
   </test>
 
   <test name="climatology_POINT_STAT_PROB_GFS_1.0DEG">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
@@ -155,7 +154,7 @@
   </test>
 
   <test name="climatology_GRID_STAT_PROB_GFS_1.0DEG">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>

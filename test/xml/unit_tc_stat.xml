@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -18,7 +17,7 @@
 
 
   <test name="tc_stat_ALAL2010">
-    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <exec>&MET_BIN;/tc_stat</exec>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
       -config &CONFIG_DIR;/TCStatConfig_ALAL2010 \
@@ -35,7 +34,7 @@
   </test>
 
   <test name="tc_stat_PROBRIRW">
-    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <exec>&MET_BIN;/tc_stat</exec>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs/alal2015_PROBRIRW.tcst \
       -config &CONFIG_DIR;/TCStatConfig_PROBRIRW \
@@ -51,7 +50,7 @@
   </test>
 
   <test name="tc_stat_LEAD_REQ">
-    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <exec>&MET_BIN;/tc_stat</exec>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs/alal2010_LEAD_REQ.tcst \
       -out &OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_stat.out \
@@ -66,7 +65,7 @@
   </test>
 
   <test name="tc_stat_FALSE_ALARMS">
-    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <exec>&MET_BIN;/tc_stat</exec>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
       -job filter -lead 24 -column_thresh BLAT ==-9999 \

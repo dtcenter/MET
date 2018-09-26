@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -20,7 +19,7 @@
 
   <!-- Test -set_hdr option with conventional obs -->
   <test name="gsid2mpr_CONV">
-    <exec>&MET_DIR;/bin/gsid2mpr</exec>
+    <exec>&MET_BIN;/gsid2mpr</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
       -set_hdr MODEL GSI_MEM001 \
@@ -34,7 +33,7 @@
 
   <!-- Test -no_check_dup option -->
   <test name="gsid2mpr_DUP">
-    <exec>&MET_DIR;/bin/gsid2mpr</exec>
+    <exec>&MET_BIN;/gsid2mpr</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
       -set_hdr MODEL GSI_MEM001 \
@@ -48,7 +47,7 @@
 
   <!-- Test multiple input files and -suffix option with radiance obs -->
   <test name="gsid2mpr_RAD">
-    <exec>&MET_DIR;/bin/gsid2mpr</exec>
+    <exec>&MET_BIN;/gsid2mpr</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem001 \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem002 \
@@ -64,7 +63,7 @@
 
   <!-- Test conventional obs with no ensemble mean provided -->
   <test name="gsidens2orank_CONV_NO_MEAN">
-    <exec>&MET_DIR;/bin/gsidens2orank</exec>
+    <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -out &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_no_mean_orank.txt \
@@ -77,7 +76,7 @@
 
   <!-- Same test as above with ensemble mean provided -->
   <test name="gsidens2orank_CONV_ENS_MEAN">
-    <exec>&MET_DIR;/bin/gsidens2orank</exec>
+    <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.ensmean \
@@ -91,7 +90,7 @@
 
   <!-- Test radiance obs with all channels -->
   <test name="gsidens2orank_RAD">
-    <exec>&MET_DIR;/bin/gsidens2orank</exec>
+    <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
       -out &OUTPUT_DIR;/gsidens2orank/diag_amsua_n18_ges_all_channels_orank.txt \
@@ -104,7 +103,7 @@
 
   <!-- Test radiance obs with select channels -->
   <test name="gsidens2orank_RAD_CHANNEL">
-    <exec>&MET_DIR;/bin/gsidens2orank</exec>
+    <exec>&MET_BIN;/gsidens2orank</exec>
     <param> \
       &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.mem* \
       -ens_mean &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_amsua_n18_ges.ensmean \
@@ -119,7 +118,7 @@
 
   <!-- Run stat_analysis on gsi2mpr output -->
   <test name="stat_analysis_MPR_TO_CNT">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001.stat \
       -job aggregate_stat -line_type MPR -out_line_type CNT -by fcst_var \
@@ -134,7 +133,7 @@
 
   <!-- Run stat_analysis on gsidens2orank output -->
   <test name="stat_analysis_ORANK_TO_RHIST">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -job aggregate_stat -line_type ORANK -out_line_type RHIST -by fcst_var \
@@ -149,7 +148,7 @@
 
   <!-- Run stat_analysis on gsidens2orank output -->
   <test name="stat_analysis_ORANK_TO_SSVAR">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/gsidens2orank/diag_conv_ges_ens_mean_orank.txt \
       -job aggregate_stat -line_type ORANK -out_line_type SSVAR -by fcst_var \

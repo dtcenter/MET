@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -21,7 +21,7 @@
   <!--                                                                  -->
 
   <test name="gen_vx_mask">
-    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <exec>&MET_BIN;/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 \
       &MET_BASE;/poly/CONUS.poly \
@@ -38,7 +38,7 @@
   <!--                                                                  -->
 
   <test name="pb2nc_ndas_lead_0">-->
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
    </env>
@@ -56,7 +56,7 @@
  </test>
 
   <test name="pb2nc_ndas_lead_12">-->
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
    </env>
@@ -74,7 +74,7 @@
  </test>
 
   <test name="pb2nc_ndas_lead_24">-->
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
    </env>
@@ -92,7 +92,7 @@
  </test>
 
   <test name="pb2nc_ndas_lead_36">-->
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
    </env>
@@ -110,7 +110,7 @@
  </test>
 
   <test name="pb2nc_ndas_lead_48">-->
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>MASK_POLY</name> <value>&CONFIG_DIR;/ref_config/RefConfig.poly</value></pair>
    </env>
@@ -133,7 +133,7 @@
   <!--                                                                                           -->
 
   <test name="pcp_combine_ST2ml_3hr_09_12">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -sum \
       00000000_000000 1 20110902_120000 3 \
@@ -146,7 +146,7 @@
   </test>
 
   <test name="pcp_combine_ST2ml_3hr_21_24">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -sum \
       00000000_000000 1 20110903_000000 3 \
@@ -160,7 +160,7 @@
   </test>
 
   <test name="pcp_combine_ST2ml_3hr_33_36">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
      <param> \
       -sum \
       00000000_000000 1 20110903_120000 3 \
@@ -173,7 +173,7 @@
  </test>
 
   <test name="pcp_combine_ST2ml_3hr_45_48">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -sum \
       00000000_000000 1 20110904_000000 3 \
@@ -187,7 +187,7 @@
   </test>
 
   <test name="pcp_combine_ST2ml_24hr_12_36">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_OBS;/ref_config/pcp_combine/2011090324/ST2ml2011090312.24h.grb \
@@ -200,7 +200,7 @@
   </test>
 
   <test name="pcp_combine_wrf_3hr_09_12">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 12 \
@@ -213,7 +213,7 @@
   </test>
 
   <test name="pcp_combine_wrf_3hr_21_24">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_024.tm00 24 \
@@ -226,7 +226,7 @@
   </test>
 
   <test name="pcp_combine_wrf_3hr_33_36">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_036.tm00 36 \
@@ -239,7 +239,7 @@
   </test>
 
   <test name="pcp_combine_wrf_3hr_45_48">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_048.tm00 48  \
@@ -252,7 +252,7 @@
   </test>
 
   <test name="pcp_combine_wrf_24hr_12_36">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_036.tm00 36 \
@@ -270,7 +270,7 @@
   <!--                                                                   -->
 
   <test name="point_stat_lead_00_upper_air_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -289,7 +289,7 @@
  </test>
 
   <test name="point_stat_lead_00_surface_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -308,7 +308,7 @@
  </test>
 
   <test name="point_stat_lead_00_winds_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -327,7 +327,7 @@
  </test>
 
   <test name="point_stat_lead_12_upper_air_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -346,7 +346,7 @@
  </test>
 
   <test name="point_stat_lead_12_surface_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -365,7 +365,7 @@
  </test>
 
   <test name="point_stat_lead_12_winds_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -384,7 +384,7 @@
  </test>
 
   <test name="point_stat_lead_24_upper_air_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -403,7 +403,7 @@
  </test>
 
   <test name="point_stat_lead_24_surface_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -422,7 +422,7 @@
  </test>
 
   <test name="point_stat_lead_24_winds_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -441,7 +441,7 @@
  </test>
 
   <test name="point_stat_lead_36_upper_air_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -460,7 +460,7 @@
  </test>
 
   <test name="point_stat_lead_36_surface_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -479,7 +479,7 @@
  </test>
 
   <test name="point_stat_lead_36_winds_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -498,7 +498,7 @@
  </test>
 
   <test name="point_stat_lead_48_upper_air_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -517,7 +517,7 @@
  </test>
 
   <test name="point_stat_lead_48_surface_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -536,7 +536,7 @@
  </test>
 
   <test name="point_stat_lead_48_winds_AFWAv3.4_Noahv2.7.1">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv2.7.1</value></pair>
@@ -555,7 +555,7 @@
  </test>
 
   <test name="point_stat_lead_00_upper_air_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -574,7 +574,7 @@
  </test>
 
   <test name="point_stat_lead_00_surface_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -593,7 +593,7 @@
  </test>
 
   <test name="point_stat_lead_00_winds_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -612,7 +612,7 @@
  </test>
 
   <test name="point_stat_lead_12_upper_air_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -631,7 +631,7 @@
  </test>
 
   <test name="point_stat_lead_12_surface_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -650,7 +650,7 @@
  </test>
 
   <test name="point_stat_lead_12_winds_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -669,7 +669,7 @@
  </test>
 
   <test name="point_stat_lead_24_upper_air_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -688,7 +688,7 @@
  </test>
 
   <test name="point_stat_lead_24_surface_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -707,7 +707,7 @@
  </test>
 
   <test name="point_stat_lead_24_winds_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -726,7 +726,7 @@
  </test>
 
   <test name="point_stat_lead_36_upper_air_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -745,7 +745,7 @@
  </test>
 
   <test name="point_stat_lead_36_surface_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -764,7 +764,7 @@
  </test>
 
   <test name="point_stat_lead_36_winds_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -783,7 +783,7 @@
  </test>
 
   <test name="point_stat_lead_48_upper_air_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -802,7 +802,7 @@
  </test>
 
   <test name="point_stat_lead_48_surface_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -821,7 +821,7 @@
  </test>
 
   <test name="point_stat_lead_48_winds_AFWAv3.4_Noahv3.3">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -844,7 +844,7 @@
   <!--                                                                  -->
 
   <test name="grid_stat_3hr_accum_time_12">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -862,7 +862,7 @@
   </test>
 
   <test name="grid_stat_3hr_accum_time_24">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -880,7 +880,7 @@
   </test>
 
   <test name="grid_stat_3hr_accum_time_36">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -898,7 +898,7 @@
   </test>
 
   <test name="grid_stat_3hr_accum_time_48">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -916,7 +916,7 @@
   </test>
 
   <test name="grid_stat_24hr_accum_time_36">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>MASK_POLY_FILE</name> <value>&OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc</value></pair>
       <pair><name>MODEL</name>          <value>AFWAv3.4_Noahv3.3</value></pair>
@@ -938,7 +938,7 @@
   <!--                                                                  -->
 
   <test name="stat_analysis_GO_Index">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ref_config/point_stat/AFWAv3.4_Noahv3.3/ \
       -lookin &OUTPUT_DIR;/ref_config/point_stat/AFWAv3.4_Noahv2.7.1/ \

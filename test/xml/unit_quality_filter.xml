@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -22,7 +21,7 @@
   <!--                                                                 -->
 
   <test name="point_stat_QTY_PB_ON">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_QUALITY_SFC</name>  <value>"8"</value></pair>
       <pair><name>OBS_QUALITY_UPA</name>  <value>"2"</value></pair>
@@ -46,7 +45,7 @@
   </test>
   
   <test name="point_stat_QTY_PB_OFF">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_QUALITY_SFC</name>  <value></value></pair>
       <pair><name>OBS_QUALITY_UPA</name>  <value></value></pair>
@@ -70,7 +69,7 @@
   </test>
   
   <test name="ensemble_stat_QTY_MADIS_VGS">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>OBS_QUALITY</name>    <value>"V", "G", "S"</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>QTY_MADIS_VGS</value></pair>

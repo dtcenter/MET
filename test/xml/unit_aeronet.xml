@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -21,7 +20,7 @@
   <!--                                    -->
 
   <test name="ascii2nc_AERONET_daily">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>VLD_FREQ</name>   <value>0</value></pair>
       <pair><name>VLD_THRESH</name> <value>0.0</value></pair>
@@ -39,7 +38,7 @@
   </test>
 
   <test name="ascii2nc_AERONET_vld_thresh">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>VLD_FREQ</name>   <value>300</value></pair>
       <pair><name>VLD_THRESH</name> <value>0.5</value></pair>
@@ -57,7 +56,7 @@
   </test>
 
   <test name="ascii2nc_AERONET_monthly">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>VLD_FREQ</name>   <value>0</value></pair>
       <pair><name>VLD_THRESH</name> <value>0.0</value></pair>
@@ -79,7 +78,7 @@
   <!--                                    -->
 
   <test name="point_stat_GRIB2_f18_NGAC_AERONET_daily">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_f18_NGAC_AERONET_daily</value></pair>
     </env>
@@ -95,7 +94,7 @@
   </test>
 
   <test name="point_stat_GRIB2_f18_NGAC_AERONET_monthly">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_f18_NGAC_AERONET_monthly</value></pair>
     </env>
@@ -111,7 +110,7 @@
   </test>
 
   <test name="point_stat_GRIB2_f21_NGAC_AERONET_daily">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_f21_NGAC_AERONET_daily</value></pair>
     </env>
@@ -127,7 +126,7 @@
   </test>
 
   <test name="point_stat_GRIB2_f21_NGAC_AERONET_monthly">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_f21_NGAC_AERONET_monthly</value></pair>
     </env>

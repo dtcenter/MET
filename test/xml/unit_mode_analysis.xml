@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
   <!--  depends on unit_mode.xml  -->
 
   <test name="mode_analysis_BYCASE_SIMPLE">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -simple \
@@ -32,7 +31,7 @@
   </test>
 
   <test name="mode_analysis_BYCASE_CLUSTER">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt \
       -bycase -single -cluster \
@@ -45,7 +44,7 @@
   </test>
 
   <test name="mode_analysis_MET-644_LOOKIN_BY_DIR">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode \
       -bycase -single -simple \
@@ -58,7 +57,7 @@
   </test>
 
   <test name="mode_analysis_MET-644_LOOKIN_BY_FILE">
-    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <exec>&MET_BIN;/mode_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.txt \
       -bycase -single -simple \

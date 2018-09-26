@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="mode_graphics_PLOT_FCST_RAW">
-    <exec>&MET_DIR;/bin/plot_mode_field</exec>
+    <exec>&MET_BIN;/plot_mode_field</exec>
     <param> \
       -raw \
       -fcst \
@@ -32,7 +31,7 @@
   </test>
 
   <test name="mode_graphics_PLOT_FCST_SIMPLE_OBJ">
-    <exec>&MET_DIR;/bin/plot_mode_field</exec>
+    <exec>&MET_BIN;/plot_mode_field</exec>
     <param> \
       -simple \
       -fcst \
@@ -45,7 +44,7 @@
   </test>
 
   <test name="mode_graphics_PLOT_FCST_COMPOSITE_OBJ">
-    <exec>&MET_DIR;/bin/plot_mode_field</exec>
+    <exec>&MET_BIN;/plot_mode_field</exec>
     <param> \
       -cluster \
       -fcst \
@@ -58,7 +57,7 @@
   </test>
 
   <test name="mode_graphics_PLOT_MULTIPLE">
-    <exec>&MET_DIR;/bin/plot_mode_field</exec>
+    <exec>&MET_BIN;/plot_mode_field</exec>
     <param> \
       -simple \
       -obs \

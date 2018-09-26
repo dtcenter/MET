@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -17,7 +17,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="pcp_combine_GRIB1_SUBTRACT">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F030.grib 30 \
@@ -30,7 +30,7 @@
   </test>
 
   <test name="mode_NO_MATCH_MERGE">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>MERGE_FLAG</name>     <value>NONE</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>NONE</value></pair>
@@ -54,7 +54,7 @@
   </test>
 
   <test name="mode_NO_MERGE">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>MERGE_FLAG</name>     <value>NONE</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>NO_MERGE</value></pair>
@@ -78,7 +78,7 @@
   </test>
 
   <test name="mode_MERGE_BOTH">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>MERGE_FLAG</name>     <value>BOTH</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
@@ -102,7 +102,7 @@
   </test>
 
   <test name="mode_MASK_POLY">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>MERGE_FLAG</name>     <value>THRESH</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
@@ -126,7 +126,7 @@
   </test>
 
  <test name="mode_CUT_LINE">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>CUT_LINE</value></pair>
     </env>
@@ -145,7 +145,7 @@
   </test>
 
   <test name="mode_QUILT">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>QUILT</value></pair>
     </env>
@@ -181,7 +181,7 @@
   </test>
 
   <test name="mode_CONFIG_MERGE">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>MERGE_FLAG</name>     <value>ENGINE</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>

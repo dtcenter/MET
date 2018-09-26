@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -18,7 +17,7 @@
   <!--                                    -->
 
   <test name="point_stat_GRIB1_NAM_GDAS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -48,7 +47,7 @@
   </test>
 
   <test name="point_stat_GRIB1_NAM_GDAS_WINDS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -68,7 +67,7 @@
   </test>
 
   <test name="point_stat_GRIB1_NAM_GDAS_MASK_SID">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -97,7 +96,7 @@
   </test>
 
   <test name="point_stat_GRIB2_NAM_NDAS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -126,7 +125,7 @@
   </test>
 
   <test name="point_stat_GRIB2_SREF_GDAS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -153,7 +152,7 @@
   </test>
 
   <test name="point_stat_GRIB1_NAM_TRMM">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>           <value>-1800</value></pair>
       <pair><name>END_DS</name>           <value>1800</value></pair>
@@ -179,7 +178,7 @@
   </test>
 
   <test name="point_stat_GRIB2_SREF_TRMM">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>           <value>-1800</value></pair>
       <pair><name>END_DS</name>           <value>1800</value></pair>
@@ -205,7 +204,7 @@
   </test>
 
   <test name="point_stat_NCMET_NAM_HMTGAGE">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>           <value>-1800</value></pair>
       <pair><name>END_DS</name>           <value>1800</value></pair>
@@ -237,7 +236,7 @@
   </test>
 
   <test name="point_stat_NCPINT_TRMM">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>           <value>-1800</value></pair>
       <pair><name>END_DS</name>           <value>150000000</value></pair>
@@ -269,7 +268,7 @@
   </test>
 
   <test name="point_stat_NCPINT_NDAS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>           <value>-1800</value></pair>
       <pair><name>END_DS</name>           <value>150000000</value></pair>
@@ -292,7 +291,7 @@
   </test>
 
   <test name="point_stat_GRIB2_SREF_TRMM_prob">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_SREF_TRMM_prob</value></pair>
     </env>
@@ -312,7 +311,7 @@
   </test>
 
   <test name="point_stat_GTG_lc">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-5400</value></pair>
       <pair><name>END_DS</name>         <value>5400</value></pair>
@@ -335,7 +334,7 @@
   </test>
 
   <test name="point_stat_GTG_latlon">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-5400</value></pair>
       <pair><name>END_DS</name>         <value>5400</value></pair>
@@ -358,7 +357,7 @@
   </test>
 
   <test name="point_stat_SID_EXC">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -380,7 +379,7 @@
   </test>
 
   <test name="point_stat_SID_EXC_CENSOR">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
@@ -402,7 +401,7 @@
   </test>
 
   <test name="point_stat_GRIB1_NAM_GDAS_INTERP_OPTS">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_INTERP_OPTS</value></pair>
       <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
@@ -419,7 +418,7 @@
   </test>
 
   <test name="point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_name">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_INTERP_OPTS_name</value></pair>
       <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>

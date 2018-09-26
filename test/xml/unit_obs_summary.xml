@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
   <exit_on_fail>false</exit_on_fail>
 
   <test name="ascii2nc_obs_summary">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
     &DATA_DIR_OBS;/ascii/obs_sum_test_qty.txt \
     &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
@@ -31,7 +30,7 @@
   </test>
   
   <test name="point_stat_OS_NONE">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>NONE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_NONE</value></pair>
@@ -50,7 +49,7 @@
   </test>
 
   <test name="point_stat_OS_NEAREST">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>NEAREST</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_NEAREST</value></pair>
@@ -69,7 +68,7 @@
   </test>
 
   <test name="point_stat_OS_MIN">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>MIN</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_MIN</value></pair>
@@ -88,7 +87,7 @@
   </test>
 
   <test name="point_stat_OS_MAX">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>MAX</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_MAX</value></pair>
@@ -107,7 +106,7 @@
   </test>
 
   <test name="point_stat_OS_UW_MEAN">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>UW_MEAN</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_UW_MEAN</value></pair>
@@ -126,7 +125,7 @@
   </test>
   
   <test name="point_stat_OS_DW_MEAN">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>DW_MEAN</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_DW_MEAN</value></pair>
@@ -145,7 +144,7 @@
   </test>
 
   <test name="point_stat_OS_MEDIAN">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>MEDIAN</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_MEDIAN</value></pair>
@@ -164,7 +163,7 @@
   </test>
 
   <test name="point_stat_OS_PERC">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OBS_SUMMARY</name> <value>PERC</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_PERC</value></pair>
@@ -183,7 +182,7 @@
   </test>
 
   <test name="point_stat_OS_UNIQUE_ALL">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>OS_UNIQUE_ALL</value></pair>
     </env>

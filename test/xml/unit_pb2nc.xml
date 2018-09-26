@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -17,7 +18,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="pb2nc_GDAS_mask_grid_G212">
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>STATION_ID</name>          <value></value></pair>
      <pair><name>MASK_GRID</name>           <value>G212</value></pair>
@@ -36,7 +37,7 @@
   </test>
 
   <test name="pb2nc_NDAS_mask_poly_conus">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value></value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
@@ -55,7 +56,7 @@
   </test>
   
   <test name="pb2nc_NDAS_mask_sid_list">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value>"72265","72274","72364","72426"</value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
@@ -74,7 +75,7 @@
   </test>
   
   <test name="pb2nc_NDAS_mask_sid_file">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value>"&CONFIG_DIR;/SID_CO.txt"</value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
@@ -93,10 +94,10 @@
   </test>
   
   <test name="pb2nc_NDAS_mask_grid_data_cfg">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value>&MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212</value></pair>
+      <pair><name>MASK_GRID</name>           <value>&MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212</value></pair>
       <pair><name>MASK_POLY</name>           <value></value></pair>
       <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
     </env>
@@ -112,7 +113,7 @@
   </test>
   
   <test name="pb2nc_NDAS_var_all">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value>"72364","72265","72274","72426","72489"</value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
@@ -131,7 +132,7 @@
   </test>
 
   <test name="pb2nc_vertical_level_500">
-   <exec>&MET_DIR;/bin/pb2nc</exec>
+   <exec>&MET_BIN;/pb2nc</exec>
    <env>
      <pair><name>STATION_ID</name>          <value>"SC-GSP","TX-HGX","KY-HPX"</value></pair>
      <pair><name>MASK_GRID</name>           <value></value></pair>
@@ -150,7 +151,7 @@
   </test>
   
   <test name="pb2nc_NDAS_summary">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value></value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>

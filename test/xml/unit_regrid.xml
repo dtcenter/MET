@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -17,7 +16,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="regrid_grid_stat_ST4_TO_HMT">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>ST4_TO_HMT</value></pair>
       <pair><name>TO_GRID</name>        <value>FCST</value></pair>
@@ -35,7 +34,7 @@
   </test>
 
   <test name="regrid_grid_stat_HMT_TO_ST4">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>HMT_TO_ST4</value></pair>
       <pair><name>TO_GRID</name>        <value>OBS</value></pair>
@@ -53,7 +52,7 @@
   </test>
 
   <test name="regrid_grid_stat_BOTH_TO_DTC165">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>BOTH_TO_DTC165</value></pair>
       <pair><name>TO_GRID</name>        <value>"DTC165"</value></pair>
@@ -71,7 +70,7 @@
   </test>
 
   <test name="regrid_grid_stat_BOTH_TO_NAM">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>BOTH_TO_NAM</value></pair>
       <pair><name>TO_GRID</name>        <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F000.grib"</value></pair>
@@ -89,7 +88,7 @@
   </test>
 
   <test name="regrid_grid_stat_BOTH_TO_HMT_D02">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>BOTH_TO_HMT_D02</value></pair>
       <pair><name>TO_GRID</name>        <value>"stereo 201 201 35.134 -125.603 -120.5 3.465 6371.20 60 N"</value></pair>
@@ -107,7 +106,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_NEAREST">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -126,7 +125,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_BILIN">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -145,7 +144,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_BUDGET">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -164,7 +163,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_MIN_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -183,7 +182,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_MAX_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -202,7 +201,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_UW_MEAN_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -221,7 +220,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_UW_MEAN_9">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -241,7 +240,7 @@
 
 
   <test name="regrid_data_plane_GFS_TO_HMT_DW_MEAN_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -260,7 +259,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_MEDIAN_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -279,7 +278,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_LS_FIT_3">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -298,7 +297,7 @@
   </test>
 
   <test name="regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
       &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
@@ -313,7 +312,7 @@
   </test>
 
   <test name="regrid_data_plane_GOES-16_AOD_TO_G212">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
       G212 \

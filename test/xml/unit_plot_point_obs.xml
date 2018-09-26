@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
   <!-- Depends on unit_pb2nc.xml -->
 
   <test name="plot_point_obs_G218">
-    <exec>&MET_DIR;/bin/plot_point_obs</exec>
+    <exec>&MET_BIN;/plot_point_obs</exec>
     <param> \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &OUTPUT_DIR;/plot_point_obs/ndas.20120409.t12z.prepbufr.tm00.nr_G218.ps \
@@ -33,7 +32,7 @@
   </test>
 
   <test name="plot_point_obs_TMP_ADPUPA">
-    <exec>&MET_DIR;/bin/plot_point_obs</exec>
+    <exec>&MET_BIN;/plot_point_obs</exec>
     <param> \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &OUTPUT_DIR;/plot_point_obs/gdas1.20120409.t12z.prepbufr_TMP_ADPUPA.ps \

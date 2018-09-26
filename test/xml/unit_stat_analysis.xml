@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -21,7 +20,7 @@
   <!--  jobs for wavelet_stat output  -->
 
   <test name="stat_analysis_AGG_RHIST">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate -line_type RHIST \
@@ -39,7 +38,7 @@
   </test>
 
   <test name="stat_analysis_AGG_PHIST">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate -line_type PHIST \
@@ -58,7 +57,7 @@
   </test>
 
   <test name="stat_analysis_AGG_RELP">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
       -job aggregate -line_type RELP -by FCST_VAR -vx_mask NWC,GRB \
@@ -76,7 +75,7 @@
   </test>
 
   <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type RHIST \
@@ -94,7 +93,7 @@
   </test>
 
   <test name="stat_analysis_AGG_STAT_ORANK_PHIST">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type PHIST \
@@ -112,7 +111,7 @@
   </test>
 
   <test name="stat_analysis_AGG_STAT_ORANK_RELP">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type RELP \
@@ -130,7 +129,7 @@
   </test>
 
   <test name="stat_analysis_AGG_STAT_ORANK_SSVAR">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type SSVAR \
@@ -148,7 +147,7 @@
   </test>
 
   <test name="stat_analysis_AGG_STAT_ORANK_ECNT">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V.stat \
       -job aggregate_stat -line_type ORANK -out_line_type ECNT \
@@ -166,7 +165,7 @@
   </test>
 
   <test name="stat_analysis_AGG_SSVAR">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
       -job aggregate -line_type SSVAR \
@@ -186,7 +185,7 @@
   <!--  jobs for ensemble_stat output  -->
 
   <test name="stat_analysis_AGG_ISC">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.stat \
       -job aggregate -line_type ISC \
@@ -209,7 +208,7 @@
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
     </env>
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_grid_stat \
@@ -235,7 +234,7 @@
       <pair><name>CONFIG_DIR</name> <value>&CONFIG_DIR;</value></pair>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
     </env>
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_point_stat \
@@ -258,7 +257,7 @@
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
     </env>
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &DATA_DIR_MODEL;/time_series_met_6.0/*.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_ramps \
@@ -274,7 +273,7 @@
   </test>
 
   <test name="stat_analysis_POINT_STAT_SUMMARY">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
       -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS,FCST-OBS,ABS(FCST-OBS)' \
@@ -287,7 +286,7 @@
   </test>
 
   <test name="stat_analysis_POINT_STAT_SUMMARY_UNION">
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
       -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS' -column_union true \

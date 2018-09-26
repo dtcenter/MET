@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -21,7 +20,7 @@
   <!--                                    -->
 
   <test name="pb2nc_AIRNOW">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <exec>&MET_BIN;/pb2nc</exec>
     <param> \
       &DATA_DIR_OBS;/bufr/prepda.2017081000 \
       &OUTPUT_DIR;/airnow/prepda.2017081000.nc \
@@ -38,7 +37,7 @@
   <!--                                    -->
 
   <test name="point_stat_GRIB2_AIRNOW">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <param> \
       &DATA_DIR_MODEL;/grib2/awip3d/AWIP3D36.tm00 \
       &OUTPUT_DIR;/airnow/prepda.2017081000.nc \

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -16,7 +15,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="mtd_basic">
-    <exec>&MET_DIR;/bin/mtd</exec>
+    <exec>&MET_BIN;/mtd</exec>
     <env>
        <pair><name>OUTPUT_PREFIX</name> <value>BASIC</value></pair>
     </env>
@@ -38,7 +37,7 @@
   </test>
 
   <test name="mtd_single">
-    <exec>&MET_DIR;/bin/mtd</exec>
+    <exec>&MET_BIN;/mtd</exec>
     <env>
        <pair><name>OUTPUT_PREFIX</name> <value>SINGLE</value></pair>
     </env>

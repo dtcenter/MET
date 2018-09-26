@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -18,7 +17,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="grid_stat_GRIB_lvl_typ_val">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB_lvl_typ_val</value></pair>
     </env>
@@ -35,7 +34,7 @@
   </test>
 
   <test name="grid_stat_GRIB2_NAM_RTMA">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_NAM_RTMA</value></pair>
     </env>
@@ -60,10 +59,9 @@
   </test>
 
   <test name="grid_stat_GRIB1_NAM_STAGE4">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GRIB1_NAM_STAGE4</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
@@ -84,10 +82,9 @@
   </test>
 
   <test name="grid_stat_GRIB1_NAM_STAGE4_CENSOR">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4_CENSOR</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GRIB1_NAM_STAGE4_CENSOR</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
@@ -102,10 +99,9 @@
   </test>
 
   <test name="grid_stat_GTG_lc">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GTG_lc</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GTG_lc</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130827.i12.f03.nc \
@@ -126,10 +122,9 @@
   </test>
 
   <test name="grid_stat_GTG_latlon">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GTG_latlon</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GTG_latlon</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
@@ -150,7 +145,7 @@
   </test>
 
   <test name="grid_stat_GRIB2_SREF_STAGE4_prob_as_scalar">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name> <value>GRIB2_SREF_STAGE4_prob_as_scalar</value></pair>
     </env>
@@ -170,11 +165,10 @@
        NetCDF output requested and test apply_mask true/false -->
 
   <test name="grid_stat_APPLY_MASK_TRUE">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>APPLY_MASK_TRUE</value></pair>
-      <pair><name>APPLY_MASK</name>      <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>APPLY_MASK_TRUE</value></pair>
+      <pair><name>APPLY_MASK</name>    <value>TRUE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
@@ -188,11 +182,10 @@
   </test>
 
   <test name="grid_stat_APPLY_MASK_FALSE">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>APPLY_MASK_FALSE</value></pair>
-      <pair><name>APPLY_MASK</name>      <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>APPLY_MASK_FALSE</value></pair>
+      <pair><name>APPLY_MASK</name>    <value>FALSE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
@@ -206,7 +199,7 @@
   </test>
 
   <test name="grid_stat_GFS_FOURIER">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
       <pair><name>OUTPUT_PREFIX</name> <value>GFS_FOURIER</value></pair>

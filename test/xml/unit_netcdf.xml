@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -23,7 +22,7 @@
   <exit_on_fail>true</exit_on_fail>
   
   <test name="ascii2nc_no_compression">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression_no_12040912_.nc \
@@ -35,7 +34,7 @@
   </test>
   
   <test name="ascii2nc_compression2_by_config">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       -config &CONFIG_DIR;/NetcdfConfig \
@@ -48,9 +47,9 @@
   </test>
   
   <test name="ascii2nc_compression3_by_env">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
-      <pair><name>MET_NC_COMPRESS</name>         <value>3</value></pair>
+      <pair><name>MET_NC_COMPRESS</name> <value>3</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
@@ -64,9 +63,9 @@
   </test>
   
   <test name="ascii2nc_compression4_by_argument">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
-      <pair><name>MET_NC_COMPRESS</name>         <value>3</value></pair>
+      <pair><name>MET_NC_COMPRESS</name> <value>3</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
@@ -80,11 +79,10 @@
   </test>
   
   <test name="365_days">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>no_leap</value></pair>
-      <pair><name>APPLY_MASK</name> <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>no_leap</value></pair>
+      <pair><name>APPLY_MASK</name>    <value>FALSE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/easm/base_series_spei12_annual_mean.nc \

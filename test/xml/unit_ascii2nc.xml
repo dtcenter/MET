@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -17,7 +17,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="ascii2nc_TRMM_3hr">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
@@ -29,7 +29,7 @@
   </test>
 
   <test name="ascii2nc_TRMM_12hr">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.22:30Z07Aug2012-10:30Z08Aug2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc \
@@ -41,7 +41,7 @@
   </test>
 
   <test name="ascii2nc_GAGE_24hr">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
       &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
@@ -53,7 +53,7 @@
   </test>
 
   <test name="ascii2nc_duplicates">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/dup_test_qty.txt \
       &OUTPUT_DIR;/ascii2nc/dup_test.nc \
@@ -65,7 +65,7 @@
   </test>
 
   <test name="ascii2nc_LITTLE_R">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/qc_out_2012-09-07_00:00:00.GRM_P+FCST \
       &OUTPUT_DIR;/ascii2nc/qc_out_2012-09-07_00:00:00.GRM_P+FCST.nc \
@@ -77,7 +77,7 @@
   </test>
 
   <test name="ascii2nc_SURFRAD">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/surfrad_tbl12136.txt \
       &DATA_DIR_OBS;/ascii/surfrad_tbl12137.txt \
@@ -91,7 +91,7 @@
   </test>
 
   <test name="ascii2nc_SURFRAD1">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
       &DATA_DIR_OBS;/surfrad/tbl12002.dat \
@@ -105,7 +105,7 @@
   </test>
 
   <test name="ascii2nc_SURFRAD_summary1">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>BEG_TS</name>   <value>000000</value></pair>
       <pair><name>END_TS</name>   <value>235959</value></pair>
@@ -126,7 +126,7 @@
   </test>
 
   <test name="ascii2nc_SURFRAD_summary2">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>BEG_TS</name>   <value>03</value></pair>
       <pair><name>END_TS</name>   <value>20</value></pair>
@@ -147,7 +147,7 @@
   </test>
 
   <test name="ascii2nc_SURFRAD_summary3">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>BEG_TS</name>   <value>17</value></pair>
       <pair><name>END_TS</name>   <value>03</value></pair>
@@ -170,7 +170,7 @@
   <!-- Test uncentered time interval -->
 
   <test name="ascii2nc_SURFRAD_summary4">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <env>
       <pair><name>BEG_TS</name>   <value>17</value></pair>
       <pair><name>END_TS</name>   <value>03</value></pair>
@@ -191,7 +191,7 @@
   </test>
 
   <test name="ascii2nc_insitu_turb">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
@@ -210,7 +210,7 @@
   </test>
 
   <test name="ascii2nc_insitu_turb_mask_sid">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
@@ -230,7 +230,7 @@
   </test>
 
   <test name="ascii2nc_insitu_turb_mask_grid_data">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
@@ -250,7 +250,7 @@
   </test>
 
   <test name="ascii2nc_insitu_turb_mask_named_grid">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
@@ -269,7 +269,7 @@
   </test>
 
   <test name="ascii2nc_MASK_GRID">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_grid_dtc165.nc \
@@ -282,7 +282,7 @@
   </test>
 
   <test name="ascii2nc_MASK_POLY">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_poly_lmv.nc \
@@ -295,7 +295,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_clear_pvwatts_one_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/clear_pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc \
@@ -307,7 +307,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_clear_pvwatts_five_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_five_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/clear_pvwatts_315510615_2006_pv_30MW_five_min_v3pt4.nc \
@@ -319,7 +319,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_clear_pvwatts_ten_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_ten_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/clear_pvwatts_315510615_2006_pv_30MW_ten_min_v3pt4.nc \
@@ -331,7 +331,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_clear_pvwatts_sixty_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/clear_pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/clear_pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc \
@@ -343,7 +343,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_HA_pvwatts_sixty_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/HA_pvwatts_315510615_2006_30MW_sixty_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/HA_pvwatts_315510615_2006_30MW_sixty_min_v3pt4.nc \
@@ -355,7 +355,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_pvwatts_one_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/pvwatts_315510615_2006_pv_30MW_one_min_v3pt4.nc \
@@ -367,7 +367,7 @@
   </test>
 
   <test name="ascii2nc_WWSIS_pvwatts_sixty_min">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/wwsis/pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.csv \
       &OUTPUT_DIR;/ascii2nc/pvwatts_315510615_2006_pv_30MW_sixty_min_v3pt4.nc \
@@ -379,7 +379,7 @@
   </test>
 
   <test name="ascii2nc_by_var_name">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/obs_test_name.txt \
       &OUTPUT_DIR;/ascii2nc/obs_test_name.nc \
@@ -391,7 +391,7 @@
   </test>
 
   <test name="ascii2nc_by_var_name_PB">
-    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/ascii/gdas1.20120409.t12z.prepbufr.name.txt \
       &OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc \

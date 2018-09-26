@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -21,7 +20,7 @@
   <!--                                    -->
 
   <test name="pcp_combine_sum_GRIB1">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       20120409_00 3 20120409_18 18 \
       &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc \
@@ -33,7 +32,7 @@
   </test>
 
   <test name="pcp_combine_sum_GRIB2">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       20120408_21 3 20120409_18 18 \
       &OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc \
@@ -49,7 +48,7 @@
   <!--                                    -->
 
   <test name="pcp_combine_add_GRIB1">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F009.grib 3 \
@@ -64,7 +63,7 @@
   </test>
 
   <test name="pcp_combine_add_GRIB2">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F009.grib2 3 \
@@ -79,7 +78,7 @@
   </test>
 
   <test name="pcp_combine_add_STAGEIV">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_OBS;/stage4/ST4.2012040906.06h 6 \
@@ -96,7 +95,7 @@
   <!--                                        -->
 
   <test name="pcp_combine_add_ACCUMS">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 12 \
@@ -114,7 +113,7 @@
   <!--                                    -->
 
   <test name="pcp_combine_sub_GRIB1">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F018.grib 6 \
@@ -127,7 +126,7 @@
   </test>
 
   <test name="pcp_combine_sub_GRIB2">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F003.grib2 12 \
@@ -140,7 +139,7 @@
   </test>
 
   <test name="pcp_combine_sub_NC_MET_06">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc 'name="APCP_18";level="(*,*)";' \
@@ -153,7 +152,7 @@
   </test>
 
   <test name="pcp_combine_sub_P_INTERP">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV 'name="RAINNC";level="(0,*,*)";' \
@@ -170,7 +169,7 @@
   <!--  using -name option                -->
 
   <test name="pcp_combine_add_VARNAME">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -add \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib 12 \
@@ -187,7 +186,7 @@
   <!--                                             -->
 
   <test name="pcp_combine_sub_DIFFERENT_INIT">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F000.grib \
@@ -206,7 +205,7 @@
   <!--                                              -->
 
   <test name="pcp_combine_sub_NEGATIVE_ACCUM">
-    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F018.grib 18 \

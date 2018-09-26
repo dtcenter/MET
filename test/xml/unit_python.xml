@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +19,7 @@
 
   <!-- Invokes Python script that reads in NUMPY text data -->
   <test name="python_numpy_plot_data_plane">
-    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter.ps \
@@ -34,7 +34,7 @@
   </test>
 
   <test name="python_numpy_mode_mixed">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>OBS_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
@@ -53,7 +53,7 @@
   </test>
 
   <test name="python_numpy_mode">
-    <exec>&MET_DIR;/bin/mode</exec>
+    <exec>&MET_BIN;/mode</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
@@ -73,7 +73,7 @@
   </test>
 
   <test name="python_numpy_grid_stat_mixed">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
@@ -90,7 +90,7 @@
   </test>
 
   <test name="python_numpy_grid_stat">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
@@ -107,7 +107,7 @@
   </test>
 
   <test name="python_numpy_point_stat">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
     </env>
@@ -124,7 +124,7 @@
   </test>
 
   <test name="python_numpy_wavelet_stat">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <exec>&MET_BIN;/wavelet_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
@@ -144,7 +144,7 @@
   </test>
 
   <test name="python_numpy_wavelet_stat_mixed">
-    <exec>&MET_DIR;/bin/wavelet_stat</exec>
+    <exec>&MET_BIN;/wavelet_stat</exec>
     <env>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
     </env>
@@ -163,7 +163,7 @@
   </test>
 
   <test name="python_numpy_regrid_data_plane">
-    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       PYTHON_NUMPY \
       G130 \

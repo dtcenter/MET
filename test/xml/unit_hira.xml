@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -17,7 +16,7 @@
   <!--  point_stat                        -->
   <!--                                    -->
   <test name="point_stat_NCMET_NAM_HMTGAGE_HIRA">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name> <value>NCMET_NAM_HMTGAGE_HIRA</value></pair>
     </env>
@@ -45,11 +44,11 @@
   <!--                                    -->
 
   <test name="stat_analysis_CONFIG_HIRA">
-    <exec>&MET_DIR;/bin/point_stat</exec>
+    <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/hira</value></pair>
     </env>
-    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
       -lookin &OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_APCP_HIRA \

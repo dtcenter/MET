@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -19,7 +18,7 @@
     <env>
       <pair><name>LEAD_REQ</name> <value></value></pair>
     </env>
-    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <exec>&MET_BIN;/tc_pairs</exec>
     <param> \
       -adeck &DATA_DIR;/adeck/*2010.dat \
       -bdeck &DATA_DIR;/bdeck/*2010.dat \
@@ -34,7 +33,7 @@
   </test>
 
   <test name="tc_pairs_INTERP12_FILL">
-    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <exec>&MET_BIN;/tc_pairs</exec>
     <env>
       <pair><name>INTERP12</name> <value>FILL</value></pair>
     </env>
@@ -52,7 +51,7 @@
   </test>
 
   <test name="tc_pairs_INTERP12_REPLACE">
-    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <exec>&MET_BIN;/tc_pairs</exec>
     <env>
       <pair><name>INTERP12</name> <value>REPLACE</value></pair>
     </env>
@@ -70,7 +69,7 @@
   </test>
 
   <test name="tc_pairs_PROBRIRW">
-    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <exec>&MET_BIN;/tc_pairs</exec>
     <param> \
       -edeck &DATA_DIR;/edeck/*2015*.dat \
       -bdeck &DATA_DIR;/bdeck/*2015*.dat \
@@ -88,7 +87,7 @@
     <env>
       <pair><name>LEAD_REQ</name> <value>"96","108"</value></pair>
     </env>
-    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <exec>&MET_BIN;/tc_pairs</exec>
     <param> \
       -adeck &DATA_DIR;/adeck/*2010.dat \
       -bdeck &DATA_DIR;/bdeck/*2010.dat \

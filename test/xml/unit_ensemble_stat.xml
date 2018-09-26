@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -25,7 +24,7 @@
   <!--  Pass input ensemble files on the command line - one missing.  -->
 
   <test name="ensemble_stat_CMD_LINE">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
@@ -67,7 +66,7 @@
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib" \
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
-          &MET_DIR;/bin/ensemble_stat</exec>
+          &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>NA</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
@@ -96,7 +95,7 @@
   <!--  Pass input ensemble files on the command line - mask station id.  -->
 
   <test name="ensemble_stat_MASK_SID">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>CENSOR_THRESH</name>  <value></value></pair>
       <pair><name>CENSOR_VAL</name>     <value></value></pair>
@@ -124,7 +123,7 @@
   </test>
 
   <test name="ensemble_stat_MASK_SID_CENSOR">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>CENSOR_THRESH</name>  <value>lt0, gt5</value></pair>
       <pair><name>CENSOR_VAL</name>     <value>  0,   5</value></pair>
@@ -161,7 +160,7 @@
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib" \
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
-          &MET_DIR;/bin/ensemble_stat</exec>
+          &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>SKIP_CONST</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
@@ -197,7 +196,7 @@
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib" \
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
-          &MET_DIR;/bin/ensemble_stat</exec>
+          &MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>DESC</name>           <value>OBS_ERROR</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>TRUE</value></pair>

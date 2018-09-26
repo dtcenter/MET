@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
   <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -20,7 +20,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="madis2nc_METAR">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
@@ -34,7 +34,7 @@
   </test>
 
   <test name="madis2nc_METAR_mask_sid">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc \
@@ -49,7 +49,7 @@
   </test>
 
   <test name="madis2nc_METAR_mask_grid">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_grid.nc \
@@ -64,7 +64,7 @@
   </test>
 
   <test name="madis2nc_RAOB">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/raob/raob_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc \
@@ -76,7 +76,7 @@
   </test>
 
   <test name="madis2nc_PROFILER_MASK_POLY">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/profiler/profiler_20120409_1200.nc \
       &OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc \
@@ -88,7 +88,7 @@
   </test>
 
   <test name="madis2nc_MARITIME">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/maritime/maritime_20120409_1200.nc \
       &OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc \
@@ -100,7 +100,7 @@
   </test>
 
   <test name="madis2nc_MESONET_MASK_GRID">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/mesonet/mesonet_20140704_1200.nc \
       &OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc \
@@ -112,7 +112,7 @@
   </test>
 
   <test name="madis2nc_ACARS_PROFILES">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/acarsProfiles/acarsProfiles_20151005_1200.nc \
       &OUTPUT_DIR;/madis2nc/acarsProfiles_20151005_1200.nc \
@@ -124,7 +124,7 @@
   </test>
 
   <test name="madis2nc_buf_handle">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \
       &OUTPUT_DIR;/madis2nc/metar_20170118_0000.nc \
@@ -136,7 +136,7 @@
   </test>
 
   <test name="madis2nc_multiple_inputs">
-    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <exec>&MET_BIN;/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
-  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
-  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
@@ -18,7 +17,7 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="grid_weight_GRID_STAT_NONE">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>NO_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
@@ -37,7 +36,7 @@
   </test>
 
   <test name="grid_weight_GRID_STAT_COS_LAT">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>COS_LAT_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
@@ -56,7 +55,7 @@
   </test>
 
   <test name="grid_weight_GRID_STAT_AREA">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <exec>&MET_BIN;/grid_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>AREA_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
@@ -75,7 +74,7 @@
   </test>
 
   <test name="grid_weight_ENSEMBLE_STAT_NONE">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>NO_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
@@ -100,7 +99,7 @@
   </test>
 
   <test name="grid_weight_ENSEMBLE_STAT_COS_LAT">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>COS_LAT_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
@@ -125,7 +124,7 @@
   </test>
 
   <test name="grid_weight_ENSEMBLE_STAT_AREA">
-    <exec>&MET_DIR;/bin/ensemble_stat</exec>
+    <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>AREA_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
