@@ -275,6 +275,8 @@ ldata.lon_orient = lon_orient;
 ldata.d_km = D_km;
 ldata.r_km = R_km;
 
+ldata.so2_angle = 0.0;
+
 if ( !west_longitude_positive )  {
 
    ldata.lon_pin    *= -1.0;

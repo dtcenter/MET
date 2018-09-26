@@ -262,6 +262,12 @@ data.nx = string_att_as_int(f, "nx");
 data.ny = string_att_as_int(f, "ny");
 
    //
+   //  Rotation angle
+   //
+
+data.so2_angle = 0.0;
+
+   //
    //  done
    //
 

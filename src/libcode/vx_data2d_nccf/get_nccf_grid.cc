@@ -421,6 +421,9 @@ data.nx = atoi(att->as_string(0));
 att = get_nc_att(ncfile, "ny");
 data.ny = atoi(att->as_string(0));
 
+   // Rotation angle
+data.so2_angle = 0.0;
+
 data.dump();
 
    //
@@ -655,6 +658,9 @@ data.nx = atoi(att->as_string(0));
    // Number of points in the y-direction
 att = get_nc_att(ncfile,, "ny");
 data.ny = atoi(att->as_string(0));
+
+   // Rotation angle
+data.so2_angle = 0.0;
 
 data.dump();
 

@@ -376,6 +376,9 @@ get_global_att(ncfile, "nx", data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
 
+   // Rotation angle
+data.so2_angle = 0.0;
+
 data.dump();
 
    //
@@ -570,6 +573,9 @@ get_global_att(ncfile, "nx", data.nx);
 
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
+
+   // Rotation angle
+data.so2_angle = 0.0;
 
 data.dump();
 
