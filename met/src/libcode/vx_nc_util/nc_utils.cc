@@ -2359,7 +2359,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt from_att) {
 NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
-   for(unsigned int idx; idx<dims.size(); idx++) {
+   for(unsigned int idx=0; idx<dims.size(); idx++) {
       NcDim dim = dims[idx];
       if (!has_dim(to_nc, GET_NC_NAME(dim).c_str())) {
          add_dim(to_nc, GET_NC_NAME(dim), dim.getSize());
