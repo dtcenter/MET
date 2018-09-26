@@ -137,7 +137,7 @@ unixtime t;
 
 s = dict_lookup_string(attrs_dict, "init");
 
-t = yyyymmdd_hhmmss_to_unix(s);
+t = timestring_to_unix(s);
 
 dp_out.set_init(t);
 
@@ -145,23 +145,23 @@ dp_out.set_init(t);
 
 s = dict_lookup_string(attrs_dict, "valid");
 
-t = yyyymmdd_hhmmss_to_unix(s);
+t = timestring_to_unix(s);
 
 dp_out.set_valid(t);
 
      ////////////////////
 
-j = dict_lookup_int(attrs_dict, "lead");
+s = dict_lookup_string(attrs_dict, "lead");
 
-j = 3600*(j/10000) + 60*((j/100)%100) + j%100;
+t = timestring_to_sec(s);
 
-dp_out.set_lead(j);
+dp_out.set_lead(t);
 
      ////////////////////
 
 s = dict_lookup_string(attrs_dict, "accum");
 
-t = hhmmss_to_sec(s);
+t = timestring_to_sec(s);
 
 dp_out.set_accum(t);
 
