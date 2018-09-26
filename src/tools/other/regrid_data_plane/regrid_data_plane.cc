@@ -749,7 +749,7 @@ void process_data_only_file() {
                              << ". max: " << dataArray.max()
                              << ", min: " << dataArray.min()
                              << ", mean: " << dataArray.sum()/data_count
-                             << " from " << data_count << "data.\n";
+                             << " from " << data_count << " data values.\n";
                      }
                   }
                }
