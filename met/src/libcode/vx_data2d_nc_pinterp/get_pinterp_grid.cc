@@ -268,6 +268,12 @@ data.d_km *= 0.001;
 data.r_km = default_grib_radius_km;
 
    //
+   //  rotation angle
+   //
+
+data.so2_angle = 0.0;
+
+   //
    //  done
    //
 

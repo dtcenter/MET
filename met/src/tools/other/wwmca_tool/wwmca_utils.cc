@@ -315,6 +315,8 @@ data.r_km = atof(a[7]);
 data.nx = atof(a[1]);
 data.ny = atof(a[2]);
 
+data.so2_angle = 0.0;
+
 if ( west_longitude_positive )  {
 
    data.lon_pin *= -1.0;

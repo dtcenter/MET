@@ -178,7 +178,8 @@ mlog << Debug(grid_debug_level)
      << "         d_km: " << d_km << "\n"
      << "         r_km: " << r_km << "\n"
      << "           nx: " << nx << "\n"
-     << "           ny: " << ny << "\n\n";
+     << "           ny: " << ny << "\n"
+     << "    so2_angle: " << so2_angle << "\n\n";
 
 }
 
@@ -1171,7 +1172,8 @@ if ( lc1->nx                == lc2->nx                      &&
      is_eq  (rescale_lon(lc1->lon_orient),
              rescale_lon(lc2->lon_orient),       loose_tol) &&
      is_eq  (lc1->d_km,        lc2->d_km,        loose_tol) &&
-     is_eq  (lc1->r_km,        lc2->r_km,        loose_tol) )  status = true;
+     is_eq  (lc1->r_km,        lc2->r_km,        loose_tol) &&
+     is_eq  (lc1->so2_angle,   lc2->so2_angle,   loose_tol) )  status = true;
 
 return ( status );
 

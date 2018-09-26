@@ -405,6 +405,9 @@ data.nx = char2_to_int(gds.nx);
    // Number of points in the y-direction
 data.ny = char2_to_int(gds.ny);
 
+   // Rotation angle
+data.so2_angle = 0.0;
+
 data.dump();
 
    //

@@ -1587,6 +1587,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.r_km = 6371.20;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
+  data.so2_angle = 0.0;
 
   grid.set(data);
 }
