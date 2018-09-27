@@ -868,7 +868,9 @@ void process_pbfile(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      cout << " PERF: " << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;
+      cout << " PERF: " << method_name << " "
+           << (end_t-start_t)/double(CLOCKS_PER_SEC)
+           << " seconds for preparing\n";
       start_t = clock();
    }
 
@@ -903,7 +905,8 @@ void process_pbfile(int i_pb) {
             showed_progress = true;
             if(mlog.verbosity_level() >= debug_level_for_performance) {
                end_t = clock();
-               cout << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds" << endl;
+               cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
+                    << " seconds\n" <<;
                start_t = clock();
             }
          }
@@ -1627,12 +1630,15 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       method_end = clock();
-      cout << " PERF: " << method_name << " " << (method_end-method_start)/double(CLOCKS_PER_SEC) << " seconds" << endl;
+      cout << " PERF: " << method_name << " "
+           << (method_end-method_start)/double(CLOCKS_PER_SEC)
+           << " seconds\n";
    }
 
    if(i_msg <= 0) {
       mlog << Warning << "\n" << method_name << " -> "
-           << "No " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages retained from file: "
+           << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+           << " messages retained from file: "
            << pbfile[i_pb] << "\n\n";
       return;
    }

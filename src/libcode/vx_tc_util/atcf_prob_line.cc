@@ -128,7 +128,6 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
               << "unexpected ATCF line type ("
               << atcflinetype_to_string(Type) << ")\n\n";
          return(0);
-         break;
    }
 
    // Check for the minumum number of elements

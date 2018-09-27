@@ -21,8 +21,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  n_obs_types      = 5; // layer base, layer top, opacity, cad score, feature classification
-
 static const char hdr_typ_string[] = "calipso";
 
 
