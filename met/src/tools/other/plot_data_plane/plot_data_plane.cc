@@ -68,9 +68,6 @@ using namespace std;
 
 static ConcatString program_name = "plot_data_plane";
 
-static const char  numpy_field_string [] = "numpy";
-static const char xarray_field_string [] = "xarray";
-
 
 ////////////////////////////////////////////////////////////////////////
 

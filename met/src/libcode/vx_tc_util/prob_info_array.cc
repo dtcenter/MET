@@ -204,7 +204,6 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
               << "unexpected ATCF line type ("
               << atcflinetype_to_string(l.type()) << ")\n\n";
          return(false);
-         break;
    }
 
    return(true);

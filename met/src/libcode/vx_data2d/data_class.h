@@ -156,14 +156,6 @@ class Met2dDataFile : public Met2dData {
 
       void process_data_plane(VarInfo *, DataPlane &);
 
-         //
-         //  retrieve the data plane, if there's only one
-         //
-         //    mostly useful for python
-         //
-
-      virtual bool data_plane(DataPlane &);   //  not a pure virtual
-
 };
 
 
