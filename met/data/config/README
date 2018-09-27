@@ -307,7 +307,7 @@ obtype = "ANALYS";
 //      - to_grid = "path"; To regrid both to a grid defined by a file.
 //      - to_grid = "spec"; To define a grid specified as follows:
 //         - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-//           [standard_parallel_2]
+//           [standard_parallel_2] N|S
 //         - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 //         - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 //         - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
@@ -2908,7 +2908,7 @@ wavelet = {
 //    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
 //
 //    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-//      [standard_parallel_2]
+//      [standard_parallel_2] N|S
 //
 //    - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 //
@@ -2916,7 +2916,7 @@ wavelet = {
 //
 //    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 //
-to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0";
+to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
 
 //
 // Supply the NetCDF output information

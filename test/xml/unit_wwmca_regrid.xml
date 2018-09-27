@@ -151,7 +151,7 @@
   <test name="wwmca_regrid_NAM_LAMBERT">
     <exec>&MET_BIN;/wwmca_regrid</exec>
     <env>
-      <pair><name>GRID_DEF</name> <value>lambert 614 428 12.190 -133.459 -95.0 12.191 6371.20 25.0 25.0</value></pair>
+      <pair><name>GRID_DEF</name> <value>lambert 614 428 12.190 -133.459 -95.0 12.191 6371.20 25.0 25.0 N</value></pair>
       <pair><name>PIXEL_AGE</name> <value>120</value></pair>
       <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
     </env>

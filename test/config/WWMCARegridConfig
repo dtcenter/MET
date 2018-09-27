@@ -15,7 +15,7 @@
 //    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
 //
 //    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-//      [standard_parallel_2]
+//      [standard_parallel_2] N|S
 //
 //    - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 //

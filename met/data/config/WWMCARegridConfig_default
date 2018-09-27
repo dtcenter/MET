@@ -15,7 +15,7 @@
 //    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
 //
 //    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
-//      [standard_parallel_2]
+//      [standard_parallel_2] N|S
 //
 //    - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 //
@@ -24,7 +24,7 @@
 //    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 //
 regrid = {
-   to_grid    = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0";
+   to_grid    = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
    method     = UW_MEAN;
    width      = 5;
    vld_thresh = 0.5;
@@ -58,7 +58,7 @@ accum_time    = "01";
 max_minutes = 120;
 
 //
-// Swap endianess of binary pixel age files 
+// Swap endianess of binary pixel age files
 //
 swap_endian = TRUE;
 
