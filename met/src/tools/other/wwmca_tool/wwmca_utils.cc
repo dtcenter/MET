@@ -30,15 +30,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-// static GridInfo create_lambert_grid       (const StringArray &);
-// static GridInfo create_latlon_grid        (const StringArray &);
-// static GridInfo create_stereographic_grid (const StringArray &);
-// static GridInfo create_mercator_grid      (const StringArray &);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 GridHemisphere find_grid_hemisphere(const Grid & grid)
 
 {
@@ -58,12 +49,12 @@ for (j=0; j<Nx; ++j)  {
 
    x = (double) j;
 
-   grid.xy_to_latlon(x, 0.0, lat, lon);  
+   grid.xy_to_latlon(x, 0.0, lat, lon);
 
    if ( lat > 0.0 )  nh = true;
    if ( lat < 0.0 )  sh = true;
 
-   grid.xy_to_latlon(x, Ny - 1.0, lat, lon);  
+   grid.xy_to_latlon(x, Ny - 1.0, lat, lon);
 
    if ( lat > 0.0 )  nh = true;
    if ( lat < 0.0 )  sh = true;
@@ -80,12 +71,12 @@ for (j=0; j<Ny; ++j)  {
 
    y = (double) j;
 
-   grid.xy_to_latlon(0.0, y, lat, lon);  
+   grid.xy_to_latlon(0.0, y, lat, lon);
 
    if ( lat > 0.0 )  nh = true;
    if ( lat < 0.0 )  sh = true;
 
-   grid.xy_to_latlon(Nx - 1.0, y, lat, lon);  
+   grid.xy_to_latlon(Nx - 1.0, y, lat, lon);
 
    if ( lat > 0.0 )  nh = true;
    if ( lat < 0.0 )  sh = true;
@@ -188,147 +179,3 @@ return ( (Interpolator *) 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-/*
-GridInfo get_grid(const char * gridinfo_string)
-
-{
-
-int n;
-char * line = (char *) 0;
-char * c = (char *) 0;
-char * p = (char *) 0;
-const char delim [] = " ";
-ConcatString s;
-const Grid * G = (const Grid *) 0;
-GridInfo info;
-
-
-
-a.clear();
-
-type = no_grid_projection;
-
-n = 1 + strlen(gridinfo_string);
-
-line = new char [n];
-
-memset(line, 0, n);
-
-strcpy(line, gridinfo_string);
-
-p = line;
-
-while ( (c = strtok(p, delim)) != 0 )  {
-
-   a.add(c);
-
-   p = (char *) 0;
-
-}   //  while
-
-s = a[0];
-
-
-if ( s == "lambert" )  {
-
-   info = create_lambert_grid(a);
-
-   return ( info );
-
-}
-
-
-if ( s == "stereo" )  {
-
-   info = create_stereographic_grid(a);
-
-   return ( info );
-
-}
-
-
-if ( s == "latlon" )  {
-
-   info = create_latlon_grid(a);
-
-   return ( info );
-
-}
-
-
-if ( s == "mercator" )  {
-
-   info = create_mercator_grid(a);
-
-   return ( info );
-
-}
-
-
-   //
-   //  nope
-   //
-
-return ( info );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-GridInfo create_lambert_grid(const StringArray & a)
-
-{
-
-LambertData data;
-const int N = a.n_elements();
-GridInfo info;
-
-
-if ( (N < 9) || (N > 10) )  return ( info );
-
-
-info.lc = new LambertData;
-
-LambertData & data = *(info.lc);
-
-data.name = "To (Lambert)";
-
-data.scale_lat_1 = atof(a[8]);
-
-if ( a.n_elements() == 10 )  data.scale_lat_2 = atof(a[9]);
-else                         data.scale_lat_2 = data.scale_lat_1;
-
-data.lat_pin = atof(a[3]);
-data.lon_pin = atof(a[4]);
-
-data.x_pin = 0.0;
-data.y_pin = 0.0;
-
-data.lcen = atof(a[5]);
-
-data.d_km = atof(a[6]);
-data.r_km = atof(a[7]);
-
-data.nx = atof(a[1]);
-data.ny = atof(a[2]);
-
-data.so2_angle = 0.0;
-
-if ( west_longitude_positive )  {
-
-   data.lon_pin *= -1.0;
-   data.lcen    *= -1.0;
-
-}
-
-return ( info );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-
