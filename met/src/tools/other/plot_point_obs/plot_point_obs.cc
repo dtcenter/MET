@@ -379,8 +379,8 @@ int main(int argc, char *argv[]) {
 
    bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
    bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);
-   int hdr_arr_len = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) : 3;
-   int obs_arr_len = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) : 5;
+   int hdr_arr_len = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) : HDR_ARRAY_LEN;
+   int obs_arr_len = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) : OBS_ARRAY_LEN;
 
    int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
 
