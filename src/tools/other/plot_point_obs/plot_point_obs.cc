@@ -184,17 +184,17 @@ int main(int argc, char *argv[]) {
    //
    if (data_plane_filename.length() > 0)
    {
-     
+
       mlog << Debug(2) << "Retrieving grid from file: "
            << data_plane_filename << "\n";
-     
+
       //
       // instantiate a Met2dDataFile object using the data_2d_factory
       // and get the grid info from the file.
       //
       Met2dDataFile * met_ptr = (Met2dDataFile *) 0;
       Met2dDataFileFactory m_factory;
-      
+
       met_ptr = m_factory.new_met_2d_data_file(data_plane_filename);
 
       if (!met_ptr)
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
    int  typ_len  = header_data.typ_len;
    int  sid_len  = header_data.sid_len;
    int  vld_len  = header_data.vld_len;
-   
+
    if(use_var_id) {
       if(ivar.n_elements() != 0) {
          mlog << Warning << "\n-gc option is ignored!\n\n";
@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
       }
    }
    mlog << "\n";
-   
+
    mlog << Debug(2) << "Observation message types: ";
    if(ityp.n_elements() == 0) mlog << "ALL\n";
    else {
@@ -379,18 +379,18 @@ int main(int argc, char *argv[]) {
 
    bool use_hdr_arr = !IS_INVALID_NC(obsVars.hdr_arr_var);
    bool use_obs_arr = !IS_INVALID_NC(obsVars.obs_arr_var);
-   int hdr_arr_len = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) : 0;
-   int obs_arr_len = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) : 0;
+   int hdr_arr_len = use_hdr_arr ? get_dim_size(&obsVars.hdr_arr_dim) : 3;
+   int obs_arr_len = use_obs_arr ? get_dim_size(&obsVars.obs_arr_dim) : 5;
 
    int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
-   
+
    //
    // Allocate space to store the data
    //
    char hdr_typ_str[typ_len];
    char hdr_sid_str[sid_len];
    char hdr_vld_str[vld_len];
-   
+
    float hdr_arr[hdr_arr_len];
    float obs_arr[obs_arr_len];
 
@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
       long var_count = get_dim_size(&bufr_var_dim);
       char obs_var_str[var_count][strl_len];
       NcVar obs_var_var = get_nc_var(f_in, nc_var_obs_var);
-      
+
       lengths[0] = var_count;
       lengths[1] = strl_len;
       if(!get_nc_data(&obs_var_var, (char *)&obs_var_str[0], lengths, offsets)) {
@@ -423,17 +423,17 @@ int main(int argc, char *argv[]) {
          var_list.add(obs_var_str[index]);
       }
    }
-   
+
    for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
       buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
-      
+
       offsets[0] = i_start;
       lengths[0] = buf_size;
       offsets_1D[0] = i_start;
       lengths_1D[0] = buf_size;
       if (use_obs_arr) {
          lengths[1] = obs_arr_len;
-        
+
          // Read the current observation message
          if(!get_nc_data(&obsVars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
             mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
@@ -465,12 +465,12 @@ int main(int argc, char *argv[]) {
             exit(1);
          }
       }
-      
+
       int hdr_idx;
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
          int str_length;
          i = i_start + i_offset;
-      
+
          if (use_obs_arr) {
             for (int j=0; j < obs_arr_len; j++)
                obs_arr[j] = obs_arr_block[i_offset][j];
@@ -482,7 +482,7 @@ int main(int argc, char *argv[]) {
             obs_arr[3] = obs_hgt_block[i_offset];
             obs_arr[4] = obs_val_block[i_offset];
          }
-         
+
          if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
 
          //
@@ -490,29 +490,29 @@ int main(int argc, char *argv[]) {
          //
          h = nint(obs_arr[0]);
          v = nint(obs_arr[1]);
-      
+
          hdr_arr[0] = header_data.lat_array[h];
          hdr_arr[1] = header_data.lon_array[h];
          hdr_arr[2] = header_data.elv_array[h];
-        
+
          hdr_idx = use_obs_arr ? h : header_data.typ_idx_array[h];
          str_length = strlen(header_data.typ_array[hdr_idx]);
          if (str_length > typ_len) str_length = typ_len;
          strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
          hdr_typ_str[str_length] = bad_data_char;
-      
+
          hdr_idx = use_obs_arr ? h : header_data.sid_idx_array[h];
          str_length = strlen(header_data.sid_array[hdr_idx]);
          if (str_length > sid_len) str_length = sid_len;
          strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
          hdr_sid_str[str_length] = bad_data_char;
-      
+
          hdr_idx = use_obs_arr ? h : header_data.vld_idx_array[h];
          str_length = strlen(header_data.vld_array[hdr_idx]);
          if (str_length > vld_len) str_length = vld_len;
          strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
          hdr_vld_str[str_length] = bad_data_char;
-      
+
          //
          // Check if we want to plot this variable type.
          //
@@ -522,31 +522,31 @@ int main(int argc, char *argv[]) {
          else {
             if(ivar.n_elements() > 0 && !ivar.has(v)) continue;
          }
-         
+
          //
          // Check if we want to plot this message type.
          //
          if(ityp.n_elements() > 0 && !ityp.has(hdr_typ_str)) continue;
-         
+
          //
          // Only plot a circle if one hasn't been plotted for this
          // location yet.
          //
          if(!ihdr.has(h)) {
-         
+
             //
             // Get the header for this observation
             //
             if(hdr_arr[0] >= 1.0E10 && hdr_arr[1] >= 1.0E10) break;
-         
+
             lat = (double) hdr_arr[0];
             lon = (double) (-1.0*hdr_arr[1]);
-         
+
             //
             // Convert lat/lon to grid x/y
             //
             grid.latlon_to_xy(lat, lon, grid_x, grid_y);
-         
+
             //
             // If the current point is off the grid, increment the skip count
             //
@@ -556,18 +556,18 @@ int main(int argc, char *argv[]) {
                ihdr.add(h);
                continue;
             }
-         
+
             //
             // Convert grid x/y to page x/y
             //
             gridxy_to_pagexy(grid, grid_bb, grid_x, grid_y, page_x, page_y, map_box);
-         
+
             //
             // Draw a circle at this point and increment the plot count
             //
             plot.circle(page_x, page_y, dotsize, 0);
             plot.fill();
-         
+
             //
             // Dump out the location being plotted
             //
@@ -576,12 +576,12 @@ int main(int argc, char *argv[]) {
                  << "] Plotting location [ type, sid, valid, lat, lon, elevation ] = [ "
                  << hdr_typ_str << ", " << hdr_sid_str << ", " << hdr_vld_str << ", "
                  << hdr_arr[0] << ", " << hdr_arr[1] << ", " << hdr_arr[2] << " ]\n";
-            
+
             ihdr.add(h);
             plot_count++;
          }
       }
-        
+
    } // end for i
    plot.grestore();
 
@@ -599,7 +599,7 @@ int main(int argc, char *argv[]) {
    // Deallocate memory and clean up
    //
    if(f_in)    {
-      delete f_in; f_in = (NcFile *) 0; 
+      delete f_in; f_in = (NcFile *) 0;
    }
    header_data.typ_idx_array.clear();
    header_data.sid_idx_array.clear();
