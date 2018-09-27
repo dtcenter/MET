@@ -957,9 +957,6 @@ bool nh_used                 = false;
 bool sh_used                 = false;
 const int Nx                 = ToGrid->nx();
 const int Ny                 = ToGrid->ny();
-// const RegridInfo regrid_info = parse_conf_regrid(Config);
-// const int Width              = regrid_info.width;
-
 
 Hemi = no_hemisphere;
 
