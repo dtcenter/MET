@@ -1580,6 +1580,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.lat_pin = double_data;
   get_att_value_doubles(&central_lon_att, double_datas);
   data.lon_pin = -double_datas[0];
+  data.hemisphere = (data.lat_pin > 0 ? 'N' : 'S');
   data.x_pin = x_pin;
   data.y_pin = y_pin;
   data.lon_orient = -double_datas[0];
