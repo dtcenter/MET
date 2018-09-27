@@ -67,12 +67,6 @@ class WwmcaRegridder {
 
       void get_grid();
 
-      void parse_lambert_grid();
-      void parse_latlon_grid();
-      void parse_stereographic_grid();
-      void parse_mercator_grid();
-
-
       void do_single_hemi(DataPlane &, const Grid * From,
                                        const AFCloudPctFile * cloud,
                                        const AFPixelTimeFile * pixel) const;
