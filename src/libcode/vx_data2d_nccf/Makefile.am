@@ -18,4 +18,3 @@ libvx_data2d_nccf_a_SOURCES = \
               vx_data2d_nccf.h
 libvx_data2d_nccf_a_CPPFLAGS = ${MET_CPPFLAGS}
 
-EXTRA_DIST = get_nccf_grid.h
