@@ -133,18 +133,7 @@ switch ( data.hemisphere )  {
 
    case 'N':  IsNorthHemisphere = true;   break;
    case 'S':  IsNorthHemisphere = false;  break;
-
-   default:
-      IsNorthHemisphere = true;
-      // data.hemisphere = 'N';
-      break;
-/*
-      mlog << Error
-           << "\n\n  LambertGrid::LambertGrid(const LambertData &) -> bad hemisphere ...\""
-           << (data.hemisphere) << "\"\n\n";
-      exit ( 1 );
-      break;
-*/
+   default:   IsNorthHemisphere = true;   break;
 
 }   //  switch
 
