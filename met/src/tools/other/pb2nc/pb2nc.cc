@@ -906,7 +906,7 @@ void process_pbfile(int i_pb) {
             if(mlog.verbosity_level() >= debug_level_for_performance) {
                end_t = clock();
                cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
-                    << " seconds\n" <<;
+                    << " seconds\n";
                start_t = clock();
             }
          }
