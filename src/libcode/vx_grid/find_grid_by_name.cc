@@ -217,10 +217,10 @@ LambertData ldata;
 
 const int N = grid_strings.n_elements();
 
-if ( (N < 9) || (N > 10) )  {
+if ( (N < 10) || (N > 11) )  {
 
    mlog << Error << "\nparse_lambert_grid() -> "
-        << "lambert conformal grid spec should have 9 or 10 entries\n\n";
+        << "lambert conformal grid spec should have 10 or 11 entries\n\n";
 
    exit ( 1 );
 
@@ -229,6 +229,8 @@ if ( (N < 9) || (N > 10) )  {
 int j;
 int Nx, Ny;
 double lat_ll, lon_ll, lon_orient, D_km, R_km, phi_1, phi_2;
+char H;
+const char * c = (const char *) 0;
 
 j = 1;
 
@@ -249,8 +251,30 @@ R_km       = atof(grid_strings[j++]);
 
 phi_1      = atof(grid_strings[j++]);
 
-if ( N == 10 )  phi_2 = atof(grid_strings[j++]);
+if ( N == 11 )  phi_2 = atof(grid_strings[j++]);
 else            phi_2 = phi_1;
+
+c          = grid_strings[j++];
+
+if ( strlen(c) != 1 )  {
+
+   mlog << Error << "\nparse_lambert_grid() -> "
+        << "bad hemisphere in grid spec\n\n";
+
+   exit ( 1 );
+
+}
+
+H = *c;
+
+if ( (H != 'N') && (H != 'S') )  {
+
+   mlog << Error << "\nparse_lambert_grid() -> "
+        << "bad hemisphere in grid spec\n\n";
+
+   exit ( 1 );
+
+}
 
    //
    //  load up the struct
@@ -260,6 +284,8 @@ ldata.name = "To (lambert)";
 
 ldata.nx = Nx;
 ldata.ny = Ny;
+
+ldata.hemisphere = H;
 
 ldata.scale_lat_1 = phi_1;
 ldata.scale_lat_2 = phi_2;

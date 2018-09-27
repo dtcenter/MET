@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -447,7 +449,7 @@ To specify a Lambert Grid, the syntax is
 
 \begin_layout LyX-Code
 lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_lat_1 [ standard_lat_2
- ]
+ ] N|S
 \end_layout
 
 \begin_layout Standard
@@ -506,11 +508,27 @@ standard_lat_2
 \series default
  are the standard parallels of the Lambert projection.
  If the two latitudes are the same, then only one need be given.
+
+\series bold
+ N|S
+\series default
+ means to write either 
+\series bold
+N
+\series default
+ or 
+\series bold
+S
+\series default
+ depending on whether the Lambert projection is from the north pole or the
+ south pole.
+ 
 \end_layout
 
 \begin_layout Standard
-As an example of specifying a Lambert grid, Suppose you have a Lambert grid
- with 614 points in the x direction, 428 points in the y direction.
+As an example of specifying a Lambert grid, suppose you have a northern
+ hemisphere Lambert grid with 614 points in the x direction and 428 points
+ in the y direction.
  The lower left corner of the grid is at latitude 
 \begin_inset ERT
 status open
@@ -586,12 +604,11 @@ circ$
 \end_layout
 
 \begin_layout LyX-Code
-To grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0"; 
+To grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N"; 
 \end_layout
 
 \begin_layout Standard
-That’s for a lambert grid.
- For a Polar Stereographic grid, the syntax is
+For a Polar Stereographic grid, the syntax is
 \end_layout
 
 \begin_layout LyX-Code
