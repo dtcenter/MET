@@ -1634,6 +1634,8 @@ obs_error = {
    dist_parm        = [];      // Distribution parameters
    inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
    inst_bias_offset = 0.0;     // Instrument bias offset adjustment
+   min              = NA;      // Valid range of data
+   max              = NA;
 }
 
 //
