@@ -329,22 +329,28 @@ void regex_clean(char** &mat)
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString str_replace(const char* data, const char* old, const char* repl){
+   ConcatString ret;
+   if(!data) return(ret);
+
    string str = data;
    size_t pos = str.find( old );
    if( string::npos == pos ) return "";
    str.replace(pos, strlen(old), repl);
 
-   ConcatString ret = str.data();
+   ret = str.data();
    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString str_replace_all(const char* data, const char* old, const char* repl){
+   ConcatString ret;
+   if(!data) return(ret);
+
    string str = data;
    while( string::npos != str.find(old) ) str = str_replace(str.c_str(), old, repl);
 
-   ConcatString ret = str.c_str();
+   ret = str.c_str();
    return ret;
 }
 
