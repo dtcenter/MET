@@ -1037,6 +1037,15 @@ void get_field(const char * filename, const char * fld_accum_mag,
    if(get_valid_ut != 0) var->set_valid(get_valid_ut);
    if(get_init_ut  != 0) var->set_init(get_init_ut);
 
+   //  read the record of interest into a DataPlane object
+   if( ! datafile->data_plane(*var, plane) ){
+      mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
+           << "\"\n\n";
+      exit(1);
+   }
+
+   grid = datafile->grid();
+
    //  build an output field name using the magic string
    if( !var_info ){
       var_info = var;
@@ -1049,15 +1058,6 @@ void get_field(const char * filename, const char * fld_accum_mag,
          field_name = str_replace_all(field_name, "/", "_");
       }
    }
-
-   //  read the record of interest into a DataPlane object
-   if( ! datafile->data_plane(*var, plane) ){
-      mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
-           << "\"\n\n";
-      exit(1);
-   }
-
-   grid = datafile->grid();
 
    if ( datafile )  { delete datafile;  datafile = (Met2dDataFile *) 0; }
 
