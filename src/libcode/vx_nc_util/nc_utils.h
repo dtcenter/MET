@@ -136,6 +136,10 @@ static const int exit_code_no_obs_vars = 4;
 //extern bool find_att(const NcFile *, const ConcatString &, NcGroupAtt &);
 //extern bool find_att(const NcVar  *, const ConcatString &, NcVarAtt   &);
 
+extern bool      get_att_value(const NcAtt *, int    &value);
+extern bool      get_att_value(const NcAtt *, float  &value);
+extern bool      get_att_value(const NcAtt *, double &value);
+
 extern bool      get_att_value_chars  (const NcAtt *, ConcatString &);
 extern int       get_att_value_int    (const NcAtt *);
 extern long long get_att_value_llong  (const NcAtt *);
@@ -155,8 +159,8 @@ extern double    get_att_value_double(const NcFile *, const ConcatString& );
 
 extern bool      get_att_no_leap_year(const NcVar *);
 
-extern NcVarAtt    get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = false);
-extern NcGroupAtt  get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = false);
+extern NcVarAtt    *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = false);
+extern NcGroupAtt  *get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = false);
 //extern NcVarAtt   *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = true);
 //extern NcGroupAtt *get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = true);
 //extern NcGroupAtt get_att(const NcFile *, const ConcatString &, bool exit_on_error = true);
