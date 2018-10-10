@@ -55,12 +55,21 @@ double * pp = 0;
 
 PyObject * shape_tuple = PyObject_GetAttrString (numpy_array, "shape");
 
+if ( ! shape_tuple )  {
+
+   mlog << Error
+        << "\ndataplane_from_numpy_array() -> trouble getting the \"shape\"\n\n";
+
+   exit ( 1 );
+
+}
+
 dim = PyTuple_Size (shape_tuple);
 
 if ( dim > max_tuple_data_dims )  {
 
    mlog << Error
-        << "dataplane_from_numpy_array() -> too many dimensions in data ... "
+        << "\ndataplane_from_numpy_array() -> too many dimensions in data ... "
         << dim << "\n\n";
 
    exit ( 1 );
@@ -72,7 +81,7 @@ get_tuple_int_values(shape_tuple, dim, sizes);
 if ( dim != 2 )  {
 
    mlog << Error
-        << "dataplane_from_numpy_array() -> can only handle 2-dimensional data, but given data is  "
+        << "\ndataplane_from_numpy_array() -> can only handle 2-dimensional data, but given data is  "
         << dim << "-dimensional\n\n";
 
    exit ( 1 );
@@ -95,15 +104,30 @@ dp_out.set_size(nx, ny);
 
 PyObject * the_data = PyObject_GetAttrString (numpy_array, "data");
 
+if ( ! the_data )  {
+
+   mlog << Error
+        << "\ndataplane_from_numpy_array() -> trouble getting the \"data\"\n\n";
+
+   exit ( 1 );
+
+}
+
 PyTypeObject * type = (PyTypeObject *) PyObject_Type (the_data);
 
+if ( ! type )  {
+
+   mlog << Error
+        << "\ndataplane_from_numpy_array() -> trouble getting the \"type\" of the data\n\n";
+
+   exit ( 1 );
+
+}
 
 if ( type->tp_as_buffer->bf_getreadbuffer (the_data, 0, &p) < 0 )  {
 
    mlog << Error
-        << "dataplane_from_numpy_array() -> getreadbufferproc errored out\n\n";
-
-   // Py_Finalize();
+        << "\ndataplane_from_numpy_array() -> getreadbufferproc errored out\n\n";
 
    exit ( 1 );
 
@@ -168,6 +192,15 @@ dp_out.set_accum(t);
      ////////////////////
 
 PyObject * py_grid = dict_lookup_dict(attrs_dict, "grid");
+
+if ( ! py_grid )  {
+
+   mlog << Error
+        << "\ndataplane_from_numpy_array() -> trouble getting the \"grid\"\n\n";
+
+   exit ( 1 );
+
+}
 
 grid_from_python_dict(py_grid, grid_out);
 
