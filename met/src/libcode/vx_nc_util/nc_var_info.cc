@@ -288,17 +288,17 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatStrin
 
 {
 
-   NcVarAtt att ;
+   NcVarAtt *att ;
    bool found = false;
    
    att_value.clear();
    
    att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC(att)) {
-      found = get_att_value_chars(&att, att_value);
+   if (!IS_INVALID_NC_P(att)) {
+      found = get_att_value_chars(att, att_value);
       if ( !found)  {
          // Check for the correct type
-         if ( GET_NC_TYPE_ID(att) != NcType::nc_CHAR ) {
+         if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR ) {
          
             mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
                    << "attribute \"" << att_name << "\" should be a string.\n\n";
@@ -307,6 +307,7 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatStrin
          }
       }
    }
+   if (att) delete att;
 
    //
    //  done
@@ -324,16 +325,16 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
 
 {
 
-   NcVarAtt att;
+   NcVarAtt *att;
    bool found = false;
    att_value = bad_data_int;
    
    att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC(att)) {
-      att_value = get_att_value_int(&att);
+   if (!IS_INVALID_NC_P(att)) {
+      att_value = get_att_value_int(att);
    
       // Check for the correct type
-      if ( GET_NC_TYPE_ID(att) != NcType::nc_INT ) {
+      if ( GET_NC_TYPE_ID_P(att) != NcType::nc_INT ) {
    
          mlog << Error << "\nget_att_int(const NcVarInfo &, const ConcatString &, int &) -> "
               << "attribute \"" << att_name << "\" should be an integer.\n\n";
@@ -342,6 +343,7 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
       }
       found = true;
    }
+   if (att) delete att;
    
    //
    //  done
@@ -359,26 +361,27 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
 
 {
 
-   NcVarAtt att;
+   NcVarAtt *att;
    bool found = false;
    
    att_value = (unixtime) bad_data_int;
    
    
    att = get_nc_att(info.var, att_name, false);
-   if (!IS_INVALID_NC(att)) {
+   if (!IS_INVALID_NC_P(att)) {
       found = true;
    }
    
    if ( !found )  return ( false );
    
    // Check the type
-   att_value = get_att_value_unixtime(&att);
+   att_value = get_att_value_unixtime(att);
    if (att_value < 0) {
       mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
            << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
       exit ( 1 );
    }
+   if (att) delete att;
    
    //
    //  done

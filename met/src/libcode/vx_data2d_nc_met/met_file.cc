@@ -395,12 +395,14 @@ float add_offset   = 0.f;
 float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt att_add_offset   = get_nc_att(var, "add_offset");
-NcVarAtt att_scale_factor = get_nc_att(var, "scale_factor");
-if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
-   add_offset = get_att_value_float(&att_add_offset);
-   scale_factor = get_att_value_float(&att_scale_factor);
+NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
+NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
+if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
+   add_offset = get_att_value_float(att_add_offset);
+   scale_factor = get_att_value_float(att_scale_factor);
 }
+if (att_add_offset) delete att_add_offset;
+if (att_scale_factor) delete att_scale_factor;
 
 status = false;
 switch ( GET_NC_TYPE_ID_P(var) )  {
@@ -598,12 +600,15 @@ plane.set_size(Nx, Ny);
    //
    float add_offset   = 0.f;
    float scale_factor = 1.f;
-   NcVarAtt att_add_offset   = get_nc_att(v, "add_offset");
-   NcVarAtt att_scale_factor = get_nc_att(v, "scale_factor");
-   if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
-      add_offset = get_att_value_float(&att_add_offset);
-      scale_factor = get_att_value_float(&att_scale_factor);
+   NcVarAtt *att_add_offset   = get_nc_att(v, "add_offset");
+   NcVarAtt *att_scale_factor = get_nc_att(v, "scale_factor");
+   if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
+      add_offset = get_att_value_float(att_add_offset);
+      scale_factor = get_att_value_float(att_scale_factor);
    }
+   if (att_add_offset) delete att_add_offset;
+   if (att_scale_factor) delete att_scale_factor;
+
    int type_id = GET_NC_TYPE_ID_P(v);
 
    long dim[dimCount], cur[dimCount];

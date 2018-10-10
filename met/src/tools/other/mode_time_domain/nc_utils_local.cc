@@ -32,9 +32,9 @@ const char * string_att(const NcFile & Nc, const char * name)
 
 {
 
-NcGroupAtt att = get_nc_att(&Nc, name);
+NcGroupAtt *att = get_nc_att(&Nc, name);
 
-if ( GET_NC_TYPE_ID(att) != NcType::nc_CHAR )  {
+if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR )  {
 
    mlog << Error << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
 
@@ -45,8 +45,9 @@ if ( GET_NC_TYPE_ID(att) != NcType::nc_CHAR )  {
 char * c = new char[8096];
 
 ConcatString value;
-get_att_value_chars(&att, value);
+get_att_value_chars(att, value);
 strncpy(c, value, value.length());
+if (att) delete att;
 
    //
    //  done

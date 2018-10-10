@@ -165,9 +165,8 @@ bool ModeNcOutputFile::open(const char * _filename)
 // int x, y;
 // int value;
 //NcDim * dim = (NcDim *) 0;
-//NcAtt * att = (NcAtt *) 0;
 NcDim dim;
-NcVarAtt att;
+NcAtt *att = (NcAtt *)0;
 ConcatString s;
 
 
@@ -257,21 +256,22 @@ for (x=0; x<Nx; ++x)  {
    //
 
    att = get_nc_att(FcstRaw, "init_time_ut");
-   InitTime = get_att_value_unixtime(&att);
+   InitTime = get_att_value_unixtime(att);
    if (InitTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> init time should be an integer or a string!\n\n";
       exit ( 1 );
    }
-   
+   if (att) delete att;
    
    att = get_nc_att(FcstRaw, "valid_time_ut");
-   ValidTime = get_att_value_unixtime(&att);
+   ValidTime = get_att_value_unixtime(att);
    if (ValidTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> valid time should be an integer or a string!\n\n";
       exit ( 1 );
    }
+   if (att) delete att;
    
 // att = FcstRaw->get_att("accum_time_sec");
 // 
