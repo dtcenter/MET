@@ -219,11 +219,12 @@ bool NcCfFile::open(const char * filepath)
   }
   else
   {
-
     // Store the dimension for the time variable as the time dimension
-    tDim = get_nc_dim(valid_time_var, 0);
-    _tDim = &tDim;
-    t_dim_name = GET_NC_NAME(tDim).c_str();
+    if (get_dim_count(valid_time_var) > 0) {
+       tDim = get_nc_dim(valid_time_var, 0);
+       _tDim = &tDim;
+       t_dim_name = GET_NC_NAME(tDim).c_str();
+    }
 
     // Parse the units for the time variable.
     NcVarAtt *units_att = get_nc_att(valid_time_var, "units", false);
