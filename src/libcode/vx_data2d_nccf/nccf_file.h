@@ -134,10 +134,6 @@ class NcCfFile {
       NcDim *_yDim;
       NcDim *_tDim;
 
-      NcDim xDim;
-      NcDim yDim;
-      NcDim tDim;
-
       NcVar *_xCoordVar;
       NcVar *_yCoordVar;
       
