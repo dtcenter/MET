@@ -67,7 +67,8 @@ MetPythonDataFile * p = 0;
          mtddf = new MetGrib2DataFile;
 #else
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
-              << "Support for GRIB2 has not been compiled!\n\n";
+              << "Support for GRIB2 has not been compiled!\n"
+              << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
 #endif
          break;
@@ -96,6 +97,17 @@ MetPythonDataFile * p = 0;
          p = new MetPythonDataFile;
          p->set_type(type);
          mtddf = p;
+         break;
+
+#else
+
+      case FileType_Python_Numpy:
+      case FileType_Python_Xarray:
+
+         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+              << "Support for Python has not been compiled!\n"
+              << "To run Python scripts, recompile with the --enable-python option.\n\n";
+         exit(1);
          break;
 
 #endif
