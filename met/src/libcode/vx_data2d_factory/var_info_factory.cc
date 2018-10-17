@@ -73,7 +73,8 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoGrib2;
 #else
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
-              << "Support for GRIB2 has not been compiled!\n\n";
+              << "Support for GRIB2 has not been compiled!\n"
+              << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
 #endif
          break;
@@ -86,22 +87,26 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcPinterp;
          break;
 
+      case FileType_Python_Numpy:
+      case FileType_Python_Xarray:
 #ifdef WITH_PYTHON
-      case FileType_Python_Numpy:    //  fall through
-      case FileType_Python_Xarray:   //  fall through
          p = new VarInfoPython;
          p->set_file_type(type);
          vi = p;
          p = 0;
-         break;
+#else
+         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+              << "Support for Python has not been compiled!\n"
+              << "To run Python scripts, recompile with the --enable-python option.\n\n";
+         exit(1);
 #endif
+      break;
 
       case FileType_NcCF:
-	vi = new VarInfoNcCF;
-	break;
-	
-      case FileType_HdfEos:
+      vi = new VarInfoNcCF;
+      break;
 
+      case FileType_HdfEos:
          mlog << Error << "\nVarInfoFactory::new_var_info() -> "
               << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
