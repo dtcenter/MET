@@ -152,8 +152,8 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>.])
-AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>.])
+AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python-config --cflags'.])
+AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python-config --ldflags'.])
 
 if test -n "$MET_PYTHON_CC"; then
    CPPFLAGS="${CPPFLAGS} ${MET_PYTHON_CC}"
