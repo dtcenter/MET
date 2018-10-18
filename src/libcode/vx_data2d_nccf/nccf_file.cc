@@ -51,6 +51,9 @@ static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name);
+static bool is_time_unit(const ConcatString units);
+static bool is_longitude_unit(const ConcatString units);
+static bool is_latitude_unit(const ConcatString units);
 
 #define USE_BUFFER  1
 
@@ -193,11 +196,50 @@ bool NcCfFile::open(const char * filepath)
      _dims[j] = new NcDim(dim);
   }
 
-  // Pull out the valid and init times
+  // Pull out the variables
 
+  NcVar *valid_time_var = (NcVar *)0;
+  ConcatString att_value;
+
+  
+  StringArray varNames;
+  Nvars = get_var_names(_ncFile, &varNames);
+  Var = new NcVarInfo [Nvars];
+  //get_vars_info(Nc, &Var);
+
+  for (int j=0; j<Nvars; ++j)  {
+    NcVar v = get_var(_ncFile, varNames[j]);
+
+    Var[j].var = new NcVar(v);
+
+    Var[j].name = GET_NC_NAME(v).c_str();
+
+    int dim_count = GET_NC_DIM_COUNT(v);
+    Var[j].Ndims = dim_count;
+
+    Var[j].Dims = new NcDim * [dim_count];
+
+    //  parse the variable attributes
+    get_att_str( Var[j], "long_name",  Var[j].long_name_att );
+    get_att_str( Var[j], "units",      Var[j].units_att     );
+
+    if (get_nc_att(Var[j].var, "axis", att_value)) {
+      if (strcmp("T", att_value) == 0 || strcmp("time", att_value) == 0) {
+        valid_time_var = Var[j].var;
+      }
+    }
+    if (get_nc_att(Var[j].var, "standard_name", att_value)) {
+      if (strcmp("time", att_value) == 0) {
+        valid_time_var = Var[j].var;
+      }
+    }
+    if ((strcmp(Var[j].name, "time") == 0) && (valid_time_var == 0)) {
+      valid_time_var = Var[j].var;
+    }
+  }   //  for j
+
+  // Pull out the valid and init times
   ConcatString units;
-  NcVar valid_time_var_T = get_var(_ncFile, "time");
-  NcVar *valid_time_var = &valid_time_var_T;
   if (IS_INVALID_NC_P(valid_time_var))
   {
 
@@ -219,11 +261,14 @@ bool NcCfFile::open(const char * filepath)
   }
   else
   {
-
     // Store the dimension for the time variable as the time dimension
-    tDim = get_nc_dim(valid_time_var, 0);
-    _tDim = &tDim;
-    t_dim_name = GET_NC_NAME(tDim).c_str();
+    if (get_dim_count(valid_time_var) > 0) {
+       NcDim tDim = get_nc_dim(valid_time_var, 0);
+       if (!IS_INVALID_NC(tDim)) {
+         _tDim = new NcDim(tDim);
+         t_dim_name = GET_NC_NAME(tDim).c_str();
+       }
+    }
 
     // Parse the units for the time variable.
     NcVarAtt units_att = get_nc_att(valid_time_var, "units", false);
@@ -311,32 +356,6 @@ bool NcCfFile::open(const char * filepath)
     //  InitTime = add_days_to_unix((unixtime)ut, (int)time_value);
     //}
   }
-
-  // Pull out the variables
-
-
-  StringArray varNames;
-  Nvars = get_var_names(_ncFile, &varNames);
-  Var = new NcVarInfo [Nvars];
-  //get_vars_info(Nc, &Var);
-
-  for (int j=0; j<Nvars; ++j)  {
-    NcVar v = get_var(_ncFile, varNames[j]);
-
-    Var[j].var = new NcVar(v);
-
-    Var[j].name = GET_NC_NAME(v).c_str();
-
-    int dim_count = GET_NC_DIM_COUNT(v);
-    Var[j].Ndims = dim_count;
-
-    Var[j].Dims = new NcDim * [dim_count];
-
-    //  parse the variable attributes
-    get_att_str( Var[j], "long_name",  Var[j].long_name_att );
-    get_att_str( Var[j], "units",      Var[j].units_att     );
-
-  }   //  for j
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
@@ -1635,12 +1654,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
 
     // See if this is a lat or lon dimension
 
-    if (strcmp(dim_units, "degrees_north") == 0 ||
-        strcmp(dim_units, "degree_north") == 0 ||
-        strcmp(dim_units, "degree_N") == 0 ||
-        strcmp(dim_units, "degrees_N") == 0 ||
-        strcmp(dim_units, "degreeN") == 0 ||
-        strcmp(dim_units, "degreesN") == 0)
+    if (is_latitude_unit(dim_units))
     {
       if (_yDim == 0)
       {
@@ -1664,12 +1678,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
       }
     }
 
-    if (strcmp(dim_units, "degrees_east") == 0 ||
-        strcmp(dim_units, "degree_east") == 0 ||
-        strcmp(dim_units, "degree_E") == 0 ||
-        strcmp(dim_units, "degrees_E") == 0 ||
-        strcmp(dim_units, "degreeE") == 0 ||
-        strcmp(dim_units, "degreesE") == 0)
+    if (is_longitude_unit(dim_units))
     {
       if (_xDim == 0)
       {
@@ -2158,25 +2167,49 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   NcVarAtt coordinates_att = get_nc_att(data_var, "coordinates");
 
   if (!IS_INVALID_NC(coordinates_att)) {
-    ConcatString coordinates_value;
+    ConcatString coordinates_value, units_value;
     NcVarAtt missing_value_att;
     get_att_value_chars(&coordinates_att, coordinates_value);
     StringArray sa = coordinates_value.split(" ");
     int count = sa.n_elements();
-    x_dim_var_name = sa[count-2];
-    y_dim_var_name = sa[count-1];
+    if (count >= 2) {
+      x_dim_var_name = sa[count-2];
+      y_dim_var_name = sa[count-1];
+    }
 
+    bool is_x_dim_var, is_y_dim_var;
     float lat_missing_value = bad_data_double;
     float lon_missing_value = bad_data_double;
     for (int var_num = 0; var_num < Nvars; ++var_num) {
-      if (strcmp(Var[var_num].name, y_dim_var_name) == 0) {
+      is_x_dim_var = is_y_dim_var = false;
+      for (int cIdx = 0; cIdx<count; cIdx++) {
+        if (strcmp(Var[var_num].name, sa[cIdx]) == 0) {
+          if (get_nc_att(Var[var_num].var, "units", units_value)) {
+            if (is_latitude_unit(units_value)) {
+              y_dim_var_name = sa[cIdx];
+              is_y_dim_var = true;
+            }
+            else if (is_longitude_unit(units_value)) {
+              x_dim_var_name = sa[cIdx];
+              is_x_dim_var = true;
+            }
+            else {
+              mlog << Warning << "\nNcCfFile::get_grid_from_coordinates() -> "
+                   << "unknown units [" << units_value << "] from ["
+                   << Var[var_num].name << "]\n\n";
+            }
+          }
+          break;
+        }
+      }
+      if (is_y_dim_var || strcmp(Var[var_num].name, y_dim_var_name) == 0) {
         _yCoordVar = Var[var_num].var;
         missing_value_att = get_nc_att(_yCoordVar, "_FillValue");
         if (!IS_INVALID_NC(missing_value_att)) {
           lat_missing_value = get_att_value_double(&missing_value_att);
         }
       }
-      else if (strcmp(Var[var_num].name, x_dim_var_name) == 0) {
+      else if (is_x_dim_var || strcmp(Var[var_num].name, x_dim_var_name) == 0) {
         _xCoordVar = Var[var_num].var;
         missing_value_att = get_nc_att(_xCoordVar, "_FillValue");
         if (!IS_INVALID_NC(missing_value_att)) {
@@ -2374,12 +2407,7 @@ bool NcCfFile::get_grid_from_dimensions()
     //dim_units = dim_units_str.c_str();
     // See if this is a lat or lon dimension
 
-    if (strcmp(dim_units, "degrees_north") == 0 ||
-        strcmp(dim_units, "degree_north") == 0 ||
-        strcmp(dim_units, "degree_N") == 0 ||
-        strcmp(dim_units, "degrees_N") == 0 ||
-        strcmp(dim_units, "degreeN") == 0 ||
-        strcmp(dim_units, "degreesN") == 0)
+    if (is_latitude_unit(dim_units))
     {
       if (_yDim == 0)
       {
@@ -2408,12 +2436,7 @@ bool NcCfFile::get_grid_from_dimensions()
              << GET_NC_NAME_P(_yCoordVar) << "\".\n\n";
       }
     }
-    else if (strcmp(dim_units, "degrees_east") == 0 ||
-        strcmp(dim_units, "degree_east") == 0 ||
-        strcmp(dim_units, "degree_E") == 0 ||
-        strcmp(dim_units, "degrees_E") == 0 ||
-        strcmp(dim_units, "degreeE") == 0 ||
-        strcmp(dim_units, "degreesE") == 0)
+    else if (is_longitude_unit(dim_units))
     {
       if (_xDim == 0)
       {
@@ -2567,6 +2590,39 @@ bool NcCfFile::get_grid_from_dimensions()
   return true;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_time_unit(const ConcatString units) {
+   bool axis_unit = (strcmp(units, "T") == 0 ||
+        strcmp(units, "time") == 0 ||
+        strcmp(units, "Time") == 0);
+   return axis_unit;
+}
+   
+////////////////////////////////////////////////////////////////////////
+
+bool is_longitude_unit(const ConcatString units) {
+   bool axis_unit = (strcmp(units, "degrees_east") == 0 ||
+        strcmp(units, "degree_east") == 0 ||
+        strcmp(units, "degree_E") == 0 ||
+        strcmp(units, "degrees_E") == 0 ||
+        strcmp(units, "degreeE") == 0 ||
+        strcmp(units, "degreesE") == 0);
+   return axis_unit;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_latitude_unit(const ConcatString units) {
+   bool axis_unit = (strcmp(units, "degrees_north") == 0 ||
+        strcmp(units, "degree_north") == 0 ||
+        strcmp(units, "degree_N") == 0 ||
+        strcmp(units, "degrees_N") == 0 ||
+        strcmp(units, "degreeN") == 0 ||
+        strcmp(units, "degreesN") == 0);
+   return axis_unit;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
