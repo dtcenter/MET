@@ -187,11 +187,14 @@ sub-directory, or the MET Online Tutorial:
 
    - If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD
      to specify the compiler (-I) and linker (-L) flags required for python.
-     Set $MET_PYTHON_CC for the directory containing the "Python.h" header file.
+     Set $MET_PYTHON_CC for the directory containing the "Python.h" header file,
+     which is the output of running 'python-config --cflags'.
      Set $MET_PYTHON_LD for the directory containing the python library file
-     and indicate the name of that file.  For example:
-     MET_PYTHON_CC='-I/usr/include/python2.7'
-     MET_PYTHON_LD='-L/usr/lib/python2.7/config-x86_64-linux-gnu -lpython2.7'
+     and indicate the library file names, which is the output of running
+     'python-config --ldflags'.
+     For example:
+     MET_PYTHON_CC=`python-config --cflags`
+     MET_PYTHON_LD=`python-config --ldflags`
      For more information about Python support in MET, please refer to Appendix
      F of the MET User's Guide.
 
