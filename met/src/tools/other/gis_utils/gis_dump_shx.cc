@@ -143,7 +143,7 @@ void usage()
 {
 
 mlog << Error
-     << "\n\n  usage:  " << program_name << " shp_filename\n\n";
+     << "\n\n  usage:  " << program_name << " shx_filename\n\n";
 
 exit ( 1 );
 
