@@ -1536,7 +1536,7 @@ if ( ! (f.open(shape_filename)) )  {
 if ( f.shape_type() != shape_type_polygon )  {
 
    mlog << Error
-        << program_name << ": shape file \""
+        << "\n" << program_name << ": shape file \""
         << shape_filename << "\" is not a polygon file\n\n";
 
    exit ( 1 );
