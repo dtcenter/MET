@@ -133,15 +133,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    }
 
    // if it is one of APCP names - (APCP_Z0) - use 'APCP' only
-   if (field_name.length () > 4 && strncmp ("APCP", field_name, 4) == 0)
-   {
-      StringArray name_arr = field_name.split ("_");
-      if (name_arr.Nelements == 2 &&
-          check_reg_exp("^[0-9]*$", name_arr[1]))
-      {
-         field_name = "APCP";
-      }
-   }
+   if ( check_reg_exp("^APCP_[0-9]*$", field_name) )  field_name = "APCP";
 
    Grib1TableEntry tab;
    int tab_match = -1;
