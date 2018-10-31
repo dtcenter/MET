@@ -137,11 +137,10 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    {
       StringArray name_arr = field_name.split ("_");
       if (name_arr.Nelements == 2 &&
-         (strlen (name_arr[1]) == 2 || strlen (name_arr[1]) == 6))
+          check_reg_exp("^[0-9]*$", name_arr[1]))
       {
          field_name = "APCP";
       }
-
    }
 
    Grib1TableEntry tab;
