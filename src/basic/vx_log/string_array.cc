@@ -789,6 +789,9 @@ bool valid = false;
 regex_t buffer;
 regex_t *preg = &buffer;
 
+// Check for null pointers
+if( !reg_exp_str || !test_str ) return( false ); 
+
 if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
         << "regcomp error for \""
