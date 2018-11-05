@@ -284,12 +284,13 @@ extern "C" {
    void openpb_(const char *, int *);
    void closepb_(int *);
    void readpb_(int *, int *, int *, double[mxr8pm],
-                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm], bool *);
+                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm], int *);
+   void readpb_hdr_ (int *,int *,double[mxr8pm]);
    void ireadns_  (int *, char *, int *);
    void readpbevt_(int *, int *, int *, double[mxr8vn][mxr8lv][mxr8pm],
-                   char[mxr8lv*mxr8pm], int *, bool *);
+                   char[mxr8lv*mxr8pm], int *, int *);
    void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm],
-                   char[mxr8lv*mxr8pm], int *, bool *);
+                   char[mxr8lv*mxr8pm], int *, int *);
    void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
    void dump_tbl_(const char *, int *, const char *, int *);
@@ -448,6 +449,10 @@ void initialize() {
    prepbufr_derive_vars.add("D_MIXR");
    prepbufr_derive_vars.add("D_PRMSL");
 
+   for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
+      hdr[idx] = r8bfms * 10;
+   }
+   
    summary_obs = new SummaryObs();
    return;
 }
@@ -881,7 +886,11 @@ void process_pbfile(int i_pb) {
    }
    mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
 
-   if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
+   int nlev_max_req = mxr8lv;
+   if (0 < conf_info.end_level && conf_info.end_level < mxr8lv) {
+      nlev_max_req = conf_info.end_level;
+      mlog << Debug(4) << "Request up to " << nlev_max_req << " vertical levels\n";
+   }
 
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
@@ -912,9 +921,9 @@ void process_pbfile(int i_pb) {
          }
       }
 
-      // Get the next PrepBufr message
+      // Get the next PrepBufr message (header only)
       ireadns_(&unit, hdr_typ, &i_date);
-      readpb_(&unit, &i_ret, &nlev, hdr, evns, &use_small_buffer);
+      readpb_hdr_(&unit, &i_ret, hdr);
 
       sprintf(time_str, "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
@@ -975,13 +984,13 @@ void process_pbfile(int i_pb) {
       }
 
       if (!is_prepbufr) {
-         int index;
+         int index, req_hdr_level = 1;
          char tmp_str[mxr8lv*mxr8pm];
 
          //Read header (station id, lat, lon, ele, time)
          strcpy(tmp_str, bufr_hdrs.text());
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
-                    &bufr_hdr_length, &use_small_buffer );
+                    &bufr_hdr_length, &req_hdr_level );
 
          // Copy sid, lat, lon, and dhr
          for (index=0; index<4; index++) {
@@ -1153,6 +1162,9 @@ void process_pbfile(int i_pb) {
          continue;
       }
 
+      // Get the next PrepBufr message
+      readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
+      
       // Special handling for "AIRNOW"
       bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
 
@@ -1409,9 +1421,8 @@ void process_pbfile(int i_pb) {
             }
             tmp_len = strlen(airnow_aux_vars);
             readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
-                       (char *)airnow_aux_vars, &tmp_len, &use_small_buffer);
+                       (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
          }
-
          bool isDegC;
          bool isMgKg;
          bool isMilliBar;
@@ -1447,7 +1458,7 @@ void process_pbfile(int i_pb) {
                }
             }
 
-            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &use_small_buffer);
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &nlev_max_req);
             if (0 >= nlev2) continue;
 
             buf_nlev = nlev2;
@@ -1655,6 +1666,7 @@ void process_pbfile_metadata(int i_pb) {
    int debug_threshold = 10;
 
    bool tmp_use_small_buffer = false;
+   int tmp_nlev_max_req = (mxr8lv_small / 64);
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
@@ -1781,14 +1793,15 @@ void process_pbfile_metadata(int i_pb) {
       if (0 == i_read) {
          // Checks the variables for header
 
+         int hdr_level = 1;
          char tmp_str[mxr8lv*mxr8pm];
          char var_name[BUFR_NAME_LEN+1];
          ConcatString hdr_name_str;
 
          strcpy(tmp_str, prepbufr_hdrs_str);
          length = strlen(tmp_str);
-         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
-         if (mxr8lv_small < nlev) use_small_buffer = false;
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
+         //if (mxr8lv_small < nlev) use_small_buffer = false;
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
             for (index=0; index<4; index++) {
@@ -1811,7 +1824,7 @@ void process_pbfile_metadata(int i_pb) {
             strcpy(var_name, default_sid_name);
             strcpy(tmp_str, bufr_avail_sid_names);
             length = strlen(tmp_str);
-            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
@@ -1828,7 +1841,7 @@ void process_pbfile_metadata(int i_pb) {
 
             strcpy(tmp_str, bufr_avail_latlon_names);
             length = strlen(tmp_str);
-            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
@@ -1959,7 +1972,7 @@ void process_pbfile_metadata(int i_pb) {
          strcpy(var_name, (char *)unchecked_var_list[vIdx]);
          var_name_len = strlen(var_name);
 
-         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &tmp_use_small_buffer);
+         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &tmp_nlev_max_req);
          if (0 >= nlev2) continue;
 
          // Search through the vertical levels
