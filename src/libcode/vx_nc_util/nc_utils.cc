@@ -126,7 +126,7 @@ bool get_att_value(const NcAtt *att, double &att_val) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_att_value_int(const NcAtt *att) {
-   int value;
+   int value = bad_data_int;
    att->getValues(&value);
    return value;
 }
@@ -134,7 +134,7 @@ int get_att_value_int(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 char get_att_value_char(const NcAtt *att) {
-   char att_val;
+   char att_val = bad_data_char;
    if (!IS_INVALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
       if (attType == NC_CHAR) {
@@ -178,7 +178,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
 ////////////////////////////////////////////////////////////////////////
 
 long long get_att_value_llong(const NcAtt *att) {
-   long long value;
+   long long value = bad_data_int;
    att->getValues(&value);
    return value;
 }
@@ -186,7 +186,7 @@ long long get_att_value_llong(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 double get_att_value_double(const NcAtt *att) {
-   double value;
+   double value = bad_data_double;
    att->getValues(&value);
    return value;
 }
@@ -211,7 +211,7 @@ double *get_att_value_doubles(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 float get_att_value_float(const NcAtt *att) {
-   float value;
+   float value = bad_data_float;
    att->getValues(&value);
    return value;
 }
@@ -219,7 +219,7 @@ float get_att_value_float(const NcAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 short get_att_value_short(const NcAtt *att) {
-   short value;
+   short value = bad_data_int;
    att->getValues(&value);
    return value;
 }
@@ -331,7 +331,6 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
       map<string,NcVarAtt> mapAttrs = var->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
          if (0 == (strcmp(att_name, ((*itAtt).first).c_str()))) {
-            //att = &((*itAtt).second);
             att = new NcVarAtt();
             *att = (*itAtt).second;
             break;
@@ -366,7 +365,6 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
       multimap<string,NcGroupAtt> mapAttrs = nc->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
          if (0 == (strcmp(att_name, ((*itAtt).first).c_str()))) {
-            //att = &((*itAtt).second);
             att = new NcGroupAtt();
             *att = (*itAtt).second;
             break;
@@ -432,6 +430,10 @@ bool get_nc_att(const NcVar *var, const ConcatString &att_name,
               << "can't read attribute \"" << att_name
               << "\" from \"" << var->getName() << "\" variable.\n\n";
       }
+      if (att) {
+         delete att;
+         att = (NcVarAtt *)0;
+      }
       if (exit_on_error) exit(1);
    }
    if (att) delete att;
@@ -463,6 +465,10 @@ bool get_nc_att(const NcVar *var, const ConcatString &att_name,
          mlog << Error << "\nget_nc_att(float) -> "
               << "can't read attribute \"" << att_name
               << "\" from \"" << var->getName() << "\" variable.\n\n";
+      }
+      if (att) {
+         delete att;
+         att = (NcVarAtt *)0;
       }
       if (exit_on_error) exit(1);
    }
@@ -3034,7 +3040,12 @@ NcDim get_nc_dim(const NcVar *var, string dim_name) {
 ////////////////////////////////////////////////////////////////////////
 
 NcDim get_nc_dim(const NcVar *var, int dim_offset) {
-   return var->getDim(dim_offset);
+   if (var->getDimCount() > dim_offset)
+      return var->getDim(dim_offset);
+   else {
+      NcDim d;
+      return d;
+   }
 }
 
 
