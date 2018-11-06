@@ -72,7 +72,7 @@ static int         nlev;
 extern "C" {
    void openpb_(const char *, int *);
    void readpb_(int *, char *, int *, int *, int *, double[mxr8pm],
-                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
+                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm], int *);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
    int mon, day, yr, hr, min, sec;
    ConcatString pb_file, blk_file;
    unixtime ut;
+   int req_lev = mxr8lv;
    char hdr_typ[512], time_str[512];
 
    if(argc != 2) {
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
    openpb_(blk_file, &file_unit);
 
    // Read the first PrepBufr message
-   readpb_(&file_unit, hdr_typ, &i_date, &i_ret, &nlev, hdr, evns);
+   readpb_(&file_unit, hdr_typ, &i_date, &i_ret, &nlev, hdr, evns, &req_lev);
 
    // Format and dump out the time string
    sprintf(time_str, "%.10i", i_date);
