@@ -33,7 +33,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl, double y_dbl) {
-   return(interp_points(dp, gt, nint(x_dbl), nint(y_dbl)));
+   int x = nint(x_dbl);
+   int y = nint(y_dbl);
+
+   // if width is even, push center to lower left instead of nearest
+   if((gt.getWidth() % 2) == 0) {
+      x = floor(x_dbl);
+      y = floor(y_dbl);
+   }
+
+   return(interp_points(dp, gt, x, y));
 }
 
 ////////////////////////////////////////////////////////////////////////
