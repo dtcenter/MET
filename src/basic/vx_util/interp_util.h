@@ -40,6 +40,9 @@ static const int dw_mean_pow = 2;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+// Round x_dbl and y_dbl to nearest integer
+extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, double x_dbl, double y_dbl);
+
 // GridTemplate version takes center x/y
 extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, int x, int y);
 extern double   interp_min     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
