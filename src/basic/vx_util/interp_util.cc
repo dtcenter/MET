@@ -32,6 +32,12 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
+NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl, double y_dbl) {
+   return(interp_points(dp, gt, nint(x_dbl), nint(y_dbl)));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y) {
    NumArray points;
 
