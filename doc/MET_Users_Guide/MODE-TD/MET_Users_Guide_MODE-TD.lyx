@@ -2137,6 +2137,56 @@ status open
 
 {
 \backslash
+tt -single file
+\backslash
+_list}
+\end_layout
+
+\end_inset
+
+ may be used instead of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -fcst}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -obs}
+\end_layout
+
+\end_inset
+
+ to define objects in a single field.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+5.
+
+\series default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
 tt -log file}
 \end_layout
 
@@ -2151,7 +2201,7 @@ tt -log file}
 \begin_layout Standard
 
 \series bold
-5.
+6.
 
 \series default
  
@@ -2190,7 +2240,7 @@ tt -log}
 \begin_layout Standard
 
 \series bold
-6.
+7.
 
 \series default
  
