@@ -1494,13 +1494,20 @@ void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
 
 {
 
-int j, k;
+int j;
 CtableEntry e;
 double x, y;
 const double dy = (map_box.height())/Nobjs;
 Box b;
 char junk[256];
 
+
+if ( Nobjs > ctable.n_entries() )  {
+   mlog << Warning << "\ndraw_obj_colortable() -> "
+        << "reusing colors since the number of objects (" << Nobjs
+        << ") exceeds the number of color table entries ("
+        << ctable.n_entries() << ")\n\n";
+}
 
 x = map_box.right();
 
@@ -1512,13 +1519,11 @@ for (j=0; j<Nobjs; ++j)  {
 
    b.set_llwh(x, y, ctable_width, dy);
 
-   e = ctable[j];
+   e = ctable[j%ctable.n_entries()];
 
    fill_box(b, e.color(), plot);
 
-   k = nint(e.value_low());
-
-   snprintf(junk, sizeof(junk), "%d", k);
+   snprintf(junk, sizeof(junk), "%d", j);
 
    plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
 
