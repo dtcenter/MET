@@ -1523,7 +1523,7 @@ for (j=0; j<Nobjs; ++j)  {
 
    fill_box(b, e.color(), plot);
 
-   snprintf(junk, sizeof(junk), "%d", j);
+   snprintf(junk, sizeof(junk), "%d", j+1);
 
    plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
 
