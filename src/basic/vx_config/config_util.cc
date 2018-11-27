@@ -12,6 +12,7 @@ using namespace std;
 
 #include <sys/types.h>
 #include <dirent.h>
+#include <limits.h>
 
 #include "config_util.h"
 
