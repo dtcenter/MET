@@ -423,7 +423,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void make_timestring(unixtime t, char * junk)
+void make_timestring(unixtime t, char * junk, size_t len)
 
 {
 
@@ -432,7 +432,7 @@ int month, day, year, hour, minute, second;
 
 unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-sprintf(junk, "%s %2d, %d  %02d:%02d:%02d",
+snprintf(junk, len, "%s %2d, %d  %02d:%02d:%02d",
         short_month_name[month], day, year,
         hour, minute, second);
 
@@ -450,7 +450,7 @@ ConcatString make_timestring(unixtime u)
 
 char junk[1024];
 
-make_timestring(u, junk);
+make_timestring(u, junk, sizeof(junk));
 
 ConcatString str = junk;
 
@@ -697,7 +697,7 @@ ConcatString HH(int hours)
 
 char junk[1024];
 
-sprintf(junk, "%02d", hours);
+snprintf(junk, sizeof(junk), "%02d", hours);
 
 ConcatString str = junk;
 

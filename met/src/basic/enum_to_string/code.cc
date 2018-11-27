@@ -114,7 +114,7 @@ int len, scope_len, max_len;
 char * len_name = (char *) 0;
 
 
-//    if ( e.scope() )  sprintf(full_id, "%s::%s", e.scope(), e.id(j));
+//    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
 
 
 max_len = 0;
@@ -144,8 +144,8 @@ for (j=0; j<(e.n_ids()); ++j)  {
 len_name = new char [max_len + 40];
 
 
-if ( e.scope() )   sprintf(len_name, "max_enum_%s_%s_len", e.scope(), e.name());
-else               sprintf(len_name, "max_enum_%s_len",   e.name());
+if ( e.scope() )   snprintf(len_name, (max_len + 40), "max_enum_%s_%s_len", e.scope(), e.name());
+else               snprintf(len_name, (max_len + 40), "max_enum_%s_len",   e.name());
 
 
 patch_name(len_name);
@@ -157,7 +157,7 @@ patch_name(len_name);
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   sprintf(junk, "%s_%s", e.u_scope(), e.name());
+   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
 
    make_lowercase(junk, lower);
 
@@ -167,14 +167,14 @@ if ( do_prefix && (e.u_scope()) )  {
 
 }
 
-if ( header_suffix )   sprintf(filename, "%s_to_string%s", lower, header_suffix);
-else                   sprintf(filename, "%s_to_string",   lower);
+if ( header_suffix )   snprintf(filename, sizeof(filename), "%s_to_string%s", lower, header_suffix);
+else                   snprintf(filename, sizeof(filename), "%s_to_string",   lower);
 
 if ( verbose )  cout << program_name << ":  Making header file \"" << filename << "\"\n" << flush;
 
 make_uppercase(e.name(), upper);
 
-sprintf(pound_define, "__%s_TO_STRING_H__", upper);
+snprintf(pound_define, sizeof(pound_define), "__%s_TO_STRING_H__", upper);
 
    //
    //  open output file
@@ -312,7 +312,7 @@ int len, scope_len, max_len;
 char * len_name = (char *) 0;
 
 
-//    if ( e.scope() )  sprintf(full_id, "%s::%s", e.scope(), e.id(j));
+//    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
 
 
 max_len = 0;
@@ -342,8 +342,8 @@ for (j=0; j<(e.n_ids()); ++j)  {
 len_name = new char [max_len + 40];
 
 
-if ( e.scope() )   sprintf(len_name, "max_enum_%s_%s_len", e.scope(), e.name());
-else               sprintf(len_name, "max_enum_%s_len",   e.name());
+if ( e.scope() )   snprintf(len_name, (max_len + 40), "max_enum_%s_%s_len", e.scope(), e.name());
+else               snprintf(len_name, (max_len + 40), "max_enum_%s_len",   e.name());
 
 
 patch_name(len_name);
@@ -355,7 +355,7 @@ patch_name(len_name);
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   sprintf(junk, "%s_%s", e.u_scope(), e.name());
+   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
 
    make_lowercase(junk, lower);
 
@@ -365,14 +365,14 @@ if ( do_prefix && (e.u_scope()) )  {
 
 }
 
-if ( header_suffix )   sprintf(filename, "%s_to_string%s", lower, header_suffix);
-else                   sprintf(filename, "%s_to_string",   lower);
+if ( header_suffix )   snprintf(filename, sizeof(filename), "%s_to_string%s", lower, header_suffix);
+else                   snprintf(filename, sizeof(filename), "%s_to_string",   lower);
 
 if ( verbose )  cout << program_name << ":  Making header file \"" << filename << "\"\n" << flush;
 
 make_uppercase(e.name(), upper);
 
-sprintf(pound_define, "__%s_TO_STRING_H__", upper);
+snprintf(pound_define, sizeof(pound_define), "__%s_TO_STRING_H__", upper);
 
    //
    //  open output file
@@ -525,7 +525,7 @@ if ( do_angle_brackets )  {
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   sprintf(junk, "%s_%s", e.u_scope(), e.name());
+   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
 
    make_lowercase(junk, lower);
 
@@ -535,7 +535,7 @@ if ( do_prefix && (e.u_scope()) )  {
 
 }
 
-sprintf(filename, "%s_to_string.cc", lower);
+snprintf(filename, sizeof(filename), "%s_to_string.cc", lower);
 
 if ( verbose )  cout << program_name << ":  Making source file \"" << filename << "\"\n" << flush;
 
@@ -643,7 +643,7 @@ if ( do_angle_brackets )  {
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   sprintf(junk, "%s_%s", e.u_scope(), e.name());
+   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
 
    make_lowercase(junk, lower);
 
@@ -653,7 +653,7 @@ if ( do_prefix && (e.u_scope()) )  {
 
 }
 
-sprintf(filename, "%s_to_string.cc", lower);
+snprintf(filename, sizeof(filename), "%s_to_string.cc", lower);
 
 if ( verbose )  cout << program_name << ":  Making source file \"" << filename << "\"\n" << flush;
 
@@ -763,8 +763,8 @@ max_len = e.max_id_length();
 
 for (j=0; j<(e.n_ids()); ++j)  {
 
-   if ( e.scope() )  sprintf(full_id, "%s::%s", e.scope(), e.id(j));
-   else              sprintf(full_id, "%s", e.id(j));
+   if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
+   else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
 
    k = strlen(e.id(j));
 
@@ -847,8 +847,8 @@ max_len = e.max_id_length();
 
 for (j=0; j<(e.n_ids()); ++j)  {
 
-   if ( e.scope() )  sprintf(full_id, "%s::%s", e.scope(), e.id(j));
-   else              sprintf(full_id, "%s", e.id(j));
+   if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
+   else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
 
    k = strlen(e.id(j));
 
@@ -1073,7 +1073,7 @@ if ( hour >= 12 )  ampm = "pm";
 
 hour = 1 + (hour + 11)%12;
 
-sprintf(junk, "%s %d, %d   %d:%02d %s %s", 
+snprintf(junk, sizeof(junk), "%s %d, %d   %d:%02d %s %s", 
               month_name[month], day, year, hour, minute, ampm, zone);
 
    //

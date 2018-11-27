@@ -115,9 +115,9 @@ void LevelInfo::dump(ostream &out) const {
    out << "LevelInfo::dump():\n"
        << "  Type    = " << leveltype_to_string(Type) << "\n"
        << "  TypeNum = " << TypeNum << "\n"
-       << "  ReqName = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
-       << "  Name    = " << (Name ? Name.text() : "(nul)") << "\n"
-       << "  Units   = " << (Units ? Units.text() : "(nul)") << "\n"
+       << "  ReqName = " << ReqName.contents() << "\n"
+       << "  Name    = " << Name.contents() << "\n"
+       << "  Units   = " << Units.contents() << "\n"
        << "  Upper   = " << Upper << "\n"
        << "  Lower   = " << Lower << "\n";
 

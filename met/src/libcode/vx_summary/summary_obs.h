@@ -137,7 +137,7 @@ public:
 
     char string_buffer[20];
 
-    sprintf(string_buffer, "%02d%02d%02d", hour, minute, second);
+    snprintf(string_buffer, sizeof(string_buffer), "%02d%02d%02d", hour, minute, second);
 
     return string(string_buffer);
   }

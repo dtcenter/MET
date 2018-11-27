@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+
 #include "two_to_one.h"
 #include "threshold.h"
 #include "thresh_array.h"
@@ -36,7 +38,7 @@ class DataPlane {
       void init_from_scratch();
       void assign(const DataPlane &);
 
-      double * Data;
+      std::vector<double> Data;
 
       int Nx;
       int Ny;
@@ -91,7 +93,7 @@ class DataPlane {
       double   operator () (int x, int y) const;
 
       const double * data() const;
-      double * buf() const;
+      std::vector<double> & buf();
 
          //
          // Do stuff
@@ -133,8 +135,8 @@ inline int      DataPlane::accum() const { return (AccumTime); }
 
 inline double DataPlane::operator()(int x, int y) const { return(get(x, y)); }
 
-inline const double * DataPlane::data() const { return ( Data ); }
-inline       double * DataPlane::buf()  const { return ( Data ); }
+inline const double * DataPlane::data() const { return ( Data.data() ); }
+inline std::vector<double> & DataPlane::buf() { return ( Data ); }
 
 ////////////////////////////////////////////////////////////////////////
 

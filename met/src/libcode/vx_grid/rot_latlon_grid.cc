@@ -344,16 +344,16 @@ a << "Projection: Rotated Lat/Lon";
 a << " Nx: " << Nx;
 a << " Ny: " << Ny;
 
-sprintf(junk, " rot_lat_ll: %.3f", RData.rot_lat_ll);   a << junk;
-sprintf(junk, " rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk;
+snprintf(junk, sizeof(junk), " rot_lat_ll: %.3f", RData.rot_lat_ll);   a << junk;
+snprintf(junk, sizeof(junk), " rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk;
 
-sprintf(junk, " delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk;
-sprintf(junk, " delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk;
+snprintf(junk, sizeof(junk), " delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk;
+snprintf(junk, sizeof(junk), " delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk;
 
-sprintf(junk, " true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk;
-sprintf(junk, " true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk;
+snprintf(junk, sizeof(junk), " true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk;
+snprintf(junk, sizeof(junk), " true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk;
 
-sprintf(junk, " aux_rotation: %.3f", RData.aux_rotation);   a << junk;
+snprintf(junk, sizeof(junk), " aux_rotation: %.3f", RData.aux_rotation);   a << junk;
 
    //
    //  done

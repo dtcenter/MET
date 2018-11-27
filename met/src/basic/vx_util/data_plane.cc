@@ -71,11 +71,11 @@ DataPlane & DataPlane::operator=(const DataPlane &d) {
 
 void DataPlane::init_from_scratch() {
 
-   Data = (double *) 0;
-
+   Nx = 0;
+   Ny = 0;
+   Nxy = 0;
    clear();
 
-   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ void DataPlane::assign(const DataPlane &d) {
 
    set_size(d.nx(), d.ny());
 
-   memcpy(Data, d.Data, Nxy*sizeof(double));
+   Data = d.Data;
 
    InitTime  = d.init();
    ValidTime = d.valid();
@@ -99,8 +99,8 @@ void DataPlane::assign(const DataPlane &d) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::clear() {
-
-   if(Data) { delete [] Data;  Data = (double *) 0; }
+    
+   Data.clear();
 
    Nx = 0;
    Ny = 0;
@@ -117,7 +117,8 @@ void DataPlane::clear() {
 
 void DataPlane::erase() {
 
-   memset(Data, 0, Nxy*sizeof(double));
+   Data.resize(Nxy);
+   Data.assign(Nxy, 0);
 
    InitTime = ValidTime = (unixtime) 0;
    LeadTime = AccumTime = 0;
@@ -175,24 +176,17 @@ void DataPlane::set_size(int x, int y) {
       //  delete exisiting data, if necessary
       //
 
-   if ( Data != (double *) 0 ) {
-      clear();
-   }
-
    Nx = x;
    Ny = y;
 
    Nxy = Nx*Ny;
 
-   Data = new double [Nxy];
-
-   if(!Data) {
-      mlog << Error << "\nvoid DataPlane::set_size() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   memset(Data, 0, Nxy*sizeof(double));
+      //
+      //  resize and initialize data
+      //
+   
+   Data.resize(Nxy);
+   Data.assign(Nxy, 0);
 
    return;
 }
@@ -213,7 +207,7 @@ void DataPlane::set(double v, int x, int y) {
 
 void DataPlane::set_constant(double v) {
 
-   if(!Data) {
+   if(Data.empty()) {
       mlog << Error << "\nDataPlane::set_constant(double) -> "
            << "no data buffer allocated!\n\n";
       exit(1);
@@ -279,7 +273,7 @@ void DataPlane::threshold(const SingleThresh &st) {
 
       if( is_bad_data(Data[j]) )  continue;
       if( st.check(Data[j]) )     Data[j] = 1.0;
-      else                        Data[j] = 0.0;
+      else                           Data[j] = 0.0;
 
    }
 
@@ -438,14 +432,14 @@ void DataPlane::shift_right(int N)
 {
 
    mlog << Debug(3)
-        << "Shifting data to the right " << N << " grid squares.\n";
+        << "Shifting dataplane to the right " << N << " grid squares.\n";
 
    //
    //  check some stuff
    //
 
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error
         << "\n\n  DataPlane::shift_right(int) -> data plane is empty!\n\n";
@@ -466,9 +460,9 @@ if ( N == 0 )  return;   //  no shift, so do nothing
 
 int x, y, x_new;
 int index_old, index_new;
-double * new_data = (double *) 0;
+std::vector<double> new_data;
 
-new_data = new double [Nxy];
+new_data.resize(Nxy, 0);
 
 for (x=0; x<Nx; ++x)  {
 
@@ -485,9 +479,7 @@ for (x=0; x<Nx; ++x)  {
 
 }
 
-delete [] Data;
-
-Data = new_data;  new_data = (double *) 0;
+Data = new_data;
 
    //
    //  done
@@ -505,7 +497,7 @@ void DataPlane::put(const double value, const int x, const int y)
 
 {
 
-if ( !Data )  {
+if ( Data.empty() )  {
 
    mlog << Error
         << "\n\n  DataPlane::put() -> no data plane allocated!\n\n";

@@ -45,7 +45,7 @@ string _secsToTimeString(const int secs)
 
   char string_buffer[20];
 
-  sprintf(string_buffer, "%02d%02d%02d", hour, minute, second);
+  snprintf(string_buffer, sizeof(string_buffer), "%02d%02d%02d", hour, minute, second);
 
   return string(string_buffer);
 }
@@ -153,19 +153,19 @@ void write_summary_attributes(NcFile *nc_file, TimeSummaryInfo summary_info) {
 
    char att_string[1024];
 
-   sprintf(att_string, "%d", summary_info.step);
+   snprintf(att_string, sizeof(att_string), "%d", summary_info.step);
    add_att(nc_file, "time_summary_step", att_string);
 
-   sprintf(att_string, "%d", summary_info.width_beg);
+   snprintf(att_string, sizeof(att_string), "%d", summary_info.width_beg);
    add_att(nc_file, "time_summary_width_beg", att_string);
 
-   sprintf(att_string, "%d", summary_info.width_end);
+   snprintf(att_string, sizeof(att_string), "%d", summary_info.width_end);
    add_att(nc_file, "time_summary_width_end", att_string);
 
    string grib_code_string;
    for (int i = 0; i < summary_info.grib_code.n_elements(); ++i)
    {
-     sprintf(att_string, "%d", summary_info.grib_code[i]);
+     snprintf(att_string, sizeof(att_string), "%d", summary_info.grib_code[i]);
      if (i == 0)
        grib_code_string = string(att_string);
      else

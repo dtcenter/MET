@@ -872,8 +872,8 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    char *c = (char *) 0;
    double lat, lon;
 
-   tmp_str = new char[strlen(poly_str)];
-   strcpy(tmp_str, poly_str);
+   tmp_str = new char[strlen(poly_str) + 1];
+   strncpy(tmp_str, poly_str, sizeof(tmp_str));
 
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
@@ -989,8 +989,8 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
    char *c = (char *) 0;
    double x, y;
 
-   tmp_str = new char[strlen(poly_str)];
-   strcpy(tmp_str, poly_str);
+   tmp_str = new char[strlen(poly_str) + 1];
+   strncpy(tmp_str, poly_str, sizeof(tmp_str));
 
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");

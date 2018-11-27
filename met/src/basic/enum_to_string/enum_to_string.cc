@@ -31,6 +31,7 @@ using namespace std;
 #include "code.h"
 #include "scope.h"
 
+#include "vx_log.h"
 #include "vx_cal.h"
 
 
@@ -44,9 +45,11 @@ using namespace std;
 
 extern int yyparse();
 
-extern FILE * yyin;
+// extern FILE * yyin;
+FILE * yyin = 0;
 
-extern char * yytext;
+// extern char * yytext;
+char * yytext = 0;
 
 extern int yydebug;
 
@@ -155,7 +158,7 @@ if ( dup2(1, 2) < 0 )  {
 
 yydebug = debug;
 
-if ( (yyin = fopen(header_filename, "r")) == NULL )  {
+if ( (yyin = met_fopen(header_filename, "r")) == NULL )  {
 
    cerr << "\n\n  unable to open input file \"" << header_filename << "\"\n\n";
 

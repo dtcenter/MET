@@ -98,7 +98,7 @@ ifstream in;
 MapRegion r;
 int count;
 
-in.open(map_data_filename);
+met_open(in, map_data_filename);
 
 if ( !in )  {
 

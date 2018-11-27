@@ -45,9 +45,8 @@ static int table_rc_to_n(int r_table, int c_table, int w, int h);
 
 
 ContingencyTable::ContingencyTable()
-
 {
-
+    
 init_from_scratch();
 
 }
@@ -69,7 +68,6 @@ clear();
 
 
 ContingencyTable::ContingencyTable(const ContingencyTable & t)
-
 {
 
 init_from_scratch();
@@ -99,15 +97,10 @@ return ( * this );
 
 
 void ContingencyTable::init_from_scratch()
-
 {
-
-E = (int *) 0;
-
-clear();
-
-return;
-
+    E = new vector<int>();
+    Name.clear();
+    Nrows = Ncols = 0;
 }
 
 
@@ -115,17 +108,15 @@ return;
 
 
 void ContingencyTable::clear()
-
 {
-
-Name.clear();
-
-if ( E )  { delete [] E;  E = (int *) 0; }
-
-Nrows = Ncols = 0;
-
-return;
-
+    if (E) delete E;
+    E = new vector<int>();
+    
+    Name.clear();
+    Nrows = Ncols = 0;
+    
+    return;
+    
 }
 
 
@@ -133,29 +124,24 @@ return;
 
 
 void ContingencyTable::assign(const ContingencyTable & t)
-
 {
-
-clear();
-
-if ( !(t.E) )  return;
-
-ContingencyTable::set_size(t.Nrows, t.Ncols);
-
-int n;
-
-n = Nrows*Ncols;
-
-memcpy(E, t.E, n*sizeof(int));
-
-Name = t.Name;
-
-   //
-   //  done
-   //
-
-return;
-
+    
+    clear();
+ 
+    if(t.E->size() == 0)  return;
+ 
+    ContingencyTable::set_size(t.Nrows, t.Ncols);
+    
+    if (E) delete E;
+    E = new vector<int>(*(t.E));
+    Name = t.Name;
+    
+    //
+    //  done
+    //
+    
+    return;
+    
 }
 
 
@@ -163,20 +149,18 @@ return;
 
 
 void ContingencyTable::zero_out()
-
 {
-
-int n = Nrows*Ncols;
-
-if ( n == 0 )  return;
-
-int j;
-
-for (j=0; j<n; ++j)  E[j] = (int) 0;
-
-
-return;
-
+    
+    int n = Nrows*Ncols;
+    
+    if ( n == 0 )  return;
+    
+    int j;
+    
+    E->assign(n, 0);
+    
+    return;
+    
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -202,13 +186,13 @@ out << prefix << "Ncols = " << Ncols << "\n";
 
 out << prefix << "\n";
 
-if ( !E )  { out.flush();  return; }
+if ( E->empty() )  { out.flush();  return; }
 
 for (r=0; r<Nrows; ++r)  {
 
    comma_string(row_total(r), j2);
 
-   sprintf(junk, "Sum for row %2d is %12s", r, j2);
+   snprintf(junk, sizeof(junk), "Sum for row %2d is %12s", r, j2);
 
    out << prefix << junk << "\n";
 
@@ -222,7 +206,7 @@ for (c=0; c<Ncols; ++c)  {
 
    comma_string(col_total(c), j2);
 
-   sprintf(junk, "Sum for col %2d is %12s", c, j2);
+   snprintf(junk, sizeof(junk), "Sum for col %2d is %12s", c, j2);
 
    out << prefix << junk << "\n";
 
@@ -259,7 +243,7 @@ for (c=0; c<Ncols; ++c)  {
 
    col_width[c] = strlen(junk);
 
-   sprintf(junk, "%d", (int) col_total(c));
+   snprintf(junk, sizeof(junk), "%d", (int) col_total(c));
 
    k = strlen(junk);
 
@@ -269,7 +253,7 @@ for (c=0; c<Ncols; ++c)  {
 
       n = rc_to_n(r, c);
 
-      comma_string(E[n], junk);
+      comma_string((*E)[n], junk);
 
       k = strlen(junk);
 
@@ -387,7 +371,7 @@ for (r=0; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
-      comma_string(E[n], junk);
+      comma_string((*E)[n], junk);
 
       k = strlen(junk);
 
@@ -467,7 +451,7 @@ clear();
 
 if ( (NR < 2) || (NC < 2) )  {
 
-   mlog << Error << "\nContingencyTable::set_size() -> # rows and # cols must be at least 2!\n\n";
+   mlog << Error << "\nContingencyTable::set_size() -> # rows (" << NR << ") and # cols (" << NC << ") must be at least 2!\n\n";
 
    exit ( 1 );
 
@@ -477,17 +461,7 @@ int j, n;
 
 n = NR*NC;
 
-E = new int [n];
-
-if ( !E )  {
-
-   mlog << Error << "\nContingencyTable::set_size() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  E[j] = 0;
+E->resize(n, 0);
 
 Nrows = NR;
 Ncols = NC;
@@ -553,7 +527,7 @@ int n;
 
 n = rc_to_n(row, col);
 
-E[n] = value;
+(*E)[n] = value;
 
 
 return;
@@ -572,7 +546,7 @@ int n;
 
 n = rc_to_n(row, col);
 
-++(E[n]);
+++((*E)[n]);
 
 
 
@@ -596,7 +570,7 @@ int j, sum;
 
 sum = 0;
 
-for (j=0; j<n; ++j)  sum += E[j];
+for (j=0; j<n; ++j)  sum += (*E)[j];
 
 
 
@@ -629,7 +603,7 @@ for (col=0; col<Ncols; ++col)  {
 
    n = rc_to_n(row, col);
 
-   sum += E[n];
+   sum += (*E)[n];
 
 }
 
@@ -665,7 +639,7 @@ for (row=0; row<Nrows; ++row)  {
 
    n = rc_to_n(row, col);
 
-   sum += E[n];
+   sum += (*E)[n];
 
 }
 
@@ -689,7 +663,7 @@ int n;
 n = rc_to_n(row, col);
 
 
-return ( E[n] );
+return ( (*E)[n] );
 
 }
 
@@ -707,11 +681,11 @@ if ( n == 0 )  return ( 0 );
 
 int j, a;
 
-a = E[0];
+a = (*E)[0];
 
 for (j=1; j<n; ++j)  {
 
-   if ( E[n] > a )  a = E[n];
+   if ( (*E)[n] > a )  a = (*E)[n];
 
 }
 
@@ -734,11 +708,11 @@ if ( n == 0 )  return ( 0 );
 
 int j, a;
 
-a = E[0];
+a = (*E)[0];
 
 for (j=1; j<n; ++j)  {
 
-   if ( E[n] < a )  a = E[n];
+   if ( (*E)[n] < a )  a = (*E)[n];
 
 }
 
@@ -798,7 +772,7 @@ for (c=0; c<Ncols; ++c)  {
 
    n = rc_to_n(k, c);
 
-   sum += E[n];
+   sum += (*E)[n];
 
 }
 
@@ -816,7 +790,7 @@ for (r=0; r<Nrows; ++r)  {
 
    n = rc_to_n(r, k);
 
-   sum += E[n];
+   sum += (*E)[n];
 
 }
 
@@ -838,7 +812,7 @@ for (r=0; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
-      sum += E[n];
+      sum += (*E)[n];
 
    }
 

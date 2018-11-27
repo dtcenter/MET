@@ -831,7 +831,7 @@ for (j=0; j<Nrows; ++j)  {
 
    n = rc_to_n(j, j);
 
-   sum += (E[n])/DN;
+   sum += ((*E)[n])/DN;
 
 }
 
@@ -914,7 +914,7 @@ for (j=0; j<Nrows; ++j)  {
 
    n = rc_to_n(j, j);
 
-   sum += (E[n])/DN;
+   sum += ((*E)[n])/DN;
 
 }
 
@@ -1044,7 +1044,7 @@ for (j=0; j<Nrows; ++j)  {
 
       n = rc_to_n(j, k);
 
-      m = E[n];
+      m = (*E)[n];
 
       t = m/DN;
 

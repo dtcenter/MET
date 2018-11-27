@@ -171,7 +171,7 @@ void MaskPoly::dump(ostream & out, int depth) const
 
 {
 
-if ( !Name )  return;
+if ( Name.empty() )  return;
 
 int j;
 char NS, EW;
@@ -194,7 +194,7 @@ for (j=0; j<Npoints; ++j)  {
    if ( Lon[j] >= 0.0 )  EW = 'W';
    else                  EW = 'E';
 
-   sprintf(junk, "Point # %2d -> %7.2f %c   %8.2f %c", j, fabs(Lat[j]), NS, fabs(Lon[j]), EW);
+   snprintf(junk, sizeof(junk), "Point # %2d -> %7.2f %c   %8.2f %c", j, fabs(Lat[j]), NS, fabs(Lon[j]), EW);
 
    out << p2 << junk << "\n";
 
@@ -277,7 +277,7 @@ ifstream in;
 
 clear();
 
-in.open(filename);
+met_open(in, filename);
 
 if ( !in )  {
 

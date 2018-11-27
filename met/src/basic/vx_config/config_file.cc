@@ -321,7 +321,7 @@ Filename.add(bison_input_filename);
 
 configdebug = (Debug ? 1 : 0);
 
-if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
+if ( (configin = met_fopen(bison_input_filename, "r")) == NULL )  {
 
    mlog << Error << "\nMetConfig::read(const char *) -> "
         << "unable to open input file \"" << name << "\"\n\n";

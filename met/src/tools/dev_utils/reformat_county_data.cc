@@ -152,7 +152,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
    memset(out_line, 0, sizeof(out_line));
 
-   sprintf(out_line, "%d %d %.3f %.3f %.3f %.3f", 
+   snprintf(out_line, sizeof(out_line), "%d %d %.3f %.3f %.3f %.3f", 
                      region_number, n_points, 
                      lat_min, lat_max, lon_min, lon_max);
 
@@ -186,7 +186,7 @@ while ( in.getline(in_line, sizeof(in_line)) )  {
 
       memset(out_line, 0, sizeof(out_line));
 
-      sprintf(out_line, "%7.3f %8.3f", lat, lon);
+      snprintf(out_line, sizeof(out_line), "%7.3f %8.3f", lat, lon);
 
       out << out_line << '\n' << flush;
 

@@ -3831,7 +3831,7 @@ void compute_perc_interval(double s, NumArray &sr_na,
 void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
    char line[max_line_len];
 
-   sprintf(line,
+   snprintf(line, max_line_len,
            "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
            c.fbar.v,    c.fstdev.v,    c.obar.v,    c.ostdev.v,
            c.pr_corr.v, c.anom_corr.v, c.rmsfa.v,   c.rmsoa.v,
@@ -3850,7 +3850,7 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
 void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
    char line[max_line_len];
 
-   sprintf(line,
+   snprintf(line, max_line_len,
            "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
            c.baser.v,   c.fmean.v,   c.acc.v,     c.fbias.v,
            c.pody.v,    c.podn.v,    c.pofd.v,    c.far.v,
@@ -3869,7 +3869,7 @@ void write_ctsinfo(ofstream &tmp_out, const CTSInfo &c) {
 void write_mctsinfo(ofstream &tmp_out, const MCTSInfo &c) {
    char line[max_line_len];
 
-   sprintf(line, "%f %f %f %f",
+   snprintf(line, max_line_len, "%f %f %f %f",
            c.acc.v, c.hk.v, c.hss.v, c.ger.v);
 
    tmp_out << line << "\n";
@@ -3882,7 +3882,7 @@ void write_mctsinfo(ofstream &tmp_out, const MCTSInfo &c) {
 void write_nbrcntinfo(ofstream &tmp_out, const NBRCNTInfo &c) {
    char line[max_line_len];
 
-   sprintf(line,
+   snprintf(line, max_line_len,
            "%f %f %f %f %f %f",
            c.fbs.v, c.fss.v, c.afss.v, c.ufss.v, c.f_rate.v, c.o_rate.v);
 

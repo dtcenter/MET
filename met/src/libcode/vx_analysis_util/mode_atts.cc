@@ -1109,7 +1109,7 @@ if ( fcst_valid_min_set )  {
 
    unix_to_mdyhms(fcst_valid_min, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "fcst_valid_min = " << junk << "\n";
 
@@ -1119,7 +1119,7 @@ if ( fcst_valid_max_set )  {
 
    unix_to_mdyhms(fcst_valid_max, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "fcst_valid_max = " << junk << "\n";
 
@@ -1129,7 +1129,7 @@ if ( obs_valid_min_set )  {
 
    unix_to_mdyhms(obs_valid_min, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "obs_valid_min = " << junk << "\n";
 
@@ -1139,7 +1139,7 @@ if ( obs_valid_max_set )  {
 
    unix_to_mdyhms(obs_valid_max, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "obs_valid_max = " << junk << "\n";
 
@@ -1149,7 +1149,7 @@ if ( fcst_init_min_set )  {
 
    unix_to_mdyhms(fcst_init_min, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "fcst_init_min = " << junk << "\n";
 
@@ -1159,7 +1159,7 @@ if ( fcst_init_max_set )  {
 
    unix_to_mdyhms(fcst_init_max, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "fcst_init_max = " << junk << "\n";
 
@@ -1169,7 +1169,7 @@ if ( obs_init_min_set )  {
 
    unix_to_mdyhms(obs_init_min, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "obs_init_min = " << junk << "\n";
 
@@ -1179,7 +1179,7 @@ if ( obs_init_max_set )  {
 
    unix_to_mdyhms(obs_init_max, month, day, year, hour, minute, second);
 
-   sprintf(junk, "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
    out << prefix << "obs_init_max = " << junk << "\n";
 

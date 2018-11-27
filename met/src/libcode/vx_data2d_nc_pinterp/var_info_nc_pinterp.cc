@@ -220,7 +220,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
    if(strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
 
    // Set the long name
-   sprintf(tmp_str, "%s(%s)", name().text(), Level.name().text());
+   snprintf(tmp_str, sizeof(tmp_str), "%s(%s)", name().text(), Level.name().text());
    set_long_name(tmp_str);
 
    // Set the units

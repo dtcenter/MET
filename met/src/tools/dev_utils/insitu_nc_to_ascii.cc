@@ -67,7 +67,7 @@ int main(int argc, char * argv [])
   // Open the output file
 
   FILE *output_file;
-  if ((output_file = fopen(output_filepath, "w")) == 0)
+  if ((output_file = met_fopen(output_filepath, "w")) == 0)
   {
 //    mlog << Error << "\n" << method_name << " -> "
 //	 << "error opening output file" << output_filepath << endl;

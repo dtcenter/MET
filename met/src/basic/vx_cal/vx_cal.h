@@ -107,7 +107,7 @@ extern  unixtime yyyymmddhh_to_unix(const char *);
 extern  unixtime yyyymmddhhmm_to_unix(const char *);
 extern  unixtime yyyymmddhhmmss_to_unix(const char *);
 
-extern  void         make_timestring(unixtime, char *);
+extern  void         make_timestring(unixtime, char *, size_t len);
 extern  ConcatString make_timestring(unixtime);
 
 extern  unixtime timestring_to_unix(const char *);

@@ -446,19 +446,19 @@ out << prefix << "Projection = Stereographic\n";
 
 out << prefix << "Hemisphere = " << (is_north() ? "North" : "South") << "\n";
 
-sprintf(junk, "%.5f", Lon_orient);
+snprintf(junk, sizeof(junk), "%.5f", Lon_orient);
 fix_float(junk);
 out << prefix << "Lon_orient       = " << junk << "\n";
 
-sprintf(junk, "%.5f", Alpha);
+snprintf(junk, sizeof(junk), "%.5f", Alpha);
 fix_float(junk);
 out << prefix << "Alpha      = " << junk << "\n";
 
-sprintf(junk, "%.5f", Bx);
+snprintf(junk, sizeof(junk), "%.5f", Bx);
 fix_float(junk);
 out << prefix << "Bx         = " << junk << "\n";
 
-sprintf(junk, "%.5f", By);
+snprintf(junk, sizeof(junk), "%.5f", By);
 fix_float(junk);
 out << prefix << "By         = " << junk << "\n";
 
@@ -497,12 +497,12 @@ a << " Ny: " << Ny;
 
 a << " IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false");
 
-sprintf(junk, " Lon_orient: %.3f", Lon_orient);   a << junk;
+snprintf(junk, sizeof(junk), " Lon_orient: %.3f", Lon_orient);   a << junk;
 
-sprintf(junk, " Bx: %.3f", Bx);   a << junk;
-sprintf(junk, " By: %.3f", By);   a << junk;
+snprintf(junk, sizeof(junk), " Bx: %.3f", Bx);   a << junk;
+snprintf(junk, sizeof(junk), " By: %.3f", By);   a << junk;
 
-sprintf(junk, " Alpha: %.4f", Alpha);   a << junk;
+snprintf(junk, sizeof(junk), " Alpha: %.4f", Alpha);   a << junk;
 
    //
    //  done

@@ -172,7 +172,7 @@ AFDataFile::read(filename, input_hemi);
 int fd = -1;
 int bytes;
 
-if ( (fd = open(filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
    mlog << Error << "\nAFCloudPctFile::read(const char *) -> "
         << "can't open file \"" << filename << "\"\n\n";

@@ -104,11 +104,11 @@ void ATCFTrackLine::dump(ostream &out, int indent_depth) const {
    out << prefix << "SubRegion       = " << subregioncode_to_string(subregion()) << "\n";
    out << prefix << "MaxSeas         = " << max_seas() << "\n";
       cs = initials();
-   out << prefix << "Initials        = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "Initials        = \"" << cs.contents() << "\"\n";
    out << prefix << "StormDirection  = " << storm_direction() << "\n";
    out << prefix << "StormSpeed      = " << storm_speed() << "\n";
       cs = storm_name();
-   out << prefix << "StormName       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "StormName       = \"" << cs.contents() << "\"\n";
    out << prefix << "Depth           = " << systemsdepth_to_string(depth()) << "\n";
    out << prefix << "WaveHeight      = " << wave_height() << "\n";
    out << prefix << "SeasCode        = " << quadranttype_to_string(seas_code()) << "\n";

@@ -672,7 +672,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
    // Find the files matching the specified regular expression with
    // the correct valid and accumulation times.
    //
-   if((dp = opendir(cur_dir)) == NULL ) {
+   if((dp = met_opendir(cur_dir)) == NULL ) {
       mlog << Error << "\nsearch_pcp_dir() -> "
            << "Cannot open precipitation directory "
            << cur_dir << "\n\n";

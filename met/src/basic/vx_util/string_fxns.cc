@@ -244,30 +244,6 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Does replace(met_base_str, MET_BASE) on the output string, first
-// checking the MET_BASE environment variable.
-//
-////////////////////////////////////////////////////////////////////////
-
-ConcatString replace_path(const char * path) {
-   ConcatString s, met_base_val;
-   char *ptr;
-
-   // Initialize
-   s = path;
-
-   // Use the MET_BASE environment variable, if set.
-   // Otherwise, use the compile-time value.
-   if((ptr = getenv(met_base_str)) != NULL) met_base_val = ptr;
-   else                                     met_base_val = MET_BASE;
-
-   s.replace(met_base_str, met_base_val);
-
-   return(s);
-}
-
-////////////////////////////////////////////////////////////////////////
 
 int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 {
@@ -360,7 +336,7 @@ ConcatString str_format(const char *fmt, ...){
    va_list vl;
    va_start(vl, fmt);
    char buf[max_str_len];
-   int status = vsprintf(buf, fmt, vl);
+   int status = vsnprintf(buf, sizeof(buf), fmt, vl);
    va_end(vl);
 
    if( status >= max_str_len - 1 ){

@@ -174,7 +174,7 @@ int month, day, year, hour, minute, second;
 
 unix_to_mdyhms(TimeStart, month, day, year, hour, minute, second);
 
-sprintf(junk, "%s %d, %d   %02d:%02d:%02d", 
+snprintf(junk, sizeof(junk), "%s %d, %d   %02d:%02d:%02d", 
                short_month_name[month], day, year, 
                hour, minute, second);
 
@@ -184,7 +184,7 @@ hour   = TimeDelta/3600;
 minute = (TimeDelta%3600)/60;
 second = TimeDelta%60;
 
-sprintf(junk, "%02d:%02d:%02d", hour, minute, second);
+snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hour, minute, second);
 
 out << prefix << "TimeDelta = " << TimeDelta << "  (" << junk << ")\n";
 

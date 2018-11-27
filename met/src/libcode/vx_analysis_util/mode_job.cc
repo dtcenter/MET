@@ -888,25 +888,25 @@ for (j=0; j<(valid_times.n_elements()); ++j)  {
 
    r = j + 2;
 
-   make_timestring(info[j].valid, junk);
+   make_timestring(info[j].valid, junk, sizeof(junk));
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.0f", info[j].area_matched);
+   snprintf(junk, sizeof(junk), "%.0f", info[j].area_matched);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%.0f", info[j].area_unmatched);
+   snprintf(junk, sizeof(junk), "%.0f", info[j].area_unmatched);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%d", info[j].n_fcst_matched);
+   snprintf(junk, sizeof(junk), "%d", info[j].n_fcst_matched);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%d", info[j].n_fcst_unmatched);
+   snprintf(junk, sizeof(junk), "%d", info[j].n_fcst_unmatched);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%d", info[j].n_obs_matched);
+   snprintf(junk, sizeof(junk), "%d", info[j].n_obs_matched);
    table.set_entry(r, k++, junk);
 
-   sprintf(junk, "%d", info[j].n_obs_unmatched);
+   snprintf(junk, sizeof(junk), "%d", info[j].n_obs_unmatched);
    table.set_entry(r, k++, junk);
 
 }   //  for j

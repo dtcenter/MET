@@ -166,7 +166,7 @@ u = new unsigned char [bytes];
 
 if ( Buf )  {
 
-   memcpy(u, Buf, Size);
+   if ( Size > 0 )  memcpy(u, Buf, Size);
 
    delete [] Buf;  Buf = 0;
 

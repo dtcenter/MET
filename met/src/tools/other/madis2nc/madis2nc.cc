@@ -2362,7 +2362,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    long *cur = new long [2];
    cur[0] = cur[1] = 0;
-   long *dim = new long [1];
+   long *dim = new long [2];
    dim[0] = 1;
 
    int hdr_idx = 0;

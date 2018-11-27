@@ -1622,7 +1622,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    char *ptr;
    ConcatString s;
 
-   if((ptr = getenv("MET_TMP_DIR")) != NULL && (opendir(ptr) != NULL )) {
+   if((ptr = getenv("MET_TMP_DIR")) != NULL && (met_opendir(ptr) != NULL )) {
       s = ptr;
    }
    else {
@@ -1636,7 +1636,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    }
 
    // Make sure that it exists
-   if(opendir(s) == NULL ) {
+   if(met_opendir(s) == NULL ) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
            << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
            << s << "\n\n";

@@ -245,7 +245,7 @@ void Nx2ContingencyTable::set_thresholds(const double * Values)
 
 {
 
-if ( !E )  {
+if ( E->empty() )  {
 
    mlog << Error << "\nNx2ContingencyTable::set_thresholds(const double *) -> table empty!\n\n";
 

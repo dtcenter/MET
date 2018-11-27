@@ -165,7 +165,7 @@ Indent prefix(depth);
 char junk[256];
 
 
-make_timestring(valid, junk);
+make_timestring(valid, junk, sizeof(junk));
 
 
 out << prefix << "Valid Time       = " << junk            << "\n";

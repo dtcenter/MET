@@ -497,19 +497,19 @@ int main(int argc, char *argv[]) {
 
          hdr_idx = use_obs_arr ? h : header_data.typ_idx_array[h];
          str_length = strlen(header_data.typ_array[hdr_idx]);
-         if (str_length > typ_len) str_length = typ_len;
+         if (str_length >= typ_len) str_length = typ_len - 1;
          strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          hdr_idx = use_obs_arr ? h : header_data.sid_idx_array[h];
          str_length = strlen(header_data.sid_array[hdr_idx]);
-         if (str_length > sid_len) str_length = sid_len;
+         if (str_length >= sid_len) str_length = sid_len - 1;
          strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          hdr_idx = use_obs_arr ? h : header_data.vld_idx_array[h];
          str_length = strlen(header_data.vld_array[hdr_idx]);
-         if (str_length > vld_len) str_length = vld_len;
+         if (str_length >= vld_len) str_length = vld_len - 1;
          strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 

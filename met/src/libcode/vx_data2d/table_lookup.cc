@@ -864,7 +864,7 @@ if ( empty(filename) )  {
 
 n_lines = file_linecount(filename) + 1;
 
-in.open(filename);
+met_open(in, filename);
 
 if ( !in )  {
 

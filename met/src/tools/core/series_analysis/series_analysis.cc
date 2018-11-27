@@ -1987,9 +1987,9 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    // Add global attributes
    write_netcdf_global(nc_out, out_file, program_name,
                        conf_info.model, conf_info.obtype, conf_info.desc);
-   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name ?
+   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
                                   (string)conf_info.mask_grid_name : na_str));
-   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name ?
+   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
                                   (string)conf_info.mask_poly_name : na_str));
    add_att(nc_out, "fcst_var",   (string)fcst_info->name());
    add_att(nc_out, "fcst_lev",   (string)fcst_info->level_name());

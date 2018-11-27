@@ -127,7 +127,7 @@ if ( (k < 0) || (k > max_decimal_places) )  {
 
 DecimalPlaces = k;
 
-sprintf(double_format, "%%.%df", DecimalPlaces);   // example:  "%.5f"
+snprintf(double_format, sizeof(double_format), "%%.%df", DecimalPlaces);   // example:  "%.5f"
 
 
 return;
@@ -144,7 +144,7 @@ PSFilter & PSFilter::operator<<(int k)
 
 char junk[128];
 
-sprintf(junk, "%d", k);
+snprintf(junk, sizeof(junk), "%d", k);
 
 (*this) << junk;
 
@@ -206,7 +206,7 @@ PSFilter & PSFilter::operator<<(const double x)
 
 char junk[256];
 
-sprintf(junk, double_format, x);
+snprintf(junk, sizeof(junk), double_format, x);
 
 operator<<(junk);
 

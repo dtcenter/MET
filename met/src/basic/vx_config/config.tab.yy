@@ -431,7 +431,7 @@ mlog << Error
      << "   column = " << c << "\n\n"
      << "   text   = \"" << configtext << "\"\n\n";
 
-in.open(bison_input_filename);
+met_open(in, bison_input_filename);
 
 for (j=1; j<LineNumber; ++j)  {   //  j starts at one here, not zero
 

@@ -158,7 +158,7 @@ column += strlen(yytext);
 
 if ( enum_mode || last_was_enum || last_was_class )  {
 
-   strcpy(yylval.name, yytext);
+   strncpy(yylval.name, yytext, sizeof(yylval.name));
 
    return ( 1 );
 

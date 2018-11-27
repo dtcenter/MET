@@ -184,7 +184,7 @@ set_precision(ascii_table_default_precision);
 
 set_bad_data_value(ascii_table_default_bad_data_value);
 
-sprintf(tmp_str, "%.0f", ascii_table_default_bad_data_value);
+snprintf(tmp_str, sizeof(tmp_str), "%.0f", ascii_table_default_bad_data_value);
 
 set_bad_data_str(tmp_str);
 
@@ -719,8 +719,8 @@ Precision = k;
 memset(f_FloatFormat, 0, sizeof(f_FloatFormat));
 memset(g_FloatFormat, 0, sizeof(g_FloatFormat));
 
-sprintf(f_FloatFormat, "%%.%df", Precision);
-sprintf(g_FloatFormat, "%%.%dg", Precision);
+snprintf(f_FloatFormat, sizeof(f_FloatFormat), "%%.%df", Precision);
+snprintf(g_FloatFormat, sizeof(g_FloatFormat), "%%.%dg", Precision);
 
 return;
 
@@ -941,7 +941,7 @@ if ( !text )  return;
    //  check for bad data value
    //
 
-sprintf(junk, "%.0f", BadDataValue);
+snprintf(junk, sizeof(junk), "%.0f", BadDataValue);
 if ( strncmp(text, junk, strlen(junk)) == 0 ) text = BadDataStr;
 
 k = strlen(text);
@@ -982,7 +982,7 @@ char junk[256];
 
 if ( fabs(a - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
 else if ( DoCommaString )              ::comma_string(a, junk);
-else                                   sprintf(junk, "%d", a);
+else                                   snprintf(junk, sizeof(junk), "%d", a);
 
 set_entry(r, c, junk);
 
@@ -1003,8 +1003,8 @@ char junk[256];
 if ( fabs(x - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
 else  {
 
-   if ( fabs(x) >= 1.0 )  sprintf(junk, f_FloatFormat, x);
-   else                   sprintf(junk, g_FloatFormat, x);
+   if ( fabs(x) >= 1.0 )  snprintf(junk, sizeof(junk), f_FloatFormat, x);
+   else                   snprintf(junk, sizeof(junk), g_FloatFormat, x);
 
 }
 

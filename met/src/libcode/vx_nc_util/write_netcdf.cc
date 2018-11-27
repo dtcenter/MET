@@ -43,22 +43,21 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
    char attribute_str[PATH_MAX];
    char hostname_str[max_str_len];
    char time_str[max_str_len];
-   
+
    unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
-   sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+   snprintf(time_str, sizeof(time_str), "%.4i%.2i%.2i_%.2i%.2i%.2i",
            yr, mon, day, hr, min, sec);
    gethostname(hostname_str, max_str_len);
-   sprintf(attribute_str,
+   snprintf(attribute_str, sizeof(attribute_str),
            "File %s generated %s UTC on host %s by the MET %s tool",
            file_name, time_str, hostname_str, program_name);
    f_out->putAtt("FileOrigins", attribute_str);
    f_out->putAtt("MET_version", met_version);
    f_out->putAtt("MET_tool", program_name);
-   //f_out->putAtt("Conventions", "CF-1.6");
    if(model_name) f_out->putAtt("model",  model_name);
    if(obtype)     f_out->putAtt("obtype", obtype);
    if(desc)       f_out->putAtt("desc",   desc);
-   
+
    return;
 }
 
@@ -107,7 +106,7 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    // Define Variables
    lat_var = f_out->addVar("lat", ncFloat, *lat_dim);
    lon_var = f_out->addVar("lon", ncFloat, *lon_dim);
-   
+
    //lat_var = &lat_var_T;
    //lon_var = &lon_var_T;
 

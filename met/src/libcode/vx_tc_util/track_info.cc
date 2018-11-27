@@ -113,17 +113,17 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
-   out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
+   out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
    out << prefix << "IsBestTrack     = " << bool_to_string(IsBestTrack) << "\n";
    out << prefix << "IsOperTrack     = " << bool_to_string(IsOperTrack) << "\n";
    out << prefix << "CheckAnly       = " << bool_to_string(CheckAnly) << "\n";
    out << prefix << "IsAnlyTrack     = " << bool_to_string(IsAnlyTrack) << "\n";
-   out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
-   out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
-   out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
+   out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
+   out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
+   out << prefix << "StormName       = \"" << StormName.contents() << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
-   out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
-   out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
+   out << prefix << "Technique       = \"" << Technique.contents() << "\"\n";
+   out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
    out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\n";
    out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str) << "\n";
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
@@ -148,17 +148,17 @@ ConcatString TrackInfo::serialize() const {
    ConcatString s;
 
    s << "TrackInfo: "
-     << "StormId = \"" << (StormId ? StormId.text() : "(nul)") << "\""
+     << "StormId = \"" << StormId.contents() << "\""
      << ", IsBest = " << bool_to_string(IsBestTrack)
      << ", IsOper = " << bool_to_string(IsOperTrack)
      << ", CheckAnly = " << bool_to_string(CheckAnly)
      << ", IsAnly = " << bool_to_string(IsAnlyTrack)
-     << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
-     << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
-     << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
+     << ", Basin = \"" << Basin.contents() << "\""
+     << ", Cyclone = \"" << Cyclone.contents() << "\""
+     << ", StormName = \"" << StormName.contents() << "\""
      << ", TechniqueNumber = " << TechniqueNumber
-     << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
-     << ", Initials = \"" << (Initials ? Initials.text() : "(nul)") << "\""
+     << ", Technique = \"" << Technique.contents() << "\""
+     << ", Initials = \"" << Initials.contents() << "\""
      << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str)
      << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str)
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
@@ -488,7 +488,7 @@ bool TrackInfo::is_match(const ATCFTrackLine &l) {
    int diff;
 
    // Make sure the technique is defined.
-   if(!Technique) return(false);
+   if(Technique.empty()) return(false);
 
    // Make sure the basin, cyclone, and technique stay constant.
    if(Basin     != l.basin() ||
@@ -550,7 +550,7 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
       match = false;
 
    // Check that technique is defined
-   if(!Technique || !t.technique()) return(false);
+   if(Technique.empty() || t.technique().empty()) return(false);
 
    // Check that init times match for non-BEST, non-analysis tracks
    if(!IsBestTrack && !t.is_best_track() &&

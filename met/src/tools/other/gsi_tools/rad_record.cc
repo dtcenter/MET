@@ -567,7 +567,7 @@ bool RadFile::open(const char * path, bool _swap_endian, int _rec_pad_size)
 
 close();
 
-if ( (Fd = ::open(path, O_RDONLY)) < 0 )  {
+if ( (Fd = met_open(path, O_RDONLY)) < 0 )  {
 
    Fd = -1;
 
