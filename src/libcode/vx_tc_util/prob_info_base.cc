@@ -93,10 +93,10 @@ void ProbInfoBase::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    out << prefix << "Type            = \"" << atcflinetype_to_string(Type) << "\"\n";
-   out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
-   out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
-   out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
-   out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
+   out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
+   out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
+   out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
+   out << prefix << "Technique       = \"" << Technique.contents() << "\"\n";
    out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\"\n";
    out << prefix << "ValidTime       = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\"\n";
    out << prefix << "Lat             = "   << Lat << "\n";
@@ -122,10 +122,10 @@ ConcatString ProbInfoBase::serialize() const {
 
    s << "ProbInfoBase: "
      << "Type = \"" << atcflinetype_to_string(Type) << "\""
-     << ", StormId = \"" << (StormId ? StormId.text() : "(nul)") << "\""
-     << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
-     << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
-     << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
+     << ", StormId = \"" << StormId.contents() << "\""
+     << ", Basin = \"" << Basin.contents() << "\""
+     << ", Cyclone = \"" << Cyclone.contents() << "\""
+     << ", Technique = \"" << Technique.contents() << "\""
      << ", InitTime = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\""
      << ", ValidTime = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\""
      << ", Lat = " << Lat

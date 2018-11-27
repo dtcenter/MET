@@ -375,7 +375,7 @@ string SummaryObs::getSummaryHeaderType(const string &header_type,
 
    char header_type_string[1024];
 
-   sprintf(header_type_string, "%s_%s_%s",
+   snprintf(header_type_string, sizeof(header_type_string), "%s_%s_%s",
            header_type.c_str(), summary_type.c_str(),
            secsToTimeString(summary_width_secs).c_str());
 

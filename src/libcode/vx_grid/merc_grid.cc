@@ -515,17 +515,17 @@ a << "Projection: Mercator";
 a << " Nx: " << Nx;
 a << " Ny: " << Ny;
 
-sprintf(junk, " Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk;
-sprintf(junk, " Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk;
+snprintf(junk, sizeof(junk), " Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk;
+snprintf(junk, sizeof(junk), " Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk;
 
-sprintf(junk, " Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk;
-sprintf(junk, " Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk;
+snprintf(junk, sizeof(junk), " Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk;
+snprintf(junk, sizeof(junk), " Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk;
 
-sprintf(junk, " Mx: %.4f", Mx);   a << junk;
-sprintf(junk, " My: %.4f", My);   a << junk;
+snprintf(junk, sizeof(junk), " Mx: %.4f", Mx);   a << junk;
+snprintf(junk, sizeof(junk), " My: %.4f", My);   a << junk;
 
-sprintf(junk, " Bx: %.4f", Bx);   a << junk;
-sprintf(junk, " By: %.4f", By);   a << junk;
+snprintf(junk, sizeof(junk), " Bx: %.4f", Bx);   a << junk;
+snprintf(junk, sizeof(junk), " By: %.4f", By);   a << junk;
 
    //
    //  done

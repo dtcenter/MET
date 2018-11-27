@@ -277,11 +277,11 @@ a << "Projection: Lat/Lon";
 a << " Nx: " << Nx;
 a << " Ny: " << Ny;
 
-sprintf(junk, " lat_ll: %.3f", lat_ll);   a << junk;
-sprintf(junk, " lon_ll: %.3f", lon_ll);   a << junk;
+snprintf(junk, sizeof(junk), " lat_ll: %.3f", lat_ll);   a << junk;
+snprintf(junk, sizeof(junk), " lon_ll: %.3f", lon_ll);   a << junk;
 
-sprintf(junk, " delta_lat: %.3f", delta_lat);   a << junk;
-sprintf(junk, " delta_lon: %.3f", delta_lon);   a << junk;
+snprintf(junk, sizeof(junk), " delta_lat: %.3f", delta_lat);   a << junk;
+snprintf(junk, sizeof(junk), " delta_lon: %.3f", delta_lon);   a << junk;
 
    //
    //  done

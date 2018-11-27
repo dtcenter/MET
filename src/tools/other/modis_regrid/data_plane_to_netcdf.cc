@@ -59,8 +59,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 
   write_grid_to_netcdf(plane, grid, out_filename, *var);
 
-  if(var)   
-  { delete var; var   = (VarInfo *) 0; }
+  if(var) { delete var; var   = (VarInfo *) 0; }
 
 }
 

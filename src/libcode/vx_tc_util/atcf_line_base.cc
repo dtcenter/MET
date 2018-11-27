@@ -102,15 +102,15 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
    out << prefix << "Line            = " << (*this) << "\n";
    out << prefix << "Type            = " << atcflinetype_to_string(Type) << "\n";
    cs = basin();
-   out << prefix << "Basin           = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "Basin           = \"" << cs.contents() << "\"\n";
    cs = cyclone_number();
-   out << prefix << "CycloneNumber   = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "CycloneNumber   = \"" << cs.contents() << "\"\n";
    out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(warning_time()) << "\n";
    out << prefix << "TechniqueNumber = " << technique_number() << "\n";
    out << prefix << "ForecastPeriod  = " << forecast_period() << "\n";
    out << prefix << "Valid           = " << unix_to_yyyymmdd_hhmmss(valid()) << "\n";
    cs = technique();
-   out << prefix << "Technique       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "Technique       = \"" << cs.contents() << "\"\n";
    out << prefix << "IsBestTrack     = \"" << (IsBestTrack ? "TRUE" : "FALSE") << "\"\n";
    out << prefix << "IsOperTrack     = \"" << (IsOperTrack ? "TRUE" : "FALSE") << "\"\n";
    out << prefix << "Lat             = " << lat() << "\n";
@@ -222,8 +222,8 @@ ConcatString ATCFLineBase::technique() const {
    ConcatString cs;
 
    // Use Technique, if already set
-   if(Technique) cs = Technique;
-   else          cs = get_item(TechniqueOffset);
+   if(Technique.nonempty()) cs = Technique;
+   else                     cs = get_item(TechniqueOffset);
 
    // Replace instances of AVN with GFS
    cs.replace("AVN", "GFS");

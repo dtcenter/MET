@@ -68,7 +68,7 @@ ShxFileHeader h;
 ShxRecord r;
 
 
-if ( (fd = open(input_filename.contents(), O_RDONLY)) < 0 )  {
+if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open input file \""

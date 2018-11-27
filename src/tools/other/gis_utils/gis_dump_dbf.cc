@@ -69,7 +69,7 @@ DbfHeader h;
 DbfSubRecord sr;
 
 
-if ( (fd = open(input_filename.contents(), O_RDONLY)) < 0 )  {
+if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open input file \""
@@ -146,7 +146,7 @@ for (j=0; j<(h.n_records); ++j)  {
 
    bytes = h.record_length;
 
-   n_read = read(fd, buf, bytes);
+   n_read = read(fd, buf, bytes < buf_size ? bytes : buf_size);
 
    if ( n_read != bytes )  {
 

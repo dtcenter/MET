@@ -22,6 +22,7 @@ using namespace std;
 #include "concat_string.h"
 #include "indent.h"
 #include "string_array.h"
+#include "file_fxns.h"
 #include "logger.h"
 
 

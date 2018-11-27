@@ -402,6 +402,8 @@ unixtime TimeArray::min() const
 int j;
 unixtime u;
 
+if(Nelements == 0)  return(bad_data_ll);
+
 for(j=0, u=e[0]; j<Nelements; j++) {
    if(e[j] < u) u = e[j];
 }
@@ -420,6 +422,8 @@ unixtime TimeArray::max() const
 
 int j;
 unixtime u;
+
+if(Nelements == 0)  return(bad_data_ll);
 
 for(j=0, u=e[0]; j<Nelements; j++) {
    if(e[j] > u) u = e[j];

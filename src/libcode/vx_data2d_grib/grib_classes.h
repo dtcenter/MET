@@ -340,9 +340,9 @@ class GribRecord  {
 
    public:
 
-      unsigned char *      data;   //  allocated
+      vector<unsigned char>        data;   //  allocated
 
-      unsigned char *    bitmap;   //  allocated
+      vector<unsigned char>      bitmap;   //  allocated
 
       Section0_Header *      is;   //  allocated
       unsigned char   *     pds;   //  allocated
@@ -386,11 +386,11 @@ class GribRecord  {
       off_t record_lseek_offset;     //   bytes from beginning of file
       off_t   data_lseek_offset;     //   bytes from beginning of file
 
-      int             data_size;
-      int            data_alloc;
+      //int             data_size;
+      //int            data_alloc;
 
-      int           bitmap_size;
-      int          bitmap_alloc;
+      //int           bitmap_size;
+      //int          bitmap_alloc;
 
       uint4                mask;
 

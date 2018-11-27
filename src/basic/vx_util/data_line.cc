@@ -220,7 +220,7 @@ if ( N_items == 0 )  { out.flush();  return; }
 
 for (j=0; j<N_items; ++j)  {
 
-   sprintf(junk, "Item[%2d]       = \"", j);
+   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
    out << prefix << junk << (Line + Offset[j]) << "\"\n";
 
@@ -232,7 +232,7 @@ out << prefix << "\n";
 
 for (j=0; j<N_items; ++j)  {
 
-   sprintf(junk, "Offset[%2d]     = ", j);
+   snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
 
    out << prefix << junk << (Offset[j]) << "\n";
 
@@ -757,7 +757,7 @@ if ( !in )  {
 
 }
 
-in->open(path);
+met_open((*in), path);
 
 if ( !(*in) )  {
 

@@ -228,7 +228,7 @@ void process_directory(const char * dir_name)
          //
          // the TMPDIR environment variable is not set so check if /tmp exists
          //
-      if ((dir = opendir(tmp_directory)) == NULL)
+      if ((dir = met_opendir(tmp_directory)) == NULL)
       {
          mlog << Error << "\nprocess_directory() -> the directory \"/tmp\" does not exist.\n\n";
          exit (1);
@@ -243,7 +243,7 @@ void process_directory(const char * dir_name)
       //
       // open this directory
       //
-   if ((dir = opendir(dir_name)) == NULL)
+   if ((dir = met_opendir(dir_name)) == NULL)
    {
       mlog << Error << "\nprocess_directory() -> can't open directory \"" << dir_name << "\"\n\n";
       exit (1);

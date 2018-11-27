@@ -286,7 +286,7 @@ out << prefix << "Init Time = ";
 
 unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
-sprintf(junk, "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
 out << junk << "\n";
 

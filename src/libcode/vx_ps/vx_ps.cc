@@ -490,7 +490,7 @@ char junk[256];
    //  read afm file
    //
 
-sprintf(junk, "%02d", n);
+snprintf(junk, sizeof(junk), "%02d", n);
 
 path << data_dir << '/' << afm_directory << '/' << junk << ".afm";
 

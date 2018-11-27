@@ -57,7 +57,7 @@ char buf[buf_size];
    //  open file
    //
 
-if ( (fd = open(filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
    mlog << Error << "\nis_bufr_file() -> unable to open input file \"" << filename << "\"\n\n";
 

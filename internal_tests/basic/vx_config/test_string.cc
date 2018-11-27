@@ -135,7 +135,7 @@ void read_file_into_string(const char * filename, ConcatString & out)
 ifstream in;
 char c;
 
-in.open(filename);
+met_open(in, filename);
 
 if ( !in )  {
 

@@ -476,13 +476,13 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "EventEqualLead ...\n";
    EventEqualLead.dump(out, depth + 1);
 
-   out << prefix << "OutInitMask = " << (OutInitMaskName ? OutInitMaskName.text() : na_str) << "\n";
+   out << prefix << "OutInitMask = " << (OutInitMaskName.nonempty() ? OutInitMaskName.text() : na_str) << "\n";
 
-   out << prefix << "OutValidMask = " << (OutValidMaskName ? OutValidMaskName.text() : na_str) << "\n";
+   out << prefix << "OutValidMask = " << (OutValidMaskName.nonempty() ? OutValidMaskName.text() : na_str) << "\n";
 
-   out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
+   out << prefix << "DumpFile = " << (DumpFile.nonempty() ? DumpFile.text() : na_str) << "\n";
 
-   out << prefix << "StatFile = " << (StatFile ? StatFile.text() : na_str) << "\n";
+   out << prefix << "StatFile = " << (StatFile.nonempty() ? StatFile.text() : na_str) << "\n";
 
    out.flush();
 

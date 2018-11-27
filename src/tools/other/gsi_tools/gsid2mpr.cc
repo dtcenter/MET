@@ -262,7 +262,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
       for(i=0; i<f.n_channels(); i++) {
          if(channel.has(f.channel_val(i))) {
             i_channel.add(i+1);
-            if(cs) cs << ", ";
+            if(cs.nonempty()) cs << ", ";
             cs << f.channel_val(i);
          }
       }

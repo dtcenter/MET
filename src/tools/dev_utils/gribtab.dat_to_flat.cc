@@ -52,7 +52,7 @@ const char * const input_filename = argv[1];
 char line[512];
 ifstream in;
 
-in.open(input_filename);
+met_open(in, input_filename);
 
 if ( ! in )  {
 

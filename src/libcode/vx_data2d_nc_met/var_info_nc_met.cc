@@ -215,7 +215,7 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    if(strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
 
    // Set the long name
-   sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
+   snprintf(tmp_str, sizeof(tmp_str), "%s(%s)", req_name().text(), Level.req_name().text());
    set_long_name(tmp_str);
 
    // Set the units

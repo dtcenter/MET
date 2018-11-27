@@ -3077,7 +3077,7 @@ void dbl_to_str(double v, char *v_str) {
 void dbl_to_str(double v, char *v_str, int precision) {
    char fmt_str[32];
 
-   sprintf(fmt_str, "%s%i%s", "%.", precision, "f");
+   snprintf(fmt_str, sizeof(fmt_str), "%s%i%s", "%.", precision, "f");
 
    if(is_bad_data(v)) sprintf(v_str, "%i", bad_data_int);
    else               sprintf(v_str, fmt_str, v);

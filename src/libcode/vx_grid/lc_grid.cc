@@ -563,17 +563,17 @@ a << "Projection: Lambert Conformal";
 a << " Nx: " << Nx;
 a << " Ny: " << Ny;
 
-sprintf(junk, " Lat_LL: %.3f", Lat_LL);   a << junk;
-sprintf(junk, " Lon_LL: %.3f", Lon_LL);   a << junk;
+snprintf(junk, sizeof(junk), " Lat_LL: %.3f", Lat_LL);   a << junk;
+snprintf(junk, sizeof(junk), " Lon_LL: %.3f", Lon_LL);   a << junk;
 
-sprintf(junk, " Lon_orient: %.3f", Lon_orient);   a << junk;
+snprintf(junk, sizeof(junk), " Lon_orient: %.3f", Lon_orient);   a << junk;
 
-sprintf(junk, " Alpha: %.3f", Alpha);   a << junk;
+snprintf(junk, sizeof(junk), " Alpha: %.3f", Alpha);   a << junk;
 
-sprintf(junk, " Cone: %.3f", Cone);   a << junk;
+snprintf(junk, sizeof(junk), " Cone: %.3f", Cone);   a << junk;
 
-sprintf(junk, " Bx: %.4f", Bx);   a << junk;
-sprintf(junk, " By: %.4f", By);   a << junk;
+snprintf(junk, sizeof(junk), " Bx: %.4f", Bx);   a << junk;
+snprintf(junk, sizeof(junk), " By: %.4f", By);   a << junk;
 
    //
    //  done

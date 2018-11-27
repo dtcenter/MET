@@ -140,7 +140,7 @@ ConcatString regex;
 struct stat sbuf;
 
 
-directory = opendir(directory_path);
+directory = met_opendir(directory_path);
 
 if ( !directory )  {
 
@@ -156,7 +156,7 @@ while ( (entry = readdir(directory)) != NULL )  {
    if ( strcmp(entry->d_name, "." ) == 0 )  continue;
    if ( strcmp(entry->d_name, "..") == 0 )  continue;
 
-   sprintf(entry_path, "%s/%s", directory_path, entry->d_name);
+   snprintf(entry_path, sizeof(entry_path), "%s/%s", directory_path, entry->d_name);
 
    if ( stat(entry_path, &sbuf) < 0 )  {
 
@@ -248,7 +248,7 @@ char file_name[PATH_MAX];
    //  Open the input ascii file
    //
 
-f_in.open(path);
+met_open(f_in, path);
 if(!f_in) {
    mlog << Error << "\nparse_ascii_file_list() -> "
         << "can't open the ASCII file list \"" << path

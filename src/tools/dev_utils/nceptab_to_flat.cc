@@ -170,7 +170,7 @@ if ( ! table_number_set )  {
    //  open the input file
    //
 
-in.open(input_filename);
+met_open(in, input_filename);
 
 if ( ! in )  {
 

@@ -38,7 +38,7 @@ int count = 0;
 ifstream in;
 char c;
 
-in.open(path);
+met_open ( in, path );
 
 if ( !in )  {
 

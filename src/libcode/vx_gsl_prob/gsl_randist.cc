@@ -52,7 +52,7 @@ void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
       // Get the seed based on the current time
       seed = get_seed();
 
-      sprintf(seed_str, "%i", seed);
+      snprintf(seed_str, sizeof(seed_str), "%i", seed);
       setenv("GSL_RNG_SEED", seed_str, 1);
    }
 

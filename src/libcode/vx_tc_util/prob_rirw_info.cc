@@ -89,7 +89,7 @@ void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
    ProbInfoBase::dump(out, indent_depth);
 
    out << prefix << "Value           = "   << Value << "\n";
-   out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
+   out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
    out << prefix << "RIRWBeg         = "   << RIRWBeg << "\n";
    out << prefix << "RIRWEnd         = "   << RIRWEnd << "\n";
 

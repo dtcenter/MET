@@ -151,22 +151,22 @@ void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write THRESH_i, OY_i, ON_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
-      sprintf(tmp_str, "%s%i", pct_columns[2], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
 
-      sprintf(tmp_str, "%s%i", pct_columns[3], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[3], i+1);
       at.set_entry(r, col, tmp_str); // Event Count (OY)
       col++;
 
-      sprintf(tmp_str, "%s%i", pct_columns[4], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[4], i+1);
       at.set_entry(r, col, tmp_str); // Non-Event Count (ON)
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
-      sprintf(tmp_str, "%s%i", pct_columns[2], n_thresh);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], n_thresh);
       at.set_entry(r, col, tmp_str);    // Threshold
    }
 
@@ -210,7 +210,7 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write THRESH_i for each threshold
    for(i=0, col=c+17; i<n_thresh; i++) {
 
-      sprintf(tmp_str, "%s%i", pstd_columns[17], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pstd_columns[17], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
@@ -241,38 +241,38 @@ void write_pjc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // LIKELIHOOD_i, and BASER_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
-      sprintf(tmp_str, "%s%i", pjc_columns[2], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[3], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[3], i+1);
       at.set_entry(r, col, tmp_str); // Event Count/N (OY_TP)
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[4], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[4], i+1);
       at.set_entry(r, col, tmp_str); // Non-Event Count/N (ON_TP)
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[5], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[5], i+1);
       at.set_entry(r, col, tmp_str); // Calibration
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[6], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[6], i+1);
       at.set_entry(r, col, tmp_str); // Refinement
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[7], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[7], i+1);
       at.set_entry(r, col, tmp_str); // Likelihood
       col++;
 
-      sprintf(tmp_str, "%s%i", pjc_columns[8], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[8], i+1);
       at.set_entry(r, col, tmp_str); // Base Rate
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
-      sprintf(tmp_str, "%s%i", pct_columns[2], n_thresh);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], n_thresh);
       at.set_entry(r, col, tmp_str);    // Threshold
    }
 
@@ -301,22 +301,22 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write THRESH_i, PODY_i, POFD_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
-      sprintf(tmp_str, "%s%i", prc_columns[2], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
 
-      sprintf(tmp_str, "%s%i", prc_columns[3], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[3], i+1);
       at.set_entry(r, col, tmp_str); // PODY
       col++;
 
-      sprintf(tmp_str, "%s%i", prc_columns[4], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[4], i+1);
       at.set_entry(r, col, tmp_str); // POFD
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
-      sprintf(tmp_str, "%s%i", prc_columns[2], n_thresh);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], n_thresh);
       at.set_entry(r, col, tmp_str);    // Threshold
    }
 
@@ -347,11 +347,11 @@ void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
    // Write CL_i and VALUE_i for each bin
    for(i=0, col=c+4; i<n_pnt; i++) {
 
-      sprintf(tmp_str, "%s%i", eclv_columns[4], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", eclv_columns[4], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
 
-      sprintf(tmp_str, "%s%i", eclv_columns[5], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", eclv_columns[5], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
    }
@@ -381,7 +381,7 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    // Write RANK_i for each rank
    for(i=0, col=c+2; i<n_rank; i++) {
 
-      sprintf(tmp_str, "%s%i", rhist_columns[2], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", rhist_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each rank
       col++;
    }
@@ -412,7 +412,7 @@ void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
    // Write BIN_i for each bin
    for(i=0, col=c+3; i<n_bin; i++) {
 
-      sprintf(tmp_str, "%s%i", phist_columns[3], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", phist_columns[3], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each bin
       col++;
    }
@@ -452,7 +452,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    // Write ENS_i for each ensemble member
    for(i=0, col=c+12; i<n_ens; i++) {
 
-      sprintf(tmp_str, "%s%i", orank_columns[12], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", orank_columns[12], i+1);
       at.set_entry(r, col, tmp_str); // Ensemble member value
       col++;
    }
@@ -489,7 +489,7 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
    // Write RELP_i for each ensemble member
    for(i=0, col=c+2; i<n_ens; i++) {
-      sprintf(tmp_str, "%s%i", relp_columns[2], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", relp_columns[2], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
    }

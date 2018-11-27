@@ -640,7 +640,7 @@ void clean_up() {
    //
    // Delete the temp file if it exists
    //
-   if(tmp_path) remove_temp_file(tmp_path);
+   if(tmp_path.nonempty()) remove_temp_file(tmp_path);
 
    return;
 }
@@ -710,7 +710,7 @@ void set_out_filename(const StringArray & a)
 void set_tmp_dir(const StringArray & a)
 {
    tmp_dir << a[0];
-   if(opendir(tmp_dir) == NULL ) {
+   if(met_opendir(tmp_dir) == NULL ) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";

@@ -18,6 +18,8 @@
 
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <stdarg.h>
 
 #include "string_array.h"
@@ -71,18 +73,13 @@ class ConcatString {
 
       void extend(int);
 
-
       int AllocInc;
-
-      int Length;
-
-      int Nalloc;
 
       int Precision;
 
       char FloatFormat[16];
 
-      char * s;
+      std::string *s;
 
    public:
 
@@ -177,9 +174,9 @@ class ConcatString {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * ConcatString::text()         const { return ( s ); }
+inline const char * ConcatString::text()         const { return ( s ? s->c_str() : 0); }
 
-inline int          ConcatString::length()       const { return ( Length ); }
+inline int          ConcatString::length()       const { return ( s->length() ); }
 
 inline int          ConcatString::precision()    const { return ( Precision ); }
 
@@ -187,10 +184,10 @@ inline const char * ConcatString::float_format() const { return ( FloatFormat );
 
 inline int          ConcatString::alloc_inc()    const { return ( AllocInc ); }
 
-inline bool         ConcatString::empty()        const { return ( Length == 0 ); }
-inline bool         ConcatString::nonempty()     const { return ( Length > 0 ); }
+inline bool         ConcatString::empty()        const { return ( s->empty() == true ); }
+inline bool         ConcatString::nonempty()     const { return ( s->empty() == false ); }
 
-inline              ConcatString::operator const char * () const { return ( s ); }
+inline              ConcatString::operator const char * () const { return ( s ? s->c_str() : 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

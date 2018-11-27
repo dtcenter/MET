@@ -2209,13 +2209,13 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(stat_file) js << "-out_stat " << stat_file << " ";
 
    // mask_grid
-   if(mask_grid_str) js << "-mask_grid " << mask_grid_str << " ";
+   if(mask_grid_str.nonempty()) js << "-mask_grid " << mask_grid_str << " ";
 
    // mask_poly
-   if(mask_poly_str) js << "-mask_poly " << mask_poly_str << " ";
+   if(mask_poly_str.nonempty()) js << "-mask_poly " << mask_poly_str << " ";
 
    // mask_sid
-   if(mask_sid_str) js << "-mask_sid " << mask_sid_str << " ";
+   if(mask_sid_str.nonempty()) js << "-mask_sid " << mask_sid_str << " ";
 
    // out_line_type
    if(out_line_type.n_elements() > 0) {

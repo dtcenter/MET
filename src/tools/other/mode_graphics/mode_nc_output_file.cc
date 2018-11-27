@@ -313,16 +313,16 @@ if ( f )  {
 
    out << "ValidTime = ";
    unix_to_mdyhms(ValidTime, month, day, year, hour, minute, second);
-   sprintf(junk, "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
    out << junk << '\n';
 
    out << "InitTime  = ";
    unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
-   sprintf(junk, "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
    out << junk << '\n';
 
    out << "AccumTime = ";
-   sprintf(junk, "%02d:%02d:%02d", AccumTime/3600, (AccumTime%3600)/60, AccumTime%60);
+   snprintf(junk, sizeof(junk), "%02d:%02d:%02d", AccumTime/3600, (AccumTime%3600)/60, AccumTime%60);
    out << junk << '\n';
 
 }

@@ -127,10 +127,10 @@ void write_prob_rirw_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
    // Write the variable PROBRIRW header columns
    for(i=0; i<n_thresh; i++) {
-      sprintf(tmp_str, "%s%i", prob_rirw_cols[21], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[21], i+1);
       at.set_entry(r, c++, tmp_str); // THRESH_i
 
-      sprintf(tmp_str, "%s%i", prob_rirw_cols[22], i+1);
+      snprintf(tmp_str, sizeof(tmp_str), "%s%i", prob_rirw_cols[22], i+1);
       at.set_entry(r, c++, tmp_str); // PROB_i
    }
 

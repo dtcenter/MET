@@ -48,7 +48,7 @@ class ContingencyTable {
 
       int rc_to_n(int r, int c) const;
 
-      int * E;   //  this is really a two-dimensional array
+      vector<int> *E;   //  this is really a two-dimensional array
 
       int Nrows;
       int Ncols;

@@ -448,18 +448,6 @@ int n_read;
 
 n_read = ::read(fd, buf, n_bytes);
 
-if ( n_read == n_bytes )  return ( true );
-
-   //
-
-if ( n_read == 0 )  {
-
-   At_Eof = true;
-
-   return ( false );
-
-}
-
 if ( n_read < 0 )  {   //  some kind of error
 
    mlog << Error
@@ -469,6 +457,14 @@ if ( n_read < 0 )  {   //  some kind of error
    exit ( 1 );
 
 }
+
+   //
+
+if ( n_read == 0 )  return ( false );
+
+   //
+
+if ( n_read == n_bytes )  return ( true );
 
 
 return ( false );   //  gotta return something

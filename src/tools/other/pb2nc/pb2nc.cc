@@ -317,7 +317,7 @@ static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 
 static int    get_event_index(int, int, int);
 static int    get_event_index_temp(int, int, int);
-static void   dbl2str(double *, char *);
+static void   dbl2str(double *, char *, size_t);
 
 static bool   keep_message_type(const char *);
 static bool   keep_station_id(const char *);
@@ -669,7 +669,7 @@ void get_variable_info(const char* tbl_filename) {
 
          if (NULL != strstr(line,"CCITT IA5")) {
             ascii_vars.add(var_name);
-            strcpy(var_unit_str,"CCITT IA5");
+            strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str));
          }
          else {
             strncpy(var_unit_str, (line+BUFR_UNIT_START), BUFR_UNIT_LEN);
@@ -824,7 +824,7 @@ void process_pbfile(int i_pb) {
          mlog << Error << "\n" << method_name << " -> "
               << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
       }
-      strcpy(prefix, get_short_name(pbfile[i_pb]));
+      strncpy(prefix, get_short_name(pbfile[i_pb]), sizeof(prefix));
       len1 = strlen(dump_dir);
       len2 = strlen(prefix);
       dumppb_(blk_file, &unit, dump_dir.text(), &len1,
@@ -898,7 +898,7 @@ void process_pbfile(int i_pb) {
    int bin_count = nint(npbmsg/20.0);
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
-   strcpy(bufr_hdr_names, bufr_hdrs.text());
+   strncpy(bufr_hdr_names, bufr_hdrs.text(), sizeof(bufr_hdr_names));
 
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
@@ -925,7 +925,7 @@ void process_pbfile(int i_pb) {
       ireadns_(&unit, hdr_typ, &i_date);
       readpb_hdr_(&unit, &i_ret, hdr);
 
-      sprintf(time_str, "%.10i", i_date);
+      snprintf(time_str, sizeof(time_str), "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
 
       // Check to make sure that the message time hasn't changed
@@ -959,14 +959,14 @@ void process_pbfile(int i_pb) {
             unix_to_yyyymmdd_hhmmss(beg_ut, start_time_str);
          }
          else {
-            strcpy(start_time_str, "NO_BEG_TIME");
+            strncpy(start_time_str, "NO_BEG_TIME", sizeof(start_time_str));
          }
 
          if(end_ut != (unixtime) 0) {
             unix_to_yyyymmdd_hhmmss(end_ut, end_time_str);
          }
          else {
-            strcpy(end_time_str, "NO_END_TIME");
+            strncpy(end_time_str, "NO_END_TIME", sizeof(end_time_str));
          }
 
          mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
@@ -988,7 +988,7 @@ void process_pbfile(int i_pb) {
          char tmp_str[mxr8lv*mxr8pm];
 
          //Read header (station id, lat, lon, ele, time)
-         strcpy(tmp_str, bufr_hdrs.text());
+         strncpy(tmp_str, bufr_hdrs.text(), sizeof(tmp_str));
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
                     &bufr_hdr_length, &req_hdr_level );
 
@@ -1037,7 +1037,7 @@ void process_pbfile(int i_pb) {
       }
 
       // Convert the SID to a string and null terminate
-      dbl2str(&hdr[0], hdr_sid);
+      dbl2str(&hdr[0], hdr_sid, sizeof(hdr_sid));
       hdr_sid[mxr8nm] = '\0';
       // Change the trailing blank space to a null
       for (i=mxr8nm-1; i>0; i--) {
@@ -1174,14 +1174,14 @@ void process_pbfile(int i_pb) {
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
          if (mappedMessageType.length() < HEADER_STR_LEN) {
-            strcpy(modified_hdr_typ, mappedMessageType);
+            strncpy(modified_hdr_typ, mappedMessageType, sizeof(modified_hdr_typ));
          }
          else {
             strncpy(modified_hdr_typ, mappedMessageType.text(), HEADER_STR_LEN);
          }
       }
       else {
-         strcpy(modified_hdr_typ, hdr_typ);
+         strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ));
       }
 
       // Search through the observation values and store them as:
@@ -1798,7 +1798,7 @@ void process_pbfile_metadata(int i_pb) {
          char var_name[BUFR_NAME_LEN+1];
          ConcatString hdr_name_str;
 
-         strcpy(tmp_str, prepbufr_hdrs_str);
+         strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
          length = strlen(tmp_str);
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
          //if (mxr8lv_small < nlev) use_small_buffer = false;
@@ -1821,8 +1821,8 @@ void process_pbfile_metadata(int i_pb) {
             }
          }
          else {
-            strcpy(var_name, default_sid_name);
-            strcpy(tmp_str, bufr_avail_sid_names);
+            strncpy(var_name, default_sid_name, sizeof(var_name));
+            strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
             length = strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
@@ -1830,7 +1830,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strcpy(var_name, tmp_hdr_array[index]);
+                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found station id: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1839,16 +1839,16 @@ void process_pbfile_metadata(int i_pb) {
             if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
             hdr_name_str.add(var_name);
 
-            strcpy(tmp_str, bufr_avail_latlon_names);
+            strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str));
             length = strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
-               strcpy(var_name, default_lon_name);
+               strncpy(var_name, default_lon_name, sizeof(var_name));
                for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strcpy(var_name, tmp_hdr_array[index]);
+                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found  longitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1856,10 +1856,10 @@ void process_pbfile_metadata(int i_pb) {
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
                hdr_name_str.add(var_name);
 
-               strcpy(var_name, default_lat_name);
+               strncpy(var_name, default_lat_name, sizeof(var_name));
                for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strcpy(var_name, tmp_hdr_array[index]);
+                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found   latitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1969,7 +1969,7 @@ void process_pbfile_metadata(int i_pb) {
          int nlev2, buf_nlev;
          int var_name_len;
          char var_name[BUFR_NAME_LEN];
-         strcpy(var_name, (char *)unchecked_var_list[vIdx]);
+         strncpy(var_name, (char *)unchecked_var_list[vIdx], sizeof(var_name));
          var_name_len = strlen(var_name);
 
          readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &tmp_nlev_max_req);
@@ -2339,12 +2339,12 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void dbl2str(double *d, char *str) {
+void dbl2str(double *d, char *str, size_t len) {
    const char *fmt_str = "%s";
 
-   sprintf(str, fmt_str, d);
+   snprintf(str, len, fmt_str, d);
    if (0 == strlen(str)) {
-      strcpy(str, "NA");
+      strncpy(str, "NA", len);
    }
 
    return;
@@ -2513,22 +2513,22 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
    mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
       if (all_vars.has(hdr_arr[i], index)) {
-         strcpy(description, all_descs[index]);
+         strncpy(description, all_descs[index], sizeof(description));
       }
       else {
-         strcpy(description, "");
+         strncpy(description, "", sizeof(description));
       }
-      sprintf(line_buf, "   %8s: %s\n", hdr_arr[i], description);
+      snprintf(line_buf, sizeof(line_buf), "   %8s: %s\n", hdr_arr[i], description);
       mlog << Debug(1) << line_buf;
    }
 
    mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements() << ") :\n";
    for(i=0; i<obs_arr.n_elements(); i++) {
       if (all_vars.has(obs_arr[i], index)) {
-         strcpy(description, all_descs[index]);
+         strncpy(description, all_descs[index], sizeof(description));
       }
       else {
-         strcpy(description, "");
+         strncpy(description, "", sizeof(description));
       }
       if (0 < variableTypeMap.count(obs_arr[i])) {
          StringArray typeArray = variableTypeMap[obs_arr[i]];
@@ -2536,13 +2536,13 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
          char message_types[(BUFR_DESCRIPTION_LEN+1)*(type_cnt+1)];
          message_types[0] = '\0';
          for (int ii=0; ii<type_cnt; ii++) {
-            if (0 < strlen(message_types)) sprintf(message_types, "%s ", message_types);
-            sprintf(message_types, "%s%s", message_types, typeArray[ii]);
+            if (strlen(message_types) < (sizeof(message_types) - 1)) snprintf(message_types, sizeof(message_types), "%s ", message_types);
+            snprintf(message_types, sizeof(message_types), "%s%s", message_types, typeArray[ii]);
          }
-         sprintf(line_buf, "   %8s: %-48s\t\ttypes: %s\n", obs_arr[i], description, message_types);
+         snprintf(line_buf, sizeof(line_buf), "   %8s: %-48s\t\ttypes: %s\n", obs_arr[i], description, message_types);
       }
       else {
-         sprintf(line_buf, "   %8s: %s\n", obs_arr[i], description);
+         snprintf(line_buf, sizeof(line_buf), "   %8s: %s\n", obs_arr[i], description);
       }
       mlog << Debug(1) << line_buf;
    }

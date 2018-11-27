@@ -32,6 +32,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+inline int imin(int a, int b)  { return ( (a < b) ? a : b ); } 
 
 static const char *separator = "===================================================";
 
@@ -102,11 +103,14 @@ word_size = 0;
 
 data_lseek_offset = record_lseek_offset = (off_t) 0;
 
-data   = (unsigned char *) 0;
-bitmap = (unsigned char *) 0;
+// data   = (unsigned char *) 0;
+// bitmap = (unsigned char *) 0;
+//
+//data_size = data_alloc = 0;
+//bitmap_size = bitmap_alloc = 0;
 
-data_size = data_alloc = 0;
-bitmap_size = bitmap_alloc = 0;
+// data = new vector<unsigned char>();
+// bitmap = new vector<unsigned char>();
 
 mask = 0L;
 
@@ -133,15 +137,12 @@ GribRecord::~GribRecord()
 {
 
 if (  is )  { delete  is;    is = (Section0_Header *) 0; }
-if ( pds )  { delete pds;   pds = (unsigned char *)   0; }
+if ( pds )  { delete [] pds;   pds = (unsigned char *)   0; }
 if ( gds )  { delete gds;   gds = (Section2_Header *) 0; }
 if ( bms )  { delete bms;   bms = (Section3_Header *) 0; }
 if ( bds )  { delete bds;   bds = (Section4_Header *) 0; }
-
-if ( data ) { delete [] data;  data = (unsigned char *) 0; }
-
-if ( bitmap ) { delete [] bitmap;  bitmap = (unsigned char *) 0; }
-
+//if ( data ) { delete data; data = (vector<unsigned char> *) 0; }
+//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) 0; }
 }
 
 
@@ -204,29 +205,12 @@ Sec2_offset_in_file = g.Sec2_offset_in_file;
 Sec3_offset_in_file = g.Sec3_offset_in_file;
 Sec4_offset_in_file = g.Sec4_offset_in_file;
 
-data = (unsigned char *) 0;
-data_size = 0;
-
-if ( g.data_size )  {
-
-   extend_data(g.data_size);
-
-   data_size = g.data_size;
-
-   memcpy(data, g.data, data_size);
-
+if ( g.data.size() )  {
+    data = g.data;
 }
 
-bitmap_size = bitmap_alloc = 0;
-
-if ( g.bitmap_size )  {
-
-   extend_bitmap(g.bitmap_size);
-
-   bitmap_size = g.bitmap_size;
-
-   memcpy(data, g.bitmap, bitmap_size);
-
+if ( g.bitmap.size() )  {
+    bitmap = g.bitmap;
 }
 
 TO = g.TO;
@@ -282,32 +266,12 @@ Sec2_offset_in_file = g.Sec2_offset_in_file;
 Sec3_offset_in_file = g.Sec3_offset_in_file;
 Sec4_offset_in_file = g.Sec4_offset_in_file;
 
-if ( data )  {
-
-   delete [] data;   data = (unsigned char *) 0;
-
-   data_size = 0;
-
+if ( g.data.size() ) {
+    data = g.data;
 }
 
-if ( g.data ) {
-
-   extend_data((int) (g.data_size));
-
-   data_size = g.data_size;
-
-   memcpy(data, g.data, data_size);
-
-}
-
-if ( g.bitmap ) {
-
-   extend_bitmap((int) (g.bitmap_size));
-
-   bitmap_size = g.bitmap_size;
-
-   memcpy(bitmap, g.bitmap, bitmap_size);
-
+if ( g.bitmap.size() ) {
+    bitmap = g.bitmap;
 }
 
 TO = g.TO;
@@ -321,38 +285,11 @@ return ( *this );
 
 
 void GribRecord::extend_data(int n)
-
 {
-
-if ( data_alloc >= n )  return;
-
-unsigned char *u = new unsigned char [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nGribRecord::extend_data(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-//   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::extend_data(int) -> memory allocation error\n\n");
-
-}
-
-if ( data )  {
-
-   memcpy(u, data, data_size);
-
-   delete [] data;   data = (unsigned char *) 0;
-
-   data_alloc = 0;
-
-}
-
-data = u;
-
-data_alloc = n;
-
-return;
-
+    if (data.capacity() >= n)
+        return;
+        
+    data.reserve(n);
 }
 
 
@@ -360,38 +297,11 @@ return;
 
 
 void GribRecord::extend_bitmap(int n)
-
 {
-
-if ( bitmap_alloc >= n )  return;
-
-unsigned char *u = new unsigned char [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nGribRecord::extend_bitmap(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-//   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribRecord::extend_bitmap(int) -> memory allocation error\n\n");
-
-}
-
-if ( bitmap )  {
-
-   memcpy(u, bitmap, bitmap_size);
-
-   delete [] bitmap;   bitmap = (unsigned char *) 0;
-
-   bitmap_alloc = 0;
-
-}
-
-bitmap = u;
-
-bitmap_alloc = n;
-
-return;
-
+    if (bitmap.capacity() >= n)
+        return;
+        
+    bitmap.reserve(n);
 }
 
 
@@ -409,7 +319,7 @@ uint4 GribRecord::long_data_value(int n) const
 int k, byte, shift;
 uint4 value, u;
 unsigned char *c1 = (unsigned char *) 0;
-unsigned char *c2 = (unsigned char *) 0;
+const unsigned char *c2 = (unsigned char *) 0;
 
 
 value = 0;
@@ -420,7 +330,7 @@ byte = k/8;
 
 c1 = (unsigned char *) (&u);
 
-c2 = data + byte;
+c2 = data.data() + byte;
 
    //
    //  we might go past the end of the data
@@ -486,11 +396,11 @@ if ( gds )  memset(gds, 0, sizeof(Section2_Header));
 if ( bms )  memset(bms, 0, sizeof(Section3_Header));
 if ( bds )  memset(bds, 0, sizeof(Section4_Header));
 
-if ( data ) memset(data, 0, data_alloc);
+if ( data.size() ) data.clear();
 
-if ( bitmap ) memset(bitmap, 0, bitmap_alloc);
+if ( bitmap.size() ) bitmap.clear();
 
-rec_num = pds_len = gds_flag = bms_flag = d_value = e_value = issue = lead = word_size = data_size = 0;
+rec_num = pds_len = gds_flag = bms_flag = d_value = e_value = issue = lead = word_size = 0;
 
 m_value = b_value = r_value = 0.0;
 
@@ -532,7 +442,7 @@ if ( (n < 0) || (gds_flag && (nx > 0) && (ny > 0) && (n >= nx*ny)) )  {
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribRecord::bms_bit(int) -> range check error ... n = %d\n\n", n);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribRecord::bms_bit(int) -> range check error ... n = %d\n\n", n);
 
 //   throw GribError(range_chk_error, __LINE__, __FILE__, temp_str);
 
@@ -801,14 +711,14 @@ strcpy(rep->name, filename + j);
 
 rep->issue = rep->lead = 0;
 
-if ( (rep->fd = ::open(filename, O_RDONLY)) < 0 )  {
+if ( (rep->fd = met_open(filename, O_RDONLY)) < 0 )  {
 
    mlog << Error << "\nGribFile::open(const char *) -> unable to open grib file " << filename << "\n\n";
 
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribFile::open(const char *) -> unable to open grib file %s\n\n", filename);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::open(const char *) -> unable to open grib file %s\n\n", filename);
 
 //   throw GribError(open_error, __LINE__, __FILE__, temp_str);
    return( false );
@@ -990,7 +900,7 @@ if ( s > (rep->buf_size) )  rep->realloc_buf(s);
 
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribFile::read_record(GribRecord &) -> found a grib record larger than the buffer size.\n\n  Increase the buffer to at least %d bytes.\n\n\n", s);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::read_record(GribRecord &) -> found a grib record larger than the buffer size.\n\n  Increase the buffer to at least %d bytes.\n\n\n", s);
 
 //   throw GribError(record_size_error, __LINE__, __FILE__, temp_str);
 
@@ -1103,8 +1013,10 @@ if ( pds_ptr->flag & 64 )  {
 
    g.extend_bitmap(s);
 
-   memcpy(g.bitmap, rep->buf + bytes_processed + 6, s);
-
+   g.bitmap.clear();
+   unsigned char *begin = rep->buf + bytes_processed + 6;
+   g.bitmap.assign(begin, begin+s);
+   
    // mlog << Debug(1) << "\n\n  reading " << s << " bytes into bitmap at file location " << (bytes_processed + 6) << "\n\n";
 
    bytes_processed += char3_to_int(g.bms->length);
@@ -1190,7 +1102,7 @@ if ( g.word_size > 32 )  {
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribFile::read_record(GribRecord &) -> Binary data word size of %d found\n\n   Binary data word sizes > 32 bits are not implemented.\n\n", g.word_size);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::read_record(GribRecord &) -> Binary data word size of %d found\n\n   Binary data word sizes > 32 bits are not implemented.\n\n", g.word_size);
 
 //   throw GribError(word_size_error, __LINE__, __FILE__, temp_str);
 
@@ -1201,10 +1113,10 @@ g.data_lseek_offset = (long) (g.record_lseek_offset + bytes_processed + 11);
 bytes = char3_to_int(g.bds->length) - 11;
 
 g.extend_data(bytes);
+g.data.clear();
 
-g.data_size = bytes;
-
-memcpy(g.data, rep->buf + bytes_processed + 11, bytes);
+unsigned char *begin = rep->buf + bytes_processed + 11;
+g.data.assign(begin, begin+bytes);
 
 g.mask = 0L;
 
@@ -1297,18 +1209,18 @@ void GribFile::index_records()
 
 {
 
-GribRecord g;
+GribRecord *g = new GribRecord();
 Section1_Header *pds_ptr = (Section1_Header *) 0;
 
 rep->record_extend(1);
 
 rep->n_records = 0;
 
-while ( read_record(g) )  {
+while ( read_record(*g) )  {
 
-   rep->record_info[rep->n_records].lseek_offset = g.record_lseek_offset;
+   rep->record_info[rep->n_records].lseek_offset = g->record_lseek_offset;
 
-   pds_ptr = (Section1_Header *) g.pds;
+   pds_ptr = (Section1_Header *) g->pds;
 
    rep->record_info[rep->n_records].gribcode = pds_ptr->grib_code;
 
@@ -1318,7 +1230,7 @@ while ( read_record(g) )  {
 
 }
 
-return;
+delete g;
 
 }
 
@@ -1363,7 +1275,7 @@ if ( bytes > rep->buf_size )  {
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribFile::read(int) -> can't read %d bytes into a %d byte buffer\n\n", bytes, rep->buf_size);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::read(int) -> can't read %d bytes into a %d byte buffer\n\n", bytes, rep->buf_size);
 
 //   throw GribError(buffer_size_error, __LINE__, __FILE__, temp_str);
 
@@ -1410,7 +1322,7 @@ if ( n_read != bytes )  {
    exit ( 1 );
 //   char temp_str[max_temp_str_length];
 
-//   sprintf(temp_str, "\n\n  GribFile::read() -> file read error ... requested %d bytes, got %d\n\n", bytes, n_read);
+//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::read() -> file read error ... requested %d bytes, got %d\n\n", bytes, n_read);
 
 //   throw GribError(file_read_error, __LINE__, __FILE__, temp_str);
 
@@ -2138,7 +2050,7 @@ switch ( pds->fcst_unit )  {
       exit ( 1 );
 //      char temp_str[max_temp_str_length];
 
-//      sprintf(temp_str, "\n\n  calc_lead_time(Section1_Header *) -> bad value for fcst unit: %d\n\n", pds->fcst_unit);
+//      snprintf(temp_str, sizeof(temp_str), "\n\n  calc_lead_time(Section1_Header *) -> bad value for fcst unit: %d\n\n", pds->fcst_unit);
 
 //      throw GribError(bad_fcst_unit_val_error, __LINE__, __FILE__, temp_str);
 

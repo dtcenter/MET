@@ -280,7 +280,7 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
 
    // Number of points inside the object that meet the threshold criteria
    for(i=0, cur_area=0; i<Nxy; i++) {
-      if(data.buf()[i] > 0 && obj_thresh.check(raw_ptr->data.buf()[i])) cur_area++;
+      if(data.data()[i] > 0 && obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
    }
 
    return(cur_area);
@@ -409,9 +409,9 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    for(i=0, n=0, val_sum=0.0; i<Nxy; i++) {
 
       // Process points for the current object
-      if(data.buf()[i] > 0) {
+      if(data.data()[i] > 0) {
 
-         v = raw_ptr->data.buf()[i];
+         v = raw_ptr->data.data()[i];
 
          // Skip bad data and zero precip
          if(::is_bad_data(v) || (precip_flag && is_eq(v, 0.0))) continue;
@@ -545,8 +545,8 @@ if ( (diameter%2 == 0) || (diameter < 3) )  {
 
 const int radius = (diameter - 1)/2;
 
-const double * in  = in_data.Data;
-      double * out = data.Data;
+const vector<double> * in  = &(in_data.Data);
+      vector<double> * out = &(data.Data);
 
 f = new bool [diameter*diameter];
 
@@ -590,11 +590,11 @@ for(y=0; y<ny; y++) {
          // bad data and continue.
          //
 
-      center = in[dn];
+      center = (*in)[dn];
 
       center_bad = ::is_bad_data(center);
 
-      if ( center_bad && vld_thresh_one ) { out[dn] = bad_data_double;  continue; }
+      if ( center_bad && vld_thresh_one ) { (*out)[dn] = bad_data_double;  continue; }
 
       sum      = 0.0;
       count    = 0;
@@ -622,7 +622,7 @@ for(y=0; y<ny; y++) {
 
             nn = STANDARD_XY_YO_N(nx, xx, yy) ;
 
-            cur = in[nn];
+            cur = (*in)[nn];
 
             if( ::is_bad_data(cur) ) { bd_count++;  continue; }
 
@@ -650,7 +650,7 @@ for(y=0; y<ny; y++) {
 
       }
 
-      out[dn] = sum;
+      (*out)[dn] = sum;
 
    } // for y
 
