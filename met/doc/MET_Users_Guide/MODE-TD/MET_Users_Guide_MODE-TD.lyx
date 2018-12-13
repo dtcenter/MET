@@ -1250,13 +1250,17 @@ status open
 
 \begin_layout Plain Layout
 
-{end time delta}
+{
+\backslash
+bf end time delta}
 \end_layout
 
 \end_inset
 
- are the differences in the corresponding times associated with the two
- objects.
+ are the differences in the corresponding time steps associated with the
+ two objects and are computed as
+\series default
+ ``forecast minus obs''.
 \end_layout
 
 \begin_layout Standard
@@ -1292,9 +1296,10 @@ bf Duration difference}
 \end_inset
 
  is the difference in the lifetimes of the two objects constituting the
- pair, in the sense of ``forecast minus obs.'' For example, if the forecast
- object of the pair has a lifetime of 5 time steps, and the observed object
- has a lifetime of 3 time steps, then this attribute has the value 2.
+ pair, in the sense of ``forecast minus obs''.
+ For example, if the forecast object of the pair has a lifetime of 5 time
+ steps, and the observed object has a lifetime of 3 time steps, then this
+ attribute has the value 2.
  Note that we do not take absolute values of the difference, so this attribute
  can be positive, negative, or zero.
 \end_layout
@@ -5333,7 +5338,7 @@ START_TIME_DELTA
 \begin_inset Text
 
 \begin_layout Plain Layout
-Difference in object start times
+Difference in object starting time steps
 \end_layout
 
 \end_inset
@@ -5362,7 +5367,7 @@ END_TIME_DELTA
 \begin_inset Text
 
 \begin_layout Plain Layout
-Difference in object end times
+Difference in object ending time steps
 \end_layout
 
 \end_inset
