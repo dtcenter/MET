@@ -58,6 +58,10 @@ fcst = {
 
    field = [
       {
+        name = "PROB"; level = "Z10";
+        prob = { name = "WIND"; thresh_lo = 12.89; };
+      },
+      {
         name = "PROB"; level = "Z2";
         prob = { name = "TMP"; thresh_hi = 273.0; };
       },
@@ -75,6 +79,10 @@ fcst = {
 obs = {
 
    field = [
+      {
+        name = "WIND"; level = "Z10";
+        cat_thresh = >12.89;
+      },
       {
         name = "TMP"; level = "Z2";
         cat_thresh = <273.0;
