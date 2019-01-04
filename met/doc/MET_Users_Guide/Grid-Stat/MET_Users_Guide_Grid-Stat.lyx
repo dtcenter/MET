@@ -548,7 +548,7 @@ The MET software will compute the full one-dimensional Fourier transform,
 \series medium
 Decomposition via Fourier transform allows the user to evaluate the model
  separately at each spatial frequency.
- As an example, the Fourier analysis allows users to examinethe "dieoff",
+ As an example, the Fourier analysis allows users to examine the "dieoff",
  or reduction, in anomaly correlation of geopotential height at various
  levels for bands of waves.
  A band of low wave numbers, say 0 - 3, represent larger frequency components,
@@ -1414,9 +1414,10 @@ ion method.
  This 1-dimensional Fourier decomposition is computed along the Y-dimension
  only (i.e.
  the columns of data).
+ It is applied to the forecast and observation fields as well as the climatologi
+cal mean field, if specified.
  It is only defined when each grid point contains valid data.
- If either input field contains missing data, no Fourier decomposition is
- computed.
+ If any input field contains missing data, no Fourier decomposition is computed.
  The available wave numbers start at 0 (the mean across each row of data)
  and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension
  of the verification grid.
