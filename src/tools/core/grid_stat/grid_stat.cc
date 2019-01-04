@@ -1771,6 +1771,10 @@ void process_scores() {
                         i, shc.get_interp_mthd(), bad_data_int,
                         FieldType_Both);
             }
+            if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp_smooth.is_empty()) {
+               write_nc("CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
+                        bad_data_int,  FieldType_Both);
+            }
          } // end if
 
       } // end for j
@@ -2364,6 +2368,10 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].obs_info->name() << "_"
                    << conf_info.vx_opt[i_vx].obs_info->level_name()
                    << var_str << "_" << mask_str;
+         // Append interpolation string for Fourier decomposition
+         if(interp_str) {
+            if(strncmp(interp_str, "_WV", 3) == 0) var_name << interp_str;
+         }
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology mean for "
