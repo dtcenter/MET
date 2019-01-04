@@ -604,6 +604,7 @@ void process_scores() {
 
    // Climatology mean and standard deviation
    DataPlane cmn_dp, csd_dp;
+   DataPlane cmn_dp_smooth;
 
    // Forecast, observation, climatology, and weights
    NumArray f_na, o_na, cmn_na, csd_na, w_na;
@@ -628,7 +629,7 @@ void process_scores() {
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
-   DataPlane cmnu_dp;
+   DataPlane cmnu_dp, cmnu_dp_smooth;
    NumArray fu_na, ou_na, cmnu_na;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
@@ -1504,6 +1505,13 @@ void process_scores() {
          // Apply Fourier decomposition
          fcst_dp_smooth = fcst_dp;
          obs_dp_smooth  = obs_dp;
+         cmn_dp_smooth  = cmn_dp;
+
+         // Reset climo spread since it does not apply to Fourier decomposition
+         if(csd_dp.nx() == fcst_dp_smooth.nx() &&
+            csd_dp.ny() == fcst_dp_smooth.ny()) {
+            csd_dp.set_constant(bad_data_double);
+         }
 
          if(!fcst_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                       conf_info.vx_opt[i].wave_1d_end[j]) ||
@@ -1515,6 +1523,20 @@ void process_scores() {
                  << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
                  << "of bad data values.\n";
             continue;
+         }
+
+         // Decompose the climatology, if provided
+         if(cmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+            cmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+            if(!cmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                        conf_info.vx_opt[i].wave_1d_end[j])) {
+               mlog << Debug(2)
+                    << "Skipping Fourier decomposition for waves "
+                    << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                    << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                    << "of bad climatology data values.\n";
+               continue;
+            }
          }
 
          // Build string for INTERP_MTHD column
@@ -1536,9 +1558,9 @@ void process_scores() {
             // Turn off the mask for missing data values
             mask_bad_data(mask_mp, fcst_dp_smooth);
             mask_bad_data(mask_mp, obs_dp_smooth);
-            if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
-               cmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, cmn_dp);
+            if(cmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+               cmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, cmn_dp_smooth);
             }
             if(csd_dp.nx() == fcst_dp_smooth.nx() &&
                csd_dp.ny() == fcst_dp_smooth.ny()) {
@@ -1548,8 +1570,8 @@ void process_scores() {
             // Apply the current mask to the current fields
             apply_mask(fcst_dp_smooth, mask_mp, f_na);
             apply_mask(obs_dp_smooth,  mask_mp, o_na);
-            apply_mask(cmn_dp,         mask_mp, cmn_na);
-            apply_mask(csd_dp,         mask_mp, csd_na);
+            apply_mask(cmn_dp_smooth,  mask_mp, cmn_na);
+            apply_mask(csd_dp,         mask_mp, csd_na); // Set to bad data above
             apply_mask(wgt_dp,         mask_mp, w_na);
 
             // Set the mask name
@@ -1660,8 +1682,9 @@ void process_scores() {
                            ui, fcst_dp.valid(), grid);
 
                // Apply Fourier decomposition to the U-wind fields
-               fu_dp_smooth = fu_dp;
-               ou_dp_smooth = ou_dp;
+               fu_dp_smooth   = fu_dp;
+               ou_dp_smooth   = ou_dp;
+               cmnu_dp_smooth = cmnu_dp;
 
                if(!fu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                           conf_info.vx_opt[i].wave_1d_end[j]) ||
@@ -1675,11 +1698,25 @@ void process_scores() {
                   continue;
                }
 
+               // Decompose the U-wind climatology field, if provided
+               if(cmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
+                  cmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
+                  if(!cmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                               conf_info.vx_opt[i].wave_1d_end[j])) {
+                     mlog << Debug(2)
+                          << "Skipping Fourier decomposition for waves "
+                          << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                          << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                          << "of bad climatology data values in U-wind.\n";
+                     continue;
+                  }
+               }
+
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth, mask_mp, fu_na);
-               apply_mask(ou_dp_smooth, mask_mp, ou_na);
-               apply_mask(cmnu_dp,      mask_mp, cmnu_na);
-               apply_mask(wgt_dp,       mask_mp, w_na);
+               apply_mask(fu_dp_smooth,   mask_mp, fu_na);
+               apply_mask(ou_dp_smooth,   mask_mp, ou_na);
+               apply_mask(cmnu_dp_smooth, mask_mp, cmnu_na);
+               apply_mask(wgt_dp,         mask_mp, w_na);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
