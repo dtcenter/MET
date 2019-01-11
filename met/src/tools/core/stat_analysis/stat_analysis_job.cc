@@ -737,8 +737,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       // Check output threshold values for 2x2 contingency table
       //
       if(out_lt == stat_fho ||
-         out_lt == stat_fho ||
          out_lt == stat_ctc ||
+         out_lt == stat_cts ||
          out_lt == stat_eclv) {
 
          if(j.out_fcst_thresh.n_elements() != 1 ||
