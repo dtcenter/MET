@@ -1655,13 +1655,212 @@ bool get_nc_data(NcFile *nc, const char *var_name, double *data,
 
 bool get_nc_data(NcVar *var, double *data) {
    bool return_status = false;
+   static const char *method_name = "get_nc_data(NcVar *, double *) ";
 
    if (!IS_INVALID_NC_P(var)) {
       //
-      // Retrieve the float value from the NetCDF variable.
+      // Retrieve the double value from the NetCDF variable.
       // Note: missing data was checked here
       //
-      var->getVar(data);
+      int unpacked_count = 0;
+      int type_id = GET_NC_TYPE_ID_P(var);
+      if ((NcType::nc_DOUBLE == type_id) || (NcType::nc_FLOAT == type_id)){
+         var->getVar(data);
+      }
+      else {
+         int cell_count = 1;
+         for (int idx=0; idx<var->getDimCount();idx++) {
+            NcDim dim = var->getDim(idx);
+            cell_count *= get_dim_size(&dim);
+         }
+         
+         double add_offset = 0.;
+         double scale_factor = 1.;
+         bool unsigned_value = false;
+         NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
+         NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
+         NcVarAtt *att_unsigned     = get_nc_att(var, "_Unsigned");
+         NcVarAtt *att_fill_value   = get_nc_att(var, "_FillValue");
+         if (!IS_INVALID_NC_P(att_add_offset)) {
+            add_offset = get_att_value_double(att_add_offset);
+         }
+         if (!IS_INVALID_NC_P(att_scale_factor)) {
+            scale_factor = get_att_value_double(att_scale_factor);
+         }
+         if (!IS_INVALID_NC_P(att_unsigned)) {
+            ConcatString att_value;
+            get_att_value_chars(att_unsigned, att_value);
+            unsigned_value = (0 == strcmp("true", att_value));
+         }
+         mlog << Debug(4) << method_name << "add_offset = " << add_offset
+              << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
+              << ", is_unsigned_value: " << unsigned_value << "\n";
+
+         switch ( type_id )  {
+            case NcType::nc_INT:
+               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+                  int fill_value = bad_data_int;
+                  int min_value =  2147483647;
+                  int max_value = -2147483648;
+                  int *packed_data = new int[cell_count];
+                  
+                  if (!IS_INVALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_int(att_fill_value);
+                  
+                  var->getVar(packed_data);
+                  for (int idx=0; idx<cell_count; idx++) {
+                     if (fill_value == packed_data[idx])
+                        data[idx] = bad_data_double;
+                     else {
+                        if (min_value > packed_data[idx]) min_value = packed_data[idx];
+                        if (max_value < packed_data[idx]) max_value = packed_data[idx];
+                        data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                        unpacked_count++;
+                     }
+                  }
+                  delete [] packed_data;
+                  mlog << Debug(4) << method_name << " unpacked_count "
+                       << unpacked_count << " out of " << cell_count
+                       << ". FillValue(int) " << fill_value
+                       << " between " << min_value << " and " << max_value << "\n";
+               }
+               break;
+            case NcType::nc_SHORT:
+               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+                  short fill_value = (short)bad_data_int;
+                  short *packed_data = new short[cell_count];
+                  
+                  if (!IS_INVALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_short(att_fill_value);
+                 
+                  var->getVar(packed_data);
+                  
+                  if (unsigned_value) {
+                     int value, unsigned_fill_value;
+                     unsigned_fill_value = (unsigned short)fill_value;
+                     for (int idx=0; idx<cell_count; idx++) {
+                        value = (unsigned short)packed_data[idx];
+                        if (unsigned_fill_value == value)
+                           data[idx] = bad_data_double;
+                        else {
+                           data[idx] = (value * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
+                     }
+                  }
+                  else {
+                     for (int idx=0; idx<cell_count; idx++) {
+                        if (fill_value == packed_data[idx])
+                           data[idx] = bad_data_double;
+                        else {
+                           data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
+                     }
+                  }
+                  if(mlog.verbosity_level() > 6) {
+                     int positive_cnt = 0;
+                     int raw_min_value =  70000;
+                     int raw_max_value = -70000;
+                     double min_value =  10e10;
+                     double max_value = -10e10;
+                     int tmp_value;
+                     for (int idx=0; idx<cell_count; idx++) {
+                        if (fill_value != packed_data[idx]) {
+                           tmp_value = packed_data[idx];
+                           if (unsigned_value) tmp_value = (unsigned short)packed_data[idx];
+                           
+                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
+                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                           if (data[idx] > 0) positive_cnt++;
+                           if (min_value > data[idx]) min_value = data[idx];
+                           if (max_value < data[idx]) max_value = data[idx];
+                        }
+                     }
+                     mlog << Debug(5) << method_name << "unpacked_count "
+                          << unpacked_count << " out of " << cell_count
+                          << ".\n     FillValue(short) " << fill_value
+                          << ", Positive count: " << positive_cnt
+                          << "\n     Scaled range: " << min_value << " and " << max_value
+                          //<< "   packed range: " << raw_min_value << " and " << raw_max_value;
+                          << "\n";
+                  }
+                  delete [] packed_data;
+               }
+               break;
+            case NcType::nc_BYTE:
+               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+                  ncbyte fill_value = (ncbyte)bad_data_int;
+                  char *packed_data = new char[cell_count];
+                  
+                  if (!IS_INVALID_NC_P(att_fill_value)) {
+                     fill_value = get_att_value_char(att_fill_value);
+                  }
+                 
+                  
+                  if (unsigned_value) {
+                     int value, unsigned_fill_value;
+                     unsigned_fill_value = (ncbyte)fill_value;
+                     for (int idx=0; idx<cell_count; idx++) {
+                        value = (unsigned char)packed_data[idx];
+                        if (unsigned_fill_value == value)
+                           data[idx] = bad_data_double;
+                        else {
+                           data[idx] = (value * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
+                     }
+                  }
+                  else {
+                     for (int idx=0; idx<cell_count; idx++) {
+                        if (fill_value == packed_data[idx])
+                           data[idx] = bad_data_double;
+                        else {
+                           data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
+                     }
+                  }
+                  if(mlog.verbosity_level() > 6) {
+                     int positive_cnt = 0;
+                     int raw_min_value =  70000;
+                     int raw_max_value = -70000;
+                     double min_value =  10e10;
+                     double max_value = -10e10;
+                     int tmp_value;
+                     for (int idx=0; idx<cell_count; idx++) {
+                        if (fill_value != packed_data[idx]) {
+                           tmp_value = packed_data[idx];
+                           if (unsigned_value) tmp_value = (unsigned char)packed_data[idx];
+                           
+                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
+                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                           if (data[idx] > 0) positive_cnt++;
+                           if (min_value > data[idx]) min_value = data[idx];
+                           if (max_value < data[idx]) max_value = data[idx];
+                        }
+                     }
+                     mlog << Debug(5) << method_name << "unpacked_count "
+                          << unpacked_count << " out of " << cell_count
+                          << ".\n     FillValue(short) " << fill_value
+                          << ", Positive count: " << positive_cnt
+                          << "\n     Scaled range: " << min_value << " and " << max_value
+                          //<< "   packed range: " << raw_min_value << " and " << raw_max_value;
+                          << "\n";
+                  }
+                  delete [] packed_data;
+               }
+               break;
+            default:
+                 mlog << Debug(1) << method_name << "type_id =============== "
+                      << type_id << " type name: " << GET_NC_TYPE_NAME_P(var)
+                      << "\n";
+         }
+         if(att_add_offset) delete att_add_offset;
+         if(att_scale_factor) delete att_scale_factor;
+         if(att_unsigned) delete att_unsigned;
+         if(att_fill_value) delete att_fill_value;
+      }
       return_status = true;
    }
    return(return_status);
@@ -1684,7 +1883,7 @@ bool get_nc_data(NcVar *var, double *data, const long *cur) {
       *data = bad_data_double;
 
       //
-      // Retrieve the float value from the NetCDF variable.
+      // Retrieve the double value from the NetCDF variable.
       // Note: missing data was checked here
       //
       var->getVar(start, count, data);

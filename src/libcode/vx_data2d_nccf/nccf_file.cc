@@ -38,6 +38,7 @@ static const int  max_met_args           = 30;
 
 const double NcCfFile::DELTA_TOLERANCE = 15.0;
 
+static const char grid_mapping_name_geostationary[] = "geostationary";
 static const char x_dim_key_name[] = "projection_x_coordinate";
 static const char y_dim_key_name[] = "projection_y_coordinate";
 static ConcatString t_dim_name = "Time";
@@ -1285,6 +1286,10 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
   {
     get_grid_mapping_vertical_perspective(grid_mapping_var);
   }
+  else if (grid_mapping_name == grid_mapping_name_geostationary)
+  {
+    get_grid_mapping_geostationary(grid_mapping_var);
+  }
   else
   {
     mlog << Error << "\n" << method_name << " -> "
@@ -2186,6 +2191,289 @@ void NcCfFile::get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_v
   mlog << Error << "\n" << method_name << " -> "
        << "Vertical perspective grid not handled in MET.\n\n";
   exit(1);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void NcCfFile::get_grid_mapping_geostationary(
+    const NcVar *grid_mapping_var)
+{
+  static const string method_name = "NcCfFile::get_grid_mapping_geostationary() ";
+
+  // perspective_point_height
+  NcVarAtt *perspective_point_height_att = get_nc_att(
+    grid_mapping_var, "perspective_point_height");
+  if (IS_INVALID_NC_P(perspective_point_height_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get perspective_point_height attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // semi_major_axis
+  NcVarAtt *semi_major_axis_att = get_nc_att(
+    grid_mapping_var, "semi_major_axis");
+  if (IS_INVALID_NC_P(semi_major_axis_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get semi_major_axis attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // semi_minor_axis
+  NcVarAtt *semi_minor_axis_att = get_nc_att(
+    grid_mapping_var, "semi_minor_axis");
+  if (IS_INVALID_NC_P(semi_minor_axis_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get semi_minor_axis attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // inverse_flattening
+  NcVarAtt *inverse_flattening_att = get_nc_att(
+    grid_mapping_var, "inverse_flattening");
+  if (IS_INVALID_NC_P(inverse_flattening_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get inverse_flattening attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // latitude_of_projection_origin
+  NcVarAtt *proj_origin_lat_att = get_nc_att(
+    grid_mapping_var, "latitude_of_projection_origin");
+  if (IS_INVALID_NC_P(proj_origin_lat_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get latitude_of_projection_origin attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // longitude_of_projection_origin
+  NcVarAtt *proj_origin_lon_att = get_nc_att(
+    grid_mapping_var, "longitude_of_projection_origin");
+  if (IS_INVALID_NC_P(proj_origin_lon_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get longitude_of_projection_origin attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // sweep_angle_axis
+  NcVarAtt *sweep_angle_axis_att = get_nc_att(
+    grid_mapping_var, "sweep_angle_axis");
+  if (IS_INVALID_NC_P(sweep_angle_axis_att))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Cannot get sweep_angle_axis attribute from "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // Look for the x/y dimensions
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // Get the standard name for the coordinate variable
+
+    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    if (IS_INVALID_NC(coord_var))
+      continue;
+
+    const NcVarAtt *std_name_att = get_nc_att(&coord_var, "standard_name");
+    if (IS_INVALID_NC_P(std_name_att))
+      continue;
+
+    ConcatString dim_std_name;
+    if (!get_att_value_chars(std_name_att, dim_std_name))
+      continue;
+    if (std_name_att) {
+       delete std_name_att;
+       std_name_att = (NcVarAtt *)0;
+    }
+  
+    // See if this is an X or Y dimension
+
+    if (strcmp(dim_std_name, x_dim_key_name) == 0)
+    {
+      _xDim = _dims[dim_num];
+
+      x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if (strcmp(Var[var_num].name, x_dim_var_name) == 0)
+        {
+          _xCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+    if (strcmp(dim_std_name, y_dim_key_name) == 0)
+    {
+      _yDim = _dims[dim_num];
+
+      y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if (strcmp(Var[var_num].name, y_dim_var_name) == 0)
+        {
+          _yCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+  }
+
+  bool do_exit = false;
+  if (_xDim == 0)
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
+    do_exit = true;
+  }
+
+  if (_yDim == 0)
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
+    do_exit = true;
+  }
+
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
+         << ") in netCDF file.\n\n";
+    do_exit = true;
+  }
+
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
+         << ") in netCDF file.\n\n";
+    do_exit = true;
+  }
+
+  if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
+      get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
+  {
+    mlog << Error << "\n" << method_name
+         << "-> Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    do_exit = true;
+  }
+
+  if (do_exit) exit(1);
+  
+  // Figure out the dx/dy  and x/y pin values from the dimension variables
+
+  long x_counts = GET_NC_SIZE_P(_xDim);
+  double x_values[x_counts];
+
+  get_nc_data(_xCoordVar, x_values);
+
+
+  long y_counts = GET_NC_SIZE_P(_yDim);
+  double y_values[y_counts];
+
+  get_nc_data(_yCoordVar, y_values);
+
+  // Unit conversion
+
+  // Calculate dx and dy assuming they are constant.  MET requires that dx be
+  // equal to dy
+
+  int bound_count = 0;
+  for (int j=0; j<_numDims; ++j)  {
+     if (0 == strcmp(_dims[j]->getName().c_str(), "number_of_image_bounds")) {
+        bound_count = _dims[j]->getSize();
+        break;
+     }
+  }
+  NcVar *var_x_bound = (NcVar *)0;
+  NcVar *var_y_bound = (NcVar *)0;
+  for (int j=0; j<Nvars; ++j)  {
+    if (0 == strcmp(Var[j].name, "x_image_bounds")) var_x_bound = Var[j].var;
+    if (0 == strcmp(Var[j].name, "y_image_bounds")) var_y_bound = Var[j].var;
+  }
+  
+
+  // Fill in the data structure.  Remember to negate the longitude
+  // values since MET uses the mathematical coordinate system centered on
+  // the center of the earth rather than the regular map coordinate system.
+
+  GoesImagerData data;
+  double double_data;
+  NumArray double_datas;
+  data.reset();
+  
+  //data.name = grid_mapping_var->getName().c_str();
+  data.name = grid_mapping_name_geostationary;
+  data.perspective_point_height = get_att_value_double(perspective_point_height_att);
+  data.semi_major_axis = get_att_value_double(semi_major_axis_att);
+  data.semi_minor_axis = get_att_value_double(semi_minor_axis_att);
+  data.inverse_flattening = get_att_value_double(inverse_flattening_att);
+  data.lat_of_projection_origin = get_att_value_double(proj_origin_lat_att);
+  data.lon_of_projection_origin = get_att_value_double(proj_origin_lon_att);
+  //data.sweep_angle_axisconst;
+  data.nx = x_counts;
+  data.ny = y_counts;
+  data.dx_rad = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
+  data.dy_rad = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  if (bound_count > 0) {
+    data.x_image_bounds = new double[bound_count];
+    data.y_image_bounds = new double[bound_count];
+    if (0 != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds);
+    if (0 != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds);
+  }
+
+  double flatten = 1.0/data.inverse_flattening;
+  data.ecc = sqrt(2.0*flatten - flatten*flatten);
+  data.radius_ratio2 = pow((data.semi_major_axis/data.semi_minor_axis), 2.0);
+  data.inv_radius_ratio2 = 1.0/data.radius_ratio2;
+  data.H = data.perspective_point_height + data.semi_major_axis;
+  //data._xSubSatIdx;
+  //data._ySubSatIdx;
+  
+  data.x_values = new double[x_counts];
+  data.y_values = new double[y_counts];
+
+  memcpy(data.x_values, x_values, sizeof(data.x_values[0])*x_counts);
+  memcpy(data.y_values, y_values, sizeof(data.y_values[0])*y_counts);
+
+  int index, buf_len;
+  double lat, lon;
+  double lat_rad, lon_rad;
+  double lat_min, lat_max, lon_min, lon_max;
+  int idx_lat_min, idx_lat_max, idx_lon_min, idx_lon_max;
+  double x_rad, cos_x, sin_x;
+  double y_rad, cos_y, sin_y;
+  double semi_major_axis_sqr = data.semi_major_axis * data.semi_major_axis;
+  double axis_ratio = semi_major_axis_sqr / (data.semi_minor_axis*data.semi_minor_axis);
+  double param_c = data.H * data.H - semi_major_axis_sqr;
+
+  // Note: Computing lat/lon was deferred because it took 1 minutes
+  
+  grid.set(data);
+  //data.dump();
+  
+  if (perspective_point_height_att) delete perspective_point_height_att;
+  if (semi_major_axis_att) delete semi_major_axis_att;
+  if (semi_minor_axis_att) delete semi_minor_axis_att;
+  if (inverse_flattening_att) delete inverse_flattening_att;
+  if (proj_origin_lat_att) delete proj_origin_lat_att;
+  if (proj_origin_lon_att) delete proj_origin_lon_att;
+  if (sweep_angle_axis_att) delete sweep_angle_axis_att;
 }
 
 

@@ -27,5 +27,6 @@ libvx_grid_a_SOURCES = \
               st_grid.cc st_grid.h \
               latlon_xyz.h latlon_xyz.cc \
               rot_latlon_grid.cc rot_latlon_grid.h \
+              goes_grid_defs.h goes_grid.cc goes_grid.h \
               vx_grid.h
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
