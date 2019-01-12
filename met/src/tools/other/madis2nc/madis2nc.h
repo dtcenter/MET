@@ -35,14 +35,18 @@ using namespace std;
 #include "mask_poly.h"
 #include "vx_grid.h"
 
+#include "vx_nc_util.h"
+#include "vx_summary.h"
+#include "nc_obs_util.h"
+#include "nc_summary.h"
+
+#include "madis2nc_conf_info.h"
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Constants
 //
 ////////////////////////////////////////////////////////////////////////
-
-//#define BUFFER_SIZE (128*1024)
-//#define BUFFER_SIZE (32*1024)
 
 
 // Enumeration of possible MADIS observation types
@@ -68,6 +72,9 @@ enum MadisType {
 
 // Constants
 static const char *program_name = "madis2nc";
+static const char *DEFAULT_CONFIG_FILENAME =
+  "MET_BASE/config/Madis2NcConfig_default";
+
 static const float fill_value   = -9999.f;
 static const int   strl_len     = 16; // Length of "YYYYMMDD_HHMMSS"
 static const int   hdr_arr_len  = 3;  // Observation header length
@@ -115,6 +122,7 @@ static MaskPoly     mask_poly;
 static StringArray  mask_sid;
 
 static int compress_level = -1;
+static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 
 // Counters
 static int          i_obs    = 0;
@@ -136,6 +144,13 @@ NcFile *f_out = (NcFile *) 0;
 int    processed_count;
 
 ////////////////////////////////////////////////////////////////////////
+
+static Madis2NcConfInfo conf_info;
+static NcObsOutputData nc_out_data;
+
+static bool do_summary;
+static bool save_summary_only = false;
+static SummaryObs *summary_obs;
 
 #endif   //  __MADIS2NC_H__
 
