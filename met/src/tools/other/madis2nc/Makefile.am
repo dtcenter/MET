@@ -11,7 +11,7 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS    = madis2nc
-madis2nc_SOURCES = madis2nc.cc
+madis2nc_SOURCES = madis2nc.cc madis2nc_conf_info.cc
 madis2nc_CPPFLAGS = ${MET_CPPFLAGS}
 madis2nc_LDFLAGS = ${MET_LDFLAGS}
 madis2nc_LDADD = -lvx_stat_out \
