@@ -671,7 +671,7 @@ void get_grid_mapping(const ConcatString cur_coord_name, Grid &fr_grid, Grid to_
             fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
             
-            bool compare_binary_and_computation = true;
+            bool compare_binary_and_computation = false;
             if (compare_binary_and_computation and fr_grid.info().gi) {
                grid_data.copy(fr_grid.info().gi);
                grid_data.compute_lat_lon();
