@@ -298,6 +298,7 @@ ll  = (const LatLonData *)        0;
 rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
+gi  = (const GoesImagerData *)    0;
 
 clear();
 
@@ -319,6 +320,7 @@ if ( ll  )  { delete ll;   ll  = (const LatLonData *)        0; };
 if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
 if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
+if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
 
 return;
 
@@ -338,6 +340,7 @@ if ( info.ll  )  set( *(info.ll)  );
 if ( info.rll )  set( *(info.rll) );
 if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
+if ( info.gi  )  set( *(info.gi ) );
 
 return;
 
@@ -359,6 +362,7 @@ if ( ll  ) ++count;
 if ( rll ) ++count;
 if ( m   ) ++count;
 if ( g   ) ++count;
+if ( gi  ) ++count;
 
 return ( count == 1 );
 
@@ -386,6 +390,7 @@ else if ( ll  )  gg.set( *ll  );
 else if ( rll )  gg.set( *rll );
 else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
+else if ( gi  )  gg.set( *gi  );
 
 return;
 
@@ -518,6 +523,28 @@ D = new GaussianData;
 memcpy(D, &data, sizeof(data));
 
 g = D;  D = (GaussianData *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const GoesImagerData & data)
+
+{
+
+clear();
+
+GoesImagerData * D = (GoesImagerData *) 0;
+
+D = new GoesImagerData;
+
+memcpy(D, &data, sizeof(data));
+
+gi = D;  D = (GoesImagerData *) 0;
 
 return;
 

@@ -169,6 +169,7 @@ class NcCfFile {
       void get_grid_mapping_stereographic(const NcVar *grid_mapping_var);
       void get_grid_mapping_transverse_mercator(const NcVar *grid_mapping_var);
       void get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_var);
+      void get_grid_mapping_geostationary(const NcVar *grid_mapping_var);
       
       bool get_grid_from_coordinates(const NcVar *data_var);
       bool get_grid_from_dimensions();
