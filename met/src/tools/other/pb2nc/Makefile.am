@@ -13,6 +13,8 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS  = pb2nc
 pb2nc_SOURCES = pb2nc.cc \
 	pb2nc_conf_info.cc \
+	calcape.f \
+	calpbl.f \
 	numpbmsg.f \
 	openpb.f \
 	closepb.f \
