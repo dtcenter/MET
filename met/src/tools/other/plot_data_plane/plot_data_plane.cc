@@ -132,17 +132,14 @@ int main(int argc, char * argv[])
    config.read(replace_path(config_map_data_filename));
 
       //
-      //  get the field info from the command line
+      // get the field info from the command line
       //
-      //
-
    config.read_string(FieldString);
 
       //
       // get the gridded file type from config string, if present
       //
    ftype = parse_conf_file_type(&config);
-
 
       //
       // instantiate the Met2dDataFile object using the data_2d_factory
@@ -175,9 +172,7 @@ int main(int argc, char * argv[])
       //
       // get the data plane from the file for this VarInfo object
       //
-
    status = met_ptr->data_plane(*var_ptr, data_plane);
-
 
    if ( ! status )
    {
