@@ -2260,8 +2260,8 @@ shift_right = 0;
 //
 
 //
-// The "message_type" entry is an array of message types to be retained.  An
-// empty list indicates that all should be retained.
+// In the PB2NC tool, the "message_type" entry is an array of message types
+// to be retained.  An empty list indicates that all should be retained.
 //
 // List of valid message types:
 //    ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
