@@ -897,11 +897,12 @@ void get_interp_points(const DataPlaneArray &dpa,
                                   pts_abv[i], dpa.lower(i_abv), to_lvl);
       }
 
-      // Store valid data values
-      if(!is_bad_data(v)) {
-         n_vld++;
-         interp_pnts.add(v);
-      }
+      // Keep track of valid data count
+      if(!is_bad_data(v)) n_vld++;
+ 
+      // Store the current value     
+      interp_pnts.add(v);
+
    } // end for i
 
    // Check for enough valid data
