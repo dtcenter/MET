@@ -1738,6 +1738,10 @@ void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
          // Check for values
          if(f_ens.n() == 0) continue;
 
+         // Skip points where climatology has been specified but is bad data
+         if(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa.n_planes() > 0 &&
+            is_bad_data(pd_ptr->cmn_na[j])) continue;
+
          // Store the observation value
          hira_pd.add_obs(pd_ptr->sid_sa[j],
             pd_ptr->lat_na[j], pd_ptr->lon_na[j],
