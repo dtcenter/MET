@@ -50,11 +50,17 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl
 NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y) {
    NumArray points;
 
-   // Search the neighborhood
+   // Search the neighborhood, storing any points off the grid as bad data
    GridPoint *gp = NULL;
-   for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny() );
-        gp != NULL; gp = gt.getNextInGrid()){
-      points.add(dp.get(gp->x, gp->y));
+   for(gp = gt.getFirst(x, y, dp.nx(), dp.ny() );
+        gp != NULL; gp = gt.getNext()){
+      if(gp->x < 0 || gp->x >= dp.nx() ||
+         gp->y < 0 || gp->y >= dp.ny()) {
+         points.add(bad_data_double);
+      }
+      else {
+         points.add(dp.get(gp->x, gp->y));
+      }
    }
 
    return(points);
@@ -132,8 +138,8 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt, int x, int y, dou
    double max_v = bad_data_double;
 
    // Search the neighborhood
-   for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-        gp != NULL; gp = gt.getNextInGrid()){
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
 
       double v = dp.get(gp->x,gp->y);
       if (is_bad_data(v)) continue;
@@ -197,8 +203,8 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, 
    data = new double [gt.size()];
 
    // Search the neighborhood
-   for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-        gp != NULL; gp = gt.getNextInGrid()){
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
 
       double v = dp.get(gp->x,gp->y);
       if (is_bad_data(v)) continue;
@@ -272,8 +278,8 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    double uw_mean_v = bad_data_double;
 
    // Sum the valid data in the neighborhood
-   for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-        gp != NULL; gp = gt.getNextInGrid()){
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
 
       double v = dp.get(gp->x,gp->y);
       if (is_bad_data(v)) continue;
@@ -487,8 +493,8 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    // Compute the ratio of events within the neighborhood
    count = count_thr = 0;
 
-   for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-        gp != NULL; gp = gt.getNextInGrid()){
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
 
       double data = dp.get(gp->x,gp->y);
       if (is_bad_data(data)) continue;
