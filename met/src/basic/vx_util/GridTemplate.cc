@@ -155,6 +155,50 @@ GridPoint *GridTemplate::getNextInGrid(void) const
 }
 
 /**********************************************************************
+ * getFirst() - Get the first template grid point without checking
+ *              the grid bounds.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
+                                  const int &nx, const int &ny) const
+{
+  // Set the grid information
+  setGrid(base_x, base_y, nx, ny);
+
+  // Send back the first point
+  return getNext();
+}
+
+/**********************************************************************
+ * getNext() - Get the next template grid point without checking the
+ *             grid bounds. Returns NULL when there are no more points.
+ *
+ * Returns a pointer to a static object which must NOT be deleted by the
+ * calling routine.
+ */
+
+GridPoint *GridTemplate::getNext(void) const
+{
+  while (_pointInGridIterator != _offsetList.end())
+  {
+    GridOffset *offset = *_pointInGridIterator;
+
+    _pointInGridIterator++;
+
+    _pointInGridReturn.x = _pointInGridBase.x + offset->x_offset;
+    _pointInGridReturn.y = _pointInGridBase.y + offset->y_offset;
+
+    return &_pointInGridReturn;
+
+  }
+
+  return (GridPoint *)NULL;
+}
+
+/**********************************************************************
  * getFirstInLftEdge() - Get the first template grid point in the left
  *                       column.
  *

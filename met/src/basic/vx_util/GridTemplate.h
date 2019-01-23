@@ -86,6 +86,10 @@ class GridTemplate
                             const int &nx, const int &ny) const;
   GridPoint *getNextInGrid(void) const;
 
+  GridPoint *getFirst(const int &base_x, const int &base_y,
+                      const int &nx, const int &ny) const;
+  GridPoint *getNext(void) const;
+
   GridPoint *getFirstInLftEdge(void) const;
   GridPoint *getNextInLftEdge(void)  const;
 
