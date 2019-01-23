@@ -1837,18 +1837,27 @@ void do_hira_prob(int i_vx, PairDataPoint *pd_ptr) {
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
 
-            // Compute the fractional coverage climatological mean value
-            // using the observation level value
-            find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
-                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
+            // Compute the fractional coverage for the climatological mean
+            if(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa.n_planes() > 0) {
 
-            cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
-                         pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
-                         InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                         conf_info.vx_opt[i_vx].hira_info.shape,
-                         conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                         conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                         pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+               // Interpolate to the observation level
+               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
+                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
+
+               cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
+                            pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                            InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
+                            conf_info.vx_opt[i_vx].hira_info.shape,
+                            conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
+                            conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
+                            pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+
+               // Check for bad data
+               if(is_bad_data(cmn_cov)) continue;
+            }
+            else {
+               cmn_cov = bad_data_double;
+            }
 
             // Store the fractional coverage pair
             hira_pd.add_pair(pd_ptr->sid_sa[k],
