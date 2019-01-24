@@ -188,23 +188,7 @@ hskip 0.5in}
 
 \end_inset
 
--adeck source
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
--edeck source
+-adeck source and/or -edeck source
 \end_layout
 
 \begin_layout LyX-Code
@@ -318,6 +302,15 @@ argument indicates the adeck ATCF format data source containing tropical
 \end_inset
 
  to be processed.
+ The 
+\series bold
+-adeck
+\series medium
+ or 
+\series bold
+-edeck
+\series medium
+ option must be used at least once.
 \end_layout
 
 \begin_layout Description
@@ -340,6 +333,15 @@ argument indicates the edeck ATCF format data source containing probabilistic
 \end_inset
 
  to be processed.
+ The 
+\series bold
+-adeck
+\series medium
+ or 
+\series bold
+-edeck
+\series medium
+ option must be used at least once.
 \end_layout
 
 \begin_layout Description
