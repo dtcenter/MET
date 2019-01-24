@@ -2160,8 +2160,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-adeck source\n"
-        << "\t-edeck source\n"
+        << "\t-adeck source and/or -edeck source\n"
         << "\t-bdeck source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
@@ -2171,12 +2170,12 @@ void usage() {
         << "\twhere\t\"-adeck source\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "model output \"" << atcf_suffix
-        << "\" data to process (required).\n"
+        << "\" data to process (required if no -edeck).\n"
 
         << "\t\t\"-edeck source\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "ensemble model output \"" << atcf_suffix
-        << "\" data to process (required).\n"
+        << "\" data to process (required if no -adeck).\n"
 
         << "\t\t\"-bdeck source\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
