@@ -178,4 +178,19 @@
     </output>
   </test>
 
+  <test name="climatology_STAT_ANALYSIS">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_climo \
+      -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/stat_analysis_MPR_to_PSTD.stat</stat>
+    </output>
+  </test>
+
 </met_test>
