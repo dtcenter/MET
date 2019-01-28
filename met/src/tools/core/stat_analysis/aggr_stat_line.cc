@@ -3544,6 +3544,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
 void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
                 PCTInfo &pct_info) {
    int pstd_flag;
+   NumArray c_na;
 
    //
    // Initialize
@@ -3567,9 +3568,14 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    else                                   pstd_flag = 0;
 
    //
+   // Compute the climatological probabilities
+   //
+   c_na = derive_climo_prob(info.cmn_na, info.csd_na, pct_info.othresh);
+
+   //
    // Compute the probabilistic counts and statistics
    //
-   compute_pctinfo(info.f_na, info.o_na, info.cmn_na, pstd_flag, pct_info);
+   compute_pctinfo(info.f_na, info.o_na, c_na, pstd_flag, pct_info);
 
    return;
 }
