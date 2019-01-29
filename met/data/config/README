@@ -581,6 +581,19 @@ regrid = {
 //
 //           ];
 //
+//    - Python (using PYTHON_NUMPY or PYTHON_XARRAY):
+//       - The Python interface for MET is described in Appendix F of the MET
+//         User's Guide.  This functionality is used when replacing the path
+//         to a gridded data file with PYTHON_NUMPY or PYTHON_XARRAY.
+//       - The "name" entry specifies the Python command that should be
+//         executed to read the data.
+//       - The "level" entry is not required for Python.
+//       e.g.
+//           field = [
+//             {
+//               name = "read_ascii_numpy.py data/python/fcst.txt FCST";
+//             }
+//           ];
 //
 fcst = {
    censor_thresh = [];
