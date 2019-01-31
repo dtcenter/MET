@@ -632,7 +632,7 @@ void sum_data_files(Grid & grid, DataPlane & plane)
 
                if ( is_bad_data(v_part) ) {
 
-                  plane.set(bad_data_double, x, y);
+                  plane.set(bad_data_float, x, y);
 
                   continue;
 
@@ -838,7 +838,13 @@ void do_add_command()
 
             part_value = part(x, y);
 
-            if ( is_bad_data(part_value) )  continue;
+            if ( is_bad_data(part_value) ) {
+
+               total.set(bad_data_float, x, y);
+
+               continue;
+
+            }
 
             total.set(total_value + part_value, x, y);
 
