@@ -606,6 +606,7 @@ void GoesImagerData::dump()
 mlog << Debug(4)
      << "\nGoesImager Grid Data:\n"
      << "      name: " << name << "\n"
+     << "  scene_id: " << scene_id << "\n"
      << "        nx: " << nx << "\n"
      << "        ny: " << ny << "\n"
      << "    dx_rad: " << dx_rad << "\n"
@@ -635,6 +636,7 @@ void GoesImagerData::reset() {
    y_values = 0; //radian
    x_image_bounds = 0;
    y_image_bounds = 0;
+   scene_id = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -644,10 +646,9 @@ void GoesImagerData::release() {
    if (lon_values) { delete[] lon_values; lon_values=0; }
    if (x_values) { delete[] x_values; x_values=0; }
    if (y_values) { delete[] y_values; y_values=0; }
-   //x_image_bounds.clear();
-   //y_image_bounds.clear();
    if (x_image_bounds) { delete[] x_image_bounds; x_image_bounds=0; }
    if (y_image_bounds) { delete[] y_image_bounds; y_image_bounds=0; }
+   if (scene_id) { delete[] scene_id; scene_id=0; }
 }
 
 ////////////////////////////////////////////////////////////////////////
