@@ -1170,6 +1170,7 @@ bool operator==(const GridInfo & i1, const GridInfo & i2)
 else if ( i1.st && i2.st )  return ( is_eq(i1.st, i2.st) );
 else if ( i1.ll && i2.ll )  return ( is_eq(i1.ll, i2.ll) );
 else if ( i1.m  && i2.m  )  return ( is_eq(i1.m,  i2.m ) );
+else if ( i1.gi && i2.gi )  return ( is_eq(i1.gi, i2.gi) );
 
 return ( false );
 
@@ -1285,6 +1286,37 @@ return ( status );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const GoesImagerData * gi1, const GoesImagerData * gi2)
+{
+
+if ( !gi1 || !gi2 )  return ( false );
+
+bool status = false;
+
+if ( gi1->nx           == gi2->nx             &&
+     gi1->ny           == gi2->ny             &&
+     is_eq  (gi1->semi_major_axis,
+             gi2->semi_major_axis, loose_tol) &&
+     is_eq  (gi1->semi_minor_axis,
+             gi2->semi_minor_axis, loose_tol) &&
+     is_eq  (gi1->inverse_flattening,
+             gi2->inverse_flattening, loose_tol) &&
+     is_eq  (gi1->perspective_point_height,
+             gi2->perspective_point_height, loose_tol) &&
+     is_eq  (gi1->lat_of_projection_origin,
+             gi2->lat_of_projection_origin, loose_tol) &&
+     is_eq  (gi1->lon_of_projection_origin,
+             gi2->lon_of_projection_origin, loose_tol) &&
+     is_eq  (gi1->dx_rad, gi2->dx_rad, loose_tol) &&
+     is_eq  (gi1->dy_rad, gi2->dy_rad, loose_tol) )  status = true;
+
+return ( status );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
