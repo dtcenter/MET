@@ -1120,7 +1120,6 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    }
    
    add_att(nc_file, "Conventions", "CF-1.6");
-   nc_file->close();
    
    if (has_error) {
       remove(geostationary_file);
