@@ -26,7 +26,8 @@
 
 struct GoesImagerData {
 
-   const char * name;
+   const char *name;
+   const char *scene_id;
 
    double perspective_point_height;
    double semi_major_axis;
@@ -34,7 +35,7 @@ struct GoesImagerData {
    double inverse_flattening;
    double lat_of_projection_origin;
    double lon_of_projection_origin;
-   const char * sweep_angle_axisconst;
+   const char *sweep_angle_axisconst;
    
    int nx;
    int ny;
