@@ -313,12 +313,14 @@
 
   <test name="regrid_data_plane_GOES-16_AOD_TO_G212">
     <exec>&MET_BIN;/regrid_data_plane</exec>
+    <env>
+      <pair><name>MET_GEOSTATIONARY_DATA</name><value>&DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat</value></pair>
+    </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
       G212 \
       &OUTPUT_DIR;/regrid/regrid_data_plane_GOES-16_AOD_TO_G212.nc \
       -field 'name="AOD";  level="(*,*)";' \
-      -coord &DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat \
       -qc 1,2,3 -method MAX \
       -v 1
     </param>
