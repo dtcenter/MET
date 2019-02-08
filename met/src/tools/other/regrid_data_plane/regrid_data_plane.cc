@@ -237,6 +237,13 @@ void process_command_line(int argc, char **argv) {
       usage();
    }
 
+   ConcatString att_val;
+   if (get_global_att(InputFilename, "scene_id", att_val)) {
+      if (0 == strcmp(att_val,"Full Disk") || 0 == strcmp(att_val,"CONUS")
+          || 0 == strcmp(att_val,"Mesoscale"))
+      set_goes_interpolate_option();
+   }
+
    RGInfo.validate();
 
    return;
@@ -314,8 +321,6 @@ void process_data_file() {
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
 
    bool is_geostationary = (0 == strcmp(fr_grid.name(), "geostationary"));
-   // Update Interpolation method for GOES 16
-   if (is_geostationary) set_goes_interpolate_option();
    
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
@@ -933,7 +938,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                }
             }
             else {
-               mlog << Debug(5) << method_name << "Ignored " << line << "\n";
+               mlog << Debug(5) << method_name << "Not using " << line << "\n";
             }
          }
       }
@@ -1136,7 +1141,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 
 void set_goes_interpolate_option() {
    if (!opt_override_width && RGInfo.width == DefaultInterpWdth) {
-      RGInfo.width = 0;
+      RGInfo.width = 2;
    }
    if (!opt_override_method && RGInfo.method == DefaultInterpMthd) {
       RGInfo.method = InterpMthd_UW_Mean;
