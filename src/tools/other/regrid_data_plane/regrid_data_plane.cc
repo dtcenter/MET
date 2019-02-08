@@ -144,8 +144,8 @@ static void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       VarInfo *vinfo, DataPlane fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping);
 static void save_geostationary_data(const ConcatString geostationary_file,
-      const int from_lat_count, const int from_lon_count,
-      const float *latitudes, const float *longitudes);
+      const float *latitudes, const float *longitudes,
+      const GoesImagerData grid_data);
 static void set_goes_interpolate_option();
 static void set_qc_flags(const StringArray &);
 static void write_grid_mapping(const char *grid_map_file, 
@@ -765,8 +765,8 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping) {
             latitudes = grid_data.lat_values;
             longitudes = grid_data.lon_values;
             if (!file_exists(geostationary_file)) {
-               save_geostationary_data(geostationary_file, from_lat_count,
-                     from_lon_count, latitudes, longitudes);
+               save_geostationary_data(geostationary_file,
+                     latitudes, longitudes, grid_data);
             }
          }
       }
@@ -1075,27 +1075,53 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 ////////////////////////////////////////////////////////////////////////
 
 static void save_geostationary_data(const ConcatString geostationary_file,
-      const int from_lat_count, const int from_lon_count,
-      const float *latitudes, const float *longitudes) {
+      const float *latitudes, const float *longitudes,
+      const GoesImagerData grid_data) {
    bool has_error = false;
    int deflate_level = 0;
    static const char *method_name = "save_geostationary_data() ";
+   
    NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
-   NcDim xdim = add_dim(nc_file, dim_name_lat, from_lon_count);
-   NcDim ydim = add_dim(nc_file, dim_name_lon, from_lat_count);
+   NcDim xdim = add_dim(nc_file, dim_name_lat, grid_data.nx);
+   NcDim ydim = add_dim(nc_file, dim_name_lon, grid_data.ny);
    
    NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, xdim, ydim, deflate_level);
    NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, xdim, ydim, deflate_level);
-   if(!put_nc_data((NcVar *)&lat_var, latitudes)) {
-      has_error = true;
-      mlog << Error << "Can not save latitudes\n";
+
+   if (!IS_INVALID_NC(lat_var)) {
+      if (grid_data.dy_rad >= 0) {
+         add_att(&lat_var, "standard_name", var_name_lat);
+         add_att(&lat_var, "units","degrees_north");
+      }
+      else {
+         add_att(&lat_var, "long_name", var_name_lat);
+         add_att(&lat_var, "units","degrees_south");
+      }
+      add_att(&lat_var, "dy_rad", grid_data.dy_rad);
+      if(!put_nc_data((NcVar *)&lat_var, latitudes)) {
+         has_error = true;
+         mlog << Error << "Can not save latitudes\n";
+      }
    }
-   if(!put_nc_data((NcVar *)&lon_var, longitudes)) {
-      has_error = true;
-      mlog << Error << "Can not save longitudes\n";
+   if (!IS_INVALID_NC(lon_var)) {
+      if (grid_data.dy_rad >= 0) {
+         add_att(&lon_var, "standard_name", var_name_lon);
+         add_att(&lon_var, "units","degrees_east");
+      }
+      else {
+         add_att(&lon_var, "long_name", var_name_lon);
+         add_att(&lon_var, "units","degrees_west");
+      }
+      add_att(&lon_var, "dx_rad", grid_data.dx_rad);
+      if(!put_nc_data((NcVar *)&lon_var, longitudes)) {
+         has_error = true;
+         mlog << Error << "Can not save longitudes\n";
+      }
    }
    
+   add_att(nc_file, "Conventions", "CF-1.6");
    nc_file->close();
+   
    if (has_error) {
       remove(geostationary_file);
       mlog << Warning << "The geostationary data file ("
