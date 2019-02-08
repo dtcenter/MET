@@ -2462,6 +2462,14 @@ void NcCfFile::get_grid_mapping_geostationary(
   double axis_ratio = semi_major_axis_sqr / (data.semi_minor_axis*data.semi_minor_axis);
   double param_c = data.H * data.H - semi_major_axis_sqr;
 
+  // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
+  ConcatString scale_id;
+  if (get_global_att(_ncFile, "scene_id", scale_id)) {
+    char* scene_id_str = new char[scale_id.length()+1];
+    strncpy(scene_id_str, scale_id.text(), scale_id.length());
+    data.scene_id = scene_id_str;
+  }
+  
   // Note: Computing lat/lon was deferred because it took 1 minutes
   
   grid.set(data);
