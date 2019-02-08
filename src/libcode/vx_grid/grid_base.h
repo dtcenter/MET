@@ -267,6 +267,7 @@ extern bool is_eq(const LambertData *,       const LambertData *);
 extern bool is_eq(const StereographicData *, const StereographicData *);
 extern bool is_eq(const LatLonData *,        const LatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
+extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 
 
 ////////////////////////////////////////////////////////////////////////
