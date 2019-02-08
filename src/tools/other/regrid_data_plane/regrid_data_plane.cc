@@ -850,8 +850,8 @@ static ConcatString make_geostationary_filename(
    }
    geo_data_filename << fr_grid.nx() << "_" << fr_grid.ny();
    if (info.gi) {
-      geo_data_filename << "_" << int(info.gi->dx_rad) * factor_float_to_int)
-            << "_" << int(info.gi->dy_rad) * factor_float_to_int)
+      geo_data_filename << "_" << int(info.gi->dx_rad * factor_float_to_int)
+            << "_" << int(info.gi->dy_rad * factor_float_to_int)
             << "_" << int(info.gi->x_image_bounds[0] * factor_float_to_int)
             << "_" << int(info.gi->y_image_bounds[0] * factor_float_to_int);
    }
