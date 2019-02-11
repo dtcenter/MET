@@ -588,9 +588,14 @@ void process_data_only_file() {
    // Read the input data file
    bool opt_all_attrs = false;
    NcFile   *_nc_in = open_ncfile(InputFilename);
+   if(IS_INVALID_NC_P(_nc_in)) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "\"" << InputFilename << "\" not a valid data file\n\n";
+      exit(1);
+   }
+   
    ncbyte  *qc_data = new ncbyte[from_data_size];
    float *from_data = new float[from_data_size];
-
    memset(qc_data, -99, from_data_size*sizeof(ncbyte)); // -99 is arbitrary number as invalid QC value
 
    NcVar from_var;
