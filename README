@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.0 (September 25, 2018)
+Model Evaluation Tools METv8.1_beta1 (February 11, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -320,6 +320,16 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 8.1 Beta 1 Release Notes:
+--------------------------------
+
+- The met-8.1_beta1 release serves as a baseline for Fortify development work.
+- Fix several bugs related to MET's Python interface, Fourier decomposition
+  (Grid-Stat), and HiRA (Point-Stat)
+- Enhance regrid_data_plane to compute GOES lat/lon locations using metadata in
+  the input NetCDF file.
+- Add configuration file for the madis2nc tool.
 
 Version 8.0 Release Notes:
 -------------------------

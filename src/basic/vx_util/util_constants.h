@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Released versions of MET
+static const char met_version_8_1[]   = "V8.1";
 static const char met_version_8_0[]   = "V8.0";
 static const char met_version_7_0[]   = "V7.0";
 static const char met_version_6_1[]   = "V6.1";
@@ -35,7 +36,7 @@ static const char met_version_1_1[]   = "V1.1";
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * const met_version    = met_version_8_0;
+static const char * const met_version    = met_version_8_1;
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
