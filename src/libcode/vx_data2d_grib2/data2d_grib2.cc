@@ -709,7 +709,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  depending on the template number, determine the reference times
-         if( 8  == gfld->ipdtnum || 9 == gfld->ipdtnum || 12 == gfld->ipdtnum ){
+         if( 8 <= gfld->ipdtnum && 12 >= gfld->ipdtnum ){
 
             if( -1 != rec->ValidTime ){
                mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() -> "
@@ -730,6 +730,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
                case 10:
                   rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[17], gfld->ipdtmpl[18], gfld->ipdtmpl[16],
                                                   gfld->ipdtmpl[19], gfld->ipdtmpl[20], gfld->ipdtmpl[21]);
+                  break;
+               case 11:
+                  rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[19], gfld->ipdtmpl[20], gfld->ipdtmpl[18],
+                                                  gfld->ipdtmpl[21], gfld->ipdtmpl[22], gfld->ipdtmpl[23]);
                   break;
                case 12:
                   rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[18], gfld->ipdtmpl[19], gfld->ipdtmpl[17],
@@ -786,9 +790,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  set the accumulation interval
          g2int range_typ = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[25] :
                              9 == gfld->ipdtnum ? gfld->ipdtmpl[32] :
+                            10 == gfld->ipdtnum ? gfld->ipdtmpl[26] :
+                            11 == gfld->ipdtnum ? gfld->ipdtmpl[28] :
                             12 == gfld->ipdtnum ? gfld->ipdtmpl[27] : 0);
          g2int range_val = ( 8 == gfld->ipdtnum ? gfld->ipdtmpl[26] :
                              9 == gfld->ipdtnum ? gfld->ipdtmpl[33] :
+                            10 == gfld->ipdtnum ? gfld->ipdtmpl[27] :
+                            11 == gfld->ipdtnum ? gfld->ipdtmpl[29] :
                             12 == gfld->ipdtnum ? gfld->ipdtmpl[28] : 0);
          double sec_accum_unit = VarInfoGrib2::g2_time_range_unit_to_sec( range_typ );
          rec->Accum = range_val * (int)sec_accum_unit;
