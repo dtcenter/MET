@@ -213,15 +213,23 @@ void process_directory(const char * dir_name)
    int fd;
    int pid;
    bool notice_found = false;
+   char *ptr;
 
       //
       // set the temporary directory and temporary filename
       //
-   pid = getpid();
-   tmp_directory = getenv("TMPDIR");
-   if (tmp_directory.length() == 0) tmp_directory = getenv("MET_TMP_DIR");
 
-   if (tmp_directory.length() == 0)
+   pid = getpid();
+   
+   if((ptr = getenv("TMPDIR")) != NULL)
+   {
+       tmp_directory = ptr;
+   }
+   else if((ptr = getenv("MET_TMP_DIR")) != NULL)
+   {
+      tmp_directory = ptr;
+   }
+   else
    {
       tmp_directory = "/tmp";
 
