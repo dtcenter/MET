@@ -135,7 +135,8 @@ static const char *var_name_lon = "longitude";
 static IntArray qc_flags;
 
 static unixtime find_valid_time(multimap<string,NcVar> mapVar);
-static void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping);
+static void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
+                             ConcatString geostationary_file);
 static int  get_lat_count(NcFile *);
 static int  get_lon_count(NcFile *);
 static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid, bool grid_map=true);
@@ -336,11 +337,15 @@ void process_data_file() {
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
    
-   ConcatString grid_map_file = make_geostationary_filename(fr_grid, to_grid);
+   ConcatString tmp_dir = config.get_tmp_dir();
+   ConcatString geostationary_file(tmp_dir);
+   ConcatString grid_map_file(tmp_dir);
    if (is_geostationary) {
       char *env_coord_name = getenv(key_geostationary_data);
-      ConcatString geostationary_file = make_geostationary_filename(
-            fr_grid, to_grid, false);
+      grid_map_file.add("/");
+      grid_map_file.add(make_geostationary_filename(fr_grid, to_grid));
+      geostationary_file.add("/");
+      geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, false));
       if (file_exists(grid_map_file)) {
          run_cs << " with " << grid_map_file;
       }
@@ -380,7 +385,7 @@ void process_data_file() {
       }
       else {
          cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
-         get_grid_mapping(fr_grid, to_grid, cellMapping);
+         get_grid_mapping(fr_grid, to_grid, cellMapping, geostationary_file);
          write_grid_mapping(grid_map_file.text(), cellMapping,
                fr_grid, to_grid);
       }
@@ -641,7 +646,8 @@ unixtime find_valid_time(multimap<string,NcVar> mapVar) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping) {
+void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
+                      ConcatString geostationary_file) {
    static const char *method_name = "get_grid_mapping() ";
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
@@ -653,7 +659,6 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping) {
 
    bool has_coord_input;
    char *tmp_coord_name = getenv(key_geostationary_data);
-   ConcatString geostationary_file = make_geostationary_filename(fr_grid, to_grid, false);
 
    if ((tmp_coord_name != NULL) && file_exists(tmp_coord_name)) {
       has_coord_input = true;
@@ -938,7 +943,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                }
             }
             else {
-               mlog << Debug(5) << method_name << "Not using " << line << "\n";
+               mlog << Debug(7) << method_name << "Not using " << line << "\n";
             }
          }
       }
@@ -972,6 +977,11 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    
    NcVar var_qc;
    NcVar var_data = get_nc_var(nc_in, vinfo->name());
+   if (IS_INVALID_NC(var_data)) {
+      mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
+      exit(1);
+   }
+   
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
    if (get_att_value_string(&var_data, "ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name);
