@@ -341,7 +341,7 @@ void process_data_file() {
    ConcatString geostationary_file(tmp_dir);
    ConcatString grid_map_file(tmp_dir);
    if (is_geostationary) {
-      char *env_coord_name = getenv(key_geostationary_data);
+      char *env_coord_name = get_env(key_geostationary_data);
       grid_map_file.add("/");
       grid_map_file.add(make_geostationary_filename(fr_grid, to_grid));
       geostationary_file.add("/");
@@ -658,7 +658,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    int from_lon_count = fr_grid.nx();
 
    bool has_coord_input;
-   char *tmp_coord_name = getenv(key_geostationary_data);
+   char *tmp_coord_name = get_env(key_geostationary_data);
 
    if ((tmp_coord_name != NULL) && file_exists(tmp_coord_name)) {
       has_coord_input = true;

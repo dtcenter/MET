@@ -1928,7 +1928,7 @@ DocumentMedia default_media()
 
 {
 
-const char * c = getenv(papersize_env);
+const char * c = get_env(papersize_env);
 
 if ( c == NULL )  return ( MediaLetter );
 

@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
       //
    if (copyright_notice_filename.length() == 0)
    {
-      copyright_notice_filename = getenv("COPYRIGHT_NOTICE");
+      copyright_notice_filename = get_env("COPYRIGHT_NOTICE");
 
       if (copyright_notice_filename.length() == 0)
       {
@@ -221,11 +221,11 @@ void process_directory(const char * dir_name)
 
    pid = getpid();
    
-   if((ptr = getenv("TMPDIR")) != NULL)
+   if((ptr = get_env("TMPDIR")) != NULL)
    {
        tmp_directory = ptr;
    }
-   else if((ptr = getenv("MET_TMP_DIR")) != NULL)
+   else if((ptr = get_env("MET_TMP_DIR")) != NULL)
    {
       tmp_directory = ptr;
    }

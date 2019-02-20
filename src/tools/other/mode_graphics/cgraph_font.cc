@@ -112,7 +112,7 @@ afm = (Afm *) 0;
 
 face = 0;
 
-const char * c = getenv (cg_font_env);
+const char * c = get_env (cg_font_env);
 
 if ( !c )  {
 

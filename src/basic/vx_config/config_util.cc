@@ -1623,7 +1623,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    char *ptr;
    ConcatString s;
 
-   if((ptr = getenv("MET_TMP_DIR")) != NULL && (met_opendir(ptr) != NULL )) {
+   if((ptr = get_env("MET_TMP_DIR")) != NULL && (met_opendir(ptr) != NULL )) {
       s = ptr;
    }
    else {

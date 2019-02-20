@@ -94,7 +94,7 @@ if ( do_reload )  {
 if ( PyErr_Occurred() )  {
 
    mlog << Error << "\npython_dataplane() -> "
-        << "an error occurred importing module \"" << getenv("PYTHONPATH")
+        << "an error occurred importing module \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
 
    PyErr_PrintEx(1);
@@ -106,7 +106,7 @@ if ( PyErr_Occurred() )  {
 if ( ! module )  {
 
    mlog << Error << "\npython_dataplane() -> "
-        << "error running python script \"" << getenv("PYTHONPATH")
+        << "error running python script \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
    exit ( 1 );
 
@@ -135,7 +135,7 @@ if ( use_xarray )  {
    if ( !data_array )  {
 
       mlog << Error << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << getenv("PYTHONPATH")
+           << "trouble reading data from \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
 
       PyErr_PrintEx(1);
@@ -160,7 +160,7 @@ if ( use_xarray )  {
    if ( !numpy_array || !attrs_dict )  {
 
       mlog << Error << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << getenv("PYTHONPATH")
+           << "trouble reading data from \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
 
       PyErr_PrintEx(1);

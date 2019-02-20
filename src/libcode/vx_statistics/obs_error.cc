@@ -454,8 +454,8 @@ void ObsErrorTable::initialize() {
    //
    // Use MET_OBS_ERROR_TABLE, if set
    //
-   ptr = getenv(met_obs_error_table);
-   if((ptr = getenv(met_obs_error_table)) != NULL) {
+   ptr = get_env(met_obs_error_table);
+   if((ptr = get_env(met_obs_error_table)) != NULL) {
       path = ptr;
       desc << "user-defined " << met_obs_error_table;
    }
