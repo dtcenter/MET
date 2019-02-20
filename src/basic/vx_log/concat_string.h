@@ -167,7 +167,7 @@ class ConcatString {
 
       void set_upper();
       void set_lower();
-
+      
 };
 
 
@@ -255,6 +255,8 @@ extern bool operator >  (const ConcatString &, const char *);
 extern bool operator >  (const char *, const ConcatString &);
 
 extern ConcatString write_css(const StringArray &);
+
+extern char *get_env(const char*);
 
 
 ////////////////////////////////////////////////////////////////////////
