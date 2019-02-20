@@ -36,8 +36,8 @@ ConcatString replace_path(const char *path) {
 
    // Use the MET_BASE environment variable, if set.
    // Otherwise, use the compile-time value.
-   if((ptr = getenv(met_base_str)) != NULL) met_base_val = ptr;
-   else                                     met_base_val = MET_BASE;
+   if((ptr = get_env(met_base_str)) != NULL) met_base_val = ptr;
+   else                                      met_base_val = MET_BASE;
 
    s.replace(met_base_str, met_base_val);
 

@@ -242,7 +242,7 @@ ConcatString MetConfig::get_tmp_dir()
    ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.
-   if((ptr = getenv("MET_TMP_DIR")) != NULL) {
+   if((ptr = get_env("MET_TMP_DIR")) != NULL) {
       tmp_dir = ptr;
    }
    else {
@@ -263,7 +263,7 @@ int MetConfig::nc_compression()
    int n = 0;
 
    // Use the MET_NC_COMPRESS environment variable, if set.
-   if((ptr = getenv("MET_NC_COMPRESS")) != NULL) {
+   if((ptr = get_env("MET_NC_COMPRESS")) != NULL) {
       n = atoi(ptr);
    }
    else {

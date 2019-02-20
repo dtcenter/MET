@@ -558,9 +558,9 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
    //  search for MET_GRIB_TABLES environment variable
    //  if not defined, try the older USER_GRIB_TABLES ones
    //
-   ptr = getenv(met_grib_tables);
+   ptr = get_env(met_grib_tables);
 
-   if(ptr == NULL) ptr = getenv(user_grib_tables);
+   if(ptr == NULL) ptr = get_env(user_grib_tables);
 
    if(ptr != NULL) {
 

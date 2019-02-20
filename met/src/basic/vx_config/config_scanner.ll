@@ -607,7 +607,7 @@ for (j=0; j<n; ++j)  {
 
          get_env_text(line + j, env_text, sizeof(env_text));
 
-         e = getenv(env_text);
+         e = get_env(env_text);
 
          if ( !e )  {
 
@@ -809,7 +809,7 @@ strncpy(junk, yytext + 2, sizeof(junk) - 1);
 
 junk[n - 3] = (char) 0;
 
-value = getenv(junk);
+value = get_env(junk);
 
 if ( !value )  {
 
