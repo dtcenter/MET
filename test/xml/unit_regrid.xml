@@ -315,6 +315,7 @@
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <env>
       <pair><name>MET_GEOSTATIONARY_DATA</name><value>&DATA_DIR_MODEL;/goes_16/g16_conus_latlon_2km_20180620.dat</value></pair>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
