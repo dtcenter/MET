@@ -476,7 +476,7 @@ void ConcatString::replace(const char * target, const char * replacement,
     }
 
     const char * c = (const char *) 0;
-    if (check_env && (c = getenv(replacement)) != NULL)
+    if (check_env && (c = get_env(replacement)) != NULL)
         replacement = c;
 
 
@@ -1062,6 +1062,73 @@ bool is_empty(const char * text)
 
 return ( (text == NULL) || (*text == 0) || (strlen(text) == 0));
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+char *get_env(const char* env_name)
+{
+   char *env_value = NULL;
+   string env_val = env_name;
+   static const char *method_name = "get_env() ";
+
+   if (env_val.find('/') != string::npos) return env_value;
+   
+   if((env_value = getenv(env_name)) != NULL) {
+      env_val = env_value;
+      mlog << Debug(10) << method_name << " " << env_name
+           << " to " << env_value << "\n";
+
+      int count_replaced = 0;
+      const char *nested_value;
+      size_t pos, pos_end, pos_env, pos_env_end;
+      pos = 0;
+      while ((pos = env_val.find('$', pos)) != string::npos) {
+         string nested_name;
+         pos_env = pos + 1;
+         if ('{' == env_val.at(pos_env)) {
+            pos_env++;
+            pos_end = env_val.find('}', pos);
+            if (string::npos == pos_end) {
+               mlog << Error << "\n" << method_name << "\""
+                    << env_val << "\" The right curly bracket is missing.\n\n";
+               exit (1);
+            }
+            else {
+               pos_env_end = pos_end;
+               pos_end++;
+            }
+         }
+         else {
+            pos_end = env_val.find('/', pos);
+            pos_env_end = pos_end - 1;
+            if (string::npos == pos_end) {
+               pos_end = env_val.length();
+               pos_env_end = pos_end;
+            }
+         }
+         nested_name = env_val.substr(pos_env, (pos_env_end-pos_env));
+         nested_value = getenv(nested_name.c_str());
+         if ( nested_value == NULL )  {
+            mlog << Error << "\n" << method_name
+                 << "can't get value of nested environment variable \""
+                 << nested_name << "\" from " << env_name << "\n\n";
+            exit ( 1 );
+         }
+         env_val.replace(pos, (pos_end - pos), nested_value);
+         mlog << Debug(7) << method_name << " " << nested_name
+              << " to " << nested_value << "\n";
+         count_replaced++;
+      }
+      if (count_replaced > 0) {
+         env_value = (char *)env_val.c_str();
+         mlog << Debug(5) << method_name << env_name << " to \""
+              << env_val.c_str() << "\"\n";
+      }
+   }
+    
+   return env_value;
 }
 
 
