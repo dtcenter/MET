@@ -142,7 +142,7 @@ static int  get_lon_count(NcFile *);
 static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid, bool grid_map=true);
 static IntArray *read_grid_mapping(const char *grid_map_file);
 static void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
-      VarInfo *vinfo, DataPlane fr_dp, DataPlane &to_dp,
+      VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping);
 static void save_geostationary_data(const ConcatString geostationary_file,
       const float *latitudes, const float *longitudes,
@@ -349,7 +349,8 @@ void process_data_file() {
       if (file_exists(grid_map_file)) {
          run_cs << " with " << grid_map_file;
       }
-      else if ((env_coord_name != NULL) && file_exists(env_coord_name)) {
+      else if ((env_coord_name != NULL) && (strlen(env_coord_name) > 0)
+                && file_exists(env_coord_name)) {
          run_cs << " with " << env_coord_name;
       }
       else if (file_exists(geostationary_file)) {
@@ -660,7 +661,8 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    bool has_coord_input;
    char *tmp_coord_name = get_env(key_geostationary_data);
 
-   if ((tmp_coord_name != NULL) && file_exists(tmp_coord_name)) {
+   if ((tmp_coord_name != NULL) && strlen(tmp_coord_name)
+        && file_exists(tmp_coord_name)) {
       has_coord_input = true;
       cur_coord_name = tmp_coord_name;
    }
@@ -880,19 +882,20 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
    static const char *method_name = "read_grid_mapping() ";
 
    //if ( ! file_exists(filename) )  {
-   IntArray *cellMapping = 0;
-
    int nx, ny, map_size;
+   IntArray *cellMapping = 0;
 
    nx = ny = map_size = 0;
    string line;
    ifstream map_file (grid_map_file);
    if (map_file.is_open()) {
-      int to_offset, coord_offset;
+      bool map_data;
+      int to_offset, coord_offset, map_count;
       StringArray str_arr;
       StringArray cell_index_arr;
 
-      bool map_data = false;
+      map_count = 0;
+      map_data = false;
       while ( getline (map_file, line) ) {
          if (0 == line.compare("[mapping]")) {
             map_data = true;
@@ -909,13 +912,19 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
             if (map_data) {
                cell_index_arr.clear();
                to_offset = atoi(str_arr[0]);
-               if ((to_offset >= 0) && (to_offset < map_size))
-               cell_index_arr.parse_delim(str_arr[1], ",");
-               for (int idx=0; idx<cell_index_arr.n_elements(); idx++) {
-                  coord_offset = atoi(cell_index_arr[idx]);
-                  if (coord_offset >= 0) {
-                     cellMapping[to_offset].add(coord_offset);
+               if ((to_offset >= 0) && (to_offset < map_size)) {
+                  cell_index_arr.parse_delim(str_arr[1], ",");
+                  if (0 < cell_index_arr.n_elements()) map_count++;
+                  for (int idx=0; idx<cell_index_arr.n_elements(); idx++) {
+                     coord_offset = atoi(cell_index_arr[idx]);
+                     if (coord_offset >= 0) {
+                        cellMapping[to_offset].add(coord_offset);
+                     }
                   }
+               }
+               else {
+                  mlog << Warning << method_name << "The offset "
+                       << to_offset  << "is out of range\n";
                }
             }
             else if ( strcasecmp(str_arr[0], "nx") == 0 )  {
@@ -948,6 +957,8 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
          }
       }
       map_file.close();
+      mlog << Debug(7) << method_name << "Read " << map_count
+           << " mappings (out of " << map_size << ")\n";
    }
    else {
       mlog << Error << method_name << "Unable to open file" << grid_map_file << "\n";
@@ -958,7 +969,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
 ////////////////////////////////////////////////////////////////////////
 
 void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
-      VarInfo *vinfo, DataPlane fr_dp, DataPlane &to_dp,
+      VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping) {
 
    bool has_qc_var = false;
@@ -968,6 +979,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    int from_lon_count = fr_grid.nx();
    int from_data_size = from_lat_count * from_lon_count;
    ConcatString qc_var_name;
+   ncbyte qc_value;
    ncbyte  *qc_data = new ncbyte[from_data_size];
    float *from_data = new float[from_data_size];
    static const char *method_name = "regrid_goes_variable() ";
@@ -992,7 +1004,13 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
    get_nc_data(&var_data, (float *)from_data);
    
-   bool has_qc_flags = (qc_flags.n_elements() > 0);
+   fr_dp.set_size(from_lon_count, from_lat_count);
+   for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+      for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+         int offset = fr_dp.two_to_one(xIdx,yIdx);
+         fr_dp.set(from_data[offset],xIdx,yIdx);
+      }
+   }
 
    int offset;
    int valid_count;
@@ -1008,6 +1026,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    float qc_max_value = -10e10;
    IntArray cellArray;
    NumArray dataArray;
+   bool has_qc_flags = (qc_flags.n_elements() > 0);
 
    missing_count = non_missing_count = 0;
    to_dp.set_constant(bad_data_double);
@@ -1033,8 +1052,8 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                }
 
                //Filter by QC flag
-               if (!has_qc_var || !has_qc_flags
-                    || qc_flags.has(qc_data[cellArray[dIdx]])) {
+               qc_value = qc_data[cellArray[dIdx]];
+               if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
                   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
                      // Break out after the first match.
                      if(vinfo->censor_thresh()[i].check(data_value)) {
@@ -1045,8 +1064,8 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                   }
                   dataArray.add(data_value);
                   if (mlog.verbosity_level() >= 4) {
-                     if (qc_min_value > data_value) qc_min_value = data_value;
-                     if (qc_max_value < data_value) qc_max_value = data_value;
+                     if (qc_min_value > qc_value) qc_min_value = qc_value;
+                     if (qc_max_value < qc_value) qc_max_value = qc_value;
                   }
                }
                else {
@@ -1068,23 +1087,21 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                else to_value = dataArray.sum() / data_count;
 
                to_dp.set(to_value, xIdx, yIdx);
-               if(mlog.verbosity_level() > 7) {
-                  if (300 < dataArray.n_elements()) {
-                     mlog << Debug(7) << method_name
-                          << ". max: " << dataArray.max()
-                          << ", min: " << dataArray.min()
-                          << ", mean: " << dataArray.sum()/data_count
-                          << " from " << data_count << " data values.\n";
-                  }
-               }
+               mlog << Debug(9) << method_name
+                    <<   "max: " << dataArray.max()
+                    << ", min: " << dataArray.min()
+                    << ", mean: " << dataArray.sum()/data_count
+                    << " from " << data_count << " data values.\n";
             }
          }
+         else {}
       }
    }
    mlog << Debug(4) << method_name << " Count: missing: "
         << missing_count << ", non_missing: " << non_missing_count
-        << " value range: [" << from_min_value << " - " << from_max_value
-        << "] QCed: [" << qc_min_value << " - " << qc_max_value << "]\n";
+        << ", value range: [" << from_min_value << " - " << from_max_value
+        << "] QCed: Filtered: " << qc_filtered_count
+        << " [" << qc_min_value << " - " << qc_max_value << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1167,11 +1184,12 @@ void write_grid_mapping(const char *grid_map_file,
    int ny = to_grid.ny();
 
    if ( file_exists(grid_map_file) )  {
-      cout << "Exist already"; 
+      mlog << Warning << method_name << grid_map_file << "Exist already\n";
    }
    else {
       ofstream map_file (grid_map_file);
       if (map_file.is_open()) {
+         int map_count = 0;
          int map_size = nx * ny;
          GridInfo info = from_grid.info();
          map_file << "[metadata]\n";
@@ -1192,12 +1210,16 @@ void write_grid_mapping(const char *grid_map_file,
                   map_file << cellMapping[idx][idx2];
                   if (idx2 < (mem_count-1)) map_file << ",";
                }
+               map_count++;
             }
             map_file << "\n";
          }
+         mlog << Debug(5) << method_name << "Write "
+              << map_count << " grid mappings (out of " << map_size << ")\n";
       }
       else {
-         cout << "Unable to open file"; 
+         mlog << Error << method_name << "Unable to open file "
+              << grid_map_file << "\n";
       }
       map_file.close();
    }
