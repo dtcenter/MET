@@ -95,7 +95,7 @@ if ( PyErr_Occurred() )  {
 
    mlog << Error << "\npython_dataplane() -> "
         << "an error occurred importing module \"" << get_env("PYTHONPATH")
-           << "/" << script_name << ".py\"\n\n";
+        << "/" << script_name << ".py\"\n\n";
 
    PyErr_PrintEx(1);
 
@@ -107,7 +107,7 @@ if ( ! module )  {
 
    mlog << Error << "\npython_dataplane() -> "
         << "error running python script \"" << get_env("PYTHONPATH")
-           << "/" << script_name << ".py\"\n\n";
+        << "/" << script_name << ".py\"\n\n";
    exit ( 1 );
 
 }
