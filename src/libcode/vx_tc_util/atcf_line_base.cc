@@ -181,7 +181,7 @@ ConcatString ATCFLineBase::get_line() const {
 
    if(N_items == 0) return(cs);
 
-   for(int i=0; i<N_items-1; i++) cs << DataLine::get_item(i) << Delimiter;
+   for(int i=0; i<N_items-1; i++) cs << DataLine::get_item(i) << DataLine::get_delimiter();
    cs << DataLine::get_item(N_items-1);
 
    return(cs);

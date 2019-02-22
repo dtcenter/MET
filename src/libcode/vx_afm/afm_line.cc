@@ -317,7 +317,7 @@ int is_boolean(const char * text, int & truth_value)
 
 {
 
-if ( strcmp(text, "true") == 0 )  {
+  if ( strncmp(text, "true", 4) == 0 )  {
 
    truth_value = 1;
 
@@ -325,7 +325,7 @@ if ( strcmp(text, "true") == 0 )  {
 
 }
 
-if ( strcmp(text, "false") == 0 )  {
+  if ( strncmp(text, "false", 5) == 0 )  {
 
    truth_value = 0;
 

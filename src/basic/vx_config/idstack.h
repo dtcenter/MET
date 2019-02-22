@@ -1,5 +1,3 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -22,8 +20,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <string>
+
 #include "indent.h"
 
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +50,7 @@ class Identifier {
       Identifier(const Identifier &);
       Identifier & operator=(const Identifier &);
 
-      char name[max_id_size];
+      string name;
 
       void clear();
 

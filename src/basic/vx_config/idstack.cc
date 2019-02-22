@@ -114,7 +114,7 @@ void Identifier::assign(const Identifier & i)
 
 clear();
 
-memcpy(name, i.name, sizeof(name));
+name = i.name;
 
 return;
 
@@ -128,7 +128,7 @@ void Identifier::clear()
 
 {
 
-memset(name, 0, sizeof(name));
+name.clear();
 
 return;
 
@@ -146,19 +146,7 @@ clear();
 
 int n;
 
-n = strlen(text);
-
-
-if ( n >= (max_id_size - 1) )  {
-
-   cerr << "\n\n  void Identifier::set(const char *) string too long!\n\n";
-
-   exit ( 1 );
-
-}
-
-
-memcpy(name, text, n);
+name.assign(text);
 
 
 return;
@@ -619,7 +607,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(text, i[j].name) == 0 )  return ( true );
+   if ( i[j].name.compare(text) == 0 )  return ( true );
 
 }
 
@@ -643,7 +631,7 @@ index = -1;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(text, i[j].name) == 0 )  { index = j;   return ( true ); }
+   if ( i[j].name.compare(text) == 0 )  { index = j;   return ( true ); }
 
 }
 

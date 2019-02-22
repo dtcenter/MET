@@ -48,7 +48,11 @@ extern "C" int        colorwrap();
 
 
 
-extern char *         colortext;
+// extern char *         colortext;
+
+char *         colortext;
+
+FILE *         colorin;
 
 extern const char *   input_filename;
 
@@ -121,7 +125,7 @@ static Color dcolor_to_color(const Dcolor &);
 
 %union {
 
-   char text[128];
+   char text[129];
 
    int ival;
 

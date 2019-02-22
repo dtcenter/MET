@@ -137,7 +137,7 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
            << "found fewer than the expected number of elements ("
            << n_items() << "<" << n_expect
            << ") in ATCF " << atcflinetype_to_string(Type) << " line:\n"
-           << Line << "\n\n";
+           << DataLine::get_line() << "\n\n";
       return(0);
    }
 

@@ -58,12 +58,6 @@ DataLine::~DataLine()
 
 {
 
-
-
-if ( Line )  { delete [] Line;  Line = (char *) 0; }
-
-if ( Offset )  { delete [] Offset;  Offset = (int *) 0; }
-
 LineNumber = N_items = N_ints = N_chars = 0;
 
 File = (LineDataFile *) 0;
@@ -108,19 +102,13 @@ void DataLine::init_from_scratch()
 
 {
 
-Line = (char *) 0;
-
-Offset = (int *) 0;
-
-
 LineNumber = N_items = 0;
 
 N_items = 0;
 
 N_chars = N_ints = 0;
 
-Delimiter = new char[strlen(dataline_default_delim) + 1];
-strcpy(Delimiter, dataline_default_delim);
+Delimiter.assign(dataline_default_delim);
 
 File = (LineDataFile *) 0;
 
@@ -136,18 +124,9 @@ void DataLine::clear()
 
 {
 
-if ( Line )  {
-
-   memset(Line, 0, N_chars);
-
-}
-
-if ( Offset )  {
-
-   memset(Offset, 0, N_ints*sizeof(int));
-
-}
-
+Line.clear();
+Items.clear();
+Offset.clear();
 
 LineNumber = 0;
 
@@ -170,19 +149,14 @@ void DataLine::assign(const DataLine & a)
 
 clear();
 
-extend_char(a.N_chars);
+//extend_char(a.N_chars);
 
-memcpy(Line, a.Line, a.N_chars);
+Line = a.Line;
+Items = a.Items;
 
-extend_int(a.N_items);
+//extend_int(a.N_items);
 
-int j;
-
-for (j=0; j<(a.N_items); ++j)  {
-
-   Offset[j] = a.Offset[j];
-
-}
+Offset = a.Offset;
 
 N_items = a.N_items;
 
@@ -204,7 +178,7 @@ void DataLine::dump(ostream & out, int depth) const
 {
 
 int j;
-char junk[256];
+//char junk[256];
 Indent prefix(depth);
 
 
@@ -217,12 +191,15 @@ out << prefix << "\n";
 
 if ( N_items == 0 )  { out.flush();  return; }
 
+std::ostringstream sstream;
+sstream.width(2);
 
 for (j=0; j<N_items; ++j)  {
 
-   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
+   //snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
-   out << prefix << junk << (Line + Offset[j]) << "\"\n";
+   sstream << "Item[" << j << "]       = \"";
+   out << prefix << sstream << Line.substr(j) << "\"\n";
 
    if ( (j%5) == 4 )  out << prefix << "\n";
 
@@ -230,11 +207,15 @@ for (j=0; j<N_items; ++j)  {
 
 out << prefix << "\n";
 
+
+sstream.str("");
+sstream.clear();
+
 for (j=0; j<N_items; ++j)  {
 
-   snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
-
-   out << prefix << junk << (Offset[j]) << "\n";
+   //snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
+   sstream << "Offset[" << j << "]     = ";
+   out << prefix << sstream << Offset[j] << "\n";
 
    if ( (j%5) == 4 )  out << prefix << "\n";
 
@@ -267,9 +248,7 @@ if ( (k < 0) || (k >= N_items) )  {
 
 }
 
-const char * c = Line + Offset[k];
-
-return ( c );
+return Items[k].c_str();
 
 }
 
@@ -302,7 +281,7 @@ return ( c );
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void DataLine::extend_char(int n)
 
 {
@@ -319,30 +298,7 @@ if ( n%dataline_charextend_alloc_inc ) ++k;
 
 n = k*dataline_charextend_alloc_inc;
 
-char * u = (char *) 0;
-
-u = new char [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nDataLine::extend_char() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, n);
-
-if ( Line )  {
-
-   memcpy(u, Line, N_chars);
-
-   delete [] Line;  Line = (char *) 0;
-
-}
-
-Line = u;  u = (char *) 0;
-
+Line.reserve(n);
 N_chars = n;
 
    //
@@ -371,29 +327,7 @@ if ( n%dataline_intextend_alloc_inc ) ++k;
 
 n = k*dataline_intextend_alloc_inc;
 
-int * u = (int *) 0;
-
-u = new int [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nDataLine::extend_int() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(u, 0, n);
-
-if ( Offset )  {
-
-   memcpy(u, Offset, N_ints*sizeof(int));
-
-   delete [] Offset;  Offset = (int *) 0;
-
-}
-
-Offset = u;  u = (int *) 0;
+Offset.reserve(n);
 
 N_ints = n;
 
@@ -404,7 +338,7 @@ N_ints = n;
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -413,7 +347,7 @@ int DataLine::max_item_width() const
 
 {
 
-if ( !Line )  return ( 0 );
+if ( Line.empty() )  return ( 0 );
 
 int j, n, w;
 
@@ -421,7 +355,7 @@ n = 0;
 
 for (j=0; j<N_items; ++j)  {
 
-   w = strlen(Line + Offset[j]);
+   w = Items[j].size();
 
    if ( w > n )  n = w;
 
@@ -449,10 +383,7 @@ if ( !f )  return ( 0 );
 File = ldf;
 
 char c;
-char * s = (char *) 0;
-char * p = (char *) 0;
-
-int pos, count;
+size_t pos, count;
 
 
    //
@@ -460,16 +391,17 @@ int pos, count;
    //
 
 pos = 0;
+count = 0;
 
 while ( f.get(c) )  {
 
    if ( !f )  { clear();  return ( 0 ); }
 
-   extend_char(pos + 5);   //  better safe than sorry
+   //extend_char(pos + 5);   //  better safe than sorry
 
-   if ( c == '\n' )  { Line[pos] = (char) 0;    break; }
+   if ( c == '\n' )  { break; }
 
-   Line[pos++] = c;
+   Line += c;
 
 }
 
@@ -479,24 +411,25 @@ if ( !f )  { clear();  return ( 0 ); }
    //  parse the line with strtok
    //
 
-s = Line;
+size_t len, tpos = std::string::npos;
 
-count = 0;
-
-while ( (p = strtok(s, Delimiter)) != NULL )  {
-
-   pos = (int) (p - Line);
-
-   ++count;
-
-   extend_int(count);
-
-   Offset[count - 1] = pos;
-
-   s = (char *) 0;
-
-}   //  while
-
+if (!Line.find_first_not_of(Delimiter)) { // no leading delimiter
+    ++count;
+    //extend_int(count);
+    Offset.push_back(pos);
+    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+}
+while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos)  {
+    len = Line.substr(pos+tpos).find_first_not_of(Delimiter);
+    if (len == std::string::npos)  // delims at the end of the line, or delim-only line
+        break;
+    pos += tpos + len;
+    
+    ++count;
+    //extend_int(count);
+    Offset.push_back(pos);
+    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+}
 
 N_items = count;
 
@@ -526,7 +459,7 @@ File = ldf;
 int i, j;
 char buf[max_str_len];
 char c;
-int pos, count;
+int start, pos, count;
 int null_char_count;
 
    //
@@ -539,8 +472,9 @@ for( i=0; i<n_wdth; i++ )  {
 
    if ( !f )  { clear();  return ( 0 ); }
 
-   extend_char(pos + wdth[i] + 1);   //  better safe than sorry
-   extend_int(++count);
+   //extend_char(pos + wdth[i] + 1);   //  better safe than sorry
+   //extend_int(++count);
+   ++count;
 
    //
    //  get the next entry
@@ -550,20 +484,21 @@ for( i=0; i<n_wdth; i++ )  {
    //
    //  store the offset to this entry
    //
-   Offset[count - 1] = pos;
+   start = pos;
+   Offset.push_back(pos);
 
    //
    //  store this entry
    //
    for( j=0; j<wdth[i]; j++ )  {
 
-     Line[pos++] = buf[j];
+     Line += buf[j]; pos++;
 
      //
      //  check for embedded newline
      //
      if(buf[j] == '\0') {
-        Line[(pos-1)] = ' ';
+        Line[pos-1] = ' ';
         null_char_count++;
      }
      else if(buf[j] == '\n') {
@@ -573,11 +508,14 @@ for( i=0; i<n_wdth; i++ )  {
              << ldf->last_line_number() + 1 << ".\n\n";
      }
    }
+   
+   Items.push_back(Line.substr(start, pos-start));
 
    //
    //  null terminate the entry
    //
-   Line[pos++] = '\0';
+   Line += '\0';
+   pos++;
 }
 
 if (null_char_count > 0)
@@ -643,10 +581,7 @@ return ( 0 );
 void DataLine::set_delimiter(const char *delimiter)
 
 {
-  delete [] Delimiter;
-
-  Delimiter = new char[strlen(delimiter) + 1];
-  strcpy(Delimiter, delimiter);
+  Delimiter.assign(delimiter);
 }
 
 
@@ -720,10 +655,6 @@ void LineDataFile::init_from_scratch()
 
 {
 
-Filename = (char *) 0;
-
-ShortFilename = (char *) 0;
-
 in = (ifstream *) 0;
 
 Last_Line_Number = 0;
@@ -773,25 +704,8 @@ int j, n;
 
 n = strlen(path);
 
-Filename = new char [1 + n];
-
-memset(Filename, 0, 1 + n);
-
-strncpy(Filename, path, n);
-
-j = n - 1;
-
-while ( (j > 0) && (Filename[j] != '/') )  --j;
-
-++j;
-
-n = strlen(Filename + j);
-
-ShortFilename = new char [1 + n];
-
-memset(ShortFilename, 0, 1 + n);
-
-strncpy(ShortFilename, Filename + j, n);
+Filename.assign(path);
+ShortFilename.assign(basename(path));
 
 
    //
@@ -819,11 +733,6 @@ if ( in )  {
    delete in;  in = (ifstream *) 0;
 
 }
-
-if ( Filename )  { delete [] Filename;  Filename = (char *) 0; }
-
-if ( ShortFilename )  { delete [] ShortFilename;  ShortFilename = (char *) 0; }
-
 
 Last_Line_Number = 0;
 
@@ -965,25 +874,12 @@ ostream & operator<<(ostream & out, const DataLine & L)
 
 if ( L.n_items() == 0 )  return ( out );
 
-int j, k, N;
-char c;
+int j;
 
-
-k = L.N_items - 1;   //  last item
-
-N = L.Offset[k] + strlen(L[k]);
-
-for (j=0; j<N; ++j)  {
-
-   c = L.Line[j];
-
-      //
-      //  patch the nul chars put there by strtok
-      //
-
-   if ( c == 0 )  out.put(' ');
-   else           out.put(c);
-
+for (j = 0; j < L.Items.size(); j++) {
+    out << L.Items[j];
+    if (j < (L.Items.size() - 1))
+        out << ' ';
 }
 
 out.put('\n');
@@ -1008,22 +904,29 @@ int j, k, N;
 char c;
 
 
-k = L.N_items - 1;   //  last item
+// k = L.N_items - 1;   //  last item
+// 
+// N = L.Offset[k] + strlen(L[k]);
+// 
+// for (j=0; j<N; ++j)  {
+// 
+//    c = L.Line[j];
+// 
+//       //
+//       //  patch the nul chars put there by strtok
+//       //
+// 
+//    if ( c == 0 )  lgr << ' ';
+//    else           lgr << c;
+// 
+// }
 
-N = L.Offset[k] + strlen(L[k]);
-
-for (j=0; j<N; ++j)  {
-
-   c = L.Line[j];
-
-      //
-      //  patch the nul chars put there by strtok
-      //
-
-   if ( c == 0 )  lgr << ' ';
-   else           lgr << c;
-
+for (j = 0; j < L.Items.size(); j++) {
+    lgr << L.Items[j];
+    if (j < (L.Items.size() - 1))
+        lgr << ' ';
 }
+
 
 lgr << '\n';
 

@@ -437,7 +437,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
                     StringArray &mask_sid, ConcatString &mask_name) {
    ifstream in;
    ConcatString tmp_file;
-   char sid_str[PATH_MAX];
+   std::string sid_str;
 
    // Initialize
    mask_sid.clear();
@@ -470,7 +470,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       mask_name = sid_str;
 
       // Store the rest of the entries as masking station ID's
-      while(in >> sid_str) mask_sid.add(sid_str);
+      while(in >> sid_str) mask_sid.add(sid_str.c_str());
 
       // Close the input file
       in.close();

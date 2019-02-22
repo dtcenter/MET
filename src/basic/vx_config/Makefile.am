@@ -11,16 +11,16 @@ include ${top_srcdir}/Make-include
 # Yacc/lex flags
 
 AM_YFLAGS	= --defines=config.tab.h -p config
-AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
+#AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
 
 # The library
 
 noinst_LIBRARIES = libvx_config.a
 
 if ENABLE_DEVELOPMENT
-    libvx_config_a_SOURCES = config.tab.yy config_scanner.ll
+    libvx_config_a_SOURCES = config.tab.yy my_config_scanner.cc
 else
-    libvx_config_a_SOURCES = config.tab.cc config.tab.h config_scanner.cc
+    libvx_config_a_SOURCES = config.tab.cc config.tab.h my_config_scanner.cc
 endif
 
 libvx_config_a_SOURCES += \
@@ -42,6 +42,7 @@ libvx_config_a_SOURCES += \
               object_types.h \
               scanner_stuff.h \
               config_constants.h \
+              my_config_scanner.cc \
               vx_config.h
 libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
 

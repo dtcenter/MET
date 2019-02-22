@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include "vx_log.h"
 
@@ -49,32 +50,33 @@ class DataLine {
       friend ostream & operator<<(ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
-   protected:
+   private:
 
-      void init_from_scratch();
+      //void extend_char  (int);
+      //void extend_int   (int);
 
-      void assign(const DataLine &);
-
-      void extend_char  (int);
-      void extend_int   (int);
-
-      char * Line;
-
+      std::string Line;
+      std::vector<std::string> Items;
+      
       int N_chars;
 
-
-      int * Offset;
+      std::vector<int> Offset;
 
       int N_ints;
 
-
-      int N_items;
-
       int LineNumber;
 
-      char *Delimiter;
+      std::string Delimiter;
 
       LineDataFile * File;  //  not allocated
+
+   
+   protected:
+   
+      void init_from_scratch();
+      void assign(const DataLine &);
+      int N_items;
+
 
    public:
 
@@ -132,9 +134,9 @@ inline  int           DataLine::n_items      () const { return ( N_items ); }
 
 inline  int           DataLine::line_number  () const { return ( LineNumber ); }
 
-inline  const char *  DataLine::get_line     () const { return ( Line ); }
+inline  const char *  DataLine::get_line     () const { return ( Line.c_str() ); }
 
-inline  const char *  DataLine::get_delimiter() const { return ( Delimiter ); }
+inline  const char *  DataLine::get_delimiter() const { return ( Delimiter.c_str() ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -149,9 +151,9 @@ class LineDataFile {
       LineDataFile(const LineDataFile &);
       LineDataFile & operator=(const LineDataFile &);
 
-      char * Filename;
+      std::string Filename;
 
-      char * ShortFilename;
+      std::string ShortFilename;
 
       int Last_Line_Number;
 
@@ -191,9 +193,9 @@ class LineDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * LineDataFile::filename() const { return ( Filename ); }
+inline const char * LineDataFile::filename() const { return ( Filename.c_str() ); }
 
-inline const char * LineDataFile::short_filename() const { return ( ShortFilename ); }
+inline const char * LineDataFile::short_filename() const { return ( ShortFilename.c_str() ); }
 
 inline int LineDataFile::last_line_number() const { return ( Last_Line_Number ); }
 

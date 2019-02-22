@@ -460,9 +460,7 @@ if ( N == 0 )  return;   //  no shift, so do nothing
 
 int x, y, x_new;
 int index_old, index_new;
-std::vector<double> new_data;
-
-new_data.resize(Nxy, 0);
+std::vector<double> new_data(Nxy);
 
 for (x=0; x<Nx; ++x)  {
 
@@ -531,7 +529,7 @@ double * b = 0;
 double * xa = 0;
 double * xb = 0;
 double xa0, value, angle;
-const int mnw = (Nx + 1)/2;
+const unsigned int mnw = (Nx + 1)/2;
 
    //
    // Check for bad data
@@ -654,7 +652,7 @@ double * xb = 0;
 double *  C = 0;
 double *  S = 0;
 double xa0, value, angle;
-const int mnw = (Nx + 1)/2;
+const int unsigned mnw = (Nx + 1)/2;
 // const int mnw = Nx - 1;
 
 // const time_t start_time = time(0);
