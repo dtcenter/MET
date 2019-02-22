@@ -129,12 +129,12 @@ void VarInfoGrib::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfoGrib::dump():\n"
-       << "  PTV     = " << PTV     << "\n"
-       << "  Code    = " << Code    << "\n"
-       << "  LvlType = " << LvlType << "\n"
-       << "  PCode   = " << PCode   << "\n"
-       << "  Center   = " << Center   << "\n"
-       << "  Subcenter   = " << Subcenter   << "\n";
+       << "  PTV       = " << PTV       << "\n"
+       << "  Code      = " << Code      << "\n"
+       << "  LvlType   = " << LvlType   << "\n"
+       << "  PCode     = " << PCode     << "\n"
+       << "  Center    = " << Center    << "\n"
+       << "  Subcenter = " << Subcenter << "\n";
 
    return;
 }
