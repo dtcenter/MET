@@ -52,14 +52,15 @@ extern void           yyerror(const char *);
 extern "C" int        configwrap();
 
 
-extern char *         configtext;
-
-extern FILE *         configin;
 
 
    //
    //  definitions that have external linkage
    //
+
+char *         configtext;
+
+FILE *         configin;
 
 
 int               LineNumber            = 1;
@@ -78,7 +79,7 @@ bool              test_mode             = false;
 
 // ConcatString   number_string;
 
-char number_string [max_id_length];
+char number_string [max_id_length + 1];
 
 IdentifierArray  ida;
 
@@ -191,7 +192,7 @@ static void do_user_function_def();
 
 %union {
 
-   char text[max_id_length];
+   char text[max_id_length + 1];
 
    Number nval;
 

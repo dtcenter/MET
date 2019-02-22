@@ -112,6 +112,20 @@ add(Text);
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString::ConcatString(const std::string & Text)
+
+{
+
+init_from_scratch();
+
+add(Text);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString & ConcatString::operator=(const ConcatString & c)
 {
     if (this != &c) {
@@ -130,7 +144,22 @@ ConcatString & ConcatString::operator=(const char * Text)
 {
     delete s;
     init_from_scratch();
-    s->assign(Text);
+    if (s)
+        s->assign(Text);
+
+    return(*this);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & ConcatString::operator=(const std::string & Text)
+{
+    delete s;
+    init_from_scratch();
+    if (s)
+        s->assign(Text);
 
     return(*this);
 }
@@ -141,7 +170,7 @@ ConcatString & ConcatString::operator=(const char * Text)
 
 void ConcatString::init_from_scratch()
 {
-    s = new string();
+    s = new std::string();
     set_precision(concat_string_default_precision);
 }
 
@@ -174,7 +203,10 @@ char ConcatString::char_at(const int idx) const
 
 void ConcatString::assign(const ConcatString & c)
 {
-    s->assign(c.text());
+    if (c.text())
+        s->assign(c.text());
+    else
+        s->clear();
     memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
     Precision = c.Precision;
 }
@@ -271,6 +303,16 @@ void ConcatString::add(const ConcatString & a)
 {
     (*s) += (*a.s);
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ConcatString::add(const std::string & a)
+{
+    (*s) += a;
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -618,6 +660,19 @@ return ( cs );
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & operator<<(ConcatString & cs, const std::string s)
+
+{
+
+cs.add(s);
+
+return ( cs );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -640,15 +695,26 @@ ConcatString & operator<<(ConcatString & a, int k)
 
 {
 
-char junk[128];
-
-snprintf(junk, sizeof(junk), "%d", k);
-
-a.add(junk);
-
+std::ostringstream sstream;
+sstream << k;
+a.add(sstream.str());
 
 return ( a );
+}
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & operator<<(ConcatString & a, unsigned int k)
+
+{
+
+std::ostringstream sstream;
+sstream << k;
+a.add(sstream.str());
+
+return ( a );
 }
 
 
@@ -659,12 +725,9 @@ ConcatString & operator<<(ConcatString & a, long long k)
 
 {
 
-char junk[128];
-
-snprintf(junk, sizeof(junk), "%lld", k);
-
-a.add(junk);
-
+std::ostringstream sstream;
+sstream << k;
+a.add(sstream.str());
 
 return ( a );
 
@@ -677,13 +740,13 @@ return ( a );
 ConcatString & operator<<(ConcatString & a, double x)
 
 {
+std::ostringstream sstream;
 
-char junk[512];
+sstream.setf(std::ios::fixed, std:: ios::floatfield);
+sstream.precision(a.precision());
+sstream << x;
 
-snprintf(junk, sizeof(junk), a.float_format(), x);
-
-a.add(junk);
-
+a.add(sstream.str());
 
 return ( a );
 
@@ -757,14 +820,14 @@ ostream & operator<<(ostream & out, const ConcatString & c)
 ////////////////////////////////////////////////////////////////////////
 
 
-bool operator==(const ConcatString & a, const ConcatString & b)
+bool ConcatString::operator==(const ConcatString & b) const
 
 {
 
-if ( a.empty() )  return ( false );
+if ( empty() )  return ( false );
 if ( b.empty() )  return ( false );
 
-int status = strcmp(a.text(), b.text());
+int status = s->compare(*(b.s));
 
 return ( status == 0 );
 
@@ -774,13 +837,13 @@ return ( status == 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool operator==(const ConcatString & a, const char * text)
+bool ConcatString::operator==(const char * text) const
 
 {
 
-if ( !text || a.empty() )  return ( false );
+if ( !text || empty() )  return ( false );
 
-int status = strcmp(text, a.text());
+int status = s->compare(text);
 
 return ( status == 0 );
 

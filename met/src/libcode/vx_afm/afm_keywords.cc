@@ -36,7 +36,7 @@ a = no_afm_keyword;
 
 for (j=0; j<n_kw_infos; ++j)  {
 
-   if ( strcmp(text, kw_info[j].text) == 0 )  {
+  if ( strncmp(text, kw_info[j].text, strlen(kw_info[j].text)+1) == 0 )  {
 
       a = kw_info[j].key;
 

@@ -268,8 +268,11 @@ class Logger
       Logger & operator<<(const char *);
       Logger & operator<<(std::string);
       Logger & operator<<(const int);
+      Logger & operator<<(const unsigned int);
       Logger & operator<<(const long);
+      Logger & operator<<(const unsigned long);
       Logger & operator<<(const long long);
+      Logger & operator<<(const unsigned long long);
       Logger & operator<<(const double);
       Logger & operator<<(const char);
       Logger & operator<<(const bool);

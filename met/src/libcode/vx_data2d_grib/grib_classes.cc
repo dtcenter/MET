@@ -321,9 +321,6 @@ uint4 value, u;
 unsigned char *c1 = (unsigned char *) 0;
 const unsigned char *c2 = (unsigned char *) 0;
 
-
-value = 0;
-
 k = n*word_size;
 
 byte = k/8;
@@ -608,7 +605,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void GribFileRep::realloc_buf(int n_bytes)
+void GribFileRep::realloc_buf(size_t n_bytes)
 
 {
 
@@ -673,7 +670,7 @@ bool GribFile::open(const char *filename)
 {
 
 int j;
-
+off_t pos;
 
 close();
 
@@ -739,7 +736,7 @@ if(!skip_header()) return ( false );
 
 index_records();
 
-lseek(rep->fd, rep->file_start, SEEK_SET);
+pos = lseek(rep->fd, rep->file_start, SEEK_SET);
 
 return ( true );
 
@@ -817,10 +814,11 @@ int GribFile::read_record(GribRecord & g)
 
 {
 
-int j, s, bytes, n_read, len;
+size_t len, bytes, n_read, s;
+int j;
 int m, d, y, hh, mm;
 int D, E;
-off_t file_pos;
+off_t file_pos, res;
 off_t bytes_processed;
 unsigned char *c = (unsigned char *) 0, c3[3];
 double t;
@@ -832,7 +830,7 @@ g.reset();
 
 file_pos = find_magic_cookie(rep->fd);
 
-lseek(rep->fd, file_pos, SEEK_SET);
+res = lseek(rep->fd, file_pos, SEEK_SET);
 
 bytes_processed = 0;
 
@@ -1138,12 +1136,12 @@ int GribFile::skip_header()
 
 {
 
-int j, found, n_read;
-long pos;
+size_t j, n_read;
+off_t pos;
 
-found = 0;
+bool found = false;
 
-lseek(rep->fd, 0L, SEEK_SET);
+pos = lseek(rep->fd, 0L, SEEK_SET);
 
 pos = lseek(rep->fd, 0L, SEEK_CUR);
 
@@ -1178,7 +1176,7 @@ if ( n_read < 0 )  {
 for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
 
    if ( strncmp((char *) (rep->buf + j), "GRIB", 4) == 0 )  {
-      found = 1;
+      found = true;
       break;
    }
 }//  for j
@@ -1195,7 +1193,7 @@ if ( !found ) {
 
 rep->file_start = (long) (pos + j);
 
-lseek(rep->fd, rep->file_start, SEEK_SET);
+pos = lseek(rep->fd, rep->file_start, SEEK_SET);
 
 return ( 1 );
 
@@ -1238,11 +1236,11 @@ delete g;
 ////////////////////////////////////////////////////////////////////////
 
 
-int GribFile::read()
+size_t GribFile::read()
 
 {
 
-int n_read;
+size_t n_read;
 
 if ( (n_read = ::read(rep->fd, (char *) rep->buf, rep->buf_size)) < 0 )  {
 
@@ -1261,11 +1259,11 @@ return ( n_read );
 ////////////////////////////////////////////////////////////////////////
 
 
-int GribFile::read(int bytes)
+size_t GribFile::read(size_t bytes)
 
 {
 
-int n_read;
+size_t n_read;
 
 if ( bytes > rep->buf_size )  {
 
@@ -1298,11 +1296,11 @@ return ( n_read );
 ////////////////////////////////////////////////////////////////////////
 
 
-int GribFile::read(int buffer_offset, int bytes)
+size_t GribFile::read(off_t buffer_offset, size_t bytes)
 
 {
 
-int n_read;
+size_t n_read;
 
 if ( (buffer_offset + bytes) > (rep->buf_size) )  {
 
@@ -1375,7 +1373,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int GribFile::n_records()
+unsigned int GribFile::n_records()
 
 {
 
@@ -1470,6 +1468,7 @@ return ( rep->name );
 void GribFile::seek_record(int n)
 
 {
+off_t offset;
 
 if ( (n < 0) || (n >= (rep->n_records)) )  {
 
@@ -1480,7 +1479,7 @@ if ( (n < 0) || (n >= (rep->n_records)) )  {
 
 }
 
-lseek(rep->fd, rep->record_info[n].lseek_offset, SEEK_SET);
+offset = lseek(rep->fd, rep->record_info[n].lseek_offset, SEEK_SET);
 
 return;
 
@@ -1536,11 +1535,11 @@ double char4_to_dbl(const unsigned char *c)
 ////////////////////////////////////////////////////////////////////////
 
 
-int char3_to_int(const unsigned char *c)
+unsigned int char3_to_int(const unsigned char *c)
 
 {
 
-int i, j;
+unsigned int i, j;
 
 i = 0;
 
@@ -1554,11 +1553,11 @@ return ( i );
 ////////////////////////////////////////////////////////////////////////
 
 
-int char2_to_int(const unsigned char *c)
+unsigned int char2_to_int(const unsigned char *c)
 
 {
 
-int i, j;
+unsigned int i, j;
 
 i = 0;
 
@@ -1976,9 +1975,11 @@ long find_magic_cookie(int fd)
 
 {
 
-int j, n_read;
-long pos;
+int j;
+size_t n_read;
+long pos = 0;
 char buf[100];
+off_t offset;
 
 while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
@@ -1990,7 +1991,7 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
          pos += j;
 
-         lseek(fd, pos + 2, SEEK_SET);
+         offset = lseek(fd, pos + 2, SEEK_SET);
 
          return ( pos );
 
@@ -2002,7 +2003,7 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
    pos += n_read - 5;
 
-   lseek(fd, pos, SEEK_SET);
+   offset = lseek(fd, pos, SEEK_SET);
 
 }   //  while
 
@@ -2029,7 +2030,7 @@ int calc_lead_time(Section1_Header *pds)
 
 {
 
-int multiplier;
+int multiplier = 0;
 
 switch ( pds->fcst_unit )  {
 

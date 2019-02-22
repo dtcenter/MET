@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
    // Input parameters
    ConcatString in_file_name;
-   char name_str[1024], level_str[1024];
+   std::string name_str, level_str;
 
    // Set verbosity level very high
    mlog.set_verbosity_level(10);
@@ -91,11 +91,11 @@ int main(int argc, char *argv[]) {
    cin  >> name_str >> level_str;
 
    // Process the user's magic strings
-   while(strncasecmp(name_str, "q", 1) != 0) {
+   while(strncasecmp(name_str.c_str(), "q", 1) != 0) {
 
       // Set up the VarInfo object
       vinfo_cur->clear();
-      vinfo_cur->set_magic(name_str, level_str);
+      vinfo_cur->set_magic(name_str.c_str(), level_str.c_str());
 
       // Dump the contents
       mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";

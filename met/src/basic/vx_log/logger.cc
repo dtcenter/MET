@@ -790,7 +790,126 @@ Logger & Logger::operator<<(const int n)
 //////////////////////////////////////////////////////////////////
 
 
+Logger & Logger::operator<<(const unsigned int n)
+{
+      //
+      // if the message level is -1, then this is an ERROR type message,
+      // so write it to cerr
+      //
+   if (message_level == ErrorMessageLevel)
+   {
+      cerr << n << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << n << flush;
+
+   }
+      //
+      // else if the message level is 0, then this is a WARNING type message,
+      // so write it to cerr
+      //
+   else if (message_level == WarningMessageLevel)
+   {
+      cerr << n << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << n << flush;
+
+   }
+      //
+      // else if the message level is greater than 0, then this is a DEBUG
+      // type message, so write it to cout, but only if it is less than or
+      // equal to the verbosity level
+      //
+   else
+   {
+      if (message_level <= VerbosityLevel)
+      {
+         cout << n << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+            (*out) << n << flush;
+
+      }
+   }
+
+   return (*this);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
 Logger & Logger::operator<<(const long l)
+{
+      //
+      // if the message level is -1, then this is an ERROR type message,
+      // so write it to cerr
+      //
+   if (message_level == ErrorMessageLevel)
+   {
+      cerr << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << l << flush;
+
+   }
+      //
+      // else if the message level is 0, then this is a WARNING type message,
+      // so write it to cerr
+      //
+   else if (message_level == WarningMessageLevel)
+   {
+      cerr << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << l << flush;
+
+   }
+      //
+      // else if the message level is greater than 0, then this is a DEBUG
+      // type message, so write it to cout, but only if it is less than or
+      // equal to the verbosity level
+      //
+   else
+   {
+      if (message_level <= VerbosityLevel)
+      {
+         cout << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+            (*out) << l << flush;
+
+      }
+   }
+
+   return (*this);
+
+}
+
+//////////////////////////////////////////////////////////////////
+
+
+Logger & Logger::operator<<(const unsigned long l)
 {
       //
       // if the message level is -1, then this is an ERROR type message,
@@ -851,6 +970,66 @@ Logger & Logger::operator<<(const long l)
 
 
 Logger & Logger::operator<<(const long long l)
+{
+      //
+      // if the message level is -1, then this is an ERROR type message,
+      // so write it to cerr
+      //
+   if (message_level == ErrorMessageLevel)
+   {
+      cerr << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << l << flush;
+
+   }
+      //
+      // else if the message level is 0, then this is a WARNING type message,
+      // so write it to cerr
+      //
+   else if (message_level == WarningMessageLevel)
+   {
+      cerr << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+         (*out) << l << flush;
+
+   }
+      //
+      // else if the message level is greater than 0, then this is a DEBUG
+      // type message, so write it to cout, but only if it is less than or
+      // equal to the verbosity level
+      //
+   else
+   {
+      if (message_level <= VerbosityLevel)
+      {
+         cout << l << flush;
+
+         //
+         // if the file is open, then also write it to the log file
+         //
+      if (is_open())
+            (*out) << l << flush;
+
+      }
+   }
+
+   return (*this);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
+Logger & Logger::operator<<(const unsigned long long l)
 {
       //
       // if the message level is -1, then this is an ERROR type message,

@@ -38,7 +38,7 @@ using namespace std;
 
 static ConcatString program_name;
 
-static const int buf_size = 65536;
+static const size_t buf_size = 65536;
 
 static unsigned char buf[buf_size];
 
@@ -63,7 +63,7 @@ if ( argc != 2 )  usage();
 int fd = -1;
 int j;
 // int pos;
-int n_read, bytes;
+size_t n_read, bytes;
 ConcatString input_filename = argv[1];
 DbfHeader h;
 DbfSubRecord sr;

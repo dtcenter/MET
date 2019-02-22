@@ -18,6 +18,8 @@
 
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include "concat_string.h"
 
@@ -139,17 +141,17 @@ class AsciiTable {
 
       bool FillBlank;    //  fill empty lines in the output with blanks?
 
-      char ** e;   //  table entries
+      std::vector<std::string> e;   //  table entries
                    //  this is really a two-dimensional
                    //  array
 
-      AsciiTableJust * Just;    //  justification values for table entries
+      std::vector<AsciiTableJust> Just;    //  justification values for table entries
                                 //  this is really a two-dimensional
                                 //  array
 
-      int * ColWidth;           //  array of column widths
-      int * InterColumnSpace;   //  array of inter-column spaces
-      int * InterRowSpace;      //  array of inter-column spaces
+      std::vector<int> ColWidth;           //  array of column widths
+      std::vector<int> InterColumnSpace;   //  array of inter-column spaces
+      std::vector<int> InterRowSpace;      //  array of inter-column spaces
 
          //
          //  floating-point stuff
@@ -159,7 +161,7 @@ class AsciiTable {
 
       double BadDataValue;
 
-      char  *BadDataStr;
+      std::string BadDataStr;
 
       char   f_FloatFormat[16];
       char   g_FloatFormat[16];
@@ -192,7 +194,7 @@ class AsciiTable {
       virtual void set_size(const int NR, const int NC);
       virtual void add_rows(const int NR);
 
-      virtual void set_entry(const int r, const int c, const char * text);
+      virtual void set_entry(const int r, const int c, const ConcatString &);
       virtual void set_entry(const int r, const int c, int);
       virtual void set_entry(const int r, const int c, char);
       virtual void set_entry(const int r, const int c, double);
@@ -221,7 +223,7 @@ class AsciiTable {
 
       virtual void set_bad_data_value(double);
 
-      virtual void set_bad_data_str  (const char *);
+      virtual void set_bad_data_str  (const std::string);
 
 
       virtual void set_fill_blank                 (bool);

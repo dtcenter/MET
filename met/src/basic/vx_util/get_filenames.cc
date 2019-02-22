@@ -242,7 +242,7 @@ StringArray parse_ascii_file_list(const char * path)
 
 ifstream f_in;
 StringArray a;
-char file_name[PATH_MAX];
+std::string file_name;
 
    //
    //  Open the input ascii file
@@ -260,7 +260,7 @@ if(!f_in) {
    //  Read and store the file names
    //
 
-while(f_in >> file_name) a.add(file_name);
+while(f_in >> file_name) a.add(file_name.c_str());
 
    //
    //  done

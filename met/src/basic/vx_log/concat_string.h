@@ -88,8 +88,13 @@ class ConcatString {
      ~ConcatString();
       ConcatString(const ConcatString &);
       ConcatString(const char *);
+      ConcatString(const std::string &);
       ConcatString & operator=(const ConcatString &);
       ConcatString & operator=(const char *);
+      ConcatString & operator=(const std::string &);
+      bool operator==(const ConcatString &) const;
+      bool operator==(const char *) const;
+
 
       void clear();
 
@@ -106,6 +111,8 @@ class ConcatString {
          //
 
       const char * text() const;
+
+      const std::string & string() const;
 
       const char * contents(const char *str = 0) const;   //  returns str or "(nul)" if the string is empty
 
@@ -133,6 +140,8 @@ class ConcatString {
       void add(const char);
 
       void add(const ConcatString &);
+      
+      void add(const std::string &);
 
       void chomp();   //  removes possible trailing newline
 
@@ -175,6 +184,7 @@ class ConcatString {
 
 
 inline const char * ConcatString::text()         const { return ( s ? s->c_str() : 0); }
+inline const std::string & ConcatString::string() const { return ( *s ); }
 
 inline int          ConcatString::length()       const { return ( s->length() ); }
 
@@ -216,8 +226,10 @@ extern std::ostream & operator<<(std::ostream &, const ConcatString &);
 
 extern ConcatString & operator << (ConcatString &, const char);
 extern ConcatString & operator << (ConcatString &, const char *);
+extern ConcatString & operator << (ConcatString &, const std::string);
 extern ConcatString & operator << (ConcatString &, const ConcatString &);
 extern ConcatString & operator << (ConcatString &, int);
+extern ConcatString & operator << (ConcatString &, unsigned int);
 extern ConcatString & operator << (ConcatString &, long long);
 extern ConcatString & operator << (ConcatString &, double);
 
@@ -230,8 +242,8 @@ extern ConcatString & operator << (ConcatString &, const Indent &);
    //
 
 
-extern bool operator == (const ConcatString &, const ConcatString &);
-extern bool operator == (const ConcatString &, const char *);
+//extern bool operator == (const ConcatString &, const ConcatString &);
+//extern bool operator == (const ConcatString &, const char *);
 extern bool operator == (const char *, const ConcatString &);
 
 extern bool operator != (const ConcatString &, const ConcatString &);

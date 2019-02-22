@@ -38,9 +38,9 @@ static const char exp_char     = 'e';
 
 static void do_blank_line(ostream & out, bool FillBlank, int width);
 
-static bool all_blanks(const char *);
+static bool all_blanks(const std::string);
 
-static void n_figures(const char * text, int & left, int & right);
+static void n_figures(const std::string text, int & left, int & right);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,18 +112,6 @@ void AsciiTable::init_from_scratch()
 
 {
 
-e = (char **) 0;
-
-ColWidth = (int *) 0;
-
-InterColumnSpace = (int *) 0;
-
-InterRowSpace = (int *) 0;
-
-BadDataStr = (char *) 0;
-
-Just = (AsciiTableJust *) 0;
-
 clear();
 
 return;
@@ -140,35 +128,29 @@ void AsciiTable::clear()
 
 char tmp_str[512];
 
-if ( e )  {
+if ( !e.empty() )  {
 
    int j, n;
 
    n = Nrows*Ncols;
 
-   for (j=0; j<n; ++j)  {
-
-      if ( e[j] )  { delete [] e[j];  e[j] = (char *) 0; }
-
-   }
-
-   delete [] e;  e = (char **) 0;
+   e.clear();
 
 }
 
-if ( BadDataStr )  {
+if ( !BadDataStr.empty() )  {
 
-   delete [] BadDataStr;  BadDataStr = (char *) 0;
+  BadDataStr.clear();
 
 }
 
-if ( ColWidth )  { delete [] ColWidth;  ColWidth = (int *) 0; }
+ColWidth.clear();
 
-if ( Just )  { delete [] Just;  Just = (AsciiTableJust *) 0; }
+Just.clear();
 
-if ( InterColumnSpace )  { delete [] InterColumnSpace;  InterColumnSpace = (int *) 0; }
+InterColumnSpace.clear();
 
-if ( InterRowSpace )  { delete [] InterRowSpace;  InterRowSpace = (int *) 0; }
+InterRowSpace.clear();
 
 TableIndent = default_table_indent;
 
@@ -212,9 +194,8 @@ int j;
 
 const int NRC = Nrows*Ncols;
 
-for (j=0; j<NRC; ++j)  {
-   if ( e[j] )  { delete [] e[j];  e[j] = (char *) 0; }
-}
+e.clear();
+e.resize(NRC);
 
 return;
 
@@ -228,13 +209,13 @@ int AsciiTable::rc_to_n(int r, int c) const
 
 {
 
-if ( !e )  {
+// if ( !e )  {
 
-   mlog << Error << "\nAsciiTable::rc_to_n() -> empty table!\n\n";
+//    mlog << Error << "\nAsciiTable::rc_to_n() -> empty table!\n\n";
 
-   exit ( 1 );
+//    exit ( 1 );
 
-}
+// }
 
 if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
 
@@ -265,7 +246,7 @@ void AsciiTable::assign(const AsciiTable & a)
 
 clear();
 
-if ( !(a.e) )  return;
+if ( a.e.empty() )  return;
 
 set_size(a.nrows(), a.ncols());
 
@@ -273,12 +254,12 @@ set_size(a.nrows(), a.ncols());
 int j, r, c;
 
 
-for (j=0; j<Ncols; ++j)  ColWidth[j] = a.ColWidth[j];
+ColWidth = a.ColWidth;
 
-for (j=0; j<(Ncols - 1); ++j)  InterColumnSpace [j] = a.InterColumnSpace [j];
-for (j=0; j<(Nrows - 1); ++j)  InterRowSpace    [j] = a.InterRowSpace    [j];
+InterColumnSpace = a.InterColumnSpace;
+InterRowSpace = a.InterRowSpace;
 
-for (j=0; j<(Nrows*Ncols); ++j)  Just[j] = a.Just[j];
+Just = a.Just;
 
 TableIndent  = a.TableIndent;
 
@@ -345,9 +326,9 @@ clear();
 int j;
 const int NRC = NR*NC;
 
-e = new char * [NRC];
+e.resize(NRC);
 
-if ( !e )  {
+if ( e.size() != NRC )  {
 
    mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 1\n\n";
 
@@ -355,14 +336,14 @@ if ( !e )  {
 
 }
 
-for (j=0; j<NRC; ++j)  e[j] = (char *) 0;
+//for (j=0; j<NRC; ++j)  e[j] = "";
 
 Nrows = NR;
 Ncols = NC;
 
-ColWidth = new int [Ncols];
+ColWidth.resize(Ncols, 0);
 
-if ( !ColWidth )  {
+if ( !ColWidth.size() )  {
 
    mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 2\n\n";
 
@@ -370,27 +351,20 @@ if ( !ColWidth )  {
 
 }
 
-for (j=0; j<Ncols; ++j)  ColWidth[j] = 0;
+//for (j=0; j<Ncols; ++j)  ColWidth[j] = 0;
 
-InterColumnSpace = new int [Ncols - 1];
+InterColumnSpace.resize(Ncols - 1, default_ics);
+InterRowSpace.resize(Nrows - 1, default_irs);
 
-for (j=0; j<(Ncols - 1); ++j)  InterColumnSpace[j] = default_ics;
+Just.resize(Nrows*Ncols, default_justification);
 
-InterRowSpace = new int [Nrows - 1];
-
-for (j=0; j<(Nrows - 1); ++j)  InterRowSpace[j] = default_irs;
-
-Just = new AsciiTableJust [Nrows*Ncols];
-
-if ( !Just )  {
+if ( !Just.size() )  {
 
    mlog << Error << "\nAsciiTable::set_size_rc() -> memory allocation error 3\n\n";
 
    exit ( 1 );
 
 }
-
-for (j=0; j<(Nrows*Ncols); ++j)  Just[j] = default_justification;
 
    //
    //  done
@@ -429,47 +403,17 @@ int jr, jc;
 const int n_rows_new = Nrows + NR;
 const int n_rows_old = Nrows;
 const int nrc_new = n_rows_new*Ncols;
-char ** c = (char **) 0;
-AsciiTableJust * atj = (AsciiTableJust *) 0;
-int * irs = (int *) 0;
-
-c = new char * [nrc_new];
-
-atj = new AsciiTableJust [nrc_new];
-
-irs = new int [n_rows_new];
-
-memset(c, 0, nrc_new*sizeof(char *));
-
-memset(irs, 0, n_rows_new*sizeof(int));
-
-   //
-   //  copy the old values into the new memory
-   //
-
-memcpy(c, e, Nrows*Ncols*sizeof(char *));
-
-memcpy(atj, Just, Nrows*Ncols*sizeof(AsciiTableJust));
-
-if ( Nrows > 1 )  memcpy(irs, InterRowSpace, (Nrows-1)*sizeof(int));
-
-   //
-   //  deallocate the old memory
-   //
-
-delete [] e;  e = (char **) 0;
-
-e = c;   c = (char **) 0;
-
-delete [] Just;  Just = (AsciiTableJust *) 0;
-
-Just = atj;   atj = (AsciiTableJust *) 0;
-
-delete [] InterRowSpace;  InterRowSpace = (int *) 0;
-
-InterRowSpace = irs;  irs = (int *) 0;
 
 Nrows = n_rows_new;
+
+InterRowSpace.reserve(n_rows_new);
+InterRowSpace.resize(n_rows_new, default_irs);
+
+Just.reserve(nrc_new);
+Just.resize(nrc_new, default_justification);
+
+e.reserve(nrc_new);
+e.resize(nrc_new);
 
    //
    //  copy the justification information from the old last
@@ -566,7 +510,7 @@ if ( (col_left < 0) || (col_left >= (Ncols - 1)) )  {
 
 }
 
-if ( !InterColumnSpace )  return ( 0 );
+if ( InterColumnSpace.empty() )  return ( 0 );
 
 return ( InterColumnSpace[col_left] );
 
@@ -642,7 +586,7 @@ if ( (row_top < 0) || (row_top >= (Nrows - 1)) )  {
 
 }
 
-if ( !InterRowSpace )  return ( 0 );
+if ( InterRowSpace.empty() )  return ( 0 );
 
 return ( InterRowSpace[row_top] );
 
@@ -744,15 +688,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AsciiTable::set_bad_data_str(const char *str)
+void AsciiTable::set_bad_data_str(const std::string str)
 
 {
 
-if ( BadDataStr ) { delete [] BadDataStr; BadDataStr = (char *) 0; }
-
-BadDataStr = new char [strlen(str)+1];
-
-strcpy(BadDataStr, str);
+BadDataStr = str;
 
 return;
 
@@ -918,7 +858,7 @@ return ( Just[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-void AsciiTable::set_entry(const int r, const int c, const char * text)
+void AsciiTable::set_entry(const int r, const int c, const ConcatString &text)
 
 {
 
@@ -933,33 +873,22 @@ n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
    //  delete old entry, if any
    //
 
-if ( e[n] )  { delete [] e[n];  e[n] = (char *) 0; }
+if ( e[n].size() )  { e[n].clear(); }
 
-if ( !text )  return;
+if ( text.empty() )  return;
 
    //
    //  check for bad data value
    //
 
 snprintf(junk, sizeof(junk), "%.0f", BadDataValue);
-if ( strncmp(text, junk, strlen(junk)) == 0 ) text = BadDataStr;
-
-k = strlen(text);
-
-e[n] = new char [1 + k];
-
-if ( !(e[n]) )  {
-
-   mlog << Error << "\nAsciiTable::set_entry() -> memory allocation error\n\n";
-
-   exit ( 1 );
-
+if ( text == junk ) {
+   e[n] = BadDataStr;
+} else {
+   e[n] = text;
 }
 
-memset(e[n], 0, 1 + k);
-
-strcpy(e[n], text);
-
+k = text.length();
 if ( ColWidth[c] < k )  ColWidth[c] = k;
 
    //
@@ -977,12 +906,17 @@ return;
 void AsciiTable::set_entry(const int r, const int c, int a)
 
 {
+char junk[255];
 
-char junk[256];
+if ( fabs(a - BadDataValue) < 0.0001 )  {
+   set_entry(r, c, BadDataStr);
+   return;
 
-if ( fabs(a - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
-else if ( DoCommaString )              ::comma_string(a, junk);
-else                                   snprintf(junk, sizeof(junk), "%d", a);
+} else if ( DoCommaString )  {
+   ::comma_string(a, junk);
+}  else  {
+   snprintf(junk, sizeof(junk), "%d", a);
+}
 
 set_entry(r, c, junk);
 
@@ -1000,7 +934,7 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 
 char junk[256];
 
-if ( fabs(x - BadDataValue) < 0.0001 )  strcpy(junk, BadDataStr);
+if ( fabs(x - BadDataValue) < 0.0001 )  strncpy(junk, BadDataStr.c_str(), sizeof(junk));
 else  {
 
    if ( fabs(x) >= 1.0 )  snprintf(junk, sizeof(junk), f_FloatFormat, x);
@@ -1033,7 +967,7 @@ if ( DoCommaString )  {
 
    if ( Precision > 0 )  s << '.' << p;
 
-   set_entry(r, c, s);
+   set_entry(r, c, s.string());
 
 } else set_entry(r, c, junk);
 
@@ -1074,7 +1008,7 @@ int n;
 n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
 
-return ( e[n] );     //  might be null
+return ( e[n].c_str() );     //  might be null
 
 }
 
@@ -1086,7 +1020,7 @@ int AsciiTable::col_width(int k) const
 
 {
 
-if ( !e )  return ( 0 );
+if ( e.empty() )  return ( 0 );
 
 if ( (k < 0) || (k >= Ncols) )  {
 
@@ -1108,7 +1042,7 @@ int AsciiTable::max_col_width() const
 
 {
 
-if ( !e )  return ( 0 );
+if ( e.empty() )  return ( 0 );
 
 int c, w, k;
 
@@ -1148,7 +1082,7 @@ for (c=0; c<Ncols; ++c)  {
 
    n = rc_to_n(r, c);
 
-   if ( e[n] )  {
+   if ( !e[n].empty() )  {
 
       if ( !all_blanks(e[n]) )  return ( false );
 
@@ -1213,13 +1147,13 @@ w = ColWidth[c];
 
 if ( w == 0 )  {
 
-   char junk[2];
+   // char junk[2];
 
-   junk[0] = (char) 0;
+   // junk[0] = (char) 0;
 
-   s = junk;
+   // s = junk;
 
-   return ( s );
+   return ( ConcatString() );
 
 }
 
@@ -1227,7 +1161,7 @@ if ( w == 0 )  {
    //  so now we know the column width is > 0
    //
 
-if ( !(e[n]) )  {
+if ( e[n].empty() )  {
 
    s.set_repeat(' ', w);
 
@@ -1235,11 +1169,9 @@ if ( !(e[n]) )  {
 
 }
 
-char * out = (char *) 0;
+char * out = new char [10 + w];   //  just to be safe
 
-out = new char [10 + w];   //  just to be safe
-
-justified_item(e[n], ColWidth[c], PadChar, Just[n], out);
+justified_item(e[n].c_str(), ColWidth[c], PadChar, Just[n], out);
 
 s = out;
 
@@ -1261,7 +1193,7 @@ int AsciiTable::table_width() const
 
 {
 
-if ( !e )  return ( 0 );
+if ( e.empty() )  return ( 0 );
 
 int j, W;
 
@@ -1283,7 +1215,7 @@ int AsciiTable::table_height() const
 
 {
 
-if ( !e )  return ( 0 );
+if ( e.empty() )  return ( 0 );
 
 int j, H;
 
@@ -1319,7 +1251,7 @@ int j, k;
 k = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
 
-if ( !(e[k]) )  return;
+if ( e[k].empty() )  return;
 
 ConcatString s = e[k];
 
@@ -1342,14 +1274,11 @@ void AsciiTable::line_up_decimal_points()
 int r, c, n, k;
 int max_left, max_right;
 int w_old, w_new;
-int * left = 0;
-int * right = 0;
+int left[Nrows];
+int right[Nrows];
 // const char fill_char = '*';
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
-
-left  = new int [Nrows];
-right = new int [Nrows];
 
 for (c=0; c<Ncols; ++c)  {
 
@@ -1404,8 +1333,6 @@ for (c=0; c<Ncols; ++c)  {
    //  done
    //
 
-if ( left  )  { delete [] left;   left  = 0; }
-if ( right )  { delete [] right;  right = 0; }
 
 DecimalPointsAligned = true;
 
@@ -1636,15 +1563,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool all_blanks(const char * text)
+bool all_blanks(std::string text)
 
 {
 
-while ( text )  {
-
-   if ( *text++ != ' ' )  return ( false );
-
-}
+if (text.find_first_not_of(' ') != std::string::npos) return false;
 
 return ( true );
 
@@ -1673,13 +1596,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void n_figures(const char * text, int & left, int & right)
+void n_figures(const std::string text, int & left, int & right)
 
 {
 
 int j;
 char c;
-int N = (text == (char *) 0 ? 0 : strlen(text));
+int N = text.length();
 
    //
    //  I wasn't able to find a string library function

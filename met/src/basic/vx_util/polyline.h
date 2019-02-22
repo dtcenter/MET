@@ -55,7 +55,7 @@ class Polyline {
 
          /////////////////////////////////////////////////////////////////////////
 
-      char * name;   //  allocated
+      std::string name;  
       
       double * u;    //  allocated
       double * v;    //  allocated
@@ -63,7 +63,7 @@ class Polyline {
       int n_points;
       int n_alloc;
 
-      void set_name(const char *);
+      void set_name(std::string);
       
       virtual void add_point(double, double);
 

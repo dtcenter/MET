@@ -157,7 +157,7 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
            << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
            << "found fewer than the expected number of elements ("
            << n_items() << "<" << MinATCFTrackElements
-           << ") in ATCF track line:\n" << Line << "\n\n";
+           << ") in ATCF track line:\n" << DataLine::get_line() << "\n\n";
       return(0);
    }
 

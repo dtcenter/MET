@@ -62,7 +62,7 @@ static const int buffer_size_error              =  11;
 static const int read_overflow_error            =  12;
 
 static const int bad_fcst_unit_val_error        =  13;
-static const int grib_search_bytes              = 100;
+static const size_t grib_search_bytes           = 100;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -467,7 +467,7 @@ class GribFileRep {
       int lead;
 
       unsigned char * buf;
-      int buf_size;
+      size_t buf_size;
 
       int n_records;
       int n_alloc;
@@ -481,7 +481,7 @@ class GribFileRep {
 
       void record_extend(int);
 
-      void realloc_buf(int size);
+      void realloc_buf(size_t size);
 
 };
 
@@ -526,15 +526,15 @@ class GribFile {
 
    protected:
 
-      int read();
-      int read(int);
-      int read(int, int);
+      size_t read();
+      size_t read(size_t);
+      size_t read(off_t, size_t);
 
    public:
 
       virtual void seek_record(int);
 
-      virtual int   n_records();
+      virtual unsigned int   n_records();
       virtual off_t record_offset(int);
       virtual int   gribcode(int);
 
@@ -549,9 +549,9 @@ class GribFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern double char4_to_dbl(const unsigned char *);
-extern int    char3_to_int(const unsigned char *);
-extern int    char2_to_int(const unsigned char *);
+extern double          char4_to_dbl(const unsigned char *);
+extern unsigned int    char3_to_int(const unsigned char *);
+extern unsigned int    char2_to_int(const unsigned char *);
 
 extern ostream & operator<<(ostream &, const GribRecord &);
 

@@ -76,7 +76,8 @@ switch ( rec_pad_length )  {
 }
 
 int n_read;
-long long rec_size_1, rec_size_2;
+unsigned long long rec_size_1, rec_size_2;
+int bytes;
 
    //
    //  first record length pad
@@ -107,10 +108,12 @@ if ( rec_size_1 < 0 || rec_size_1 > buf_size )  {
 
 }
 
-if ( (n_read = read(fd, buf, rec_size_1)) != rec_size_1 )  {
+bytes = min<int>(rec_size_1, buf_size);   //  shouldn't be needed, given the above code
+
+if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
    mlog << Error << "\n\n  read_fortran_binary() -> read error ... "
-        << "tried to read " << rec_size_1 << " bytes, got "
+        << "tried to read " << bytes << " bytes, got "
         << n_read << "\n\n";
 
    exit ( 1 );
@@ -181,6 +184,7 @@ switch ( rec_pad_length )  {
 }
 
 int n_read;
+int bytes;
 long long rec_size_1, rec_size_2;
 
    //
@@ -228,10 +232,12 @@ if ( rec_size_1 < 0 || rec_size_1 > buf_size )  {
 
 }
 
-if ( (n_read = read(fd, buf, rec_size_1)) != rec_size_1 )  {
+bytes = min<int>(rec_size_1, buf_size);
+
+if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
    mlog << Error << "\n\n  read_fortran_binary() -> read error ... "
-        << "tried to read " << rec_size_1 << " bytes, got "
+        << "tried to read " << bytes << " bytes, got "
         << n_read << "\n\n";
 
    exit ( 1 );

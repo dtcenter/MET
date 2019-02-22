@@ -40,9 +40,6 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline() {
-
-   name = (char *) 0;
-
    u = v = (double *) 0;
 
    clear();
@@ -58,9 +55,6 @@ Polyline::~Polyline() {
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline(const Polyline &c) {
-
-   name = (char *) 0;
-
    u = v = (double *) 0;
 
    assign(c);
@@ -81,7 +75,6 @@ Polyline & Polyline::operator=(const Polyline &c) {
 
 void Polyline::clear() {
 
-   if(name) { delete [] name; name = (char *) 0; }
    if(u)    { delete [] u;    u = (double *) 0; }
    if(v)    { delete [] v;    v = (double *) 0; }
 
@@ -97,7 +90,7 @@ void Polyline::assign(const Polyline &c) {
 
    clear();
 
-   if(c.name) set_name(c.name);
+   set_name(c.name);
 
    if(c.n_points == 0) return;
 
@@ -152,20 +145,19 @@ return;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Polyline::set_name(const char *n) {
+void Polyline::set_name(std::string n) {
 
-   if(n) {
+   if(!n.empty()) {
 
-      name = new char [strlen(n)+1];
+      name = n;
 
-      if(!name) {
+      if(name.empty()) {
          mlog << Error << "\nPolyline::set_name(const char *) -> "
               << "memory allocation error 1" << "\n\n";
 
          exit(1);
       }
 
-      strcpy(name, n);
    }
 
    return;
@@ -929,7 +921,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
 
 void parse_latlon_poly_file(const char *poly_file, Polyline &poly) {
    ifstream in;
-   char tmp_str[512];
+   std::string tmp_str;
    double lat, lon;
 
    // Open the polyline file specified
@@ -1032,7 +1024,7 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
 
 void parse_xy_poly_file(const char *poly_file, Polyline &poly) {
    ifstream in;
-   char tmp_str[512];
+   std::string tmp_str;
    double x, y;
 
    // Open the polyline file specified
