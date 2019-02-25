@@ -983,7 +983,7 @@ AC_SUBST(FC_LIBS, [-lgfortran])
 # problems so just set it to "-g" if the user hasn't overridden it
 # themselves.
 
-${CXXFLAGS="-g"}
+: ${CXXFLAGS="-g"}
 
 # Checks for programs.
 
