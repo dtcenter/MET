@@ -1647,38 +1647,6 @@ hskip 0.5in}
 
 \end_inset
 
-[-coord filename]
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-[-qc flags]
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-method type] 
 \end_layout
 
@@ -1727,7 +1695,23 @@ hskip 0.5in}
 
 \end_inset
 
-[-name list] 
+[-name list]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-qc flags]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1850,35 +1834,6 @@ Optional arguments for regrid_data_plane
 \series default
 The 
 \series bold
--coord filename
-\series default
- option specifies the lat/lon location for the input data.
- This is used when processing GOES-16 data.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-6.
- 
-\series default
-The 
-\series bold
--qc flags
-\series default
- option specifies a comma-separated list of QC flags, for example "0,1".
- This option is only applied if the -coord argument is given and the QC
- variable exists.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-7.
- 
-\series default
-The 
-\series bold
 -method type
 \series default
  option overrides the default regridding method.
@@ -1888,7 +1843,7 @@ The
 \begin_layout Description
 
 \series medium
-8.
+6.
  
 \series default
 The 
@@ -1902,7 +1857,7 @@ The
 \begin_layout Description
 
 \series medium
-9.
+7.
  
 \series default
 The 
@@ -1917,7 +1872,7 @@ The
 \begin_layout Description
 
 \series medium
-10.
+8.
  
 \series default
 The 
@@ -1931,7 +1886,31 @@ The
 \begin_layout Description
 
 \series medium
-11.
+9.
+ 
+\series default
+The 
+\series bold
+-qc flags
+\series default
+ option specifies a comma-separated list of QC flags, for example "0,1"
+ for GOES-16 and GOES-17 data.
+ This option is only applied if the variable's grid_mapping attribute is
+ 
+\begin_inset Quotes eld
+\end_inset
+
+goes_imager_projection
+\begin_inset Quotes erd
+\end_inset
+
+ and the associated QC variable exists.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+10.
  The 
 \series bold
 -log file
@@ -1950,7 +1929,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-12.
+11.
  The 
 \series bold
 -v level
@@ -1976,7 +1955,7 @@ level
 \begin_layout Description
 
 \series medium
-13.
+12.
 
 \series default
  The 
@@ -2105,11 +2084,15 @@ regridded.nc
 \series default
 will include 6-hour accumulated precipitation, 2m temperature, 10m U and
  V components of the wind, and the 500mb geopotential height.
- 
 \end_layout
 
 \begin_layout Standard
-
+For the GOES-16 and GOES-17 data, the computing lat/long is time consuming.
+ So the computed coordinate (lat/long) is saved into the NetCDF file to
+ the environment variable MET_TMP_DIR or /tmp if MET_TMP_DIR is not defined.
+ The computing lat/long step can be skipped if the coordinate file is given
+ through the environment variable MET_GEOSTATIONARY_DATA.
+ 
 \series medium
 An example of call regrid_data_plane to process GOES-16 AOD data is shown
  below:
@@ -2147,12 +2130,6 @@ regrid_data_plane_GOES-16_AOD_TO_G212.nc
 \end_layout
 
 \begin_layout LyX-Code
--coord g16_conus_latlon_2km_20180620.dat 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
 -qc 1,2,3
 \end_layout
 
@@ -2164,11 +2141,6 @@ regrid_data_plane_GOES-16_AOD_TO_G212.nc
 
 \series medium
 When processing GOES-16 data, the 
-\series bold
--coord
-\series medium
- option must be used to define the input GOES-16 lat/lon locations.
- The 
 \series bold
 -qc
 \series medium
