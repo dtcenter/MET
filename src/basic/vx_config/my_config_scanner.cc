@@ -156,6 +156,8 @@ static int do_comp();
 
 static int do_fort_thresh();
 
+static bool replace_env(ConcatString &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -941,6 +943,12 @@ if ( c == '$' )  {
 
    env_value = e;
 
+   while ( 1 )  {
+
+      if ( ! replace_env(env_value) )  break;
+
+   }
+
    reading_env = true;
 
    env_index = 0;
@@ -1224,6 +1232,75 @@ if ( is_int(s, len) )  return  ( true );
 if ( is_float_v2(s, len) )  return ( true );
 
 return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool replace_env(ConcatString & cs)
+
+{
+
+size_t pos1, pos2;
+const std::string & s = cs.string();
+
+
+if ( (pos1 = s.find("${", 0, 2)) == string::npos )  return ( false );
+
+   //
+   //  replace the environment variable
+   //
+
+if ( (pos2 = s.find('}', pos)) == string::npos )  {
+
+   mlog << Error
+        << "replace_env() -> can't closing brackent in string \""
+        << cs << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+std::string out;
+std::string env;
+char * env_value = 0;
+
+env = s.substr(pos1 + 2, pos2 - pos1 - 2);
+
+env_value = getenv(env.c_str());
+
+if ( ! env_value )  {
+
+   mlog << Error
+        << "\n\n  replace_env() -> unable to get value for environment variable \""
+        << (env.c_str()) << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+out = s.substr(0, pos1);
+
+out += env_value;
+
+out += s.substr(pos2 + 1);
+
+
+cout << "\n\n   out = \"" << (out.c_str()) << "\n\n" << flush;
+
+
+
+   //
+   //  done
+   //
+
+cs.clear();
+
+cs = out;
+
+return ( true );
 
 }
 
