@@ -1256,7 +1256,6 @@ void usage() {
         << "\tto_grid\n"
         << "\toutput_filename\n"
         << "\t-field string\n"
-        << "\t[-coord filename]\n"
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
