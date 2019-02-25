@@ -556,7 +556,7 @@ void GoesImagerData::copy(const GoesImagerData *from)
    int var_y_bound = sizeof(from->y_image_bounds) / var_y_size;
    mlog << Debug(5) << "GoesImager copy(): bound count: x=" 
         << var_x_bound << ", y=" << var_y_bound
-        << " data size: x=" << var_x_size << ", y=" << var_y_size << "\n";
+        << " data size (bytes): x=" << var_x_size << ", y=" << var_y_size << "\n";
    if (0 != var_x_bound) {
       x_image_bounds = new double[var_x_bound];
       memcpy(x_image_bounds, from->x_image_bounds,
