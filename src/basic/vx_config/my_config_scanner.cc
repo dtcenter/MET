@@ -109,6 +109,8 @@ static const int n_fort_thresh_strings = sizeof(fort_thresh_string)/sizeof(*fort
 
 static bool reading_env    = false;
 
+static bool reading_comment = false;
+
 // static unsigned char * file_buffer = 0;
 
 
@@ -747,6 +749,8 @@ void do_c_comment()
 
 {
 
+reading_comment = true;
+
 int c1, c2;
 
 
@@ -762,10 +766,12 @@ while ( 1 )  {
 
    c1 = c2;
 
-   c2 = nextchar();
+   // c2 = nextchar();
+   c2 = fgetc(configin);
 
 }
 
+reading_comment = false;
 
 
 return;
@@ -782,16 +788,22 @@ void do_cpp_comment()
 
 int c;
 
+reading_comment = true;
 
 while ( 1 )  {
 
-   c = nextchar();
+   if ( feof (configin) )  break;
+
+   // c = nextchar();
+   c = fgetc(configin);
 
    if ( (c == eof) || (c == '\n') )  break;
 
 }
 
-// if ( c == '\n' )  { ++LineNumber;  Column = 0; }
+if ( c == '\n' )  { ++LineNumber;  Column = 0; }
+
+reading_comment = false;
 
 return;
 
