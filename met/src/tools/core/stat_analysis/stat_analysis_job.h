@@ -151,6 +151,9 @@ extern void write_line     (const ConcatString &, ofstream *);
 extern double compute_ss_index(const ConcatString &, LineDataFile &,
                  STATAnalysisJob &, int &, int &);
 
+extern void write_case_cols(const ConcatString &, AsciiTable &,
+                 int &, int &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __STAT_ANALYSIS_JOB_H__
