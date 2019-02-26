@@ -296,9 +296,6 @@ extern void mpr_to_pct(
 
 extern double compute_vif(NumArray &);
 
-extern void write_case_cols(const ConcatString &, AsciiTable &,
-                            int &, int &);
-
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __AGGR_STAT_LINE_H__
