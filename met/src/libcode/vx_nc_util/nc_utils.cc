@@ -1096,6 +1096,7 @@ double get_double_var(NcVar * var, const int index) {
       int vi;
       short vs;
       float vf;
+      long long vl;
       int dataType = GET_NC_TYPE_ID_P(var);
       switch (dataType) {
          case NC_DOUBLE:
@@ -1112,6 +1113,17 @@ double get_double_var(NcVar * var, const int index) {
          case NC_INT:
             var->getVar(start, count, &vi);
             k = (double)vi;
+            break;
+         case NC_INT64:
+            long long converted_vl;
+            var->getVar(start, count, &vl);
+            k = (double)vl;
+            converted_vl = (long long)k;
+            if (converted_vl != vl) {
+               mlog << Warning << "\nget_double_var() -> "
+                    << " the value was changed during type conversion: "
+                    << converted_vl << " (was  " << vl << ")\n";
+            }
             break;
          default:
             mlog << Error << "\nget_double_var() -> "
@@ -1388,6 +1400,34 @@ bool get_nc_data(NcVar *var, float *data) {
               << ", is_unsigned_value: " << unsigned_value << "\n";
 
          switch ( type_id )  {
+            case NcType::nc_INT64:
+               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+                  long long fill_value = bad_data_int;
+                  long long min_value =  2147483647; // 9223372036854775807;
+                  long long max_value = -2147483648; //−9223372036854775808;
+                  long long *packed_data = new long long[cell_count];
+                  
+                  if (!IS_INVALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_int(att_fill_value);
+                  
+                  var->getVar(packed_data);
+                  for (int idx=0; idx<cell_count; idx++) {
+                     if (fill_value == packed_data[idx])
+                        data[idx] = bad_data_float;
+                     else {
+                        if (min_value > packed_data[idx]) min_value = packed_data[idx];
+                        if (max_value < packed_data[idx]) max_value = packed_data[idx];
+                        data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                        unpacked_count++;
+                     }
+                  }
+                  delete [] packed_data;
+                  mlog << Debug(4) << method_name << " unpacked_count "
+                       << unpacked_count << " out of " << cell_count
+                       << ". FillValue(int) " << fill_value
+                       << " between " << min_value << " and " << max_value << "\n";
+               }
+               break;
             case NcType::nc_INT:
                if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
                   int fill_value = bad_data_int;
@@ -1697,6 +1737,34 @@ bool get_nc_data(NcVar *var, double *data) {
               << ", is_unsigned_value: " << unsigned_value << "\n";
 
          switch ( type_id )  {
+            case NcType::nc_INT64:
+               if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
+                  int fill_value = bad_data_int;
+                  long long min_value =  2147483647; // 9223372036854775807;
+                  long long max_value = -2147483648; //−9223372036854775808;
+                  long long *packed_data = new long long[cell_count];
+                  
+                  if (!IS_INVALID_NC_P(att_fill_value))
+                     fill_value = get_att_value_int(att_fill_value);
+                  
+                  var->getVar(packed_data);
+                  for (int idx=0; idx<cell_count; idx++) {
+                     if (fill_value == packed_data[idx])
+                        data[idx] = bad_data_double;
+                     else {
+                        if (min_value > packed_data[idx]) min_value = packed_data[idx];
+                        if (max_value < packed_data[idx]) max_value = packed_data[idx];
+                        data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                        unpacked_count++;
+                     }
+                  }
+                  delete [] packed_data;
+                  mlog << Debug(4) << method_name << " unpacked_count "
+                       << unpacked_count << " out of " << cell_count
+                       << ". FillValue(int) " << fill_value
+                       << " between " << min_value << " and " << max_value << "\n";
+               }
+               break;
             case NcType::nc_INT:
                if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) {
                   int fill_value = bad_data_int;
@@ -2612,6 +2680,20 @@ void copy_nc_att_int(NcFile *nc_to, NcGroupAtt *from_att) {
    }
 }
          
+void copy_nc_att_int64(NcFile *nc_to, NcGroupAtt *from_att) {
+   size_t att_length = from_att->getAttLength();
+   if (att_length == 1) {
+      long long value;
+      from_att->getValues(&value);
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
+   }
+   else {
+      long long values[att_length];
+      from_att->getValues(&values);
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+   }
+}
+         
 void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
@@ -2671,6 +2753,20 @@ void copy_nc_att_int(NcVar *var_to, NcGroupAtt *from_att) {
    }
    else {
       int values[att_length];
+      from_att->getValues(&values);
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+   }
+}
+         
+void copy_nc_att_int64(NcVar *var_to, NcGroupAtt *from_att) {
+   size_t att_length = from_att->getAttLength();
+   if (att_length == 1) {
+      long long value;
+      from_att->getValues(&value);
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
+   }
+   else {
+      long long values[att_length];
       from_att->getValues(&values);
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
    }
@@ -2747,6 +2843,20 @@ void copy_nc_att_int(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
          
+void copy_nc_att_int64(NcVar *var_to, NcVarAtt *from_att) {
+   size_t att_length = from_att->getAttLength();
+   if (att_length == 1) {
+      long long value;
+      from_att->getValues(&value);
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
+   }
+   else {
+      long long values[att_length];
+      from_att->getValues(&values);
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+   }
+}
+         
 void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
@@ -2798,6 +2908,9 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const char * attr_name) {
       case NC_INT:
          copy_nc_att_int(var_to, from_att);
          break;
+      case NC_INT64:
+         copy_nc_att_int64(var_to, from_att);
+         break;
       case NC_CHAR:
          copy_nc_att_char(var_to, from_att);
          break;
@@ -2829,6 +2942,9 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const char * attr_name) {
          break;
       case NC_INT:
          copy_nc_att_int(var_to, from_att);
+         break;
+      case NC_INT64:
+         copy_nc_att_int64(var_to, from_att);
          break;
       case NC_CHAR:
          copy_nc_att_char(var_to, from_att);
@@ -2867,6 +2983,9 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
             break;
          case NC_INT:
             copy_nc_att_int(nc_to, from_att);
+            break;
+         case NC_INT64:
+            copy_nc_att_int64(nc_to, from_att);
             break;
          case NC_CHAR:
             copy_nc_att_char(nc_to, from_att);
@@ -2912,6 +3031,9 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
             break;
          case NC_INT:
             copy_nc_att_int(var_to, from_att);
+            break;
+         case NC_INT64:
+            copy_nc_att_int64(var_to, from_att);
             break;
          case NC_CHAR:
             copy_nc_att_char(var_to, from_att);
