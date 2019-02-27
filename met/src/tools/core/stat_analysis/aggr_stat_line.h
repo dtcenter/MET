@@ -70,10 +70,19 @@ struct StatHdrInfo {
    void clear();
    void add(const STATLine &line);
    void check_shc(const ConcatString &cur_case);
-   StatHdrColumns get_shc(const ConcatString &cur_case,
-                          const StringArray &hdr_name,
-                          const StringArray &hdr_value,
-                          const STATLineType lt);
+   StatHdrColumns   get_shc(const ConcatString &cur_case,
+                            const StringArray  &case_cols,
+                            const StringArray  &hdr_cols,
+                            const StringArray  &hdr_vals,
+                            const STATLineType lt);
+   ConcatString get_shc_str(const ConcatString &cur_case,
+                            const StringArray  &case_cols,
+                            const StringArray  &case_vals,
+                            const StringArray  &hdr_cols,
+                            const StringArray  &hdr_vals,
+                            const char         *col_name,
+                            const StringArray  &col_vals,
+                            bool               warning);
 };
 
 struct AggrSummaryInfo {
