@@ -3291,6 +3291,67 @@ mask1,mask2,mask3
 .
 \end_layout
 
+\begin_layout Standard
+When using the 
+\begin_inset Quotes eld
+\end_inset
+
+-out_stat
+\begin_inset Quotes erd
+\end_inset
+
+ option to create a .stat output file and stratifying results using one or
+ more 
+\begin_inset Quotes eld
+\end_inset
+
+-by
+\begin_inset Quotes erd
+\end_inset
+
+ job command options, those columns may be referenced in the 
+\begin_inset Quotes eld
+\end_inset
+
+-set_hdr
+\begin_inset Quotes erd
+\end_inset
+
+ option.
+ When using mulitple 
+\begin_inset Quotes eld
+\end_inset
+
+-by
+\begin_inset Quotes erd
+\end_inset
+
+ options, use 
+\begin_inset Quotes eld
+\end_inset
+
+CASE
+\begin_inset Quotes erd
+\end_inset
+
+ to reference the full case information string:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,OBS_SID
+ -set_hdr VX_MASK OBS_SID -set_hdr DESC CASE
+\end_layout
+
+\begin_layout Standard
+The example above reads MPR lines, stratifies the data by forecast variable
+ name and station ID, and writes the output for each case to a .stat output
+ file.
+ When creating the .stat file, write the full case information to the DESC
+ output column and the station ID to the VX_MASK column.
+\end_layout
+
 \begin_layout LyX-Code
 
 \series bold
