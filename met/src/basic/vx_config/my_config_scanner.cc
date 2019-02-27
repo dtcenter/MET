@@ -160,6 +160,8 @@ static int do_fort_thresh();
 
 static bool replace_env(ConcatString &);
 
+static bool is_fort_thresh_no_spaces();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -351,6 +353,8 @@ if ( pos == 0 )  return ( skip );
 if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
 
 if ( is_float_v2() )  { if ( do_float() )  return ( token(FLOAT) ); }
+
+if ( is_fort_thresh_no_spaces() )  { return ( do_fort_thresh() ); }
 
 int t;
 
@@ -1313,6 +1317,27 @@ cs.clear();
 cs = out;
 
 return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_fort_thresh_no_spaces()
+
+{
+
+int j;
+
+for (j=0; j<n_fort_thresh_strings; ++j)  {
+
+   if ( (strncmp(configtext, fort_thresh_string[j], 2) == 0) && (is_number(configtext + 2, max_id_length - 2)) )    return ( true );
+
+}
+
+
+return ( false );
 
 }
 
