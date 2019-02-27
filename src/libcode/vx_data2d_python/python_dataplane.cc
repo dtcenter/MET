@@ -28,6 +28,12 @@ GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char python_path_env [] = "PYTHONPATH";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void python_dataplane(const char * script_name,
                       int script_argc, char ** script_argv,
                       const bool use_xarray, DataPlane & met_dp_out,
@@ -64,6 +70,10 @@ if ( PyErr_Occurred() )  {
    exit ( 1 );
 
 }
+
+   //
+   //  read the PYTHONPATH environment variable
+   //
 
    //
    //  set the arguments
