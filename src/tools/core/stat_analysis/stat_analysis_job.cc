@@ -1138,7 +1138,8 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cts || lt == stat_nbrcts) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1297,7 +1298,8 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_mcts) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1406,7 +1408,8 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_pstd) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1545,7 +1548,8 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -1686,7 +1690,8 @@ void write_job_aggr_grad(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) write_header_cols(shc, j.stat_at, r);
 
       //
@@ -1913,7 +1918,8 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) write_header_cols(shc, j.stat_at, r);
 
       //
@@ -1978,7 +1984,8 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -2045,7 +2052,8 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -2112,7 +2120,8 @@ void write_job_aggr_relp(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
@@ -2188,7 +2197,8 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = case_it->second.hdr.get_shc(case_it->first, j.hdr_name, j.hdr_value, lt);
+      shc = case_it->second.hdr.get_shc(case_it->first, j.by_column,
+                                        j.hdr_name, j.hdr_value, lt);
 
       //
       // Loop through the bin map to determine the total count
@@ -2387,7 +2397,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
 
       //
       // Set SSVAR alpha value
@@ -2535,7 +2546,8 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
       //
       // Format the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
 
       //
       // ISC output line
@@ -2631,7 +2643,8 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cts || lt == stat_nbrcts || lt == stat_mcts ||
             lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) {
@@ -2828,7 +2841,8 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Write the output STAT header columns
       //
-      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                   j.hdr_name, j.hdr_value, lt);
       if(j.stat_out) {
          if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(j.out_alpha);
          write_header_cols(shc, j.stat_at, r);
@@ -3230,13 +3244,17 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       // Copy over the output STAT header columns
       //
-      ctc_shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_ctc);
+      ctc_shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                       j.hdr_name, j.hdr_value,
+                                       stat_ctc);
 
       //
       // Compute contingency table statistics, if requested
       //
       if(j.out_line_type.has(stat_cts_str)) {
-         cts_shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_cts);
+         cts_shc = it->second.hdr.get_shc(it->first, j.by_column,
+                                          j.hdr_name, j.hdr_value,
+                                          stat_cts);
          cts_shc.set_alpha(j.out_alpha);
          cts_info.compute_stats();
          cts_info.compute_ci();

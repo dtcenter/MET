@@ -2784,6 +2784,15 @@ output_stats = {
 //                                 specify what should be written to the header
 //                                 columns of the output .stat file.
 //
+//   When using the "-by" job command option, you may reference those columns
+//   in the "-set_hdr" job command options.  For example, when computing statistics
+//   separately for each station, write the station ID string to the VX_MASK column
+//   of the output .stat output file: 
+//     -job aggregate_stat -line_type MPR -out_line_type CNT \
+//     -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
+//   When using mulitple "-by" options, use "CASE" to reference the full string:
+//     -by FCST_VAR,OBS_SID -set_hdr DESC CASE -stat_out out.stat
+//
 jobs = [
    "-job filter         -line_type SL1L2 -vx_mask DTC165 \
     -dump_row  job_filter_SL1L2.stat",

@@ -54,6 +54,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static bool is_precip_var_name(const ConcatString &s);
+static const std::string case_str = "CASE";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -304,45 +305,29 @@ void StatHdrInfo::check_shc(const ConcatString &cur_case) {
 ////////////////////////////////////////////////////////////////////////
 
 StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
-                                    const StringArray &hdr_name,
-                                    const StringArray &hdr_value,
+                                    const StringArray  &case_cols,
+                                    const StringArray  &hdr_cols,
+                                    const StringArray  &hdr_vals,
                                     const STATLineType lt) {
    ConcatString css;
-   double out_alpha;
+   StringArray case_vals;
    ThreshArray ta;
-   SingleThresh thresh;
+   double out_alpha;
    int index, wdth;
    StatHdrColumns shc;
 
+   // Split up the current case into values
+   case_vals = cur_case.split(":");
+
    // MODEL
-   css = write_css(model);
-   if(model.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << model.n_elements()
-           << " unique MODEL values: " << css << "\n";
-   }
-   if(hdr_name.has("MODEL", index)) {
-      shc.set_model(hdr_value[index]);
-   }
-   else {
-      shc.set_model(css);
-   }
+   shc.set_model(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "MODEL", model, false));
 
    // DESC
-   css = write_css(desc);
-   if(desc.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << desc.n_elements()
-           << " unique DESC values: " << css << "\n";
-   }
-   if(hdr_name.has("DESC", index)) {
-      shc.set_desc(hdr_value[index]);
-   }
-   else {
-      shc.set_desc(css);
-   }
+   shc.set_desc(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "DESC", desc, false));
 
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
@@ -352,22 +337,22 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << fcst_lead.n_elements()
            << " unique FCST_LEAD values: " << css << "\n";
    }
-   if(hdr_name.has("FCST_LEAD", index)) {
-      shc.set_fcst_lead_sec(timestring_to_sec(hdr_value[index]));
+   if(hdr_cols.has("FCST_LEAD", index)) {
+      shc.set_fcst_lead_sec(timestring_to_sec(hdr_vals[index]));
    }
    else {
       shc.set_fcst_lead_sec(fcst_lead.max());
    }
 
    // FCST_VALID_BEG, FCST_VALID_END
-   if(hdr_name.has("FCST_VALID_BEG", index)) {
-      shc.set_fcst_valid_beg(timestring_to_unix(hdr_value[index]));
+   if(hdr_cols.has("FCST_VALID_BEG", index)) {
+      shc.set_fcst_valid_beg(timestring_to_unix(hdr_vals[index]));
    }
    else {
       shc.set_fcst_valid_beg(fcst_valid_beg);
    }
-   if(hdr_name.has("FCST_VALID_END", index)) {
-      shc.set_fcst_valid_end(timestring_to_unix(hdr_value[index]));
+   if(hdr_cols.has("FCST_VALID_END", index)) {
+      shc.set_fcst_valid_end(timestring_to_unix(hdr_vals[index]));
    }
    else {
       shc.set_fcst_valid_end(fcst_valid_end);
@@ -381,131 +366,61 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << obs_lead.n_elements()
            << " unique OBS_LEAD values: " << css << "\n";
    }
-   if(hdr_name.has("OBS_LEAD", index)) {
-      shc.set_obs_lead_sec(timestring_to_sec(hdr_value[index]));
+   if(hdr_cols.has("OBS_LEAD", index)) {
+      shc.set_obs_lead_sec(timestring_to_sec(hdr_vals[index]));
    }
    else {
       shc.set_obs_lead_sec(obs_lead.max());
    }
 
    // OBS_VALID_BEG, OBS_VALID_END
-   if(hdr_name.has("OBS_VALID_BEG", index)) {
-      shc.set_obs_valid_beg(timestring_to_unix(hdr_value[index]));
+   if(hdr_cols.has("OBS_VALID_BEG", index)) {
+      shc.set_obs_valid_beg(timestring_to_unix(hdr_vals[index]));
    }
    else {
       shc.set_obs_valid_beg(obs_valid_beg);
    }
-   if(hdr_name.has("OBS_VALID_END", index)) {
-      shc.set_obs_valid_end(timestring_to_unix(hdr_value[index]));
+   if(hdr_cols.has("OBS_VALID_END", index)) {
+      shc.set_obs_valid_end(timestring_to_unix(hdr_vals[index]));
    }
    else {
       shc.set_obs_valid_end(obs_valid_end);
    }
 
    // FCST_VAR
-   css = write_css(fcst_var);
-   if(fcst_var.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << fcst_var.n_elements()
-           << " unique FCST_VAR values: " << css << "\n";
-   }
-   if(hdr_name.has("FCST_VAR", index)) {
-      shc.set_fcst_var(hdr_value[index]);
-   }
-   else {
-      shc.set_fcst_var(css);
-   }
+   shc.set_fcst_var(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "FCST_VAR", fcst_var, false));
 
    // FCST_LEV
-   css = write_css(fcst_lev);
-   if(fcst_lev.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << fcst_lev.n_elements()
-           << " unique FCST_LEV values: " << css << "\n";
-   }
-   if(hdr_name.has("FCST_LEV", index)) {
-      shc.set_fcst_lev(hdr_value[index]);
-   }
-   else {
-      shc.set_fcst_lev(css);
-   }
+   shc.set_fcst_lev(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "FCST_LEV", fcst_lev, false));
 
    // OBS_VAR
-   css = write_css(obs_var);
-   if(obs_var.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << obs_var.n_elements()
-           << " unique OBS_VAR values: " << css << "\n";
-   }
-   if(hdr_name.has("OBS_VAR", index)) {
-      shc.set_obs_var(hdr_value[index]);
-   }
-   else {
-      shc.set_obs_var(css);
-   }
+   shc.set_obs_var(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "OBS_VAR", obs_var, false));
 
    // OBS_LEV
-   css = write_css(obs_lev);
-   if(obs_lev.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << obs_lev.n_elements()
-           << " unique OBS_LEV values: " << css << "\n";
-   }
-   if(hdr_name.has("OBS_LEV", index)) {
-      shc.set_obs_lev(hdr_value[index]);
-   }
-   else {
-      shc.set_obs_lev(css);
-   }
+   shc.set_obs_lev(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "OBS_LEV", obs_lev, false));
 
    // OBTYPE
-   css = write_css(obtype);
-   if(obtype.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << obtype.n_elements()
-           << " unique OBTYPE values: " << css << "\n";
-   }
-   if(hdr_name.has("OBTYPE", index)) {
-      shc.set_obtype(hdr_value[index]);
-   }
-   else {
-      shc.set_obtype(css);
-   }
+   shc.set_obtype(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "OBTYPE", obtype, false));
 
    // VX_MASK
-   css = write_css(vx_mask);
-   if(vx_mask.n_elements() > 1) {
-      mlog << Debug(2)
-           << "For case \"" << cur_case << "\", found "
-           << vx_mask.n_elements()
-           << " unique VX_MASK values: " << css << "\n";
-   }
-   if(hdr_name.has("VX_MASK", index)) {
-      shc.set_mask(hdr_value[index]);
-   }
-   else {
-      shc.set_mask(css);
-   }
+   shc.set_mask(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "VX_MASK", vx_mask, false));
 
    // INTERP_MTHD
-   css = write_css(interp_mthd);
-   if(interp_mthd.n_elements() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << interp_mthd.n_elements()
-           << " unique INTERP_MTHD values: " << css << ".\n";
-   }
-   if(hdr_name.has("INTERP_MTHD", index)) {
-      shc.set_interp_mthd(hdr_value[index]);
-   }
-   else {
-      shc.set_interp_mthd(css);
-   }
+   shc.set_interp_mthd(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "INTERP_MTHD", interp_mthd, true));
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
@@ -520,62 +435,28 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
       wdth = nint(sqrt(interp_pnts[0]));
    }
 
-   if(hdr_name.has("INTERP_PNTS", index)) {
-      wdth = nint(sqrt(atof(hdr_value[index])));
+   if(hdr_cols.has("INTERP_PNTS", index)) {
+      wdth = nint(sqrt(atof(hdr_vals[index])));
    }
    shc.set_interp_wdth(wdth);
 
    // FCST_THRESH
-   css = write_css(fcst_thresh);
-   if(fcst_thresh.n_elements() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << fcst_thresh.n_elements()
-           << " unique FCST_THRESH values: " << css << "\n";
-   }
-   if(hdr_name.has("FCST_THRESH", index)) {
-      shc.set_fcst_thresh(hdr_value[index]);
-   }
-   else {
-      ta.clear();
-      ta.add_css(css);
-      shc.set_fcst_thresh(ta);
-   }
+   ta.clear();
+   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                          "FCST_THRESH", fcst_thresh, true));
+   shc.set_fcst_thresh(ta);
 
    // OBS_THRESH
-   css = write_css(obs_thresh);
-   if(obs_thresh.n_elements() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << obs_thresh.n_elements()
-           << " unique OBS_THRESH values: " << css << "\n";
-   }
-   if(hdr_name.has("OBS_THRESH", index)) {
-      shc.set_obs_thresh(hdr_value[index]);
-   }
-   else {
-      ta.clear();
-      ta.add_css(css);
-      shc.set_obs_thresh(ta);
-   }
+   ta.clear();
+   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                          "OBS_THRESH", obs_thresh, true));
+   shc.set_obs_thresh(ta);
 
    // COV_THRESH
-   css = write_css(cov_thresh);
-   if(cov_thresh.n_elements() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << cov_thresh.n_elements()
-           << " unique COV_THRESH values: " << css << ".\n";
-      thresh.clear();
-   }
-   if(hdr_name.has("COV_THRESH", index)) {
-      shc.set_cov_thresh(hdr_value[index]);
-   }
-   else {
-      ta.clear();
-      ta.add_css(css);
-      shc.set_cov_thresh(ta);
-   }
+   ta.clear();
+   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                          "COV_THRESH", cov_thresh, true));
+   shc.set_cov_thresh(ta);
 
    // ALPHA
    css = write_css(alpha);
@@ -590,8 +471,8 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
       out_alpha = alpha[0];
    }
 
-   if(hdr_name.has("ALPHA", index)) {
-      out_alpha = atof(hdr_value[index]);
+   if(hdr_cols.has("ALPHA", index)) {
+      out_alpha = atof(hdr_vals[index]);
    }
    shc.set_alpha(out_alpha);
 
@@ -599,6 +480,57 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    shc.set_line_type(statlinetype_to_string(lt));
 
    return(shc);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
+                                      const StringArray  &case_cols,
+                                      const StringArray  &case_vals,
+                                      const StringArray  &hdr_cols,
+                                      const StringArray  &hdr_vals,
+                                      const char         *col_name,
+                                      const StringArray  &col_vals,
+                                      bool               warning) {
+   ConcatString css, shc_str;
+   int hdr_index, case_index;
+
+
+   // Build comma-separated list of column values
+   css = write_css(col_vals);
+
+   // Check for multiple entries
+   if(col_vals.n_elements() > 1) {
+      ConcatString msg;
+      msg << "For case \"" << cur_case << "\", found "
+          << col_vals.n_elements() << " unique " << col_name
+          << " values: " << css << "\n";
+      if(warning) mlog << Warning  << msg;
+      else        mlog << Debug(2) << msg;
+   }
+
+   // Check the header options.
+   if(hdr_cols.has(col_name, hdr_index)) {
+
+      // Check for the full CASE string.
+      if(case_str.compare(hdr_vals[hdr_index]) == 0) {
+         shc_str = cur_case;
+      }
+      // Check for one of the case columns.
+      else if(case_cols.has(hdr_vals[hdr_index], case_index)) {
+         shc_str = case_vals[case_index];
+      }
+      // Otherwise, use the constant header string.
+      else {
+         shc_str = hdr_vals[hdr_index];
+      }
+   }
+   // Otherwise, use the comma-separated list of values.
+   else {
+      shc_str = css;
+   }
+
+   return(shc_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
