@@ -259,7 +259,7 @@ static const char * nbrcnt_columns [] = {
 };
 
 static const char * grad_columns [] = {
-   "TOTAL",
+   "TOTAL",       "DX",          "DY",
    "FGBAR",       "OGBAR",       "MGBAR",
    "EGBAR",       "S1",          "S1_OG",
    "FGOG_RATIO"

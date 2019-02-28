@@ -1643,6 +1643,19 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &j,
          else {
 
             //
+            // Check for DY and DY remaining constant
+            //
+            if(m[key].grad_info.dx != cur.dx ||
+               m[key].grad_info.dy != cur.dy) {
+               mlog << Error << "\naggr_grad_lines() -> "
+                    << "the \"DX\" and \"DY\" columns must remain constant ("
+                    << m[key].grad_info.dx << " and " << m[key].grad_info.dy
+                    << " != " << cur.dx << " and " << cur.dy
+                    << ").  Try setting \"-column_eq DX n -column_eq DY n\".\n\n";
+               throw(1);
+            }
+
+            //
             // Aggregate the GRAD partial sums
             //
             m[key].grad_info += cur;

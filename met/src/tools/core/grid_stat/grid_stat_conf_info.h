@@ -168,6 +168,10 @@ class GridStatVxOpt {
       IntArray         wave_1d_beg;      // Fourier 1-dimensional decomposition
       IntArray         wave_1d_end;      // beginning and ending wave numbers
 
+      // Gradient Options
+      IntArray         grad_dx;          // Gradient step size in the X direction
+      IntArray         grad_dy;          // Gradient step size in the Y direction
+
       bool             rank_corr_flag;   // Flag for computing rank correlations
 
       // Output file options
@@ -201,6 +205,7 @@ class GridStatVxOpt {
       int get_n_nbrhd_wdth()   const;
       int get_n_cov_thresh()   const;
       int get_n_wave_1d()      const;
+      int get_n_grad()         const;
       int get_n_ci_alpha()     const;
 };
 
@@ -213,6 +218,7 @@ inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_ele
 inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return(nbrhd_info.width.n_elements());  }
 inline int  GridStatVxOpt::get_n_cov_thresh()  const { return(nbrhd_info.cov_ta.n_elements()); }
 inline int  GridStatVxOpt::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());       }
+inline int  GridStatVxOpt::get_n_grad()        const { return(grad_dx.n_elements());           }
 inline int  GridStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());          }
 
 ////////////////////////////////////////////////////////////////////////

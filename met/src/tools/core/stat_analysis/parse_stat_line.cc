@@ -276,6 +276,8 @@ void parse_grad_line(STATLine &l, GRADInfo &grad_info) {
    grad_info.clear();
 
    grad_info.total = atoi(l.get_item("TOTAL"));
+   grad_info.dx    = atoi(l.get_item("DX"));
+   grad_info.dy    = atoi(l.get_item("DY"));
    grad_info.fgbar = atof(l.get_item("FGBAR"));
    grad_info.ogbar = atof(l.get_item("OGBAR"));
    grad_info.mgbar = atof(l.get_item("MGBAR"));

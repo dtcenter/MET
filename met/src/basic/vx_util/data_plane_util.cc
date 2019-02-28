@@ -651,7 +651,7 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane gradient(const DataPlane &dp, int dim) {
+DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    int x, y, x1, y1;
    double v, v1, gr;
    DataPlane grad_dp;
@@ -669,8 +669,8 @@ DataPlane gradient(const DataPlane &dp, int dim) {
       for(y=0; y<dp.ny(); y++) {
 
          // dim: 0 for x-dimension, 1 for y-dimension
-         x1 = (dim == 0 ? x+1 : x  );
-         y1 = (dim == 0 ? y   : y+1);
+         x1 = (dim == 0 ? x+delta : x  );
+         y1 = (dim == 0 ? y       : y+delta);
          v1 = (x1 >= dp.nx() || y1 >= dp.ny() ?
                bad_data_double : dp.get(x1, y1));
          v  = dp.get(x, y);

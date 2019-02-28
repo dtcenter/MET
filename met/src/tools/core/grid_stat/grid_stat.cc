@@ -92,6 +92,7 @@
 //                    all options settable for each verification task.
 //   043    02/14/17  Halley Gotway  Add nbrhd.field option to skip the
 //                    computation of fractional coverage fields.
+//   044    02/22/19  Halley Gotway  Make gradient dx/dy configurable.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1210,75 +1211,87 @@ void process_scores() {
          if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
             conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None) {
 
-            // Compute the gradients
-            DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
-            fgx_dp = gradient(fcst_dp_smooth, 0);
-            fgy_dp = gradient(fcst_dp_smooth, 1);
-            ogx_dp = gradient(obs_dp_smooth,  0);
-            ogy_dp = gradient(obs_dp_smooth,  1);
-
             // Allocate memory in one big chunk based on grid size
+            DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
             NumArray  fgx_na, fgy_na, ogx_na, ogy_na;
             fgx_na.extend(grid.nx()*grid.ny());
             fgy_na.extend(grid.nx()*grid.ny());
             ogx_na.extend(grid.nx()*grid.ny());
             ogy_na.extend(grid.nx()*grid.ny());
 
-            // Loop through the masks to be applied
-            for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
+            // Loop over gradient Dx/Dy
+            for(k=0; k<conf_info.vx_opt[i].get_n_grad(); k++) {
 
-               // Store the current mask
-               mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
+               int dx = conf_info.vx_opt[i].grad_dx[k];
+               int dy = conf_info.vx_opt[i].grad_dy[k];
 
-               // Turn off the mask for missing data values
-               mask_bad_data(mask_mp, fgx_dp);
-               mask_bad_data(mask_mp, fgy_dp);
-               mask_bad_data(mask_mp, ogx_dp);
-               mask_bad_data(mask_mp, ogy_dp);
+               // Compute the gradients
+               fgx_dp = gradient(fcst_dp_smooth, 0, dx);
+               fgy_dp = gradient(fcst_dp_smooth, 1, dy);
+               ogx_dp = gradient(obs_dp_smooth,  0, dx);
+               ogy_dp = gradient(obs_dp_smooth,  1, dy);
 
-               // Apply the current mask to the current fields
-               apply_mask(fgx_dp, mask_mp, fgx_na);
-               apply_mask(fgy_dp, mask_mp, fgy_na);
-               apply_mask(ogx_dp, mask_mp, ogx_na);
-               apply_mask(ogy_dp, mask_mp, ogy_na);
-               apply_mask(wgt_dp, mask_mp, w_na);
+               // Loop through the masks to be applied
+               for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
-               // Set the mask name
-               shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+                  // Store the current mask
+                  mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
 
-               mlog << Debug(2) << "Computing Gradient Statistics "
-                    << "over region " << shc.get_mask()
-                    << ", using " << fgx_na.n_elements() << " pairs.\n";
+                  // Turn off the mask for missing data values
+                  mask_bad_data(mask_mp, fgx_dp);
+                  mask_bad_data(mask_mp, fgy_dp);
+                  mask_bad_data(mask_mp, ogx_dp);
+                  mask_bad_data(mask_mp, ogy_dp);
 
-               // Continue if no pairs were found
-               if(fgx_na.n_elements() == 0) continue;
+                  // Apply the current mask to the current fields
+                  apply_mask(fgx_dp, mask_mp, fgx_na);
+                  apply_mask(fgy_dp, mask_mp, fgy_na);
+                  apply_mask(ogx_dp, mask_mp, ogx_na);
+                  apply_mask(ogy_dp, mask_mp, ogy_na);
+                  apply_mask(wgt_dp, mask_mp, w_na);
 
-               // Compute GRAD
-               grad_info.set(fgx_na, fgy_na, ogx_na, ogy_na, w_na);
+                  // Set the mask name
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
 
-               // Write out GRAD
-               if(conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None &&
-                  grad_info.total > 0) {
+                  mlog << Debug(2) << "Computing Gradient DX(" << dx << ")/DY("
+                       << dy << ") Statistics " << "over region " << shc.get_mask()
+                       << ", using " << fgx_na.n_elements() << " pairs.\n";
 
-                  write_grad_row(shc, grad_info,
-                     conf_info.vx_opt[i].output_flag[i_grad] == STATOutputType_Both,
-                     stat_at, i_stat_row,
-                     txt_at[i_grad], i_txt_row[i_grad]);
+                  // Continue if no pairs were found
+                  if(fgx_na.n_elements() == 0) continue;
+
+                  // Compute GRAD
+                  grad_info.set(dx, dy, fgx_na, fgy_na, ogx_na, ogy_na, w_na);
+
+                  // Write out GRAD
+                  if(conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None &&
+                     grad_info.total > 0) {
+
+                     write_grad_row(shc, grad_info,
+                        conf_info.vx_opt[i].output_flag[i_grad] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_grad], i_txt_row[i_grad]);
+                  }
+               } // end for m (n_mask)
+
+               // Write out the gradients if requested in the config file
+               if(conf_info.vx_opt[i].nc_info.do_gradient) {
+                  ConcatString cs;
+                  cs << cs_erase << "FCST_XGRAD_" << dx;
+                  write_nc(cs, fgx_dp, i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+                  cs << cs_erase << "FCST_YGRAD_" << dy;
+                  write_nc(cs, fgy_dp, i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+                  cs << cs_erase << "OBS_XGRAD_" << dx;
+                  write_nc(cs,  ogx_dp, i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+                  cs << cs_erase << "OBS_YGRAD_" << dy;
+                  write_nc(cs,  ogy_dp, i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
                }
 
-            } // end for k (n_mask)
-
-            // Write out the gradients if requested in the config file
-            if(conf_info.vx_opt[i].nc_info.do_gradient) {
-               write_nc("FCST_XGRAD", fgx_dp, i, mthd, pnts,
-                        conf_info.vx_opt[i].interp_info.field);
-               write_nc("FCST_YGRAD", fgy_dp, i, mthd, pnts,
-                        conf_info.vx_opt[i].interp_info.field);
-               write_nc("OBS_XGRAD",  ogx_dp, i, mthd, pnts,
-                        conf_info.vx_opt[i].interp_info.field);
-               write_nc("OBS_YGRAD",  ogy_dp, i, mthd, pnts,
-                        conf_info.vx_opt[i].interp_info.field);
-            }
+            } // end for k (n_grad)
 
          } // end if GRAD
 
