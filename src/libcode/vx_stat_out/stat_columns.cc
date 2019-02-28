@@ -3230,11 +3230,19 @@ void write_grad_cols(const GRADInfo &grad_info,
 
    //
    // Gradient Line Type (GRAD)
-   //    TOTAL,       FBAR,        OBAR,
-   //    FOBAR,       FFBAR,       OOBAR
+   //    TOTAL,       DX,          DY,
+   //    FGBAR,       OGBAR,       MGBAR,
+   //    EGBAR,       S1,          S1_OG,
+   //    FGOG_RATIO
    //
    at.set_entry(r, c+0,  // Total Count
       grad_info.total);
+
+   at.set_entry(r, c+1,  // DX 
+      grad_info.dx);
+
+   at.set_entry(r, c+1,  // DY
+      grad_info.dy);
 
    at.set_entry(r, c+1,  // FGBAR
       grad_info.fgbar);

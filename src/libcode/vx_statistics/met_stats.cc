@@ -2786,6 +2786,14 @@ GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
    GRADInfo g_info;
 
+   if(dx != c.dx || dy != c.dy) {
+      mlog << Error << "\nGRADInfo::operator+=() -> "
+           << "the gradient DX (" << dx << " vs " << c.dx
+           << ") and DY (" << dy << " vs " << c.dy
+           << ") sizes must remain constant!\n\n";
+      exit(1);
+   }
+
    g_info.total  = total + c.total;
 
    if(g_info.total > 0) {
@@ -2813,7 +2821,7 @@ void GRADInfo::init_from_scratch() {
 
 void GRADInfo::clear() {
 
-   // Gradient partial sums
+   dx    = dy    = 0;
    fgbar = ogbar = 0.0;
    mgbar = egbar = 0.0;
    total = 0;
@@ -2826,6 +2834,10 @@ void GRADInfo::clear() {
 void GRADInfo::assign(const GRADInfo &c) {
 
    clear();
+
+   // Gradient sizes
+   dx = c.dx;
+   dy = c.dy;
 
    // Gradient partial sums
    fgbar = c.fgbar;
@@ -2884,7 +2896,8 @@ double GRADInfo::fgog_ratio() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GRADInfo::set(const NumArray &fgx_na, const NumArray &fgy_na,
+void GRADInfo::set(int grad_dx, int grad_dy,
+                   const NumArray &fgx_na, const NumArray &fgy_na,
                    const NumArray &ogx_na, const NumArray &ogy_na,
                    const NumArray &w_na) {
    int i;
@@ -2905,6 +2918,10 @@ void GRADInfo::set(const NumArray &fgx_na, const NumArray &fgy_na,
 
    // Initialize
    clear();
+
+   // Store the gradient size
+   dx = grad_dx;
+   dy = grad_dy;
 
    // Check for no matched pairs to process
    if(fgx_na.n_elements() == 0) return;

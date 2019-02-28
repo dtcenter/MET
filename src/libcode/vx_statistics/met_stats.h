@@ -594,6 +594,10 @@ class GRADInfo {
       GRADInfo & operator=(const GRADInfo &);
       GRADInfo & operator+=(const GRADInfo &);
 
+      // Gradient Size
+      int dx;
+      int dy;
+
       // Gradient Partial Sums
       int    total;
       double fgbar, ogbar, mgbar, egbar;
@@ -604,7 +608,8 @@ class GRADInfo {
       double fgog_ratio() const; // fgog_ratio = fgbar / ogbar
 
       // Compute sums
-      void set(const NumArray &fgx_na, const NumArray &fgy_na,
+      void set(int grad_dx, int grad_dy,
+               const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
                const NumArray &w_na);
 

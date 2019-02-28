@@ -517,6 +517,9 @@ void GridStatVxOpt::clear() {
    wave_1d_beg.clear();
    wave_1d_end.clear();
 
+   grad_dx.clear();
+   grad_dy.clear();
+
    rank_corr_flag = false;
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
@@ -721,6 +724,20 @@ void GridStatVxOpt::process_config(
       exit(1);
    }
 
+   // Conf: gradient
+   d = odict.lookup_dictionary(conf_key_gradient);
+   grad_dx = d->lookup_int_array(conf_key_dx);
+   grad_dy = d->lookup_int_array(conf_key_dy);
+
+   // Check for the same length
+   if(grad_dx.n_elements() != grad_dy.n_elements()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The gradient dx and dy arrays must have "
+           << "the same length (" << grad_dx.n_elements() << " != "
+           << grad_dy.n_elements() << ").\n\n";
+      exit(1);
+   }
+
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
@@ -798,7 +815,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    fwind_ta, owind_ta, wind_logic,
    //    eclv_points, climo_cdf_ta, ci_alpha
    //    boot_info, nbrhd_info,
-   //    wave_1d_beg, wave_1d_end,
+   //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,
    //    rank_corr_flag, output_flag, nc_info
    //
 
@@ -952,9 +969,9 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_grad):
          // Number of GRAD lines =
-         //    Masks * Smoothing Methods
+         //    Masks * Smoothing Methods * Gradient Sizes
          n = (prob_flag ? 0 :
-              get_n_mask() * get_n_interp());
+              get_n_mask() * get_n_interp() * get_n_grad());
          break;
 
       default:

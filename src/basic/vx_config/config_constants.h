@@ -598,6 +598,8 @@ static const char conf_key_fourier[]          = "fourier";
 static const char conf_key_wave_1d_beg[]      = "wave_1d_beg";
 static const char conf_key_wave_1d_end[]      = "wave_1d_end";
 static const char conf_key_gradient[]         = "gradient";
+static const char conf_key_dx[]               = "dx";
+static const char conf_key_dy[]               = "dy";
 
 //
 // Wavelet-Stat specific parameter key names

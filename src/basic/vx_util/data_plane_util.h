@@ -70,7 +70,7 @@ extern DataPlane normal_cdf(const DataPlane &, const DataPlane &,
 extern DataPlane normal_cdf_inv(const double, const DataPlane &,
                                 const DataPlane &);
 
-extern DataPlane gradient(const DataPlane &, int dim);
+extern DataPlane gradient(const DataPlane &, int dim, int delta);
 
 ////////////////////////////////////////////////////////////////////////
 
