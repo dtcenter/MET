@@ -2280,6 +2280,9 @@ StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
    if(mtddf)                            list.add(a);
    else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
 
+   // Cleanup
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
    return(list);
 }
 
