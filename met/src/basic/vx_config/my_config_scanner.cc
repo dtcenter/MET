@@ -297,8 +297,10 @@ else if ( strncmp(configtext, "==", 2) == 0 )  return ( do_comp() );
 
 else if ( strncmp(configtext, "!=", 2) == 0 )  return ( do_comp() );
 else if ( strncmp(configtext, "NA", 2) == 0 )  return ( do_comp() );
+
 else if ( strncmp(configtext, "&&", 2) == 0 )  { Column += 2;  return ( LOGICAL_OP_AND ); }
 else if ( strncmp(configtext, "||", 2) == 0 )  { Column += 2;  return ( LOGICAL_OP_OR  ); }
+
 else {
 
   putback(c2);
@@ -435,6 +437,8 @@ const int k = char_class[c];
 if ( k == char_class_digit )  return ( true );
 
 if ( k == char_class_alpha )  return ( true );
+
+if ( k == char_class_sign  )  return ( true );
 
 if ( c == '.' )  return ( true );
 
