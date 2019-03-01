@@ -3238,31 +3238,31 @@ void write_grad_cols(const GRADInfo &grad_info,
    at.set_entry(r, c+0,  // Total Count
       grad_info.total);
 
-   at.set_entry(r, c+1,  // DX 
+   at.set_entry(r, c+1,  // DX
       grad_info.dx);
 
-   at.set_entry(r, c+1,  // DY
+   at.set_entry(r, c+2,  // DY
       grad_info.dy);
 
-   at.set_entry(r, c+1,  // FGBAR
+   at.set_entry(r, c+3,  // FGBAR
       grad_info.fgbar);
 
-   at.set_entry(r, c+2,  // OGBAR
+   at.set_entry(r, c+4,  // OGBAR
       grad_info.ogbar);
 
-   at.set_entry(r, c+3,  // MGBAR
+   at.set_entry(r, c+5,  // MGBAR
       grad_info.mgbar);
 
-   at.set_entry(r, c+4,  // EGBAR
+   at.set_entry(r, c+6,  // EGBAR
       grad_info.egbar);
 
-   at.set_entry(r, c+5,  // S1
+   at.set_entry(r, c+7,  // S1
       grad_info.s1());
 
-   at.set_entry(r, c+6,  // S1_OG
+   at.set_entry(r, c+8,  // S1_OG
       grad_info.s1_og());
 
-   at.set_entry(r, c+7,  // FGOG_RATIO
+   at.set_entry(r, c+9,  // FGOG_RATIO
       grad_info.fgog_ratio());
 
    return;
@@ -3405,7 +3405,7 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    //    ME_OERR,      RMSE_OERR,    SPREAD_OERR,
    //    SPREAD_PLUS_OERR
    //
-   at.set_entry(r, c+0,  // Total Number of Pairs 
+   at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_pair);
 
    at.set_entry(r, c+1,  // Number of ensemble members

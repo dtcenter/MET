@@ -671,7 +671,8 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
          // dim: 0 for x-dimension, 1 for y-dimension
          x1 = (dim == 0 ? x+delta : x  );
          y1 = (dim == 0 ? y       : y+delta);
-         v1 = (x1 >= dp.nx() || y1 >= dp.ny() ?
+         v1 = (x1 < 0 || x1 >= dp.nx() ||
+               y1 < 0 || y1 >= dp.ny() ?
                bad_data_double : dp.get(x1, y1));
          v  = dp.get(x, y);
          gr = (is_bad_data(v1) || is_bad_data(v) ?

@@ -1651,7 +1651,8 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &j,
                     << "the \"DX\" and \"DY\" columns must remain constant ("
                     << m[key].grad_info.dx << " and " << m[key].grad_info.dy
                     << " != " << cur.dx << " and " << cur.dy
-                    << ").  Try setting \"-column_eq DX n -column_eq DY n\".\n\n";
+                    << ").  Try setting \"-column_eq DX n -column_eq DY n\""
+                    << " or \"-by DX,DY\".\n\n";
                throw(1);
             }
 

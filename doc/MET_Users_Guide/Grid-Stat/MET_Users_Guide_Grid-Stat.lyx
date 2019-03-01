@@ -1454,6 +1454,81 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+grad = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   dx = [ 1 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   dy = [ 1 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+gradient
+\series medium
+ entry is a dictionary which specifies the number and size of gradients
+ to be computed.
+ The 
+\series bold
+dx
+\series medium
+ and 
+\series bold
+dy
+\series medium
+ entries specify the size of the gradients in grid units in the X and Y
+ dimensions, respectively.
+ 
+\series bold
+dx
+\series medium
+ and 
+\series bold
+dy
+\series medium
+ are arrays of integers (positive or negative) which must have the same
+ length, and the GRAD output line type will be computed separately for each
+ entry.
+ When computing gradients, the value at the (x, y) grid point is replaced
+ by the value at the (x+dx, y+dy) grid point minus the value at (x, y).
+ This configuration option may be set separately in each 
+\series bold
+obs.field
+\series medium
+ entry.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
@@ -4681,7 +4756,7 @@ name "table_GS_format_info_GRAD"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="13" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -4811,7 +4886,7 @@ Total number of matched pairs
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4820,7 +4895,65 @@ Total number of matched pairs
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gradient size in the X-direction
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gradient size in the Y-direction
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4829,7 +4962,7 @@ FGBAR
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4844,7 +4977,7 @@ Mean of absolute value of forecast gradients
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -4873,7 +5006,7 @@ Mean of absolute value of observed gradients
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -4902,7 +5035,7 @@ Mean of maximum of absolute values of forecast and observed gradients
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -4931,7 +5064,7 @@ Mean of absolute value of forecast minus observed gradients
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -4960,7 +5093,7 @@ S1 score
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -4989,7 +5122,7 @@ S1 score with respect to observed gradient
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -5424,19 +5557,19 @@ For each model variable (VAR), vertical level (LVL), masking region (MASK),
 \begin_inset Text
 
 \begin_layout Plain Layout
-FCST_XGRAD
+FCST_XGRAD_DX
 \begin_inset Newline newline
 \end_inset
 
-FCST_YGRAD
+FCST_YGRAD_DX
 \begin_inset Newline newline
 \end_inset
 
-OBS_XGRAD
+OBS_XGRAD_DY
 \begin_inset Newline newline
 \end_inset
 
-OBS_YGRAD
+OBS_YGRAD_DY
 \end_layout
 
 \end_inset
@@ -5455,7 +5588,8 @@ lat, lon
 
 \begin_layout Plain Layout
 List the gradient of the forecast and observation fields computed in the
- grid-x and grid-y directions.
+ grid-x and grid-y directions where DX and DY indicate the gradient direction
+ and size.
 \end_layout
 
 \end_inset
@@ -5465,10 +5599,6 @@ List the gradient of the forecast and observation fields computed in the
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
