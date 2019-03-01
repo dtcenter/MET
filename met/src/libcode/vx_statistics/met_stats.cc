@@ -2052,7 +2052,6 @@ NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
-
    NBRCNTInfo n_info;
    double den;
 
@@ -2794,7 +2793,9 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
       exit(1);
    }
 
-   g_info.total  = total + c.total;
+   g_info.dx    = dx;
+   g_info.dy    = dy;
+   g_info.total = total + c.total;
 
    if(g_info.total > 0) {
       g_info.fgbar = (fgbar*total + c.fgbar*c.total) / g_info.total;

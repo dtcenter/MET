@@ -2421,7 +2421,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
-      else if(field_name == "FCST_XGRAD" || field_name == "FCST_YGRAD") {
+      else if(check_reg_exp("FCST_XGRAD_", field_name) ||
+              check_reg_exp("FCST_YGRAD_", field_name)) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
@@ -2439,7 +2440,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_fcst_lev();
          units_att = conf_info.vx_opt[i_vx].fcst_info->units();
       }
-      else if(field_name == "OBS_XGRAD" || field_name == "OBS_YGRAD") {
+      else if(check_reg_exp("OBS_XGRAD_", field_name) ||
+              check_reg_exp("OBS_YGRAD_", field_name)) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name() << "_"

@@ -1162,6 +1162,23 @@ fourier = {
 }
 
 //
+// The "gradient" entry is a dictionary which specifies the number and size of
+// gradients to be computed. The "dx" and "dy" entries specify the size of the
+// gradients in grid units in the X and Y dimensions, respectively. dx and dy
+// are arrays of integers (positive or negative) which must have the same
+// length, and the GRAD output line type will be computed separately for each
+// entry. When computing gradients, the value at the (x, y) grid point is
+// replaced by the value at the (x+dx, y+dy) grid point minus the value at
+// (x, y).
+//
+// This configuration option may be set separately in each "obs.field" entry.
+//
+gradient = {
+   dx = [ 1 ];
+   dy = [ 1 ];
+}
+
+//
 // The "hira" entry is a dictionary that is very similar to the "interp" and
 // "nbrhd" entries.  It specifies information for applying the High Resolution
 // Assessment (HiRA) verification logic in Point-Stat.  HiRA is analogous to
@@ -2787,7 +2804,7 @@ output_stats = {
 //   When using the "-by" job command option, you may reference those columns
 //   in the "-set_hdr" job command options.  For example, when computing statistics
 //   separately for each station, write the station ID string to the VX_MASK column
-//   of the output .stat output file: 
+//   of the output .stat output file:
 //     -job aggregate_stat -line_type MPR -out_line_type CNT \
 //     -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
 //   When using mulitple "-by" options, use "CASE" to reference the full string:
