@@ -1420,7 +1420,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    }
 
    // Append the variable name suffix
-   var_str << var_name_suffix;
+   if(var_name_suffix) var_str << var_name_suffix;
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = config.nc_compression();
@@ -1431,7 +1431,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes
    add_att(&nc_var, "name",  (const char *) var_str);
-   tmp_str = long_name_prefix;
+   if(long_name_prefix) tmp_str = long_name_prefix;
+   else                 tmp_str.clear();
    tmp_str << var_info->long_name();
    add_att(&nc_var, "long_name", (const char *) tmp_str);
 
