@@ -448,13 +448,28 @@ void process_add_sub_der_args(const CommandLine & cline) {
            << "parsing the command line arguments a list of files, "
            << "each followed by a configuration string.\n";
 
+      //
+      // Without -field, at least 3 arguments are required.
+      //
+      if(cline.n() < 3) { 
+         mlog << Error << "\nprocess_add_sub_der_args() -> " 
+              << "when not using the \"-field\" option, at least 3 "
+              << "arguments are required!\n\n";
+         exit(1);
+      }
+
       for(i=0, n_files=0; i<(cline.n() - 1); i+=2) {
          file_list.add(cline[i]);
-         if(check_reg_exp("/", cline[i+1])) {
-            mlog << Warning << "\nprocess_add_sub_der_args() -> "
-                 << "the configuration string (" << cline[i+1]
-                 << ") contains unexpected characters. "
-                 << "Did you forget the \"-field\" option?\n\n";
+
+         //
+         // Check if this is actually a file name
+         //
+         if(file_exists(cline[i+1])) {
+            mlog << Error << "\nprocess_add_sub_der_args() -> "
+                 << "file name used when config string expected ("
+                 << cline[i+1]
+                 << "). Did you forget the \"-field\" option?\n\n";
+            exit(1);
          }
          field_list.add(cline[i+1]);
       }
