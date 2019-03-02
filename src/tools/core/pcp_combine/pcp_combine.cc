@@ -6,7 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-///////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   pcp_combine.cc
 //
@@ -15,71 +15,63 @@
 //      more gridded data files into a single gridded data file and
 //      writes the output in NetCDF format.
 //
-//      The tool may be run three different modes: sum, add, subtract
+//      The tool may be run in four different modes:
+//         sum, add, subtract, derive
 //
 //      The sum command requires the user to specify an initialization
 //      time, input accumulation interval, valid time, and output
 //      accumulation interval.
 //
-//      The add and subtract commands require the user to specify a
-//      list of input files, each followed by an accumulation interval.
+//      The add, subtract, and derive commands require the user to
+//      specify a list of input files.  Each input file may be followed
+//      by an accumulation interval or a config file string, describing
+//      the data to be processed.  Alternatively, use the -field command
+//      line option to set all config file strings to the same thing.
+//
 //      The subtract command requires exactly two input files while the
-//      add command supports one or more input files.
+//      add and derive commands support one or more input files.
 //
 //      In all cases, the last argument is the output NetCDF file name.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    01-24-07  Halley Gotway  New
-//
 //   001    12-07-07  Halley Gotway  Change time format from
-//                                   YYYY-MM-DD_HH:MM:SS to YYYYMMDD_HHMMSS
-//
+//                    YYYY-MM-DD_HH:MM:SS to YYYYMMDD_HHMMSS.
 //   002    01-31-08  Halley Gotway  Add support for the -add and
-//                                   -subtract options
-//
+//                    -subtract options.
 //   003    09/23/08  Halley Gotway  Change argument sequence for the
-//                                   GRIB record access routines.
-//
+//                    GRIB record access routines.
 //   004    02/20/09  Halley Gotway  Append _HH to the variable name
-//                                   for non-zero accumulation times.
-//
+//                    for non-zero accumulation times.
 //   005    12/23/09  Halley Gotway  Call the library read_pds routine.
-//
 //   006    05/21/10  Halley Gotway  Enhance to search multiple
-//                                   -pcp_dir directory arguments.
-//
+//                    -pcp_dir directory arguments.
 //   007    06/25/10  Halley Gotway  Allow times to be specified in
-//                                   HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
-//
+//                    HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
-//
 //   009    07/27/10  Halley Gotway  Enhance to allow addition of any
-//                                   number of input files/accumulation intervals.
-//                                   Add lat/lon variables to NetCDF.
-//
+//                    number of input files/accumulation intervals.
+//                    Add lat/lon variables to NetCDF.
 //   010    04/19/11  Halley Gotway  Bugfix for -add option.
-//
 //   011    10/20/11  Holmes         Added use of command line class to
-//                                   parse the command line arguments.
-//
+//                    parse the command line arguments.
 //   012    11/14/11  Halley Gotway  Bugfix for -add option when
-//                                   when handling missing data values.
-//
+//                    when handling missing data values.
 //   013    12/21/11  Bullock        Ported to new repository.
-//
 //   014    03/07/12  Halley Gotway  Bugfix in get_field() function and
-//                                   remove unnecessary time strings.
-//
+//                    remove unnecessary time strings.
 //   015    04/12/12  Oldenburg      Support for all gridded data types.
 //   016    01/23/13  Halley Gotway  Update usage statement and code
-//                                   cleanup.
-//   017    10/17/13  Halley Gotway  Bugfix for closing file handles during
-//                                   pcpdir search.
+//                    cleanup.
+//   017    10/17/13  Halley Gotway  Bugfix for closing file handles
+//                    during pcpdir search.
 //   018    04/16/14  Halley Gotway  Bugfix for the -varname option.
-//   019    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   020    12/02/16  Halley Gotway  Change init and accumulation subtraction
-//                                   errors to warnings.
+//   019    05/20/16  Prestopnik J   Removed -version (now in
+//                    command_line.cc)
+//   020    12/02/16  Halley Gotway  Change init and accumulation
+//                    subtraction errors to warnings.
+//   021    03/01/19  Halley Gotway  Add -derive command line option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -121,15 +113,21 @@ static const char default_pcp_dir [] = ".";
 static const char default_reg_exp [] = ".*";
 
 // Run Command enumeration
-enum RunCommand { sum = 0, add = 1, sub = 2 };
+enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
 
 // Variables for top-level command line arguments
 static RunCommand run_command = sum;
-static int verbosity = 1;
+static int verbosity = 2;
 
 // Variables common to all commands
+static int          n_files;
+static ConcatString field_string = "";
 static ConcatString out_filename;
-static MetConfig config;
+static ConcatString out_var_name = "";
+static bool         out_var_name_flag = false;
+static MetConfig    config;
+static VarInfo*     var_info = (VarInfo *) 0;
+static int          compress_level = -1;
 
 // Variables for the sum command
 static unixtime     init_time;
@@ -138,62 +136,76 @@ static unixtime     valid_time;
 static int          out_accum;
 static StringArray  pcp_dir;
 static ConcatString pcp_reg_exp = default_reg_exp;
-static ConcatString user_dict = "";
-static ConcatString field_name = "";
-static bool         name_flag = false;
-static VarInfo*     var_info = (VarInfo *) 0;
 
-// Variables for the add and subtract commands
-static ConcatString *in_file = (ConcatString *) 0;
-static StringArray   accum_mag;
-static int           n_files;
-static int           compress_level = -1;
+// Variables for the add, subtract, and derive commands
+static StringArray  file_list;
+static StringArray  field_list;
+static StringArray  derive_list;
+static bool         do_sum       = false;
+static bool         do_min       = false;
+static bool         do_max       = false;
+static bool         do_range     = false;
+static bool         do_mean      = false;
+static bool         do_stdev     = false;
+static bool         do_vld_count = false;
 
-///////////////////////////////////////////////////////////////////////////////
+// Output NetCDF file
+NcFile *nc_out = (NcFile *) 0;
+NcDim   lat_dim;
+NcDim   lon_dim;
+
+////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
 
 static void process_sum_args(const CommandLine &);
-static void process_add_sub_args(const CommandLine &);
+static void process_add_sub_der_args(const CommandLine &);
 
 static void do_sum_command();
 static void do_add_command();
 static void do_sub_command();
+static void do_der_command();
 
 static void sum_data_files(Grid &, DataPlane &);
-static int  search_pcp_dir(const char *, const unixtime, ConcatString &);
+static int  search_pcp_dir(const char *, const unixtime,
+                           ConcatString &);
 
 static void get_field(const char * filename, const int get_accum,
-                      const unixtime get_init_ut, const unixtime get_valid_ut,
+                      const unixtime get_init_ut,
+                      const unixtime get_valid_ut,
                       Grid & grid, DataPlane & plane);
 
-static void get_field(const char * filename, const char * fld_accum_mag,
-                      const unixtime get_init_ut, const unixtime get_valid_ut,
+static void get_field(const char * filename, const char * cur_field,
+                      const unixtime get_init_ut,
+                      const unixtime get_valid_ut,
                       Grid & grid, DataPlane & plane);
 
-static void write_netcdf(unixtime, unixtime, int, const Grid &, const DataPlane &);
+static void open_nc(const Grid &);
+static void write_nc_data(unixtime, unixtime, int, const DataPlane &,
+                          const char *var_name_suffix = '\0',
+                          const char *long_name_prefix = '\0');
+static void close_nc();
 
+static ConcatString parse_config_str(const char *);
 static bool is_timestring(const char *);
 
 static void usage();
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
+static void set_derive(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
-static void set_user_dict(const StringArray & a);
+static void set_field(const StringArray & a);
 static void set_name(const StringArray & a);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[])
-
-{
-
-program_name = get_short_name(argv[0]);
+int main(int argc, char *argv[]) {
+   program_name = get_short_name(argv[0]);
 
    //
    // Set handler to be called for memory allocation error
@@ -210,24 +222,21 @@ program_name = get_short_name(argv[0]);
    //
    if     (run_command == sum) do_sum_command();
    else if(run_command == add) do_add_command();
-   else                        do_sub_command();
+   else if(run_command == sub) do_sub_command();
+   else                        do_der_command();
 
    return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv)
-
-{
-
+void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    //
-   // check for zero arguments
+   // Check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if (argc == 1) usage();
 
    //
    // Default to running the sum command
@@ -240,71 +249,41 @@ void process_command_line(int argc, char **argv)
    cline.set(argc, argv);
 
    //
-   // set the usage function
+   // Set the usage function
    //
    cline.set_usage(usage);
 
    //
-   // add the options function calls
+   // Add the options function calls
    //
-   cline.add(set_sum,       "-sum",      0);
-   cline.add(set_add,       "-add",      0);
-   cline.add(set_subtract,  "-subtract", 0);
-   cline.add(set_pcpdir,    "-pcpdir",   1);
-   cline.add(set_pcprx,     "-pcprx",    1);
-   cline.add(set_user_dict, "-config",   1);
-   cline.add(set_user_dict, "-field",    1);
-   cline.add(set_name,      "-name",     1);
-   cline.add(set_name,      "-varname",  1);
-   cline.add(set_logfile,   "-log",      1);
-   cline.add(set_verbosity, "-v",        1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_sum,        "-sum",        0);
+   cline.add(set_add,        "-add",        0);
+   cline.add(set_subtract,   "-subtract",   0);
+   cline.add(set_derive,     "-derive",     1);
+   cline.add(set_pcpdir,     "-pcpdir",     1);
+   cline.add(set_pcprx,      "-pcprx",      1);
+   cline.add(set_field,      "-field",      1);
+   cline.add(set_name,       "-name",       1);
+   cline.add(set_name,       "-varname",    1);
+   cline.add(set_logfile,    "-log",        1);
+   cline.add(set_verbosity,  "-v",          1);
+   cline.add(set_compress,   "-compress",   1);
 
    //
-   // parse the command line
+   // Parse the command line
    //
    cline.parse();
 
    //
-   // set the verbosity level
+   // Set the verbosity level
    //
    mlog.set_verbosity_level(verbosity);
-
-   //
-   // Check for error. Depending on the type of command, there should
-   // be a different number of arguments left. For the sum command
-   // there should be five arguments left: the init_time, the in_accum,
-   // the valid_time, the out_accum, and the out_file. For the add
-   // command there should be at least three arguments left: in_file1,
-   // accum1, [in_file2, accum2, ..., in_filen, accumn], and the
-   // out_file. For the subtract command there should be five
-   // arguments left: in_file1, accum1, in_file2, accum2, and
-   // out_file.
-   //
-   if (run_command == sum)
-   {
-      if (cline.n() != 5)
-         usage();
-
-   }
-   else if (run_command == add)
-   {
-      if (cline.n() < 3)
-         usage();
-
-   }
-   else
-   {
-      if (cline.n() != 5)
-         usage();
-
-   }
 
    //
    // Process the specific command arguments
    //
    if(run_command == sum) process_sum_args(cline);
-   else                   process_add_sub_args(cline);
+   else                   process_add_sub_der_args(cline);
 
    //
    // If pcp_dir is not set, set it to the current directory.
@@ -316,22 +295,23 @@ void process_command_line(int argc, char **argv)
    //
    config.read(replace_path(config_const_filename));
 
-   //
-   //  done
-   //
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_sum_args(const CommandLine & cline)
-
-{
+void process_sum_args(const CommandLine & cline) {
 
    //
-   // Parse the sum arguments
+   // Check for enough command line arguments
+   //   init_time, in_accum, valid_time, out_accum, out_file
    //
+   if(cline.n() != 5) {
+      mlog << Error << "\nprocess_sum_args() -> "
+           << "expected exactly 5 arguments but got " << cline.n()
+           << "!\n\n";
+      exit(1);
+   }
 
    //
    // Init time
@@ -384,48 +364,113 @@ void process_sum_args(const CommandLine & cline)
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_add_sub_args(const CommandLine & cline)
-
-{
-
+void process_add_sub_der_args(const CommandLine & cline) {
    int i;
 
    //
-   // Figure out the number of files provided
+   // Check for enough command line arguments
    //
-   for(i=0, n_files=0; i<(cline.n() - 1); i+=2) { // Only check accumulation interval for enough args
-
-      n_files++; // Increment file count
-
-   } // end for i
-
-   //
-   // Allocate memory for file names and accumulations
-   //
-   in_file = new ConcatString [n_files];
-
-   //
-   // Store the input files and accumulations
-   //
-   for(i=0; i<n_files; i++) {
-      in_file[i] = cline[i*2];
-      accum_mag.add( cline[i*2 + 1] );
+   if(cline.n() < 2) {
+      mlog << Error << "\nprocess_add_sub_der_args() -> "
+           << "expected at least 2 arguments but got " << cline.n()
+           << "!\n\n";
+      exit(1);
    }
 
    //
-   // Store the output file
+   // Store last entry as the output file
    //
-   out_filename = cline[n_files*2];
+   out_filename = cline[cline.n()-1];
+
+   //
+   // If the -field command line option was used, process remaining
+   // arguments as a list of file names.
+   //
+   if(!field_string.empty()) {
+      mlog << Debug(2)
+           << "Since the \"-field\" command line option was used, "
+           << "parsing the command line arguments as a list of "
+           << "files.\n";
+
+      //
+      // If one input file was specified, check for an ascii file list.
+      //
+      if(cline.n() == 2) {
+         Met2dDataFileFactory mtddf_factory;
+         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+         config.read_string(parse_config_str(field_string));
+         GrdFileType type = parse_conf_file_type(&config);
+
+         //
+         // Attempt to read the first file as a gridded data file.
+         // If the read was successful, store the file name.
+         // Otherwise, process as an ascii file list.
+         //
+         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0],
+                                                        type))) {
+            file_list.add(cline[0]);
+         }
+         else {
+            mlog << Debug(1)
+                 << "Parsing input file names from ASCII file list: "
+                 << cline[0] << "\n";
+            file_list = parse_ascii_file_list(cline[0]);
+         }
+
+         //
+         // Cleanup
+         //
+         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+      }
+      //
+      // Otherwise, store list of multiple input files.
+      //
+      else {
+         for(i=0; i<(cline.n()-1); i++) {
+            file_list.add(cline[i]);
+         }
+      }
+
+      //
+      // Store the corresponding configuration strings.
+      //
+      for(i=0; i<file_list.n(); i++) {
+         field_list.add(field_string);
+      }
+   }
+   //
+   // If the -field command line option was not used, process remaining
+   // arguments as pairs of filenames followed by configuration strings.
+   //
+   else {
+      mlog << Debug(2)
+           << "Since the \"-field\" command line option was not used, "
+           << "parsing the command line arguments a list of files, "
+           << "each followed by a configuration string.\n";
+
+      for(i=0, n_files=0; i<(cline.n() - 1); i+=2) {
+         file_list.add(cline[i]);
+         if(check_reg_exp("/", cline[i+1])) {
+            mlog << Warning << "\nprocess_add_sub_der_args() -> "
+                 << "the configuration string (" << cline[i+1]
+                 << ") contains unexpected characters. "
+                 << "Did you forget the \"-field\" option?\n\n";
+         }
+         field_list.add(cline[i+1]);
+      }
+   }
+
+   //
+   // Store the number of input files.
+   //
+   n_files = file_list.n();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sum_command()
-
-{
-
+void do_sum_command() {
    DataPlane plane;
    Grid grid;
    int lead_time;
@@ -491,22 +536,18 @@ void do_sum_command()
    sum_data_files(grid, plane);
 
    //
-   // Write the combined precipitation field out in NetCDF format
+   // Write output.
    //
-   mlog << Debug(1)
-        << "Writing output file: " << out_filename << "\n";
-
-   write_netcdf(init_time, valid_time, out_accum, grid, plane);
+   open_nc(grid);
+   write_nc_data(init_time, valid_time, out_accum, plane);
+   close_nc();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void sum_data_files(Grid & grid, DataPlane & plane)
-
-{
-
+void sum_data_files(Grid & grid, DataPlane & plane) {
    int i, j, x, y;
    DataPlane part;
    double v_sum, v_part;
@@ -548,14 +589,15 @@ void sum_data_files(Grid & grid, DataPlane & plane)
       //
       for(j=0; j<pcp_dir.n_elements(); j++) {
 
-         pcp_recs[i] = search_pcp_dir(pcp_dir[j], pcp_times[i], pcp_files[i]);
+         pcp_recs[i] = search_pcp_dir(pcp_dir[j], pcp_times[i],
+                                      pcp_files[i]);
 
-         if( pcp_recs[i] != -1 )  {
+         if(pcp_recs[i] != -1) {
 
             mlog << Debug(1)
                  << "[" << (i+1) << "] File " << pcp_files[i]
-                 << " matches valid time of " << unix_to_yyyymmdd_hhmmss(pcp_times[i])
-                 << "\n";
+                 << " matches valid time of "
+                 << unix_to_yyyymmdd_hhmmss(pcp_times[i]) << "\n";
 
             break;
 
@@ -593,19 +635,21 @@ void sum_data_files(Grid & grid, DataPlane & plane)
       //
       // Read data for the file.
       //
-      get_field(pcp_files[i], in_accum, init_time, pcp_times[i], gr, part);
+      get_field(pcp_files[i], in_accum, init_time, pcp_times[i], gr,
+                part);
 
       //
       // For the first file processed store the grid, allocate memory
       // to store the precipitation sums, and initialize the sums
       //
-      if ( i == 0 )  {
+      if(i == 0) {
 
          grid = gr;
 
          plane = part;
 
-      } else {
+      }
+      else {
 
          //
          // Check to make sure the grid stays the same
@@ -613,12 +657,14 @@ void sum_data_files(Grid & grid, DataPlane & plane)
          if(!(grid == gr)) {
             mlog << Error << "\nsum_data_files() -> "
                  << "the input fields must be on the same grid.\n"
-                 << grid.serialize() << "\n" << gr.serialize() << "\n\n";
+                 << grid.serialize() << "\n" << gr.serialize()
+                 << "\n\n";
             exit(1);
          }
 
          //
-         // Increment the precipitation sums keeping track of the bad data values
+         // Increment the precipitation sums keeping track of the bad
+         // data values
          //
          for(x=0; x<grid.nx(); x++) {
 
@@ -626,11 +672,11 @@ void sum_data_files(Grid & grid, DataPlane & plane)
 
                v_sum = plane(x, y);
 
-               if ( is_bad_data(v_sum) )  continue;
+               if(is_bad_data(v_sum)) continue;
 
                v_part = part(x, y);
 
-               if ( is_bad_data(v_part) ) {
+               if(is_bad_data(v_part) ) {
 
                   plane.set(bad_data_float, x, y);
 
@@ -660,10 +706,8 @@ void sum_data_files(Grid & grid, DataPlane & plane)
 
 ////////////////////////////////////////////////////////////////////////
 
-int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cur_file)
-
-{
-
+int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
+                   ConcatString & cur_file) {
    int i_rec;
    struct dirent *dirp = (struct dirent *) 0;
    DIR *dp = (DIR *) 0;
@@ -706,48 +750,61 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          Met2dDataFileFactory factory;
-         Met2dDataFile * datafile = (Met2dDataFile *) 0;
+         Met2dDataFile * mtddf = (Met2dDataFile *) 0;
          VarInfoFactory var_fac;
          VarInfo * var = (VarInfo *) 0;
 
-         //  create a data file object
-         datafile = factory.new_met_2d_data_file(cur_file);
-         if( !datafile ){
-            mlog << Warning << "search_pcp_dir() - can't open data file \"" << cur_file << "\"\n";
+         //
+         // Create a data file object.
+         //
+         mtddf = factory.new_met_2d_data_file(cur_file);
+         if(!mtddf) {
+            mlog << Warning << "search_pcp_dir() -> "
+                 << "can't open data file \"" << cur_file << "\"\n";
             continue;
          }
 
-         //  create a VarInfo object from the data file
-         var = var_fac.new_var_info(datafile->file_type());
-         if( !var ){
-            mlog << Warning << "search_pcp_dir() -> unable to determine filetype of \"" << cur_file << "\"\n";
+         //
+         // Create a VarInfo object from the data file.
+         //
+         var = var_fac.new_var_info(mtddf->file_type());
+         if(!var) {
+            mlog << Warning << "search_pcp_dir() -> "
+                 << "unable to determine filetype of \"" << cur_file
+                 << "\"\n";
             continue;
          }
 
-         //  initialize the VarInfo object with a field dictionary and
-         //  the requested timing information
-         ConcatString accum_dict = user_dict;
-         if( user_dict.empty() ){
-            accum_dict.format("name=\"APCP\";level=\"A%s\";", sec_to_hhmmss(in_accum).text());
+         //
+         // Initialize the VarInfo object with a field dictionary and
+         // the requested timing information.
+         //
+         ConcatString accum_dict = field_string;
+         if(field_string.empty()) {
+            accum_dict.format("name=\"APCP\";level=\"A%s\";",
+                              sec_to_hhmmss(in_accum).text());
          }
-         config.read_string( accum_dict.text() );
-         var->set_dict( config );
+         config.read_string(accum_dict.text());
+         var->set_dict(config);
 
          var->set_valid(cur_ut);
          var->set_init(init_time);
          var->set_lead(init_time ? cur_ut - init_time : bad_data_int);
 
-         //  look for a VarInfo record match in the data file
-         i_rec = datafile->index(*var);
+         //
+         // Look for a VarInfo record match in the data file.
+         //
+         i_rec = mtddf->index(*var);
 
-         //  delete allocated data file
-         if( datafile ) {
-            delete datafile;
-            datafile = (Met2dDataFile *) 0;
-         }
+         //
+         // Cleanup.
+         //
+         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
-         //  check for a valid match
-         if( -1 != i_rec ) break;
+         //
+         // Check for a valid match.
+         //
+         if(-1 != i_rec) break;
 
       } // end if
 
@@ -765,10 +822,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_add_command()
-
-{
-
+void do_add_command() {
    Grid grid1, grid2;
    DataPlane total, part;
    double total_value, part_value;
@@ -776,42 +830,37 @@ void do_add_command()
    int i, x, y, nc_accum;
 
    mlog << Debug(2)
-        << "Performing addition command for " << n_files
-        << " files.\n";
+        << "Performing addition command for " << n_files << " files.\n";
 
    //
-   // Read current field
+   // Read the first field
    //
-   mlog << Debug(1)
-        << "Reading input file: " << in_file[0] << "\n";
-
-
-   get_field(in_file[0], accum_mag[0], 0, 0, grid1, total);
+   get_field(file_list[0], field_list[0], 0, 0, grid1, total);
 
    // Initialize output times
    nc_init_time  = total.init();
    nc_valid_time = total.valid();
-   nc_accum = total.accum();
+   nc_accum      = total.accum();
 
    //
-   // Loop through the rest of the input files
+   // Loop through the rest of the input files.
+   // i starts at one here, not zero.
    //
-   for(i=1; i<n_files; i++) {   //  i starts at one here, not zero
+   for(i=1; i<n_files; i++) {
 
       //
       // Read current field
       //
-      mlog << Debug(1) << "Reading input file: " << in_file[i] << "\n";
-
-      get_field(in_file[i].text(), accum_mag[i], 0, 0, grid2, part);
+      get_field(file_list[i], field_list[i], 0, 0, grid2, part);
 
       //
       // Check for the same grid dimensions
       //
-      if( grid1 != grid2 ) {
+      if(grid1 != grid2 ) {
          mlog << Error << "\ndo_add_command() -> "
               << "the input fields must be on the same grid.\n"
-              << grid1.serialize() << "\n" << grid2.serialize() << "\n\n";
+              << grid1.serialize() << "\n" << grid2.serialize()
+              << "\n\n";
          exit(1);
       }
 
@@ -827,18 +876,16 @@ void do_add_command()
       //
       // Increment sums for each grid point
       //
-
       for(x=0; x<(part.nx()); x++) {
-
          for(y=0; y<(part.ny()); y++) {
 
             total_value = total(x, y);
 
-            if ( is_bad_data(total_value) )  continue;
+            if(is_bad_data(total_value)) continue;
 
             part_value = part(x, y);
 
-            if ( is_bad_data(part_value) ) {
+            if(is_bad_data(part_value) ) {
 
                total.set(bad_data_float, x, y);
 
@@ -849,18 +896,15 @@ void do_add_command()
             total.set(total_value + part_value, x, y);
 
          } // end for y
-
       } // end for x
-
    } // end for i
 
    //
-   // Write the combined precipitation field out in NetCDF format
+   // Write output.
    //
-   mlog << Debug(1)
-        << "Writing output file: " << out_filename << "\n";
-
-   write_netcdf(nc_init_time, nc_valid_time, nc_accum, grid1, total);
+   open_nc(grid1);
+   write_nc_data(nc_init_time, nc_valid_time, nc_accum, total);
+   close_nc();
 
    return;
 
@@ -868,10 +912,7 @@ void do_add_command()
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sub_command()
-
-{
-
+void do_sub_command() {
    DataPlane plus, minus, difference;
    Grid grid1, grid2;
    unixtime nc_init_time, nc_valid_time;
@@ -883,27 +924,21 @@ void do_sub_command()
    //
    if(n_files != 2) {
       mlog << Error << "\ndo_sub_command() -> "
-           << "you must specify exactly two input files for subtraction.\n\n";
+           << "you must specify exactly two input files for "
+           << "subtraction.\n\n";
       exit(1);
    }
 
    //
    // Read the two specified data files
    //
-   mlog << Debug(1)
-        << "Reading input file: " << in_file[0] << "\n";
-
-   get_field(in_file[0], accum_mag[0], 0, 0, grid1, plus);
-
-   mlog << Debug(1)
-        << "Reading input file: " << in_file[1] << "\n";
-
-   get_field(in_file[1], accum_mag[1], 0, 0, grid2, minus);
+   get_field(file_list[0], field_list[0], 0, 0, grid1, plus);
+   get_field(file_list[1], field_list[1], 0, 0, grid2, minus);
 
    //
    // Check for the same grid dimensions
    //
-   if( grid1 != grid2 ) {
+   if(grid1 != grid2 ) {
       mlog << Error << "\ndo_sub_command() -> "
            << "the input fields must be on the same grid.\n"
            << grid1.serialize() << "\n" << grid2.serialize() << "\n\n";
@@ -940,8 +975,8 @@ void do_sub_command()
    //
    if(plus.accum() < minus.accum()) {
       mlog << Warning << "\ndo_sub_command() -> "
-           << "the first accumulation interval is less than the second ("
-           << sec_to_hhmmss(plus.accum()) << " < "
+           << "the first accumulation interval is less than the "
+           << "second (" << sec_to_hhmmss(plus.accum()) << " < "
            << sec_to_hhmmss(minus.accum()) << ") for subtraction.\n\n";
    }
    nc_accum = plus.accum() - minus.accum();
@@ -954,118 +989,336 @@ void do_sub_command()
    //
    // Perform the specified command for each grid point
    //
-
    difference.set_constant(bad_data_float);
 
    for(x=0; x<(plus.nx()); x++) {
-
       for(y=0; y<(plus.ny()); y++) {
 
          v_plus = plus(x, y);
 
-         if ( is_bad_data(v_plus) )  continue;
+         if(is_bad_data(v_plus)) continue;
 
          v_minus = minus(x, y);
 
-         if ( is_bad_data(v_minus) )  continue;
+         if(is_bad_data(v_minus)) continue;
 
          difference.set(v_plus - v_minus, x, y);
 
       } // end for y
-
    } // end for x
 
    //
-   // Write the combined precipitation field out in NetCDF format
+   // Write output.
    //
-   mlog << Debug(1) << "Writing output file: " << out_filename << "\n";
-   write_netcdf(nc_init_time, nc_valid_time, nc_accum, grid1, difference);
+   open_nc(grid1);
+   write_nc_data(nc_init_time, nc_valid_time, nc_accum, difference);
+   close_nc();
 
    return;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_der_command() {
+   Grid grid, cur_grid;
+   DataPlane cur_dp, der_dp;
+   DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
+   unixtime nc_init_time, nc_valid_time;
+   int i, j, nxy, nc_accum, nc_accum_sum;
+   double v;
+
+   //
+   // Check for at least one derivation option.
+   //
+   if(!(do_sum  || do_min   || do_max || do_range ||
+        do_mean || do_stdev || do_vld_count)) {
+      mlog << Error << "\ndo_der_command() -> "
+           << "at least one derivation option must be specified!\n\n";
+      exit(1);
+   }
+
+   mlog << Debug(2)
+        << "Performing derivation command (" << write_css(derive_list)
+        << ") for " << n_files << " files.\n";
+
+   //
+   // Loop through the input files.
+   //
+   for(i=0; i<n_files; i++) {
+
+      //
+      // Read the current field.
+      //
+      get_field(file_list[i], field_list[i], 0, 0, cur_grid, cur_dp);
+
+      //
+      // Initialize.
+      //
+      if(grid.nx() == 0 || grid.ny() == 0) {
+
+         // Initialize the grid
+         grid = cur_grid;
+
+         // Initialize the timing information
+         nc_init_time  = cur_dp.init();
+         nc_valid_time = cur_dp.valid();
+         nc_accum      = cur_dp.accum();
+         nc_accum_sum  = cur_dp.accum();
+
+         //
+         // Initialize to the first field.
+         //
+         min_dp = cur_dp;
+         max_dp = cur_dp;
+         sum_dp = cur_dp;
+
+         //
+         // Initialize good data values to 0.
+         //
+         sum_sq_dp = cur_dp;
+         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+            if(!is_bad_data(cur_dp.data()[j])) {
+               sum_dp.buf()[j] = 0.0;
+               sum_sq_dp.buf()[j] = 0.0;
+            }
+         }
+
+         //
+         // Initialize valid data counts to 0.
+         //
+         vld_dp = cur_dp;
+         vld_dp.set_constant(0.0);
+      }
+      //
+      // Check for grid mismatch
+      //
+      else if(grid != cur_grid) {
+         mlog << Error << "\ndo_der_command() -> "
+              << "the input fields must be on the same grid.\n"
+              << grid.serialize() << "\n" << cur_grid.serialize()
+              << "\n\n";
+         exit(1);
+      }
+      //
+      // Update timing information
+      //
+      else {
+
+         // Output init time:
+         //    If it changes, reset to 0.
+         if(nc_init_time != cur_dp.init()) {
+            nc_init_time = (unixtime) 0;
+         }
+
+         // Output valid time:
+         //    If it changes, keep track of the maximum.
+         if(nc_valid_time < cur_dp.valid()) {
+            nc_valid_time = cur_dp.valid();
+         }
+
+         // Output accumulation time:
+         //    If it changes, reset to 0.
+         if(nc_accum != cur_dp.accum()) {
+            nc_accum = 0;
+         }
+         nc_accum_sum += cur_dp.accum();
+      }
+
+      //
+      // Update sums and counts.
+      //
+      for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+
+         // Get current data value
+         v = cur_dp.data()[j];
+
+         // Update valid counts.
+         if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
+         else                continue;
+
+         // Update min/max fields which may contain bad data.
+         if(!is_bad_data(min_dp.buf()[j]) && v < min_dp.buf()[j]) {
+            min_dp.buf()[j] = v;
+         }
+         if(!is_bad_data(max_dp.buf()[j]) && v > max_dp.buf()[j]) {
+            max_dp.buf()[j] = v;
+         }
+
+         // Update sum and sum of squares which does not have bad data.
+         sum_dp.buf()[j]    += v;
+         sum_sq_dp.buf()[j] += v*v;
+      }
+   }
+
+   //
+   // Compute derived fields and write the output.
+   //
+   open_nc(grid);
+   if(do_sum) {
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum, sum_dp,
+                    "_SUM", "Sum of ");
+   }
+   if(do_min) {
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, min_dp,
+                    "_MIN", "Minimum Value of ");
+   }
+   if(do_max) {
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, max_dp,
+                    "_MAX", "Maximum Value of ");
+   }
+   if(do_range) {
+      der_dp = max_dp;
+      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+         if(is_bad_data(max_dp.data()[i]) ||
+            is_bad_data(min_dp.data()[i])) {
+            der_dp.buf()[i] = bad_data_double;
+         }
+         else {
+            der_dp.buf()[i] = max_dp.data()[i] - min_dp.data()[i];
+         }
+      }
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
+                    "_RANGE", "Range of ");
+   }
+   if(do_mean) {
+      der_dp = sum_dp;
+      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+         if(is_bad_data(sum_dp.data()[i]) ||
+            is_bad_data(vld_dp.data()[i]) ||
+            is_eq(vld_dp.data()[i], 0.0)) {
+            der_dp.buf()[i] = bad_data_double;
+         }
+         else {
+            der_dp.buf()[i] = sum_dp.data()[i]/vld_dp.data()[i];
+         }
+      }
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
+                    "_MEAN", "Mean Value of ");
+   }
+   if(do_stdev) {
+      der_dp = sum_dp;
+      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+         double s  = sum_dp.data()[i];
+         double sq = sum_sq_dp.data()[i];
+         double n  = vld_dp.data()[i];
+         if(is_bad_data(s) || is_bad_data(sq) ||
+            is_bad_data(n) || n <= 1) {
+            der_dp.buf()[i] = bad_data_double;
+         }
+         else {
+            v = (sq - s*s/n)/(n-1);
+            if(is_eq(v, 0.0)) v = 0.0;
+            der_dp.buf()[i] = sqrt(v);
+         }
+      }
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
+                    "_STDEV", "Standard Deviation of ");
+   }
+   if(do_vld_count) {
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum, vld_dp,
+                    "_VLD", "Valid Data Count of ");
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void get_field(const char * filename, const int get_accum,
                const unixtime get_init_ut, const unixtime get_valid_ut,
-               Grid & grid, DataPlane & plane)
-
-{
-   get_field(filename, sec_to_hhmmss(get_accum), get_init_ut, get_valid_ut, grid, plane);
+               Grid & grid, DataPlane & plane) {
+   get_field(filename, sec_to_hhmmss(get_accum), get_init_ut,
+             get_valid_ut, grid, plane);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_field(const char * filename, const char * fld_accum_mag,
+void get_field(const char *filename, const char *cur_field,
                const unixtime get_init_ut, const unixtime get_valid_ut,
-               Grid & grid, DataPlane & plane)
-
-{
-
+               Grid & grid, DataPlane & plane) {
    Met2dDataFileFactory factory;
    Met2dDataFile * datafile = (Met2dDataFile *) 0;
    GrdFileType ftype;
    VarInfoFactory var_fac;
    VarInfo* var;
 
-   //  build the field config string
-   ConcatString config_str = is_timestring(fld_accum_mag) ? user_dict.text() : fld_accum_mag;
-   if( config_str.empty() ){
-      config_str.format("name=\"APCP\";level=\"A%s\";", fld_accum_mag);
-   }
+   //
+   // Build the field config string
+   //
+   ConcatString config_str = parse_config_str(cur_field);
 
-   //  parse the config string
+   mlog << Debug(1)
+        << "Reading data (" << config_str
+        << ") from input file: " << filename << "\n";
+
+   //
+   // Parse the config string
+   //
    config.read_string(config_str);
 
-   //  get the gridded file type from config string, if present
+   //
+   // Get the gridded file type from config string, if present
+   //
    ftype = parse_conf_file_type(&config);
 
-   //  open the data file and build a VarInfo object
+   //
+   // Open the data file and build a VarInfo object
+   //
    datafile = factory.new_met_2d_data_file(filename, ftype);
-   if( !datafile ){
-      mlog << Error << "\nget_field() -> can't open data file \"" << filename
-           << "\"\n\n";
+   if(!datafile) {
+      mlog << Error << "\nget_field() -> "
+           << "can't open data file \"" << filename << "\"\n\n";
       exit(1);
    }
 
    var = var_fac.new_var_info(datafile->file_type());
-   if( !var ){
-      mlog << Error << "\nget_field() -> unable to determine filetype of \""
-           << filename << "\"\n\n";
+   if(!var) {
+      mlog << Error << "\nget_field() -> "
+           << "unable to determine filetype of \"" << filename
+           << "\"\n\n";
       exit(1);
    }
 
-   //  initialize the VarInfo object with a config
+   //
+   // Initialize the VarInfo object with a config
+   //
    var->set_dict(config);
 
-   //  set the VarInfo timing object
+   //
+   // Set the VarInfo timing object
+   //
    if(get_valid_ut != 0) var->set_valid(get_valid_ut);
    if(get_init_ut  != 0) var->set_init(get_init_ut);
 
-   //  read the record of interest into a DataPlane object
-   if( ! datafile->data_plane(*var, plane) ){
-      mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
+   //
+   // Read the record of interest into a DataPlane object
+   //
+   if(!datafile->data_plane(*var, plane)) {
+      mlog << Error << "\nget_field() -> "
+           << "can't get data plane from file \"" << filename
            << "\"\n\n";
       exit(1);
    }
 
    grid = datafile->grid();
 
-   //  build an output field name using the magic string
-   if( !var_info ){
+   //
+   // Build an output field name using the magic string
+   //
+   if(!var_info) {
       var_info = var;
-      if( field_name.empty() ){
-         field_name = var->magic_str();
-         field_name = str_replace_all(field_name, "(", "");
-         field_name = str_replace_all(field_name, ")", "");
-         field_name = str_replace_all(field_name, "*", "");
-         field_name = str_replace_all(field_name, ",", "");
-         field_name = str_replace_all(field_name, "/", "_");
+      if(out_var_name.empty()) {
+         out_var_name = var->magic_str();
+         out_var_name = str_replace_all(out_var_name, "(", "");
+         out_var_name = str_replace_all(out_var_name, ")", "");
+         out_var_name = str_replace_all(out_var_name, "*", "");
+         out_var_name = str_replace_all(out_var_name, ",", "");
+         out_var_name = str_replace_all(out_var_name, "/", "_");
       }
    }
 
-   if ( datafile )  { delete datafile;  datafile = (Met2dDataFile *) 0; }
+   if(datafile) { delete datafile;  datafile = (Met2dDataFile *) 0; }
 
    return;
 
@@ -1073,87 +1326,90 @@ void get_field(const char * filename, const char * fld_accum_mag,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
-                  const Grid &grid, const DataPlane & plane)
-
-{
-
-   ConcatString var_str;
-   ConcatString tmp_str, tmp2_str;
+void open_nc(const Grid &grid) {
    ConcatString command_str;
 
-   NcFile *f_out   = (NcFile *) 0;
-   NcDim  lat_dim ;
-   NcDim  lon_dim ;
-   NcVar  pcp_var ;
+   // List the output file
+   mlog << Debug(1)
+        << "Writing output file: " << out_filename << "\n";
 
    // Create a new NetCDF file and open it.
-   f_out = open_ncfile(out_filename, true);
+   nc_out = open_ncfile(out_filename, true);
 
-   if(IS_INVALID_NC_P(f_out)) {
-      mlog << Error << "\nwrite_netcdf() -> "
+   if(IS_INVALID_NC_P(nc_out)) {
+      mlog << Error << "\nopen_nc() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      delete f_out;
-      f_out = (NcFile *) 0;
-
+      delete nc_out;
+      nc_out = (NcFile *) 0;
       exit(1);
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_filename, program_name);
+   write_netcdf_global(nc_out, out_filename, program_name);
 
    if(run_command == sum) {
-
       command_str << cs_erase
-                  << "Sum: " << n_files << " files with accumulations of "
+                  << "Sum: " << n_files
+                  << " files with accumulations of "
                   << sec_to_hhmmss(in_accum) << '.';
-
    } else if(run_command == add) {
-
       command_str << cs_erase
                   << "Addition: " << n_files << " files.";
-
    }
-   else { // run_command == subtract
-
+   else if(run_command == sub) {
       command_str << cs_erase
                   << "Subtraction: "
-                  << in_file[0] << " minus " << in_file[1];
-
+                  << file_list[0] << " minus " << file_list[1];
+   }
+   else { // run_command == der
+      command_str << cs_erase
+                  << "Derive: " << write_css(derive_list) << " of "
+                  << n_files << " files.";
    }
 
-   add_att(f_out, "RunCommand", (const char *) command_str);
+   add_att(nc_out, "RunCommand", (const char *) command_str);
 
-   //
    // Add the projection information
-   //
-   write_netcdf_proj(f_out, grid);
+   write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
+   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
-   // If the -varname command line option was used or the accumulation
-   // interval is zero, just use the field_name
-   if(name_flag || nc_accum == 0) {
-      var_str = field_name;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
+                   const DataPlane &cur_dp, const char *var_name_suffix,
+                   const char *long_name_prefix) {
+   ConcatString var_str;
+   ConcatString tmp_str, tmp2_str;
+   NcVar nc_var;
+
+   // If the -name command line option was used or the accumulation
+   // interval is zero, just use the out_var_name.
+   if(out_var_name_flag || nc_accum == 0) {
+      var_str = out_var_name;
    }
    // Otherwise, append the accumluation interval to the variable name
    else {
 
       // Store up to the first underscore
-      tmp_str       = field_name;
+      tmp_str       = out_var_name;
       StringArray l = tmp_str.split("_");
       tmp_str       = l[0];
 
       // For an hourly accumulation interval, append _HH
       if(nc_accum % sec_per_hour == 0) {
          var_str.set_precision(2);
-         var_str << cs_erase << tmp_str << '_' << HH(nc_accum/sec_per_hour);
+         var_str << cs_erase << tmp_str << '_'
+                 << HH(nc_accum/sec_per_hour);
       }
 
       // For any other accumulation interval, append _HHMMSS
@@ -1163,15 +1419,21 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       }
    }
 
+   // Append the variable name suffix
+   var_str << var_name_suffix;
+
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = config.nc_compression();
 
    // Define Variable
-   pcp_var = add_var(f_out, (const char *) var_str, ncFloat, lat_dim, lon_dim, deflate_level);
+   nc_var = add_var(nc_out, (const char *) var_str, ncFloat,
+                    lat_dim, lon_dim, deflate_level);
 
    // Add variable attributes
-   add_att(&pcp_var, "name",  (const char *) var_str);
-   add_att(&pcp_var, "long_name", (const char *) var_info->long_name());
+   add_att(&nc_var, "name",  (const char *) var_str);
+   tmp_str = long_name_prefix;
+   tmp_str << var_info->long_name();
+   add_att(&nc_var, "long_name", (const char *) tmp_str);
 
    // Ouput level string
    if(nc_accum != 0) {
@@ -1184,87 +1446,112 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       var_str << cs_erase << var_info->level().name();
    }
 
-   add_att(&pcp_var, "level", (const char *) var_str);
-   add_att(&pcp_var, "units", (const char *) var_info->units());
-   add_att(&pcp_var, "_FillValue", bad_data_float);
+   add_att(&nc_var, "level", (const char *) var_str);
+   add_att(&nc_var, "units", (const char *) var_info->units());
+   add_att(&nc_var, "_FillValue", bad_data_float);
 
    //
-   // Add initialization, valid, and accumulation time info as attributes to
-   // the pcp_var
+   // Add initialization, valid, and accumulation time info as
+   // attributes to the nc_var
    //
    if(nc_init == (unixtime) 0) nc_init = nc_valid;
 
    //
    // Write out the times
    //
-   write_netcdf_var_times(&pcp_var, nc_init, nc_valid, nc_accum);
+   write_netcdf_var_times(&nc_var, nc_init, nc_valid, nc_accum);
 
    //
    // Write the precip data
    //
-   if(!put_nc_data_with_dims(&pcp_var, plane.data(), plane.ny(), plane.nx())) {
-
-      mlog << Error << "\nwrite_netcdf() -> "
-           << "error with pcp_var->put()\n\n";
+   if(!put_nc_data_with_dims(&nc_var, cur_dp.data(),
+                             cur_dp.ny(), cur_dp.nx())) {
+      mlog << Error << "\nwrite_nc_data() -> "
+           << "error with nc_var->put()\n\n";
       exit(1);
    }
-
-   delete f_out;
-   f_out = (NcFile *) 0;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void close_nc() {
 
-bool is_timestring(const char * text)
+   // Clean up
+   if(nc_out) {
+      delete nc_out; nc_out = (NcFile *) 0;
+   }
 
-{
-
-if ( is_hh(text) ) return ( true );
-
-if ( is_hhmmss(text) ) return ( true );
-
-return ( false );
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage()
+ConcatString parse_config_str(const char *s) {
+   ConcatString config_str;
 
-{
+   if(is_timestring(s)) {
+      config_str.format("name=\"APCP\"; level=\"A%s\";", s);
+   }
+   else {
+      config_str = s;
+   }
+
+   return(config_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_timestring(const char * text) {
+
+   if(is_hh(text))     return(true);
+   if(is_hhmmss(text)) return(true);
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// JHG, still need to manually "-set" the output metdata
+// JHG, what about manually setting the output "-name" for multiple "-derive" fields?
+
+void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
-        << "Usage: " << program_name << "\n"
-        << "\t[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]\n"
+        << "Usage: " << program_name << "\n\n"
+        << "\t[[-sum] sum_args] |\n"
+        << "\t[-add input_files] |\n"
+        << "\t[-subtract input_files] |\n"
+        << "\t[-derive stat_list input_files]\n\n"
         << "\t[-field string]\n"
         << "\t[-name variable_name]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"-sum sum_args\" indicates that accumulations "
-        << "from multiple files should be summed up using the "
-        << "arguments provided.\n"
+        << "\twhere\t\"-sum sum_args\" indicates that data from "
+        << "multiple files should be summed up using the arguments "
+        << "provided.\n"
 
-        << "\t\t\"-add add_args\" indicates that accumulations from "
-        << "one or more files should be added together using the "
-        << "arguments provided.\n"
+        << "\t\t\"-add input_files\" indicates that data from one or more "
+        << "input files should be added together.\n"
 
-        << "\t\t\"-subtract subtract_args\" indicates that "
-        << "accumulations from two files should be subtracted using "
-        << "the arguments provided.\n"
+        << "\t\t\"-subtract input_files\" indicates that data from "
+        << "exactly two input files should be subtracted.\n"
 
-        << "\t\t\"-field string\" defines the data to be extracted from "
-        << "the input files (optional).\n"
+        << "\t\t\"-derive stat_list input_files\" indicates that "
+        << "the comma-separated list of statistics in \"stat_list\"\n"
+        << "\t\t(sum, min, max, range, mean, stdev, or vld_count) should be "
+        << "derived from one or more input files.\n\n"
 
-        << "\t\t\"-name variable_name\" name of combined variable in "
-        << "output NetCDF file (optional).\n"
+        << "\t\t\"-field string\" defines the data to be extracted "
+        << "from the input files (optional).\n"
+
+        << "\t\t\"-name variable_name\" specifies the variable name to "
+        << "be written to the output NetCDF file (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -1272,14 +1559,12 @@ void usage()
         << "\t\t\"-v level\" overrides the default level of logging ("
         << verbosity << ") (optional).\n"
 
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << config.nc_compression() << ") (optional).\n\n"
+        << "\t\t\"-compress level\" overrides the compression level of "
+        << "NetCDF variable ("  << config.nc_compression()
+        << ") (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
-        << "the default behavior.\n"
-
-        << "\t\tNote: For \"-add\" and \"-subtract\", the accumulation intervals "
-        << "may be substituted with config file strings.\n\n"
+        << "the default behavior.\n\n"
 
         << "\tSUM_ARGS:\n"
         << "\t\tinit_time\n"
@@ -1301,60 +1586,46 @@ void usage()
         << "time in YYYYMMDD[_HH[MMSS]] format (required).\n"
 
         << "\t\t\t\"out_accum\" indicates the desired accumulation "
-        << "interval for the output NetCDF file in HH[MMSS] format (required).\n"
-
-        << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
-        << "be written consisting of the sum of the accumulation intervals "
+        << "interval for the output NetCDF file in HH[MMSS] format "
         << "(required).\n"
 
-        << "\t\t\t\"-pcpdir path\" overrides the default precipitation directory ("
-        << default_pcp_dir << ") (optional).\n"
+        << "\t\t\t\"out_file\" indicates the name of the output NetCDF"
+        << "file to be written (required).\n"
 
-        << "\t\t\t\"-pcprx reg_exp\" overrides the default regular expression for "
-        << "precipitation file naming convention (" << default_reg_exp
-        << ") (optional).\n\n"
+        << "\t\t\t\"-pcpdir path\" overrides the default search "
+        << "directory (" << default_pcp_dir << ") (optional).\n"
+
+        << "\t\t\t\"-pcprx reg_exp\" overrides the default regular "
+        << "expression for input file naming convention ("
+        << default_reg_exp << ") (optional).\n\n"
 
         << "\t\t\tNote: Set init_time to 00000000_000000 when summing "
         << "observation files.\n\n"
 
-        << "\tADD_ARGS:\n"
-        << "\t\tin_file1 accum1 [in_file2 accum2 ... in_filen accumn]\n"
+        << "\tINPUT_FILES:\n"
+        << "\t\tfile_1 config_str_1 ... file_n config_str_n\n"
+        << "\t\t...OR...\n"
+        << "\t\tfile_1 ... file_n | file_list (with \"-field\" option required)\n"
         << "\t\tout_file\n\n"
 
-        << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
-        << "file to be used (required).\n"
+        << "\t\twhere\t\"file_i\" is the name of the i-th input "
+        << "gridded data file.\n"
 
-        << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
-        << "from in_file1 in HH[MMSS] format (required).\n"
+        << "\t\t\t\"config_str_i\" is the field to be extracted from the "
+        << "i-th gridded data file.\n"
 
-        << "\t\t\t\"in_filen\" indicates additional input data files to be "
-        << "added together (optional).\n"
+        << "\t\t\t\"file_list\" is an ASCII file containing a list of "
+        << "gridded data files.\n"
 
-        << "\t\t\t\"accumn\" indicates the accumulation interval to be used "
-        << "from in_filen in HH[MMSS] format (required).\n"
-
-        << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
+        << "\t\t\t\"out_file\" is the name of the output NetCDF file to "
         << "be written (required).\n\n"
 
-        << "\tSUBTRACT_ARGS:\n"
-        << "\t\tin_file1 accum1\n"
-        << "\t\tin_file2 accum2\n"
-        << "\t\tout_file\n\n"
+        << "\t\tNote: For \"-subtract\", exactly 2 input files must be "
+        << "specified.\n"
 
-        << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
-        << "file to be used (required).\n"
-
-        << "\t\t\t\"accum1\" indicates the accumulation interval to be used "
-        << "from in_file1 in HH[MMSS] format (required).\n"
-
-        << "\t\t\t\"in_file2\" indicates the name of the second input data "
-        << "file to be subtracted from in_file1 (required).\n"
-
-        << "\t\t\t\"accum2\" indicates the accumulation interval to be used "
-        << "from in_file2 in HH[MMSS] format (required).\n"
-
-        << "\t\t\t\"out_file\" indicates the name of the output NetCDF file to "
-        << "be written (required).\n"
+        << "\t\tNote: The \"config_str\" and \"-field\" strings may be to a "
+        << "timestring in HH[MMSS] format for accumulated precipitation or a "
+        << "full configuration string.\n"
 
         << "\n" << flush;
 
@@ -1363,29 +1634,54 @@ void usage()
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_sum(const StringArray &)
-{
+void set_sum(const StringArray &) {
    run_command = sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_add(const StringArray &)
-{
+void set_add(const StringArray &) {
    run_command = add;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_subtract(const StringArray &)
-{
+void set_subtract(const StringArray &) {
    run_command = sub;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
-{
+void set_derive(const StringArray & a) {
+   run_command = der;
+
+   StringArray sa;
+   sa.add_css(a[0]);
+
+   //
+   // Parse the options and set the corresponding flags
+   //
+   for(int i=0; i<sa.n(); i++) {
+           if(strcasecmp(sa[i], "SUM")       == 0) do_sum       = true;
+      else if(strcasecmp(sa[i], "MIN")       == 0) do_min       = true;
+      else if(strcasecmp(sa[i], "MAX")       == 0) do_max       = true;
+      else if(strcasecmp(sa[i], "RANGE")     == 0) do_range     = true;
+      else if(strcasecmp(sa[i], "MEAN")      == 0) do_mean      = true;
+      else if(strcasecmp(sa[i], "STDEV")     == 0) do_stdev     = true;
+      else if(strcasecmp(sa[i], "VLD_COUNT") == 0) do_vld_count = true;
+      else {
+         mlog << Error << "\nset_derive() -> "
+           << "\"" << sa[i] << "\" is not a supported option for the "
+           << "\"-derive\" command!\n\n";
+         exit(1);
+      }
+      derive_list.add(to_upper(sa[i]));
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_logfile(const StringArray & a) {
    ConcatString filename;
 
    filename = a[0];
@@ -1395,38 +1691,33 @@ void set_logfile(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_verbosity(const StringArray & a)
-{
+void set_verbosity(const StringArray & a) {
    verbosity = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcpdir(const StringArray & a)
-{
+void set_pcpdir(const StringArray & a) {
    pcp_dir.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcprx(const StringArray & a)
-{
+void set_pcprx(const StringArray & a) {
    pcp_reg_exp = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_user_dict(const StringArray & a)
-{
-   user_dict = a[0];
+void set_field(const StringArray & a) {
+   field_string = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a)
-{
-   field_name = a[0];
-   name_flag  = true;
+void set_name(const StringArray & a) {
+   out_var_name = a[0];
+   out_var_name_flag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
