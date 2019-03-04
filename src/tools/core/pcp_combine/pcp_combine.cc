@@ -1228,7 +1228,7 @@ void do_der_command() {
       }
       else if(strcasecmp(derive_list[i], "range") == 0) {
          der_dp = max_dp;
-         for(j=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
             if(is_bad_data(max_dp.data()[j]) ||
                is_bad_data(min_dp.data()[j])) {
                der_dp.buf()[j] = bad_data_double;
