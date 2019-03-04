@@ -869,10 +869,10 @@ void do_derive_command() {
    //
    // Check for exactly two input files for difference.
    //
-   if(strcasestr(derive_list_css, "diff") == 0 && n_files != 2) {
+   if(strcasestr(derive_list_css, "diff") && n_files != 2) {
       mlog << Error << "\ndo_derive_command() -> "
            << "you must specify exactly two input files for a "
-           << "difference!\n";
+           << "difference!\n\n";
       exit(1);
    }
 
@@ -1095,6 +1095,8 @@ void do_derive_command() {
       }
    } // end for i
 
+   close_nc();
+
    return;
 }
 
@@ -1217,7 +1219,7 @@ void open_nc(const Grid &grid) {
 
    // List the output file
    mlog << Debug(1)
-        << "Writing output file: " << out_filename << "\n";
+        << "Creating output file: " << out_filename << "\n";
 
    // Create a new NetCDF file and open it.
    nc_out = open_ncfile(out_filename, true);
@@ -1367,6 +1369,10 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 ////////////////////////////////////////////////////////////////////////
 
 void close_nc() {
+
+   // List the output file
+   mlog << Debug(1)
+        << "Closing output file: " << out_filename << "\n";
 
    //
    // Clean up.
