@@ -111,6 +111,8 @@ static ConcatString program_name;
 static const char zero_time_str   [] = "00000000_000000";
 static const char default_pcp_dir [] = ".";
 static const char default_reg_exp [] = ".*";
+static const char derive_options  [] =
+                     "sum, min, max, range, mean, stdev, vld_count";
 
 // Run Command enumeration
 enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
@@ -123,10 +125,9 @@ static int verbosity = 2;
 static int          n_files;
 static ConcatString field_string = "";
 static ConcatString out_filename;
-static ConcatString out_var_name = "";
-static bool         out_var_name_flag = false;
+static StringArray  out_var_name;
 static MetConfig    config;
-static VarInfo*     var_info = (VarInfo *) 0;
+static VarInfo *    var_info = (VarInfo *) 0;
 static int          compress_level = -1;
 
 // Variables for the sum command
@@ -141,13 +142,6 @@ static ConcatString pcp_reg_exp = default_reg_exp;
 static StringArray  file_list;
 static StringArray  field_list;
 static StringArray  derive_list;
-static bool         do_sum       = false;
-static bool         do_min       = false;
-static bool         do_max       = false;
-static bool         do_range     = false;
-static bool         do_mean      = false;
-static bool         do_stdev     = false;
-static bool         do_vld_count = false;
 
 // Output NetCDF file
 NcFile *nc_out = (NcFile *) 0;
@@ -182,7 +176,7 @@ static void get_field(const char * filename, const char * cur_field,
 
 static void open_nc(const Grid &);
 static void write_nc_data(unixtime, unixtime, int, const DataPlane &,
-                          const char *var_name_suffix = '\0',
+                          const char *var_name = '\0',
                           const char *long_name_prefix = '\0');
 static void close_nc();
 
@@ -286,7 +280,7 @@ void process_command_line(int argc, char **argv) {
    else                   process_add_sub_der_args(cline);
 
    //
-   // If pcp_dir is not set, set it to the current directory.
+   // If pcp_dir is not set, set to the default.
    //
    if(pcp_dir.n_elements() == 0) pcp_dir.add(default_pcp_dir);
 
@@ -294,6 +288,27 @@ void process_command_line(int argc, char **argv) {
    // Initialize the MetConfig object
    //
    config.read(replace_path(config_const_filename));
+
+   //
+   // Check the -name option.
+   //
+   if(run_command != der && out_var_name.n() > 1) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "Unless running the \"-derive\" command, only 1 output "
+           << "variable \"-name\" (" << write_css(out_var_name)
+           << ") may be specified!\n\n";
+      exit(1);
+   }
+   else if(run_command == der &&
+           out_var_name.n() > 1 &&
+           out_var_name.n() != derive_list.n()) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "When running the \"-derive\" command with the "
+           << "\"-name \" option, the number of output variable names ("
+           << out_var_name.n() << ") must match the number of derived "
+           << "fields (" << derive_list.n() << ")!\n\n";
+      exit(1);
+   }
 
    return;
 }
@@ -451,8 +466,8 @@ void process_add_sub_der_args(const CommandLine & cline) {
       //
       // Without -field, at least 3 arguments are required.
       //
-      if(cline.n() < 3) { 
-         mlog << Error << "\nprocess_add_sub_der_args() -> " 
+      if(cline.n() < 3) {
+         mlog << Error << "\nprocess_add_sub_der_args() -> "
               << "when not using the \"-field\" option, at least 3 "
               << "arguments are required!\n\n";
          exit(1);
@@ -499,8 +514,12 @@ void do_sum_command() {
    //
    // Build init time string
    //
-   if(init_time != 0) init_time_str = unix_to_yyyymmdd_hhmmss(init_time);
-   else               init_time_str = zero_time_str;
+   if(init_time != 0) {
+      init_time_str = unix_to_yyyymmdd_hhmmss(init_time);
+   }
+   else {
+      init_time_str = zero_time_str;
+   }
 
    mlog << Debug(2)
         << "Performing sum command: "
@@ -515,7 +534,8 @@ void do_sum_command() {
    //
    if(out_accum > lead_time && init_time != (unixtime) 0) {
       mlog << Error << "\ndo_sum_command() -> "
-           << "The output accumulation time (" << sec_to_hhmmss(out_accum)
+           << "The output accumulation time ("
+           << sec_to_hhmmss(out_accum)
            << ") cannot be greater than the lead time ("
            << sec_to_hhmmss(lead_time) << ").\n\n";
       exit(1);
@@ -527,7 +547,8 @@ void do_sum_command() {
    //
    if(out_accum%in_accum != 0) {
       mlog << Error << "\ndo_sum_command() -> "
-           << "The output accumulation time (" << sec_to_hhmmss(out_accum)
+           << "The output accumulation time ("
+           << sec_to_hhmmss(out_accum)
            << ") must be divisible by the input accumulation "
            << "time (" << sec_to_hhmmss(in_accum) << ").\n\n";
       exit(1);
@@ -767,7 +788,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          Met2dDataFileFactory factory;
          Met2dDataFile * mtddf = (Met2dDataFile *) 0;
          VarInfoFactory var_fac;
-         VarInfo * var = (VarInfo *) 0;
+         VarInfo * cur_var = (VarInfo *) 0;
 
          //
          // Create a data file object.
@@ -782,8 +803,8 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Create a VarInfo object from the data file.
          //
-         var = var_fac.new_var_info(mtddf->file_type());
-         if(!var) {
+         cur_var = var_fac.new_var_info(mtddf->file_type());
+         if(!cur_var) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -800,21 +821,23 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
                               sec_to_hhmmss(in_accum).text());
          }
          config.read_string(accum_dict.text());
-         var->set_dict(config);
+         cur_var->set_dict(config);
 
-         var->set_valid(cur_ut);
-         var->set_init(init_time);
-         var->set_lead(init_time ? cur_ut - init_time : bad_data_int);
+         cur_var->set_valid(cur_ut);
+         cur_var->set_init(init_time);
+         cur_var->set_lead(init_time ?
+                           cur_ut - init_time : bad_data_int);
 
          //
          // Look for a VarInfo record match in the data file.
          //
-         i_rec = mtddf->index(*var);
+         i_rec = mtddf->index(*cur_var);
 
          //
          // Cleanup.
          //
-         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
+         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
 
          //
          // Check for a valid match.
@@ -1041,13 +1064,14 @@ void do_der_command() {
    DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    unixtime nc_init_time, nc_valid_time;
    int i, j, nxy, nc_accum, nc_accum_sum;
+   ConcatString out_name;
    double v;
 
    //
    // Check for at least one derivation option.
    //
-   if(!(do_sum  || do_min   || do_max || do_range ||
-        do_mean || do_stdev || do_vld_count)) {
+
+   if(derive_list.n() == 0) {
       mlog << Error << "\ndo_der_command() -> "
            << "at least one derivation option must be specified!\n\n";
       exit(1);
@@ -1170,70 +1194,91 @@ void do_der_command() {
    // Compute derived fields and write the output.
    //
    open_nc(grid);
-   if(do_sum) {
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum, sum_dp,
-                    "_SUM", "Sum of ");
-   }
-   if(do_min) {
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, min_dp,
-                    "_MIN", "Minimum Value of ");
-   }
-   if(do_max) {
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, max_dp,
-                    "_MAX", "Maximum Value of ");
-   }
-   if(do_range) {
-      der_dp = max_dp;
-      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-         if(is_bad_data(max_dp.data()[i]) ||
-            is_bad_data(min_dp.data()[i])) {
-            der_dp.buf()[i] = bad_data_double;
-         }
-         else {
-            der_dp.buf()[i] = max_dp.data()[i] - min_dp.data()[i];
-         }
+
+   //
+   // Loop through the derived fields.
+   //
+   for(i=0; i<derive_list.n(); i++) {
+
+      //
+      // Build the output variable name.
+      //
+      if(out_var_name.n() == derive_list.n()) {
+         out_name = out_var_name[i];
       }
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
-                    "_RANGE", "Range of ");
-   }
-   if(do_mean) {
-      der_dp = sum_dp;
-      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-         if(is_bad_data(sum_dp.data()[i]) ||
-            is_bad_data(vld_dp.data()[i]) ||
-            is_eq(vld_dp.data()[i], 0.0)) {
-            der_dp.buf()[i] = bad_data_double;
-         }
-         else {
-            der_dp.buf()[i] = sum_dp.data()[i]/vld_dp.data()[i];
-         }
+      else {
+         out_name = out_var_name[0];
+         out_name << "_" << derive_list[i];
       }
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
-                    "_MEAN", "Mean Value of ");
-   }
-   if(do_stdev) {
-      der_dp = sum_dp;
-      for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-         double s  = sum_dp.data()[i];
-         double sq = sum_sq_dp.data()[i];
-         double n  = vld_dp.data()[i];
-         if(is_bad_data(s) || is_bad_data(sq) ||
-            is_bad_data(n) || n <= 1) {
-            der_dp.buf()[i] = bad_data_double;
-         }
-         else {
-            v = (sq - s*s/n)/(n-1);
-            if(is_eq(v, 0.0)) v = 0.0;
-            der_dp.buf()[i] = sqrt(v);
-         }
+
+      //
+      // Write the current derived field.
+      //
+      if(strcasecmp(derive_list[i], "sum") == 0) {
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum,
+                       sum_dp, out_name, "Sum of ");
       }
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, der_dp,
-                    "_STDEV", "Standard Deviation of ");
-   }
-   if(do_vld_count) {
-      write_nc_data(nc_init_time, nc_valid_time, nc_accum, vld_dp,
-                    "_VLD", "Valid Data Count of ");
-   }
+      else if(strcasecmp(derive_list[i], "min") == 0) {
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                       min_dp, out_name, "Minimum Value of ");
+      }
+      else if(strcasecmp(derive_list[i], "max") == 0) {
+      write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                    max_dp, out_name, "Maximum Value of ");
+      }
+      else if(strcasecmp(derive_list[i], "range") == 0) {
+         der_dp = max_dp;
+         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+            if(is_bad_data(max_dp.data()[i]) ||
+               is_bad_data(min_dp.data()[i])) {
+               der_dp.buf()[i] = bad_data_double;
+            }
+            else {
+               der_dp.buf()[i] = max_dp.data()[i] - min_dp.data()[i];
+            }
+         }
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                       der_dp, out_name, "Range of ");
+      }
+      else if(strcasecmp(derive_list[i], "mean") == 0) {
+         der_dp = sum_dp;
+         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+            if(is_bad_data(sum_dp.data()[i]) ||
+               is_bad_data(vld_dp.data()[i]) ||
+               is_eq(vld_dp.data()[i], 0.0)) {
+               der_dp.buf()[i] = bad_data_double;
+            }
+            else {
+               der_dp.buf()[i] = sum_dp.data()[i]/vld_dp.data()[i];
+            }
+         }
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                       der_dp, out_name, "Mean Value of ");
+      }
+      else if(strcasecmp(derive_list[i], "stdev") == 0) {
+         der_dp = sum_dp;
+         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+            double s  = sum_dp.data()[i];
+            double sq = sum_sq_dp.data()[i];
+            double n  = vld_dp.data()[i];
+            if(is_bad_data(s) || is_bad_data(sq) ||
+               is_bad_data(n) || n <= 1) {
+               der_dp.buf()[i] = bad_data_double;
+            }
+            else {
+               v = (sq - s*s/n)/(n-1);
+               if(is_eq(v, 0.0)) v = 0.0;
+               der_dp.buf()[i] = sqrt(v);
+            }
+         }
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                       der_dp, out_name, "Standard Deviation of ");
+      }
+      else if(strcasecmp(derive_list[i], "vld_count") == 0) {
+         write_nc_data(nc_init_time, nc_valid_time, nc_accum,
+                       vld_dp, out_name, "Valid Data Count of ");
+      }
+   } // end for i
 
    return;
 }
@@ -1253,10 +1298,10 @@ void get_field(const char *filename, const char *cur_field,
                const unixtime get_init_ut, const unixtime get_valid_ut,
                Grid & grid, DataPlane & plane) {
    Met2dDataFileFactory factory;
-   Met2dDataFile * datafile = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
    GrdFileType ftype;
    VarInfoFactory var_fac;
-   VarInfo* var;
+   VarInfo *cur_var;
 
    //
    // Build the field config string
@@ -1280,15 +1325,15 @@ void get_field(const char *filename, const char *cur_field,
    //
    // Open the data file and build a VarInfo object
    //
-   datafile = factory.new_met_2d_data_file(filename, ftype);
-   if(!datafile) {
+   mtddf = factory.new_met_2d_data_file(filename, ftype);
+   if(!mtddf) {
       mlog << Error << "\nget_field() -> "
            << "can't open data file \"" << filename << "\"\n\n";
       exit(1);
    }
 
-   var = var_fac.new_var_info(datafile->file_type());
-   if(!var) {
+   cur_var = var_fac.new_var_info(mtddf->file_type());
+   if(!cur_var) {
       mlog << Error << "\nget_field() -> "
            << "unable to determine filetype of \"" << filename
            << "\"\n\n";
@@ -1298,42 +1343,53 @@ void get_field(const char *filename, const char *cur_field,
    //
    // Initialize the VarInfo object with a config
    //
-   var->set_dict(config);
+   cur_var->set_dict(config);
 
    //
    // Set the VarInfo timing object
    //
-   if(get_valid_ut != 0) var->set_valid(get_valid_ut);
-   if(get_init_ut  != 0) var->set_init(get_init_ut);
+   if(get_valid_ut != 0) cur_var->set_valid(get_valid_ut);
+   if(get_init_ut  != 0) cur_var->set_init(get_init_ut);
 
    //
    // Read the record of interest into a DataPlane object
    //
-   if(!datafile->data_plane(*var, plane)) {
+   if(!mtddf->data_plane(*cur_var, plane)) {
       mlog << Error << "\nget_field() -> "
            << "can't get data plane from file \"" << filename
            << "\"\n\n";
       exit(1);
    }
 
-   grid = datafile->grid();
+   grid = mtddf->grid();
 
    //
-   // Build an output field name using the magic string
+   // Set the global var_info, if needed.
    //
    if(!var_info) {
-      var_info = var;
-      if(out_var_name.empty()) {
-         out_var_name = var->magic_str();
-         out_var_name = str_replace_all(out_var_name, "(", "");
-         out_var_name = str_replace_all(out_var_name, ")", "");
-         out_var_name = str_replace_all(out_var_name, "*", "");
-         out_var_name = str_replace_all(out_var_name, ",", "");
-         out_var_name = str_replace_all(out_var_name, "/", "_");
-      }
+      var_info = var_fac.new_var_info(mtddf->file_type());
+      *var_info = *cur_var;
    }
 
-   if(datafile) { delete datafile;  datafile = (Met2dDataFile *) 0; }
+   //
+   // Set the output variable name, if needed.
+   //
+   if(out_var_name.n() == 0) {
+      ConcatString cs;
+      cs = var_info->magic_str();
+      cs = str_replace_all(cs, "(", "");
+      cs = str_replace_all(cs, ")", "");
+      cs = str_replace_all(cs, "*", "");
+      cs = str_replace_all(cs, ",", "");
+      cs = str_replace_all(cs, "/", "_");
+      out_var_name.add(cs);
+   }
+
+   //
+   // Cleanup.
+   //
+   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
+   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
 
    return;
 
@@ -1401,24 +1457,38 @@ void open_nc(const Grid &grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
-                   const DataPlane &cur_dp, const char *var_name_suffix,
+                   const DataPlane &cur_dp, const char *out_name,
                    const char *long_name_prefix) {
    ConcatString var_str;
    ConcatString tmp_str, tmp2_str;
    NcVar nc_var;
 
-   // If the -name command line option was used or the accumulation
-   // interval is zero, just use the out_var_name.
-   if(out_var_name_flag || nc_accum == 0) {
-      var_str = out_var_name;
+   //
+   // Choose the output variable name to be written.
+   //
+
+   //
+   // Use the argument to this function, specified for -derive.
+   //
+   if(out_name) {
+      var_str = out_name;
    }
-   // Otherwise, append the accumluation interval to the variable name
+   //
+   // If the -name command line option was used or the accumulation
+   // interval is zero, use the out_var_name.
+   //
+   else if(out_var_name.n() > 0 || nc_accum == 0) {
+      var_str = out_var_name[0];
+   }
+   //
+   // Otherwise, append the precipitation accumulation interval.
+   //
    else {
 
       // Store up to the first underscore
-      tmp_str       = out_var_name;
-      StringArray l = tmp_str.split("_");
-      tmp_str       = l[0];
+      tmp_str        = out_var_name[0];
+      StringArray sa = tmp_str.split("_");
+      tmp_str        = sa[0];
 
       // For an hourly accumulation interval, append _HH
       if(nc_accum % sec_per_hour == 0) {
@@ -1433,9 +1503,6 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
          var_str << cs_erase << tmp_str << '_' << tmp2_str;
       }
    }
-
-   // Append the variable name suffix
-   if(var_name_suffix) var_str << var_name_suffix;
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = config.nc_compression();
@@ -1494,10 +1561,11 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
 void close_nc() {
 
-   // Clean up
-   if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0;
-   }
+   //
+   // Clean up.
+   //
+   if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  0; }
+   if(var_info ) { delete var_info; var_info = (VarInfo *) 0; }
 
    return;
 }
@@ -1529,21 +1597,19 @@ bool is_timestring(const char * text) {
 
 ////////////////////////////////////////////////////////////////////////
 
-// JHG, still need to manually "-set" the output metdata
-// JHG, what about manually setting the output "-name" for multiple "-derive" fields?
-
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
-        << "Usage: " << program_name << "\n\n"
-        << "\t[[-sum] sum_args] |\n"
-        << "\t[-add input_files] |\n"
-        << "\t[-subtract input_files] |\n"
-        << "\t[-derive stat_list input_files]\n\n"
+        << "Usage: " << program_name << "\n"
+        << "\t[-sum] sum_args |\n"
+        << "\t-add input_files |\n"
+        << "\t-subtract input_files |\n"
+        << "\t-derive stat_list input_files\n"
+        << "\tout_file\n"
         << "\t[-field string]\n"
-        << "\t[-name variable_name]\n"
+        << "\t[-name list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -1552,25 +1618,29 @@ void usage() {
         << "multiple files should be summed up using the arguments "
         << "provided.\n"
 
-        << "\t\t\"-add input_files\" indicates that data from one or more "
-        << "input files should be added together.\n"
+        << "\t\t\"-add input_files\" indicates that data from one or "
+        << "more input files should be added together.\n"
 
         << "\t\t\"-subtract input_files\" indicates that data from "
         << "exactly two input files should be subtracted.\n"
 
         << "\t\t\"-derive stat_list input_files\" indicates that "
         << "the comma-separated list of statistics in \"stat_list\"\n"
-        << "\t\t(sum, min, max, range, mean, stdev, or vld_count) should be "
-        << "derived from one or more input files.\n\n"
+        << "\t\t(" << derive_options << ") should be derived from one "
+        << "or more input files.\n"
+
+        << "\t\t\"out_file\" is the name of the output NetCDF file to "
+        << "be written (required).\n"
 
         << "\t\t\"-field string\" defines the data to be extracted "
         << "from the input files (optional).\n"
 
-        << "\t\t\"-name variable_name\" specifies the variable name to "
-        << "be written to the output NetCDF file (optional).\n"
+        << "\t\t\"-name list\" is a comma-separated list of output "
+        << "variable names to be written to the \"out_file\" "
+        << "(optional).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
-        << "file (optional).\n"
+        << "\t\t\"-log file\" write log messages to the specified file "
+        << "(optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << verbosity << ") (optional).\n"
@@ -1579,34 +1649,26 @@ void usage() {
         << "NetCDF variable ("  << config.nc_compression()
         << ") (optional).\n\n"
 
-        << "\t\tNote: Specifying \"-sum\" is not required since it is "
-        << "the default behavior.\n\n"
-
         << "\tSUM_ARGS:\n"
         << "\t\tinit_time\n"
         << "\t\tin_accum\n"
         << "\t\tvalid_time\n"
         << "\t\tout_accum\n"
-        << "\t\tout_file\n"
         << "\t\t[-pcpdir path]\n"
         << "\t\t[-pcprx reg_exp]\n\n"
 
-        << "\t\twhere\t\"init_time\" indicates the initialization "
-        << "time of the input data files in YYYYMMDD[_HH[MMSS]] format "
+        << "\t\twhere\t\"init_time\" is the initialization time of the "
+        << "input data files in YYYYMMDD[_HH[MMSS]] format "
         << "(required).\n"
 
-        << "\t\t\t\"in_accum\" indicates the accumulation interval "
-        << "of the input data files in HH[MMSS] format (required).\n"
+        << "\t\t\t\"in_accum\" is the accumulation interval of the "
+        << "input data files in HH[MMSS] format (required).\n"
 
-        << "\t\t\t\"valid_time\" indicates the desired valid "
-        << "time in YYYYMMDD[_HH[MMSS]] format (required).\n"
+        << "\t\t\t\"valid_time\" is the desired output valid time in "
+        << "YYYYMMDD[_HH[MMSS]] format (required).\n"
 
-        << "\t\t\t\"out_accum\" indicates the desired accumulation "
-        << "interval for the output NetCDF file in HH[MMSS] format "
-        << "(required).\n"
-
-        << "\t\t\t\"out_file\" indicates the name of the output NetCDF"
-        << "file to be written (required).\n"
+        << "\t\t\t\"out_accum\" is the desired output accumulation "
+        << "interval in HH[MMSS] format (required).\n"
 
         << "\t\t\t\"-pcpdir path\" overrides the default search "
         << "directory (" << default_pcp_dir << ") (optional).\n"
@@ -1615,33 +1677,33 @@ void usage() {
         << "expression for input file naming convention ("
         << default_reg_exp << ") (optional).\n\n"
 
-        << "\t\t\tNote: Set init_time to 00000000_000000 when summing "
-        << "observation files.\n\n"
+        << "\t\tNote:\tSpecifying \"-sum\" is not required since it is "
+        << "the default behavior.\n"
+        << "\t\t\tNote: Set \"init_time\" to 00000000_000000 when "
+        << "summing observation files.\n\n"
 
         << "\tINPUT_FILES:\n"
-        << "\t\tfile_1 config_str_1 ... file_n config_str_n\n"
-        << "\t\t...OR...\n"
-        << "\t\tfile_1 ... file_n | file_list (with \"-field\" option required)\n"
-        << "\t\tout_file\n\n"
+        << "\t\tfile_1 config_str_1 ... file_n config_str_n | \n"
+        << "\t\tfile_1 ... file_n |\n"
+        << "\t\tfile_list\n\n"
 
         << "\t\twhere\t\"file_i\" is the name of the i-th input "
         << "gridded data file.\n"
 
-        << "\t\t\t\"config_str_i\" is the field to be extracted from the "
-        << "i-th gridded data file.\n"
+        << "\t\t\t\"config_str_i\" is the field to be extracted from "
+        << "the i-th gridded data file.\n"
 
         << "\t\t\t\"file_list\" is an ASCII file containing a list of "
-        << "gridded data files.\n"
+        << "gridded data files.\n\n"
 
-        << "\t\t\t\"out_file\" is the name of the output NetCDF file to "
-        << "be written (required).\n\n"
-
-        << "\t\tNote: For \"-subtract\", exactly 2 input files must be "
-        << "specified.\n"
-
-        << "\t\tNote: The \"config_str\" and \"-field\" strings may be to a "
-        << "timestring in HH[MMSS] format for accumulated precipitation or a "
-        << "full configuration string.\n"
+        << "\t\tNote:\tFor \"-subtract\", exactly 2 input files must "
+        << "be specified.\n"
+        << "\t\tNote:\tThe \"-config\" option is required unless a "
+        << "\"config_str\" is specified for each input file.\n"
+        << "\t\tNote:\tThe \"config_str\" and \"-field\" strings may "
+        << "be set to a timestring in HH[MMSS] format\n"
+        << "\t\t\tfor accumulated precipitation or a full "
+        << "configuration string.\n"
 
         << "\n" << flush;
 
@@ -1678,20 +1740,13 @@ void set_derive(const StringArray & a) {
    // Parse the options and set the corresponding flags
    //
    for(int i=0; i<sa.n(); i++) {
-           if(strcasecmp(sa[i], "SUM")       == 0) do_sum       = true;
-      else if(strcasecmp(sa[i], "MIN")       == 0) do_min       = true;
-      else if(strcasecmp(sa[i], "MAX")       == 0) do_max       = true;
-      else if(strcasecmp(sa[i], "RANGE")     == 0) do_range     = true;
-      else if(strcasecmp(sa[i], "MEAN")      == 0) do_mean      = true;
-      else if(strcasecmp(sa[i], "STDEV")     == 0) do_stdev     = true;
-      else if(strcasecmp(sa[i], "VLD_COUNT") == 0) do_vld_count = true;
-      else {
+      if(!strcasestr(derive_options, sa[i])) {
          mlog << Error << "\nset_derive() -> "
            << "\"" << sa[i] << "\" is not a supported option for the "
            << "\"-derive\" command!\n\n";
          exit(1);
       }
-      derive_list.add(to_upper(sa[i]));
+      derive_list.add(sa[i]);
    }
 }
 
@@ -1732,8 +1787,7 @@ void set_field(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_name(const StringArray & a) {
-   out_var_name = a[0];
-   out_var_name_flag = true;
+   out_var_name.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
