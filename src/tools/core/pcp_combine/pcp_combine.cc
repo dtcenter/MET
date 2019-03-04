@@ -304,7 +304,7 @@ void process_command_line(int argc, char **argv) {
            out_var_name.n() != derive_list.n()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "When running the \"-derive\" command with the "
-           << "\"-name \" option, the number of output variable names ("
+           << "\"-name\" option, the number of output variable names ("
            << out_var_name.n() << ") must match the number of derived "
            << "fields (" << derive_list.n() << ")!\n\n";
       exit(1);
@@ -1228,13 +1228,13 @@ void do_der_command() {
       }
       else if(strcasecmp(derive_list[i], "range") == 0) {
          der_dp = max_dp;
-         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-            if(is_bad_data(max_dp.data()[i]) ||
-               is_bad_data(min_dp.data()[i])) {
-               der_dp.buf()[i] = bad_data_double;
+         for(j=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
+            if(is_bad_data(max_dp.data()[j]) ||
+               is_bad_data(min_dp.data()[j])) {
+               der_dp.buf()[j] = bad_data_double;
             }
             else {
-               der_dp.buf()[i] = max_dp.data()[i] - min_dp.data()[i];
+               der_dp.buf()[j] = max_dp.data()[j] - min_dp.data()[j];
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
@@ -1242,14 +1242,14 @@ void do_der_command() {
       }
       else if(strcasecmp(derive_list[i], "mean") == 0) {
          der_dp = sum_dp;
-         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-            if(is_bad_data(sum_dp.data()[i]) ||
-               is_bad_data(vld_dp.data()[i]) ||
-               is_eq(vld_dp.data()[i], 0.0)) {
-               der_dp.buf()[i] = bad_data_double;
+         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+            if(is_bad_data(sum_dp.data()[j]) ||
+               is_bad_data(vld_dp.data()[j]) ||
+               is_eq(vld_dp.data()[j], 0.0)) {
+               der_dp.buf()[j] = bad_data_double;
             }
             else {
-               der_dp.buf()[i] = sum_dp.data()[i]/vld_dp.data()[i];
+               der_dp.buf()[j] = sum_dp.data()[j]/vld_dp.data()[j];
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
@@ -1257,18 +1257,18 @@ void do_der_command() {
       }
       else if(strcasecmp(derive_list[i], "stdev") == 0) {
          der_dp = sum_dp;
-         for(i=0, nxy=grid.nx()*grid.ny(); i<nxy; i++) {
-            double s  = sum_dp.data()[i];
-            double sq = sum_sq_dp.data()[i];
-            double n  = vld_dp.data()[i];
+         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+            double s  = sum_dp.data()[j];
+            double sq = sum_sq_dp.data()[j];
+            double n  = vld_dp.data()[j];
             if(is_bad_data(s) || is_bad_data(sq) ||
                is_bad_data(n) || n <= 1) {
-               der_dp.buf()[i] = bad_data_double;
+               der_dp.buf()[j] = bad_data_double;
             }
             else {
                v = (sq - s*s/n)/(n-1);
                if(is_eq(v, 0.0)) v = 0.0;
-               der_dp.buf()[i] = sqrt(v);
+               der_dp.buf()[j] = sqrt(v);
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
@@ -1698,7 +1698,7 @@ void usage() {
 
         << "\t\tNote:\tFor \"-subtract\", exactly 2 input files must "
         << "be specified.\n"
-        << "\t\tNote:\tThe \"-config\" option is required unless a "
+        << "\t\tNote:\tThe \"-field\" option is required unless a "
         << "\"config_str\" is specified for each input file.\n"
         << "\t\tNote:\tThe \"config_str\" and \"-field\" strings may "
         << "be set to a timestring in HH[MMSS] format\n"
