@@ -123,11 +123,15 @@ static int verbosity = 2;
 
 // Variables common to all commands
 static int          n_files;
+static StringArray  req_field_list;
 static ConcatString field_string = "";
 static ConcatString out_filename;
+static StringArray  req_out_var_name;
 static StringArray  out_var_name;
+static int          i_out_var = 0;
 static MetConfig    config;
 static VarInfo *    var_info = (VarInfo *) 0;
+static double       vld_thresh = 1.0;
 static int          compress_level = -1;
 
 // Variables for the sum command
@@ -192,11 +196,14 @@ static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_field(const StringArray & a);
 static void set_name(const StringArray & a);
+static void set_vld_thresh(const StringArray & a);
 static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+   int i, j;
+
    program_name = get_short_name(argv[0]);
 
    //
@@ -210,10 +217,38 @@ int main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    //
-   // Perform the requested job command
+   // Process each requested field
    //
-   if(run_command == sum) do_sum_command();
-   else                   do_derive_command();
+   for(i=0; i<req_field_list.n(); i++) {
+
+      //
+      // Reinitialize for the current loop.
+      //
+      field_string = req_field_list[i];
+      if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
+      out_var_name = req_out_var_name;
+
+      //
+      // Reset when reading multiple fields from the same input files.
+      //
+      if(run_command == derive && req_field_list.n() > 0) {
+         field_list.clear();
+         for(j=0; j<file_list.n(); j++) {
+            field_list.add(field_string);
+         }
+      }
+
+      //
+      // Perform the requested run command
+      //
+      if(run_command == sum) do_sum_command();
+      else                   do_derive_command();
+   }
+
+   //
+   // Clean up
+   //
+   close_nc();
 
    return(0);
 }
@@ -255,6 +290,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_field,      "-field",      1);
    cline.add(set_name,       "-name",       1);
    cline.add(set_name,       "-varname",    1);
+   cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_logfile,    "-log",        1);
    cline.add(set_verbosity,  "-v",          1);
    cline.add(set_compress,   "-compress",   1);
@@ -276,6 +312,11 @@ void process_command_line(int argc, char **argv) {
    else                   process_derive_args(cline);
 
    //
+   // If -field not set, set to a list of length 1 with an empty string.
+   //
+   if(req_field_list.n() == 0) req_field_list.add("");
+
+   //
    // If pcp_dir is not set, set to the default.
    //
    if(pcp_dir.n_elements() == 0) pcp_dir.add(default_pcp_dir);
@@ -288,21 +329,12 @@ void process_command_line(int argc, char **argv) {
    //
    // Check the -name option.
    //
-   if(run_command != derive && out_var_name.n() > 1) {
+   if(req_out_var_name.n() > 0 &&
+      req_out_var_name.n() != (req_field_list.n() * derive_list.n())) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "Unless running the \"-derive\" command, only 1 output "
-           << "variable \"-name\" (" << write_css(out_var_name)
-           << ") may be specified!\n\n";
-      exit(1);
-   }
-   else if(run_command == derive &&
-           out_var_name.n() > 1 &&
-           out_var_name.n() != derive_list.n()) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "When running the \"-derive\" command with the "
-           << "\"-name\" option, the number of output variable names ("
-           << out_var_name.n() << ") must match the number of derived "
-           << "fields (" << derive_list.n() << ")!\n\n";
+           << "expected " << req_field_list.n() * derive_list.n()
+           << " entries for the \"-name\" command line option but got "
+           << req_out_var_name.n() << "!\n\n";
       exit(1);
    }
 
@@ -397,7 +429,8 @@ void process_derive_args(const CommandLine & cline) {
    // If the -field command line option was used, process remaining
    // arguments as a list of file names.
    //
-   if(!field_string.empty()) {
+   if(req_field_list.n() > 0) {
+
       mlog << Debug(2)
            << "Since the \"-field\" command line option was used, "
            << "parsing the command line arguments as a list of "
@@ -409,7 +442,7 @@ void process_derive_args(const CommandLine & cline) {
       if(cline.n() == 2) {
          Met2dDataFileFactory mtddf_factory;
          Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-         config.read_string(parse_config_str(field_string));
+         config.read_string(parse_config_str(req_field_list[0]));
          GrdFileType type = parse_conf_file_type(&config);
 
          //
@@ -441,33 +474,17 @@ void process_derive_args(const CommandLine & cline) {
             file_list.add(cline[i]);
          }
       }
-
-      //
-      // Store the corresponding configuration strings.
-      //
-      for(i=0; i<file_list.n(); i++) {
-         field_list.add(field_string);
-      }
    }
    //
    // If the -field command line option was not used, process remaining
    // arguments as pairs of filenames followed by configuration strings.
    //
    else {
+
       mlog << Debug(2)
            << "Since the \"-field\" command line option was not used, "
            << "parsing the command line arguments a list of files, "
            << "each followed by a configuration string.\n";
-
-      //
-      // Without -field, at least 3 arguments are required.
-      //
-      if(cline.n() < 3) {
-         mlog << Error << "\nprocess_derive_args() -> "
-              << "when not using the \"-field\" option, at least 3 "
-              << "arguments are required!\n\n";
-         exit(1);
-      }
 
       for(i=0, n_files=0; i<(cline.n() - 1); i+=2) {
          file_list.add(cline[i]);
@@ -568,11 +585,10 @@ void do_sum_command() {
    sum_data_files(grid, plane);
 
    //
-   // Write output.
+   // Write output
    //
    open_nc(grid);
    write_nc_data(init_time, valid_time, out_accum, plane);
-   close_nc();
 
    return;
 }
@@ -847,13 +863,14 @@ void do_derive_command() {
    Grid grid, cur_grid;
    DataPlane cur_dp, der_dp;
    DataPlane diff_dp, min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
+   MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
-   int i, j, nxy, nc_accum, nc_accum_sum, nc_accum_diff;
+   int i, j, n, nxy, nc_accum, nc_accum_sum, nc_accum_diff;
    ConcatString out_name, derive_list_css;
    double v;
 
    //
-   // List of all requested field derivations.
+   // List of all requested field derivations
    //
    derive_list_css = write_css(derive_list);
 
@@ -867,7 +884,7 @@ void do_derive_command() {
    }
 
    //
-   // Check for exactly two input files for difference.
+   // Check for exactly two input files for difference
    //
    if(strcasestr(derive_list_css, "diff") && n_files != 2) {
       mlog << Error << "\ndo_derive_command() -> "
@@ -881,22 +898,25 @@ void do_derive_command() {
         << ") for " << n_files << " files.\n";
 
    //
-   // Loop through the input files.
+   // Loop through the input files
    //
    for(i=0; i<n_files; i++) {
 
       //
-      // Read the current field.
+      // Read the current field
       //
       get_field(file_list[i], field_list[i], 0, 0, cur_grid, cur_dp);
 
       //
-      // Initialize.
+      // Initialize
       //
       if(grid.nx() == 0 || grid.ny() == 0) {
 
+         //
          // Initialize the grid
+         //
          grid = cur_grid;
+         nxy  = grid.nx() * grid.ny();
 
          // Initialize the timing information
          nc_init_time  = cur_dp.init();
@@ -906,7 +926,7 @@ void do_derive_command() {
          nc_accum_diff = cur_dp.accum();
 
          //
-         // Initialize to the first field.
+         // Initialize to the first field
          //
          diff_dp = cur_dp;
          min_dp  = cur_dp;
@@ -914,10 +934,10 @@ void do_derive_command() {
          sum_dp  = cur_dp;
 
          //
-         // Initialize good data values to 0.
+         // Initialize good data values to 0
          //
          sum_sq_dp = cur_dp;
-         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+         for(j=0; j<nxy; j++) {
             if(!is_bad_data(cur_dp.data()[j])) {
                sum_dp.buf()[j] = 0.0;
                sum_sq_dp.buf()[j] = 0.0;
@@ -967,9 +987,9 @@ void do_derive_command() {
       }
 
       //
-      // Update sums and counts.
+      // Update sums and counts
       //
-      for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+      for(j=0; j<nxy; j++) {
 
          // Get current data value
          v = cur_dp.data()[j];
@@ -983,36 +1003,58 @@ void do_derive_command() {
             diff_dp.buf()[j] -= v;
          }
 
-         // Update min/max fields which may contain bad data.
-         if(!is_bad_data(min_dp.buf()[j]) && v < min_dp.buf()[j]) {
+         // Update min/max fields which may contain bad data
+         if(is_bad_data(min_dp.buf()[j]) || v < min_dp.buf()[j]) {
             min_dp.buf()[j] = v;
          }
-         if(!is_bad_data(max_dp.buf()[j]) && v > max_dp.buf()[j]) {
+         if(is_bad_data(max_dp.buf()[j]) || v > max_dp.buf()[j]) {
             max_dp.buf()[j] = v;
          }
 
-         // Update the sum and sum of squares which does not have bad
-         // data.
+         // Update the sums which do not have bad data
          sum_dp.buf()[j]    += v;
          sum_sq_dp.buf()[j] += v*v;
       }
    }
 
    //
-   // Compute derived fields and write the output.
+   // Compute the valid data mask
    //
-   open_nc(grid);
+   mask.set_size(grid.nx(), grid.ny());
+   for(j=0, n=0; j<nxy; j++) {
+      mask.buf()[j] = ((double) vld_dp.data()[j]/n_files) >= vld_thresh;
+      if(!mask.buf()[j]) n++;
+   }
+
+   mlog << Debug(2)
+        << "Skipping " << n << " of " << nxy << " grid points which "
+        << "do not meet the valid data threshold (" << vld_thresh
+        << ").\n";
 
    //
-   // Loop through the derived fields.
+   // Apply the valid data mask
+   //
+   apply_mask(diff_dp,   mask);
+   apply_mask(min_dp,    mask);
+   apply_mask(max_dp,    mask);
+   apply_mask(sum_dp,    mask);
+   apply_mask(sum_sq_dp, mask);
+
+   //
+   // Open the output file, if needed
+   //
+   if(!nc_out) open_nc(grid);
+
+   //
+   // Loop through the derived fields
    //
    for(i=0; i<derive_list.n(); i++) {
 
       //
-      // Build the output variable name.
+      // Build the output variable name
       //
-      if(out_var_name.n() == derive_list.n()) {
-         out_name = out_var_name[i];
+      if(out_var_name.n() == (req_field_list.n() * derive_list.n())) {
+         out_name = out_var_name[i_out_var];
       }
       else {
          out_name = out_var_name[0];
@@ -1020,10 +1062,12 @@ void do_derive_command() {
       }
 
       mlog << Debug(2)
-           << "Writing output variable \"" << out_name << "\".\n";
+           << "Writing output variable \"" << out_name
+           << "\" for the \"" << derive_list[i] << "\" of \""
+           << var_info->magic_str() << "\".\n";
 
       //
-      // Write the current derived field.
+      // Write the current derived field
       //
       if(strcasecmp(derive_list[i], "sum") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum,
@@ -1043,7 +1087,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i], "range") == 0) {
          der_dp = max_dp;
-         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+         for(j=0; j<nxy; j++) {
             if(is_bad_data(max_dp.data()[j]) ||
                is_bad_data(min_dp.data()[j])) {
                der_dp.buf()[j] = bad_data_double;
@@ -1057,7 +1101,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i], "mean") == 0) {
          der_dp = sum_dp;
-         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+         for(j=0; j<nxy; j++) {
             if(is_bad_data(sum_dp.data()[j]) ||
                is_bad_data(vld_dp.data()[j]) ||
                is_eq(vld_dp.data()[j], 0.0)) {
@@ -1072,7 +1116,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i], "stdev") == 0) {
          der_dp = sum_dp;
-         for(j=0, nxy=grid.nx()*grid.ny(); j<nxy; j++) {
+         for(j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
             double sq = sum_sq_dp.data()[j];
             double n  = vld_dp.data()[j];
@@ -1094,8 +1138,6 @@ void do_derive_command() {
                        vld_dp, out_name, "Valid Data Count of ");
       }
    } // end for i
-
-   close_nc();
 
    return;
 }
@@ -1354,7 +1396,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    write_netcdf_var_times(&nc_var, nc_init, nc_valid, nc_accum);
 
    //
-   // Write the precip data
+   // Write the data
    //
    if(!put_nc_data_with_dims(&nc_var, cur_dp.data(),
                              cur_dp.ny(), cur_dp.nx())) {
@@ -1362,6 +1404,11 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
            << "error with nc_var->put()\n\n";
       exit(1);
    }
+
+   //
+   // Increment the counter
+   //
+   i_out_var++;
 
    return;
 }
@@ -1423,6 +1470,7 @@ void usage() {
         << "\tout_file\n"
         << "\t[-field string]\n"
         << "\t[-name list]\n"
+        << "\t[-vld_thresh n]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -1445,12 +1493,15 @@ void usage() {
         << "\t\t\"out_file\" is the name of the output NetCDF file to "
         << "be written (required).\n"
 
-        << "\t\t\"-field string\" defines the data to be extracted "
-        << "from the input files (optional).\n"
+        << "\t\t\"-field string\" may be used multiple times to define "
+        << "the data to be processed (optional).\n"
 
         << "\t\t\"-name list\" is a comma-separated list of output "
         << "variable names to be written to the \"out_file\" "
         << "(optional).\n"
+
+        << "\t\t\"-vld_thresh\" overrides the default required ratio "
+        << "of valid data (" << vld_thresh << ") (optional).\n"
 
         << "\t\t\"-log file\" write log messages to the specified file "
         << "(optional).\n"
@@ -1498,7 +1549,7 @@ void usage() {
         << "\tINPUT_FILES:\n"
         << "\t\tfile_1 config_str_1 ... file_n config_str_n | \n"
         << "\t\tfile_1 ... file_n |\n"
-        << "\t\tfile_list\n\n"
+        << "\t\tinput_file_list\n\n"
 
         << "\t\twhere\t\"file_i\" is the name of the i-th input "
         << "gridded data file.\n"
@@ -1506,7 +1557,7 @@ void usage() {
         << "\t\t\t\"config_str_i\" is the field to be extracted from "
         << "the i-th gridded data file.\n"
 
-        << "\t\t\t\"file_list\" is an ASCII file containing a list of "
+        << "\t\t\t\"input_file_list\" is an ASCII file containing a list of "
         << "gridded data files.\n\n"
 
         << "\t\tNote:\tFor \"-subtract\", exactly 2 input files must "
@@ -1527,6 +1578,7 @@ void usage() {
 
 void set_sum(const StringArray &) {
    run_command = sum;
+   derive_list.add("sum");
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1551,7 +1603,7 @@ void set_derive(const StringArray & a) {
    sa.add_css(a[0]);
 
    //
-   // Parse the options and set the corresponding flags
+   // Parse the derivation options
    //
    for(int i=0; i<sa.n(); i++) {
       if(!strcasestr(derive_options, sa[i])) {
@@ -1595,13 +1647,25 @@ void set_pcprx(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_field(const StringArray & a) {
-   field_string = a[0];
+   req_field_list.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_name(const StringArray & a) {
-   out_var_name.add_css(a[0]);
+   req_out_var_name.add_css(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_vld_thresh(const StringArray & a) {
+   vld_thresh = atof(a[0]);
+   if(vld_thresh > 1 || vld_thresh < 0) {
+      mlog << Error << "\nset_vld_thresh() -> "
+           << "the \"-vld_thresh\" command line option (" << vld_thresh
+           << ") must be set between 0 and 1!\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
