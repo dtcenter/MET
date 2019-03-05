@@ -303,7 +303,7 @@ void process_command_line(int argc, char **argv) {
    // Read the first input ensemble file
    if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0], etype))) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "Trouble reading ensemble file \""
+           << "trouble reading ensemble file \""
            << ens_file_list[0] << "\"\n\n";
       exit(1);
    }
@@ -328,7 +328,7 @@ void process_command_line(int argc, char **argv) {
       // Read the first gridded observation file
       if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0], otype))) {
          mlog << Error << "\nprocess_command_line() -> "
-              << "Trouble reading gridded observation file \""
+              << "trouble reading gridded observation file \""
               << grid_obs_file_list[0] << "\"\n\n";
          exit(1);
       }
@@ -560,7 +560,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    // Read the current ensemble file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
       mlog << Error << "\nget_data_plane() -> "
-           << "Trouble reading file \"" << infile << "\"\n\n";
+           << "trouble reading file \"" << infile << "\"\n\n";
       exit(1);
    }
 
@@ -608,7 +608,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    // Read the current ensemble file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
       mlog << Error << "\nget_data_plane_array() -> "
-           << "Trouble reading file \"" << infile << "\"\n\n";
+           << "trouble reading file \"" << infile << "\"\n\n";
       exit(1);
    }
 
@@ -1090,6 +1090,16 @@ int process_point_ens(int i_ens, int &n_miss) {
       // Read the gridded data from the input forecast file
       if(!get_data_plane_array(ens_file, info->file_type(), info,
                                fcst_dpa, true)) {
+
+         // Error out if unable to read the ensemble mean
+         if(is_ens_mean) {
+            mlog << Error << "\nprocess_point_ens() -> "
+                 << "trouble reading the ensemble mean field \""
+                 << info->magic_str() << "\" from file \""
+                 << ens_file << "\"\n\n";
+            exit(1);
+         }
+
          n_miss++;
          continue;
       }
@@ -1505,8 +1515,9 @@ void process_grid_vx() {
 
          if(!found) {
             mlog << Error << "\nprocess_grid_vx() -> "
-                 << "Trouble reading field " << info->magic_str()
-                 << " from file " << mn_file << "\n\n";
+                 << "trouble reading ensemble mean field \""
+                 << info->magic_str() << "\" from file \""
+                 << mn_file << "\"\n\n";
             exit(1);
          }
 
