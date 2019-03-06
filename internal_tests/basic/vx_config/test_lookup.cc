@@ -12,6 +12,8 @@
 
 static const bool debug = false;
 
+static const char lookup_key [] = "str";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +28,7 @@ using namespace std;
 #include "vx_util.h"
 
 #include "config_file.h"
+#include "config_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,9 +100,9 @@ Dictionary * md = (Dictionary *) 0;
 
 cout << "\n\n";
 
-cout << "Getting top ...\n\n";
+cout << "Getting \"" << lookup_key << "\" ...\n\n";
 
-e = config.lookup("top");
+e = config.lookup(lookup_key);
 
 if ( !e )  {
 
@@ -109,12 +112,18 @@ if ( !e )  {
 
 }
 
-// e->dump(cout);
+e->dump(cout);
 
-ed = e->dict_value();
+// ed = e->dict_value();
 
 cout << "\n\n";
 
+ConcatString foo;
+
+foo = parse_conf_string(&config, lookup_key);
+
+
+/*
    //
    //  get mid
    //
@@ -148,7 +157,7 @@ if ( !h )  {
 }
 
 h->dump(cout);
-
+*/
 
 
 
