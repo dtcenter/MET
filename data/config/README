@@ -467,14 +467,28 @@ regrid = {
 //        settings are combined when filtering matched pairs of forecast and
 //        observed values.
 //
-//   - The "file_type" entry specifies the input file type rather than letting
-//     the code determine it itself.  For valid file_type values, see
-//     "File types" in the data/config/ConfigConstants file.  This entry should
-//     be defined within the "fcst" or "obs" dictionaries.
+//   - The "file_type" entry specifies the input gridded data file type rather
+//     than letting the code determine it.  MET determines the file type by
+//     checking for known suffixes and examining the file contents.  Use this
+//     option to override the code's choice.  The valid file_type values are
+//     listed the "data/config/ConfigConstants" file and are described below.
+//     This entry should be defined within the "fcst" and/or "obs" dictionaries.
 //     e.g.
 //     fcst = {
-//        file_type = NETCDF_NCCF;
-//        ...
+//        file_type = GRIB1;         // GRIB version 1
+//        file_type = GRIB2;         // GRIB version 2
+//        file_type = NETCDF_MET;    // NetCDF created by another MET tool
+//        file_type = NETCDF_PINT;   // NetCDF created by running the p_interp
+//                                   // or wrf_interp utility on WRF output.
+//                                   // May be used to read unstaggered raw WRF
+//                                   // NetCDF output at the surface or a
+//                                   // single model level.
+//        file_type = NETCDF_NCCF;   // NetCDF following the Climate Forecast
+//                                   // (CF) convention.
+//        file_type = PYTHON_NUMPY;  // Run a Python script to load data into
+//                                   // a NumPy array.
+//        file_type = PYTHON_XARRAY; // Run a Python script to load data into
+//                                   // an xarray object.
 //     }
 //
 //   - The "wind_thresh" entry is an array of thresholds used to filter wind
