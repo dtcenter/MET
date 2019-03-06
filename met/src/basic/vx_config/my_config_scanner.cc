@@ -697,13 +697,15 @@ n = 0;
 
 while ( n < max_id_length )  {
 
-   c = nextchar();
+   // c = nextchar();
+      c = fgetc(configin);
 
    if ( c == '\"' )  break;
 
    if ( c == '\\' )  {
 
-      c = nextchar();
+      // c = nextchar();
+         c = fgetc(configin);
 
       switch ( c )  {
 
@@ -737,7 +739,41 @@ while ( n < max_id_length )  {
 
 if ( (pos > 0) && (lexeme[pos - 1] == '\"') )  { lexeme[pos - 1] = (char) 0;  --pos; }
 
-strncpy(configlval.text, line, max_id_length);
+
+ConcatString s = (char *) lexeme;
+
+while ( replace_env(s) )  {
+
+   // cout << "s = \"" << s << "\"\n\n" << flush;
+
+}
+
+if ( s.length() >= max_id_length )  {
+
+   mlog << Error 
+        << "string \"" << s << "\" too long!\n\n";
+
+   exit ( 1 );
+
+}
+
+clear_lexeme();
+
+if ( s.nonempty() )  {
+
+   strncpy((char *) lexeme, s.contents(), max_id_length);
+
+   strncpy(configlval.text, line, max_id_length);
+
+} else {
+
+   lexeme[0] = 0;
+
+   configlval.text[0] = (char) 0;
+
+}
+
+lexeme[max_id_length] = 0;
 
 configlval.text[ sizeof(configlval.text) - 1 ] = (char) 0;
 
