@@ -644,8 +644,9 @@ void process_obs_file(int i_nc) {
    unixtime hdr_ut;
    NcFile *obs_in = (NcFile *) 0;
 
-   // Determine if vectors will be verified
+   // Set flags for vectors
    bool vflag = conf_info.get_vflag();
+   bool is_ugrd, is_vgrd;
 
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
@@ -819,11 +820,16 @@ void process_obs_file(int i_nc) {
          strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
+         // Check for wind components
+         is_ugrd = ( use_var_id &&         var_name == ugrd_abbr_str ) ||
+                   (!use_var_id && nint(obs_arr[1]) == ugrd_grib_code);
+         is_vgrd = ( use_var_id &&         var_name == vgrd_abbr_str ) ||
+                   (!use_var_id && nint(obs_arr[1]) == vgrd_grib_code);
 
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
          // must be followed by VGRD
-         if(vflag && nint(obs_arr[1]) == ugrd_grib_code) {
+         if(vflag && is_ugrd) {
             for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
          }
 
@@ -831,7 +837,7 @@ void process_obs_file(int i_nc) {
          // winds are to be computed.  Make sure that the
          // previous observation was UGRD with the same header
          // and at the same vertical level.
-         if(vflag && nint(obs_arr[1]) == vgrd_grib_code) {
+         if(vflag && is_vgrd) {
 
             if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
                !is_eq(obs_arr[2], prev_obs_arr[2]) ||
