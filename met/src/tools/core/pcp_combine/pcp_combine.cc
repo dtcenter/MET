@@ -926,29 +926,21 @@ void do_derive_command() {
          nc_accum_diff = cur_dp.accum();
 
          //
-         // Initialize to the first field.
+         // Initialize to bad data.
          //
-         diff_dp = cur_dp;
-         min_dp  = cur_dp;
-         max_dp  = cur_dp;
-         sum_dp  = cur_dp;
+         der_dp.set_size(grid.nx(), grid.ny());
+         der_dp.set_constant(bad_data_double);
+         diff_dp = der_dp;
+         min_dp  = der_dp;
+         max_dp  = der_dp;
 
          //
-         // Initialize good data values to 0.
+         // Initialize to 0.
          //
-         sum_sq_dp = cur_dp;
-         for(j=0; j<nxy; j++) {
-            if(!is_bad_data(cur_dp.data()[j])) {
-               sum_dp.buf()[j] = 0.0;
-               sum_sq_dp.buf()[j] = 0.0;
-            }
-         }
-
-         //
-         // Initialize valid data counts to 0.
-         //
-         vld_dp = cur_dp;
-         vld_dp.set_constant(0.0);
+         der_dp.set_constant(0.0);
+         sum_dp    = der_dp;
+         sum_sq_dp = der_dp;
+         vld_dp    = der_dp;
       }
       //
       // Check for grid mismatch
@@ -994,14 +986,22 @@ void do_derive_command() {
          // Get current data value.
          v = cur_dp.data()[j];
 
+         // Update the difference field.
+         if(i == 0) {      // Add field
+            diff_dp.buf()[j] = v;
+         }
+         else if(i == 1) { // Subtract field
+            if(is_bad_data(diff_dp.buf()[j]) || is_bad_data(v)) {
+               diff_dp.buf()[j] = bad_data_double;
+            }
+            else {
+               diff_dp.buf()[j] -= v;
+            }
+         }
+
          // Update valid counts.
          if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
          else                continue;
-
-         // Update the difference field.
-         if(!is_bad_data(diff_dp.buf()[j])) {
-            diff_dp.buf()[j] -= v;
-         }
 
          // Update min/max fields which may contain bad data.
          if(is_bad_data(min_dp.buf()[j]) || v < min_dp.buf()[j]) {
