@@ -1284,53 +1284,57 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    NcVar nc_var;
 
    //
-   // Use the -name command line argument, if specified.
+   // Write to the -name command line argument, if specified.
    //
    if(out_var_name.n() == (req_field_list.n() * derive_list.n())) {
       var_str = out_var_name[i_out_var];
    }
    //
-   // For zero accum, use the VarInfo name and level.
-   //
-   else if(nc_accum == 0) {
-      var_str = var_info->magic_str();
-      var_str = str_replace_all(var_str, "(", "");
-      var_str = str_replace_all(var_str, ")", "");
-      var_str = str_replace_all(var_str, "*", "");
-      var_str = str_replace_all(var_str, ",", "");
-      var_str = str_replace_all(var_str, "/", "_");
-   }
-   //
-   // For nonzero accum, use the VarInfo name and accumulation interval.
+   // Otherwise, build the output variable name from the VarInfo.
    //
    else {
 
       //
-      // Use the name prior to the first underscore.
+      // For zero accum, use the name and level, unless it includes
+      // special characters.
       //
-      cs      = var_info->name();
-      sa      = cs.split("_");
-      var_str = sa[0];
-
-      //
-      // For an hourly accumulation interval, append _HH.
-      //
-      if(nc_accum%sec_per_hour == 0) {
-         var_str.set_precision(2);
-         var_str << '_' << HH(nc_accum/sec_per_hour);
+      if(nc_accum == 0) {
+         var_str = var_info->name();
+         cs      = var_info->level_name();
+         if(!check_reg_exp("[\\(\\*\\,\\)]", cs)) var_str << "_" << cs;
       }
       //
-      // For any other accumulation interval, append _HHMMSS.
+      // For non-zero accum, use the name and accumulation interval.
       //
       else {
-         var_str << "_" << sec_to_hhmmss(nc_accum);
-      }
-   }
 
-   //
-   // Append the derivation string.
-   //
-   if(run_command == der) var_str << "_" << derive_str;
+         //
+         // Use the name prior to the first underscore.
+         //
+         cs      = var_info->name();
+         sa      = cs.split("_");
+         var_str = sa[0];
+
+         //
+         // For an hourly accumulation interval, append _HH.
+         //
+         if(nc_accum%sec_per_hour == 0) {
+            var_str.set_precision(2);
+            var_str << '_' << HH(nc_accum/sec_per_hour);
+         }
+         //
+         // For any other accumulation interval, append _HHMMSS.
+         //
+         else {
+            var_str << "_" << sec_to_hhmmss(nc_accum);
+         }
+      }
+
+      //
+      // Append the derivation string.
+      //
+      if(run_command == der) var_str << "_" << derive_str;
+   }
 
    mlog << Debug(2)
         << "Writing output variable \"" << var_str
