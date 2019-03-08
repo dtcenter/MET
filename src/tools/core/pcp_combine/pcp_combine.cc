@@ -112,7 +112,7 @@ static const char zero_time_str   [] = "00000000_000000";
 static const char default_pcp_dir [] = ".";
 static const char default_reg_exp [] = ".*";
 static const char derive_options  [] =
-   "sum, diff, min, max, range, mean, stdev, vld_count";
+   "sum, min, max, range, mean, stdev, vld_count";
 
 // Run Command enumeration
 enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
@@ -157,9 +157,10 @@ NcDim   lon_dim;
 static void process_command_line(int, char **);
 
 static void process_sum_args(const CommandLine &);
-static void process_derive_args(const CommandLine &);
+static void process_add_sub_derive_args(const CommandLine &);
 
 static void do_sum_command();
+static void do_sub_command();
 static void do_derive_command();
 
 static void sum_data_files(Grid &, DataPlane &);
@@ -234,11 +235,12 @@ int main(int argc, char *argv[]) {
       }
 
       //
-      // Perform the requested run command.
-      // Derive handles add, subtract, and derive.
+      // Perform the requested run or subtract command.
+      // Derive handles add and derive.
       //
-      if(run_command == sum) do_sum_command();
-      else                   do_derive_command();
+           if(run_command == sum) do_sum_command();
+      else if(run_command == sub) do_sub_command();
+      else                        do_derive_command();
    }
 
    //
@@ -306,7 +308,7 @@ void process_command_line(int argc, char **argv) {
    // Process the specific command arguments.
    //
    if(run_command == sum) process_sum_args(cline);
-   else                   process_derive_args(cline);
+   else                   process_add_sub_derive_args(cline);
 
    //
    // If -field not set, set to a list of length 1 with an empty string.
@@ -404,14 +406,14 @@ void process_sum_args(const CommandLine & cline) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_derive_args(const CommandLine & cline) {
+void process_add_sub_derive_args(const CommandLine & cline) {
    int i;
 
    //
    // Check for enough command line arguments
    //
    if(cline.n() < 2) {
-      mlog << Error << "\nprocess_derive_args() -> "
+      mlog << Error << "\nprocess_add_sub_derive_args() -> "
            << "expected at least 2 arguments but got " << cline.n()
            << "!\n\n";
       exit(1);
@@ -490,7 +492,7 @@ void process_derive_args(const CommandLine & cline) {
          // Check if this is actually a file name
          //
          if(file_exists(cline[i+1])) {
-            mlog << Error << "\nprocess_derive_args() -> "
+            mlog << Error << "\nprocess_add_sub_derive_args() -> "
                  << "file name used when config string expected ("
                  << cline[i+1]
                  << "). Did you forget the \"-field\" option?\n\n";
@@ -857,13 +859,113 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
 ////////////////////////////////////////////////////////////////////////
 
+void do_sub_command() {
+   DataPlane plus, minus, diff;
+   Grid grid1, grid2;
+   unixtime nc_init_time, nc_valid_time;
+   int i, nxy, nc_accum;
+
+   //
+   // Check for exactly two input files
+   //
+   if(n_files != 2) {
+      mlog << Error << "\ndo_sub_command() -> "
+           << "you must specify exactly two input files for "
+           << "subtraction.\n\n";
+      exit(1);
+   }
+
+   //
+   // Read the two specified data files
+   //
+   mlog << Debug(1)
+        << "Reading input file: " << file_list[0] << "\n";
+   get_field(file_list[0], field_list[0], 0, 0, grid1, plus);
+
+   mlog << Debug(1)
+        << "Reading input file: " << file_list[1] << "\n";
+   get_field(file_list[1], field_list[1], 0, 0, grid2, minus);
+
+   //
+   // Check for the same grid dimensions
+   //
+   if(grid1 != grid2) {
+      mlog << Error << "\ndo_sub_command() -> "
+           << "the input fields must be on the same grid.\n"
+           << grid1.serialize() << "\n" << grid2.serialize() << "\n\n";
+      exit(1);
+   }
+
+   //
+   // Compute output accumulation, initialization, and valid times
+   // for the subtract command.
+   //
+   mlog << Debug(2) << "Performing subtraction command.\n";
+
+   //
+   // Output valid time
+   //
+   nc_valid_time = plus.valid();
+
+   //
+   // Output initialization time
+   // Warning if init_time1 != init_time2.
+   //
+   if(plus.init() != minus.init()) {
+      mlog << Warning << "\ndo_sub_command() -> "
+           << "the initialization times do not match ("
+           << unix_to_yyyymmdd_hhmmss(plus.init()) <<  " != "
+           << unix_to_yyyymmdd_hhmmss(minus.init())
+           << ") for subtraction.  Using the first value.\n\n";
+   }
+   nc_init_time = plus.init();
+
+   //
+   // Output accumulation time
+   // Warning if accum1 < accum2.
+   //
+   if(plus.accum() < minus.accum()) {
+      mlog << Warning << "\ndo_sub_command() -> "
+           << "the first accumulation interval is less than the "
+           << "second (" << sec_to_hhmmss(plus.accum()) << " < "
+           << sec_to_hhmmss(minus.accum()) << ") for subtraction.\n\n";
+   }
+   nc_accum = plus.accum() - minus.accum();
+
+   //
+   // Initialize.
+   //
+   diff = plus;
+
+   //
+   // Update value for each grid point.
+   //
+   for(i=0, nxy=grid1.nx()*grid1.ny(); i<nxy; i++) {
+      if(!is_bad_data( diff.data()[i]) &&
+         !is_bad_data(minus.data()[i])) {
+         diff.buf()[i] -= minus.data()[i];
+      }
+   }
+
+   //
+   // Write output.
+   //
+   open_nc(grid1);
+   write_nc_data(nc_init_time, nc_valid_time, nc_accum, diff,
+                 "diff", "");
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_derive_command() {
    Grid grid, cur_grid;
    DataPlane cur_dp, der_dp;
-   DataPlane diff_dp, min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
+   DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
-   int i, j, n, nxy, nc_accum, nc_accum_sum, nc_accum_diff;
+   int i, j, n, nxy, nc_accum, nc_accum_sum;
    ConcatString derive_list_css;
    double v;
 
@@ -878,16 +980,6 @@ void do_derive_command() {
    if(derive_list.n() == 0) {
       mlog << Error << "\ndo_derive_command() -> "
            << "at least one derivation option must be specified!\n\n";
-      exit(1);
-   }
-
-   //
-   // Check for exactly two input files for difference.
-   //
-   if(strcasestr(derive_list_css, "diff") && n_files != 2) {
-      mlog << Error << "\ndo_derive_command() -> "
-           << "you must specify exactly two input files for a "
-           << "difference!\n\n";
       exit(1);
    }
 
@@ -923,14 +1015,12 @@ void do_derive_command() {
          nc_valid_time = cur_dp.valid();
          nc_accum      = cur_dp.accum();
          nc_accum_sum  = cur_dp.accum();
-         nc_accum_diff = cur_dp.accum();
 
          //
          // Initialize to bad data.
          //
          der_dp.set_size(grid.nx(), grid.ny());
          der_dp.set_constant(bad_data_double);
-         diff_dp = der_dp;
          min_dp  = der_dp;
          max_dp  = der_dp;
 
@@ -975,7 +1065,6 @@ void do_derive_command() {
             nc_accum = 0;
          }
          nc_accum_sum  += cur_dp.accum();
-         nc_accum_diff -= cur_dp.accum();
       }
 
       //
@@ -986,28 +1075,15 @@ void do_derive_command() {
          // Get current data value.
          v = cur_dp.data()[j];
 
-         // Update the difference field.
-         if(i == 0) {      // Add field
-            diff_dp.buf()[j] = v;
-         }
-         else if(i == 1) { // Subtract field
-            if(is_bad_data(diff_dp.buf()[j]) || is_bad_data(v)) {
-               diff_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               diff_dp.buf()[j] -= v;
-            }
-         }
-
          // Update valid counts.
          if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
          else                continue;
 
          // Update min/max fields which may contain bad data.
-         if(is_bad_data(min_dp.buf()[j]) || v < min_dp.buf()[j]) {
+         if(is_bad_data(min_dp.data()[j]) || v < min_dp.data()[j]) {
             min_dp.buf()[j] = v;
          }
-         if(is_bad_data(max_dp.buf()[j]) || v > max_dp.buf()[j]) {
+         if(is_bad_data(max_dp.data()[j]) || v > max_dp.data()[j]) {
             max_dp.buf()[j] = v;
          }
 
@@ -1023,7 +1099,7 @@ void do_derive_command() {
    mask.set_size(grid.nx(), grid.ny());
    for(j=0, n=0; j<nxy; j++) {
       mask.buf()[j] = ((double) vld_dp.data()[j]/n_files) >= vld_thresh;
-      if(!mask.buf()[j]) n++;
+      if(!mask.data()[j]) n++;
    }
 
    mlog << Debug(2)
@@ -1034,7 +1110,6 @@ void do_derive_command() {
    //
    // Apply the valid data mask.
    //
-   apply_mask(diff_dp,   mask);
    apply_mask(min_dp,    mask);
    apply_mask(max_dp,    mask);
    apply_mask(sum_dp,    mask);
@@ -1056,10 +1131,6 @@ void do_derive_command() {
       if(strcasecmp(derive_list[i], "sum") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum,
                        sum_dp, derive_list[i], "Sum of ");
-      }
-      else if(strcasecmp(derive_list[i], "diff") == 0) {
-         write_nc_data(nc_init_time, nc_valid_time, nc_accum_diff,
-                       diff_dp, derive_list[i], "Difference of ");
       }
       else if(strcasecmp(derive_list[i], "min") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
@@ -1115,7 +1186,8 @@ void do_derive_command() {
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       der_dp, derive_list[i], "Standard Deviation of ");
+                       der_dp, derive_list[i],
+                       "Standard Deviation of ");
       }
       else if(strcasecmp(derive_list[i], "vld_count") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
