@@ -127,7 +127,40 @@ bool get_att_value(const NcAtt *att, double &att_val) {
 
 int get_att_value_int(const NcAtt *att) {
    int value = bad_data_int;
-   att->getValues(&value);
+   cout << " att: " << att->getName() << " " << att->getType().getName()
+        << " " << att->getType().getId()
+        << "\n";
+   switch (att->getType().getId()) {
+      case NC_BYTE:
+         signed char b_value;
+         att->getValues(&b_value);
+         value = (int)b_value;
+         break;
+      case NC_SHORT:
+         short s_value;
+         att->getValues(&s_value);
+         value = (int)s_value;
+         break;
+      case NC_INT:
+         att->getValues(&value);
+         break;
+      case NC_INT64:
+         long long l_value;
+         att->getValues(&l_value);
+         value = (int)l_value;
+         if ((long long)value != l_value) {
+            mlog << Warning << "\nget_att_value_int() -> "
+                 << "loosing precision during type conversion. "
+                 << value << " from int64 \"" << l_value 
+                 << "\" for attribute \"" << GET_NC_NAME_P(att) << "\".\n\n";
+         }
+         break;
+      default:
+         mlog << Warning << "\nget_att_value_int() -> "
+              << "data type mismatch (int vs. \"" << GET_NC_TYPE_NAME_P(att)
+              << "\" for attribute \"" << GET_NC_NAME_P(att) << "\".\n\n";
+         break;
+   }
    return value;
 }
 
