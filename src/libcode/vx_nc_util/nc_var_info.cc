@@ -30,6 +30,7 @@ using namespace std;
 unixtime get_att_value_unixtime(const NcAtt *att) {
    unixtime time_value = -1;
    switch ( GET_NC_TYPE_ID_P(att) )  {
+      case NC_INT64:
       case NC_INT:
          time_value = get_att_value_int(att);
          break;
@@ -334,7 +335,9 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
       att_value = get_att_value_int(att);
    
       // Check for the correct type
-      if ( GET_NC_TYPE_ID_P(att) != NcType::nc_INT ) {
+      nc_type att_type = GET_NC_TYPE_ID_P(att);
+      if ( att_type != NcType::nc_INT && att_type != NcType::nc_INT64
+           && att_type != NcType::nc_SHORT && att_type != NcType::nc_BYTE ) {
    
          mlog << Error << "\nget_att_int(const NcVarInfo &, const ConcatString &, int &) -> "
               << "attribute \"" << att_name << "\" should be an integer.\n\n";
