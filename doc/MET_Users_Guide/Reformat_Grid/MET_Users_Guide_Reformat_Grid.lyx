@@ -124,13 +124,18 @@ name "sec:Pcp-Combine-tool"
 
 \series medium
 This section contains a description of running the Pcp-Combine tool.
- The Pcp-Combine tool is used (if needed) to modify the precipitation accumulati
-on intervals from two or more gridded files into a single NetCDF file containing
- the desired accumulation interval.
- This tool enables users to define identical forecast and observation or
- analysis precipitation accumulation intervals prior to running the MET
- statistics tools.
- This tool supports three types of commands, 
+ The Pcp-Combine tool summarizes data across multiple input gridded data
+ files and writes the results to a single NetCDF output file.
+ It is often used to modify precipitation accumulation intervals in the
+ forecast and/or observation datasets to make them comparable.
+ However it can also be used to derive summary fields, such as daily min/max
+ temperature or average precipitation rate.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The Pcp-Combine tool supports four types of commands (
 \begin_inset Quotes eld
 \end_inset
 
@@ -146,7 +151,7 @@ add
 \begin_inset Quotes erd
 \end_inset
 
- and 
+, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -154,8 +159,21 @@ subtract
 \begin_inset Quotes erd
 \end_inset
 
-, which may be run on any gridded data files supported by MET.
- By default, the 
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+derive
+\begin_inset Quotes erd
+\end_inset
+
+) which may be run on any gridded data files supported by MET.
+\end_layout
+
+\begin_layout Enumerate
+
+\series medium
+The 
 \begin_inset Quotes eld
 \end_inset
 
@@ -163,25 +181,52 @@ sum
 \begin_inset Quotes erd
 \end_inset
 
- command searches for 
-\series bold
-APCP
-\series medium
-, the GRIB string for accumulated preciptation.
- Use the 
+ command is the default command and therefore specifying 
 \begin_inset Quotes eld
 \end_inset
 
--field
+-sum
 \begin_inset Quotes erd
 \end_inset
 
- option to override this default when processing fields other than 
-\series bold
-APCP
+ on the command line is optional.
+ Using the sum arguments described below, Pcp-Combine searches the input
+ data directories (
+\begin_inset Quotes eld
+\end_inset
+
+-pcpdir
+\begin_inset Quotes erd
+\end_inset
+
+ option) for data which matches the requested time stamps and accumulation
+ intervals.
+ Pcp-Combine only considers files from the input data directory which match
+ the specified regular expression (
+\begin_inset Quotes eld
+\end_inset
+
+-pcprx
+\begin_inset Quotes erd
+\end_inset
+
+ option).
+ While 
+\begin_inset Quotes eld
+\end_inset
+
+sum
+\begin_inset Quotes erd
+\end_inset
+
+ searches for matching data, all the other commands are run on the explicit
+ set of input files specified.
+\end_layout
+
+\begin_layout Enumerate
+
 \series medium
- or non-GRIB files.
- Running the 
+The 
 \begin_inset Quotes eld
 \end_inset
 
@@ -189,12 +234,76 @@ add
 \begin_inset Quotes erd
 \end_inset
 
- command on a single file will result in that file being written out in
- NetCDF format, with no changes to the data values.
- The files being combined must all be on a common grid.
- The Pcp-Combine tool does not support automated regridding.
+ command reads the requested data from the input data files and adds them
+ together.
+\end_layout
+
+\begin_layout Enumerate
+
+\series medium
+The 
+\begin_inset Quotes eld
+\end_inset
+
+subtract
+\begin_inset Quotes erd
+\end_inset
+
+ command reads the requested data from exactly two input files and computes
+ their difference.
+\end_layout
+
+\begin_layout Enumerate
+The 
+\begin_inset Quotes eld
+\end_inset
+
+derive
+\begin_inset Quotes erd
+\end_inset
+
+ command reads the requested data from the input data files and computes
+ the requested summary fields.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+By default, the Pcp-Combine tool processes data for 
+\series bold
+APCP
+\series medium
+, the GRIB string for accumulated preciptation.
+ When requesting data using time strings (i.e.
+ [HH]MMSS), pcp_combine searches for accumulated precipitation for that
+ accumulation interval.
+ Alternatively, use the 
+\begin_inset Quotes eld
+\end_inset
+
+-field
+\begin_inset Quotes erd
+\end_inset
+
+ option to process fields other than 
+\series bold
+APCP
+\series medium
+ or for non-GRIB files.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+-field
+\begin_inset Quotes erd
+\end_inset
+
+ option may be used multiple times to process multiple fields in a single
+ run.
+ Since the Pcp-Combine tool does not support automated regridding, all input
+ data must be on the same grid.
  In general the input files should have the same initialization time unless
- the user has indicated that it shoud ignore the initialization time for
+ the user has indicated that it should ignore the initialization time for
  the 
 \begin_inset Quotes eld
 \end_inset
@@ -256,7 +365,71 @@ hskip 0.5in}
 
 \end_inset
 
-[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]
+[-sum] sum_args |
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-add input_files |
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-subtract input_files |
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-derive stat_list input_files
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+out_file
 \end_layout
 
 \begin_layout LyX-Code
@@ -288,7 +461,23 @@ hskip 0.5in}
 
 \end_inset
 
-[-name variable_name]
+[-name list]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-vld_thresh n]
 \end_layout
 
 \begin_layout LyX-Code
@@ -342,7 +531,7 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-The arguments to pcp_combine vary depending on the mode in which it is run.
+The arguments to pcp_combine vary depending on the run command.
  Listed below are the arguments for the 
 \series default
 sum
@@ -469,15 +658,12 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-Listed below are the arguments for the 
-\series default
-add
-\series medium
- command:
+The add, subtract, and derive commands all require that the input files
+ be explicitly listed:
 \end_layout
 
 \begin_layout LyX-Code
-ADD_ARGS:
+INPUT_FILES:
 \end_layout
 
 \begin_layout LyX-Code
@@ -493,8 +679,8 @@ hskip 0.5in}
 
 \end_inset
 
-in_file1 accum1 [in_file2 accum2 ...
- in_filen accumn]
+file_1 config_str_1 ...
+ file_n config_str_n |
 \end_layout
 
 \begin_layout LyX-Code
@@ -510,17 +696,8 @@ hskip 0.5in}
 
 \end_inset
 
-out_file
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Listed below are the arguments for the subtract command:
-\end_layout
-
-\begin_layout LyX-Code
-SUBTRACT_ARGS:
+file_1 ...
+ file_n |
 \end_layout
 
 \begin_layout LyX-Code
@@ -536,39 +713,7 @@ hskip 0.5in}
 
 \end_inset
 
-in_file1 accum1
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-in_file2 accum2
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-out_file
+input_file_list
 \end_layout
 
 \begin_layout Standard
@@ -582,16 +727,26 @@ Required arguments for the pcp_combine
 1.
 
 \series medium
- The Pcp-Combine tool must be run with exactly one of the 
+ The Pcp-Combine tool must be run with exactly one run command (
 \series default
 -sum, -add
 \series medium
-, or 
+,
 \series default
--subtract
+ -subtract, or -derive)
 \series medium
- command line arguments with the corresponding additional arguments.
- 
+ with the corresponding additional arguments.
+\end_layout
+
+\begin_layout Description
+2.
+
+\series medium
+ The 
+\series bold
+out_file 
+\series medium
+argument indicates the name for the NetCDF file to be written.
 \end_layout
 
 \begin_layout Standard
@@ -602,7 +757,7 @@ Optional arguments for pcp_combine
 \end_layout
 
 \begin_layout Description
-2.
+3.
 
 \series medium
  The 
@@ -615,22 +770,40 @@ Optional arguments for pcp_combine
 APCP
 \series medium
  or non-GRIB files.
-\end_layout
-
-\begin_layout Description
-3.
-
-\series medium
- The 
-\series bold
--name variable_name
-\series medium
- gives the name of the combined variable in output NetCDF file.
- 
+ This option may be used multiple times and output will be created for each.
 \end_layout
 
 \begin_layout Description
 4.
+
+\series medium
+ The 
+\series bold
+-name list
+\series medium
+ option is a comma-separated list of output variable names which override
+ the default choices.
+ If specified, the number of names must match the number of variables to
+ written to the output file.
+\end_layout
+
+\begin_layout Description
+5.
+
+\series medium
+ 
+\series default
+The 
+\series bold
+-vld_thresh n
+\series default
+ option overrides the default required ratio of valid data for at each grid
+ point for an output value to be written.
+ The default is 1.0.
+\end_layout
+
+\begin_layout Description
+6.
 
 \series medium
  The 
@@ -649,7 +822,7 @@ standard out and error
 \end_layout
 
 \begin_layout Description
-5.
+7.
 
 \series medium
  The 
@@ -675,11 +848,7 @@ level
 \end_layout
 
 \begin_layout Description
-
-\series medium
-6.
-
-\series default
+8.
  The 
 \series bold
 -compress level
@@ -766,17 +935,6 @@ out_accum
  period to be summed.
 \end_layout
 
-\begin_layout Description
-5.
-
-\series medium
- The 
-\series bold
-out_file 
-\series medium
-argument indicates the name for the NetCDF file to be written.
-\end_layout
-
 \begin_layout Standard
 
 \series bold
@@ -785,7 +943,7 @@ Optional arguments for pcp_combine sum command
 \end_layout
 
 \begin_layout Description
-6.
+5.
 
 \series medium
  The
@@ -809,7 +967,7 @@ path
 \end_layout
 
 \begin_layout Description
-7.
+6.
 
 \series medium
  The 
@@ -817,7 +975,7 @@ path
 -pcprx reg_exp
 \series medium
  option indicates the regular expression to be used in matching files in
- the precipitation directory specified.
+ the search directories specified.
  The contents of 
 \begin_inset Quotes eld
 \end_inset
@@ -831,8 +989,8 @@ reg_exp
 \end_inset
 
  will override the default setting that matches all file names.
- If the precipitation directory contains a large number of files, the user
- may specify that only a subset of those files be processed using a regular
+ If the search directories contain a large number of files, the user may
+ specify that only a subset of those files be processed using a regular
  expression which will speed up the run time.
 \end_layout
 
@@ -840,7 +998,7 @@ reg_exp
 
 \series bold
 \bar under
-Required arguments for the pcp_combine add command
+Required arguments for the pcp_combine derive command
 \end_layout
 
 \begin_layout Description
@@ -848,130 +1006,106 @@ Required arguments for the pcp_combine add command
 
 \series medium
  The 
+\begin_inset Quotes eld
+\end_inset
+
+derive
+\begin_inset Quotes erd
+\end_inset
+
+ run command must be followed by 
 \series bold
-in_file1
+stat_list
 \series medium
- argument indicates the first file to be processed, and can be any gridded
- file.
- 
-\end_layout
-
-\begin_layout Description
-2.
-
-\series medium
+ which is a comma-separated list of summary fields to be computed.
  The 
 \series bold
-in_accum1
+stat_list
 \series medium
- argument, provided in HH[MMSS] format, indicates the accumulation interval
- to be extracted from the first file.
- For non-precipitation fields, this argument can be replaced by a configuration
- string, e.g.
- 'name="TMP"; level="P500";'.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-An arbitrary number of additional files and accumulations can be provided.
- All of them will be added and the total will be placed in the output file.
- 
+ may be set to sum, min, max, range, mean, stdev, and vld_count for the
+ sum, minimum, maximum, range (max-min), average, standard deviation, and
+ valid data count fields, respectively.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
 \bar under
-Required arguments for the pcp_combine subtract command
+Input files for pcp_combine add, subtract, and derive commands
+\end_layout
+
+\begin_layout Description
+
+\series medium
+The input files for the add, subtract, and derive command can be specified
+ in one of 3 ways:
+\end_layout
+
+\begin_layout Description
+1.
+
+\series medium
+ Use 
+\series bold
+file_1 config_str_1 ...
+ file_n config_str_n
+\series medium
+ to specify the full path to each input file followed by a description of
+ the data to be read from it.
+ The 
+\series bold
+config_str_i
+\series medium
+ argument describing the data can be a set to a time string in HH[MMSS]
+ format for accumulated preciptiation or a full configuration string.
+ For example, use 
+\series bold
+'name="TMP"; level="P500";'
+\series medium
+ to process temperature at 500mb.
+\end_layout
+
+\begin_layout Description
+2.
+
+\series medium
+ Use 
+\series bold
+file_1 ...
+ file_n
+\series medium
+ to specify the list of input files to be processed on the command line.
+ Rather then specifying a separate configuration string for each input file,
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+-field
+\begin_inset Quotes erd
+\end_inset
+
+ command line option is required to specify the data to be processed.
 \end_layout
 
 \begin_layout Description
 3.
 
 \series medium
- The 
+ Use 
 \series bold
-in_file1
+input_file_list
 \series medium
- argument indicates the first file to be processed, and can be any gridded
- file.
-\end_layout
+ to specify the name of an ASCII file which contains the paths for the gridded
+ data files to be processed.
+ As in the previous option, the 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Description
-4.
-
-\series medium
- The 
-\series bold
-in_accum1
-\series medium
- argument, provided in HH[MMSS] format, indicates the accumulation interval
- to be extracted from the first gridded file.
- For non-precipitation fields, this argument can be replaced by a configuration
- string, e.g.
- 'name=
+-field
 \begin_inset Quotes erd
 \end_inset
 
-TMP
-\begin_inset Quotes erd
-\end_inset
-
-; level=
-\begin_inset Quotes erd
-\end_inset
-
-P500
-\begin_inset Quotes erd
-\end_inset
-
-;'.
-\end_layout
-
-\begin_layout Description
-5.
-
-\series medium
- The 
-\series bold
-in_file2
-\series medium
- argument indicates the second file to be processed.
- 
-\end_layout
-
-\begin_layout Description
-6.
-
-\series medium
- The 
-\series bold
-in_accum2
-\series medium
- argument, provided in HH[MMSS] format, indicates the accumulation interval
- to be extracted from the second file.
- This accumulation will be subtracted from the first.
- For non-precipitation fields, this argument can be replaced by a configuration
- string, e.g.
- 'name=
-\begin_inset Quotes erd
-\end_inset
-
-TMP
-\begin_inset Quotes erd
-\end_inset
-
-; level=
-\begin_inset Quotes erd
-\end_inset
-
-P500
-\begin_inset Quotes erd
-\end_inset
-
-;'.
+ command line option is required to specify the data to be processed.
 \end_layout
 
 \begin_layout Standard
@@ -1475,7 +1609,7 @@ Longitude value for each point in the grid
 \begin_inset Text
 
 \begin_layout Plain Layout
-GRIB Code Abbreviation or -name option
+Name and level of the requested data or value of the -name option.
 \end_layout
 
 \end_inset
@@ -1495,7 +1629,8 @@ lat, lon
 \begin_layout Plain Layout
 Data value (i.e.
  accumulated precipitation) for each point in the grid.
- The name of the variable describes the name and level.
+ The name of the variable describes the name and level and any deriviation
+ logic that was applied.
 \end_layout
 
 \end_inset
