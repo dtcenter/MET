@@ -72,6 +72,7 @@
 //   020    12/02/16  Halley Gotway  Change init and accumulation
 //                    subtraction errors to warnings.
 //   021    03/01/19  Halley Gotway  Add -derive command line option.
+//   022    03/08/19  Halley Gotway  Support multiple -field options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -314,6 +315,11 @@ void process_command_line(int argc, char **argv) {
    if(req_field_list.n() == 0) req_field_list.add("");
 
    //
+   // Determine the number of output variables to write.
+   //
+   n_out_var = derive_list.n() * req_field_list.n();
+
+   //
    // If pcp_dir is not set, set to the default.
    //
    if(pcp_dir.n_elements() == 0) pcp_dir.add(default_pcp_dir);
@@ -398,11 +404,6 @@ void process_sum_args(const CommandLine & cline) {
            << ") must be greater than zero.\n\n";
       exit(1);
    }
-
-   //
-   // Write exactly one output variable.
-   //
-   n_out_var = 1;
 
    return;
 }
@@ -510,12 +511,6 @@ void process_add_sub_derive_args(const CommandLine & cline) {
    //
    n_files = file_list.n();
 
-   //
-   // Determine the number of output variables to write.
-   //
-   n_out_var = derive_list.n();
-   if(req_field_list.n() > 0) n_out_var *= req_field_list.n();
-
    return;
 }
 
@@ -528,12 +523,12 @@ void do_sum_command() {
    ConcatString init_time_str;
 
    //
-   // Compute the lead time
+   // Compute the lead time.
    //
    lead_time = valid_time - init_time;
 
    //
-   // Build init time string
+   // Build init time string.
    //
    if(init_time != 0) {
       init_time_str = unix_to_yyyymmdd_hhmmss(init_time);
@@ -576,7 +571,7 @@ void do_sum_command() {
    }
 
    //
-   // Check that the lead time is divisible by the the input
+   // Check that the lead time is divisible by the the input.
    // accumulation time except when init_time = 0 for observations.
    //
    if(lead_time%in_accum != 0 && init_time != (unixtime) 0) {
@@ -588,14 +583,14 @@ void do_sum_command() {
    }
 
    //
-   // Find and sum up the matching precipitation files
+   // Find and sum up the matching precipitation files.
    //
    sum_data_files(grid, plane);
 
    //
-   // Write output
+   // Write output.
    //
-   open_nc(grid);
+   if(!nc_out) open_nc(grid);
    write_nc_data(init_time, valid_time, out_accum, plane, "sum", "");
 
    return;
@@ -649,14 +644,11 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
                                       pcp_files[i]);
 
          if(pcp_recs[i] != -1) {
-
             mlog << Debug(1)
                  << "[" << (i+1) << "] File " << pcp_files[i]
                  << " matches valid time of "
                  << unix_to_yyyymmdd_hhmmss(pcp_times[i]) << "\n";
-
             break;
-
          } // if
 
       } // end for j
@@ -665,7 +657,6 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
       // Check for no matching file found.
       //
       if(pcp_recs[i] == -1) {
-
          mlog << Error << "\nsum_data_files() -> "
               << "cannot find a file with a valid time of "
               << unix_to_yyyymmdd_hhmmss(pcp_times[i])

@@ -31,6 +31,21 @@
     </output>
   </test>
 
+  <test name="pcp_combine_sum_GRIB1_MULTIPLE_FIELDS">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      20120409_00 3 20120409_18 18 \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_SUM_MULTIPLE_FIELDS.nc \
+      -pcpdir &DATA_DIR_MODEL;/grib1/nam \
+      -field 'name="APCP"; level="A3";' \
+      -field 'name="ACPCP"; level="A3";' \
+      -name PRECIP_18,CONV_PRECIP_18
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_SUM_MULTIPLE_FIELDS.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="pcp_combine_sum_GRIB2">
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
