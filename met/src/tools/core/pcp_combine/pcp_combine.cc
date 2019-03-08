@@ -124,11 +124,12 @@ static int verbosity = 2;
 // Variables common to all commands
 static int          n_files;
 static StringArray  req_field_list;
+static bool         field_option_used = false;
 static ConcatString field_string = "";
 static ConcatString out_filename;
 static StringArray  req_out_var_name;
-static StringArray  out_var_name;
 static int          i_out_var = 0;
+static int          n_out_var;
 static MetConfig    config;
 static VarInfo *    var_info = (VarInfo *) 0;
 static double       vld_thresh = 1.0;
@@ -222,16 +223,13 @@ int main(int argc, char *argv[]) {
       //
       field_string = req_field_list[i];
       if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
-      out_var_name = req_out_var_name;
 
       //
       // Reset when reading multiple fields from the same input files.
       //
-      if(run_command != sum && req_field_list.n() > 0) {
+      if(field_option_used) {
          field_list.clear();
-         for(j=0; j<file_list.n(); j++) {
-            field_list.add(field_string);
-         }
+         for(j=0; j<file_list.n(); j++) field_list.add(field_string);
       }
 
       //
@@ -329,9 +327,9 @@ void process_command_line(int argc, char **argv) {
    // Check the -name option.
    //
    if(req_out_var_name.n() > 0 &&
-      req_out_var_name.n() != (req_field_list.n() * derive_list.n())) {
+      req_out_var_name.n() != n_out_var) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "expected " << req_field_list.n() * derive_list.n()
+           << "expected " << n_out_var
            << " entries for the \"-name\" command line option but got "
            << req_out_var_name.n() << "!\n\n";
       exit(1);
@@ -400,6 +398,11 @@ void process_sum_args(const CommandLine & cline) {
            << ") must be greater than zero.\n\n";
       exit(1);
    }
+
+   //
+   // Write exactly one output variable.
+   //
+   n_out_var = 1;
 
    return;
 }
@@ -506,6 +509,12 @@ void process_add_sub_derive_args(const CommandLine & cline) {
    // Store the number of input files.
    //
    n_files = file_list.n();
+
+   //
+   // Determine the number of output variables to write.
+   //
+   n_out_var = derive_list.n();
+   if(req_field_list.n() > 0) n_out_var *= req_field_list.n();
 
    return;
 }
@@ -1358,8 +1367,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    // Write to the -name command line argument, if specified.
    //
-   if(out_var_name.n() == (req_field_list.n() * derive_list.n())) {
-      var_str = out_var_name[i_out_var];
+   if(req_out_var_name.n() == n_out_var) {
+      var_str = req_out_var_name[i_out_var];
    }
    //
    // Otherwise, build the output variable name from the VarInfo.
@@ -1713,6 +1722,7 @@ void set_pcprx(const StringArray & a) {
 
 void set_field(const StringArray & a) {
    req_field_list.add(a[0]);
+   field_option_used = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
