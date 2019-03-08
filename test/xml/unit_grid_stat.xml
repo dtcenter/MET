@@ -72,6 +72,7 @@
     <output>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_fho.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_grad.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_ctc.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_mctc.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_mcts.txt</stat>

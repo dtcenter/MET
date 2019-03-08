@@ -1251,7 +1251,7 @@ void process_scores() {
                   apply_mask(wgt_dp, mask_mp, w_na);
 
                   // Set the mask name
-                  shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[m]);
 
                   mlog << Debug(2) << "Computing Gradient DX(" << dx << ")/DY("
                        << dy << ") Statistics " << "over region " << shc.get_mask()

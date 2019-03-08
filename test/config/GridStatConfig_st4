@@ -143,8 +143,8 @@ fourier = {
 // May be set separately in each "obs.field" entry
 //
 gradient = {
-   dx = [ 1 ];
-   dy = [ 1 ];
+   dx = [ 1, 3, 5  ];
+   dy = [ 1, 3, 10 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ output_flag = {
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
-   grad   = NONE;
+   grad   = BOTH;
 }
 
 //
@@ -186,7 +186,7 @@ nc_pairs_flag   = {
    weight     = FALSE;
    nbrhd      = FALSE;
    fourier    = FALSE;
-   gradient   = FALSE;
+   gradient   = TRUE;
    apply_mask = TRUE;
 }
 
