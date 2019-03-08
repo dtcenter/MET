@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
       //
       // Reset when reading multiple fields from the same input files.
       //
-      if(run_command != sum && req_field_list.n() > 1) {
+      if(run_command != sum && req_field_list.n() > 0) {
          field_list.clear();
          for(j=0; j<file_list.n(); j++) {
             field_list.add(field_string);
@@ -950,7 +950,7 @@ void do_sub_command() {
    //
    // Write output.
    //
-   open_nc(grid1);
+   if(!nc_out) open_nc(grid1);
    write_nc_data(nc_init_time, nc_valid_time, nc_accum, diff,
                  "diff", "");
 
