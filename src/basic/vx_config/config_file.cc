@@ -61,6 +61,16 @@ extern void finish_string_scan ();
 ////////////////////////////////////////////////////////////////////////
 
 
+static void recursive_envs(const char * infile, const char * outfile);
+
+static void recursive_envs(string &);
+
+static bool replace_env(string &);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class MetConfig
    //
@@ -306,8 +316,16 @@ if ( empty(name) )  {
 }
 
 DictionaryStack DS(*this);
+ConcatString temp_filename;
 
-bison_input_filename = name;
+temp_filename = make_temp_file_name("met_config", 0);
+
+recursive_envs(name, temp_filename);
+
+
+
+
+bison_input_filename = (const char *) temp_filename;
 
 dict_stack = &DS;
 
@@ -324,7 +342,7 @@ configdebug = (Debug ? 1 : 0);
 if ( (configin = met_fopen(bison_input_filename, "r")) == NULL )  {
 
    mlog << Error << "\nMetConfig::read(const char *) -> "
-        << "unable to open input file \"" << name << "\"\n\n";
+        << "unable to open input file \"" << bison_input_filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -380,6 +398,8 @@ Column     = 1;
 is_lhs     = true;
 
 set_exit_on_warning();
+
+unlink(temp_filename);
 
 return ( true );
 
@@ -482,6 +502,152 @@ return ( _e );
 ////////////////////////////////////////////////////////////////////////
 
 
+void recursive_envs(const char * infile, const char * outfile)
+
+{
+
+ifstream in;
+ofstream out;
+
+in.open(infile);
+
+if ( ! in )  {
+
+   mlog << Error
+        << "\n\n  recursive_envs() -> unable to open input file \""
+        << infile << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+out.open(outfile);
+
+
+if ( ! out )  {
+
+   mlog << Error
+        << "\n\n  recursive_envs() -> unable to open output file \""
+        << outfile << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+string line;
+
+while ( getline(in, line) )  {
+
+   recursive_envs(line);
+
+   out << line << '\n';
+
+}
+
+
+   //
+   //  done
+   //
+
+in.close();
+out.close();
+
+return;
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void recursive_envs(string & line)
+
+{
+
+while ( 1 )  {
+
+   if ( ! replace_env(line) )  break;
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool replace_env(string & line)
+
+{
+
+size_t pos1, pos2;
+string out;
+
+pos1 = line.find("${");
+
+if ( pos1 == string::npos )  return ( false );
+
+   //
+   //  replace the environment variable
+   //
+
+if ( (pos2 = line.find('}', pos1)) == string::npos )  {
+
+   mlog << Error
+   // cerr
+        << "replace_env(string &) -> can't closing brackent in string \""
+        << line << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+string env;
+char * env_value = 0;
+
+env = line.substr(pos1 + 2, pos2 - pos1 - 2);
+
+env_value = getenv(env.c_str());
+
+if ( ! env_value )  {
+
+   mlog << Error
+   // cerr
+        << "\n\n  replace_env() -> unable to get value for environment variable \""
+        << (env.c_str()) << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+out = line.substr(0, pos1);
+
+out += env_value;
+
+out += line.substr(pos2 + 1);
+
+
+// cout << "\n\n   out = \"" << (out.c_str()) << "\n\n" << flush;
+
+
+
+   //
+   //  done
+   //
+
+line = out;
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+
