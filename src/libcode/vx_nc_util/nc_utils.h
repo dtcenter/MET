@@ -121,6 +121,8 @@ static const char nc_var_unit[]         = "obs_unit";
 static const char nc_att_use_var_id[]   = "use_var_id";
 static const char nc_att_obs_version[]  = "MET_Obs_version";
 
+static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* since [0-9]\\{4\\}";
+
 static const char MET_NC_Obs_ver_1_2[]  = "1.02";
 static const char MET_NC_Obs_version[]  = "1.02";
 
@@ -348,6 +350,10 @@ extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
 extern unixtime get_reference_unixtime(ConcatString);
+
+extern bool is_nc_unit_time(const char *units);
+extern bool is_nc_unit_longitude(const char *units);
+extern bool is_nc_unit_latitude(const char *units);
 
 ////////////////////////////////////////////////////////////////////////
 
