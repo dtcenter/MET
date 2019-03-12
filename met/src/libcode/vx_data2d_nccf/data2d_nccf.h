@@ -35,6 +35,7 @@ class MetNcCFDataFile : public Met2dDataFile {
    private:
 
       void nccf_init_from_scratch();
+      NcVarInfo *find_first_data_var();
 
       MetNcCFDataFile(const MetNcCFDataFile &);
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
@@ -80,7 +81,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 
          //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, int offset=-1);
 
          //  retrieve all matching data planes
 

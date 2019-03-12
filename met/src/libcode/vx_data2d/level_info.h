@@ -29,7 +29,8 @@ enum LevelType
    LevelType_Vert,      // Vertical Level
    LevelType_Pres,      // Pressure Level
    LevelType_RecNumber, // GRIB version 1 Record Number
-   LevelType_SFC        // Surface
+   LevelType_SFC,       // Surface
+   LevelType_Time       // Time
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,6 +47,7 @@ class LevelInfo
 
       double Upper;         // Upper level limit
       double Lower;         // Lower level limit
+      double Increment;     // Increment (seconds for time, 0 for no increment)
 
       void init_from_scratch();
       void assign(const LevelInfo &);
@@ -72,6 +74,7 @@ class LevelInfo
       ConcatString units()    const;
       double       upper()       const;
       double       lower()       const;
+      double       increment()   const;
 
          //
          // set stuff
@@ -85,6 +88,7 @@ class LevelInfo
       void set_upper(double u);
       void set_lower(double l);
       void set_range(double l, double u);
+      void set_increment(double i);
 
 };
 
@@ -97,6 +101,7 @@ inline ConcatString LevelInfo::name()     const { return(Name);    }
 inline ConcatString LevelInfo::units()    const { return(Units);   }
 inline double       LevelInfo::upper()    const { return(Upper);   }
 inline double       LevelInfo::lower()    const { return(Lower);   }
+inline double       LevelInfo::increment()const { return(Increment);}
 
 ///////////////////////////////////////////////////////////////////////////////
 

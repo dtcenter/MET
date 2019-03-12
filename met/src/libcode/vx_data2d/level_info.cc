@@ -87,6 +87,7 @@ void LevelInfo::assign(const LevelInfo &l) {
    Units   = l.units();
    Upper   = l.upper();
    Lower   = l.lower();
+   Increment = l.increment();
 
    return;
 }
@@ -178,6 +179,13 @@ void LevelInfo::set_lower(double l) {
 void LevelInfo::set_range(double l, double u) {
    Lower = l;
    Upper = u;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void LevelInfo::set_increment(double i) {
+   Increment = i;
    return;
 }
 
