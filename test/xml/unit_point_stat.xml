@@ -21,7 +21,7 @@
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
-      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib {name="LAND";level="L0";}</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib {name=\"LAND\";level=\"L0\";}</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
       <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
@@ -100,7 +100,7 @@
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
-      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 {name="LAND";level="L0";}</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 {name=\"LAND\";level=\"L0\";}</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_NAM_NDAS</value></pair>
       <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012_gNam.grib2"</value></pair>
     </env>
@@ -129,7 +129,7 @@
     <env>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
-      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 {name="TMP";level="Z2";} &lt;280</value></pair>
+      <pair><name>MASK_POLY_FILE</name> <value>&DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 {name=\"TMP\";level=\"Z2\";} &lt;280</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB2_SREF_GDAS</value></pair>
       <pair><name>CLIMO_FILE</name>     <value></value></pair>
     </env>
