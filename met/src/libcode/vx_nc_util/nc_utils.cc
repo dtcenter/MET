@@ -3541,3 +3541,37 @@ unixtime get_reference_unixtime(ConcatString time_str) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool is_nc_unit_latitude(const char *units) {
+   bool axis_unit = (strcmp(units, "degrees_north") == 0 ||
+        strcmp(units, "degree_north") == 0 ||
+        strcmp(units, "degree_N") == 0 ||
+        strcmp(units, "degrees_N") == 0 ||
+        strcmp(units, "degreeN") == 0 ||
+        strcmp(units, "degreesN") == 0);
+   return axis_unit;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_unit_longitude(const char *units) {
+   bool axis_unit = (strcmp(units, "degrees_east") == 0 ||
+        strcmp(units, "degree_east") == 0 ||
+        strcmp(units, "degree_E") == 0 ||
+        strcmp(units, "degrees_E") == 0 ||
+        strcmp(units, "degreeE") == 0 ||
+        strcmp(units, "degreesE") == 0);
+   return axis_unit;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_nc_unit_time(const char *units) {
+   //bool time_unit = (strcmp(units, "T") == 0 ||
+   //     strcmp(units, "time") == 0 ||
+   //     strcmp(units, "Time") == 0) ||
+   //     check_reg_exp(nc_time_unit_exp, units);
+   return check_reg_exp(nc_time_unit_exp, units);
+}
+   
+////////////////////////////////////////////////////////////////////////
