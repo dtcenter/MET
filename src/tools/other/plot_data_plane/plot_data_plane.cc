@@ -108,43 +108,44 @@ int main(int argc, char * argv[])
    VarInfo * var_ptr = (VarInfo * ) 0;
    VarInfoFactory v_factory;
    DataPlane data_plane;
+   DataPlaneArray data_plane_array;
    Grid grid;
    GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
 
-      //
-      // set the default color table
-      //
+   //
+   // set the default color table
+   //
    ColorTableName << "MET_BASE/colortables/met_default.ctable";
 
-      //
-      // process the command line arguments
-      //
+   //
+   // process the command line arguments
+   //
    process_command_line(argc, argv);
 
-      //
-      // parse the config string
-      //
+   //
+   // parse the config string
+   //
    MetConfig config;
    config.read(replace_path(config_const_filename));
    config.read(replace_path(config_map_data_filename));
 
-      //
-      // get the field info from the command line
-      //
+   //
+   // get the field info from the command line
+   //
    config.read_string(FieldString);
 
-      //
-      // get the gridded file type from config string, if present
-      //
+   //
+   // get the gridded file type from config string, if present
+   //
    ftype = parse_conf_file_type(&config);
 
-      //
-      // instantiate the Met2dDataFile object using the data_2d_factory
-      // and the VarInfo object using the var_info_factory
-      //
+   //
+   // instantiate the Met2dDataFile object using the data_2d_factory
+   // and the VarInfo object using the var_info_factory
+   //
    mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
    met_ptr = m_factory.new_met_2d_data_file(InputFilename, ftype);
 
@@ -164,15 +165,23 @@ int main(int argc, char * argv[])
       exit (1);
    }
 
-      //
-      // populate the var_info object from the magic string
-      //
+   //
+   // populate the var_info object from the magic string
+   //
    var_ptr->set_dict(config);
 
-      //
-      // get the data plane from the file for this VarInfo object
-      //
-   status = met_ptr->data_plane(*var_ptr, data_plane);
+   //
+   // get the data plane from the file for this VarInfo object
+   //
+   //status = met_ptr->data_plane(*var_ptr, data_plane);
+   int plane_cnt = met_ptr->data_plane_array(*var_ptr, data_plane_array);
+   if (0 < plane_cnt) {
+      status = true;
+      data_plane = data_plane_array[0];
+      if (1 < plane_cnt)
+         mlog << Debug(1) << program_name << " plots the first data plane out of "
+              << plane_cnt << " data planes.\n";
+   }
 
    if ( ! status )
    {
@@ -181,28 +190,28 @@ int main(int argc, char * argv[])
       exit (1);
    }
 
-      //
-      // get the grid info from the Met2dDataFile object
-      //
+   //
+   // get the grid info from the Met2dDataFile object
+   //
    grid = met_ptr->grid();
 
-      //
-      // read in the color table file and scale the color table to fit
-      // the data
-      //
+   //
+   // read in the color table file and scale the color table to fit
+   // the data
+   //
    color_table.read(replace_path(ColorTableName));
 
    if (is_eq(color_table.data_min(bad_data_double), 0.0) &&
        is_eq(color_table.data_max(bad_data_double), 1.0))
    {
-         //
-         // Need to rescale. First get the min and max values of the data.
-         //
+      //
+      // Need to rescale. First get the min and max values of the data.
+      //
       data_plane.data_range(data_min, data_max);
 
-         //
-         // Next check if the user has given a data range to use.
-         //
+      //
+      // Next check if the user has given a data range to use.
+      //
       if (!is_eq(PlotRangeMin, 0.0) || !is_eq(PlotRangeMax, 0.0))
       {
          data_min = PlotRangeMin;
@@ -212,16 +221,16 @@ int main(int argc, char * argv[])
       color_table.rescale(data_min, data_max, bad_data_double);
    }
 
-      //
-      // plot the image
-      //
+   //
+   // plot the image
+   //
    mlog << Debug(1)  << "Creating postscript file: " << OutputFilename << "\n";
    data_plane_plot(InputFilename, OutputFilename, grid, TitleString,
                    color_table, &config, data_plane);
 
-      //
-      // done
-      //
+   //
+   // done
+   //
 
 #ifdef  WITH_PYTHON
    GP.finalize();
@@ -239,53 +248,53 @@ void process_command_line(int argc, char **argv)
 {
    CommandLine cline;
 
-      //
-      // check for zero arguments
-      //
+   //
+   // check for zero arguments
+   //
    if (argc == 1)
       usage();
 
-      //
-      // parse the command line into tokens
-      //
+   //
+   // parse the command line into tokens
+   //
    cline.set(argc, argv);
 
-      //
-      // allow for negative numbers on the command line
-      // which may be used for the -plot_range option.
-      //
+   //
+   // allow for negative numbers on the command line
+   // which may be used for the -plot_range option.
+   //
    cline.allow_numbers();
 
-      //
-      // set the usage function
-      //
+   //
+   // set the usage function
+   //
    cline.set_usage(usage);
 
-      //
-      // add the options function calls
-      //
+   //
+   // add the options function calls
+   //
    cline.add(set_colortable_name, "-color_table", 1);
    cline.add(set_plot_range, "-plot_range", 2);
    cline.add(set_title_string, "-title", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
 
-      //
-      // parse the command line
-      //
+   //
+   // parse the command line
+   //
    cline.parse();
 
-      //
-      // Check for error. There should be three arguments left:
-      // the input filename, the output filename, and the magic
-      // string.
-      //
+   //
+   // Check for error. There should be three arguments left:
+   // the input filename, the output filename, and the magic
+   // string.
+   //
    if (cline.n() != 3)
       usage();
 
-      //
-      // store the filenames and magic string.
-      //
+   //
+   // store the filenames and magic string.
+   //
    InputFilename  = cline[0];
    OutputFilename = cline[1];
    FieldString    = cline[2];

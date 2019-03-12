@@ -73,6 +73,8 @@ class NcCfFile {
         return GET_NC_SIZE_P(_yDim);
       }
       
+      NcVarInfo *get_time_var_info() const { return _time_var_info; }
+      
          //
          //  time
          //
@@ -136,6 +138,7 @@ class NcCfFile {
 
       NcVar *_xCoordVar;
       NcVar *_yCoordVar;
+      NcVarInfo *_time_var_info;
       
       void init_from_scratch();
 

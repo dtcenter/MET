@@ -1,5 +1,4 @@
 
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -52,10 +51,6 @@ static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name);
-static bool is_time_unit(const ConcatString units);
-static bool is_longitude_unit(const ConcatString units);
-static bool is_latitude_unit(const ConcatString units);
-
 
 #define USE_BUFFER  1
 
@@ -96,6 +91,7 @@ void NcCfFile::init_from_scratch()
   _ncFile = (NcFile *) 0;
   _dims = (NcDim **) 0;
   Var = (NcVarInfo *) 0;
+  _time_var_info = (NcVarInfo *)NULL;
 
   // Close any existing file
 
@@ -228,15 +224,28 @@ bool NcCfFile::open(const char * filepath)
     if (get_nc_att(Var[j].var, "axis", att_value)) {
       if (strcmp("T", att_value) == 0 || strcmp("time", att_value) == 0) {
         valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
       }
     }
     if (get_nc_att(Var[j].var, "standard_name", att_value)) {
       if (strcmp("time", att_value) == 0) {
         valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
       }
     }
     if ((strcmp(Var[j].name, "time") == 0) && (valid_time_var == 0)) {
       valid_time_var = Var[j].var;
+      _time_var_info = &Var[j];
+    }
+  }   //  for j
+
+  if (NULL == _time_var_info) {
+    for (int j=0; j<Nvars; ++j)  {
+      if (is_nc_unit_time(Var[j].units_att)) {
+        valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
+        break;
+      }
     }
   }   //  for j
 
@@ -738,9 +747,11 @@ int NcCfFile::lead_time() const
 
 double NcCfFile::getData(NcVar * var, const LongArray & a) const
 {
+  static const string method_name
+      = "NcCfFile::getData(NcVar *, const LongArray &) -> ";
   if (!args_ok(a))
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad arguments:\n";
     a.dump(cerr);
     exit(1);
@@ -749,7 +760,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   int dim_count = get_dim_count(var);
   if (dim_count != a.n_elements())
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\n" << method_name
          << "needed " << (dim_count) << " arguments for variable "
          << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
@@ -757,24 +768,29 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   if (dim_count >= max_met_args)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\n" << method_name
          << "too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
     exit(1);
   }
 
+  for (int k=0; k<dim_count; k++) {
+    int dim_size = var->getDim(k).getSize();
+    if (dim_size < a[k]) {
+      unixtime ut_ref;
+      int sec_per_unit = 0;
+      unixtime ut_dim = a[k];
+      if (dim_size < a[k]) {
+        mlog << Error << "\n" << method_name
+             << "offset (" << a[k] << ") at " << k
+             << "th dimension (" << long(dim_size) << ") is too big for variable \""
+             << GET_NC_NAME_P(var) << "\"\n\n";
+        exit ( 1 );
+      }
+    }
+  }
+
   bool status;
   double d;
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
-  if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
-  
   double missing_value = get_var_missing_value(var);
   double fill_value    = get_var_fill_value(var);
 
@@ -815,19 +831,17 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
     default:
     {
-      mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
-           << "bad type [" << GET_NC_TYPE_NAME_P(var) << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
+      mlog << Error << "\n" << method_name
+           << "bad type [" << GET_NC_TYPE_NAME_P(var)
+           << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit(1);
       break;
     }
   }   //  switch
-  if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
-    d = d * scale_factor + add_offset;
-  }
 
   if (!status)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad status for var->get()\n\n";
     exit(1);
   }
@@ -840,12 +854,17 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
 ////////////////////////////////////////////////////////////////////////
 
-
+// Update unix_time to offset of the time variables to a variable
 bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 {
+  static const string method_name_short
+      = "NcCfFile::getData(NcVar*, LongArray&, DataPlane&) ";
+  static const string method_name
+      = "NcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> ";
+    
   if (!args_ok(a))
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad arguments:\n";
     a.dump(cerr);
     exit(1);
@@ -854,7 +873,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   int dim_count = get_dim_count(v);
   if (dim_count != a.n_elements())
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) -> "
+    mlog << Error << "\n" << method_name
          << "needed " << (dim_count) << " arguments for variable "
          << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
@@ -862,7 +881,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (dim_count >= max_met_args)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) -> "
+    mlog << Error << "\n" << method_name
          << "too may arguments for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
     exit(1);
   }
@@ -884,7 +903,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (!found)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\n" << method_name
          << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
     exit(1);
   }
@@ -901,7 +920,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
       if ((j != var->x_slot) && (j != var->y_slot))
       {
-        mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
+        mlog << Error << "\n" << method_name
              << "star found in bad slot\n\n";
         exit(1);
       }
@@ -910,7 +929,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (count != 2)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad star count ... " << count << "\n\n";
     exit(1);
   }
@@ -922,7 +941,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (x_slot < 0 || y_slot < 0)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad x|y|z slot\n\n";
     exit(1);
   }
@@ -945,7 +964,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   int y_offset;
   bool swap_to_north = grid.get_swap_to_north();
   if (swap_to_north) {
-    mlog << Debug(2) << "NcCfFile::getData -> data was flipped to north.\n";
+    mlog << Debug(2) << "\n" << method_name << "data was flipped to north.\n";
   }
 
   //  get the data
@@ -954,11 +973,25 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   float  f[nx];
   double d[nx];
 
+  size_t dim_size;
   long offsets[dim_count];
   long lengths[dim_count];
   for (int k=0; k<dim_count; k++) {
     offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
     lengths[k] = 1;
+    dim_size = v->getDim(k).getSize();
+    if (dim_size < offsets[k]) {
+      unixtime ut_ref;
+      int sec_per_unit = 0;
+      unixtime ut_dim = offsets[k];
+      if (dim_size < offsets[k]) {
+        mlog << Error << "\n" << method_name
+             << "offset (" << offsets[k] << ") at " << k
+             << "th dimension (" << long(dim_size) << ") is too big for variable \""
+             << GET_NC_NAME_P(v) << "\"\n\n";
+        exit ( 1 );
+      }
+    }
   }
 
   offsets[x_slot] = 0;
@@ -1006,8 +1039,9 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         break;
 
       default:
-        mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
-             << " bad type [" << GET_NC_TYPE_NAME_P(v) << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+        mlog << Error << "\n" << method_name
+             << " bad type [" << GET_NC_TYPE_NAME_P(v)
+             << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
         exit ( 1 );
         break;
 
@@ -1035,7 +1069,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   }   //  for x
 
   //  done
-
   return true;
 }
 
@@ -1683,7 +1716,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
 
     // See if this is a lat or lon dimension
 
-    if (is_latitude_unit(dim_units))
+    if (is_nc_unit_latitude(dim_units))
     {
       if (_yDim == 0)
       {
@@ -1707,7 +1740,7 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
       }
     }
 
-    if (is_longitude_unit(dim_units))
+    if (is_nc_unit_longitude(dim_units))
     {
       if (_xDim == 0)
       {
@@ -2515,11 +2548,11 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       for (int cIdx = 0; cIdx<count; cIdx++) {
         if (strcmp(Var[var_num].name, sa[cIdx]) == 0) {
           if (get_nc_att(Var[var_num].var, "units", units_value)) {
-            if (is_latitude_unit(units_value)) {
+            if (is_nc_unit_latitude(units_value)) {
               y_dim_var_name = sa[cIdx];
               is_y_dim_var = true;
             }
-            else if (is_longitude_unit(units_value)) {
+            else if (is_nc_unit_longitude(units_value)) {
               x_dim_var_name = sa[cIdx];
               is_x_dim_var = true;
             }
@@ -2742,7 +2775,7 @@ bool NcCfFile::get_grid_from_dimensions()
     //dim_units = dim_units_str.c_str();
     // See if this is a lat or lon dimension
 
-    if (is_latitude_unit(dim_units))
+    if (is_nc_unit_latitude(dim_units))
     {
       if (_yDim == 0)
       {
@@ -2771,7 +2804,7 @@ bool NcCfFile::get_grid_from_dimensions()
              << GET_NC_NAME_P(_yCoordVar) << "\".\n\n";
       }
     }
-    else if (is_longitude_unit(dim_units))
+    else if (is_nc_unit_longitude(dim_units))
     {
       if (_xDim == 0)
       {
@@ -2927,39 +2960,6 @@ bool NcCfFile::get_grid_from_dimensions()
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_time_unit(const ConcatString units) {
-   bool axis_unit = (strcmp(units, "T") == 0 ||
-        strcmp(units, "time") == 0 ||
-        strcmp(units, "Time") == 0);
-   return axis_unit;
-}
-   
-////////////////////////////////////////////////////////////////////////
-
-bool is_longitude_unit(const ConcatString units) {
-   bool axis_unit = (strcmp(units, "degrees_east") == 0 ||
-        strcmp(units, "degree_east") == 0 ||
-        strcmp(units, "degree_E") == 0 ||
-        strcmp(units, "degrees_E") == 0 ||
-        strcmp(units, "degreeE") == 0 ||
-        strcmp(units, "degreesE") == 0);
-   return axis_unit;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool is_latitude_unit(const ConcatString units) {
-   bool axis_unit = (strcmp(units, "degrees_north") == 0 ||
-        strcmp(units, "degree_north") == 0 ||
-        strcmp(units, "degree_N") == 0 ||
-        strcmp(units, "degrees_N") == 0 ||
-        strcmp(units, "degreeN") == 0 ||
-        strcmp(units, "degreesN") == 0);
-   return axis_unit;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 
 void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) {
 
@@ -2968,7 +2968,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
 
    // Check for expected time string format:
    //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
-   if(!check_reg_exp("^[a-z|A-Z]* since [0-9]\\{4\\}" , str)) {
+   if(!check_reg_exp(nc_time_unit_exp , str)) {
       mlog << Warning << "\nparse_cf_time_string() -> "
            << "unexpected NetCDF CF convention time unit \""
            << str << "\"\n\n";

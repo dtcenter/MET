@@ -141,6 +141,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
    char *ptr2 = 0;
    char *ptr3 = 0;
    char *save_ptr = 0;
+   const char *method_name = "VarInfoNcCF::set_magic() -> ";
 
    // Validate the magic string
    VarInfo::set_magic(nstr, lstr);
@@ -191,7 +192,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                // Check if a range has already been supplied
                if (Dimension.has(range_flag))
                {
-                  mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+                  mlog << Error << "\n" << method_name
                        << "only one dimension can have a range for NetCDF variable \""
                        << MagicStr << "\".\n\n";
                   exit(1);
@@ -207,10 +208,51 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   Level.set_type(LevelType_Pres);
                }
             }
+            // Check for a range of times
+            else if ((ptr3 = strchr(ptr2, ':')) != NULL) {
+               // Check if a range has already been supplied
+               if (Dimension.has(range_flag))
+               {
+                  mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+                       << "only one dimension can have a range for NetCDF variable \""
+                       << MagicStr << "\".\n\n";
+                  exit(1);
+               }
+               else
+               {
+                  int increment = 0;
+                  // Store the dimension of the range and limits
+                  *ptr3++ = 0;
+                  char *ptr_inc = strchr(ptr3, ':');
+                  if (ptr_inc != NULL) *ptr_inc++ = 0;
+                  mlog << Debug(7) << method_name
+                       << " start: " << ptr2 << ", end: " << ptr3 << "\n";
+                  unixtime time_lower = timestring_to_unix(ptr2);
+                  unixtime time_upper = timestring_to_unix(ptr3);
+                  if (ptr_inc != NULL) {
+                     increment = timestring_to_sec(ptr_inc);
+                     mlog << Debug(7) << method_name
+                          << " increment: " << ptr_inc << " to "
+                          << increment << " seconds.\n";
+                  }
+                  
+                  Dimension.add(range_flag);
+                  Level.set_lower(time_lower);
+                  Level.set_upper(time_upper);
+                  Level.set_increment(increment);
+
+                  // Assume time level type for a range of levels
+                  Level.set_type(LevelType_Time);
+               }
+            }
             else
             {
                // Single level
-               Dimension.add(atoi(ptr2));
+               int level = atoi(ptr2);
+               int unix_time = timestring_to_unix(ptr2);
+               // Put unix time (from yyyymmdd_hhmmss)
+               if (unix_time > 0) level = unix_time;
+               Dimension.add(level);
             }
          }
 
