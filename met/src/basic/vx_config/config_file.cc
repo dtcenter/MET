@@ -586,6 +586,21 @@ bool replace_env(string & line)
 size_t pos1, pos2;
 string out;
 
+   //
+   //  eliminate any trailing C++-style comments
+   //
+
+if ( (pos1 = line.find("//")) != string::npos )  {
+
+   line.erase(pos1);
+
+}
+
+
+   //
+   //  look for environment variables
+   //
+
 pos1 = line.find("${");
 
 if ( pos1 == string::npos )  return ( false );
