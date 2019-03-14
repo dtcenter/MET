@@ -1,5 +1,10 @@
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+static const bool verbose = true;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -110,6 +115,8 @@ static const int n_fort_thresh_strings = sizeof(fort_thresh_string)/sizeof(*fort
 static bool reading_env    = false;
 
 static bool reading_comment = false;
+
+static bool need_number     = false;
 
 // static unsigned char * file_buffer = 0;
 
@@ -252,7 +259,9 @@ switch ( c )  {
    case ')':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
 
    case '+':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
-   case '-':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
+
+   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } }  break;
+
    case '*':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
    case '^':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }  break;
 
@@ -291,11 +300,11 @@ if ( c == '/' )  {
 
 c2 = nextchar();
 
-     if ( strncmp(configtext, "<=", 2) == 0 )  return ( do_comp() );
-else if ( strncmp(configtext, ">=", 2) == 0 )  return ( do_comp() );
-else if ( strncmp(configtext, "==", 2) == 0 )  return ( do_comp() );
+     if ( strncmp(configtext, "<=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
+else if ( strncmp(configtext, ">=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
+else if ( strncmp(configtext, "==", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
 
-else if ( strncmp(configtext, "!=", 2) == 0 )  return ( do_comp() );
+else if ( strncmp(configtext, "!=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
 else if ( strncmp(configtext, "NA", 2) == 0 )  return ( do_comp() );
 
 else if ( strncmp(configtext, "&&", 2) == 0 )  { Column += 2;  return ( LOGICAL_OP_AND ); }
@@ -308,10 +317,11 @@ else {
 }
 
 
-if ( strncmp(configtext, "<" , 1) == 0 )  return ( do_comp() );
-if ( strncmp(configtext, ">" , 1) == 0 )  return ( do_comp() );
+if ( strncmp(configtext, "<" , 1) == 0 )  { need_number = true;  return ( do_comp() ); }
+if ( strncmp(configtext, ">" , 1) == 0 )  { need_number = true;  return ( do_comp() ); }
 if ( strncmp(configtext, "=" , 1) == 0 )  return ( token( '=' ) );
 if ( strncmp(configtext, "!" , 1) == 0 )  return ( token( LOGICAL_OP_NOT ) );
+
 
 // putback(configtext[0]);
 
@@ -614,6 +624,8 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
 
 strncpy(configlval.text, configtext, sizeof(configlval.text) - 1);
 
+need_number = false;
+
 return ( IDENTIFIER );
 
 }
@@ -632,6 +644,7 @@ configlval.nval.i = atoi(configtext);
 
 configlval.nval.is_int = true;
 
+need_number = false;
 
 
 return ( 1 );
@@ -652,6 +665,7 @@ configlval.nval.d = atof(configtext);
 
 configlval.nval.is_int = false;
 
+need_number = false;
 
 
 return ( true );
@@ -1064,6 +1078,8 @@ return ( t );
 int do_comp()
 
 {
+
+// if ( verbose )  cout << "\n\n   ... in do_comp()\n\n" << flush;
 
 int return_value;
 
