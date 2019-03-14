@@ -107,7 +107,7 @@
       <pair><name>MERGE_FLAG</name>     <value>THRESH</value></pair>
       <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
       <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
-      <pair><name>MASK_POLY</name>      <value>MET_BASE/poly/NWC.poly</value></pair>
+      <pair><name>MASK_POLY</name>      <value>"MET_BASE/poly/NWC.poly"</value></pair>
       <pair><name>POLY_FLAG</name>      <value>BOTH</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>MASK_POLY</value></pair>
     </env>
@@ -147,6 +147,11 @@
   <test name="mode_QUILT">
     <exec>&MET_BIN;/mode</exec>
     <env>
+      <pair><name>MERGE_FLAG</name>     <value>THRESH</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>"MET_BASE/poly/NWC.poly"</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>BOTH</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>QUILT</value></pair>
     </env>
     <param> \

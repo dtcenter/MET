@@ -94,7 +94,7 @@ max_centroid_dist = 800.0/grid_res;
 mask = {
    grid      = "";
    grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-   poly      = "${MASK_POLY}";
+   poly      = ${MASK_POLY};
    poly_flag = ${POLY_FLAG}; // Apply to NONE, FCST, OBS, or BOTH
 }
 
