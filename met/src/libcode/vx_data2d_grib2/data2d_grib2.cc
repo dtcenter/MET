@@ -680,7 +680,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
          //  parse the time reference indicator (Table 1.2)
          switch( gfld->idsect[4] ){
-            case 0:     rec->ValidTime = ref_time;      break;      //  Analysis
+            case 0:                                                 //  Analysis: interpret as the
+                                                                    //  model initialization time
             case 1:     rec->InitTime  = ref_time;      break;      //  Start of Forecast
             case 2:     rec->ValidTime = ref_time;      break;      //  Verifying Time of Forecast
             case 3:     rec->ValidTime = ref_time;      break;      //  Observation Time
