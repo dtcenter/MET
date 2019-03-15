@@ -36,15 +36,17 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       void nccf_init_from_scratch();
       NcVarInfo *find_first_data_var();
+      long get_time_offset(long time_dim_value);
 
       MetNcCFDataFile(const MetNcCFDataFile &);
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
 
-         //
-         //  NetCDF file
-         //
+      //
+      //  NetCDF file
+      //
       
       NcCfFile * _file;    //  allocated
+      long time_dim_offset; // current time offset to get the data plane
 
    public:
 
@@ -53,48 +55,48 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       virtual int nx() const
       {
-	if (_file == 0)
-	  return 0;
-	
-	return _file->getNx();
+         if (_file == 0)
+            return 0;
+    
+         return _file->getNx();
       }
       
 
       virtual int ny() const
       {
-	if (_file == 0)
-	  return 0;
-	
-	return _file->getNy();
+         if (_file == 0)
+            return 0;
+    
+         return _file->getNy();
       }
       
 
-         //
-         //  set stuff
-         //
+      //
+      //  set stuff
+      //
 
-         //
-         //  get stuff
-         //
+      //
+      //  get stuff
+      //
 
       GrdFileType file_type() const;
 
-         //  retrieve the first matching data plane
+      //  retrieve the first matching data plane
 
-      bool data_plane(VarInfo &, DataPlane &, int offset=-1);
+      bool data_plane(VarInfo &, DataPlane &);
 
-         //  retrieve all matching data planes
+      //  retrieve all matching data planes
 
       int data_plane_array(VarInfo &, DataPlaneArray &);
 
-         //  retrieve the index of the first matching record
+      //  retrieve the index of the first matching record
 
       int index(VarInfo &);
 
 
-         //
-         //  do stuff
-         //
+      //
+      //  do stuff
+      //
 
       bool open  (const char * filename);
 

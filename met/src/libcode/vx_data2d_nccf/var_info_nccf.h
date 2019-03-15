@@ -27,9 +27,9 @@ class VarInfoNcCF : public VarInfo
 {
    private:
 
-         //
-         // NetCDF-specific parameters
-         //
+      //
+      // NetCDF-specific parameters
+      //
 
       LongArray Dimension; // Dimension values for extracting 2D field
 
@@ -45,27 +45,27 @@ class VarInfoNcCF : public VarInfo
       void dump(ostream &) const;
       void clear();
 
-         //
-         // get stuff
-         //
+      //
+      // get stuff
+      //
 
       GrdFileType file_type()             const;
       const       LongArray & dimension() const;
       int         dimension(int i)        const;
       int         n_dimension()           const;
 
-         //
-         // set stuff
-         //
+      //
+      // set stuff
+      //
 
       void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &s);
 
       void add_dimension(int dim);
 
-         //
-         // do stuff
-         //
+      //
+      // do stuff
+      //
 
       bool is_precipitation()     const;
       bool is_specific_humidity() const;

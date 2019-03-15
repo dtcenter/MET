@@ -88,6 +88,7 @@ void LevelInfo::assign(const LevelInfo &l) {
    Upper   = l.upper();
    Lower   = l.lower();
    Increment = l.increment();
+   as_offset = l.is_as_offset();
 
    return;
 }
@@ -104,6 +105,8 @@ void LevelInfo::clear() {
    Units.clear();
    Upper  = 0.0;
    Lower  = 0.0;
+   Increment = 0.0;
+   as_offset = true;
 
    return;
 }
@@ -114,13 +117,13 @@ void LevelInfo::dump(ostream &out) const {
 
    // Dump out the contents
    out << "LevelInfo::dump():\n"
-       << "  Type    = " << leveltype_to_string(Type) << "\n"
-       << "  TypeNum = " << TypeNum << "\n"
-       << "  ReqName = " << ReqName.contents() << "\n"
-       << "  Name    = " << Name.contents() << "\n"
-       << "  Units   = " << Units.contents() << "\n"
-       << "  Upper   = " << Upper << "\n"
-       << "  Lower   = " << Lower << "\n";
+       << "  Type      = " << leveltype_to_string(Type) << "\n"
+       << "  TypeNum   = " << TypeNum << "\n"
+       << "  ReqName   = " << ReqName.contents() << "\n"
+       << "  Name      = " << Name.contents() << "\n"
+       << "  Units     = " << Units.contents() << "\n"
+       << "  Upper     = " << Upper << "\n"
+       << "  Increment = " << Increment << "\n";
 
    return;
 }
@@ -186,6 +189,13 @@ void LevelInfo::set_range(double l, double u) {
 
 void LevelInfo::set_increment(double i) {
    Increment = i;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void LevelInfo::set_as_offset(bool b) {
+   as_offset = b;
    return;
 }
 

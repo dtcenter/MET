@@ -227,12 +227,17 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   if (ptr_inc != NULL) *ptr_inc++ = 0;
                   mlog << Debug(7) << method_name
                        << " start: " << ptr2 << ", end: " << ptr3 << "\n";
-                  unixtime time_lower = timestring_to_unix(ptr2);
-                  unixtime time_upper = timestring_to_unix(ptr3);
+                       
+                  bool datestring_start = is_datestring(ptr2);
+                  bool datestring_end   = is_datestring(ptr3);
+                  unixtime time_lower = datestring_start
+                      ? timestring_to_unix(ptr2) : atoi(ptr2);
+                  unixtime time_upper = datestring_end
+                      ? timestring_to_unix(ptr3) : atoi(ptr3);
                   if (ptr_inc != NULL) {
                      increment = timestring_to_sec(ptr_inc);
                      mlog << Debug(7) << method_name
-                          << " increment: " << ptr_inc << " to "
+                          << " increment: \"" << ptr_inc << "\" to "
                           << increment << " seconds.\n";
                   }
                   
@@ -243,15 +248,22 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
 
                   // Assume time level type for a range of levels
                   Level.set_type(LevelType_Time);
+                  if (datestring_end && datestring_start)
+                    Level.set_as_offset(false);
                }
             }
             else
             {
                // Single level
                int level = atoi(ptr2);
-               int unix_time = timestring_to_unix(ptr2);
-               // Put unix time (from yyyymmdd_hhmmss)
-               if (unix_time > 0) level = unix_time;
+               if (is_datestring(ptr2)) {
+                  unixtime unix_time = timestring_to_unix(ptr2);
+                  // Put unix time (from yyyymmdd[_hhmmss])
+                  //if (unix_time > 0) {
+                    level = unix_time;
+                  //}
+                  Level.set_as_offset(false);;
+               }
                Dimension.add(level);
             }
          }
