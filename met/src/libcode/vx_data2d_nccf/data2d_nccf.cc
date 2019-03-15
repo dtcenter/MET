@@ -150,21 +150,6 @@ void MetNcCFDataFile::dump(ostream & out, int depth) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-long MetNcCFDataFile::get_time_offset(long time_dim_value) {
-   long cur_time_offset = time_dim_offset;
-   int dim_size = _file->ValidTime.n_elements();
-   if (0 > cur_time_offset || cur_time_offset >= dim_size) {
-      if (time_dim_value >= dim_size) {
-         for (int idx=0; idx<dim_size; idx++) {
-            if (_file->ValidTime[idx] == time_dim_value) {
-               cur_time_offset = idx;
-               break;
-            }
-         }
-      }
-   }
-   return cur_time_offset;
-}
 
 bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
@@ -195,7 +180,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
     int time_dim_slot = data_var->t_slot;
     if (0 <= time_dim_slot) {
       long time_offset = dimension[time_dim_slot];
-      if (!vinfo_nc->level().is_as_offset()) {
+      if (!vinfo_nc->level().is_as_offset() || (time_offset == vx_data2d_star)) {
         time_offset = get_time_offset(time_offset);
         if ((0 <= time_offset) && (time_offset < time_cnt))
           dimension[time_dim_slot] = time_offset;
@@ -503,3 +488,24 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 
    return 0;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+long MetNcCFDataFile::get_time_offset(long time_dim_value) {
+   long cur_time_offset = time_dim_offset;
+   int dim_size = _file->ValidTime.n_elements();
+   if ((time_dim_value != vx_data2d_star) &&
+       (0 > cur_time_offset || cur_time_offset >= dim_size)) {
+      if (time_dim_value >= dim_size) {
+         for (int idx=0; idx<dim_size; idx++) {
+            if (_file->ValidTime[idx] == time_dim_value) {
+               cur_time_offset = idx;
+               break;
+            }
+         }
+      }
+   }
+   return cur_time_offset;
+}
+
+////////////////////////////////////////////////////////////////////////
