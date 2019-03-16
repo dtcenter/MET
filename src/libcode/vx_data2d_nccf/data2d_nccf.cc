@@ -23,12 +23,15 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int error_code_no_error          = 0;
-static const int error_code_no_time_dim       = 1;
-static const int error_code_no_matching_times = 2;
-static const int error_code_empty_times       = 3;
-static const int error_code_bad_increment     = 4;
-static const int error_code_no_start_time     = 5;
+static const int error_code_no_error                = 0;
+static const int error_code_no_time_dim             = 1;
+static const int error_code_missing_time_value      = 2;
+static const int error_code_missing_time_values     = 3;
+static const int error_code_missing_time_offsets    = 4;
+static const int error_code_empty_times             = 5;
+static const int error_code_bad_increment           = 6;
+static const int error_code_bad_offset              = 7;
+static const int error_code_unknown                 = 999;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -74,7 +77,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
    _file  = (NcCfFile *) 0;
-   time_dim_offset = -1;
+   _time_dim_offset = -1;
 
    close();
 
@@ -180,8 +183,11 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
     int time_dim_slot = data_var->t_slot;
     if (0 <= time_dim_slot) {
       long time_offset = dimension[time_dim_slot];
-      if (!vinfo_nc->level().is_as_offset() || (time_offset == vx_data2d_star)) {
-        time_offset = get_time_offset(time_offset);
+      bool time_as_value = !vinfo_nc->level().is_as_offset();
+      if (time_as_value || (time_offset == range_flag) || (time_offset == vx_data2d_star)) {
+        time_offset = _time_dim_offset;
+        if (time_as_value && time_as_value >= time_cnt)
+          time_offset = get_time_offset(_time_dim_offset);
         if ((0 <= time_offset) && (time_offset < time_cnt))
           dimension[time_dim_slot] = time_offset;
         else {
@@ -286,9 +292,6 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
                                       DataPlaneArray &plane_array) {
    int n_rec = 0;
    bool status = false;
-   int error_code = error_code_no_error;
-   double time_lower = bad_data_double;
-   double time_upper = bad_data_double;
    VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
    static const string method_name_short
          = "MetNcCFDataFile::data_plane_array() -> ";
@@ -308,103 +311,120 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    if (NULL == info) return(n_rec);
    
    DataPlane plane;
+   bool not_found = true;
+   double time_lower = bad_data_double;
+   double time_upper = bad_data_double;
+   int error_code = error_code_no_error;
    int time_dim_slot = info->t_slot;
    int time_dim_size = _file->ValidTime.n_elements();
-   LongArray dimension = vinfo_nc->dimension();
    LevelInfo level = vinfo.level();
-   bool is_time_levels = (level.type() == LevelType_Time);
-   if ((0 >= time_dim_size) || (0 > time_dim_slot)){
-      // Does not have time dimension
-      if (is_time_levels) {
-         error_code = error_code_no_time_dim;
+   LongArray dimension = vinfo_nc->dimension();
+   bool is_time_range = (level.type() == LevelType_Time);
+   bool time_as_value = !level.is_as_offset();
+   
+   long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
+   long time_value = (time_as_value ? dim_offset : -1);
+   bool include_all_times = (dim_offset == vx_data2d_star);
+
+   if ((0 >= time_dim_size) || (0 > time_dim_slot)
+       || (!is_time_range && !include_all_times)) {
+      // Does not have time dimension OR range was not given
+      if ((0 < time_dim_size) && (0 <= time_dim_slot)) {
+         _time_dim_offset = -1; //reset _time_dim_offset
+         if (time_as_value) {
+            // Contains single yyyymmdd instead of time offset.
+            error_code = error_code_missing_time_value;
+            for (int idx=0; idx<time_dim_size; idx++) {
+               if (_file->ValidTime[idx] == time_value) {
+                  _time_dim_offset = idx;
+                  error_code = error_code_no_error;
+                  break;
+               }
+            }
+         }
+         else if (dim_offset >= time_dim_size || dim_offset < 0) {       
+            error_code = error_code_bad_offset;
+         }
       }
-      else if(data_plane(vinfo, plane)) {
-         plane_array.add(plane, bad_data_double, bad_data_double);
-         n_rec = 1;
+      if (error_code == error_code_no_error) {
+         if (data_plane(vinfo, plane)) {
+            //error_code = error_code_no_error;
+            plane_array.add(plane, bad_data_double, bad_data_double);
+            n_rec = 1;
+         }
       }
    }
-   else {
+   else {   // has time dim and requested range of times
       int idx;
       LongArray time_offsets;
       TimeArray missing_times;
-      int dim_offset = dimension[time_dim_slot];
-      bool time_as_value = !level.is_as_offset();
-      bool include_all_times = (dim_offset == vx_data2d_star);
-      if (include_all_times || time_as_value) {
-         bool not_found = true;
-         if (include_all_times) {
+      if (include_all_times) {
+         for (idx=0; idx<time_dim_size; idx++) {
+            time_offsets.add(idx);
+         }
+      }
+      else if (is_time_range) {
+         time_lower = level.lower();
+         time_upper = level.upper();
+         int next_offset = -1;
+         double time_inc = level.increment();
+         if (time_as_value) {
+            // Find the start offset.
             for (idx=0; idx<time_dim_size; idx++) {
+               if (_file->ValidTime[idx] < time_lower) continue;
+               next_offset = idx;
+               if (_file->ValidTime[idx] == time_lower) {
+                  time_offsets.add(idx);
+                  next_offset++;
+                  //not_found = false;
+               }
+               break;
+            }
+            //if (not_found) missing_times.add(time_lower);
+            
+            if (0 > next_offset) error_code = error_code_missing_time_values;
+            else if (0 > time_inc) error_code = error_code_bad_increment;
+            else if (0 == time_inc) {   // no increment configuration
+               for (idx=next_offset; idx<time_dim_size; idx++) {
+                  if (_file->ValidTime[idx] > time_upper) break;
+                  time_offsets.add(idx);
+               }
+            }
+            else {
+               long next_time;
+               next_time = time_lower + time_inc;
+               for (idx=next_offset; idx<time_dim_size; idx++) {
+                  if (_file->ValidTime[idx] > time_upper) break;
+                  else if (_file->ValidTime[idx] < next_time) continue;
+                  else if (_file->ValidTime[idx] == next_time) {
+                     time_offsets.add(idx);
+                     next_time += time_inc;
+                  }
+                  else { // next_time < _file->ValidTime[idx]
+                     while (next_time < _file->ValidTime[idx]) {
+                        missing_times.add(next_time);
+                        next_time += time_inc;
+                     }
+                     if (_file->ValidTime[idx] == next_time) {
+                        time_offsets.add(idx);
+                        next_time += time_inc;
+                     }
+                  }
+                  if (next_time > time_upper) break;
+               }
+            }
+         }
+         else if (time_lower < time_dim_size) {
+            int inc_offset = (time_inc <= 0) ? 1 : time_inc;
+            int max_time_offset = time_upper;
+            if (max_time_offset == time_dim_size) missing_times.add(time_dim_size);
+            else if (max_time_offset > time_dim_size) {
+               for (idx=time_dim_size; idx<=max_time_offset; idx++)
+                  missing_times.add(idx);
+            }
+            for (idx=time_lower; idx<max_time_offset; idx+=inc_offset) {
                time_offsets.add(idx);
             }
-         }
-         else if (!level.is_as_offset()) {
-            if (is_time_levels) {
-               int next_offset = -1;
-               double time_inc = level.increment();
-               
-               time_lower = level.lower();
-               time_upper = level.upper();
-               
-               // Find the start offset.
-               for (idx=0; idx<time_dim_size; idx++) {
-                  if (_file->ValidTime[idx] < time_lower) continue;
-                  next_offset = idx;
-                  if (_file->ValidTime[idx] == time_lower) {
-                     time_offsets.add(idx);
-                     next_offset++;
-                     not_found = false;
-                  }
-                  break;
-               }
-               if (not_found) missing_times.add(time_lower);
-               
-               if (0 > next_offset) error_code = error_code_no_start_time;
-               else {
-                  if (0 < time_inc) {
-                     long next_time;
-                     next_time = time_lower + time_inc;
-                     for (idx=next_offset; idx<time_dim_size; idx++) {
-                        if (_file->ValidTime[idx] > time_upper) break;
-                        else if (_file->ValidTime[idx] < next_time) continue;
-                        else if (_file->ValidTime[idx] == next_time) {
-                           time_offsets.add(idx);
-                           next_time += time_inc;
-                        }
-                        else { // next_time < _file->ValidTime[idx]
-                           while (next_time < _file->ValidTime[idx]) {
-                              missing_times.add(next_time);
-                              next_time += time_inc;
-                           }
-                           if (_file->ValidTime[idx] == next_time) {
-                              time_offsets.add(idx);
-                              next_time += time_inc;
-                           }
-                        }
-                        if (next_time > time_upper) break;
-                     }
-                  }
-                  else if (0 == time_inc) {
-                     for (idx=next_offset; idx<time_dim_size; idx++) {
-                        if (_file->ValidTime[idx] > time_upper) break;
-                        time_offsets.add(idx);
-                     }
-                  }
-                  else {
-                     error_code = error_code_bad_increment;
-                  }
-               }
-            }
-         }
-         else if (dim_offset >= time_dim_size) {
-            // Contains single yyyymmdd instead of time offset.
-            for (int idx=0; idx<time_dim_size; idx++) {
-               if (_file->ValidTime[idx] == dim_offset) {
-                  time_offsets.add(idx);
-                  not_found = false;
-                  break;
-               }
-            }
-            if (not_found) missing_times.add(dim_offset);
          }
          
          int missing_count = missing_times.n_elements();
@@ -415,37 +435,40 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
                     << "\" does not exist.\n";
             }
          }
-         
-         if (0 < time_offsets.n_elements()) {
-            for (idx=0; idx<time_offsets.n_elements(); idx++) {
-               time_dim_offset = time_offsets[idx];
+      }
+      //else if (dim_offset >= time_dim_size || (dim_offset < 0)) {
+      //   mlog << Warning << method_name_short
+      //        << "The time offset is out of range (0 <= offset < "
+      //        << time_dim_size << ").\n";
+      //}
+      else error_code = error_code_unknown;
 
-               if (data_plane(vinfo, plane)) {
-                  plane_array.add(plane, time_lower, time_upper);
-                  n_rec++;
-               }
+      if (0 < time_offsets.n_elements()) {
+         for (idx=0; idx<time_offsets.n_elements(); idx++) {
+            _time_dim_offset = time_offsets[idx];
+            if (data_plane(vinfo, plane)) {
+               plane_array.add(plane, time_lower, time_upper);
+               n_rec++;
             }
          }
-         else if (is_time_levels) error_code = error_code_no_matching_times;
-         else if (include_all_times) error_code = error_code_empty_times;
       }
-      else if (dim_offset >= time_dim_size || (dim_offset < 0)) {
-         mlog << Warning << method_name_short
-              << "The time offset is out of range (0 <= offset < "
-              << time_dim_size << ").\n";
+      else if (is_time_range) {
+          error_code = time_as_value ? error_code_missing_time_values
+                                     : error_code_missing_time_offsets;
       }
+      else if (include_all_times) error_code = error_code_empty_times;
    }
    
    // Handling error code
    if (error_code > error_code_no_error) {
       ConcatString log_msg;
-      log_msg << "variable \"" << vinfo_nc->req_name() << "\" does not ";
+      log_msg << "variable \"" << vinfo_nc->req_name() << "\" ";
       if (error_code == error_code_no_time_dim) {
-         log_msg << "support the range of times because the time dimension is "
+         log_msg << "does not support the range of times because the time dimension is "
                  << time_dim_size;
       }
-      else if (error_code == error_code_no_matching_times) {
-         log_msg << "have the matching time ranges between "
+      else if (error_code == error_code_missing_time_values) {
+         log_msg << "does not have the matching time ranges between "
                  << unix_to_yyyymmdd_hhmmss(time_lower) << " and "
                  << unix_to_yyyymmdd_hhmmss(time_upper);
          if (0 < _file->ValidTime.n_elements()) {
@@ -454,14 +477,28 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
                     << unix_to_yyyymmdd_hhmmss(_file->ValidTime.max()) << "]";
          }
       }
+      else if (error_code == error_code_missing_time_offsets) {
+         log_msg << "does not have the matching time offsets between "
+                 << nint(time_lower) << " and " << nint(time_upper);
+         if (0 < _file->ValidTime.n_elements()) {
+            log_msg << " [0 <= offset < " << _file->ValidTime.n_elements() << "]";
+         }
+      }
       else if (error_code == error_code_empty_times) {
-         log_msg << "have the time values";
+         log_msg << "does not have the time values";
       }
       else if (error_code == error_code_bad_increment) {
-         log_msg << "have the time values";
+         log_msg << "was configured with bad increment";
       }
-      else if (error_code == error_code_no_start_time) {
-         log_msg << "have the time values";
+      else if (error_code == error_code_bad_offset) {
+         log_msg << "was configured with the bad time offset"
+                 << " (0 <= offset < " << time_dim_size << ")";
+      }
+      else if (error_code == error_code_missing_time_value) {
+         log_msg << "does not have the matching time "
+                 << unix_to_yyyymmdd_hhmmss(time_value) << " ["
+                 << unix_to_yyyymmdd_hhmmss(_file->ValidTime.min()) << " and "
+                 << unix_to_yyyymmdd_hhmmss(_file->ValidTime.max()) << "]";
       }
       else {
          log_msg.clear();
@@ -492,16 +529,13 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 ////////////////////////////////////////////////////////////////////////
 
 long MetNcCFDataFile::get_time_offset(long time_dim_value) {
-   long cur_time_offset = time_dim_offset;
+   long cur_time_offset = time_dim_value;
    int dim_size = _file->ValidTime.n_elements();
-   if ((time_dim_value != vx_data2d_star) &&
-       (0 > cur_time_offset || cur_time_offset >= dim_size)) {
-      if (time_dim_value >= dim_size) {
-         for (int idx=0; idx<dim_size; idx++) {
-            if (_file->ValidTime[idx] == time_dim_value) {
-               cur_time_offset = idx;
-               break;
-            }
+   if (time_dim_value >= dim_size) {
+      for (int idx=0; idx<dim_size; idx++) {
+         if (_file->ValidTime[idx] == time_dim_value) {
+            cur_time_offset = idx;
+            break;
          }
       }
    }
