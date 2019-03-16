@@ -46,7 +46,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //
       
       NcCfFile * _file;    //  allocated
-      long time_dim_offset; // current time offset to get the data plane
+      long _time_dim_offset; // current time offset to get the data plane
 
    public:
 

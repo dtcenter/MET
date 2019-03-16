@@ -186,6 +186,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
          }
          else
          {
+            bool as_offset = true;
             // Check for a range of levels
             if ((ptr3 = strchr(ptr2, '-')) != NULL)
             {
@@ -235,10 +236,13 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   unixtime time_upper = datestring_end
                       ? timestring_to_unix(ptr3) : atoi(ptr3);
                   if (ptr_inc != NULL) {
-                     increment = timestring_to_sec(ptr_inc);
-                     mlog << Debug(7) << method_name
-                          << " increment: \"" << ptr_inc << "\" to "
-                          << increment << " seconds.\n";
+                    if (datestring_end && datestring_start) {
+                      increment = timestring_to_sec(ptr_inc);
+                      mlog << Debug(7) << method_name
+                           << " increment: \"" << ptr_inc << "\" to "
+                           << increment << " seconds.\n";
+                    }
+                    else increment = atoi(ptr_inc);
                   }
                   
                   Dimension.add(range_flag);
@@ -249,7 +253,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   // Assume time level type for a range of levels
                   Level.set_type(LevelType_Time);
                   if (datestring_end && datestring_start)
-                    Level.set_as_offset(false);
+                    as_offset = false;
                }
             }
             else
@@ -262,10 +266,11 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   //if (unix_time > 0) {
                     level = unix_time;
                   //}
-                  Level.set_as_offset(false);;
+                  as_offset = false;
                }
                Dimension.add(level);
             }
+            Level.set_as_offset(as_offset);
          }
 
          // Set ptr to NULL for next call to strtok
