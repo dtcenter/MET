@@ -127,9 +127,6 @@ bool get_att_value(const NcAtt *att, double &att_val) {
 
 int get_att_value_int(const NcAtt *att) {
    int value = bad_data_int;
-   cout << " att: " << att->getName() << " " << att->getType().getName()
-        << " " << att->getType().getId()
-        << "\n";
    switch (att->getType().getId()) {
       case NC_BYTE:
          signed char b_value;
