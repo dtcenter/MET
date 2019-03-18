@@ -311,13 +311,6 @@
     </output>
   </test>
 
-  <test name="regrid_data_plane_REMOVE_GRID_MAP">
-    <exec>rm</exec>
-    <param> &OUTPUT_DIR;/CONUS_2500_1500_*
-    </param>
-    <output></output>
-  </test>  
-  
   <test name="regrid_data_plane_GOES_16_AOD_TO_G212">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <env>
