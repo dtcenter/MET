@@ -257,7 +257,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    // Check for empty input string
    if(mask_poly_str.empty()) return;
 
-   ConcatString file_name;
+   ConcatString file_name, config_str;
    StringArray tokens;
    Grid mask_grid;
 
@@ -268,9 +268,10 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    tokens = mask_poly_str.split(poly_str_delim);
    file_name = replace_path(tokens[0]);
    file_name.ws_strip();
+   if(tokens.n_elements() > 1) config_str = tokens[1];
 
    // If not a 2D data file, process as a lat/lon polyline file
-   if(!is_2d_data_file(file_name)) {
+   if(!is_2d_data_file(file_name, config_str)) {
       process_poly_mask(file_name, grid, mask_dp, mask_name);
    }
    // Otherwise, process as a 2d data file
@@ -359,7 +360,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
    // Check for empty input string
    if(mask_poly_str.empty()) return;
 
-   ConcatString file_name;
+   ConcatString file_name, config_str;
    DataPlane mask_dp;
    StringArray tokens;
 
@@ -370,9 +371,10 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
    tokens = mask_poly_str.split(poly_str_delim);
    file_name = replace_path(tokens[0]);
    file_name.ws_strip();
+   if(tokens.n_elements() > 1) config_str = tokens[1];
 
    // If not a 2D data file, process as a lat/lon polyline file
-   if(!is_2d_data_file(file_name)) {
+   if(!is_2d_data_file(file_name, config_str)) {
       mask_poly.load(file_name);
    }
    // Otherwise, process as a 2d data file
@@ -396,13 +398,29 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    ConcatString file_name, thresh_str;
    StringArray tokens;
    SingleThresh st;
-   MetConfig config;
    bool append_level, append_thresh;
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
    file_name = replace_path(tokens[0]);
    file_name.ws_strip();
+
+   // Initialize config object
+   MetConfig config;
+   config.read(replace_path(config_const_filename));
+
+   // Parse the dictionary string
+   if(tokens.n_elements() > 1) {
+      append_level = true;
+      config.read_string(tokens[1]);
+   }
+   else {
+      append_level = false;
+      config.read_string(default_mask_dict);
+   }
+
+   // Parse the requested file type
+   GrdFileType type = parse_conf_file_type(&config);
 
    // 2D Data file
    Met2dDataFileFactory mtddf_factory;
@@ -413,7 +431,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    VarInfo *info = (VarInfo *) 0;
 
    // Open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(file_name);
+   mtddf = mtddf_factory.new_met_2d_data_file(file_name, type);
 
    // If data file pointer is NULL, assume a lat/lon polyline file
    if(!mtddf) {
@@ -427,16 +445,6 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
 
    // Create a new VarInfo object
    info = info_factory.new_var_info(mtddf->file_type());
-
-   // Parse the dictionary string
-   if(tokens.n_elements() > 1) {
-      append_level = true;
-      config.read_string(tokens[1]);
-   }
-   else {
-      append_level = false;
-      config.read_string(default_mask_dict);
-   }
 
    // Set up the VarInfo object
    info->set_dict(config);
