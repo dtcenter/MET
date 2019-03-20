@@ -226,11 +226,21 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool is_2d_data_file(const char *filename) {
+bool is_2d_data_file(const ConcatString &filename,
+                     const ConcatString &config_str) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   GrdFileType type = FileType_None;
 
-   mtddf = mtddf_factory.new_met_2d_data_file(filename);
+   // Check for a requested file type
+   if(config_str.nonempty()) {
+      MetConfig config;
+      config.read(replace_path(config_const_filename));
+      config.read_string(config_str);
+      type = parse_conf_file_type(&config);
+   }
+
+   mtddf = mtddf_factory.new_met_2d_data_file(filename, type);
    bool status = (mtddf != 0);
 
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
