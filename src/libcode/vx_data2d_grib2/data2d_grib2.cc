@@ -206,12 +206,24 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if( 1 < listMatch.size() ){
       ConcatString msg = "";
       for(size_t i=0; i < listMatch.size(); i++) {
-         msg << (i ? ", " : "") << listMatch[i]->RecNum;
+         msg << "record " << listMatch[i]->RecNum
+             << " field " << listMatch[i]->FieldNum
+             << ": ipdtmpl[" << listMatch[i]->IPDTmpl.n()
+             << "] = ";
+         for(int j=0; j < listMatch[i]->IPDTmpl.n(); j++) {
+            msg << listMatch[i]->IPDTmpl[j];
+            if(j < (listMatch[i]->IPDTmpl.n() - 1)) msg << ", ";
+         }
+         msg << "\n";
       }
       mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
-           << "Multiple matching records found for '"
-           << vinfo_g2->magic_str() << "' - " << msg << " - using "
-           << listMatch[0]->RecNum << "\n\n";
+           << "Using the first of " << listMatch.size()
+           << " matching records for \""
+           << vinfo_g2->magic_str() << "\":\n" << msg
+           << "Try setting the 0-based \""
+           << conf_key_GRIB2_ipdtmpl_index << "\" and \""
+           << conf_key_GRIB2_ipdtmpl_val
+           << "\" config file options to select one.\n\n";
    }
 
    //  report the matched record
@@ -268,7 +280,8 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
             msg << "\n";
          }
          mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
-              << "Multiple exact matching records found for \""
+              << "Using the first of " << listMatchExact.size()
+              << " exact matching records for \""
               << vinfo_g2->magic_str() << "\":\n" << msg
               << "Try setting the 0-based \""
               << conf_key_GRIB2_ipdtmpl_index << "\" and \""
