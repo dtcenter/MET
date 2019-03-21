@@ -69,7 +69,7 @@ jobs = [
     -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat \
     -set_hdr VX_MASK CONUS",
    "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
-    -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0 \
+    -line_type MPR -out_line_type CNT -by VX_MASK -set_hdr DESC CASE -n_boot_rep 0 \
     -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat",
    "-job aggregate -fcst_var TMP -fcst_lev Z2 \
     -line_type CTC -by FCST_THRESH \
