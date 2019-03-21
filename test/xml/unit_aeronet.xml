@@ -30,10 +30,22 @@
       &DATA_DIR_OBS;/aeronet/150918_150918_DRAGON_DenverLaCasa.lev15 \
       -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
       &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc \
-      -v 1
+      -v 1 -format aeronetv2
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_AERONET_v3_daily">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/aeronet/20150917_20150926_Table_Mountain.lev20 \
+      &OUTPUT_DIR;/aeronet/20150917_20150926_Table_Mountain.lev20.nc \
+      -v 1 -format aeronetv3
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/aeronet/20150917_20150926_Table_Mountain.lev20.nc</point_nc>
     </output>
   </test>
 
