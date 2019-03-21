@@ -118,7 +118,8 @@ bool MetGrib2DataFile::open(const char * _filename) {
 
    bool status = ( 0 < RecList.size() );
    if( !status ){
-      mlog << Warning << "\nGRIB2 records not found in input file '" << Filename << "'\n\n";
+      mlog << Warning << "\nGRIB2 records not found in input file '"
+           << Filename << "'\n\n";
    }
 
    return status;
@@ -172,21 +173,26 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       //  verify that only a single data_plane was found
       if( 1 > plane_array.n_planes() ){
 
-         mlog << Warning << "\nMetGrib2DataFile::data_plane() - No matching record found for '"
+         mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
+              << "No matching record found for '"
               << vinfo_g2->magic_str() << "'\n\n";
          return false;
 
       } else if( 1 < plane_array.n_planes() ){
 
-         mlog << Warning << "\nMetGrib2DataFile::data_plane() - Wind speed/direction derivation "
-              << "found " << plane_array.n_planes() << " matching records found for '"
+         mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
+              << "Wind speed/direction derivation found "
+              << plane_array.n_planes()
+              << " matching records found for '"
               << vinfo_g2->magic_str() << "'\n\n";
 
       }
 
       //  report the matched record
-      mlog << Debug(3) << "MetGrib2DataFile::data_plane() - Found derived match for '"
-           << vinfo_g2->magic_str() << "' in GRIB2 file '" << Filename << "'\n";
+      mlog << Debug(3) << "MetGrib2DataFile::data_plane() -> "
+           << "Found derived match for '"
+           << vinfo_g2->magic_str() << "' in GRIB2 file '"
+           << Filename << "'\n";
 
       plane = plane_array[0];
 
@@ -199,19 +205,25 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    //  verify that a only single record was found
    if( 1 < listMatch.size() ){
       ConcatString msg = "";
-      for(size_t i=0; i < listMatch.size(); i++) msg << (i ? ", " : "") << listMatch[i]->RecNum;
-      mlog << Warning << "\nMetGrib2DataFile::data_plane() - Multiple matching records found for '"
-           << vinfo_g2->magic_str() << "' - " << msg << " - using " << listMatch[0]->RecNum << "\n\n";
+      for(size_t i=0; i < listMatch.size(); i++) {
+         msg << (i ? ", " : "") << listMatch[i]->RecNum;
+      }
+      mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
+           << "Multiple matching records found for '"
+           << vinfo_g2->magic_str() << "' - " << msg << " - using "
+           << listMatch[0]->RecNum << "\n\n";
    }
 
    //  report the matched record
-   mlog << Debug(3) << "MetGrib2DataFile::data_plane() - Found exact match for '"
-        << vinfo_g2->magic_str() << "' in GRIB2 record " << listMatch[0]->RecNum
+   mlog << Debug(3) << "MetGrib2DataFile::data_plane() -> "
+        << "Found exact match for '" << vinfo_g2->magic_str()
+        << "' in GRIB2 record " << listMatch[0]->RecNum
         << " field " << listMatch[0]->FieldNum << " of GRIB2 file '"
         << Filename << "'\n";
 
    //  read the data plane for the matched record
-   bool read_success = read_grib2_record_data_plane(listMatch[0], plane);
+   bool read_success = read_grib2_record_data_plane(listMatch[0],
+                                                    plane);
 
    //  check the data plane for wind rotation
    plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
@@ -244,31 +256,48 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
       //  report on the exact match(es)
       if( 1 < listMatchExact.size() ){
          ConcatString msg = "";
-         for(size_t i=0; i < listMatchExact.size(); i++) msg << (i ? ", " : "") << listMatchExact[i]->RecNum;
-         mlog << Warning << "\nMetGrib2DataFile::data_plane_array() - Multiple exact matching records found for \""
-              << vinfo_g2->magic_str() << "\" - records " << msg << "\n\n";
+         for(size_t i=0; i < listMatchExact.size(); i++) {
+            msg << "record " << listMatchExact[i]->RecNum
+                << " field " << listMatchExact[i]->FieldNum
+                << ": ipdtmpl[" << listMatchExact[i]->IPDTmpl.n()
+                << "] = ";
+            for(int j=0; j < listMatchExact[i]->IPDTmpl.n(); j++) {
+               msg << listMatchExact[i]->IPDTmpl[j];
+               if(j < (listMatchExact[i]->IPDTmpl.n() - 1)) msg << ", ";
+            }
+            msg << "\n";
+         }
+         mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
+              << "Multiple exact matching records found for \""
+              << vinfo_g2->magic_str() << "\":\n" << msg
+              << "Try setting the 0-based \""
+              << conf_key_GRIB2_ipdtmpl_index << "\" and \""
+              << conf_key_GRIB2_ipdtmpl_val
+              << "\" config file options to select one.\n\n";
       } else {
-         mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() - Found exact match for \""
-              << vinfo_g2->magic_str() << "\" in GRIB2 record " << listMatchExact[0]->RecNum
-              << " field " << listMatchExact[0]->FieldNum << " of GRIB2 file \""
-              << Filename << "\"\n";
+         mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() -> "
+              << "Found exact match for \"" << vinfo_g2->magic_str()
+              << "\" in GRIB2 record " << listMatchExact[0]->RecNum
+              << " field " << listMatchExact[0]->FieldNum
+              << " of GRIB2 file \"" << Filename << "\"\n";
       }
 
       listRead.push_back( listMatchExact[0] );
-
    }
 
    //  otherwise, if range matches were found, use them
    else if( 0 < listMatchRange.size() ){
 
       ConcatString msg = "";
-      for(size_t i=0; i < listMatchRange.size(); i++) msg << (i ? ", " : "") << listMatchRange[i]->RecNum;
-      mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() - Found range match for \""
-           << vinfo_g2->magic_str() << "\" in GRIB2 records " << msg << " of GRIB2 file \""
+      for(size_t i=0; i < listMatchRange.size(); i++) {
+         msg << (i ? ", " : "") << listMatchRange[i]->RecNum;
+      }
+      mlog << Debug(3) << "MetGrib2DataFile::data_plane_array() -> "
+           << "Found range match for \"" << vinfo_g2->magic_str()
+           << "\" in GRIB2 records " << msg << " of GRIB2 file \""
            << Filename << "\"\n";
 
       listRead = listMatchRange;
-
    }
 
    //  if nothing was found, try to build derived records
@@ -278,18 +307,20 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
 
       //  if no matches were found, bail
       if( 1 > plane_array.n_planes() ){
-         mlog << Warning << "\nMetGrib2DataFile::data_plane_array() - No matching records found for '"
+         mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
+              << "No matching records found for '"
               << vinfo_g2->magic_str() << "'\n\n";
          return 0;
       }
 
       //  report the matched record
-      mlog << Debug(3) << "\nMetGrib2DataFile::data_plane_array() - Wind speed/direction derivation "
-           << "found " << plane_array.n_planes() << " matching records found for '"
+      mlog << Debug(3) << "\nMetGrib2DataFile::data_plane_array() -> "
+           << "Wind speed/direction derivation "
+           << "found " << plane_array.n_planes()
+           << " matching records found for '"
            << vinfo_g2->magic_str() << "'\n\n";
 
       return plane_array.n_planes();
-
    }
 
    //  read the matched data planes into a data plane array
@@ -306,7 +337,8 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
       plane = check_uv_rotation(vinfo_g2, *it, plane);
 
       //  add the data plane to the array at the specified level(s)
-      double lvl_lower = (double)(*it)->LvlVal1, lvl_upper = (double)(*it)->LvlVal2;
+      double lvl_lower = (double)(*it)->LvlVal1;
+      double lvl_upper = (double)(*it)->LvlVal2;
       if( LevelType_Pres == VarInfoGrib2::g2_lty_to_level_type((*it)->LvlTyp) ){
          lvl_lower = ( (double)(*it)->LvlVal1 ) / 100.0;
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
@@ -315,11 +347,9 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
       process_data_plane(vinfo_g2, plane);
 
       plane_array.add(plane, lvl_lower, lvl_upper);
-
    }
 
    return num_read;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -396,6 +426,21 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
           (!is_bad_data(vinfo->der_type())  && vinfo->der_type()  != (*it)->DerType  ) ||
           (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ){
          continue;
+      }
+
+      //  test ipdtmpl array values
+      if(vinfo->n_ipdtmpl() > 0) {
+         int i, j;
+         bool skip = false;
+         for(i=0; i<vinfo->n_ipdtmpl(); i++) {
+            j = vinfo->ipdtmpl_index(i);
+            if(j < (*it)->IPDTmpl.n() &&
+              (*it)->IPDTmpl[j] != vinfo->ipdtmpl_val(i)) {
+               skip = true;
+               break;
+            }
+         }
+         if(skip) continue;
       }
 
       // if this is ensemble record - test for ensemble information
@@ -518,25 +563,30 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
 
    //  check that the field is present in the pair map
    string parm_name = vinfo->name().text();
-   if( 0 == PairMap.count( parm_name ) || 0 == (rec->ResCompFlag & 8) ) return plane;
+   if( 0 == PairMap.count( parm_name ) ||
+       0 == (rec->ResCompFlag & 8) ) {
+      return plane;
+   }
 
-   //  build the magic string of the pair field, and make sure it's present
+   //  build the magic string of the pair field, and check it
    ConcatString pair_mag = build_magic( rec );
    pair_mag.replace(parm_name.data(), PairMap[parm_name].data());
    if( 0 == NameRecMap.count( string(pair_mag.text()) ) ){
-      mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation - UV rotation pair "
-           << "record not found: '" << pair_mag << "'\n";
+      mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation -> "
+           << "UV rotation pair record not found: '" << pair_mag
+           << "'\n";
       return plane;
    }
 
    //  read the data plane for the pair record
    Grib2Record *rec_pair = NameRecMap[pair_mag.text()];
    DataPlane plane_pair;
-   read_grib2_record_data_plane(NameRecMap[pair_mag.text()], plane_pair);
+   read_grib2_record_data_plane(NameRecMap[pair_mag.text()],
+                                plane_pair);
 
-   mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation() - Found pair match \""
-        << pair_mag << "\" in GRIB2 record " << rec_pair->RecNum << " field "
-        << rec_pair->FieldNum << "\n";
+   mlog << Debug(3) << "MetGrib2DataFile::check_uv_rotation() -> "
+        << "Found pair match \"" << pair_mag << "\" in GRIB2 record "
+        << rec_pair->RecNum << " field " << rec_pair->FieldNum << "\n";
 
    //  rotate the winds
    DataPlane u2d, v2d, u2d_rot, v2d_rot;
@@ -557,7 +607,10 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
    DataPlaneArray array_ret;
 
    //  if the requested field cannot be derived, bail
-   if( vinfo->name() != "WIND" && vinfo->name() != "WDIR" ) return array_ret;
+   if( vinfo->name() != "WIND" &&
+       vinfo->name() != "WDIR" ) {
+      return array_ret;
+   }
 
    //  read the data_plane objects for each constituent
    DataPlaneArray array_u, array_v;
@@ -569,9 +622,11 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
 
    //  derive wind speed or direction
    if( array_u.n_planes() != array_v.n_planes() ){
-      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() - when deriving "
-           << "winds, the number of U-wind records (" << array_u.n_planes()
-           << ") does not match the number of V-wind record (" << array_v.n_planes()
+      mlog << Warning << "\nMetGrib2DataFile::data_plane_array() -> "
+           << "when deriving winds, the number of U-wind records ("
+           << array_u.n_planes()
+           << ") does not match the number of V-wind record ("
+           << array_v.n_planes()
            << ") for GRIB2 file '" << filename() << "'\n\n";
 
       return array_ret;
@@ -584,19 +639,23 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
       if( !is_eq(array_u.lower(i), array_v.lower(i)) ||
           !is_eq(array_u.upper(i), array_v.upper(i)) ){
 
-         mlog << Warning << "\nMetGrib1DataFile::data_plane_array() - when deriving "
-              << "winds for level " << i+1 << ", the U-wind levels (" << array_u.lower(i)
-              << ", " << array_u.upper(i) << ") do not match the V-wind levels ("
-              << array_v.lower(i) << ", " << array_v.upper(i) << ") in GRIB file '"
-              << filename() << "'\n\n";
+         mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
+              << "when deriving winds for level " << i+1
+              << ", the U-wind levels (" << array_u.lower(i)
+              << ", " << array_u.upper(i)
+              << ") do not match the V-wind levels ("
+              << array_v.lower(i) << ", " << array_v.upper(i)
+              << ") in GRIB file '" << filename() << "'\n\n";
 
          return array_ret;
       }
 
       //  perform the derivation
       DataPlane plane_deriv;
-      if(vinfo->name() == "WIND") derive_wind(array_u[i], array_v[i], plane_deriv);
-      else                        derive_wdir(array_u[i], array_v[i], plane_deriv);
+      if(vinfo->name() == "WIND") derive_wind(array_u[i], array_v[i],
+                                              plane_deriv);
+      else                        derive_wdir(array_u[i], array_v[i],
+                                              plane_deriv);
 
       //  add the current data plane
       array_ret.add(plane_deriv, array_u.lower(i), array_u.upper(i));
@@ -636,7 +695,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
              48 != gfld->ipdtnum ){     //  aerosol data
-            mlog << Warning << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
+            mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
+                 << "unexpected PDS template number ("
                  << gfld->ipdtnum << ") may cause unexpected results. "
                  << "Please email met_help@ucar.edu.\n\n";
          }
@@ -654,6 +714,9 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
          rec->LvlTyp       = gfld->ipdtmpl[9];
+
+         //  store the full pdtmpl values
+         for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
 
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
          //  Reference: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
@@ -940,7 +1003,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       ScanMode    = t[18];
       ResCompFlag = t[13];
-      
+
          //
          //  build a RotatedLatLonData struct with the projection information
          //
@@ -997,7 +1060,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
          //  auxilliary rotation around the rotated polar axis
          //
 
-      data.aux_rotation = (t[21])*angle_factor; 
+      data.aux_rotation = (t[21])*angle_factor;
 
          //
          //  if y scan order is -y, move lat_ll
@@ -1025,7 +1088,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
 
 
-   
+
 
    }   //  else
 
@@ -1211,21 +1274,24 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    g2int numfields;
    float v, v_miss[2];
    int n_miss, i;
-   if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld, cgrib, numfields) ){
-      mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
-           << "failed to read record at offset " << rec->ByteOffset << " and field number "
-           << rec->FieldNum << "\n\n";
+   if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
+                               cgrib, numfields) ){
+      mlog << Error
+           << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
+           << "failed to read record at offset " << rec->ByteOffset
+           << " and field number " << rec->FieldNum << "\n\n";
       exit(1);
    }
 
    //  ensure the grid has been read, and initialize the grid size
-   if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
+   if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) {
+      read_grib2_grid(gfld);
+   }
    int n_x = Raw_Grid->nx();
    int n_y = Raw_Grid->ny();
 
    //  determine whether or not the data bitmap applies
    bool apply_bmap = ( 0 == gfld->ibmap || 254 == gfld->ibmap );
-
 
    //
    //  * * * *  read grid data  * * * *

@@ -97,17 +97,20 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    VarInfo::assign(v);
 
    // Copy
-   Record     = v.record();
-   Discipline = v.discipline();
-   MTable     = v.m_table();
-   LTable     = v.l_table();
-   ParmCat    = v.parm_cat();
-   Parm       = v.parm();
-   PDTmpl     = v.pdt();
-   Process    = v.process();
-   EnsType    = v.ens_type();
-   DerType    = v.der_type();
-   StatType   = v.stat_type();
+   Record     = v.Record;
+   Discipline = v.Discipline;
+   MTable     = v.MTable;
+   LTable     = v.LTable;
+   ParmCat    = v.ParmCat;
+   Parm       = v.Parm;
+   PDTmpl     = v.PDTmpl;
+   Process    = v.Process;
+   EnsType    = v.EnsType;
+   DerType    = v.DerType;
+   StatType   = v.StatType;
+
+   IPDTmplIndex = v.IPDTmplIndex;
+   IPDTmplVal   = v.IPDTmplVal;
 
    return;
 }
@@ -132,6 +135,9 @@ void VarInfoGrib2::clear() {
    DerType    = bad_data_int;
    StatType   = bad_data_int;
 
+   IPDTmplIndex.clear();
+   IPDTmplVal.clear();
+
    return;
 }
 
@@ -152,6 +158,10 @@ void VarInfoGrib2::dump(ostream &out) const {
        << "  EnsType    = " << EnsType    << "\n"
        << "  DerType    = " << DerType    << "\n"
        << "  StatType   = " << StatType   << "\n";
+   out << "  IPDTmplIndex:\n";
+   IPDTmplIndex.dump(out);
+   out << "  IPDTmplVal:\n";
+   IPDTmplVal.dump(out);
 
    return;
 }
@@ -235,6 +245,21 @@ void VarInfoGrib2::set_stat_type(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoGrib2::set_ipdtmpl_index(const IntArray &v) {
+   IPDTmplIndex = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib2::set_ipdtmpl_val(const IntArray &v) {
+   IPDTmplVal = v;
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoGrib2::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Validate the magic_string
@@ -269,6 +294,19 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    DerType                 = dict.lookup_int   (conf_key_GRIB2_der_type,  false);
    StatType                = dict.lookup_int   (conf_key_GRIB2_stat_type, false);
 
+   IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
+   IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);
+
+   //  arrays must have the same length
+   if(IPDTmplIndex.n() != IPDTmplVal.n()) {
+      mlog << Error << "\nVarInfoGrib2::set_dict() -> "
+           << "the number of \"" << conf_key_GRIB2_ipdtmpl_index
+           << "\" entries (" << IPDTmplIndex.n()
+           << ") must match the number of \"" << conf_key_GRIB2_ipdtmpl_val
+           << "\" entries (" << IPDTmplVal.n() << ")!\n\n";
+      exit(1);
+   }
+
    //  if the name is specified, use it
    if( !field_name.empty() ){
 
@@ -276,11 +314,13 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_req_name( field_name );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
-                                  tab, tab_match) &&
+      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat,
+                                  field_parm, mtab, cntr, ltab, tab,
+                                  tab_match) &&
           field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-              << "unrecognized GRIB2 field abbreviation '" << field_name << "'\n\n";
+              << "unrecognized GRIB2 field abbreviation '" << field_name
+              << "'\n\n";
          exit(1);
       }
 
@@ -300,7 +340,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, mtab, cntr, ltab, tab) ){
+      if( !GribTable.lookup_grib2(field_disc, field_parm_cat,
+                                  field_parm, mtab, cntr, ltab, tab) ){
          mlog << Error << "\nVarInfoGrib2::set_dict() -> "
               << "no parameter found with matching "
               << "GRIB2_disc ("     << field_disc     << ") "
@@ -337,7 +378,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    }
 
    //  if the level type is a record number, set the data member
-   set_record( Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1 );
+   set_record( Level.type() == LevelType_RecNumber ?
+               nint(Level.lower()) : -1 );
 
    //  if the field is not probabilistic, work is done
    if( field_name != "PROB" ) return;
@@ -360,8 +402,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
-                               tab, tab_match) ){
+   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat,
+                               field_parm, mtab, cntr, ltab, tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "unrecognized GRIB2 probability field abbreviation '"
            << prob_name << "'\n\n";
@@ -475,18 +517,18 @@ double VarInfoGrib2::g2_time_range_unit_to_sec(int ind) {
    //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-4.shtml
    double sec_per_unit = -1;
    switch(ind) {
-      case 0:     sec_per_unit = sec_per_minute;             break;    // minute
-      case 1:     sec_per_unit = sec_per_hour;               break;    // hour
-      case 2:     sec_per_unit = sec_per_day;                break;    // day
-      case 3:     sec_per_unit = sec_per_day*30.0;           break;    // month
-      case 4:     sec_per_unit = sec_per_day*365.0;          break;    // year
-      case 5:     sec_per_unit = sec_per_day*365.0*10.0;     break;    // decade
-      case 6:     sec_per_unit = sec_per_day*365.0*30.0;     break;    // normal (30 years)
-      case 7:     sec_per_unit = sec_per_day*365.0*100.0;    break;    // century
-      case 10:    sec_per_unit = sec_per_hour*3.0;           break;    // 3 hours
-      case 11:    sec_per_unit = sec_per_hour*6.0;           break;    // 6 hours
-      case 12:    sec_per_unit = sec_per_hour*12.0;          break;    // 12 hours
-      case 13:    sec_per_unit = 1.0;                        break;    // second
+      case 0:  sec_per_unit = sec_per_minute;          break; // minute
+      case 1:  sec_per_unit = sec_per_hour;            break; // hour
+      case 2:  sec_per_unit = sec_per_day;             break; // day
+      case 3:  sec_per_unit = sec_per_day*30.0;        break; // month
+      case 4:  sec_per_unit = sec_per_day*365.0;       break; // year
+      case 5:  sec_per_unit = sec_per_day*365.0*10.0;  break; // decade
+      case 6:  sec_per_unit = sec_per_day*365.0*30.0;  break; // normal (30 years)
+      case 7:  sec_per_unit = sec_per_day*365.0*100.0; break; // century
+      case 10: sec_per_unit = sec_per_hour*3.0;        break; // 3 hours
+      case 11: sec_per_unit = sec_per_hour*6.0;        break; // 6 hours
+      case 12: sec_per_unit = sec_per_hour*12.0;       break; // 12 hours
+      case 13: sec_per_unit = 1.0;                     break; // second
    }
    return sec_per_unit;
 }
