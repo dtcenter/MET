@@ -112,18 +112,18 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   DataLine dl;
   dl.set_delimiter(",");
   ascii_file >> dl;
-  
-  //Check if version 3
+
+  // Check if version 3
   string line = dl.get_line();
   if (line.length() > 17) {
-     line = line.substr(0, 17);
-     if (strcmp(line.c_str(), "AERONET Version 3") == 0) {
-       is_file_type = true;
-       format_version = 3;
-       return is_file_type;
-     }
+    line = line.substr(0, 17);
+    if (strcmp(line.c_str(), "AERONET Version 3") == 0) {
+      is_file_type = true;
+      format_version = 3;
+      return is_file_type;
+    }
   }
-  
+
   ascii_file >> dl;
   ascii_file >> dl;
 
@@ -140,6 +140,10 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   return is_file_type;
 }
 
+void AeronetHandler::setFormatVersion(int version) {
+
+  format_version = version;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Private/Protected methods

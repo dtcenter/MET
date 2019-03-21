@@ -3618,7 +3618,7 @@ Optional arguments for ascii2nc
 \series bold
 -format ASCII_format
 \series medium
- option may be set to "met_point", "little_r", "surfrad", "wwsis", or "aeronet".
+ option may be set to "met_point", "little_r", "surfrad", "wwsis", "aeronet", "aeronetv2", or "aeronetv3".
  If passing in ISIS data, use the 
 \begin_inset Quotes eld
 \end_inset

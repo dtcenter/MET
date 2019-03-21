@@ -35,10 +35,22 @@ public:
   virtual ~AeronetHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
-  
+
+  void setFormatVersion(int version);
+
   static string getFormatString()
   {
     return "aeronet";
+  }
+
+  static string getFormatString_v2()
+  {
+    return "aeronetv2";
+  }
+
+  static string getFormatString_v3()
+  {
+    return "aeronetv3";
   }
 
   /////////////////////////

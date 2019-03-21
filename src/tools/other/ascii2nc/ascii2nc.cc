@@ -40,6 +40,7 @@
 //                                     file option.
 //   013    09-21-15  Prestopnik     Add Aeronet observations.
 //   014    07-23-18  Halley Gotway  Support masks defined by gen_vx_mask.
+//   015    03-20-19  Fillmore       Add aeronetv2 and aeronetv3 options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +98,8 @@ enum ASCIIFormat {
    ASCIIFormat_Little_R,
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
-   ASCIIFormat_Aeronet
+   ASCIIFormat_Aeronet_v2,
+   ASCIIFormat_Aeronet_v3
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -281,9 +283,18 @@ FileHandler *create_file_handler(const ASCIIFormat format,
     return (FileHandler *)new WwsisHandler(program_name);
   }
 
-  case ASCIIFormat_Aeronet:
+  case ASCIIFormat_Aeronet_v2:
   {
-    return (FileHandler *)new AeronetHandler(program_name);
+    AeronetHandler *handler = new AeronetHandler(program_name);
+    handler->setFormatVersion(2);
+    return (FileHandler *) handler;
+  }
+
+  case ASCIIFormat_Aeronet_v3:
+  {
+    AeronetHandler *handler = new AeronetHandler(program_name);
+    handler->setFormatVersion(3);
+    return (FileHandler *) handler;
   }
 
   case ASCIIFormat_None:
@@ -426,8 +437,10 @@ void usage() {
         << MetHandler::getFormatString() << "\", \""
         << LittleRHandler::getFormatString() << "\", \""
         << SurfradHandler::getFormatString() << "\", \""
-        << WwsisHandler::getFormatString() << "\", or \""
-        << AeronetHandler::getFormatString() << "\" (optional).\n"
+        << WwsisHandler::getFormatString() << "\", \""
+        << AeronetHandler::getFormatString() << "\", \""
+        << AeronetHandler::getFormatString_v2() << "\", or \""
+        << AeronetHandler::getFormatString_v3() << "\" (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -490,8 +503,12 @@ void set_format(const StringArray & a) {
    else if(WwsisHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat_WWSIS;
    }
-   else if(AeronetHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_Aeronet;
+   else if(AeronetHandler::getFormatString() == a[0]
+     || AeronetHandler::getFormatString_v2() == a[0]) {
+     ascii_format = ASCIIFormat_Aeronet_v2;
+   }
+   else if(AeronetHandler::getFormatString_v3() == a[0]) {
+     ascii_format = ASCIIFormat_Aeronet_v3;
    }
    else {
       mlog << Error << "\nset_format() -> "
