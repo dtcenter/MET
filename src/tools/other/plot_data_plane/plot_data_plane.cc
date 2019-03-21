@@ -173,15 +173,7 @@ int main(int argc, char * argv[])
    //
    // get the data plane from the file for this VarInfo object
    //
-   //status = met_ptr->data_plane(*var_ptr, data_plane);
-   int plane_cnt = met_ptr->data_plane_array(*var_ptr, data_plane_array);
-   if (0 < plane_cnt) {
-      status = true;
-      data_plane = data_plane_array[0];
-      if (1 < plane_cnt)
-         mlog << Debug(1) << program_name << " plots the first data plane out of "
-              << plane_cnt << " data planes.\n";
-   }
+   status = met_ptr->data_plane(*var_ptr, data_plane);
 
    if ( ! status )
    {
