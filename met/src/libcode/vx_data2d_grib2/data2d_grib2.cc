@@ -447,8 +447,9 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          bool skip = false;
          for(i=0; i<vinfo->n_ipdtmpl(); i++) {
             j = vinfo->ipdtmpl_index(i);
-            if(j < (*it)->IPDTmpl.n() &&
-              (*it)->IPDTmpl[j] != vinfo->ipdtmpl_val(i)) {
+            if(j >= (*it)->IPDTmpl.n() ||
+              (j < (*it)->IPDTmpl.n() &&
+              (*it)->IPDTmpl[j] != vinfo->ipdtmpl_val(i))) {
                skip = true;
                break;
             }
