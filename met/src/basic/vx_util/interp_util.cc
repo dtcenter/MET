@@ -224,6 +224,8 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, 
       median_v = percentile(data, num_good_points, 0.50);
    }
 
+   delete[] data;
+
    return median_v;
 }
 

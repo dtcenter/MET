@@ -288,6 +288,8 @@ grid = met_ptr->grid();
    //  done
    //
 
+delete met_ptr;   met_ptr = (Met2dDataFile *) 0;
+
 return;
 
 }

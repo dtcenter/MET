@@ -582,6 +582,13 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          }
       }
    }
+
+   delete[] hdr_typ_idx_block;
+   delete[] hdr_sid_idx_block;
+   delete[] hdr_vld_idx_block;
+   delete[] hdr_lat_block;
+   delete[] hdr_lon_block;
+   delete[] hdr_elv_block;
    
    if (!has_array_vars) {
       int tmp_dim_size;
@@ -737,6 +744,11 @@ void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *my_hdr_data) {
          my_hdr_data->inst_typ_array.add(hdr_inst_typ_block[hIndex]);
       }
    }
+
+   delete[] hdr_prpt_typ_block;
+   delete[] hdr_irpt_typ_block;
+   delete[] hdr_inst_typ_block;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -861,11 +873,11 @@ bool read_nc_obs_data(NetcdfObsVars obs_vars, int buf_size, int offset,
          }
       }
    
-      delete obs_hid_buf;
-      delete obs_vid_buf;
-      delete obs_lvl_buf;
-      delete obs_hgt_buf;
-      delete obs_val_buf;
+      delete[] obs_hid_buf;
+      delete[] obs_vid_buf;
+      delete[] obs_lvl_buf;
+      delete[] obs_hgt_buf;
+      delete[] obs_val_buf;
    }
    return result;
 }

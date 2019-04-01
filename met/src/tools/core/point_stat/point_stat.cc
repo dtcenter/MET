@@ -1791,6 +1791,9 @@ void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
             stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       }
+
+      if ( gt )  { delete gt;  gt = 0; }
+
    } // end for i
 
    return;

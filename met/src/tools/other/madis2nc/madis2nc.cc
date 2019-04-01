@@ -805,7 +805,7 @@ void process_madis_metar(NcFile *&f_in) {
    // Loop through each record and get the header data.
    //
    for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      long *dim2D = new long [2];
+      long dim2D [2];
       int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       dim[0] = buf_size;
       cur[0] = i_hdr_s;
@@ -1212,8 +1212,8 @@ void process_madis_raob(NcFile *&f_in) {
    // Loop through each record and get the header data.
    //
    for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      long *dim2D = new long [2];
-      long *dim3D = new long [3];
+      long dim2D [2];
+      long dim3D [3];
       int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
       int nlvl_manLevel[buf_size];

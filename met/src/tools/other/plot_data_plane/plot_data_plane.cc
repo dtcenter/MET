@@ -224,6 +224,10 @@ int main(int argc, char * argv[])
    // done
    //
 
+
+if ( met_ptr )  { delete met_ptr;  met_ptr = 0; }
+if ( var_ptr )  { delete var_ptr;  var_ptr = 0; }
+
 #ifdef  WITH_PYTHON
    GP.finalize();
 #endif

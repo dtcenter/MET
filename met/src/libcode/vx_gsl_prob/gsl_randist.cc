@@ -115,7 +115,7 @@ void ran_shuffle(const gsl_rng *r, NumArray &na) {
 
    for(i=0; i<n; i++) na.set(i, arr[i]);
 
-   if(arr) { delete arr; arr = (double *) 0; }
+   if(arr) { delete[] arr; arr = (double *) 0; }
 
    return;
 }
@@ -161,8 +161,8 @@ void ran_choose(const gsl_rng *r, NumArray &src_na,
    dest_na.clear();
    for(i=0; i<k; i++) dest_na.add(dest[i]);
 
-   if(src)  { delete src;  src  = (double *) 0; }
-   if(dest) { delete dest; dest = (double *) 0; }
+   if(src)  { delete[] src;  src  = (double *) 0; }
+   if(dest) { delete[] dest; dest = (double *) 0; }
 
    return;
 }
@@ -200,8 +200,8 @@ void ran_sample(const gsl_rng *r, NumArray &src_na,
    dest_na.clear();
    for(i=0; i<k; i++) dest_na.add(dest[i]);
 
-   if(src)  { delete src;  src  = (double *) 0; }
-   if(dest) { delete dest; dest = (double *) 0; }
+   if(src)  { delete[] src;  src  = (double *) 0; }
+   if(dest) { delete[] dest; dest = (double *) 0; }
 
    return;
 }

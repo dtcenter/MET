@@ -178,7 +178,7 @@ int num_tokens(const char *test_str, const char *separator)
    //
    // Check for an empty string
    //
-   if(!c) return(0);
+   if(!c) { delete [] temp_str;  temp_str = 0;  return(0); }
    else   n = 1;
 
    //
@@ -224,7 +224,8 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 {
    //  compile the regex pattern
    int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
-   regex_t *re = new regex_t;
+   // regex_t *re = new regex_t;
+   regex_t * re = (regex_t *) malloc(sizeof(regex_t));
    regmatch_t pmatch[num_pmat];
    if( 0 != (rc = regcomp(re, pat, REG_EXTENDED)) ){
       mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
@@ -263,7 +264,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
       mat = NULL;
    }
 
-   regfree(re);
+   regfree(re);  re = 0;
    return num_act;
 }
 

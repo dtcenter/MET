@@ -1036,7 +1036,7 @@ StringArray parse_file_list  (const StringArray & a, const GrdFileType type)
 {
 
 int i;
-Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+Met2dDataFile * mtddf = (Met2dDataFile *) 0;
 Met2dDataFileFactory factory;
 StringArray list;
 
@@ -1060,6 +1060,12 @@ mtddf = factory.new_met_2d_data_file(a[0].c_str(), type);
    //
 if(mtddf)                            list.add(a);
 else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0].c_str());
+
+   //
+   //  done
+   //
+
+if ( mtddf )  { delete mtddf;  mtddf = (Met2dDataFile *) 0; }
 
 return ( list );
 

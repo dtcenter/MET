@@ -30,6 +30,7 @@ static const char met_base_str[] = "MET_BASE";
 
 ////////////////////////////////////////////////////////////////////////
 
+
 extern ConcatString replace_path(const ConcatString path);
 extern ConcatString replace_path(const char * path);
 
@@ -41,10 +42,17 @@ extern void         met_open(ofstream &out, const char *path);
 
 extern FILE *       met_fopen(const char *path, const char *mode);
 
+
 extern DIR *        met_opendir(const char *path);
+
+extern void         met_closedir(DIR *);
+
 
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __FILE_FXNS_H__
 
 ////////////////////////////////////////////////////////////////////////
+
+
+

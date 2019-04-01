@@ -321,6 +321,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Cleanup
 
   if (obs_arr) { delete [] obs_arr; obs_arr = (float *) 0; }
+  if (hdr_arr) { delete [] hdr_arr; hdr_arr = (float *) 0; }
 
   return true;
 }

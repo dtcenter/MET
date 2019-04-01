@@ -404,10 +404,6 @@ else                                            s << " on host " << junk;
    //  allocate the buffer
    //
 
-unsigned char * buf   = 0;
-
-buf   = new unsigned char [buf_size];
-
 int   * const ibuf = new int [n_data];
 
 mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
@@ -473,6 +469,10 @@ obs_vars.hdr_lat_var.putVar(fhdr_lat_buf);
 obs_vars.hdr_lon_var.putVar(fhdr_lon_buf);
 obs_vars.hdr_elv_var.putVar(fhdr_elv_buf);
 
+delete [] fhdr_lat_buf;
+delete [] fhdr_lon_buf;
+delete [] fhdr_elv_buf;
+ 
    //
    //  populate the hdr_vld variable
    //
@@ -512,13 +512,13 @@ for (j=0; j<n_data; ++j)  {
 
 obs_vars.hdr_vld_var.putVar(ibuf);
 
+delete[] ibuf;
+ 
    //
    //  populate the obs_arr variable
    //
 
 Calipso_5km_Obs obs;
-
-memset(buf, 0, buf_size);
 
 float f[5];
 int qc_value;

@@ -102,7 +102,8 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 void PB2NCConfInfo::process_config() {
    int i;
    ConcatString s, mask_name;
-   StringArray sa, *sid_list;
+   StringArray sa;
+   StringArray * sid_list = 0;
    Dictionary *dict = (Dictionary *) 0;
 
    // Dump the contents of the config file
@@ -226,6 +227,8 @@ void PB2NCConfInfo::process_config() {
 
    obs_bufr_map = parse_conf_obs_bufr_map(&conf);
    message_type_map = parse_conf_message_type_map(&conf);
+
+   if ( sid_list )  { delete [] sid_list;   sid_list = (StringArray *) 0; }
 
    return;
 }

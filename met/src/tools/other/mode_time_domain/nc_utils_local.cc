@@ -28,6 +28,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int cbuf_size = 8096;
+
+static char cbuf [cbuf_size];
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 const char * string_att(const NcFile & Nc, const char * name)
 
 {
@@ -42,18 +50,20 @@ if ( GET_NC_TYPE_ID_P(att) != NcType::nc_CHAR )  {
 
 }
 
-char * c = new char[8096];
-
 ConcatString value;
 get_att_value_chars(att, value);
-strncpy(c, value.c_str(), value.length());
-if (att) delete att;
+// strncpy(cbuf, value.c_str(), value.length());
+strncpy(cbuf, value.c_str(), cbuf_size - 1);
+
+cbuf[cbuf_size - 1] = (char) 0;
+
+if (att) { delete att;  att = 0; }
 
    //
    //  done
    //
 
-return ( c );
+return ( cbuf );
 
 }
 

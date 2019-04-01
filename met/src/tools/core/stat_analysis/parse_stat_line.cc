@@ -170,7 +170,7 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
-   if(thresh) { delete thresh; thresh = (double *) 0; }
+   if ( thresh )  { delete [] thresh; thresh = (double *) 0; }
 
    return;
 }
