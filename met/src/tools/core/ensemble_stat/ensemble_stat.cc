@@ -1049,7 +1049,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
    VarInfo *info = (VarInfo *) 0;
-   bool info_alloc = false;
+   VarInfoNcMet ens_mean_info;
 
    ConcatString ens_file;
    bool is_ens_mean = (-1 == i_ens);
@@ -1067,12 +1067,13 @@ int process_point_ens(int i_ens, int &n_miss) {
    // the forecast fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // Use the calculated mean file, in necessary
+      // Use the calculated mean file, if necessary
       if(is_ens_mean && ens_mean_user.empty()) {
          fcst_dpa.clear();
-         info = new VarInfoNcMet();
-         info->set_magic(get_ens_mn_var_name(i), (string)"(*,*)");
-         info_alloc = true;
+         ens_mean_info.clear();
+         ens_mean_info.set_magic(get_ens_mn_var_name(i),
+                                 (string)"(*,*)");
+         info = &ens_mean_info;
       }
       else {
          info = conf_info.vx_opt[i].vx_pd.fcst_info;
@@ -1098,9 +1099,6 @@ int process_point_ens(int i_ens, int &n_miss) {
       // Dump out the number of levels found
       mlog << Debug(2) << "For " << info->magic_str()
            << " found " << fcst_dpa.n_planes() << " forecast levels.\n";
-
-      // Clean up the allocated VarInfo object, if necessary
-      if(info_alloc) { delete info; info = (VarInfo *) 0; }
 
       // Store information for the raw forecast fields
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
@@ -1387,7 +1385,7 @@ void process_grid_vx() {
                conf_info.vx_opt[i].obs_error.flag = false;
             }
             else {
-	      
+
                // Do a lookup for this variable and message type
                oerr_ptr = obs_error_table.lookup(
                   conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
@@ -1481,9 +1479,8 @@ void process_grid_vx() {
 
       // Process the ensemble mean, if necessary
       if(ens_mean_flag) {
-
          VarInfo *info = (VarInfo *) 0;
-         bool info_alloc = false;
+         VarInfoNcMet ens_mean_info;
          ConcatString mn_file = (ens_mean_user.empty() ?
                                  ens_mean_file : ens_mean_user);
 
@@ -1492,9 +1489,9 @@ void process_grid_vx() {
 
          // Use the calculated mean file, in necessary
          if(ens_mean_user.empty()) {
-            info = new VarInfoNcMet();
-            info->set_magic(get_ens_mn_var_name(i), (string)"(*,*)");
-            info_alloc = true;
+            ens_mean_info.set_magic(get_ens_mn_var_name(i),
+                                    (string)"(*,*)");
+            info = &ens_mean_info;
          }
          else {
             info = conf_info.vx_opt[i].vx_pd.fcst_info;
@@ -1511,9 +1508,6 @@ void process_grid_vx() {
                  << mn_file << "\"\n\n";
             exit(1);
          }
-
-         // Clean up the allocated VarInfo object, if necessary
-         if(info_alloc) { delete info; info = (VarInfo *) 0; }
       }
 
       // Loop through and apply each of the smoothing operations
