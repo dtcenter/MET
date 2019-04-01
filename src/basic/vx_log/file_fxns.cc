@@ -13,10 +13,14 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <fcntl.h>
+
+#include "vx_log.h"
 
 #include "file_fxns.h"
 
@@ -87,3 +91,30 @@ DIR *met_opendir(const char *path) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void met_closedir(DIR * dp)
+
+{
+
+int status = ::closedir(dp);
+
+if ( status < 0 )  {
+
+   mlog << Error
+        << "\n\n  met_closedir(DIR *) -> trouble closing directory ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

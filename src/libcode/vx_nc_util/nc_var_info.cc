@@ -375,13 +375,17 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
       found = true;
    }
    
-   if ( !found )  return ( false );
+   if ( !found ) {
+     if (att) delete att;
+     return ( false );
+   }
    
    // Check the type
    att_value = get_att_value_unixtime(att);
    if (att_value < 0) {
       mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
            << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
+      if (att) delete att;
       exit ( 1 );
    }
    if (att) delete att;

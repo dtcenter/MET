@@ -182,14 +182,13 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  char *aircraft_id = new char[_numRecords * aircraft_id_len];
+  char *aircraft_id= new char[_numRecords * aircraft_id_len];
   
-  //if (!aircraft_id_var->get(aircraft_id, _numRecords, aircraft_id_len))
   if (!get_nc_data(&aircraft_id_var, aircraft_id))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving aircraftId values from file\n";
-    
+    if(aircraft_id) delete[] aircraft_id;
     return false;
   }
   
@@ -197,6 +196,8 @@ bool InsituNcFile::open(const char * filename)
   
   for (int i = 0; i < _numRecords; ++i)
     _aircraftId[i] = &aircraft_id[i * aircraft_id_len];
+
+  if(aircraft_id) delete[] aircraft_id;
   
   // timeObs
 

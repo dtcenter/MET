@@ -906,6 +906,8 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
+   if ( gt )  { delete gt;  gt = (const GridTemplate *) 0; }
+
    return;
 }
 

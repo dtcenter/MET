@@ -88,7 +88,7 @@ void MtdFileBase::clear()
 if ( G )  { delete G;  G = (Grid *) 0; }
 
 Nx = Ny = Nt = 0;
-
+ 
 StartTime = (unixtime) 0;
 
 DeltaT = 0;
@@ -385,8 +385,11 @@ DeltaT    = string_att_as_int (f, delta_t_att_name);
 
    //  FileType
 
- ConcatString s = (string)string_att(f, filetype_att_name);
+// ConcatString s = (string)string_att(f, filetype_att_name);
+ConcatString s;
 bool status = false;
+
+s.add(string_att(f, filetype_att_name));
 
 status = string_to_mtdfiletype(s.text(), FileType);
 

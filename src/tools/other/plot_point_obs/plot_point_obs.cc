@@ -206,6 +206,8 @@ int main(int argc, char *argv[]) {
 
       grid = met_ptr->grid();
 
+      if ( met_ptr )  { delete met_ptr;  met_ptr = 0; }
+
    } else {
       mlog << Debug(2) << "Using default global grid.\n";
    }

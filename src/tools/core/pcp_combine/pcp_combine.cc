@@ -839,11 +839,9 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
          if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
 
-         //
-         // Check for a valid match.
-         //
-         if(-1 != i_rec) break;
-
+         //  check for a valid match
+         if( -1 != i_rec ) break;
+	 
       } // end if
 
    } // end while
@@ -853,6 +851,8 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
            << "cannot close search directory: " << cur_dir << "\n\n";
       exit(1);
    }
+
+   dp = 0;
 
    return(i_rec);
 }
@@ -1282,6 +1282,8 @@ void get_field(const char *filename, const char *cur_field,
    //
    if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
    if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
+
+   // if ( var )  { delete var;  var = 0; }
 
    return;
 

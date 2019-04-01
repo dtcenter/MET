@@ -462,7 +462,7 @@ void process_data_file() {
 
    } // end for i
 
-   if (is_geostationary) {
+   if (is_geostationary && nc_in != NULL) {
       multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
       for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
             itVar != mapVar.end(); ++itVar) {
@@ -477,6 +477,11 @@ void process_data_file() {
    
    // Close the output file
    close_nc();
+
+   // nc_in->close();
+   delete nc_in;  nc_in = 0;
+   
+   delete [] cellMapping;   cellMapping = 0;
 
    // Clean up
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
@@ -613,9 +618,9 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 
 unixtime find_valid_time(multimap<string,NcVar> mapVar) {
    NcVar from_var;
-   unixtime init_time, valid_time;
+   unixtime valid_time;
    ConcatString time_unit, tmp_time_unit;
-   double *time_values = new double[100];
+   double time_values [100];
    static const char *method_name = "find_valid_time() ";
    
    valid_time = 0;
@@ -700,6 +705,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       int    count_in_grid;
       float  *latitudes  = (float  *)0;
       float  *longitudes = (float  *)0;
+      bool latlon_allocated = false;
       //float  *latitudes  = new float[data_size];
       //float  *longitudes = new float[data_size];
       int buff_size = data_size*sizeof(float);
@@ -709,7 +715,8 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       if (has_coord_input) {
          latitudes  = new float[data_size];
          longitudes = new float[data_size];
-          
+         latlon_allocated = true;
+
          memset(latitudes,  0, buff_size);
          memset(longitudes, 0, buff_size);
          
@@ -723,8 +730,8 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
          }
          else {
             FILE *pFile = met_fopen ( cur_coord_name.c_str(), "rb" );
-            fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
-            fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
+            (void) fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
+            (void) fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
             
             bool compare_binary_and_computation = false;
@@ -813,12 +820,15 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
          if (0 == longitudes)
             mlog << Error << method_name << " Fail to get longitudes\n";
       }
-      if (has_coord_input) {
+      if (has_coord_input || latlon_allocated ) {
          if (latitudes) delete [] latitudes;
          if (longitudes) delete [] longitudes;
       }
       grid_data.release();
+
    }
+
+
    if(coord_nc_in) {
       delete coord_nc_in;
    }
@@ -1012,13 +1022,13 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       }
    }
 
-   int offset;
-   int valid_count;
-   int censored_count;
-   int missing_count;
-   int non_missing_count;
-   int qc_filtered_count;
-   int global_attr_count;
+   int offset = 0;
+   int valid_count = 0;
+   int censored_count = 0;
+   int missing_count = 0;
+   int non_missing_count = 0;
+   int qc_filtered_count = 0;
+   // int global_attr_count;
    float data_value;
    float from_min_value =  10e10;
    float from_max_value = -10e10;
@@ -1097,6 +1107,10 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
          else {}
       }
    }
+
+   delete [] qc_data;   qc_data = 0;
+   delete [] from_data; from_data = 0;
+
    mlog << Debug(4) << method_name << " Count: missing: "
         << missing_count << ", non_missing: " << non_missing_count
         << ", value range: [" << from_min_value << " - " << from_max_value
@@ -1162,6 +1176,9 @@ static void save_geostationary_data(const ConcatString geostationary_file,
      mlog << Debug(3) << method_name << "The geostationary data file ("
           << geostationary_file << ") was saved\n";
    }
+
+   delete nc_file;  nc_file = 0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////

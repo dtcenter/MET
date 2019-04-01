@@ -710,12 +710,16 @@ void set_out_filename(const StringArray & a)
 void set_tmp_dir(const StringArray & a)
 {
    tmp_dir << a[0];
-   if(met_opendir(tmp_dir.c_str()) == NULL ) {
+   DIR * dp = 0;
+   if( (dp = met_opendir(tmp_dir.c_str())) == NULL ) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
    }
+
+   met_closedir(dp);   dp = 0;
+
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }
 

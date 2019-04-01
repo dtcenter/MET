@@ -102,9 +102,13 @@ bool is_nccf_file(const char * filename)
 					nccf_att_value2) == 0);
          }
       }
+
+      delete nc_file;
+
    }
    catch(...) {
    }
+
    return ( status );
 
 }
@@ -125,8 +129,12 @@ bool is_ncmet_file(const char * filename)
          status = (get_global_att(nc_file, ncmet_att_version,    att_val) ||
                    get_global_att(nc_file, ncmet_att_projection, att_val));
       }
+
+      delete nc_file;
+	 
    }catch(...) {
    }
+   
    return ( status );
 
 }
@@ -149,8 +157,12 @@ bool is_ncpinterp_file(const char * filename)
             status = (strstr(att_val.c_str(), ncpinterp_att_value));
          }
       }
+
+      delete nc_file;
+
    }catch(...) {
    }
+   
    return ( status );
 
 }

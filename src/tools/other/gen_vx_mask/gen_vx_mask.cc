@@ -1231,11 +1231,13 @@ void write_netcdf(const DataPlane &dp) {
    if(!put_nc_data_with_dims(&mask_var, &mask_data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
+      // Delete allocated memory
+      if(mask_data) { delete[] mask_data; mask_data = (float *) 0; }
       exit(1);
    }
 
    // Delete allocated memory
-   if(mask_data) { delete mask_data; mask_data = (float *) 0; }
+   if(mask_data) { delete[] mask_data; mask_data = (float *) 0; }
 
    delete f_out;
    f_out = (NcFile *) 0;

@@ -650,8 +650,9 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    NcFile *nc = open_ncfile(nc_name);
    if (0 != nc && !IS_INVALID_NC_P(nc)) {
       status = get_global_att(nc, att_name, att_val, false);
-      delete nc;
    }
+
+   if(nc) delete nc;
 
    return(status);
 }
@@ -666,9 +667,10 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
    NcFile *nc = open_ncfile(nc_name);
    if (0 != nc && !IS_INVALID_NC_P(nc)) {
       status = get_global_att(nc, att_name, att_val, false);
-      delete nc;
    }
 
+   if(nc) delete nc;
+   
    return(status);
 }
 

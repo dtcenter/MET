@@ -141,6 +141,9 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    // Write the lon data
    put_nc_data(&lon_var, &lon_data[0], lon_dim->getSize(), 0);
 
+   if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
+   if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
+
    return;
 }
 
@@ -199,6 +202,9 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    // Write the lon data
    put_nc_data(&lon_var, &lon_data[0], counts, offsets);
+
+   if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
+   if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
 
    return;
 }
