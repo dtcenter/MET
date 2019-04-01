@@ -50,7 +50,7 @@ clear();
 }
 
 
-////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////
 
 
 RotatedLatLonGrid::~RotatedLatLonGrid()
@@ -425,47 +425,12 @@ void RotatedLatLonGrid::shift_right(int N)
 
 {
 
+if ( N == 0 )  return;
 
-mlog << Error
-     << "\n\n  RotatedLatLonGrid::shift_right(int) -> not implemented\n\n";
+mlog << Error << "\nRotatedLatLonGrid::shift_right(int) -> "
+     << "shifting is not implemented\n\n";
 
 exit ( 1 );
-
-
-/*
-if ( N == 0 )  return;
-
-if ( ! is_global() ) {
-
-
-   mlog << Error
-        << "\n\n  RotatedLatLonGrid::shift_right(int) -> "
-        << "shifting is not allowed for non-global grids\n\n";
-
-   exit ( 1 );
-
-}
-
-mlog << Warning
-     << "Shifting global LatLon grid to the right " << N
-     << " grid boxes.\n";
-
-N %= Nx;
-
-if ( N < 0 )  N += Nx;
-
-if ( N == 0 )  return;
-
-
-double new_lat_ll, new_lon_ll;
-
-// xy_to_latlon( N, 0.0, new_lat_ll, new_lon_ll);
-   xy_to_latlon(-N, 0.0, new_lat_ll, new_lon_ll);
-
-lon_ll = new_lon_ll;
-
-RData.latlon.lon_ll = new_lon_ll;
-*/
 
 return;
 

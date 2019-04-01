@@ -357,7 +357,7 @@ if ( N == 0 )  return;
 
 if ( ! is_global() ) {
 
-   mlog << Error 
+   mlog << Error
         << "\n\n  LatLonGrid::shift_right(int) -> "
         << "shifting is not allowed for non-global grids\n\n";
 
@@ -375,11 +375,9 @@ if ( N < 0 )  N += Nx;
 
 if ( N == 0 )  return;
 
-
 double new_lat_ll, new_lon_ll;
 
-// xy_to_latlon( N, 0.0, new_lat_ll, new_lon_ll);
-   xy_to_latlon(-N, 0.0, new_lat_ll, new_lon_ll);
+xy_to_latlon((double) -1.0*N, 0.0, new_lat_ll, new_lon_ll);
 
 lon_ll = new_lon_ll;
 
