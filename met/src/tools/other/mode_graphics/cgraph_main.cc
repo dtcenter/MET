@@ -267,7 +267,7 @@ switch ( Ptype )  {
 
 
    case png_type:
-      cstatus = cairo_surface_write_to_png (Surface, Filename);
+      cstatus = cairo_surface_write_to_png (Surface, Filename.c_str());
       if ( cstatus != CAIRO_STATUS_SUCCESS )  {
          mlog << Error << "\n\n  CgraphBase::write() -> trouble writing png file \""
               << Filename << "\" ... " << cairo_status_to_string(cstatus)
@@ -344,7 +344,7 @@ switch ( Ptype )  {
 
    case svg_type:
       Filename << ".svg";
-      Surface = cairo_svg_surface_create   (Filename, width, height);
+      Surface = cairo_svg_surface_create   (Filename.c_str(), width, height);
       break;
 
    default:
@@ -574,13 +574,13 @@ f.full_pfb_name << f.gs_font_dir << '/'
                 << gs_ps_map_info[ps_font_number].gs_pfb_name
                 << ".pfb";
 
-f.short_pfb_name = get_short_name(f.full_pfb_name);
+f.short_pfb_name = get_short_name(f.full_pfb_name.c_str());
 
 f.full_afm_name << f.gs_font_dir << '/'
                 << gs_ps_map_info[ps_font_number].gs_pfb_name
                 << ".afm";
 
-f.short_afm_name = get_short_name(f.full_afm_name);
+f.short_afm_name = get_short_name(f.full_afm_name.c_str());
 
 f.ps_name = gs_ps_map_info[ps_font_number].ps_font_name;
 
@@ -600,7 +600,7 @@ if ( ! (f.afm->read(f.full_afm_name)) )  {
 
 }
 
-f.face = ft_load(f.full_pfb_name, f.full_afm_name);
+f.face = ft_load(f.full_pfb_name.c_str(), f.full_afm_name.c_str());
 
 
 

@@ -66,7 +66,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static ConcatString program_name = "plot_data_plane";
+static ConcatString program_name = (string)"plot_data_plane";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,13 +129,13 @@ int main(int argc, char * argv[])
    // parse the config string
    //
    MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read(replace_path(config_map_data_filename));
+   config.read(replace_path(config_const_filename).c_str());
+   config.read(replace_path(config_map_data_filename).c_str());
 
    //
    // get the field info from the command line
    //
-   config.read_string(FieldString);
+   config.read_string(FieldString.c_str());
 
    //
    // get the gridded file type from config string, if present
@@ -147,7 +147,7 @@ int main(int argc, char * argv[])
    // and the VarInfo object using the var_info_factory
    //
    mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
-   met_ptr = m_factory.new_met_2d_data_file(InputFilename, ftype);
+   met_ptr = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if (!met_ptr)
    {
@@ -191,7 +191,7 @@ int main(int argc, char * argv[])
    // read in the color table file and scale the color table to fit
    // the data
    //
-   color_table.read(replace_path(ColorTableName));
+   color_table.read(replace_path(ColorTableName).c_str());
 
    if (is_eq(color_table.data_min(bad_data_double), 0.0) &&
        is_eq(color_table.data_max(bad_data_double), 1.0))
@@ -368,8 +368,8 @@ void set_title_string(const StringArray & a)
 
 void set_plot_range(const StringArray & a)
 {
-   PlotRangeMin = atof(a[0]);
-   PlotRangeMax = atof(a[1]);
+   PlotRangeMin = atof(a[0].c_str());
+   PlotRangeMax = atof(a[1].c_str());
 
 }
 
@@ -393,7 +393,7 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 }
 

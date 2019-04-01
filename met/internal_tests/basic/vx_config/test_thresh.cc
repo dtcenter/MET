@@ -78,13 +78,13 @@ if ( dup2(1, 2) < 0 )  {
 config.set_debug(debug);
 
 bool status = false;
-ConcatString local_thresh_string = argv[1];
+ConcatString local_thresh_string = (string)argv[1];
 const double value = atof(argv[2]);
 SingleThresh st;
 
 test_mode = true;
 
-status = config.read_string(local_thresh_string);
+status = config.read_string(local_thresh_string.c_str());
 
 if ( ! status )  {
 

@@ -66,7 +66,7 @@ void TCStatConfInfo::read_config(const char *default_file_name,
                                   const char *user_file_name) {
 
    // Read the config file constants
-   Conf.read(replace_path(config_const_filename));
+   Conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    Conf.read(default_file_name);
@@ -90,7 +90,7 @@ void TCStatConfInfo::process_config() {
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
-   check_met_version(Version);
+   check_met_version(Version.c_str());
 
    // Conf: TCStatJob::AModel
    Filter.AModel = Conf.lookup_string_array(conf_key_amodel);
@@ -120,12 +120,12 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.InitInc.add(timestring_to_unix(sa[i]));
+      Filter.InitInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.InitExc.add(timestring_to_unix(sa[i]));
+      Filter.InitExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
    Filter.ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
@@ -134,32 +134,32 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::ValidInc
    sa = Conf.lookup_string_array(conf_key_valid_inc);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.ValidInc.add(timestring_to_unix(sa[i]));
+      Filter.ValidInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidExc
    sa = Conf.lookup_string_array(conf_key_valid_exc);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.ValidExc.add(timestring_to_unix(sa[i]));
+      Filter.ValidExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: TCStatJob::InitHour
    sa = Conf.lookup_string_array(conf_key_init_hour);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.InitHour.add(timestring_to_sec(sa[i]));
+      Filter.InitHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::ValidHour
    sa = Conf.lookup_string_array(conf_key_valid_hour);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.ValidHour.add(timestring_to_sec(sa[i]));
+      Filter.ValidHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::Lead
    sa = Conf.lookup_string_array(conf_key_lead);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.Lead.add(timestring_to_sec(sa[i]));
+      Filter.Lead.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
    for(i=0; i<sa.n_elements(); i++)
-      Filter.LeadReq.add(timestring_to_sec(sa[i]));
+      Filter.LeadReq.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: TCStatJob::InitMask
    Filter.InitMask = Conf.lookup_string_array(conf_key_init_mask);
@@ -283,8 +283,8 @@ void TCStatConfInfo::process_config() {
    //       TCStatJob::RIRWExactADeck, TCStatJob::RIRWExactBDeck,
    //       TCStatJob::RIRWThreshADeck, TCStatJob::RIRWThreshBDeck
    Filter.RIRWTrack       = int_to_tracktype(Conf.lookup_int(conf_key_rirw_track));
-   Filter.RIRWTimeADeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_adeck));
-   Filter.RIRWTimeBDeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_bdeck));
+   Filter.RIRWTimeADeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_adeck).c_str());
+   Filter.RIRWTimeBDeck   = timestring_to_sec(Conf.lookup_string(conf_key_rirw_time_bdeck).c_str());
    Filter.RIRWExactADeck  = Conf.lookup_bool(conf_key_rirw_exact_adeck);
    Filter.RIRWExactBDeck  = Conf.lookup_bool(conf_key_rirw_exact_bdeck);
    Filter.RIRWThreshADeck = Conf.lookup_thresh(conf_key_rirw_thresh_adeck);
@@ -303,11 +303,11 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::OutInitMask
    poly_file = Conf.lookup_string(conf_key_out_init_mask);
-   if(poly_file.nonempty()) Filter.set_out_init_mask(poly_file);
+   if(poly_file.nonempty()) Filter.set_out_init_mask(poly_file.c_str());
 
    // Conf: TCStatJob::OutValidMask
    poly_file = Conf.lookup_string(conf_key_out_valid_mask);
-   if(poly_file.nonempty()) Filter.set_out_valid_mask(poly_file);
+   if(poly_file.nonempty()) Filter.set_out_valid_mask(poly_file.c_str());
 
    // Conf: Jobs
    Jobs = Conf.lookup_string_array(conf_key_jobs);

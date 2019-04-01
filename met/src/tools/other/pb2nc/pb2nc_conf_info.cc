@@ -86,7 +86,7 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
                                 const char *user_file_name) {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    conf.read(default_file_name);
@@ -129,7 +129,7 @@ void PB2NCConfInfo::process_config() {
    }
 
    // Parse surface_message_types from message_type_group_map
-   if(group_map.count(surface_msg_typ_group_str) == 0) {
+   if(group_map.count((string)surface_msg_typ_group_str) == 0) {
       mlog << Error << "\nPB2NCConfInfo::process_config() -> "
            << "\"" << conf_key_message_type_group_map
            << "\" must contain an entry for \""
@@ -137,7 +137,7 @@ void PB2NCConfInfo::process_config() {
       exit(1);
    }
    else {
-      surface_message_types = group_map[surface_msg_typ_group_str];
+     surface_message_types = group_map[(string)surface_msg_typ_group_str];
    }
 
    // Conf: station_id

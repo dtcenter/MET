@@ -199,7 +199,7 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file);
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -229,7 +229,7 @@ void process_command_line(int argc, char **argv) {
 
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.boot_rng, conf_info.boot_seed);
+   rng_set(rng_ptr, conf_info.boot_rng.c_str(), conf_info.boot_seed.c_str());
 
    // List the lengths of the series options
    mlog << Debug(1)
@@ -333,7 +333,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n_elements(); i++) {
-      if(file_exists(file_list[i])) break;
+      if(file_exists(file_list[i].c_str())) break;
    }
 
    // Check for no valid files
@@ -343,7 +343,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i], type))) {
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), type))) {
       mlog << Error << "\nTrouble reading data file \""
            << file_list[i] << "\"\n\n";
       exit(1);
@@ -471,7 +471,7 @@ void get_series_entry(int i_series, VarInfo *info,
    dp.clear();
 
    // If not already found, search for a matching file
-   if(strlen(found_files[i_series]) == 0) {
+   if(found_files[i_series].length() == 0) {
 
       // Loop through the file list
       for(i=0; i<search_files.n_elements(); i++) {
@@ -565,14 +565,14 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    bool found = false;
 
    // Check that the file exists
-   if(!file_exists(cur_file)) {
+   if(!file_exists(cur_file.c_str())) {
       mlog << Warning << "\nread_single_entry() -> "
            << "File does not exist: " << cur_file << "\n\n";
       return(false);
    }
 
    // Open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
+   mtddf = mtddf_factory.new_met_2d_data_file(cur_file.c_str(), type);
 
    // Attempt to read the gridded data from the current file
    found = mtddf->data_plane(*info, dp);
@@ -837,13 +837,13 @@ void do_cts(int n, const NumArray &f_na, const NumArray &o_na) {
       compute_cts_stats_ci_bca(rng_ptr, f_na, o_na,
          conf_info.n_boot_rep,
          cts_info, n_cts, true,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
+         conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
          cts_info, n_cts, true,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
+         conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
    // Loop over the categorical thresholds
@@ -900,13 +900,13 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
       compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
          conf_info.n_boot_rep,
          mcts_info, true,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
+         conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
          mcts_info, true,
-         conf_info.rank_corr_flag, conf_info.tmp_dir);
+         conf_info.rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
    // Add statistic value for each possible MCTC column
@@ -974,14 +974,14 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
             pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
-            cnt_info, conf_info.tmp_dir);
+            cnt_info, conf_info.tmp_dir.c_str());
       }
       else {
          compute_cnt_stats_ci_perc(rng_ptr,
             pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
-            cnt_info, conf_info.tmp_dir);
+            cnt_info, conf_info.tmp_dir.c_str());
       }
 
       // Add statistic value for each possible CNT column
@@ -1203,7 +1203,7 @@ void store_stat_cts(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cts_info.n_alpha;
+   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = cts_info.n_alpha;
 
    // Loop over the alpha values, if necessary
    for(i=0; i<n_ci; i++) {
@@ -1361,14 +1361,14 @@ void store_stat_mctc(int n, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL") { v = (double) mcts_info.cts.total(); }
    else if(c == "N_CAT") { v = (double) mcts_info.cts.nrows(); }
-   else if(check_reg_exp("F[0-9]*_O[0-9]*", c)) {
+   else if(check_reg_exp("F[0-9]*_O[0-9]*", c.c_str())) {
 
       d = "FI_OJ";
 
       // Parse column name to retrieve index values
       sa = c.split("_");
-      i  = atoi(sa[0]+1) - 1;
-      j  = atoi(sa[1]+1) - 1;
+      i  = atoi(sa[0].c_str()+1) - 1;
+      j  = atoi(sa[1].c_str()+1) - 1;
 
       // Range check
       if(i < 0 || i >= mcts_info.cts.nrows() ||
@@ -1424,7 +1424,7 @@ void store_stat_mcts(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = mcts_info.n_alpha;
+   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = mcts_info.n_alpha;
 
    // Loop over the alpha values, if necessary
    for(i=0; i<n_ci; i++) {
@@ -1493,7 +1493,7 @@ void store_stat_cnt(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = cnt_info.n_alpha;
+   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = cnt_info.n_alpha;
 
    // Loop over the alpha values, if necessary
    for(i=0; i<n_ci; i++) {
@@ -1708,10 +1708,10 @@ void store_stat_pct(int n, const ConcatString &col,
    ConcatString d = c;
 
    // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c)) {
+   if(check_reg_exp("_[0-9]", c.c_str())) {
 
       // Parse the index value from the column name
-      i = atoi(strrchr(c, '_') + 1) - 1;
+      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
 
       // Range check
       if(i < 0 || i >= pct_info.pct.nrows()) {
@@ -1725,10 +1725,10 @@ void store_stat_pct(int n, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                     { v = (double) pct_info.pct.n();                      }
    else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1;              }
-   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);                      }
-   else if(check_reg_exp("OY_[0-9]", c))     { v = (double) pct_info.pct.event_count_by_row(i);
+   else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);                      }
+   else if(check_reg_exp("OY_[0-9]", c.c_str()))     { v = (double) pct_info.pct.event_count_by_row(i);
                                                d = "OY_I";                                         }
-   else if(check_reg_exp("ON_[0-9]", c))     { v = (double) pct_info.pct.nonevent_count_by_row(i);
+   else if(check_reg_exp("ON_[0-9]", c.c_str()))     { v = (double) pct_info.pct.nonevent_count_by_row(i);
                                                d = "ON_I";                                         }
    else {
      mlog << Error << "\nstore_stat_pct() -> "
@@ -1773,7 +1773,7 @@ void store_stat_pstd(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c, "_NC") || strstr(c, "_BC")) n_ci = pct_info.n_alpha;
+   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = pct_info.n_alpha;
 
    // Loop over the alpha values, if necessary
    for(i=0; i<n_ci; i++) {
@@ -1839,10 +1839,10 @@ void store_stat_pjc(int n, const ConcatString &col,
    ConcatString d = c;
 
    // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c)) {
+   if(check_reg_exp("_[0-9]", c.c_str())) {
 
       // Parse the index value from the column name
-      i = atoi(strrchr(c, '_') + 1) - 1;
+      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
 
       // Range check
       if(i < 0 || i >= pct_info.pct.nrows()) {
@@ -1859,19 +1859,19 @@ void store_stat_pjc(int n, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                          { v = (double) tot;                                       }
    else if(c == "N_THRESH")                       { v = (double) pct_info.pct.nrows() + 1;                  }
-   else if(check_reg_exp("THRESH_[0-9]", c))      { v = pct_info.pct.threshold(i);
+   else if(check_reg_exp("THRESH_[0-9]", c.c_str()))      { v = pct_info.pct.threshold(i);
                                                     d = "THRESH_I";                                         }
-   else if(check_reg_exp("OY_TP_[0-9]", c))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;
+   else if(check_reg_exp("OY_TP_[0-9]", c.c_str()))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;
                                                     d = "OY_TP_I";                                          }
-   else if(check_reg_exp("ON_TP_[0-9]", c))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot;
+   else if(check_reg_exp("ON_TP_[0-9]", c.c_str()))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot;
                                                     d = "ON_TP_I";                                          }
-   else if(check_reg_exp("CALIBRATION_[0-9]", c)) { v = pct_info.pct.row_calibration(i);
+   else if(check_reg_exp("CALIBRATION_[0-9]", c.c_str())) { v = pct_info.pct.row_calibration(i);
                                                     d = "CALIBRATION_I";                                    }
-   else if(check_reg_exp("REFINEMENT_[0-9]", c))  { v = pct_info.pct.row_refinement(i);
+   else if(check_reg_exp("REFINEMENT_[0-9]", c.c_str()))  { v = pct_info.pct.row_refinement(i);
                                                     d = "REFINEMENT_I";                                     }
-   else if(check_reg_exp("LIKELIHOOD_[0-9]", c))  { v = pct_info.pct.row_event_likelihood(i);
+   else if(check_reg_exp("LIKELIHOOD_[0-9]", c.c_str()))  { v = pct_info.pct.row_event_likelihood(i);
                                                     d = "LIKELIHOOD_I";                                     }
-   else if(check_reg_exp("BASER_[0-9]", c))       { v = pct_info.pct.row_obar(i);
+   else if(check_reg_exp("BASER_[0-9]", c.c_str()))       { v = pct_info.pct.row_obar(i);
                                                     d = "BASER_I";                                          }
    else {
      mlog << Error << "\nstore_stat_pjc() -> "
@@ -1917,10 +1917,10 @@ void store_stat_prc(int n, const ConcatString &col,
    ConcatString d = c;
 
    // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c)) {
+   if(check_reg_exp("_[0-9]", c.c_str())) {
 
       // Parse the index value from the column name
-      i = atoi(strrchr(c, '_') + 1) - 1;
+      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
 
       // Range check
       if(i < 0 || i >= pct_info.pct.nrows()) {
@@ -1938,11 +1938,11 @@ void store_stat_prc(int n, const ConcatString &col,
    // Get the column value
         if(c == "TOTAL")                     { v = (double) pct_info.pct.n();         }
    else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1; }
-   else if(check_reg_exp("THRESH_[0-9]", c)) { v = pct_info.pct.threshold(i);
+   else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);
                                                d = "THRESH_I";                        }
-   else if(check_reg_exp("PODY_[0-9]", c))   { v = ct.pod_yes();
+   else if(check_reg_exp("PODY_[0-9]", c.c_str()))   { v = ct.pod_yes();
                                                d = "PODY_I";                          }
-   else if(check_reg_exp("POFD_[0-9]", c))   { v = ct.pofd();
+   else if(check_reg_exp("POFD_[0-9]", c.c_str()))   { v = ct.pofd();
                                                d = "POFD_I";                          }
    else {
      mlog << Error << "\nstore_stat_prc() -> "
@@ -1975,7 +1975,7 @@ void store_stat_prc(int n, const ConcatString &col,
 void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_file, true);
+   nc_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -1985,8 +1985,8 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file, program_name,
-                       conf_info.model, conf_info.obtype, conf_info.desc);
+   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+                       conf_info.model.c_str(), conf_info.obtype.c_str(), conf_info.desc.c_str());
    add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
                                   (string)conf_info.mask_grid_name : na_str));
    add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
@@ -2249,13 +2249,13 @@ void set_log_file(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2273,12 +2273,12 @@ StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
    }
 
    // Attempt to read the first file as a gridded data file
-   mtddf = mtddf_factory.new_met_2d_data_file(a[0], type);
+   mtddf = mtddf_factory.new_met_2d_data_file(a[0].c_str(), type);
 
    // If the read was successful, store the list of gridded files.
    // Otherwise, process entries as ASCII files.
    if(mtddf)                            list.add(a);
-   else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
+   else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0].c_str());
 
    // Cleanup
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
@@ -2298,7 +2298,7 @@ void parse_long_names() {
         << "Reading stat column descriptions: " << file_name << "\n";
 
    // Open the data file
-   f_in.open(file_name);
+   f_in.open(file_name.c_str());
    if(!f_in) {
       mlog << Error << "\nparse_long_names() -> "
            << "can't open the ASCII file \"" << file_name

@@ -105,9 +105,9 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    // Allocate memory for output pairs
    extend(pd.n_obs);
 
-   set_mask_name(pd.mask_name);
+   set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
-   set_msg_typ(pd.msg_typ);
+   set_msg_typ(pd.msg_typ.c_str());
    set_msg_typ_vals(pd.msg_typ_vals);
 
    set_interp_mthd(pd.interp_mthd);
@@ -118,10 +118,10 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    if(pd.sid_sa.n_elements() == pd.n_obs) {
 
       for(i=0; i<pd.n_obs; i++) {
-         add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+         add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                   pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                   pd.lvl_na[i], pd.elv_na[i],
-                  pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                  pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                   pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
       }
    }
@@ -732,7 +732,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the GRIB code for the observation matches
    // the specified code
    if ((var_name != 0) && (0 < strlen(var_name))) {
-      if (0 != strcmp(var_name, obs_info->name())) {
+      if ( var_name != obs_info->name() ) {
          rej_gc++;
          return;
       }
@@ -746,7 +746,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    if( obs_qty_filt.n_elements() && strcmp(obs_qty, "") ) {
       bool qty_match = false;
       for(i=0; i<obs_qty_filt.n_elements() && !qty_match; i++)
-         if(strcmp(obs_qty, obs_qty_filt[i]) == 0) qty_match = true;
+         if( obs_qty == obs_qty_filt[i] ) qty_match = true;
 
       if( !qty_match ){
          rej_qty++;
@@ -1177,10 +1177,10 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
 
          // Handle point data
          if(pd.sid_sa.n_elements() == pd.n_obs) {
-            out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+            out_pd.add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                             pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                             pd.lvl_na[i], pd.elv_na[i],
-                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                             pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
          // Handle gridded data
@@ -1232,10 +1232,10 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
 
          // Handle point data
          if(pd.sid_sa.n_elements() == pd.n_obs) {
-            out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+            out_pd.add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                             pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                             pd.lvl_na[i], pd.elv_na[i],
-                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                             pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
          // Handle gridded data

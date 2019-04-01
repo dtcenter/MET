@@ -719,12 +719,12 @@ test_mode = true;
    //  strip off trailing SetLogic symbols
    //
 
-ConcatString cs = str;
+ConcatString cs = string(str);
 cs.chomp(setlogic_symbol_union);
 cs.chomp(setlogic_symbol_intersection);
 cs.chomp(setlogic_symbol_symdiff);
 
-status = config.read_string(cs);
+status = config.read_string(cs.c_str());
 
 if ( ! status )  {
 

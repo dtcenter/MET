@@ -450,7 +450,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(name, e[j].option_text) == 0 )  return ( j );
+  if ( strcmp(name, e[j].option_text.c_str()) == 0 )  return ( j );
 
 }
 
@@ -680,7 +680,7 @@ const char * CommandLine::operator[](int k) const
 
 const char * c = (const char *) 0;
 
-c = args[k];
+ c = args[k].c_str();
 
 return ( c );
 
@@ -718,7 +718,7 @@ N = args.n_elements();
 
 for (j=0; j<N; ++j)  {
 
-   name = args[j];
+  name = args[j].c_str();
 
    if ( is_switch(name) )  {
 
@@ -726,7 +726,7 @@ for (j=0; j<N; ++j)  {
 
       if ( (strcmp(name, "-version") == 0) || (strcmp(name, "--version") == 0) )  show_version();   //  doesn't return
 
-      option_index = options.lookup(args[j]);
+      option_index = options.lookup(args[j].c_str());
 
       if ( option_index >= 0 )  return ( j );
 
@@ -819,10 +819,10 @@ cout << "\nMET Version:\t" << met_version << "\n";
 ConcatString version_file;
 version_file = replace_path("MET_BASE/version.txt");
 
-if ( file_exists(version_file) )  {
+ if ( file_exists(version_file.c_str()) )  {
 
    ifstream in;
-   in.open(version_file);
+   in.open(version_file.c_str());
    string line;
 
    if ( !in )  {
@@ -873,7 +873,7 @@ const char * switch_name = (const char *) 0;
 
 while ( (j = next_option(index)) >= 0 )  {
 
-   switch_name = args[j];
+  switch_name = args[j].c_str();
 
    if ( index < 0 )  {
 
@@ -949,7 +949,7 @@ for (j=0; j<Nargs; ++j)  {
 
    }
 
-   c = args[k];
+   c = args[k].c_str();
 
    if ( is_switch(c) )  {
 
@@ -993,7 +993,7 @@ while ( 1 )  {
 
    if ( k >= args.n_elements() )  break;
 
-   c = args[k];
+   c = args[k].c_str();
 
    if ( is_switch(c) )  break;
 

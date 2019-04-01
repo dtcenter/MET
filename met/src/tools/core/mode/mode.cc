@@ -374,13 +374,13 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+  mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+  compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

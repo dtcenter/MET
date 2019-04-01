@@ -68,7 +68,7 @@ config.set_debug(debug);
    //
 
 config.read_string("name=\"APCP\"; level=\"(*,*)\";");
-config.read(replace_path(config_const_filename)); 
+config.read(replace_path(config_const_filename).c_str()); 
 
    //
    //  dump

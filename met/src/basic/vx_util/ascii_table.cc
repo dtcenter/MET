@@ -901,12 +901,20 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+void AsciiTable::set_entry(const int r, const int c, const char* text)
+
+{
+  set_entry(r, c, (string)text);
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 void AsciiTable::set_entry(const int r, const int c, int a)
 
 {
-char junk[255];
+ConcatString junk;
 
 if ( fabs(a - BadDataValue) < 0.0001 )  {
    set_entry(r, c, BadDataStr);
@@ -915,7 +923,7 @@ if ( fabs(a - BadDataValue) < 0.0001 )  {
 } else if ( DoCommaString )  {
    ::comma_string(a, junk);
 }  else  {
-   snprintf(junk, sizeof(junk), "%d", a);
+  junk.format("%d", a);
 }
 
 set_entry(r, c, junk);
@@ -932,24 +940,26 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 
 {
 
-char junk[256];
+  //ConcatString junk;
+ConcatString str;
 
-if ( fabs(x - BadDataValue) < 0.0001 )  strncpy(junk, BadDataStr.c_str(), sizeof(junk));
+if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
 else  {
 
-   if ( fabs(x) >= 1.0 )  snprintf(junk, sizeof(junk), f_FloatFormat, x);
-   else                   snprintf(junk, sizeof(junk), g_FloatFormat, x);
+  if ( fabs(x) >= 1.0 )   str.format(f_FloatFormat, x);
+  else                    str.format(g_FloatFormat, x);
 
 }
 
-fix_float(junk);
+ fix_float(str);
 
 if ( DoCommaString )  {
-
+  char * junk;
+  strncpy(junk, str.c_str(), str.length());
    char * p = (char *) 0;
    long X;
    ConcatString s;
-   char j2[256];
+   ConcatString j2;
 
    p = strchr(junk, '.');
 
@@ -969,7 +979,7 @@ if ( DoCommaString )  {
 
    set_entry(r, c, s.string());
 
-} else set_entry(r, c, junk);
+} else set_entry(r, c, str);
 
 return;
 
@@ -983,11 +993,9 @@ void AsciiTable::set_entry(const int r, const int c, char a)
 
 {
 
-char junk[32];
+ConcatString junk;
 
-junk[0] = a;
-
-junk[1] = (char) 0;
+junk = a;
 
 set_entry(r, c, junk);
 
@@ -999,7 +1007,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * AsciiTable::operator()(int r, int c) const
+const ConcatString AsciiTable::operator()(int r, int c) const
 
 {
 
@@ -1008,7 +1016,7 @@ int n;
 n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
 
-return ( e[n].c_str() );     //  might be null
+return ( e[n] );     //  might be null
 
 }
 
@@ -1147,12 +1155,6 @@ w = ColWidth[c];
 
 if ( w == 0 )  {
 
-   // char junk[2];
-
-   // junk[0] = (char) 0;
-
-   // s = junk;
-
    return ( ConcatString() );
 
 }
@@ -1257,7 +1259,7 @@ ConcatString s = e[k];
 
 for (j=0; j<n; ++j)  s << fill_char;
 
-set_entry(r, c, s.text());
+set_entry(r, c, s);
 
 return;
 
@@ -1276,7 +1278,6 @@ int max_left, max_right;
 int w_old, w_new;
 int left[Nrows];
 int right[Nrows];
-// const char fill_char = '*';
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
@@ -1355,7 +1356,7 @@ for (j=0; j<Ncols; ++j)  {
 
    s.set_repeat(underline_char, ColWidth[j]);
 
-   set_entry(row, j, s.text());
+   set_entry(row, j, s);
 
 }   //  for j
 

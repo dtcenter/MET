@@ -62,7 +62,7 @@ n_alloc = N = 0;
 if ( X )  { delete [] X;  X = (double *) 0; }
 if ( Y )  { delete [] Y;  Y = (double *) 0; }
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+ if ( Name != "" )  { Name.clear(); }
 
 }
 
@@ -106,7 +106,7 @@ void PiecewiseLinear::init_from_scratch()
 
 n_alloc = N = 0;
 
-Name = (char *) 0;
+Name.clear();
 
 X = Y = (double *) 0;
 
@@ -147,7 +147,7 @@ if ( p.N == 0 )  return;
 
 N = p.N;
 
-if ( p.Name )  set_name(p.Name);
+if ( p.Name != "" )  set_name(p.Name);
 
 extend(p.N);
 
@@ -259,7 +259,7 @@ PiecewiseLinear::PiecewiseLinear(const char *NAME, int Npoints, const double *XX
 
 init_from_scratch();
 
-if ( NAME )  set_name(NAME);
+  if ( NAME )  set_name((string)NAME);
 
 extend(Npoints);
 
@@ -358,20 +358,17 @@ return ( -100 );   //  just to satisfy the compiler
 ////////////////////////////////////////////////////////////////////////
 
 
-void PiecewiseLinear::set_name(const char * T)
+void PiecewiseLinear::set_name(const ConcatString T)
 
 {
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+  if ( Name != "" )  { Name.clear(); }
 
 
-Name = new char [1 + strlen(T)];
+  Name = T;
 
 
-strcpy(Name, T);
-
-
-return;
+  return;
 
 }
 

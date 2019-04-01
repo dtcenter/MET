@@ -91,7 +91,7 @@ struct ProbRIRWMapData {
 // Define struct used to perform comparisons on ConcatStrings
 struct cs_cmp {
   bool operator()(const ConcatString & cs1, const ConcatString & cs2) const {
-    return(strcmp(cs1, cs2) < 0);
+    return(cs1 < cs2);
   }
 };
 
@@ -113,7 +113,7 @@ enum TCStatJobType {
    NoTCStatJobType         // Default value
 };
 
-extern TCStatJobType string_to_tcstatjobtype(const char *);
+extern TCStatJobType string_to_tcstatjobtype(const ConcatString);
 extern ConcatString  tcstatjobtype_to_string(const TCStatJobType);
 
 ////////////////////////////////////////////////////////////////////////

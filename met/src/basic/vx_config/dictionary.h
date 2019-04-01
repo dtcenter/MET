@@ -96,20 +96,20 @@ class DictionaryEntry {
          //  set stuff
          //
 
-      void set_int          (const char * _name, int);
-      void set_double       (const char * _name, double);
-      void set_boolean      (const char * _name, bool);
-      void set_string       (const char * _name, const char * _text);
-      void set_dict         (const char * _name, const Dictionary &);
+      void set_int          (const std::string _name, int);
+      void set_double       (const std::string _name, double);
+      void set_boolean      (const std::string _name, bool);
+      void set_string       (const std::string _name, const std::string _text);
+      void set_dict         (const std::string _name, const Dictionary &);
       void set_array        (const char * _name, const Dictionary &);
-      void set_threshold    (const char * _name, const SingleThresh &);
-      void set_pwl          (const char * _name, const PiecewiseLinear &);
+      void set_threshold    (const std::string _name, const SingleThresh &);
+      void set_pwl          (const std::string _name, const PiecewiseLinear &);
 
       void set_variable     (const char * _name, const IcodeVector &);
 
-      void set_user_function (const char * _name, const IcodeVector &, int _n_args);
+      void set_user_function (const std::string _name, const IcodeVector &, int _n_args);
 
-      void set_name         (const char *);
+      void set_name         (const std::string);
 
       void set_icodevector  (const IcodeVector &);
       void set_local_vars   (const IdentifierArray &);
@@ -192,7 +192,7 @@ class Dictionary {
 
       void patch_parents();
 
-      virtual const DictionaryEntry * lookup_simple(const char * name);   //  no scope
+      virtual const DictionaryEntry * lookup_simple(const std::string name);   //  no scope
 
 
       int Nentries;
@@ -250,7 +250,7 @@ class Dictionary {
 
       virtual void store(const Dictionary &);
 
-      virtual const DictionaryEntry * lookup(const char * name);
+      virtual const DictionaryEntry * lookup(const std::string name);
 
          //
          //  convenience functions
@@ -357,7 +357,7 @@ class DictionaryStack {
       void push();
       void push_array();
 
-      void pop_dict    (const char * name);
+      void pop_dict    (const std::string name);
 
       void pop_element (const char * name);
 
@@ -365,7 +365,7 @@ class DictionaryStack {
 
       void store(const DictionaryEntry &);
 
-      const DictionaryEntry * lookup(const char * name) const;
+      const DictionaryEntry * lookup(const std::string name) const;
 
 };
 

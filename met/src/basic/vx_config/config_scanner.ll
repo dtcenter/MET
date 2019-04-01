@@ -509,7 +509,7 @@ if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return 
 
 int index;
 
-if ( (! is_lhs) && is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
    //  local variable ?

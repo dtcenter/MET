@@ -308,16 +308,16 @@ tokens.parse_delim(get_short_name(filename), "_.");
 for (j=0; j<tokens.n_elements(); ++j)  {
 
    //  Unixtime in the form YYYYMMDDHH[MMSS]
-   if ( is_number(tokens[j]) && strlen(tokens[j]) >= 10 )
-      file_ut = timestring_to_unix(tokens[j]);
+  if ( is_number(tokens[j].c_str()) && tokens[j].length() >= 10 )
+      file_ut = timestring_to_unix(tokens[j].c_str());
 
    //  Lead time in hours as a 1 - 4 digit number
-   else if ( is_number(tokens[j]) && strlen(tokens[j]) <= 4)
-      file_sec = atoi(tokens[j]) * sec_per_hour;
+  else if ( is_number(tokens[j].c_str()) && tokens[j].length() <= 4)
+      file_sec = atoi(tokens[j].c_str()) * sec_per_hour;
 
-   else if ( strcasecmp(tokens[j], "NH") == 0 )  Hemisphere = 'N';
+   else if ( strcasecmp(tokens[j].c_str(), "NH") == 0 )  Hemisphere = 'N';
 
-   else if ( strcasecmp(tokens[j], "SH") == 0 )  Hemisphere = 'S';
+   else if ( strcasecmp(tokens[j].c_str(), "SH") == 0 )  Hemisphere = 'S';
 
 }
 

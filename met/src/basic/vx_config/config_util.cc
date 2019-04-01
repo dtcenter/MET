@@ -24,7 +24,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 // MetConfig object containing config value constants
-static MetConfig conf_const(replace_path(config_const_filename));
+static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ ConcatString parse_conf_version(Dictionary *dict) {
    s = dict->lookup_string(conf_key_version);
 
    if(dict->last_lookup_status()) {
-      check_met_version(s);
+     check_met_version(s.c_str());
    }
 
    return(s);
@@ -146,7 +146,7 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
       }
 
       // Check for embedded whitespace in non-empty strings
-      if(!s.empty() && check_reg_exp(ws_reg_exp, s) == true) {
+      if(!s.empty() && check_reg_exp(ws_reg_exp, s.c_str()) == true) {
          mlog << Error << "\nparse_conf_string() -> "
               << "The \"" << conf_key << "\" entry (\"" << s
               << "\") cannot contain embedded whitespace.\n\n";
@@ -216,7 +216,7 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
       cs.set_lower();
 
       // Get the integer flag value for the current entry
-      v = dict->lookup_int(cs);
+      v = dict->lookup_int(cs.c_str());
 
       // Convert integer to enumerated STATOutputType
            if(v == conf_const.lookup_int(conf_val_none)) t = STATOutputType_None;
@@ -268,10 +268,10 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
    for(i=0; i<out_dict->n_entries(); i++) {
 
       // Get the line type for the current entry
-      line_type = string_to_statlinetype((*out_dict)[i]->name());
+      line_type = string_to_statlinetype((*out_dict)[i]->name().c_str());
 
       // Get the StringArray value for the current entry
-      sa = out_dict->lookup_string_array((*out_dict)[i]->name());
+      sa = out_dict->lookup_string_array((*out_dict)[i]->name().c_str());
 
       // Set ignore case to true
       sa.set_ignore_case(true);
@@ -359,7 +359,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
 
          // Set up the new entry, taking only a single level value
          if(lvl.n_elements() > 0) {
-            entry.set_string(conf_key_level, lvl[index-(total-n_lvl)]);
+            entry.set_string(conf_key_level, lvl[index-(total-n_lvl)].c_str());
             i_dict.store(entry);
          }
 
@@ -410,7 +410,7 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
 
    // Parse station ID's to exclude from each entry
    for(i=0; i<sa.n_elements(); i++) {
-      parse_sid_mask(sa[i], cur, mask_name);
+     parse_sid_mask(string(sa[i]), cur, mask_name);
       sid_exc_sa.add(cur);
    }
 
@@ -447,16 +447,16 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
    if(mask_sid_str.empty()) return;
 
    // Replace any instances of MET_BASE with it's expanded value
-   tmp_file = replace_path(mask_sid_str);
+   tmp_file = replace_path(mask_sid_str.c_str());
 
    // Process file name
-   if(file_exists(tmp_file)) {
+   if(file_exists(tmp_file.c_str())) {
 
       mlog << Debug(4) << "parse_sid_mask() -> "
            << "parsing station ID masking file \"" << tmp_file << "\"\n";
 
       // Open the mask station id file specified
-      in.open(tmp_file);
+      in.open(tmp_file.c_str());
 
       if(!in) {
          mlog << Error << "\nparse_sid_mask() -> "
@@ -484,7 +484,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
       // Print a warning if the string contains a dot which suggests
       // the user was trying to specify a file name.
-      if(check_reg_exp("[.]", mask_sid_str)) {
+      if(check_reg_exp("[.]", mask_sid_str.c_str())) {
          mlog << Warning << "\nparse_sid_mask() -> "
               << "unable to process \"" << mask_sid_str
               << "\" as a file name and processing it as a single "
@@ -495,8 +495,8 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
            << "storing single station ID mask \"" << mask_sid_str << "\"\n";
 
       // Check for embedded whitespace or slashes
-      if(check_reg_exp(ws_reg_exp, mask_sid_str) ||
-         check_reg_exp("[/]", mask_sid_str)) {
+      if(check_reg_exp(ws_reg_exp, mask_sid_str.c_str()) ||
+         check_reg_exp("[/]", mask_sid_str.c_str())) {
          mlog << Error << "\nparse_sid_mask() -> "
               << "masking station ID string can't contain whitespace or "
               << "slashes \"" << mask_sid_str << "\".\n\n";
@@ -783,10 +783,10 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    info.raw_data = ts_dict->lookup_bool(conf_key_raw_data);
 
    // Conf: beg
-   info.beg = timestring_to_sec(ts_dict->lookup_string(conf_key_beg));
+   info.beg = timestring_to_sec(ts_dict->lookup_string(conf_key_beg).c_str());
 
    // Conf: end
-   info.end = timestring_to_sec(ts_dict->lookup_string(conf_key_end));
+   info.end = timestring_to_sec(ts_dict->lookup_string(conf_key_end).c_str());
 
    // Conf: step
    info.step = ts_dict->lookup_int(conf_key_step);
@@ -1110,7 +1110,7 @@ void InterpInfo::validate() {
 
    for(int i=0; i<n_interp; i++) {
 
-      InterpMthd methodi = string_to_interpmthd(method[i]);
+      InterpMthd methodi = string_to_interpmthd(method[i].c_str());
 
       // Check the nearest neighbor special case
       if(width[i] == 1 &&
@@ -1487,7 +1487,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    info.cov_ta = hira_dict->lookup_thresh_array(conf_key_cov_thresh);
 
    // Pass coverage thresholds through probaiblity logic
-   info.cov_ta = string_to_prob_thresh(info.cov_ta.get_str());
+   info.cov_ta = string_to_prob_thresh(info.cov_ta.get_str().c_str());
 
    // Error check the coverage (probability) thresholds
    check_prob_thresh(info.cov_ta);
@@ -1637,7 +1637,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    }
 
    // Make sure that it exists
-   if(met_opendir(s) == NULL ) {
+   if(met_opendir(s.c_str()) == NULL ) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
            << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
            << s << "\n\n";
@@ -1796,14 +1796,14 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    for(i=0; i<sa.n_elements(); i++) {
 
       // Add threshold to existing map entry
-      if(m.count(sa[i]) >= 1) {
-         m[sa[i]].add(ta[i]);
+     if(m.count(string(sa[i])) >= 1) {
+       m[string(sa[i])].add(ta[i]);
       }
       // Add a new map entry
       else {
          ta_entry.clear();
          ta_entry.add(ta[i]);
-         m[sa[i]] = ta_entry;
+         m[string(sa[i])] = ta_entry;
       }
    }
 

@@ -262,11 +262,10 @@ class Logger
          // do stuff
          //
 
-      void open_log_file(ConcatString &);
-      void open_log_file(const char *);
+      void open_log_file(const ConcatString);
 
       Logger & operator<<(const char *);
-      Logger & operator<<(std::string);
+      Logger & operator<<(const std::string);
       Logger & operator<<(const int);
       Logger & operator<<(const unsigned int);
       Logger & operator<<(const long);
@@ -294,8 +293,6 @@ inline int Logger::verbosity_level() const { return (VerbosityLevel); }
 
 inline bool Logger::is_open() const { return (out != 0); }
 
-inline Logger & Logger::operator<<(std::string s){ return *this << s.c_str(); }
-
 
 //////////////////////////////////////////////////////////////////
 
@@ -307,7 +304,6 @@ inline Logger & Logger::operator<<(std::string s){ return *this << s.c_str(); }
 
 
 extern MsgLevel & level(const int);
-// extern LoggerDebug & Debug(const int);
 extern MsgLevel & Debug(const int);
 extern LoggerError Error;
 extern LoggerWarning Warning;

@@ -143,7 +143,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Observation quality
 
-    ConcatString obs_qty = (_nFileColumns == n_met_col ? na_str : data_line[9]);
+    ConcatString obs_qty = (_nFileColumns == n_met_col ? na_string : (string)data_line[9]);
 
     // Observation value
 

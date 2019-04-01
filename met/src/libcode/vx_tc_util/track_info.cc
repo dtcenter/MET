@@ -565,9 +565,9 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::is_interp() const {
-   const char *s = Technique;
+   const char *s = Technique.c_str();
 
-   s += (strlen(Technique) - 1);
+   s += (strlen(Technique.c_str()) - 1);
 
    // Return true if the last character of the model name is 'I'
    return(*s == 'I');
@@ -865,11 +865,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    }
 
    // Initialize average track to the first track
-   tavg.set_basin(tracks[0].basin());
-   tavg.set_cyclone(tracks[0].cyclone());
-   tavg.set_storm_name(tracks[0].storm_name());
+   tavg.set_basin(tracks[0].basin().c_str());
+   tavg.set_cyclone(tracks[0].cyclone().c_str());
+   tavg.set_storm_name(tracks[0].storm_name().c_str());
    tavg.set_technique_number(tracks[0].technique_number());
-   tavg.set_technique(model);
+   tavg.set_technique(model.c_str());
    tavg.set_init(tracks[0].init());
    tavg.set_storm_id();
 
@@ -1024,14 +1024,14 @@ bool has_storm_id(const StringArray &storm_id,
    for(i=0; i<storm_id.n_elements(); i++) {
 
       // Check that the basin matches
-      if(strncasecmp(storm_id[i], basin, 2) != 0) continue;
+      if(strncasecmp(storm_id[i].c_str(), basin.c_str(), 2) != 0) continue;
 
       // Check that the cyclone number matches
-      if(strncasecmp(storm_id[i]+2, cyclone, 2) != 0 &&
-         strncasecmp(storm_id[i]+2,    "AL", 2) != 0) continue;
+      if(strncasecmp(storm_id[i].c_str()+2, cyclone.c_str(), 2) != 0 &&
+         strncasecmp(storm_id[i].c_str()+2,    "AL", 2) != 0) continue;
 
       // Parse the year
-      year = atoi(storm_id[i]+4);
+      year = atoi(storm_id[i].c_str()+4);
 
       // Handle a single year
       if(year >= 1900 && year < 2100) {

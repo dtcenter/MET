@@ -14,15 +14,16 @@
 #ifndef  __FIX_FLOAT_H__
 #define  __FIX_FLOAT_H__
 
+#include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void fix_float(char *);
+extern void fix_float(ConcatString);
 
-extern void fix_float_with_blanks(char *);
+extern void fix_float_with_blanks(ConcatString);
 
-extern void fix_float_with_char(char *, const char replacement_char);
+extern void fix_float_with_char(ConcatString, const char replacement_char);
 
 
 ////////////////////////////////////////////////////////////////////////

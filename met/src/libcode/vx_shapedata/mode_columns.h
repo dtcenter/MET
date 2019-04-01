@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * mode_hdr_columns [] = {
+static const string mode_hdr_columns [] = {
 
    "VERSION",                    //   1
    "MODEL",                      //   2
@@ -41,7 +41,7 @@ static const char * mode_hdr_columns [] = {
 
 };
 
-static const char * mode_obj_columns [] = {
+static const string mode_obj_columns [] = {
 
    "OBJECT_ID",                  //  21
    "OBJECT_CAT",                 //  22

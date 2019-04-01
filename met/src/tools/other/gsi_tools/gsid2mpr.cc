@@ -113,8 +113,8 @@ int main(int argc, char * argv []) {
       obs_key_map.clear();
 
       // Process by file type
-      if(is_conv(cline[i])) process_conv(cline[i], output_filename);
-      else                  process_rad (cline[i], output_filename);
+      if(is_conv(cline[i])) process_conv(cline[i], output_filename.c_str());
+      else                  process_rad (cline[i], output_filename.c_str());
    }
 
    return(0);
@@ -180,16 +180,16 @@ void process_conv(const char *conv_filename, const char *output_filename) {
             d_v.guess = d_v.guess_v;
             d_v.obs   = d_v.obs_v;
 
-            if(!check_dup || (check_dup && !is_dup(get_conv_key(d)))) {
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d).c_str()))) {
                write_mpr_row_conv(at, n_out++, d);
             }
-            if(!check_dup || (check_dup && !is_dup(get_conv_key(d_v)))) {
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d_v).c_str()))) {
                write_mpr_row_conv(at, n_out++, d_v);
             }
          }
          // Handle other variable types
          else {
-            if(!check_dup || (check_dup && !is_dup(get_conv_key(d)))) {
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d).c_str()))) {
                write_mpr_row_conv(at, n_out++, d);
             }
          }
@@ -317,7 +317,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
                             f.channel_val(i_channel[i]-1),
                             f.use_channel(i_channel[i]-1));
 
-         if(!check_dup || (check_dup && !is_dup(get_rad_key(d)))) {
+         if(!check_dup || (check_dup && !is_dup(get_rad_key(d).c_str()))) {
             write_mpr_row_rad(at, n_out++, d);
          }
       }
@@ -366,7 +366,7 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    if(not_has_OBS_VALID_END)  shc.set_obs_valid_end(d.obs_ut);
    if(not_has_FCST_VAR)       shc.set_fcst_var(d.var);
    if(not_has_OBS_VAR)        shc.set_obs_var(d.var);
-   if(not_has_OBTYPE)         shc.set_obtype(d.obtype);
+   if(not_has_OBTYPE)         shc.set_obtype(d.obtype.c_str());
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -569,7 +569,7 @@ void set_no_check_dup(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_channel(const StringArray & a) {
-   channel.add_css(a[0]);
+   channel.add_css(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -604,7 +604,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

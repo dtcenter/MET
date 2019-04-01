@@ -201,6 +201,13 @@ void VarInfo::set_name(const char *str) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_name(const string str) {
+   Name = str;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_ens(const char *str) {
    Ensemble = str;
    return;
@@ -337,8 +344,8 @@ void VarInfo::set_regrid(const RegridInfo &ri) {
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
-   if((unsigned int) nstr.length() != strcspn(nstr, " \t") ||
-      (unsigned int) lstr.length() != strcspn(lstr, " \t")) {
+   if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
+      (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
       mlog << Error << "\nVarInfo::set_magic() -> "
            << "embedded whitespace found in the nstr \"" << nstr
            << "\" or lstr \"" << lstr << "\".\n\n";
@@ -358,15 +365,15 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
-   if(dict.last_lookup_status()) set_init(timestring_to_unix(s));
+   if(dict.last_lookup_status()) set_init(timestring_to_unix(s.c_str()));
 
    // Set valid time, if present
    s = dict.lookup_string(conf_key_valid_time, false);
-   if(dict.last_lookup_status()) set_valid(timestring_to_unix(s));
+   if(dict.last_lookup_status()) set_valid(timestring_to_unix(s.c_str()));
 
    // Set lead time, if present
    s = dict.lookup_string(conf_key_lead_time, false);
-   if(dict.last_lookup_status()) set_lead(timestring_to_sec(s));
+   if(dict.last_lookup_status()) set_lead(timestring_to_sec(s.c_str()));
 
    // Parse prob_as_scalar, if present
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);
@@ -488,8 +495,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
    //  set the level information
    Level.set_type(lt);
-   Level.set_req_name(lvl_name);
-   Level.set_name(lvl_name);
+   Level.set_req_name(lvl_name.c_str());
+   Level.set_name(lvl_name.c_str());
 
    //  set the lower limit
    if(lt == LevelType_Accum) Level.set_lower(timestring_to_sec( lvl_val1.data() ));
@@ -564,7 +571,7 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
       MagicStr = str_format("%s/%s/PROB", field_name.text(), Level.name().text());
    }
    set_name     ( field_name );
-   set_req_name ( field_name );
+   set_req_name ( field_name.c_str() );
 
 }
 

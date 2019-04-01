@@ -186,12 +186,12 @@ StringArray a;
    //  - min/max latitude
    //  - min/max longitude
    //  - optional region description
-   r.number   = atoi(a[0]);
-   r.n_points = atoi(a[1]);
-   r.lat_min  = atof(a[2]);
-   r.lat_max  = atof(a[3]);
-   r.lon_min  = atof(a[4]);
-   r.lon_max  = atof(a[5]);
+   r.number   = atoi(a[0].c_str());
+   r.n_points = atoi(a[1].c_str());
+   r.lat_min  = atof(a[2].c_str());
+   r.lat_max  = atof(a[3].c_str());
+   r.lon_min  = atof(a[4].c_str());
+   r.lon_max  = atof(a[5].c_str());
 
    // check that the number of points to read in is not greater than the size
    // of the arrays to hold the lat/lon point values
@@ -205,8 +205,8 @@ StringArray a;
    for(j=0; j<r.n_points; j++) {
       if(!line.read_line(in)) return (false);
       a = line.split(" ");
-      r.lat[j] = atof(a[0]);
-      r.lon[j] = atof(a[1]);
+      r.lat[j] = atof(a[0].c_str());
+      r.lon[j] = atof(a[1].c_str());
    }
 
    //

@@ -369,8 +369,8 @@ bool operator>>(istream & in, TCPoly & p) {
    // Parse header line: NNN AAAAAAAA 2
    // NNN is the 3-digit number of points
    // AAAAAAAA is the 8-character name of the region
-   n = atoi(a[0]);
-   strncpy(name, line+4, 8);
+   n = atoi(a[0].c_str());
+   strncpy(name, line.c_str()+4, 8);
    name[8] = '\0';
    name_cs = name;
    name_cs.ws_strip();
@@ -385,7 +385,7 @@ bool operator>>(istream & in, TCPoly & p) {
       if(!line.read_line(in)) return (false);
       a = line.split(" ");
       // Convert from degrees east to west
-      p.LatLon.add_point(rescale_lon(-1.0*atof(a[0])), atof(a[1]));
+      p.LatLon.add_point(rescale_lon(-1.0*atof(a[0].c_str())), atof(a[1].c_str()));
    }
    
    if(p.LatLon.n_points < 2) {

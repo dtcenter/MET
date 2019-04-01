@@ -70,31 +70,6 @@ void check_met_version(const char * check_version) {
 ////////////////////////////////////////////////////////////////////////
 
 
-bool less_than_met_version(const char *str1, const char *str2) {
-
-   // Skip past the leading 'V'
-   ConcatString cs1 = str1 + 1;
-   ConcatString cs2 = str2 + 1;
-
-   // Split based on the period
-   StringArray sa1 = cs1.split(".");
-   StringArray sa2 = cs2.split(".");
-
-   // str1 < str2 if any sa1 elements are less than sa2
-   // or they are all the same but it is shorter in length
-   for(int i=0; i<sa2.n_elements(); i++) {
-      if(i == sa1.n_elements())            return(true);
-      else if(atoi(sa1[i]) < atoi(sa2[i])) return(true);
-      else if(atoi(sa1[i]) > atoi(sa2[i])) return(false);
-   }
-
-   return(false);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 const char * get_short_name(const char * path)
 
 {
@@ -310,10 +285,10 @@ ConcatString str_replace(const char* data, const char* old, const char* repl){
 
    string str = data;
    size_t pos = str.find( old );
-   if( string::npos == pos ) return "";
+   if( string::npos == pos ) return ret;
    str.replace(pos, strlen(old), repl);
 
-   ret = str.data();
+   ret = str;
    return ret;
 }
 
@@ -344,18 +319,18 @@ ConcatString str_format(const char *fmt, ...){
       exit(1);
    }
 
-   ConcatString ret = buf;
+   ConcatString ret = string(buf);
    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString str_trim(const char *str){
+ConcatString str_trim(const ConcatString str){
    string dat = str;
    while( ' ' == dat.at(0) )              dat.replace(0,              1, "");
    while( ' ' == dat.at(dat.size() - 1) ) dat.replace(dat.size() - 1, 1, "");
 
-   ConcatString ret = dat.c_str();
+   ConcatString ret = dat;
    return ret;
 }
 

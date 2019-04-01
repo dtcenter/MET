@@ -87,10 +87,10 @@ class ConcatString {
       ConcatString(int _alloc_inc);
      ~ConcatString();
       ConcatString(const ConcatString &);
-      ConcatString(const char *);
+      //      ConcatString(const char *);
       ConcatString(const std::string &);
       ConcatString & operator=(const ConcatString &);
-      ConcatString & operator=(const char *);
+      //      ConcatString & operator=(const char *);
       ConcatString & operator=(const std::string &);
       bool operator==(const ConcatString &) const;
       bool operator==(const char *) const;
@@ -112,9 +112,11 @@ class ConcatString {
 
       const char * text() const;
 
+      const char * c_str() const;
+
       const std::string & string() const;
 
-      const char * contents(const char *str = 0) const;   //  returns str or "(nul)" if the string is empty
+      const std::string contents(const char *str = 0) const;   //  returns str or "(nul)" if the string is empty
 
       int length() const;   //  not including trailing nul
 
@@ -135,7 +137,7 @@ class ConcatString {
          //  do stuff
          //
 
-      void add(const char *);
+      //      void add(const char *);
 
       void add(const char);
 
@@ -149,7 +151,8 @@ class ConcatString {
 
       void chomp(const char *);   //  removes trailing suffix, if possible
 
-      operator const char * () const;
+      //      operator const char * () const;
+      operator const std::string () const;
 
       bool startswith(const char *) const;
       bool   endswith(const char *) const;
@@ -170,6 +173,7 @@ class ConcatString {
 
       bool read_line(std::istream &);   //  read a line from the input stream
 
+      void replace_char(int i, char c);
       //  replace all occurences of target with replacement
       //  if "replacement" is an environment variable, use it's value
       void replace(const char * target, const char * replacement, bool check_env = true);
@@ -177,6 +181,9 @@ class ConcatString {
       void set_upper();
       void set_lower();
       
+      int find(int c);
+      int compare(size_t pos, size_t len, std::string str);
+      int comparecase(size_t pos, size_t len, std::string str);
 };
 
 
@@ -184,6 +191,7 @@ class ConcatString {
 
 
 inline const char * ConcatString::text()         const { return ( s ? s->c_str() : 0); }
+inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : 0); }
 inline const std::string & ConcatString::string() const { return ( *s ); }
 
 inline int          ConcatString::length()       const { return ( s->length() ); }
@@ -197,7 +205,9 @@ inline int          ConcatString::alloc_inc()    const { return ( AllocInc ); }
 inline bool         ConcatString::empty()        const { return ( s->empty() == true ); }
 inline bool         ConcatString::nonempty()     const { return ( s->empty() == false ); }
 
-inline              ConcatString::operator const char * () const { return ( s ? s->c_str() : 0 ); }
+//inline              ConcatString::operator const char * () const { return ( s ? s->c_str() : 0 ); }
+
+inline              ConcatString::operator const std::string () const { return ( s ? *s : 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -225,8 +235,8 @@ extern std::ostream & operator<<(std::ostream &, const ConcatString &);
 
 
 extern ConcatString & operator << (ConcatString &, const char);
-extern ConcatString & operator << (ConcatString &, const char *);
-extern ConcatString & operator << (ConcatString &, const std::string);
+//extern ConcatString & operator << (ConcatString &, const char *);
+extern ConcatString & operator << (ConcatString &, const std::string&);
 extern ConcatString & operator << (ConcatString &, const ConcatString &);
 extern ConcatString & operator << (ConcatString &, int);
 extern ConcatString & operator << (ConcatString &, unsigned int);

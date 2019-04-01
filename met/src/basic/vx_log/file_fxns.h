@@ -30,11 +30,14 @@ static const char met_base_str[] = "MET_BASE";
 
 ////////////////////////////////////////////////////////////////////////
 
-extern ConcatString replace_path(const char *path);
+extern ConcatString replace_path(const ConcatString path);
+extern ConcatString replace_path(const char * path);
 
 extern int          met_open(const char *path, int oflag);
 
 extern void         met_open(ifstream &in, const char *path);
+
+extern void         met_open(ofstream &out, const char *path);
 
 extern FILE *       met_fopen(const char *path, const char *mode);
 

@@ -19,7 +19,7 @@
 
 extern ConcatString make_temp_file_name(const char *, const char *);
 
-extern void         remove_temp_file(const char *);
+extern void         remove_temp_file(const ConcatString);
 
 ////////////////////////////////////////////////////////////////////////
 

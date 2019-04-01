@@ -142,7 +142,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
          // Open the next file for reading
          CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile]))) {
+         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
             mlog << Error << "\nTCStatFiles::operator>>(TrackPairInfo &) -> "
                  << "can't open file \"" << FileList[CurFile]
                  << "\" for reading\n\n";
@@ -197,7 +197,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 
          // Open the next file for reading
          CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile]))) {
+         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
             mlog << Error << "\nTCStatFiles::operator>>(ProbRIRWPairInfo &) -> "
                  << "can't open file \"" << FileList[CurFile]
                  << "\" for reading\n\n";
@@ -246,7 +246,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
 
          // Open the next file for reading
          CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile]))) {
+         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
             mlog << Error << "\nTCStatFiles::operator>>(TCStatLine &) -> "
                  << "can't open file \"" << FileList[CurFile]
                  << "\" for reading\n\n";

@@ -56,7 +56,7 @@ void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
    for(i=0; i<map_dict->n_entries(); i++) {
 
       // Get the map data setting for the current entry
-      file_name  = replace_path((*map_dict)[i]->dict_value()->lookup_string(conf_key_file_name));
+      file_name  = replace_path((*map_dict)[i]->dict_value()->lookup_string(conf_key_file_name).c_str());
       line_color = (*map_dict)[i]->dict_value()->lookup_num_array(conf_key_line_color);
       line_width = (*map_dict)[i]->dict_value()->lookup_double(conf_key_line_width);
       line_dash  = (*map_dict)[i]->dict_value()->lookup_string(conf_key_line_dash, false);
@@ -75,8 +75,8 @@ void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
       p.gsave();
       p.setlinewidth(line_width);
       p.setrgbcolor(line_color[0]/255.0, line_color[1]/255.0, line_color[2]/255.0);
-      if(line_dash.length() > 0) p.setdash(line_dash);
-      draw_map_data(gr, gr_bb, p, dim, file_name);
+      if(line_dash.length() > 0) p.setdash(line_dash.c_str());
+      draw_map_data(gr, gr_bb, p, dim, file_name.c_str());
       p.grestore();
    }
    

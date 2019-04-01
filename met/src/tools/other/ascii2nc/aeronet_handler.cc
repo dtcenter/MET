@@ -550,7 +550,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   ConcatString stationLon_string(data_line[1]);
   StringArray stationLonTokens = stationLon_string.split("=");
-  _stationLon = atof(stationLonTokens[stationLonTokens.n_elements()-1]);
+  _stationLon = atof(stationLonTokens[stationLonTokens.n_elements()-1].c_str());
 
   //
   // Get the stationLat
@@ -558,7 +558,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   ConcatString stationLat_string(data_line[2]);
   StringArray stationLatTokens = stationLat_string.split("=");
-  _stationLat = atof(stationLatTokens[stationLatTokens.n_elements()-1]);
+  _stationLat = atof(stationLatTokens[stationLatTokens.n_elements()-1].c_str());
 
   //
   // Get the stationAlt
@@ -566,7 +566,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   ConcatString stationAlt_string(data_line[3]);
   StringArray stationAltTokens = stationAlt_string.split("=");
-  _stationAlt = atof(stationAltTokens[stationAltTokens.n_elements()-1]);
+  _stationAlt = atof(stationAltTokens[stationAltTokens.n_elements()-1].c_str());
 
   return true;
 

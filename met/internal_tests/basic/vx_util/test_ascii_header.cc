@@ -63,7 +63,7 @@ int main(int argc, char * argv []) {
 
    // AsciiHeader object
    AsciiHeader hdr;
-   const AsciiHeaderLine *line = hdr.header(Version, DataType, LineType);
+   const AsciiHeaderLine *line = hdr.header(Version.c_str(), DataType.c_str(), LineType.c_str());
 
    mlog << Debug(1)
         << "Version:  " << Version << "\n"
@@ -74,7 +74,7 @@ int main(int argc, char * argv []) {
    for(i=0; i<ColNames.n_elements(); i++) {
       mlog << Debug(1)
            << ColNames[i] << " Offset = "
-           << line->col_offset(ColNames[i], Dim) << "\n";
+           << line->col_offset(ColNames[i].c_str(), Dim) << "\n";
    }
 
    // Process each column offset
@@ -107,7 +107,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -119,9 +119,9 @@ void set_name(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_offset(const StringArray & a) {
-        if(a.n_elements() == 1) ColOffsets.add(atoi(a[0]));
+        if(a.n_elements() == 1) ColOffsets.add(atoi(a[0].c_str()));
    else if(a.n_elements() == 2) {
-      for(int i=atoi(a[0]); i<=atoi(a[1]); i++) ColOffsets.add(i);
+      for(int i=atoi(a[0].c_str()); i<=atoi(a[1].c_str()); i++) ColOffsets.add(i);
    }
    else {
       usage();
@@ -131,7 +131,7 @@ void set_offset(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_dim(const StringArray & a) {
-   Dim = atoi(a[0]);
+   Dim = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

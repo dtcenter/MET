@@ -40,7 +40,7 @@ static const char y_dim_name           [] = "south_north";
 static const char t_dim_name           [] = "Time";
 static const char z_dim_p_interp_name  [] = "num_metgrid_levels";
 static const char z_dim_wrf_interp_name[] = "vlevs";
-static const char strl_dim_name        [] = "DateStrLen";
+static const string strl_dim_name         = "DateStrLen";
 
 static const char  times_var_name      [] = "Times";
 static const char  month_var_name      [] = "month";
@@ -56,10 +56,10 @@ static const char pressure_var_wrf_interp_name [] = "LEV";
 static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
 
-static const char init_time_att_name   [] = "START_DATE";
+static const string init_time_att_name   = "START_DATE";
 
-static const char description_att_name [] = "description";
-static const char units_att_name       [] = "units";
+static const string description_att_name  = "description";
+static const string units_att_name        = "units";
 
 static const int max_pinterp_args         = 30;
 
@@ -213,7 +213,7 @@ StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
    
 for (j=0; j<Ndims; ++j)  {
-   c = gDimNames[j];
+   c = gDimNames[j].c_str();
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
    if ( strcasecmp(c, t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
@@ -248,7 +248,7 @@ if ( has_var(Nc, times_var_name) ) {
    for (j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
       get_string_val(&v, j, str_len, tmp_time_str);
-      strncpy ( time_str, tmp_time_str, str_len );
+      strncpy ( time_str, tmp_time_str.c_str(), str_len );
       time_str[str_len] = '\0';
 
       // Check for leading blank
@@ -290,7 +290,7 @@ else {
 ConcatString att_value;
 get_global_att(Nc, init_time_att_name, att_value);
 
-InitTime = parse_init_time(att_value);
+InitTime = parse_init_time(att_value.c_str());
 
    //
    //  variables
@@ -303,7 +303,7 @@ InitTime = parse_init_time(att_value);
    Var = new NcVarInfo [Nvars];
 
    for (j=0; j<Nvars; ++j)  {
-      v = get_var(Nc, varNames[j]);
+      v = get_var(Nc, varNames[j].c_str());
   
       Var[j].var = new NcVar(v);
   
@@ -327,8 +327,8 @@ InitTime = parse_init_time(att_value);
       if ( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_p_interp_name)   == 0 ||
            strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ) {
          PressureIndex = j;
-              if ( strcasecmp(Var[j].units_att, pa_units_str ) == 0 ) hPaCF = 0.01;
-         else if ( strcasecmp(Var[j].units_att, hpa_units_str) == 0 ) hPaCF = 1.0;
+              if ( strcasecmp(Var[j].units_att.c_str(), pa_units_str ) == 0 ) hPaCF = 0.01;
+         else if ( strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0 ) hPaCF = 1.0;
       }
      
   
@@ -336,7 +336,7 @@ InitTime = parse_init_time(att_value);
       get_dim_names(&v, &dimNames);
   
       for (k=0; k<(dim_count); ++k)  {
-        c = dimNames[k];
+        c = dimNames[k].c_str();
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
   
@@ -576,8 +576,8 @@ float add_offset   = 0.f;
 float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
+NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
+NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
 if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
    add_offset = get_att_value_float(att_add_offset);
    scale_factor = get_att_value_float(att_scale_factor);
@@ -715,7 +715,7 @@ if ( !found )  {
    //  check x_slot and y_slot
    //
 
-if ( (var->x_slot < 0) || (var->y_slot < 0) )  {
+if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0) )  {
 
    mlog << Error
         << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
@@ -796,8 +796,8 @@ long offsets[dim_count];
 long lengths[dim_count];
 float add_offset   = 0.f;
 float scale_factor = 1.f;
-NcVarAtt *att_add_offset   = get_nc_att(v, "add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(v, "scale_factor");
+NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
+NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
 if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
    add_offset = get_att_value_float(att_add_offset);
    scale_factor = get_att_value_float(att_scale_factor);

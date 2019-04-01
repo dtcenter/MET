@@ -167,8 +167,8 @@ void process_data_file() {
 
    // Parse the config string
    MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read_string(FieldString);
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldString.c_str());
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = config.nc_compression();
@@ -181,7 +181,7 @@ void process_data_file() {
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    mlog << Debug(1)  << "Reading input file: " << InputFilename << "\n";
-   mtddf = m_factory.new_met_2d_data_file(InputFilename, ftype);
+   mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!mtddf) {
       mlog << Error << "\nprocess_data_file() -> "
@@ -205,7 +205,7 @@ void process_data_file() {
    vinfo->set_dict(config);
 
    // Open the input file
-   if(!mtddf->open(InputFilename)) {
+   if(!mtddf->open(InputFilename.c_str())) {
       mlog << Error << "\nprocess_data_file() -> can't open file \""
            << InputFilename << "\"\n\n";
       exit(1);
@@ -284,7 +284,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    ConcatString cs;
 
    // Create a new NetCDF file and open it
-   NcFile *f_out = open_ncfile(OutputFilename, true);
+   NcFile *f_out = open_ncfile(OutputFilename.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
@@ -294,7 +294,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, OutputFilename, program_name);
+   write_netcdf_global(f_out, OutputFilename.c_str(), program_name.c_str());
 
    // Add the run command
    add_att(f_out, "RunCommand", shift_cs);
@@ -428,27 +428,27 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_from(const StringArray &a) {
-   FrLat = atof(a[0]);
-   FrLon = atof(a[1]);
+   FrLat = atof(a[0].c_str());
+   FrLon = atof(a[1].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_to(const StringArray &a) {
-   ToLat = atof(a[0]);
-   ToLon = atof(a[1]);
+   ToLat = atof(a[0].c_str());
+   ToLon = atof(a[1].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_method(const StringArray &a) {
-   Method = string_to_interpmthd(a[0]);
+   Method = string_to_interpmthd(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_width(const StringArray &a) {
-   Width = atoi(a[0]);
+   Width = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -472,13 +472,13 @@ void set_logfile(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray &a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

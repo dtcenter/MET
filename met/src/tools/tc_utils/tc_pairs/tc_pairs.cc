@@ -251,7 +251,7 @@ void process_command_line(int argc, char **argv) {
         << "Config File User: " << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file);
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Load the distance to land data file
    if(dland_dp.nx() == 0 || dland_dp.ny() == 0) load_dland();
@@ -547,7 +547,7 @@ void process_track_files(const StringArray &files,
    for(i=0; i<files.n_elements(); i++) {
 
       // Open the current file
-      if(!f.open(files[i])) {
+      if(!f.open(files[i].c_str())) {
          mlog << Error
               << "\nprocess_track_files() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
@@ -565,7 +565,7 @@ void process_track_files(const StringArray &files,
          tot_read++;
 
          // Add model suffix, if specified
-         if(strlen(model_suffix[i]) > 0) {
+         if(model_suffix[i].length() > 0) {
             cs << cs_erase << line.technique() << model_suffix[i];
             line.set_technique(cs);
          }
@@ -647,7 +647,7 @@ void process_prob_files(const StringArray &files,
    for(i=0; i<files.n_elements(); i++) {
 
       // Open the current file
-      if(!f.open(files[i])) {
+      if(!f.open(files[i].c_str())) {
          mlog << Error
               << "\nprocess_prob_files() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
@@ -665,7 +665,7 @@ void process_prob_files(const StringArray &files,
          tot_read++;
 
          // Add model suffix, if specified
-         if(strlen(model_suffix[i]) > 0) {
+         if(model_suffix[i].length() > 0) {
             cs << cs_erase << line.technique() << model_suffix[i];
             line.set_technique(cs);
          }
@@ -1053,7 +1053,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    for(i=0, n_add=0, n_replace=0; i<tracks.n_tracks(); i++) {
 
       // Skip AMODEL names not ending in '2' or '3'
-      c = *(tracks[i].technique() + strlen(tracks[i].technique()) - 1);
+     c = tracks[i].technique()[tracks[i].technique().length() - 1];
       if(c != '2' && c != '3') continue;
 
       // Search for corresponding track with AMODEL name ending in '2'
@@ -1076,7 +1076,7 @@ void derive_interp12(TrackInfoArray &tracks) {
 
       // Create a copy the '2' or '3' track and rename it to 'I'.
       interp_track = tracks[i];
-      interp_track.set_technique(amodel);
+      interp_track.set_technique(amodel.c_str());
 
       // Search for corresponding track with AMODEL name ending in 'I'
       track_case << cs_erase
@@ -1183,7 +1183,7 @@ int derive_consensus(TrackInfoArray &tracks) {
                if(tracks[l].basin()     == case_cmp[0]                       &&
                   tracks[l].cyclone()   == case_cmp[1]                       &&
                   tracks[l].technique() == conf_info.Consensus[j].Members[k] &&
-                  tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2])) {
+                  tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2].c_str())) {
                   con_tracks.add(tracks[l]);
                   found = true;
                   mlog << Debug(5)
@@ -1292,7 +1292,7 @@ int derive_lag(TrackInfoArray &tracks) {
          // Adjust the TrackInfo model name
          lag_model << cs_erase << new_track.technique()
                    << "_LAG_" << sec_to_timestring(s);
-         new_track.set_technique(lag_model);
+         new_track.set_technique(lag_model.c_str());
 
          // Adjust the TrackInfo times
          new_track.set_init(new_track.init() + s);
@@ -1490,7 +1490,7 @@ void derive_baseline_model(const ConcatString &model,
    }
 
    // Store the basin name
-   strncpy(basin, ti.basin(), 2);
+   strncpy(basin, ti.basin().c_str(), 2);
 
    // Store the valid time of the starting point
    unix_to_mdyhms(ti[i_start].valid(),
@@ -1555,11 +1555,11 @@ void derive_baseline_model(const ConcatString &model,
 
    // Populate the CLIPER/SHIFOR track info
    new_track.set_init(ti[i_start].valid());
-   new_track.set_basin(ti.basin());
-   new_track.set_cyclone(ti.cyclone());
+   new_track.set_basin(ti.basin().c_str());
+   new_track.set_cyclone(ti.cyclone().c_str());
    new_track.set_storm_id();
-   new_track.set_storm_name(ti.storm_name());
-   new_track.set_technique(model);
+   new_track.set_storm_name(ti.storm_name().c_str());
+   new_track.set_technique(model.c_str());
    new_track.set_technique_number(ti.technique_number());
 
    // Store the initial track point
@@ -1883,7 +1883,7 @@ void load_dland() {
    if(file_name.empty()) return;
    // Open the NetCDF output of the tc_dland tool
    MetNcFile MetNc;
-   if(!MetNc.open(file_name)) {
+   if(!MetNc.open(file_name.c_str())) {
       mlog << Error
            << "\nload_dland() -> "
            << "problem reading file \"" << file_name << "\"\n\n";
@@ -1892,8 +1892,8 @@ void load_dland() {
 
    // Find the first non-lat/lon variable
    for(i=0; i<MetNc.Nvars; i++) {
-      if(strcmp(MetNc.Var[i].name, nc_met_lat_var_name) != 0 &&
-         strcmp(MetNc.Var[i].name, nc_met_lon_var_name) != 0)
+      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_var_name) != 0 &&
+         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_var_name) != 0)
          break;
    }
 
@@ -1950,7 +1950,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
         << "Watch/Warning file: " << file_name << "\n";
 
    // Open the watch/warning ASCII file
-   if(!f_in.open(file_name)) {
+   if(!f_in.open(file_name.c_str())) {
       mlog << Error << "\nprocess_watch_warn() -> "
            << "can't open input watch/warning ASCII file \""
            << file_name << "\" for reading\n\n";
@@ -2005,7 +2005,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    out_files.add(out_file);
 
    // Create the output file
-   open_tc_txt_file(out, out_file);
+   open_tc_txt_file(out, out_file.c_str());
 
    // Initialize the output AsciiTable
    out_at.set_size(p.n_points() + 1, n_tc_header_cols + n_tc_mpr_cols);
@@ -2022,9 +2022,9 @@ void write_tracks(const TrackPairInfoArray &p) {
 
    // Store masking regions in the header
    if(conf_info.InitMaskName.nonempty())  tchc.set_init_mask(conf_info.InitMaskName);
-   else                                   tchc.set_init_mask(na_str);
+   else                                   tchc.set_init_mask(na_string);
    if(conf_info.ValidMaskName.nonempty()) tchc.set_valid_mask(conf_info.ValidMaskName);
-   else                                   tchc.set_valid_mask(na_str);
+   else                                   tchc.set_valid_mask(na_string);
 
    // Loop through the TrackPairInfo objects
    for(i=0; i<p.n_pairs(); i++) {
@@ -2066,7 +2066,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    out_files.add(out_file);
 
    // Create the output file
-   open_tc_txt_file(out, out_file);
+   open_tc_txt_file(out, out_file.c_str());
 
    // Determine the number of output rows and max number of probs
    max_n = p[0].prob_rirw().n_prob();
@@ -2100,9 +2100,9 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
 
    // Store masking regions in the header
    if(conf_info.InitMaskName.nonempty())  tchc.set_init_mask(conf_info.InitMaskName);
-   else                                   tchc.set_init_mask(na_str);
+   else                                   tchc.set_init_mask(na_string);
    if(conf_info.ValidMaskName.nonempty()) tchc.set_valid_mask(conf_info.ValidMaskName);
-   else                                   tchc.set_valid_mask(na_str);
+   else                                   tchc.set_valid_mask(na_string);
 
    // Loop through the ProbRIRWPairInfo objects
    for(i=0; i<p.n_pairs(); i++) {
@@ -2226,11 +2226,11 @@ void set_atcf_source(const StringArray & a,
                      StringArray &source, StringArray &model_suffix) {
    int i;
    StringArray sa;
-   ConcatString cs, suffix = "";
+   ConcatString cs, suffix;
 
    // Check for optional suffix sub-argument
    for(i=0; i<a.n_elements(); i++) {
-      if(strncmp(a[i], "suffix", strlen("suffix")) == 0) {
+      if( a[i] == "suffix" ) {
          cs = a[i];
          sa = cs.split("=");
          if(sa.n_elements() != 2) {
@@ -2248,7 +2248,7 @@ void set_atcf_source(const StringArray & a,
 
    // Parse the remaining sources
    for(i=0; i<a.n_elements(); i++) {
-     if(strncmp(a[i], "suffix", strlen("suffix")) == 0) continue;
+     if( a[i] == "suffix" ) continue;
      source.add(a[i]);
      model_suffix.add(suffix);
    }
@@ -2281,7 +2281,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

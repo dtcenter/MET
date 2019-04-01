@@ -153,11 +153,11 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     // Store the message type
 
-    ConcatString concat_string = data_line[4];
+    ConcatString concat_string = (string)data_line[4];
     concat_string.ws_strip();
     ConcatString hdr_typ;
     
-    if (_messageTypeMap[concat_string])
+    if (_messageTypeMap[concat_string] != "")
     {
       hdr_typ = _messageTypeMap[concat_string];
       if (!mappedTypes.has(concat_string)) {
@@ -182,7 +182,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     // Store the station id
 
-    ConcatString hdr_sid = data_line[2];
+    ConcatString hdr_sid = (string)data_line[2];
     hdr_sid.ws_strip();
     hdr_sid.replace(" ", "_", false);
 
@@ -214,7 +214,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
     if (!is_eq(atof(data_line[18]), lr_missing_value))
     {
       ConcatString obs_qty = (is_eq(atof(data_line[19]), lr_missing_value) ?
-                              na_str : data_line[19]);
+                              na_string : (string)data_line[19]);
       obs_qty.ws_strip();
 
       // 002	PRMSL	Pressure reduced to MSL	Pa
@@ -272,7 +272,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
           ConcatString obs_qty =
             (is_eq(atof(data_line[i+1]), lr_missing_value) ?
-             na_str : data_line[i+1]);
+             na_string : (string)data_line[i+1]);
           obs_qty.ws_strip();
 
           // Observation value

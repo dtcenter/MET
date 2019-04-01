@@ -387,7 +387,7 @@ int j;
 
 for (j=0; j<n_subrecs; ++j)  {
 
-   if ( strcmp(text, subrec[j].field_name) == 0 )  return ( subrec + j );
+   if ( text == subrec[j].field_name )  return ( subrec + j );
 
 }
 
@@ -480,7 +480,7 @@ void DbfSubRecord::clear()
 
 {
 
-memset(field_name, 0, sizeof(field_name));
+field_name = "";
 
 field_type = 0;
 
@@ -509,7 +509,7 @@ void DbfSubRecord::assign(const DbfSubRecord & r)
 
 clear();
 
-memcpy(field_name, r.field_name, sizeof(field_name));
+field_name = r.field_name;
 
 field_type         = r.field_type;
 displacement       = r.displacement;
@@ -537,7 +537,7 @@ void DbfSubRecord::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-if ( strlen(field_name) > 0 )  {
+if ( field_name.length() > 0 )  {
 
    out << prefix << "field_name         = \"" << field_name << "\"\n";
 
@@ -577,7 +577,7 @@ void DbfSubRecord::set(unsigned char * buf)
 
 clear();
 
-memcpy(field_name, buf, 10);
+field_name = "";
 
 field_type = buf[11];
 
@@ -631,7 +631,7 @@ max_name_len = 0;
 
 for (j=0; j<(h.n_subrecs); ++j)  {
 
-   len = strlen(s[j].field_name);
+  len = s[j].field_name.length();
 
    if ( len > max_name_len )  max_name_len = len;
 
@@ -645,7 +645,7 @@ for (j=0; j<(h.n_subrecs); ++j)  {
 
    out << p0 << s[j].field_name;
 
-   for (k=strlen(s[j].field_name); k<max_name_len; ++k)  out << ' ';
+   for (k=s[j].field_name.length(); k<max_name_len; ++k)  out << ' ';
 
    out << " = \"";
 

@@ -70,15 +70,15 @@ if ( dup2(1, 2) < 0 )  {
 config.set_debug(debug);
 
 bool status = false;
-ConcatString config_string   = argv[1];
-ConcatString config_filename = argv[2];
+ConcatString config_string   = (string)argv[1];
+ConcatString config_filename = (string)argv[2];
 
    //
    //  read the string
    //
 
 
-status = config.read_string(config_string);
+status = config.read_string(config_string.c_str());
 
 if ( ! status )  {
 
@@ -93,7 +93,7 @@ if ( ! status )  {
    //  read the file
    //
 
-status = config.read(config_filename);
+status = config.read(config_filename.c_str());
 
 if ( ! status )  {
 

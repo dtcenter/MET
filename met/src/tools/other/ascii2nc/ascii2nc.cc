@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
    // Store the input ASCII file name and the output NetCDF file name
    //
    for (int i = 0; i < cline.n() - 1; ++i)
-     asfile_list.push_back(cline[i]);
+     asfile_list.push_back((string)cline[i]);
    ncfile = cline[cline.n() - 1];
 
    //
@@ -320,7 +320,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
   //
   LineDataFile f_in;
 
-  if(!f_in.open(ascii_filename)) {
+  if(!f_in.open(ascii_filename.c_str())) {
     mlog << Error << "\ndetermine_ascii_format() -> "
          << "can't open input ASCII file \"" << ascii_filename
          << "\" for reading\n\n";
@@ -599,13 +599,13 @@ void set_mask_sid(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -255,7 +255,7 @@ for (x=0; x<Nx; ++x)  {
    //  get init time, valid time, lead time from FcstRaw variable attributes
    //
 
-   att = get_nc_att(FcstRaw, "init_time_ut");
+   att = get_nc_att(FcstRaw, (string)"init_time_ut");
    InitTime = get_att_value_unixtime(att);
    if (InitTime < 0) {
       mlog << Error
@@ -264,7 +264,7 @@ for (x=0; x<Nx; ++x)  {
    }
    if (att) delete att;
    
-   att = get_nc_att(FcstRaw, "valid_time_ut");
+   att = get_nc_att(FcstRaw, (string)"valid_time_ut");
    ValidTime = get_att_value_unixtime(att);
    if (ValidTime < 0) {
       mlog << Error
@@ -998,7 +998,7 @@ if ( Filename.empty() )  {
 
 ConcatString s;
 
-s = get_short_name(Filename);
+s = get_short_name(Filename.c_str());
 
 return ( s );
 

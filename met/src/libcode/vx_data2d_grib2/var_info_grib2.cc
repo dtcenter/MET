@@ -311,12 +311,11 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    if( !field_name.empty() ){
 
       set_name( field_name );
-      set_req_name( field_name );
+      set_req_name( field_name.c_str() );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat,
-                                  field_parm, mtab, cntr, ltab, tab,
-                                  tab_match) &&
+      if( !GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
+                                  tab, tab_match) &&
           field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() -> "
               << "unrecognized GRIB2 field abbreviation '" << field_name
@@ -356,16 +355,16 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       field_name = tab.parm_name;
    }
 
-   set_ens          (ens_str);
+   set_ens          (ens_str.c_str());
    //  set the matched parameter lookup information
    set_name         ( field_name    );
-   set_req_name     ( field_name    );
+   set_req_name     ( field_name.c_str()    );
    if( field_name != "PROB" ){
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
-      set_units     ( tab.units     );
-      set_long_name ( tab.full_name );
+      set_units     ( tab.units.c_str()     );
+      set_long_name ( tab.full_name.c_str() );
    }
 
    //  call the parent to set the level information
@@ -402,8 +401,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat,
-                               field_parm, mtab, cntr, ltab, tab, tab_match) ){
+   if( !GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
+                               tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "unrecognized GRIB2 probability field abbreviation '"
            << prob_name << "'\n\n";
@@ -414,8 +413,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_parm_cat   ( tab.index_b );
    set_parm       ( tab.index_c );
    set_p_flag     ( true        );
-   set_p_units    ( tab.units   );
-   set_units      ( tab.units   );
+   set_p_units    ( tab.units.c_str()   );
+   set_units      ( tab.units.c_str()   );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 

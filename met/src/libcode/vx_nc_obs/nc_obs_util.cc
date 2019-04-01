@@ -440,31 +440,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    my_hdr_data.vld_len   = vld_len;
    my_hdr_data.strl_len  = strl_len;
    my_hdr_data.strll_len = strl2_len;
-   if (has_array_vars) {
-      my_hdr_data.typ_array.extend(nhdr_count);
-      my_hdr_data.sid_array.extend(nhdr_count);
-      my_hdr_data.vld_array.extend(nhdr_count);
-   }
-   else {
-      my_hdr_data.typ_idx_array.extend(nhdr_count);
-      my_hdr_data.sid_idx_array.extend(nhdr_count);
-      my_hdr_data.vld_idx_array.extend(nhdr_count);
-
-      int tmp_dim_size;
-      tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
-      my_hdr_data.typ_array.extend(tmp_dim_size);
-      tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
-      my_hdr_data.sid_array.extend(tmp_dim_size);
-      tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
-      my_hdr_data.vld_array.extend(tmp_dim_size);
-      mlog << Debug(7)
-           << "    tbl dims: messge_type: " << get_dim_size(&obs_vars.hdr_typ_dim)
-           << "  station id: " << get_dim_size(&obs_vars.hdr_sid_dim)
-           << "  valid_time: " << get_dim_size(&obs_vars.hdr_vld_dim) << "\n";
-   }
-   my_hdr_data.lat_array.extend(nhdr_count);
-   my_hdr_data.lon_array.extend(nhdr_count);
-   my_hdr_data.elv_array.extend(nhdr_count);
    
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
         ? NC_BUFFER_SIZE_32K : (nhdr_count));
@@ -1305,14 +1280,13 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    int processed_count = 0;
    for (int index=0; index<data_count; index++) {
       int len, len2;
-      const char* string_data;
+      const string string_data= strArray[index];
       
       processed_count++;
-      string_data = strArray[index];
-      len  = strlen(string_data);
-      len2 = strlen(data_buf[buf_index]);
+      len  = string_data.length();
+      len2 = strnlen(data_buf[buf_index], str_len);
       if (len2 < len) len2 = len;
-      strncpy(data_buf[buf_index], string_data, len);
+      strncpy(data_buf[buf_index], string_data.c_str(), len);
       for (int idx=len; idx<len2; idx++)
          data_buf[buf_index][idx] = bad_data_char;
 

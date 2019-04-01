@@ -33,17 +33,17 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name          [] = "lon";
-static const char y_dim_name          [] = "lat";
+static const char x_dim_name []           = "lon";
+static const char y_dim_name []          = "lat";
 
-static const char valid_time_att_name [] = "valid_time_ut";
-static const char  init_time_att_name [] = "init_time_ut";
-static const char accum_time_att_name [] = "accum_time_sec";
+static const string valid_time_att_name  = "valid_time_ut";
+static const string  init_time_att_name  = "init_time_ut";
+static const string accum_time_att_name  = "accum_time_sec";
 
-static const char name_att_name       [] = "name";
-static const char long_name_att_name  [] = "long_name";
-static const char level_att_name      [] = "level";
-static const char units_att_name      [] = "units";
+static const string name_att_name        = "name";
+static const string long_name_att_name   = "long_name";
+static const string level_att_name       = "level";
+static const string units_att_name       = "units";
 
 static const int  max_met_args           = 30;
 
@@ -168,7 +168,7 @@ get_dim_names(Nc, &gDimNames);
 Ndims = gDimNames.n_elements();
 
 for (j=0; j<Ndims; ++j)  {
-   c = gDimNames[j];
+   c = gDimNames[j].c_str();
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
    if ( strcmp(c, x_dim_name) == 0 ) {
@@ -192,7 +192,7 @@ for (j=0; j<Ndims; ++j)  {
 
    for (j=0; j<Nvars; ++j)  {
 
-      v = get_var(Nc, varNames[j]);
+      v = get_var(Nc, varNames[j].c_str());
 
       Var[j].var = new NcVar(v);
 
@@ -222,7 +222,7 @@ for (j=0; j<Ndims; ++j)  {
       get_dim_names(&v, &dimNames);
 
       for (k=0; k<(dim_count); ++k)  {
-         c = dimNames[k];
+         c = dimNames[k].c_str();
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
 
@@ -395,8 +395,8 @@ float add_offset   = 0.f;
 float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
 double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
+NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
+NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
 if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
    add_offset = get_att_value_float(att_add_offset);
    scale_factor = get_att_value_float(att_scale_factor);
@@ -543,7 +543,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       ++count;
 
-      if ( (j != var->x_slot) && (j != var->y_slot) )  {
+      if ( (var == NULL) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
 
          mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
               << " star found in bad slot\n\n";
@@ -566,13 +566,12 @@ if ( count != 2 )  {
 }
 
    //
-   //  check slots
+   //  check slots - additional logic to satisfy Fortify Null Dereference
    //
-
-const int x_slot = var->x_slot;
-const int y_slot = var->y_slot;
-
-if ( (x_slot < 0) || (y_slot < 0) )  {
+   
+ int x_slot_tmp = 0;
+ int y_slot_tmp = 0;
+ if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0)  )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
         << " bad x|y|z slot\n\n";
@@ -580,7 +579,14 @@ if ( (x_slot < 0) || (y_slot < 0) )  {
    exit ( 1 );
 
 }
+else {
+  x_slot_tmp = var->x_slot;
+  y_slot_tmp = var->y_slot;
+}
 
+const int x_slot = x_slot_tmp;
+const int y_slot = y_slot_tmp;
+ 
    //
    //  get the bad data value
    //
@@ -600,8 +606,8 @@ plane.set_size(Nx, Ny);
    //
    float add_offset   = 0.f;
    float scale_factor = 1.f;
-   NcVarAtt *att_add_offset   = get_nc_att(v, "add_offset");
-   NcVarAtt *att_scale_factor = get_nc_att(v, "scale_factor");
+   NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
+   NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
    if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
       add_offset = get_att_value_float(att_add_offset);
       scale_factor = get_att_value_float(att_scale_factor);

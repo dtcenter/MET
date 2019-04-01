@@ -320,12 +320,12 @@ ConcatString temp_filename;
 
 temp_filename = make_temp_file_name("met_config", 0);
 
-recursive_envs(name, temp_filename);
+recursive_envs(name, temp_filename.c_str());
 
 
 
 
-bison_input_filename = (const char *) temp_filename;
+ bison_input_filename = (const char *) temp_filename.c_str();
 
 dict_stack = &DS;
 
@@ -399,7 +399,7 @@ is_lhs     = true;
 
 set_exit_on_warning();
 
-unlink(temp_filename);
+unlink(temp_filename.c_str());
 
 return ( true );
 
@@ -432,7 +432,7 @@ ConcatString temp_filename = get_tmp_dir();
 
 temp_filename << "/" << make_temp_file_name("config", ".temp");
 
-out.open(temp_filename);
+ out.open(temp_filename.c_str());
 
 if ( ! out )  {
 
@@ -448,9 +448,9 @@ out << s << '\n';
 
 out.close();
 
-bool status = read(temp_filename);
+bool status = read(temp_filename.c_str());
 
-remove_temp_file(temp_filename);
+ remove_temp_file(temp_filename);
 
 return ( status );
 
@@ -509,7 +509,7 @@ void recursive_envs(const char * infile, const char * outfile)
 ifstream in;
 ofstream out;
 
-in.open(infile);
+met_open(in, infile);
 
 if ( ! in )  {
 
@@ -521,7 +521,7 @@ if ( ! in )  {
 
 }
 
-out.open(outfile);
+met_open(out, outfile);
 
 
 if ( ! out )  {
@@ -530,6 +530,7 @@ if ( ! out )  {
         << "\n\n  recursive_envs() -> unable to open output file \""
         << outfile << "\"\n\n";
 
+   in.close();
    exit ( 1 );
 
 }

@@ -131,9 +131,9 @@ mlog << Debug(1)
    //  and then the user config file.
    //
 
-config.read(replace_path(config_const_filename));
-config.read(default_config_file);
-config.read(config_filename);
+config.read(replace_path(config_const_filename).c_str());
+config.read(default_config_file.c_str());
+config.read(config_filename.c_str());
 
    //
    //  dump the contents of the config file
@@ -151,12 +151,12 @@ bool swap = config.lookup_bool(conf_key_swap_endian);
    //  load up regridder
    //
 
-if ( cp_nh_filename.length() > 0 )  regridder.set_cp_nh_file(cp_nh_filename);
-if ( cp_sh_filename.length() > 0 )  regridder.set_cp_sh_file(cp_sh_filename);
-if ( pt_nh_filename.length() > 0 )  regridder.set_pt_nh_file(pt_nh_filename, swap);
-if ( pt_sh_filename.length() > 0 )  regridder.set_pt_sh_file(pt_sh_filename, swap);
+if ( cp_nh_filename.length() > 0 )  regridder.set_cp_nh_file(cp_nh_filename.c_str());
+if ( cp_sh_filename.length() > 0 )  regridder.set_cp_sh_file(cp_sh_filename.c_str());
+if ( pt_nh_filename.length() > 0 )  regridder.set_pt_nh_file(pt_nh_filename.c_str(), swap);
+if ( pt_sh_filename.length() > 0 )  regridder.set_pt_sh_file(pt_sh_filename.c_str(), swap);
 
-regridder.set_config(config, config_filename);
+regridder.set_config(config, config_filename.c_str());
 
    //
    //  done
@@ -164,7 +164,7 @@ regridder.set_config(config, config_filename);
 
 if ( mlog.verbosity_level() >= 5 )  regridder.dump(cout);
 
-regridder.do_output(output_filename);
+regridder.do_output(output_filename.c_str());
 
 
    //
@@ -312,7 +312,7 @@ void set_verbosity(const StringArray & a)
 
 {
 
-mlog.set_verbosity_level(atoi(a[0]));
+mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 
@@ -329,7 +329,7 @@ int get_compress() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 

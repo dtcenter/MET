@@ -322,12 +322,12 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // MODEL
    shc.set_model(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "MODEL", model, false));
+                  "MODEL", model, false).c_str());
 
    // DESC
    shc.set_desc(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "DESC", desc, false));
+                  "DESC", desc, false).c_str());
 
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
@@ -338,7 +338,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << " unique FCST_LEAD values: " << css << "\n";
    }
    if(hdr_cols.has("FCST_LEAD", index)) {
-      shc.set_fcst_lead_sec(timestring_to_sec(hdr_vals[index]));
+      shc.set_fcst_lead_sec(timestring_to_sec(hdr_vals[index].c_str()));
    }
    else {
       shc.set_fcst_lead_sec(fcst_lead.max());
@@ -346,13 +346,13 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // FCST_VALID_BEG, FCST_VALID_END
    if(hdr_cols.has("FCST_VALID_BEG", index)) {
-      shc.set_fcst_valid_beg(timestring_to_unix(hdr_vals[index]));
+      shc.set_fcst_valid_beg(timestring_to_unix(hdr_vals[index].c_str()));
    }
    else {
       shc.set_fcst_valid_beg(fcst_valid_beg);
    }
    if(hdr_cols.has("FCST_VALID_END", index)) {
-      shc.set_fcst_valid_end(timestring_to_unix(hdr_vals[index]));
+      shc.set_fcst_valid_end(timestring_to_unix(hdr_vals[index].c_str()));
    }
    else {
       shc.set_fcst_valid_end(fcst_valid_end);
@@ -367,7 +367,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << " unique OBS_LEAD values: " << css << "\n";
    }
    if(hdr_cols.has("OBS_LEAD", index)) {
-      shc.set_obs_lead_sec(timestring_to_sec(hdr_vals[index]));
+      shc.set_obs_lead_sec(timestring_to_sec(hdr_vals[index].c_str()));
    }
    else {
       shc.set_obs_lead_sec(obs_lead.max());
@@ -375,13 +375,13 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // OBS_VALID_BEG, OBS_VALID_END
    if(hdr_cols.has("OBS_VALID_BEG", index)) {
-      shc.set_obs_valid_beg(timestring_to_unix(hdr_vals[index]));
+      shc.set_obs_valid_beg(timestring_to_unix(hdr_vals[index].c_str()));
    }
    else {
       shc.set_obs_valid_beg(obs_valid_beg);
    }
    if(hdr_cols.has("OBS_VALID_END", index)) {
-      shc.set_obs_valid_end(timestring_to_unix(hdr_vals[index]));
+      shc.set_obs_valid_end(timestring_to_unix(hdr_vals[index].c_str()));
    }
    else {
       shc.set_obs_valid_end(obs_valid_end);
@@ -395,7 +395,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // FCST_LEV
    shc.set_fcst_lev(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "FCST_LEV", fcst_lev, false));
+                  "FCST_LEV", fcst_lev, false).c_str());
 
    // OBS_VAR
    shc.set_obs_var(
@@ -405,17 +405,17 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // OBS_LEV
    shc.set_obs_lev(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBS_LEV", obs_lev, false));
+                  "OBS_LEV", obs_lev, false).c_str());
 
    // OBTYPE
    shc.set_obtype(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBTYPE", obtype, false));
+                  "OBTYPE", obtype, false).c_str());
 
    // VX_MASK
    shc.set_mask(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "VX_MASK", vx_mask, false));
+                  "VX_MASK", vx_mask, false).c_str());
 
    // INTERP_MTHD
    shc.set_interp_mthd(
@@ -436,26 +436,26 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    }
 
    if(hdr_cols.has("INTERP_PNTS", index)) {
-      wdth = nint(sqrt(atof(hdr_vals[index])));
+      wdth = nint(sqrt(atof(hdr_vals[index].c_str())));
    }
    shc.set_interp_wdth(wdth);
 
    // FCST_THRESH
    ta.clear();
    ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "FCST_THRESH", fcst_thresh, true));
+                          "FCST_THRESH", fcst_thresh, true).c_str());
    shc.set_fcst_thresh(ta);
 
    // OBS_THRESH
    ta.clear();
    ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "OBS_THRESH", obs_thresh, true));
+                          "OBS_THRESH", obs_thresh, true).c_str());
    shc.set_obs_thresh(ta);
 
    // COV_THRESH
    ta.clear();
    ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "COV_THRESH", cov_thresh, true));
+                          "COV_THRESH", cov_thresh, true).c_str());
    shc.set_cov_thresh(ta);
 
    // ALPHA
@@ -472,7 +472,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    }
 
    if(hdr_cols.has("ALPHA", index)) {
-      out_alpha = atof(hdr_vals[index]);
+      out_alpha = atof(hdr_vals[index].c_str());
    }
    shc.set_alpha(out_alpha);
 
@@ -744,26 +744,26 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Store the current requested line type
             //
-            lty = string_to_statlinetype(req_lty[i]);
+            lty = string_to_statlinetype(req_lty[i].c_str());
 
             //
             // Retrieve the column value, checking dervied stats
             //
             if((line.type() == stat_fho ||
                 line.type() == stat_ctc) && lty == stat_cts) {
-               v = cts_info.get_stat(req_col[i]);
+               v = cts_info.get_stat(req_col[i].c_str());
                w = cts_info.cts.n();
             }
             else if(line.type() == stat_sl1l2 && lty == stat_cnt) {
-               v = cnt_info.get_stat(req_col[i]);
+               v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == stat_sal1l2 && lty == stat_cnt) {
-               v = cnt_info.get_stat(req_col[i]);
+               v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == stat_vl1l2 && lty == stat_vcnt) {
-               v = vl1l2_info.get_stat(req_col[i]);
+               v = vl1l2_info.get_stat(req_col[i].c_str());
                w = vl1l2_info.vcount;
             }
             else if(line.type() != lty) {
@@ -3177,8 +3177,8 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Add forecast and observation values
          //
-         m[key].f_na.add(atof(line.get_item(j.column[0])));
-         m[key].o_na.add(atof(line.get_item(j.column[1])));
+         m[key].f_na.add(atof(line.get_item(j.column[0].c_str())));
+         m[key].o_na.add(atof(line.get_item(j.column[1].c_str())));
 
          //
          // Keep track of the unique header column entries
@@ -3545,9 +3545,9 @@ double compute_vif(NumArray &na) {
 bool is_precip_var_name(const ConcatString &s) {
 
    bool match = has_prefix(pinterp_precipitation_names,
-                           n_pinterp_precipitation_names, s) ||
+                           n_pinterp_precipitation_names, s.c_str()) ||
                 has_prefix(grib_precipitation_abbr,
-                           n_grib_precipitation_abbr, s);
+                           n_grib_precipitation_abbr, s.c_str());
 
    return(match);
 }

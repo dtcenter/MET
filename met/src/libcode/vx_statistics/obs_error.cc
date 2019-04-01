@@ -475,7 +475,7 @@ void ObsErrorTable::initialize() {
       mlog << Debug(1)
            << "Reading " << desc << " file: " << file_names[i] << "\n";
 
-      if(!read(file_names[i])) {
+      if(!read(file_names[i].c_str())) {
          mlog << Error << "\nObsErrorTable::initialize() -> "
               << "unable to read " << desc << " file \""
               << file_names[i] << "\"\n\n";

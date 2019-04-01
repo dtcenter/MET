@@ -366,7 +366,7 @@ ConcatString STATLine::get(const char *col_str, bool check_na) const
 
 {
 
-ConcatString cs = get_item(col_str, check_na);
+  ConcatString cs = (string)get_item(col_str, check_na);
 
    //
    // If not found, check derivable timing columns
@@ -533,7 +533,6 @@ unixtime STATLine::fcst_valid_beg() const
 
 unixtime t;
 const char * c = get_item("FCST_VALID_BEG");
-
 t = timestring_to_unix(c);
 
 return ( t );
@@ -550,7 +549,6 @@ unixtime STATLine::fcst_valid_end() const
 
 unixtime t;
 const char * c = get_item("FCST_VALID_END");
-
 t = timestring_to_unix(c);
 
 return ( t );
@@ -596,7 +594,6 @@ unixtime STATLine::obs_valid_beg() const
 
 unixtime t;
 const char * c = get_item("OBS_VALID_BEG");
-
 t = timestring_to_unix(c);
 
 return ( t );
@@ -613,7 +610,6 @@ unixtime STATLine::obs_valid_end() const
 
 unixtime t;
 const char * c = get_item("OBS_VALID_END");
-
 t = timestring_to_unix(c);
 
 return ( t );
@@ -793,7 +789,7 @@ SetLogic STATLine::thresh_logic() const
 
 SetLogic t = SetLogic_None;
 
-ConcatString cs = get_item("FCST_THRESH", false);
+ConcatString cs = (string)get_item("FCST_THRESH", false);
 
      if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
 else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;

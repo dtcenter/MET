@@ -216,7 +216,7 @@ get_axis_angle(ax, ay, az, angle);
 
 snprintf(junk, sizeof(junk), "%13.10f", angle);
 
-fix_float(junk);
+ fix_float(string(junk));
 
 out << prefix << "Angle = " << junk << "\n";
 

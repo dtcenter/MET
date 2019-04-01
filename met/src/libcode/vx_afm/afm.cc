@@ -1344,7 +1344,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int Afm::read(const char * filename)
+int Afm::read(const ConcatString& filename)
 
 {
 
@@ -1362,7 +1362,8 @@ clear_liginfos();
 
 in = new ifstream;
 
-in->open(filename);
+met_open(*in, filename.c_str());
+//in->open(filename.c_str());
 
 if ( !(*in) )  {
 
@@ -1536,37 +1537,37 @@ while ( (*in) >> line )  {
 
       case afm_keyword_FontName:
          tok = line.rest_as_string();
-         set_string(FontName, tok.s);
+         set_string(FontName, tok.s.c_str());
          break;
 
       case afm_keyword_FullName:
          tok = line.rest_as_string();
-         set_string(FullName, tok.s);
+         set_string(FullName, tok.s.c_str());
          break;
 
       case afm_keyword_FamilyName:
          tok = line.rest_as_string();
-         set_string(FamilyName, tok.s);
+         set_string(FamilyName, tok.s.c_str());
          break;
 
       case afm_keyword_Weight:
          tok = line.rest_as_string();
-         set_string(Weight, tok.s);
+         set_string(Weight, tok.s.c_str());
          break;
 
       case afm_keyword_Version:
          tok = line.rest_as_string();
-         set_string(Version, tok.s);
+         set_string(Version, tok.s.c_str());
          break;
 
       case afm_keyword_EncodingScheme:
          tok = line.rest_as_string();
-         set_string(EncodingScheme, tok.s);
+         set_string(EncodingScheme, tok.s.c_str());
          break;
 
       case afm_keyword_ItalicAngle:
          tok = line.nexttoken();
-         ItalicAngle = atof(tok.s);
+         ItalicAngle = atof(tok.s.c_str());
          break;
 
       case afm_keyword_IsFixedPitch:
@@ -1804,9 +1805,9 @@ while ( (*in) >> line )  {
             exit ( 1 );
          }
          tok = line.nexttoken();
-         set_string(kpx[n].name1, tok.s);
+         set_string(kpx[n].name1, tok.s.c_str());
          tok = line.nexttoken();
-         set_string(kpx[n].name2, tok.s);
+         set_string(kpx[n].name2, tok.s.c_str());
          tok = line.nexttoken();
          kpx[n].dx = tok.as_double();
          ++n;
@@ -1926,7 +1927,6 @@ AfmCharMetrics & c = cm[n];
 
 clear_liginfos();
 
-
 tok = line.nexttoken();
 
 ascii_code = tok.i;
@@ -1937,7 +1937,6 @@ c.ascii_code = ascii_code;
 
 
 while ( 1 )  {
-
    tok = line.nexttoken();
 
    if ( tok.type == afm_token_endofline )  break;
@@ -1961,7 +1960,7 @@ while ( 1 )  {
 
       case afm_keyword_N:
          tok = line.nexttoken();
-         set_string(c.name, tok.s);
+         set_string(c.name, tok.s.c_str());
          break;
 
       case afm_keyword_B:
@@ -1982,9 +1981,9 @@ while ( 1 )  {
             exit ( 1 );
          }
          tok = line.nexttoken();
-         set_string(liginfo[n_liginfos].successor_name, tok.s);
+         set_string(liginfo[n_liginfos].successor_name, tok.s.c_str());
          tok = line.nexttoken();
-         set_string(liginfo[n_liginfos].ligature_name, tok.s);
+         set_string(liginfo[n_liginfos].ligature_name, tok.s.c_str());
          ++n_liginfos;
          break;
 
@@ -2049,7 +2048,7 @@ AfmCompositeInfo & c = compinfo[n];
 
 tok = line.nexttoken();
 
-set_string(c.name, tok.s);
+set_string(c.name, tok.s.c_str());
 
 tok = line.nexttoken();
 
@@ -2083,7 +2082,7 @@ while ( 1 )  {
             exit ( 1 );
          }
          tok = line.nexttoken();
-         set_string(c.pcc[n_pcc].name, tok.s);
+         set_string(c.pcc[n_pcc].name, tok.s.c_str());
          tok = line.nexttoken();
          c.pcc[n_pcc].delta_x = tok.i;
          tok = line.nexttoken();

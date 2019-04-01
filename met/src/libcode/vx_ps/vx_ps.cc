@@ -200,7 +200,7 @@ close();
 
 File = new ofstream;
 
-File->open(filename);
+met_open(*File, filename);
 
 if ( !(*File) )  {
 
@@ -319,7 +319,7 @@ f << "%!PS-Adobe-3.0\n";
    //  comments
    //
 
-f << "%%Title: "   << get_short_name(output_filename()) << '\n';
+f << "%%Title: "   << get_short_name(output_filename().c_str()) << '\n';
 
 f << "%%Creator: MET Graphics\n";
 
@@ -447,7 +447,7 @@ ConcatString data_dir;
 
 data_dir = replace_path(default_met_data_dir);
 
-choose_font_with_dir(n, s, data_dir);
+choose_font_with_dir(n, s, data_dir.c_str());
 
 return;
 

@@ -26,13 +26,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void comma_string(long long i, char * output)
+void comma_string(long long i, ConcatString output)
 
 {
 
 // mlog << Debug(1) << "I = " << i << "\n";
 
-if ( i == 0 )  { strcpy(output, "0");  return; }
+if ( i == 0 )  { output = "0";  return; }
 
 int d_count =  0;
 int minus   =  0;
@@ -59,7 +59,7 @@ if ( minus )  s[s_count--] = '-';
 
 ++s_count;
 
-strcpy(output, s + s_count);
+output = s + s_count;
 
 return;
 
@@ -73,11 +73,9 @@ ConcatString comma_string(long long i)
 
 {
 
-char junk[256];
+ConcatString str;
 
-comma_string(i, junk);
-
-ConcatString str = junk;
+comma_string(i, str);
 
 return ( str );
 

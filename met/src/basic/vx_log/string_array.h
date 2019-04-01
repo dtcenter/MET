@@ -20,7 +20,8 @@
 
 #include <iostream>
 #include <ostream>
-
+#include <vector>
+#include <algorithm>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -34,10 +35,7 @@ class StringArray {
 
       void assign(const StringArray &);
 
-
-      char ** s;
-
-      int  Nelements;
+      std::vector<std::string> s;
 
       int  Nalloc;
 
@@ -60,17 +58,17 @@ class StringArray {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      const char * operator[](int) const;
+      const std::string operator[](int) const;
 
       void set_ignore_case(const bool);
 
-      void add(const char *);
-
+      void add(const std::string text);
+      
       void add(const StringArray &);
 
-      void add_css(const char *);
+      void add_css(const std::string);
 
-      void set(int i, const char *);
+      void set(int i, const std::string);
 
       void insert(int i, const char *);
 
@@ -81,19 +79,19 @@ class StringArray {
 
       int length(int) const;
 
-      bool has(const char *) const;
+      bool has(const std::string) const;
 
-      bool has(const char *, int & index) const;
+      bool has(const std::string, int & index) const;
 
          //
          //  parse delimited strings
          //
 
-      void parse_wsss(const char *);
+      void parse_wsss(const std::string);
 
-      void parse_css(const char *);
+      void parse_css(const std::string);
 
-      void parse_delim(const char *, const char *delim);
+      void parse_delim(const std::string, const char *delim);
 
          //
          //  for use when parsing command-line switches
@@ -127,9 +125,9 @@ class StringArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int StringArray::n_elements() const { return ( Nelements ); }
+inline int StringArray::n_elements() const { return ( s.size() ); }
 
-inline int StringArray::n         () const { return ( Nelements ); }
+inline int StringArray::n         () const { return ( s.size() ); }
 
 inline int StringArray::max_length() const { return ( MaxLength ); }
 

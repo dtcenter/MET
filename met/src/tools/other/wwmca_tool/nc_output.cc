@@ -95,19 +95,19 @@ void WwmcaRegridder::do_output(const char * output_filename)
 
    s = Config->lookup_string(conf_key_variable_name);
    
-   data_var = add_var(ncfile, (const char *) s, ncFloat, lat_dim, lon_dim, deflate_level);
+   data_var = add_var(ncfile, s.c_str(), ncFloat, lat_dim, lon_dim, deflate_level);
    
    s = Config->lookup_string(conf_key_units);
    
-   add_att(&data_var, "units", (const char *) s);
+   add_att(&data_var, "units", s.c_str());
    
    s = Config->lookup_string(conf_key_long_name);
    
-   add_att(&data_var, "long_name", (const char *) s);
+   add_att(&data_var, "long_name", s.c_str());
    
    s = Config->lookup_string(conf_key_level);
    
-   add_att(&data_var, "level", (const char *) s);
+   add_att(&data_var, "level", s.c_str());
    
    add_att(&data_var, "_FillValue", fill_value);
 
@@ -119,7 +119,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    
    if ( s.length() > 0 )  {
    
-      valid_time = timestring_to_unix((const char *) s);
+      valid_time = timestring_to_unix(s.c_str());
    
       mlog << Debug(2) << "Parsed valid time ("
            << unix_to_yyyymmdd_hhmmss(valid_time)
@@ -154,7 +154,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    
    if ( s.length() > 0 )  {
    
-      init_time = timestring_to_unix((const char *) s);
+      init_time = timestring_to_unix(s.c_str());
    
       mlog << Debug(2) << "Parsed initialization time ("
            << unix_to_yyyymmdd_hhmmss(init_time)
@@ -180,7 +180,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    s = Config->lookup_string("accum_time");
    
    accum_time = ( s.length() > 0 ?
-                  timestring_to_sec((const char *) s) :
+                  timestring_to_sec(s.c_str()) :
                   0);
    
    write_netcdf_var_times(&data_var, init_time, valid_time, accum_time);

@@ -161,7 +161,7 @@ unixtime t;
 
 s = dict_lookup_string(attrs_dict, "init");
 
-t = timestring_to_unix(s);
+t = timestring_to_unix(s.c_str());
 
 dp_out.set_init(t);
 
@@ -169,7 +169,7 @@ dp_out.set_init(t);
 
 s = dict_lookup_string(attrs_dict, "valid");
 
-t = timestring_to_unix(s);
+t = timestring_to_unix(s.c_str());
 
 dp_out.set_valid(t);
 
@@ -177,7 +177,7 @@ dp_out.set_valid(t);
 
 s = dict_lookup_string(attrs_dict, "lead");
 
-t = timestring_to_sec(s);
+t = timestring_to_sec(s.c_str());
 
 dp_out.set_lead(t);
 
@@ -185,7 +185,7 @@ dp_out.set_lead(t);
 
 s = dict_lookup_string(attrs_dict, "accum");
 
-t = timestring_to_sec(s);
+t = timestring_to_sec(s.c_str());
 
 dp_out.set_accum(t);
 
@@ -207,9 +207,9 @@ grid_from_python_dict(py_grid, grid_out);
      ////////////////////
 
 vinfo.set_name(dict_lookup_string(attrs_dict, "name"));
-vinfo.set_long_name(dict_lookup_string(attrs_dict, "long_name"));
-vinfo.set_level_name(dict_lookup_string(attrs_dict, "level"));
-vinfo.set_units(dict_lookup_string(attrs_dict, "units"));
+vinfo.set_long_name(dict_lookup_string(attrs_dict, "long_name").c_str());
+vinfo.set_level_name(dict_lookup_string(attrs_dict, "level").c_str());
+vinfo.set_units(dict_lookup_string(attrs_dict, "units").c_str());
 
      ////////////////////
 

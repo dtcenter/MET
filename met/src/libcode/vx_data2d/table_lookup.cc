@@ -213,13 +213,13 @@ tok.parse_wsss(line);
 if (tok.n_elements() < 4) return (false);
 
 for (j=0; j<4; ++j) {
-   if(!is_number(tok[j])) return (false);
+   if(!is_number(tok[j].c_str())) return (false);
 }
 
-code         = atoi(tok[0]);
-table_number = atoi(tok[1]);
-center       = atoi(tok[2]);
-subcenter    = atoi(tok[3]);
+code         = atoi(tok[0].c_str());
+table_number = atoi(tok[1].c_str());
+center       = atoi(tok[2].c_str());
+subcenter    = atoi(tok[3].c_str());
 
    //
    //  grab the 3 strings separated by double quotes
@@ -427,17 +427,17 @@ tok.parse_wsss(line);
 if (tok.n_elements() < 8) return (false);
 
 for (j=0; j<8; ++j) {
-   if(!is_number(tok[j])) return (false);
+   if(!is_number(tok[j].c_str())) return (false);
 }
 
-index_a   = atoi(tok[0]);
-mtab_set  = atoi(tok[1]);
-mtab_low  = atoi(tok[2]);
-mtab_high = atoi(tok[3]);
-cntr      = atoi(tok[4]);
-ltab      = atoi(tok[5]);
-index_b   = atoi(tok[6]);
-index_c   = atoi(tok[7]);
+index_a   = atoi(tok[0].c_str());
+mtab_set  = atoi(tok[1].c_str());
+mtab_low  = atoi(tok[2].c_str());
+mtab_high = atoi(tok[3].c_str());
+cntr      = atoi(tok[4].c_str());
+ltab      = atoi(tok[5].c_str());
+index_b   = atoi(tok[6].c_str());
+index_c   = atoi(tok[7].c_str());
 
    //
    //  grab the 3 strings separated by double quotes
@@ -512,7 +512,7 @@ TableFlatFile::TableFlatFile(int) {
    //  read the default grib1 table file, expanding MET_BASE
    //
    for (int i = 0; i < filtered_file_names.n_elements(); i++) {
-      if (!read(filtered_file_names[i])) {
+      if (!read(filtered_file_names[i].c_str())) {
          mlog << Error << "\nTableFlatFile::TableFlatFile(int) -> "
               << "unable to read table file \"" << filtered_file_names[i]
               << "\"\n\n";
@@ -531,7 +531,7 @@ TableFlatFile::TableFlatFile(int) {
 
    for (int i = 0; i < filtered_file_names.n_elements(); i++)
    {
-      if (!read(filtered_file_names[i])) {
+      if (!read(filtered_file_names[i].c_str())) {
          mlog << Error << "\nTableFlatFile::TableFlatFile(int) ->"
               << "unable to read table file \"" << filtered_file_names[i]
               << "\"\n\n";
@@ -577,7 +577,7 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
               << met_grib_tables << " file: " << filtered_file_names[i]
               << "\n";
 
-         if (!read(filtered_file_names[i])) {
+         if (!read(filtered_file_names[i].c_str())) {
             mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
                  << "unable to read user-defined " << table_type
                  << " table file \"" << filtered_file_names[i]
@@ -947,7 +947,7 @@ while ( line.read_line(in) )  {
 
    line << "\n";
 
-   status = g1e[N_grib1_elements + j]->parse_line(line);
+   status = g1e[N_grib1_elements + j]->parse_line(line.c_str());
 
    if ( ! status )  {
 
@@ -1021,7 +1021,7 @@ while ( line.read_line(in) )  {
 
    g2e[N_grib2_elements + j] = new Grib2TableEntry;
 
-   status = g2e[N_grib2_elements + j]->parse_line(line);
+   status = g2e[N_grib2_elements + j]->parse_line(line.c_str());
 
    if ( ! status )  {
 

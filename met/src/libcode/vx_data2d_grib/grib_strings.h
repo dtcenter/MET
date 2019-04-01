@@ -21,12 +21,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char missing_str[]        = "MISSING";
+static const string missing_str        = "MISSING";
 static const char ugrd_abbr_str[]      = "UGRD";
-static const char vgrd_abbr_str[]      = "VGRD";
-static const char ugrd_vgrd_abbr_str[] = "UGRD_VGRD";
-static const char wind_abbr_str[]      = "WIND";
-static const char wdir_abbr_str[]      = "WDIR";
+static const char vgrd_abbr_str[]     = "VGRD";
+static const string ugrd_vgrd_abbr_str = "UGRD_VGRD";
+static const string wind_abbr_str      = "WIND";
+static const string wdir_abbr_str      = "WDIR";
 
 ////////////////////////////////////////////////////////////////////////
 

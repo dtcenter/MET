@@ -189,10 +189,10 @@ bool status = false;
    //  parse supported projection types
    //
 
-     if ( strcasecmp(grid_strings[0], "lambert")  == 0 )  status = parse_lambert_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0], "latlon")   == 0 )  status = parse_latlon_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0], "stereo")   == 0 )  status = parse_stereographic_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0], "mercator") == 0 )  status = parse_mercator_grid(grid_strings, g);
+     if ( strcasecmp(grid_strings[0].c_str(), "lambert")  == 0 )  status = parse_lambert_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "latlon")   == 0 )  status = parse_latlon_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "stereo")   == 0 )  status = parse_stereographic_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "mercator") == 0 )  status = parse_mercator_grid(grid_strings, g);
 else                                                      status = false;
 
    //
@@ -238,23 +238,23 @@ j = 1;
    //  get info from the strings
    //
 
-Nx         = atoi(grid_strings[j++]);
-Ny         = atoi(grid_strings[j++]);
+Nx         = atoi(grid_strings[j++].c_str());
+Ny         = atoi(grid_strings[j++].c_str());
 
-lat_ll     = atof(grid_strings[j++]);
-lon_ll     = atof(grid_strings[j++]);
+lat_ll     = atof(grid_strings[j++].c_str());
+lon_ll     = atof(grid_strings[j++].c_str());
 
-lon_orient = atof(grid_strings[j++]);
+lon_orient = atof(grid_strings[j++].c_str());
 
-D_km       = atof(grid_strings[j++]);
-R_km       = atof(grid_strings[j++]);
+D_km       = atof(grid_strings[j++].c_str());
+R_km       = atof(grid_strings[j++].c_str());
 
-phi_1      = atof(grid_strings[j++]);
+phi_1      = atof(grid_strings[j++].c_str());
 
-if ( N == 11 )  phi_2 = atof(grid_strings[j++]);
+if ( N == 11 )  phi_2 = atof(grid_strings[j++].c_str());
 else            phi_2 = phi_1;
 
-c          = grid_strings[j++];
+c          = grid_strings[j++].c_str();
 
 if ( strlen(c) != 1 )  {
 
@@ -362,20 +362,20 @@ j = 1;
    //  get info from the strings
    //
 
-Nx         = atoi(grid_strings[j++]);
-Ny         = atoi(grid_strings[j++]);
+Nx         = atoi(grid_strings[j++].c_str());
+Ny         = atoi(grid_strings[j++].c_str());
 
-lat_ll     = atof(grid_strings[j++]);
-lon_ll     = atof(grid_strings[j++]);
+lat_ll     = atof(grid_strings[j++].c_str());
+lon_ll     = atof(grid_strings[j++].c_str());
 
-lon_orient = atof(grid_strings[j++]);
+lon_orient = atof(grid_strings[j++].c_str());
 
-D_km       = atof(grid_strings[j++]);
-R_km       = atof(grid_strings[j++]);
+D_km       = atof(grid_strings[j++].c_str());
+R_km       = atof(grid_strings[j++].c_str());
 
-lat_scale  = atof(grid_strings[j++]);
+lat_scale  = atof(grid_strings[j++].c_str());
 
-c          = grid_strings[j++];
+c          = grid_strings[j++].c_str();
 
 if ( strlen(c) != 1 )  {
 
@@ -477,14 +477,14 @@ j = 1;
    //  get info from the strings
    //
 
-Nx        = atoi(grid_strings[j++]);
-Ny        = atoi(grid_strings[j++]);
+Nx        = atoi(grid_strings[j++].c_str());
+Ny        = atoi(grid_strings[j++].c_str());
 
-lat_ll    = atof(grid_strings[j++]);
-lon_ll    = atof(grid_strings[j++]);
+lat_ll    = atof(grid_strings[j++].c_str());
+lon_ll    = atof(grid_strings[j++].c_str());
 
-delta_lat = atof(grid_strings[j++]);
-delta_lon = atof(grid_strings[j++]);
+delta_lat = atof(grid_strings[j++].c_str());
+delta_lon = atof(grid_strings[j++].c_str());
 
    //
    //  load up the struct
@@ -557,14 +557,14 @@ j = 1;
    //  get info from the strings
    //
 
-Nx     = atoi(grid_strings[j++]);
-Ny     = atoi(grid_strings[j++]);
+Nx     = atoi(grid_strings[j++].c_str());
+Ny     = atoi(grid_strings[j++].c_str());
 
-lat_ll = atof(grid_strings[j++]);
-lon_ll = atof(grid_strings[j++]);
+lat_ll = atof(grid_strings[j++].c_str());
+lon_ll = atof(grid_strings[j++].c_str());
 
-lat_ur = atof(grid_strings[j++]);
-lon_ur = atof(grid_strings[j++]);
+lat_ur = atof(grid_strings[j++].c_str());
+lon_ur = atof(grid_strings[j++].c_str());
 
 
    //

@@ -127,7 +127,7 @@ x = atof(cline[j]);
    //
    //
 
-const DictionaryEntry * e = config.lookup(function_name);
+const DictionaryEntry * e = config.lookup(function_name.c_str());
 
 if ( !e )  {
 

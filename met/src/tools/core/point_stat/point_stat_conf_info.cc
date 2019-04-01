@@ -84,7 +84,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
                                     const char *user_file_name) {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    conf.read(default_file_name);
@@ -126,7 +126,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
    // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
+   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
       mlog << Error << "\nPointStatConfInfo::process_config() -> "
            << "\"" << conf_key_message_type_group_map
            << "\" must contain an entry for \""
@@ -134,7 +134,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
    else {
-      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
+     msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
    }
 
    // Conf: fcst.field and obs.field
@@ -720,7 +720,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Verifying a probability field
    if(vx_pd.fcst_info->is_prob()) {
-      fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
+      fcat_ta = string_to_prob_thresh(fcat_ta.get_str().c_str());
    }
 
    // Check for equal threshold length for non-probability fields
@@ -799,7 +799,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    obs_perc = parse_conf_percentile(&odict);
 
    // Conf: desc
-   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
+   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc).c_str());
 
    // Conf: sid_exc
    vx_pd.set_sid_exc_filt(parse_conf_sid_exc(&odict));
@@ -857,7 +857,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
    // Define the verifying message type name and values
    for(i=0; i<n_msg_typ; i++) {
-      vx_pd.set_msg_typ(i, msg_typ[i]);
+      vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
       if(sa.n_elements() == 0) sa.add(msg_typ[i]);
       vx_pd.set_msg_typ_vals(i, sa);
@@ -868,33 +868,33 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Define the grid masks
    for(i=0; i<mask_grid.n_elements(); i++) {
       n = i;
-      vx_pd.set_mask_area(n, mask_name[n],
+      vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
    for(i=0; i<mask_poly.n_elements(); i++) {
       n = i + mask_grid.n_elements();
-      vx_pd.set_mask_area(n, mask_name[n],
+      vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
    for(i=0; i<mask_sid.n_elements(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements();
-      vx_pd.set_mask_sid(n, mask_name[n],
+      vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
    for(i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
-      vx_pd.set_mask_llpnt(n, mask_name[n], &mask_llpnt[i]);
+      vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
    // Define the interpolation methods
    for(i=0; i<n_interp; i++) {
-      vx_pd.set_interp(i, interp_info.method[i], interp_info.width[i],
+      vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
    }
 

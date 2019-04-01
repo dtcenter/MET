@@ -301,7 +301,7 @@ void process_command_line(int argc, char **argv) {
    etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
    // Read the first input ensemble file
-   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0], etype))) {
+   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0].c_str(), etype))) {
       mlog << Error << "\nprocess_command_line() -> "
            << "trouble reading ensemble file \""
            << ens_file_list[0] << "\"\n\n";
@@ -316,7 +316,7 @@ void process_command_line(int argc, char **argv) {
    if(point_obs_flag) {
       otype = FileType_Gb1;
       if(point_obs_file_list.n_elements() > 0) {
-         use_var_id = is_using_var_id(point_obs_file_list[0]);
+	use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
       }
    }
    else if(!grid_obs_flag) otype = FileType_None;
@@ -326,7 +326,7 @@ void process_command_line(int argc, char **argv) {
       otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Read the first gridded observation file
-      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0], otype))) {
+      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0].c_str(), otype))) {
          mlog << Error << "\nprocess_command_line() -> "
               << "trouble reading gridded observation file \""
               << grid_obs_file_list[0] << "\"\n\n";
@@ -349,7 +349,7 @@ void process_command_line(int argc, char **argv) {
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
 
    // Set the model name
-   shc.set_model(conf_info.model);
+   shc.set_model(conf_info.model.c_str());
 
    // Allocate arrays to store threshold counts
    thresh_count_na = new NumArray [conf_info.get_max_n_thresh()];
@@ -382,7 +382,7 @@ void process_command_line(int argc, char **argv) {
    // Check for missing ensemble files
    for(i=0; i<ens_file_list.n_elements(); i++) {
 
-      if(stat(ens_file_list[i], &results) != 0) {
+      if(stat(ens_file_list[i].c_str(), &results) != 0) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble file: "
               << ens_file_list[i] << "\n\n";
@@ -418,7 +418,7 @@ void process_command_line(int argc, char **argv) {
               << "ignoring input -ens_mean file because no ensemble "
               << "mean is needed.\n\n";
       }
-      else if(stat(ens_mean_user, &results)) {
+      else if(stat(ens_mean_user.c_str(), &results)) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble mean file: "
               << ens_mean_user << "\n\n";
@@ -473,7 +473,7 @@ void process_n_vld() {
          if(!ens_file_vld[j]) continue;
 
          // Check for valid data
-         if(!get_data_plane(ens_file_list[j], etype,
+         if(!get_data_plane(ens_file_list[j].c_str(), etype,
                             conf_info.ens_info[i], dp, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "ensemble field \""
@@ -513,7 +513,7 @@ void process_n_vld() {
 
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
-         if(!get_data_plane_array(ens_file_list[j], etype,
+         if(!get_data_plane_array(ens_file_list[j].c_str(), etype,
                                   conf_info.vx_opt[i].vx_pd.fcst_info,
                                   dpa, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
@@ -674,7 +674,7 @@ void process_ensemble() {
          if(!ens_file_vld[j]) continue;
 
          // Read the current field
-         if(!get_data_plane(ens_file_list[j], etype,
+         if(!get_data_plane(ens_file_list[j].c_str(), etype,
                             conf_info.ens_info[i], ens_dp, true)) continue;
 
          // Create a NetCDF file to store the ensemble output
@@ -839,7 +839,7 @@ void process_point_obs(int i_nc) {
         << point_obs_file_list[i_nc] << "\n";
 
    // Open the observation file as a NetCDF file.
-   obs_in = open_ncfile(point_obs_file_list[i_nc]);
+   obs_in = open_ncfile(point_obs_file_list[i_nc].c_str());
 
    if(IS_INVALID_NC_P(obs_in)) {
       delete obs_in;
@@ -922,14 +922,14 @@ void process_point_obs(int i_nc) {
 
    float obs_arr[OBS_ARRAY_LEN], hdr_arr[hdr_arr_len];
    int  hdr_typ_arr[hdr_typ_arr_len];
-   char hdr_typ_str[max_str_len];
-   char hdr_sid_str[max_str_len];
-   char hdr_vld_str[max_str_len];
-   char obs_qty_str[max_str_len];
+   ConcatString hdr_typ_str;
+   ConcatString hdr_sid_str;
+   ConcatString hdr_vld_str;
+   ConcatString obs_qty_str;
 
    StringArray var_names;
-   char var_name[var_name_len+1];
-   strcpy(var_name, "");
+   ConcatString var_name;
+
    if (use_var_id) {
       NcVar obs_var = get_nc_var(obs_in, nc_var_obs_var);
       if (!get_nc_data_to_array(&obs_var, &var_names)) {
@@ -967,10 +967,10 @@ void process_point_obs(int i_nc) {
          }
 
          if (use_arr_vars) {
-            strcpy(obs_qty_str, obs_qty_str_block[i_offset]);
+            obs_qty_str = obs_qty_str_block[i_offset];
          }
          else {
-            strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_offset]]);
+            obs_qty_str = obs_qty_array[obs_qty_idx_block[i_offset]];
          }
 
          int headerOffset  = obs_arr[0];
@@ -1000,33 +1000,24 @@ void process_point_obs(int i_nc) {
 
          // Read the corresponding header type for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.typ_idx_array[headerOffset];
-         str_length = strlen(header_data.typ_array[hdr_idx]);
-         if (str_length > typ_len) str_length = typ_len;
-         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
-         hdr_typ_str[str_length] = bad_data_char;
+         hdr_typ_str = header_data.typ_array[hdr_idx];
 
          // Read the corresponding header Station ID for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.sid_idx_array[headerOffset];
-         str_length = strlen(header_data.sid_array[hdr_idx]);
-         if (str_length > sid_len) str_length = sid_len;
-         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
-         hdr_sid_str[str_length] = bad_data_char;
+         hdr_sid_str = header_data.sid_array[hdr_idx];
 
          // Read the corresponding valid time for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.vld_idx_array[headerOffset];
-         str_length = strlen(header_data.vld_array[hdr_idx]);
-         if (str_length > vld_len) str_length = vld_len;
-         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
-         hdr_vld_str[str_length] = bad_data_char;
+         hdr_vld_str = header_data.vld_array[hdr_idx];
 
          // Convert string to a unixtime
-         hdr_ut = timestring_to_unix(hdr_vld_str);
+         hdr_ut = timestring_to_unix(hdr_vld_str.c_str());
 
          if (use_var_id && obs_arr[1] < var_names.n_elements()) {
-            strcpy(var_name, var_names[obs_arr[1]]);
+            var_name = var_names[obs_arr[1]];
          }
          else {
-            strcpy(var_name, "");
+            var_name = "";
          }
 
          // Check each conf_info.vx_pd object to see if this observation
@@ -1034,9 +1025,9 @@ void process_point_obs(int i_nc) {
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str,
-                                              hdr_sid_str, hdr_ut, obs_qty_str,
-                                              obs_arr, grid, var_name);
+            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
+                                              hdr_sid_str.c_str(), hdr_ut, obs_qty_str.c_str(),
+                                              obs_arr, grid, var_name.c_str());
          }
       }
    } // end for i_start
@@ -1080,7 +1071,7 @@ int process_point_ens(int i_ens, int &n_miss) {
       if(is_ens_mean && ens_mean_user.empty()) {
          fcst_dpa.clear();
          info = new VarInfoNcMet();
-         info->set_magic(get_ens_mn_var_name(i), "(*,*)");
+         info->set_magic(get_ens_mn_var_name(i), (string)"(*,*)");
          info_alloc = true;
       }
       else {
@@ -1088,7 +1079,7 @@ int process_point_ens(int i_ens, int &n_miss) {
       }
 
       // Read the gridded data from the input forecast file
-      if(!get_data_plane_array(ens_file, info->file_type(), info,
+      if(!get_data_plane_array(ens_file.c_str(), info->file_type(), info,
                                fcst_dpa, true)) {
 
          // Error out if unable to read the ensemble mean
@@ -1146,16 +1137,16 @@ void process_point_scores() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Set the description
-      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc);
+      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name().text());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name().text());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
@@ -1171,13 +1162,13 @@ void process_point_scores() {
       for(j=0; j<conf_info.vx_opt[i].get_n_msg_typ(); j++) {
 
          // Store the message type in the obtype column
-         shc.set_obtype(conf_info.vx_opt[i].msg_typ[j]);
+         shc.set_obtype(conf_info.vx_opt[i].msg_typ[j].c_str());
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the verification masking region
-            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
             // Loop through the interpolation methods
             for(l=0; l<conf_info.vx_opt[i].get_n_interp(); l++) {
@@ -1338,7 +1329,7 @@ void process_grid_vx() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Set the obtype column
-   shc.set_obtype(conf_info.obtype);
+   shc.set_obtype(conf_info.obtype.c_str());
 
    // Allocate space to store the forecast fields
    fcst_dp = new DataPlane [n_ens];
@@ -1355,16 +1346,16 @@ void process_grid_vx() {
       shc.set_fcst_valid_end(ens_valid_ut);
 
       // Set the description
-      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc);
+      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name().text());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
 
       // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name().text());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
@@ -1384,8 +1375,8 @@ void process_grid_vx() {
 
             // Check for table entries for this variable and message type
             if(!obs_error_table.has(
-                  conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                  conf_info.obtype)) {
+                  conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                  conf_info.obtype.c_str())) {
                mlog << Warning << "\nprocess_grid_vx() -> "
                     << "Disabling observation error logic since the "
                     << "obs error table contains no entry for OBS_VAR("
@@ -1396,11 +1387,11 @@ void process_grid_vx() {
                conf_info.vx_opt[i].obs_error.flag = false;
             }
             else {
-
+	      
                // Do a lookup for this variable and message type
                oerr_ptr = obs_error_table.lookup(
-                  conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                  conf_info.obtype);
+                  conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                  conf_info.obtype.c_str());
 
                // If match was found and includes a value range setting,
                // reset to NULL and lookup separately for grid point
@@ -1429,7 +1420,7 @@ void process_grid_vx() {
 
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[j]) {
-            found = get_data_plane(ens_file_list[j], etype,
+            found = get_data_plane(ens_file_list[j].c_str(), etype,
                                    conf_info.vx_opt[i].vx_pd.fcst_info,
                                    fcst_dp[j], true);
          }
@@ -1464,7 +1455,7 @@ void process_grid_vx() {
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
-         found = get_data_plane(grid_obs_file_list[j], otype,
+         found = get_data_plane(grid_obs_file_list[j].c_str(), otype,
                                 conf_info.vx_opt[i].vx_pd.obs_info,
                                 obs_dp, true);
 
@@ -1502,7 +1493,7 @@ void process_grid_vx() {
          // Use the calculated mean file, in necessary
          if(ens_mean_user.empty()) {
             info = new VarInfoNcMet();
-            info->set_magic(get_ens_mn_var_name(i), "(*,*)");
+            info->set_magic(get_ens_mn_var_name(i), (string)"(*,*)");
             info_alloc = true;
          }
          else {
@@ -1510,7 +1501,7 @@ void process_grid_vx() {
          }
 
          // Read the gridded data from the mean file
-         found = get_data_plane(mn_file, FileType_None,
+         found = get_data_plane(mn_file.c_str(), FileType_None,
                                 info, emn_dp, true);
 
          if(!found) {
@@ -1530,7 +1521,7 @@ void process_grid_vx() {
 
          // Store current settings
          ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
-         InterpMthd   mthd       = string_to_interpmthd(mthd_str);
+         InterpMthd   mthd       = string_to_interpmthd(mthd_str.c_str());
          int          wdth       = conf_info.vx_opt[i].interp_info.width[j];
          double       vld_thresh = conf_info.vx_opt[i].interp_info.vld_thresh;
          GridTemplateFactory::GridTemplates shape = conf_info.vx_opt[i].interp_info.shape;
@@ -1575,8 +1566,8 @@ void process_grid_vx() {
                  << "gridded observation data.\n";
             obs_dp = add_obs_error_bc(conf_info.rng_ptr,
                         FieldType_Obs, oerr_ptr, oraw_dp, oraw_dp,
-                        conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                        conf_info.obtype);
+                        conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                        conf_info.obtype.c_str());
          }
 
          // Looop through the ensemble members
@@ -1600,8 +1591,8 @@ void process_grid_vx() {
                     << "ensemble member " << k+1 << ".\n";
                fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
                                FieldType_Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
-                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                               conf_info.obtype);
+                               conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                               conf_info.obtype.c_str());
             }
          } // end for k
 
@@ -1609,7 +1600,7 @@ void process_grid_vx() {
          for(k=0; k<conf_info.vx_opt[i].get_n_mask_area(); k++) {
 
             // Set the mask name
-            shc.set_mask(conf_info.vx_opt[i].mask_name_area[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name_area[k].c_str());
 
             // Store the current mask
             mask_mp = conf_info.mask_area_map[conf_info.vx_opt[i].mask_name_area[k]];
@@ -1802,8 +1793,8 @@ void process_grid_scores(int i_vx,
          }
          else if(conf_info.vx_opt[i_vx].obs_error.flag) {
             e = obs_error_table.lookup(
-                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name(),
-                   conf_info.obtype, oraw_dp(x,y));
+                   conf_info.vx_opt[i_vx].vx_pd.obs_info->name().c_str(),
+                   conf_info.obtype.c_str(), oraw_dp(x,y));
          }
          else {
             e = (ObsErrorEntry *) 0;
@@ -1963,7 +1954,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, true);
+   nc_out = open_ncfile(out_nc_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -1974,7 +1965,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file.text(), program_name,
-                       conf_info.model, conf_info.obtype);
+                       conf_info.model.c_str(), conf_info.obtype.c_str());
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -2043,7 +2034,7 @@ void setup_txt_files() {
    stat_file << tmp_str << stat_file_ext;
 
    // Create the output STAT file
-   open_txt_file(stat_out, stat_file);
+   open_txt_file(stat_out, stat_file.c_str());
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
@@ -2078,7 +2069,7 @@ void setup_txt_files() {
                      << txt_file_ext;
 
          // Create the output text file
-         open_txt_file(txt_out[i], txt_file[i]);
+         open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Get the maximum number of columns for this line type
          switch(i) {
@@ -2318,7 +2309,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
       // Loop through each threshold
       for(i=0; i<conf_info.ens_ta[i_ens].n_elements(); i++) {
 
-         snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s", conf_info.ens_ta[i_ens][i].get_abbr_str().contents());
+         snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s", conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str());
 
          // Store the data
          for(j=0; j<count_na.n_elements(); j++) {
@@ -2391,7 +2382,7 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
 
    // Add the variable attributes
    add_var_att_local(conf_info.ens_info[i_ens], &ens_var, false, dp,
-                     name_str, long_name_str);
+                     name_str.c_str(), long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
@@ -2433,7 +2424,7 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
 
    // Add the variable attributes
    add_var_att_local(conf_info.ens_info[i_ens], &ens_var, true, dp,
-                     name_str, long_name_str);
+                     name_str.c_str(), long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
@@ -2560,7 +2551,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, false, dp,
-                     name_str, long_name_str);
+                     name_str.c_str(), long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
@@ -2618,7 +2609,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, true, dp,
-                     name_str, long_name_str);
+                     name_str.c_str(), long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
@@ -2667,7 +2658,7 @@ void finish_txt_files() {
    // close the STAT output files
    if(stat_out) {
       *stat_out << stat_at;
-      close_txt_file(stat_out, stat_file);
+      close_txt_file(stat_out, stat_file.c_str());
    }
 
    // Finish up each of the optional text files
@@ -2679,7 +2670,7 @@ void finish_txt_files() {
          // Write the AsciiTable to a file
          if(txt_out[i]) {
             *txt_out[i] << txt_at[i];
-            close_txt_file(txt_out[i], txt_file[i]);
+            close_txt_file(txt_out[i], txt_file[i].c_str());
          }
       }
    }
@@ -2801,14 +2792,14 @@ void set_ens_mean(const StringArray & a)
 
 void set_obs_valid_beg(const StringArray & a)
 {
-   obs_valid_beg_ut = timestring_to_unix(a[0]);
+   obs_valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_obs_valid_end(const StringArray & a)
 {
-   obs_valid_end_ut = timestring_to_unix(a[0]);
+   obs_valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2833,13 +2824,13 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -84,13 +84,14 @@ extern  int       unix_to_sec_of_day (unixtime u);
 
 extern  void     substring_vx_cal       (const char * text, char * out, int first, int last);
 
-extern  void         sec_to_hhmmss      (int, char *);
+extern  void         sec_to_hhmmss      (int, ConcatString&);
 extern  ConcatString sec_to_hhmmss      (int);
 
 extern  ConcatString sec_to_hhmmss_colon(int);
 
 extern  int      hhmmss_to_sec          (const char *);
 
+extern  void         unix_to_yyyymmdd_hhmmss(unixtime, ConcatString&);
 extern  void         unix_to_yyyymmdd_hhmmss(unixtime, char *);
 extern  ConcatString unix_to_yyyymmdd_hhmmss(unixtime);
 
@@ -107,7 +108,7 @@ extern  unixtime yyyymmddhh_to_unix(const char *);
 extern  unixtime yyyymmddhhmm_to_unix(const char *);
 extern  unixtime yyyymmddhhmmss_to_unix(const char *);
 
-extern  void         make_timestring(unixtime, char *, size_t len);
+extern  void         make_timestring(unixtime, ConcatString&);
 extern  ConcatString make_timestring(unixtime);
 
 extern  unixtime timestring_to_unix(const char *);
@@ -178,6 +179,7 @@ static const double     bad_data_double       = -9999.0;
 static const char       bad_data_str[]        = "-9999";
 static const char       bad_data_char         = '\0';
 static const char       na_str[]              = "NA";
+static const string     na_string             = "NA";
 
 
 ////////////////////////////////////////////////////////////////////////

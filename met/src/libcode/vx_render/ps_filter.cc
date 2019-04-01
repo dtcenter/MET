@@ -204,13 +204,13 @@ PSFilter & PSFilter::operator<<(const double x)
 
 {
 
-char junk[256];
+  ConcatString junk;
 
-snprintf(junk, sizeof(junk), double_format, x);
+  junk.format(double_format, x);
 
-operator<<(junk);
+  operator<<(junk);
 
-return ( * this );
+  return ( * this );
 
 }
 

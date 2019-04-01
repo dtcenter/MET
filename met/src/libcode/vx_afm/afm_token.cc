@@ -96,7 +96,7 @@ void AfmToken::init_from_scratch()
 
 {
 
-s = (char *) 0;
+  s = "";
 
 clear();
 
@@ -113,7 +113,7 @@ void AfmToken::clear()
 
 {
 
-if ( s )  { delete [] s;  s = (char *) 0; }
+if ( s != "" )  { s.clear(); }
 
 line_number = column = -1;
 
@@ -152,7 +152,7 @@ i = t.i;
 
 d = t.d;
 
-if ( t.s )  {
+if ( t.s != "" )  {
 
    set_string(t.s);
 
@@ -175,7 +175,6 @@ void AfmToken::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "line_number = " << line_number << "\n";
-out << prefix << "column      = " << column      << "\n";
 
 out << prefix << "type        = " << afmtokentype_to_string(type)  << "\n";
 
@@ -184,7 +183,7 @@ out << prefix << "keyword     = " << afmkeyword_to_string(keyword) << "\n";
 out << prefix << "i           = " << i           << "\n";
 out << prefix << "d           = " << d           << "\n";
 
-if ( s )  {
+if ( s != "" )  {
 
    out << prefix << "s           = \"" << s      << "\"\n";
 
@@ -208,19 +207,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfmToken::set_string(const char * text)
+void AfmToken::set_string(const ConcatString text)
 
 {
 
-if ( s )  { delete [] s;  s = (char *) 0; }
+if ( s != "" )  { s.clear(); }
 
-if ( !text )  return;
+if ( text == "" )  return;
 
-int n = strlen(text);
-
-s = new char [1 + n];
-
-strcpy(s, text);
+s = text;
 
 return;
 

@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
    for (vector< ConcatString >::const_iterator it_mdfile = md_files.begin();
        it_mdfile != md_files.end(); ++it_mdfile)
    {
-      process_madis_file(*it_mdfile);
+     process_madis_file((*it_mdfile).c_str());
    }
 
    bool use_var_id = true;
@@ -266,7 +266,7 @@ void process_command_line(int argc, char **argv) {
    // Store the input MADIS file name and the output NetCDF file name
    //
    for (i = 0; i < cline.n() - 1; ++i)
-     md_files.push_back(cline[i]);
+     md_files.push_back((string)cline[i]);
    ncfile = cline[cline.n() - 1];
 
    conf_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
@@ -378,7 +378,7 @@ void setup_netcdf_out(int nhdr) {
    // Create the output netCDF file for writing
    //
    mlog << Debug(1) << "Writing MET File:\t" << ncfile << "\n";
-   f_out = open_ncfile(ncfile, true);
+   f_out = open_ncfile(ncfile.c_str(), true);
 
    //
    // Check for a valid file
@@ -428,7 +428,7 @@ static bool get_filtered_nc_data(NcVar var, float *data,
 
    if(!(status = get_nc_data(&var, data, dim, cur))) return status;
 
-   get_nc_att(&var, in_fillValue_str, in_fill_value);
+   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
    for (int idx=0; idx<dim; idx++) {
       if(is_eq(data[idx], in_fill_value)) {
          data[idx] = bad_data_float;
@@ -448,7 +448,7 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
 
    if(!(status = get_nc_data(&var, data, dim, cur))) return status;
 
-   get_nc_att(&var, in_fillValue_str, in_fill_value);
+   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
    mlog << Debug(5)  << "    get_filtered_nc_data_2d(int): in_fill_value="
         << in_fill_value << "\n";
 
@@ -479,7 +479,7 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
    if(!(status = get_nc_data(&var, data, dim, cur))) return status;
 
-   get_nc_att(&var, in_fillValue_str, in_fill_value);
+   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
    mlog << Debug(5)  << "    get_filtered_nc_data_2d: in_fill_value="
         << in_fill_value << "\n";
 
@@ -622,13 +622,13 @@ MadisType get_madis_type(NcFile *&f_in) {
    //
    // FUTURE WORK: Interrogate the MADIS file and determine it's type.
    //
-   if (get_global_att(f_in, "id", attr_value)) {
+   if (get_global_att(f_in, (string)"id", attr_value)) {
       if (attr_value == "MADIS_MARITIME")     madis_type = madis_maritime;
       else if (attr_value == "MADIS_MESONET") madis_type = madis_mesonet;
       else if (attr_value == "MADIS_METAR")   madis_type = madis_metar;
    }
-   else if (get_global_att(f_in, "title", attr_value)) {
-      if (attr_value.contents("MADIS ACARS")) madis_type = madis_acarsProfiles;
+   else if (get_global_att(f_in, (string)"title", attr_value)) {
+      if (attr_value.contents("MADIS ACARS") != "") madis_type = madis_acarsProfiles;
    }
    return(madis_type);
 }
@@ -1173,12 +1173,12 @@ void process_madis_raob(NcFile *&f_in) {
    nhdr         = get_dim_value(f_in, in_recNum_str);
    int my_rec_end = (rec_end == 0) ? nhdr : rec_end;
 
-   get_dim(f_in, "manLevel", maxlvl_manLevel);
-   get_dim(f_in, "sigTLevel", maxlvl_sigTLevel);
-   get_dim(f_in, "sigWLevel", maxlvl_sigWLevel);
-   get_dim(f_in, "sigPresWLevel", maxlvl_sigPresWLevel);
-   get_dim(f_in, "mTropNum", maxlvl_mTropNum);
-   get_dim(f_in, "mWndNum", maxlvl_mWndNum);
+   get_dim(f_in, (string)"manLevel", maxlvl_manLevel);
+   get_dim(f_in, (string)"sigTLevel", maxlvl_sigTLevel);
+   get_dim(f_in, (string)"sigWLevel", maxlvl_sigWLevel);
+   get_dim(f_in, (string)"sigPresWLevel", maxlvl_sigPresWLevel);
+   get_dim(f_in, (string)"mTropNum", maxlvl_mTropNum);
+   get_dim(f_in, (string)"mWndNum", maxlvl_mWndNum);
 
    //
    // Setup the output NetCDF file
@@ -3066,7 +3066,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Check masked regions
             //
-            if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid)) continue;
+            if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
             //
             // Get the number of levels  and height for this level
@@ -3241,22 +3241,22 @@ void set_type(const StringArray & a)
    //
    // Parse the MADIS type
    //
-   if(strcasecmp(a[0], metar_str) == 0) {
+   if(strcasecmp(a[0].c_str(), metar_str) == 0) {
       mtype = madis_metar;
    }
-   else if(strcasecmp(a[0], raob_str) == 0) {
+   else if(strcasecmp(a[0].c_str(), raob_str) == 0) {
       mtype = madis_raob;
    }
-   else if(strcasecmp(a[0], profiler_str) == 0) {
+   else if(strcasecmp(a[0].c_str(), profiler_str) == 0) {
       mtype = madis_profiler;
    }
-   else if(strcasecmp(a[0], maritime_str) == 0) {
+   else if(strcasecmp(a[0].c_str(), maritime_str) == 0) {
       mtype = madis_maritime;
    }
-   else if(strcasecmp(a[0], mesonet_str) == 0) {
+   else if(strcasecmp(a[0].c_str(), mesonet_str) == 0) {
       mtype = madis_mesonet;
    }
-   else if(strcasecmp(a[0], acarsProfiles_str) == 0) {
+   else if(strcasecmp(a[0].c_str(), acarsProfiles_str) == 0) {
       mtype = madis_acarsProfiles;
    }
    else {
@@ -3291,14 +3291,14 @@ void set_lvl_dim(const StringArray & a)
 
 void set_rec_beg(const StringArray & a)
 {
-   rec_beg = atoi(a[0]);
+   rec_beg = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_rec_end(const StringArray & a)
 {
-   rec_end = atoi(a[0]);
+   rec_end = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3378,13 +3378,13 @@ void set_mask_sid(const StringArray & a) {
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

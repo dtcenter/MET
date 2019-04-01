@@ -1208,7 +1208,7 @@ DataField = new SwathDataField [Ndatafields];
 
 for (j=0; j<Ndatafields; ++j)  {
 
-   DataField[j].set_name(a[j]);
+   DataField[j].set_name(a[j].c_str());
 
 }
 
@@ -1241,7 +1241,7 @@ for (j=0; j<Ndatafields; ++j)  {
 
    s = DataField[j].name();
 
-   c = (const char *) s;
+   c = s.c_str();
 
    if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
@@ -1260,7 +1260,7 @@ for (j=0; j<Ndatafields; ++j)  {
 
    for (k=0; k<n_dims; ++k)  {
 
-      d = dimension(a[k]);
+      d = dimension(a[k].c_str());
 
       if ( !d )  {
 
@@ -1322,13 +1322,16 @@ if ( (retval = SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
+   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
 
    exit ( 1 );
 
 }
 
-if ( retval == 0 )  return;
-
+ if ( retval == 0 ) {
+   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+   return;
+ }
 parse_csl(att_buf, a);
 
 Nattributes = a.n_elements();
@@ -1337,13 +1340,14 @@ Attribute = new SatAttribute [Nattributes];
 
 for (j=0; j<Nattributes; ++j)  {
 
-   Attribute[j].set_name(a[j]);
+   Attribute[j].set_name(a[j].c_str());
 
-   if ( SWattrinfo(SwathId, (char *) (a[j]), &nt, &att_size) < 0 )  {
+   if ( SWattrinfo(SwathId, (char*)a[j].c_str(), &nt, &att_size) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
 
+      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
       exit ( 1 );
 
    }
@@ -1353,11 +1357,11 @@ for (j=0; j<Nattributes; ++j)  {
 
    clear_buf(att_buf, att_buf_size);
 
-   if ( SWreadattr(SwathId, (char *) (a[j]), att_buf) < 0 )  {
+   if ( SWreadattr(SwathId, (char*)a[j].c_str(), att_buf) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
-
+      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
       exit ( 1 );
 
    }
@@ -1417,7 +1421,7 @@ GeoField = new SwathDataField [Ngeofields];
 
 for (j=0; j<Ngeofields; ++j)  {
 
-   GeoField[j].set_name(a[j]);
+   GeoField[j].set_name(a[j].c_str());
 
 }
 
@@ -1451,7 +1455,7 @@ for (j=0; j<Ngeofields; ++j)  {
 
    s = GeoField[j].name();
 
-   c = (const char *) s;
+   c = s.c_str();
 
    if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
@@ -1470,7 +1474,7 @@ for (j=0; j<Ngeofields; ++j)  {
 
    for (k=0; k<n_dims; ++k)  {
 
-      d = dimension(a[k]);
+      d = dimension(a[k].c_str());
 
       if ( !d )  {
 
@@ -1530,9 +1534,9 @@ Dimension = new SatDimension [Ndimensions];
 
 for (j=0; j<Ndimensions; ++j)  {
 
-   Dimension[j].set_name(a[j]);
+   Dimension[j].set_name(a[j].c_str());
 
-   if ( (k = SWdiminfo(SwathId, (char *) (a[j]))) < 0 )  {
+   if ( (k = SWdiminfo(SwathId, (char*)a[j].c_str())) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_dimensions() ->can't get size for dimension \"" << a[j] << "\"\n\n";
@@ -2135,9 +2139,9 @@ if ( Nswaths > 0 )  Swath = new CloudsatSwath [Nswaths];
 
 for (j=0; j<Nswaths; ++j)  {
 
-   Swath[j].set_name(a[j]);
+   Swath[j].set_name(a[j].c_str());
 
-   if ( (k = SWattach(FileId, (char *) (a[j]))) < 0 )  {
+   if ( (k = SWattach(FileId, (char *) a[j].c_str())) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwathFile::open(const char *) -> to attach swath # " << j << " in file \"" << _filename << "\"\n\n";
@@ -2214,7 +2218,7 @@ ConcatString CloudsatSwathFile::short_name() const
 
 ConcatString s;
 
-if ( Filename.nonempty() )  s = get_short_name(Filename);
+if ( Filename.nonempty() )  s = get_short_name(Filename.c_str());
 
 return ( s );
 

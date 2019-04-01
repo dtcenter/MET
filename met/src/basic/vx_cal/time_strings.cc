@@ -27,24 +27,24 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void sec_to_hhmmss(int in_sec, char *str)
+void sec_to_hhmmss(int in_sec, ConcatString& str)
 
 {
 
 int hour, minute, second;
 
 if ( in_sec == bad_data_int )  {
-   strcpy(str, na_str);
+   str = na_str;
 }
 else  {
 
    sec_to_hms(in_sec, hour, minute, second);
 
    if(in_sec < 0) {
-      sprintf(str, "-%.2i%.2i%.2i", abs(hour), abs(minute), abs(second));
+      str.format("-%.2i%.2i%.2i", abs(hour), abs(minute), abs(second));
    }
    else {
-      sprintf(str, "%.2i%.2i%.2i", hour, minute, second);
+      str.format("%.2i%.2i%.2i", hour, minute, second);
    }
 }
 
@@ -60,11 +60,9 @@ ConcatString sec_to_hhmmss(int in_sec)
 
 {
 
-char junk[1024];
-
-sec_to_hhmmss(in_sec, junk);
-
-ConcatString str = junk;
+ConcatString str;
+ 
+sec_to_hhmmss(in_sec, str);
 
 return ( str );
 
@@ -128,7 +126,7 @@ return ( i );
 ////////////////////////////////////////////////////////////////////////
 
 
-void unix_to_yyyymmdd_hhmmss(unixtime u, char *str)
+void unix_to_yyyymmdd_hhmmss(unixtime u, ConcatString& str)
 
 {
 
@@ -136,7 +134,25 @@ int year, month, day, hour, minute, second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
-sprintf(str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+ str.format("%.4i%.2i%.2i_%.2i%.2i%.2i",
+        year, month, day, hour, minute, second);
+ 
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void unix_to_yyyymmdd_hhmmss(unixtime u, char * junk, size_t len)
+
+{
+
+int year, month, day, hour, minute, second;
+
+unix_to_mdyhms(u, month, day, year, hour, minute, second);
+
+ snprintf(junk, len, "%.4i%.2i%.2i_%.2i%.2i%.2i",
         year, month, day, hour, minute, second);
 
 return;
@@ -151,11 +167,9 @@ ConcatString unix_to_yyyymmdd_hhmmss(unixtime u)
 
 {
 
-char junk[1024];
+ConcatString str;
 
-unix_to_yyyymmdd_hhmmss(u, junk);
-
-ConcatString str = junk;
+unix_to_yyyymmdd_hhmmss(u, str);
 
 return ( str );
 
@@ -282,7 +296,7 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-void unix_to_yyyymmddhh(unixtime u, char *str)
+void unix_to_yyyymmddhh(unixtime u, ConcatString& str)
 
 {
 
@@ -290,7 +304,7 @@ int year, month, day, hour, minute, second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
-sprintf(str, "%.4i%.2i%.2i%.2i", year, month, day, hour);
+str.format("%.4i%.2i%.2i%.2i", year, month, day, hour);
 
 return;
 
@@ -304,11 +318,9 @@ ConcatString unix_to_yyyymmddhh(unixtime u)
 
 {
 
-char junk[1024];
+ConcatString str;
 
-unix_to_yyyymmddhh(u, junk);
-
-ConcatString str = junk;
+unix_to_yyyymmddhh(u, str);
 
 return ( str );
 
@@ -326,7 +338,7 @@ ConcatString str;
 
 str << text << "0000";
 
-return ( yyyymmddhhmmss_to_unix(str) );
+ return ( yyyymmddhhmmss_to_unix(str.c_str()) );
 
 }
 
@@ -341,7 +353,7 @@ ConcatString str;
 
 str << text << "00";
 
-return ( yyyymmddhhmmss_to_unix(str) );
+ return ( yyyymmddhhmmss_to_unix(str.c_str()) );
 
 }
 
@@ -423,7 +435,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void make_timestring(unixtime t, char * junk, size_t len)
+void make_timestring(unixtime t, ConcatString& str)
 
 {
 
@@ -432,7 +444,7 @@ int month, day, year, hour, minute, second;
 
 unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-snprintf(junk, len, "%s %2d, %d  %02d:%02d:%02d",
+ str.format("%s %2d, %d  %02d:%02d:%02d",
         short_month_name[month], day, year,
         hour, minute, second);
 
@@ -448,11 +460,9 @@ ConcatString make_timestring(unixtime u)
 
 {
 
-char junk[1024];
+ConcatString str;
 
-make_timestring(u, junk, sizeof(junk));
-
-ConcatString str = junk;
+make_timestring(u, str);
 
 return ( str );
 
@@ -482,7 +492,6 @@ else if ( strlen(text) == 0 ) {
 
    mlog << Error << "\ntimestring_to_unix(const char *) -> "
         << "empty time string!\n\n";
-
    exit ( 1 );
 
 }
@@ -638,7 +647,6 @@ else {
 
 }
 
-
 return ( t );
 
 }
@@ -695,11 +703,9 @@ ConcatString HH(int hours)
 
 {
 
-char junk[1024];
+ConcatString str;
 
-snprintf(junk, sizeof(junk), "%02d", hours);
-
-ConcatString str = junk;
+str.format("%02d", hours);
 
 return ( str );
 

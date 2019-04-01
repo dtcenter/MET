@@ -229,7 +229,7 @@ void set_max_minutes(const StringArray & a)
 
 {
 
-max_minutes = atoi(a[0]);
+max_minutes = atoi(a[0].c_str());
 
 return;
 
@@ -261,7 +261,7 @@ void set_verbosity(const StringArray & a)
 
 {
 
-mlog.set_verbosity_level(atoi(a[0]));
+mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 
@@ -332,7 +332,7 @@ make_image(f_cp, f_pt, image);
    //  open the output file
    //
 
-plot.open(output_filename);
+plot.open(output_filename.c_str());
 
 plot.pagenumber(1);
 
@@ -402,7 +402,7 @@ draw_latlon_grid(plot, f_cp.hemisphere());
 
 plot.choose_font(26, 12.0);
 
-plot.write_centered_text(2, 1, 0.5*page_width, info.y_ll() - 30.0, 0.5, 1.0, short_name);
+plot.write_centered_text(2, 1, 0.5*page_width, info.y_ll() - 30.0, 0.5, 1.0, short_name.c_str());
 
    //
    //  done
@@ -562,7 +562,7 @@ ConcatString filename;
 
 filename = replace_path(map_filename);
 
-in.open(filename);
+in.open(filename.c_str());
 
 if ( !in )  {
 

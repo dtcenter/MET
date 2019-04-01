@@ -135,7 +135,7 @@ VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
    GrdFileType type;
 
    // Convert the string to a gridded data file type
-   string_to_grdfiletype(s, type);
+   string_to_grdfiletype(s.c_str(), type);
 
    return(new_var_info(type));
 }

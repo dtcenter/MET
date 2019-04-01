@@ -76,7 +76,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
          vx_grid = *ogrid;
       }
       // Search for a named grid
-      else if(sa.n_elements() == 1 && find_grid_by_name(info.name, vx_grid)) {
+      else if(sa.n_elements() == 1 && find_grid_by_name(info.name.c_str(), vx_grid)) {
          mlog << Debug(3)
               << "Use the grid named \"" << info.name << "\".\n";
       }
@@ -95,12 +95,13 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
          Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
          // Attempt to open the data file
-         if(!(mtddf = mtddf_factory.new_met_2d_data_file(info.name))) {
+         if(!(mtddf = mtddf_factory.new_met_2d_data_file(info.name.c_str()))) {
             mlog << Error << "\nparse_vx_grid() -> "
                  << "can't open file \"" << info.name << "\"\n\n";
             exit(1);
          }
          vx_grid = mtddf->grid();
+         delete mtddf;
       }
    }
 
@@ -168,12 +169,12 @@ void parse_grid_mask(const ConcatString &mask_grid_str, const Grid &grid,
    //
    // Check to make sure that we're not using the full domain
    //
-   if(strcmp(full_domain_str, mask_grid_str) != 0) {
+   if( full_domain_str != mask_grid_str) {
 
       //
       // Search for the grid name in the predefined grids
       //
-      if(!find_grid_by_name(mask_name, mask_grid)) {
+      if(!find_grid_by_name(mask_name.c_str(), mask_grid)) {
          mlog << Error << "\nparse_grid_mask() -> "
               << "the mask_grid requested \"" << mask_grid_str
               << "\" is not defined.\n\n";
@@ -214,10 +215,10 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
    Met2dDataFile * datafile = (Met2dDataFile *) 0;
 
    // First, try to find the grid by name.
-   if(!find_grid_by_name(mask_grid_str, grid)) {
+   if(!find_grid_by_name(mask_grid_str.c_str(), grid)) {
 
       // If that doesn't work, try to open a data file.
-      datafile = factory.new_met_2d_data_file(replace_path(mask_grid_str));
+      datafile = factory.new_met_2d_data_file(replace_path(mask_grid_str.c_str()).c_str());
 
       if(!datafile) {
         mlog << Error << "\nparse_grid_mask() -> "
@@ -266,7 +267,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
-   file_name = replace_path(tokens[0]);
+   file_name = replace_path(tokens[0].c_str());
    file_name.ws_strip();
    if(tokens.n_elements() > 1) config_str = tokens[1];
 
@@ -334,7 +335,7 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
    poly_mask.clear();
 
    // Parse out the polyline from the file
-   poly_mask.load(file_name);
+   poly_mask.load(file_name.c_str());
 
    // Store the name of the masking polyline
    mask_name = poly_mask.name();
@@ -369,13 +370,13 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
-   file_name = replace_path(tokens[0]);
+   file_name = replace_path(tokens[0].c_str());
    file_name.ws_strip();
    if(tokens.n_elements() > 1) config_str = tokens[1];
 
    // If not a 2D data file, process as a lat/lon polyline file
    if(!is_2d_data_file(file_name, config_str)) {
-      mask_poly.load(file_name);
+      mask_poly.load(file_name.c_str());
    }
    // Otherwise, process as a 2d data file
    else {
@@ -402,17 +403,17 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
 
    // Tokenize the input string
    tokens = mask_poly_str.split(poly_str_delim);
-   file_name = replace_path(tokens[0]);
+   file_name = replace_path(tokens[0].c_str());
    file_name.ws_strip();
 
    // Initialize config object
    MetConfig config;
-   config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_const_filename).c_str());
 
    // Parse the dictionary string
    if(tokens.n_elements() > 1) {
       append_level = true;
-      config.read_string(tokens[1]);
+      config.read_string(tokens[1].c_str());
    }
    else {
       append_level = false;
@@ -431,7 +432,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    VarInfo *info = (VarInfo *) 0;
 
    // Open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(file_name, type);
+   mtddf = mtddf_factory.new_met_2d_data_file(file_name.c_str(), type);
 
    // If data file pointer is NULL, assume a lat/lon polyline file
    if(!mtddf) {
@@ -464,7 +465,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    thresh_str.ws_strip();
 
    // Apply threshold to the data plane and convert to MaskPlane
-   st.set(thresh_str);
+   st.set(thresh_str.c_str());
    mask_dp.threshold(st);
 
    // Store the mask name

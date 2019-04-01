@@ -93,7 +93,7 @@ void ClistEntry::init_from_scratch()
 
 {
 
-Name = (char *) 0;
+Name = (string)"";
 
 clear();
 
@@ -109,7 +109,7 @@ void ClistEntry::clear()
 
 {
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+  if ( Name != "" )  { Name.clear(); }
 
 D.r = D.g = D.b = 0.0;
 
@@ -127,7 +127,7 @@ void ClistEntry::assign(const ClistEntry & e)
 
 clear();
 
-if ( e.Name )  set_name(e.Name);
+if ( e.Name != "" )  set_name(e.Name);
 
 set_color(e.D);
 
@@ -165,22 +165,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ClistEntry::set_name(const char * text)
+void ClistEntry::set_name(const std::string text)
 
 {
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+  if ( Name != "" )  { Name.clear(); }
 
-int n = strlen(text);
+  Name = text;
 
-Name = new char [1 + n];
-
-strcpy(Name, text);
-
-Name[n] = (char) 0;
-
-
-return;
+  return;
 
 }
 
@@ -405,7 +398,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int ColorList::has_name(const char * text, int & index)
+int ColorList::has_name(const std::string text, int & index)
 
 {
 
@@ -415,7 +408,7 @@ index = -1;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(e[j].name(), text) == 0 )  {
+   if ( e[j].name() == text )  {
 
       index = j;
 

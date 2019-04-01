@@ -760,7 +760,7 @@ if ( ! dict_stack->top_is_array() )  return;
 
 DictionaryEntry e;
 
-e.set_dict(0, DD);
+e.set_dict("", DD);
 
 dict_stack->store(e);
 
@@ -841,8 +841,8 @@ for (j=0; j<count; ++j)  {
 
    n = ns.pop();
 
-   if ( n.is_int )  e.set_int    (0, n.i);
-   else             e.set_double (0, n.d);
+   if ( n.is_int )  e.set_int    ("", n.i);
+   else             e.set_double ("", n.d);
 
    dict_stack->store(e);
 
@@ -871,7 +871,7 @@ void do_string(const char * text)
 
 DictionaryEntry e;
 
-e.set_string(0, text);
+e.set_string("", text);
 
 dict_stack->store(e);
 
@@ -890,7 +890,7 @@ void do_boolean(const bool & boolean)
 
 DictionaryEntry e;
 
-e.set_boolean(0, boolean);
+e.set_boolean("", boolean);
 
 dict_stack->store(e);
 
@@ -951,7 +951,7 @@ else {
 
       T.set(node);
 
-      e.set_threshold(0, T);
+      e.set_threshold("", T);
 
       dict_stack->store(e);
 
@@ -978,7 +978,7 @@ SingleThresh T;
 
 T.set(na_str);
 
-e.set_threshold(0, T);
+e.set_threshold("", T);
 
 dict_stack->store(e);
 
@@ -1173,6 +1173,9 @@ ThreshType op  = no_thresh_type;
 const char * p = text + 2;         //  we know that all the prefixes
                                    //  (like "le" or "gt") are two
                                    //  characters long
+
+  //  foo
+
 
      if ( strncmp(text, "le", 2) == 0 )  op = thresh_le;
 else if ( strncmp(text, "lt", 2) == 0 )  op = thresh_lt;
@@ -1600,7 +1603,7 @@ if ( ida.n_elements() > max_user_function_args )  {
 
 }
 
-e.set_user_function(function_name, icvs.pop(), ida.n_elements());
+e.set_user_function(function_name.c_str(), icvs.pop(), ida.n_elements());
 
 dict_stack->store(e);
 

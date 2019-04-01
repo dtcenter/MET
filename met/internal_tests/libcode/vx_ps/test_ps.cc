@@ -101,11 +101,11 @@ plot.choose_font(7, 10.0);
 
 s = documentmedia_to_string(plot.media());
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), v_margin + 40.0, 0.5, 0.0, s);
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), v_margin + 40.0, 0.5, 0.0, s.c_str());
 
 s = documentorientation_to_string(plot.orientation());
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), v_margin + 20.0, 0.5, 0.0, s);
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), v_margin + 20.0, 0.5, 0.0, s.c_str());
 
    //
    //  border

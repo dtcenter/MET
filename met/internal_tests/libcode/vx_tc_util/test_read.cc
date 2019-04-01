@@ -35,13 +35,13 @@ int main(int argc, char *argv[]) {
       exit(1);
    }
 
-   ConcatString input_filename = argv[1];
+   ConcatString input_filename = (string)argv[1];
    LineDataFile f;
    ATCFTrackLine t_line;
    TrackInfoArray t_array;
    int count, i;
 
-   if(!f.open(input_filename)) {
+   if(!f.open(input_filename.c_str())) {
       mlog << Error
            << "\n" << program_name
            << ": unable to open input file \"" << input_filename << "\"\n\n";

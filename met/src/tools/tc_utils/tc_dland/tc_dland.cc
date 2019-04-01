@@ -185,7 +185,7 @@ void process_land_data() {
       mlog << Debug(2)
            << "Reading TC land data file: "
            << replace_path(land_data_files[i]) << "\n";
-      land_array.add_file(replace_path(land_data_files[i]));
+      land_array.add_file(replace_path(land_data_files[i]).c_str());
    }
 
    land_array.set_check_dist();
@@ -210,7 +210,7 @@ void process_distances() {
    NcVar  dland_var ;
 
    // Create a new NetCDF file and open it
-   f_out = open_ncfile(out_filename, true);
+   f_out = open_ncfile(out_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nprocess_distances() -> "
@@ -223,7 +223,7 @@ void process_distances() {
 
    // Add global attributes
    mlog << Debug(3) << "Writing NetCDF global attributes.\n";
-   write_netcdf_global(f_out, out_filename, program_name);
+   write_netcdf_global(f_out, out_filename.c_str(), program_name.c_str());
 
    // Add the projection information
    mlog << Debug(3) << "Writing NetCDF map projection.\n";
@@ -362,12 +362,12 @@ void set_grid(const StringArray & a) {
    ConcatString filename;
 
    GridData.name      = "user_defined";
-   GridData.lat_ll    = atof(a[0]);
-   GridData.lon_ll    = -1.0*atof(a[1]); // switch from deg east to west
-   GridData.delta_lat = atof(a[2]);
-   GridData.delta_lon = atof(a[3]);
-   GridData.Nlat      = atoi(a[4]);
-   GridData.Nlon      = atoi(a[5]);
+   GridData.lat_ll    = atof(a[0].c_str());
+   GridData.lon_ll    = -1.0*atof(a[1].c_str()); // switch from deg east to west
+   GridData.delta_lat = atof(a[2].c_str());
+   GridData.delta_lon = atof(a[3].c_str());
+   GridData.Nlat      = atoi(a[4].c_str());
+   GridData.Nlon      = atoi(a[5].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -395,13 +395,13 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

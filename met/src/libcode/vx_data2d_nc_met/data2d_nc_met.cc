@@ -135,20 +135,20 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
    plane.clear();
 
    // Check for NA in the requested name
-   if(strcmp(vinfo_nc->req_name(), na_str) == 0) {
+   if( vinfo_nc->req_name() ==  na_str ) {
 
       // Store the name of the first data variable
       for(i=0; i<MetNc->Nvars; i++) {
-         if(strcmp(MetNc->Var[i].name, nc_met_lat_var_name) != 0 &&
-            strcmp(MetNc->Var[i].name, nc_met_lon_var_name) != 0) {
-            vinfo_nc->set_req_name(MetNc->Var[i].name);
+         if( MetNc->Var[i].name != nc_met_lat_var_name &&
+             MetNc->Var[i].name != nc_met_lon_var_name ) {
+            vinfo_nc->set_req_name(MetNc->Var[i].name.c_str());
             break;
          }
       }
    }
 
    // Read the data
-   status = MetNc->data(vinfo_nc->req_name(),
+   status = MetNc->data(vinfo_nc->req_name().c_str(),
                         vinfo_nc->dimension(),
                         plane, info);
 
@@ -188,9 +188,9 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
       else                                 vinfo.set_name(info->name);
-      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att);
-      if(info->level_att.length()     > 0) vinfo.set_level_name(info->level_att);
-      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att);
+      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
+      if(info->level_att.length()     > 0) vinfo.set_level_name(info->level_att.c_str());
+      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
    }
 
    return(status);
@@ -223,7 +223,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
 
 int MetNcMetDataFile::index(VarInfo &vinfo){
 
-   if( NULL == MetNc->find_var_name( vinfo.name() ) ) return -1;
+   if( NULL == MetNc->find_var_name( vinfo.name().c_str() ) ) return -1;
 
    if( ( vinfo.valid()              && MetNc->ValidTime   != vinfo.valid() ) ||
        ( vinfo.init()               && MetNc->InitTime    != vinfo.init()  ) ||

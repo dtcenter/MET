@@ -58,11 +58,11 @@ ConcatString unixtime_to_string(const unixtime t)
 
 {
 
-char junk[256];
+ConcatString junk;
 
-snprintf(junk, sizeof(junk), "%lld", t);
+junk.format("%lld", t);
 
-return ( ConcatString(junk) );
+return ( junk );
 
 }
 

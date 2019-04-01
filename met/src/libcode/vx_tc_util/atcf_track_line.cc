@@ -168,7 +168,7 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
 
 int ATCFTrackLine::v_max() const {
    return(VMaxOffset < N_items ?
-          parse_int_check_zero(get_item(VMaxOffset)) :
+          parse_int_check_zero(get_item(VMaxOffset).c_str()) :
           bad_data_int);
 }
 
@@ -176,7 +176,7 @@ int ATCFTrackLine::v_max() const {
 
 int ATCFTrackLine::mslp() const {
    return(MSLPOffset < N_items ?
-          parse_int_check_zero(get_item(MSLPOffset)) :
+          parse_int_check_zero(get_item(MSLPOffset).c_str()) :
           bad_data_int);
 }
 
@@ -184,7 +184,7 @@ int ATCFTrackLine::mslp() const {
 
 CycloneLevel ATCFTrackLine::level() const {
    return(LevelOffset < N_items ?
-          string_to_cyclonelevel(get_item(LevelOffset)) :
+          string_to_cyclonelevel(get_item(LevelOffset).c_str()) :
           NoCycloneLevel);
 }
 
@@ -192,7 +192,7 @@ CycloneLevel ATCFTrackLine::level() const {
 
 int ATCFTrackLine::wind_intensity() const {
    return(WindIntensityOffset < N_items ?
-          parse_int_check_zero(get_item(WindIntensityOffset)) :
+          parse_int_check_zero(get_item(WindIntensityOffset).c_str()) :
           bad_data_int);
 }
 
@@ -200,7 +200,7 @@ int ATCFTrackLine::wind_intensity() const {
 
 QuadrantType ATCFTrackLine::quadrant() const {
    return(QuadrantOffset < N_items ?
-          string_to_quadranttype(get_item(QuadrantOffset)) :
+          string_to_quadranttype(get_item(QuadrantOffset).c_str()) :
           NoQuadrantType);
 }
 
@@ -208,7 +208,7 @@ QuadrantType ATCFTrackLine::quadrant() const {
 
 int ATCFTrackLine::radius1() const {
    return(Radius1Offset < N_items ?
-          parse_int_check_zero(get_item(Radius1Offset)) :
+          parse_int_check_zero(get_item(Radius1Offset).c_str()) :
           bad_data_int);
 }
 
@@ -216,7 +216,7 @@ int ATCFTrackLine::radius1() const {
 
 int ATCFTrackLine::radius2() const {
    return(Radius2Offset < N_items ?
-          parse_int_check_zero(get_item(Radius2Offset)) :
+          parse_int_check_zero(get_item(Radius2Offset).c_str()) :
           bad_data_int);
 }
 
@@ -224,7 +224,7 @@ int ATCFTrackLine::radius2() const {
 
 int ATCFTrackLine::radius3() const {
    return(Radius3Offset < N_items ?
-          parse_int_check_zero(get_item(Radius3Offset)) :
+          parse_int_check_zero(get_item(Radius3Offset).c_str()) :
           bad_data_int);
 }
 
@@ -232,7 +232,7 @@ int ATCFTrackLine::radius3() const {
 
 int ATCFTrackLine::radius4() const {
    return(Radius4Offset < N_items ?
-          parse_int_check_zero(get_item(Radius4Offset)) :
+          parse_int_check_zero(get_item(Radius4Offset).c_str()) :
           bad_data_int);
 }
 
@@ -240,7 +240,7 @@ int ATCFTrackLine::radius4() const {
 
 int ATCFTrackLine::isobar_pressure() const {
    return(IsobarPressureOffset < N_items ?
-          parse_int_check_zero(get_item(IsobarPressureOffset)) :
+          parse_int_check_zero(get_item(IsobarPressureOffset).c_str()) :
           bad_data_int);
 }
 
@@ -248,7 +248,7 @@ int ATCFTrackLine::isobar_pressure() const {
 
 int ATCFTrackLine::isobar_radius() const {
    return(IsobarRadiusOffset < N_items ?
-          parse_int_check_zero(get_item(IsobarRadiusOffset)) :
+          parse_int_check_zero(get_item(IsobarRadiusOffset).c_str()) :
           bad_data_int);
 }
 
@@ -256,7 +256,7 @@ int ATCFTrackLine::isobar_radius() const {
 
 int ATCFTrackLine::max_wind_radius() const {
    return(MaxWindRadiusOffset < N_items ?
-          parse_int_check_zero(get_item(MaxWindRadiusOffset)) :
+          parse_int_check_zero(get_item(MaxWindRadiusOffset).c_str()) :
           bad_data_int);
 }
 
@@ -264,7 +264,7 @@ int ATCFTrackLine::max_wind_radius() const {
 
 int ATCFTrackLine::gusts() const {
    return(GustsOffset < N_items ?
-          parse_int_check_zero(get_item(GustsOffset)) :
+          parse_int_check_zero(get_item(GustsOffset).c_str()) :
           bad_data_int);
 }
 
@@ -272,7 +272,7 @@ int ATCFTrackLine::gusts() const {
 
 int ATCFTrackLine::eye_diameter() const {
    return(EyeDiameterOffset < N_items ?
-          parse_int_check_zero(get_item(EyeDiameterOffset)) :
+          parse_int_check_zero(get_item(EyeDiameterOffset).c_str()) :
           bad_data_int);
 }
 
@@ -280,7 +280,7 @@ int ATCFTrackLine::eye_diameter() const {
 
 SubregionCode ATCFTrackLine::subregion() const {
    return(SubRegionOffset < N_items ?
-          string_to_subregioncode(get_item(SubRegionOffset)) :
+          string_to_subregioncode(get_item(SubRegionOffset).c_str()) :
           NoSubregionCode);
 }
 
@@ -288,7 +288,7 @@ SubregionCode ATCFTrackLine::subregion() const {
 
 int ATCFTrackLine::max_seas() const {
    return(MaxSeasOffset < N_items ?
-          parse_int_check_zero(get_item(MaxSeasOffset)) :
+          parse_int_check_zero(get_item(MaxSeasOffset).c_str()) :
           bad_data_int);
 }
 
@@ -296,15 +296,15 @@ int ATCFTrackLine::max_seas() const {
 
 ConcatString ATCFTrackLine::initials() const {
    return(InitialsOffset < N_items ?
-          get_item(InitialsOffset).text() :
-          "");
+          (string)get_item(InitialsOffset) :
+          (string)"");
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFTrackLine::storm_direction() const {
    return(StormDirectionOffset < N_items ?
-          parse_int(get_item(StormDirectionOffset)) :
+          parse_int(get_item(StormDirectionOffset).c_str()) :
           bad_data_int);
 }
 
@@ -312,7 +312,7 @@ int ATCFTrackLine::storm_direction() const {
 
 int ATCFTrackLine::storm_speed() const {
    return(StormSpeedOffset < N_items ?
-          parse_int(get_item(StormSpeedOffset)) :
+          parse_int(get_item(StormSpeedOffset).c_str()) :
           bad_data_int);
 }
 
@@ -320,15 +320,15 @@ int ATCFTrackLine::storm_speed() const {
 
 ConcatString ATCFTrackLine::storm_name() const {
    return(StormNameOffset < N_items ?
-          get_item(StormNameOffset).text() :
-          "");
+          (string)get_item(StormNameOffset) :
+          (string)"");
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SystemsDepth ATCFTrackLine::depth() const {
    return(DepthOffset < N_items ?
-          string_to_systemsdepth(get_item(DepthOffset)) :
+          string_to_systemsdepth(get_item(DepthOffset).c_str()) :
           NoSystemsDepth);
 }
 
@@ -336,7 +336,7 @@ SystemsDepth ATCFTrackLine::depth() const {
 
 int ATCFTrackLine::wave_height() const {
    return(WaveHeightOffset < N_items ?
-          parse_int_check_zero(get_item(WaveHeightOffset)) :
+          parse_int_check_zero(get_item(WaveHeightOffset).c_str()) :
           bad_data_int);
 }
 
@@ -344,7 +344,7 @@ int ATCFTrackLine::wave_height() const {
 
 QuadrantType ATCFTrackLine::seas_code() const {
    return(SeasCodeOffset < N_items ?
-          string_to_quadranttype(get_item(SeasCodeOffset)) :
+          string_to_quadranttype(get_item(SeasCodeOffset).c_str()) :
           NoQuadrantType);
 }
 
@@ -352,7 +352,7 @@ QuadrantType ATCFTrackLine::seas_code() const {
 
 int ATCFTrackLine::seas_radius1() const {
    return(SeasRadius1Offset < N_items ?
-          parse_int_check_zero(get_item(SeasRadius1Offset)) :
+          parse_int_check_zero(get_item(SeasRadius1Offset).c_str()) :
           bad_data_int);
 }
 
@@ -360,7 +360,7 @@ int ATCFTrackLine::seas_radius1() const {
 
 int ATCFTrackLine::seas_radius2() const {
    return(SeasRadius2Offset < N_items ?
-          parse_int_check_zero(get_item(SeasRadius2Offset)) :
+          parse_int_check_zero(get_item(SeasRadius2Offset).c_str()) :
           bad_data_int);
 }
 
@@ -368,7 +368,7 @@ int ATCFTrackLine::seas_radius2() const {
 
 int ATCFTrackLine::seas_radius3() const {
    return(SeasRadius3Offset < N_items ?
-          parse_int_check_zero(get_item(SeasRadius3Offset)) :
+          parse_int_check_zero(get_item(SeasRadius3Offset).c_str()) :
           bad_data_int);
 }
 
@@ -376,7 +376,7 @@ int ATCFTrackLine::seas_radius3() const {
 
 int ATCFTrackLine::seas_radius4() const {
    return(SeasRadius4Offset < N_items ?
-          parse_int_check_zero(get_item(SeasRadius4Offset)) :
+          parse_int_check_zero(get_item(SeasRadius4Offset).c_str()) :
           bad_data_int);
 }
 

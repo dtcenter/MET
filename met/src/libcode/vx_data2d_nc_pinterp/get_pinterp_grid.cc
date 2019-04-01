@@ -35,7 +35,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char proj_att_name             [] = "MAP_PROJ_CHAR";
+static const string proj_att_name             = "MAP_PROJ_CHAR";
 static const char ps_proj_att_name          [] = "Polar Stereographic";
 static const char lambert_proj_att_name     [] = "Lambert Conformal";
 static const char mercator_proj_att_name    [] = "Mercator";
@@ -44,8 +44,8 @@ static const char ps_proj_var_name          [] = "Polar_Stereographic";
 static const char lambert_proj_var_name     [] = "Lambert_Conformal";
 static const char mercator_proj_var_name    [] = "Mercator";
 
-static const char nx_dimension_name         [] = "west_east";
-static const char ny_dimension_name         [] = "south_north";
+static const string nx_dimension_name          = "west_east";
+static const string ny_dimension_name          = "south_north";
 
 static const char ps_default_gridname       [] = "polar";
 static const char lambert_default_gridname  [] = "lambert";
@@ -105,9 +105,9 @@ if ( get_global_att(&nc, proj_att_name, proj_att_value) ) {
    //
    //  if present, parse the global projection attribute value
    //
-        if ( strcasecmp(proj_att_value,       ps_proj_att_name) == 0 )  { status = get_ps_grid       (nc, grid); }
-   else if ( strcasecmp(proj_att_value,  lambert_proj_att_name) == 0 )  { status = get_lambert_grid  (nc, grid); }
-   else if ( strcasecmp(proj_att_value, mercator_proj_att_name) == 0 )  { status = get_mercator_grid (nc, grid); }
+        if ( strcasecmp(proj_att_value.c_str(),       ps_proj_att_name) == 0 )  { status = get_ps_grid       (nc, grid); }
+   else if ( strcasecmp(proj_att_value.c_str(),  lambert_proj_att_name) == 0 )  { status = get_lambert_grid  (nc, grid); }
+   else if ( strcasecmp(proj_att_value.c_str(), mercator_proj_att_name) == 0 )  { status = get_mercator_grid (nc, grid); }
 }
 else {
 
@@ -147,7 +147,7 @@ data.name = ps_default_gridname;
    //  scale latitude
    //
 
-get_global_att_double(&nc, "TRUELAT1", data.scale_lat, true);
+get_global_att_double(&nc, (string)"TRUELAT1", data.scale_lat, true);
 
    //
    //  hemisphere ... assume north?
@@ -167,8 +167,8 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  pin point
    //
 
-get_global_att_double(&nc, "CEN_LAT", data.lat_pin, true);
-get_global_att_double(&nc, "CEN_LON", data.lon_pin, true);
+get_global_att_double(&nc, (string)"CEN_LAT", data.lat_pin, true);
+get_global_att_double(&nc, (string)"CEN_LON", data.lon_pin, true);
 data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
@@ -178,14 +178,14 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-get_global_att_double(&nc, "STAND_LON", data.lon_orient, true);
+get_global_att_double(&nc, (string)"STAND_LON", data.lon_orient, true);
 data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-get_global_att_double(&nc, "DX", data.d_km, true);
+get_global_att_double(&nc, (string)"DX", data.d_km, true);
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
@@ -223,8 +223,8 @@ data.name = lambert_default_gridname;
    //  scale latitude(s)
    //
 
-get_global_att_double(&nc, "TRUELAT1", data.scale_lat_1, true);
-get_global_att_double(&nc, "TRUELAT2", data.scale_lat_2, true);
+get_global_att_double(&nc, (string)"TRUELAT1", data.scale_lat_1, true);
+get_global_att_double(&nc, (string)"TRUELAT2", data.scale_lat_2, true);
 
    //
    //  hemisphere ... assume north?
@@ -244,8 +244,8 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  pin point
    //
 
-get_global_att_double(&nc, "CEN_LAT", data.lat_pin, true);
-get_global_att_double(&nc, "CEN_LON", data.lon_pin, true);
+get_global_att_double(&nc, (string)"CEN_LAT", data.lat_pin, true);
+get_global_att_double(&nc, (string)"CEN_LON", data.lon_pin, true);
 data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
@@ -255,14 +255,14 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-get_global_att_double(&nc, "STAND_LON", data.lon_orient, true);
+get_global_att_double(&nc, (string)"STAND_LON", data.lon_orient, true);
 data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-get_global_att_double(&nc, "DX", data.d_km, true);
+get_global_att_double(&nc, (string)"DX", data.d_km, true);
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
@@ -317,22 +317,22 @@ get_dim(&nc, ny_dimension_name, data.ny, true);
    //  center lat, lon
    //
 
-get_global_att_double(&nc, "CEN_LAT", lat_center, true);
-get_global_att_double(&nc, "CEN_LON", lon_center, true);
+get_global_att_double(&nc, (string)"CEN_LAT", lat_center, true);
+get_global_att_double(&nc, (string)"CEN_LON", lon_center, true);
 lon_center *= -1.0;
 
    //
    //  D_km
    //
 
-get_global_att_double(&nc, "DX", D_km, true);
+get_global_att_double(&nc, (string)"DX", D_km, true);
 D_km *= 0.001;
 
    //
    //  scale latitude
    //
 
-get_global_att_double(&nc, "TRUELAT1", scale_lat, true);
+get_global_att_double(&nc, (string)"TRUELAT1", scale_lat, true);
 
    //
    //  do some calculations

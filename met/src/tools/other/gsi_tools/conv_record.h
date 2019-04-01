@@ -130,7 +130,7 @@ class ConvRecord : public GsiRecord {
          //  do stuff
          //
 
-      char variable [4];
+      ConcatString variable;
 
       int nchar;
       int nreal;

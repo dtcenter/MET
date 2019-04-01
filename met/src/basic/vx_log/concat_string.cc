@@ -98,20 +98,6 @@ assign(c);
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString::ConcatString(const char * Text)
-
-{
-
-init_from_scratch();
-
-add(Text);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 ConcatString::ConcatString(const std::string & Text)
 
 {
@@ -134,20 +120,6 @@ ConcatString & ConcatString::operator=(const ConcatString & c)
         assign(c);
     }
     return *this;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-ConcatString & ConcatString::operator=(const char * Text)
-{
-    delete s;
-    init_from_scratch();
-    if (s)
-        s->assign(Text);
-
-    return(*this);
 }
 
 
@@ -204,59 +176,12 @@ char ConcatString::char_at(const int idx) const
 void ConcatString::assign(const ConcatString & c)
 {
     if (c.text())
-        s->assign(c.text());
+              s->assign(c.text());
     else
         s->clear();
     memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
     Precision = c.Precision;
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-// void ConcatString::extend(int n)
-// {
-//
-// if ( n < Nalloc )  return;
-//
-// if ( AllocInc == 0 )  AllocInc = default_cs_alloc_inc;
-//
-// int k;
-//
-// k = n/AllocInc;
-//
-// if ( n%AllocInc )  ++k;
-//
-// n = k*AllocInc;
-//
-// char * u = new char [n];
-//
-// if ( !u )  {
-//
-//    mlog << Error << "\nConcatString::extend(int) -> memory allocation error\n\n";
-//
-//    exit ( 1 );
-//
-// }
-//
-// memset(u, 0, n);
-//
-// if ( s && (Length > 0) )  {
-//
-//    memcpy(u, s, Length);
-//
-//    delete [] s;  s = (char *) 0;
-//
-// }
-//
-// s = u;  u = (char *) 0;
-//
-// Nalloc = n;
-//
-// return;
-//
-// }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -276,19 +201,6 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-void ConcatString::add(const char * a)
-{
-    if (!a)             // nothing to do for null string
-        return;
-
-    (*s) += a;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 void ConcatString::add(const char c)
 {
@@ -443,12 +355,12 @@ StringArray ConcatString::split(const char * delim) const
     size_t end = s->find_first_of(delim);
     while (end != string::npos) {
         if (start != end)
-            a.add(s->substr(start, end-start).c_str());
+            a.add(s->substr(start, end-start));
         start = end + 1;
         end = s->find_first_of(delim, start);
     }
     if (start < s->length())
-        a.add(s->substr(start).c_str());
+        a.add(s->substr(start));
 
     return a;
 }
@@ -503,6 +415,11 @@ int ConcatString::format(const char *fmt, ...)
 }
 
 
+void ConcatString::replace_char(int i, char c)
+{
+  s->replace(i, 1, 1, c);
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -552,12 +469,12 @@ void ConcatString::set_lower()
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * ConcatString::contents(const char *str) const
+const string ConcatString::contents(const char * str) const
 {
-    if (s->empty()) {
-        return (str ? str : "(nul)");
+    if (s->empty() || *s == "") {
+      return (str ? str : "(nul)");
     } else {
-        return (s->c_str());
+      return ( *s );
     }
 }
 
@@ -663,7 +580,7 @@ return ( cs );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString & operator<<(ConcatString & cs, const std::string s)
+ConcatString & operator<<(ConcatString & cs, const std::string & s)
 
 {
 
@@ -1196,5 +1113,30 @@ char *get_env(const char* env_name)
 
 
 ////////////////////////////////////////////////////////////////////////
+
+int ConcatString::find(int c)
+{
+  std::string::size_type position = s->rfind(c);
+  if ( position != std::string::npos) {
+    return position;
+  }
+  else {
+    return -1;
+  }
+}
+
+int ConcatString::compare(size_t pos, size_t len, std::string str)
+{
+  return s->compare(pos, len, str);
+}
+
+int ConcatString::comparecase(size_t pos, size_t len, std::string str)
+{
+  std::string lower_s = *s;
+  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+  std::string lower_str = str;
+  transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
+  return lower_s.compare(pos, len, lower_str);
+}
 
 

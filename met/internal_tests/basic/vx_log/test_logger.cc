@@ -21,7 +21,7 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
-   ConcatString infile = "test_log_file.txt";
+  ConcatString infile = (string)"test_log_file.txt";
    ConcatString str;
    int n = 4;
    bool b = true;

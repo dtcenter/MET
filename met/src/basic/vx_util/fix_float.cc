@@ -25,7 +25,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float(char * s)
+void fix_float(ConcatString s)
 
 {
 
@@ -39,7 +39,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float_with_blanks(char * s)
+void fix_float_with_blanks(ConcatString s)
 
 {
 
@@ -53,7 +53,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float_with_char(char * s, const char replacement)
+void fix_float_with_char(ConcatString s, const char replacement)
 
 {
 
@@ -61,11 +61,9 @@ void fix_float_with_char(char * s, const char replacement)
    //  test for "-0" or "+0"
    //
 
-if ( (strcmp(s, "-0") == 0) || (strcmp(s, "+0") == 0) )  {
+  if (  s == (string)"-0" || s == (string)"+0" )  {
 
-   s[0] = '0';
-
-   s[1] = (char) 0;
+   s = '0';
 
 }
 
@@ -73,25 +71,26 @@ if ( (strcmp(s, "-0") == 0) || (strcmp(s, "+0") == 0) )  {
    //  no decimal point? ... just return
    //
 
-if ( strchr(s, '.') == NULL )  return;
+//if ( strchr(s, '.') == NULL )  return;
+ if ( s.find('.') == -1 )  return;
 
    //
    //  scientific notation? ... just return
    //
 
-if ( strchr(s, 'e') != NULL || strchr(s, 'E') != NULL )  return;
+ if ( s.find('e') != -1 || s.find('E') != -1 )  return;
 
    //
    //  get to work
    //
 
-int j = strlen(s) - 1;
+ int j = s.length() - 1;
 
 while ( j >= 0 )  {
 
-   if ( s[j] == '.' )  { s[j]   = replacement;  break; }
+  if ( s[j] == '.' )  { s.replace_char(j, replacement);  break; }
 
-   if ( s[j] == '0' )  { s[j--] = replacement;  continue; }
+  if ( s[j] == '0' )  { s.replace_char(j--,replacement);  continue; }
 
    break;
 
@@ -101,11 +100,9 @@ while ( j >= 0 )  {
    //  test again for "-0" or "+0"
    //
 
-if ( (strcmp(s, "-0") == 0) || (strcmp(s, "+0") == 0) )  {
+ if ( s == (string)"-0" || s == (string)"+0" )  {
 
-   s[0] = '0';
-
-   s[1] = (char) 0;
+   s = '0';
 
 }
 

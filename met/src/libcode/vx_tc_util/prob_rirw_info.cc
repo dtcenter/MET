@@ -155,10 +155,10 @@ void ProbRIRWInfo::initialize(const ATCFProbLine &l) {
 
    ProbInfoBase::initialize(l);
 
-   Value    = parse_int(l.get_item(ProbRIRWValueOffset));
+   Value    = parse_int(l.get_item(ProbRIRWValueOffset).c_str());
    Initials =           l.get_item(ProbRIRWInitialsOffset);
-   RIRWBeg  = parse_int(l.get_item(ProbRIRWBegOffset));
-   RIRWEnd  = parse_int(l.get_item(ProbRIRWEndOffset));
+   RIRWBeg  = parse_int(l.get_item(ProbRIRWBegOffset).c_str());
+   RIRWEnd  = parse_int(l.get_item(ProbRIRWEndOffset).c_str());
 
    return;
 }
@@ -169,9 +169,9 @@ bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
 
    if(!ProbInfoBase::is_match(l)) return(false);
 
-   return(Value   == parse_int(l.get_item(ProbRIRWValueOffset)) &&
-          RIRWBeg == parse_int(l.get_item(ProbRIRWBegOffset))   &&
-          RIRWEnd == parse_int(l.get_item(ProbRIRWEndOffset)));
+   return(Value   == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
+          RIRWBeg == parse_int(l.get_item(ProbRIRWBegOffset).c_str())   &&
+          RIRWEnd == parse_int(l.get_item(ProbRIRWEndOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

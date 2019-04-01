@@ -166,7 +166,7 @@ int TCStatLine::is_header() const {
 
 ConcatString TCStatLine::get(const char *col_str, bool check_na) const {
 
-   ConcatString cs = get_item(col_str, check_na);
+  ConcatString cs = (string)get_item(col_str, check_na);
 
    //
    // If not found, check derivable timing columns

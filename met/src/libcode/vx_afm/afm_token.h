@@ -22,7 +22,7 @@
 
 #include "afm_token_types.h"
 #include "afm_keywords.h"
-
+#include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +46,8 @@ class AfmToken {
 
       void dump(ostream &, int depth = 0) const;
 
-      void set_string(const char *);
+      //      void set_string(const char *);
+      void set_string(const ConcatString);
 
       int line_number;
       int column;
@@ -69,7 +70,8 @@ class AfmToken {
 
       double d;
 
-      char * s;
+      //      char * s;
+      ConcatString s;
 
 };
 

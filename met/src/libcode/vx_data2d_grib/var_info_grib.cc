@@ -226,10 +226,10 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib1(field_name, field_ptv, field_code, field_center, field_subcenter, tab, tab_match) )
+      if( !GribTable.lookup_grib1(field_name.c_str(), field_ptv, field_code, field_center, field_subcenter, tab, tab_match) )
       {
          //  if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
+         if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
             mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
                  << "unrecognized GRIB1 field abbreviation '"
@@ -268,8 +268,8 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
       }
    }
    set_code      ( tab.code      );
-   set_long_name ( tab.full_name );
-   set_units     ( tab.units     );
+   set_long_name ( tab.full_name.c_str() );
+   set_units     ( tab.units.c_str()     );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,13 +296,13 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    if( !field_name.empty() ){
       set_name     ( field_name );
-      set_req_name ( field_name );
+      set_req_name ( field_name.c_str() );
    }
    set_field_rec   (field_code);
    set_center      (field_center);
    set_subcenter   (field_subcenter);
    set_ptv         (field_ptv);
-   set_ens         (ens_str);
+   set_ens         (ens_str.c_str());
 
    //  call the parent to set the level information
    set_level_info_grib(dict);
@@ -332,7 +332,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    double thresh_hi       = dict_prob->lookup_double(conf_key_thresh_hi, false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib1(prob_name, field_ptv, field_code, tab, tab_match) ){
+   if( !GribTable.lookup_grib1(prob_name.c_str(), field_ptv, field_code, tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib::set_dict() -> "
            << "unrecognized GRIB1 probability field abbreviation '"
            << prob_name << "'\n\n";
@@ -341,7 +341,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    set_p_flag  ( true      );
    set_p_code  ( tab.code  );
-   set_p_units ( tab.units );
+   set_p_units ( tab.units.c_str() );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
@@ -358,7 +358,7 @@ bool VarInfoGrib::is_precipitation() const {
    // Check to see if it matches the GRIB precipitation abbreviations.
    //
    for(i=0; i<n_grib_precipitation_abbr; i++) {
-      if(strcmp(ReqName, grib_precipitation_abbr[i]) == 0) {
+      if( ReqName ==  grib_precipitation_abbr[i] ) {
          status = true;
          break;
       }
@@ -378,7 +378,7 @@ bool VarInfoGrib::is_specific_humidity() const {
    // Check to see if it matches the GRIB specific humidity abbreviations.
    //
    for(i=0; i<n_grib_specific_humidity_abbr; i++) {
-      if(strcmp(ReqName, grib_specific_humidity_abbr[i]) == 0) {
+      if( ReqName == grib_specific_humidity_abbr[i] ) {
          status = true;
          break;
       }

@@ -249,20 +249,20 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file);
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Use a variable index from var_name instead of GRIB code
-   bool use_var_id = is_using_var_id(obs_file[0]);
+   bool use_var_id = is_using_var_id(obs_file[0].c_str());
 
    // Store the forecast file type
    ftype = fcst_mtddf->file_type();
@@ -271,13 +271,13 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, use_var_id);
 
    // Set the model name
-   shc.set_model(conf_info.model);
+   shc.set_model(conf_info.model.c_str());
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
    rng_set(rng_ptr,
-           conf_info.vx_opt[0].boot_info.rng,
-           conf_info.vx_opt[0].boot_info.seed);
+           conf_info.vx_opt[0].boot_info.rng.c_str(),
+           conf_info.vx_opt[0].boot_info.seed.c_str());
 
    // List the input files
    mlog << Debug(1)
@@ -359,7 +359,7 @@ void setup_txt_files() {
    stat_file << base_name << stat_file_ext;
 
    // Create the output STAT file
-   open_txt_file(stat_out, stat_file);
+   open_txt_file(stat_out, stat_file.c_str());
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
@@ -391,7 +391,7 @@ void setup_txt_files() {
                      << txt_file_ext;
 
          // Create the output text file
-         open_txt_file(txt_out[i], txt_file[i]);
+         open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Get the maximum number of columns for this line type
          switch(i) {
@@ -651,7 +651,7 @@ void process_obs_file(int i_nc) {
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
    // output of the PB2NC or ASCII2NC tool.
-   obs_in = open_ncfile(obs_file[i_nc]);
+   obs_in = open_ncfile(obs_file[i_nc].c_str());
 
    if(IS_INVALID_NC_P(obs_in)) {
       delete obs_in;
@@ -779,7 +779,7 @@ void process_obs_file(int i_nc) {
             strcpy(obs_qty_str, obs_qty_block[i_block_idx]);
          }
          else {
-            strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_block_idx]]);
+            strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_block_idx]].c_str());
          }
 
          int headerOffset = obs_arr[0];
@@ -801,23 +801,23 @@ void process_obs_file(int i_nc) {
 
          // Read the corresponding header type for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.typ_idx_array[headerOffset];
-         str_length = strlen(header_data.typ_array[hdr_idx]);
+         str_length = header_data.typ_array[hdr_idx].length();
          if (str_length > typ_len) str_length = typ_len;
-         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
+         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx].c_str(), str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          // Read the corresponding header Station ID for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.sid_idx_array[headerOffset];
-         str_length = strlen(header_data.sid_array[hdr_idx]);
+         str_length = header_data.sid_array[hdr_idx].length();
          if (str_length > sid_len) str_length = sid_len;
-         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
+         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx].c_str(), str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          // Read the corresponding valid time for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.vld_idx_array[headerOffset];
-         str_length = strlen(header_data.vld_array[hdr_idx]);
+         str_length = header_data.vld_array[hdr_idx].length();
          if (str_length > vld_len) str_length = vld_len;
-         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
+         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx].c_str(), str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
          // Check for wind components
@@ -857,7 +857,7 @@ void process_obs_file(int i_nc) {
 
          int grib_code = obs_arr[1];
          if (use_var_id && grib_code < var_names.n_elements()) {
-            strcpy(var_name, var_names[grib_code]);
+            strcpy(var_name, var_names[grib_code].c_str());
             obs_arr[1] = bad_data_int;
          }
          else {
@@ -934,19 +934,19 @@ void process_scores() {
       if(conf_info.vx_opt[i].vx_pd.fcst_dpa.n_planes() == 0) continue;
 
       // Store the description
-      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc);
+      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().c_str());
 
       // Set the forecast lead time
       shc.set_fcst_lead_sec(conf_info.vx_opt[i].vx_pd.fcst_dpa[0].lead());
@@ -966,13 +966,13 @@ void process_scores() {
       for(j=0; j<conf_info.vx_opt[i].get_n_msg_typ(); j++) {
 
          // Store the message type in the obtype column
-         shc.set_obtype(conf_info.vx_opt[i].msg_typ[j]);
+         shc.set_obtype(conf_info.vx_opt[i].msg_typ[j].c_str());
 
          // Loop through the verification masking regions
          for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the verification masking region
-            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
             // Loop through the interpolation methods
             for(l=0; l<conf_info.vx_opt[i].get_n_interp(); l++) {
@@ -1279,7 +1279,7 @@ void process_scores() {
                      // Store the verification masking region
                      cs = conf_info.vx_opt[i].mask_name[k];
                      if(n_cdf_bin > 1) cs << "_BIN" << m+1;
-                     shc.set_mask(cs);
+                     shc.set_mask(cs.c_str());
 
                      // Compute PCT
                      do_pct(pct_info, i, pd_ptr,
@@ -1334,7 +1334,7 @@ void process_scores() {
                } // end Compute PCT
 
                // Reset the verification masking region
-               shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+               shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
             } // end for l
 
@@ -1421,7 +1421,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
          cts_info, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
@@ -1430,7 +1430,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
          cts_info, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -1472,7 +1472,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
          mcts_info,
          conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
    else {
       compute_mcts_stats_ci_perc(rng_ptr, pd_ptr->f_na, pd_ptr->o_na,
@@ -1481,7 +1481,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
          mcts_info,
          conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -1539,14 +1539,14 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
             pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep,
-            cnt_info[i], conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir.c_str());
       }
       else {
          compute_cnt_stats_ci_perc(rng_ptr,
             pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep, conf_info.vx_opt[i_vx].boot_info.rep_prop,
-            cnt_info[i], conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir.c_str());
       }
    } // end for i
 
@@ -1749,11 +1749,11 @@ void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
             is_bad_data(pd_ptr->cmn_na[j])) continue;
 
          // Store the observation value
-         hira_pd.add_obs(pd_ptr->sid_sa[j],
+         hira_pd.add_obs(pd_ptr->sid_sa[j].c_str(),
             pd_ptr->lat_na[j], pd_ptr->lon_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
-            pd_ptr->o_na[j], pd_ptr->o_qc_sa[j],
+            pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
             pd_ptr->cmn_na[j], pd_ptr->csd_na[j],
             pd_ptr->wgt_na[j]);
 
@@ -1870,11 +1870,11 @@ void do_hira_prob(int i_vx, PairDataPoint *pd_ptr) {
             }
 
             // Store the fractional coverage pair
-            hira_pd.add_pair(pd_ptr->sid_sa[k],
+            hira_pd.add_pair(pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
-               f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k],
+               f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
                cmn_cov, pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
 
          } // end for k
@@ -1977,7 +1977,7 @@ void finish_txt_files() {
    // close the STAT output files
    if(stat_out) {
       *stat_out << stat_at;
-      close_txt_file(stat_out, stat_file);
+      close_txt_file(stat_out, stat_file.c_str());
    }
 
    // Finish up each of the optional text files
@@ -1989,7 +1989,7 @@ void finish_txt_files() {
          // Write the AsciiTable to a file
          if(txt_out[i]) {
             *txt_out[i] << txt_at[i];
-            close_txt_file(txt_out[i], txt_file[i]);
+            close_txt_file(txt_out[i], txt_file[i].c_str());
          }
       }
    }
@@ -2079,14 +2079,14 @@ void set_ncfile(const StringArray & a)
 
 void set_obs_valid_beg_time(const StringArray & a)
 {
-   obs_valid_beg_ut = timestring_to_unix(a[0]);
+   obs_valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_obs_valid_end_time(const StringArray & a)
 {
-   obs_valid_end_ut = timestring_to_unix(a[0]);
+   obs_valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2111,7 +2111,7 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

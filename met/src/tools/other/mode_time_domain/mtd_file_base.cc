@@ -385,7 +385,7 @@ DeltaT    = string_att_as_int (f, delta_t_att_name);
 
    //  FileType
 
-ConcatString s = string_att(f, filetype_att_name);
+ ConcatString s = (string)string_att(f, filetype_att_name);
 bool status = false;
 
 status = string_to_mtdfiletype(s.text(), FileType);

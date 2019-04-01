@@ -119,16 +119,16 @@ class StatHdrColumns {
       void set_obs_valid_beg (const unixtime);
       void set_obs_valid_end (const unixtime);
 
-      void set_fcst_var      (const char *);
+      void set_fcst_var      (const ConcatString);
       void set_fcst_lev      (const char *);
 
-      void set_obs_var       (const char *);
+      void set_obs_var       (const ConcatString);
       void set_obs_lev       (const char *);
 
       void set_obtype        (const char *);
       void set_mask          (const char *);
 
-      void set_interp_mthd   (const char *s,
+      void set_interp_mthd   (ConcatString s,
                               GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);
       void set_interp_mthd   (const InterpMthd m,
                               GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);

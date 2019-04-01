@@ -52,7 +52,7 @@ static ConcatString modis_filename;
 
 static ConcatString modis_field;
 
-static ConcatString units = default_units;
+static ConcatString units = (string)default_units;
 
 static double data_fill_value = -9999.0;
 
@@ -146,7 +146,7 @@ get_grid();
 
 mlog << Debug(1) << "Processing " << modis_filename << "\n";
 
-process(modis_filename);
+process(modis_filename.c_str());
 
 
 
@@ -273,7 +273,7 @@ Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
 Met2dDataFileFactory m_factory;
 
 mlog << Debug(1)  << "Opening data file: " << grid_data_file << "\n";
-met_ptr = m_factory.new_met_2d_data_file(grid_data_file);
+met_ptr = m_factory.new_met_2d_data_file(grid_data_file.c_str());
 
 if ( !met_ptr ) {
 
@@ -300,7 +300,7 @@ void set_scale(const StringArray & a)
 
 {
 
-data_scale = atof(a[0]);
+data_scale = atof(a[0].c_str());
 
 return;
 
@@ -314,7 +314,7 @@ void set_offset(const StringArray & a)
 
 {
 
-data_offset = atof(a[0]);
+data_offset = atof(a[0].c_str());
 
 return;
 
@@ -328,7 +328,7 @@ void set_fillvalue(const StringArray & a)
 
 {
 
-data_fill_value = atof(a[0]);
+data_fill_value = atof(a[0].c_str());
 
 return;
 
@@ -339,7 +339,7 @@ return;
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,7 +351,7 @@ int get_compress() {
 /////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +385,7 @@ if ( ! in.open(input_filename) )  {
 
 }
 
-in.select_data_field(modis_field);
+in.select_data_field(modis_field.c_str());
 
 in.set_data_scale(data_scale);
 in.set_data_offset(data_offset);
@@ -466,7 +466,7 @@ mlog << Debug(2) << "Nonzero count is " << nonzero_count << "\n";
 
 ConcatString output_field_name = modis_field;
 
-write_grid_to_netcdf(plane, grid, output_filename, output_field_name, modis_field, units);
+write_grid_to_netcdf(plane, grid, output_filename.c_str(), output_field_name.c_str(), modis_field.c_str(), units.c_str());
 
 
 

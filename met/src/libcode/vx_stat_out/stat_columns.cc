@@ -86,14 +86,14 @@ void write_header_row(const char **cols, int n_cols, int hdr_flag,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to this line type
    for(i=0; i<n_cols; i++)
-      at.set_entry(r, i+c, cols[i]);
+     at.set_entry(r, i+c, (string)cols[i]);
 
    return;
 }
@@ -108,14 +108,14 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the MCTC line type
-   at.set_entry(r, c+0, mctc_columns[0]);
-   at.set_entry(r, c+1, mctc_columns[1]);
+   at.set_entry(r, c+0, (string)mctc_columns[0]);
+   at.set_entry(r, c+1, (string)mctc_columns[1]);
 
    // Write Fi_Oj for each cell of the NxN table
    for(i=0, col=c+2; i<n_cat; i++) {
@@ -134,39 +134,39 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
 void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
    int i, col;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PCT line type
-   at.set_entry(r, c+0, pct_columns[0]);
-   at.set_entry(r, c+1, pct_columns[1]);
+   at.set_entry(r, c+0, (string)pct_columns[0]);
+   at.set_entry(r, c+1, (string)pct_columns[1]);
 
    // Write THRESH_i, OY_i, ON_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], i+1);
+      tmp_str.format("%s%i", pct_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[3], i+1);
+      tmp_str.format("%s%i", pct_columns[3], i+1);
       at.set_entry(r, col, tmp_str); // Event Count (OY)
       col++;
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[4], i+1);
+      tmp_str.format("%s%i", pct_columns[4], i+1);
       at.set_entry(r, col, tmp_str); // Non-Event Count (ON)
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], n_thresh);
+      tmp_str.format("%s%i", pct_columns[2], n_thresh);
       at.set_entry(r, col, tmp_str);    // Threshold
    }
 
@@ -183,35 +183,35 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PSTD line type
-   at.set_entry(r, c+0,  pstd_columns[0]);
-   at.set_entry(r, c+1,  pstd_columns[1]);
-   at.set_entry(r, c+2,  pstd_columns[2]);
-   at.set_entry(r, c+3,  pstd_columns[3]);
-   at.set_entry(r, c+4,  pstd_columns[4]);
-   at.set_entry(r, c+5,  pstd_columns[5]);
-   at.set_entry(r, c+6,  pstd_columns[6]);
-   at.set_entry(r, c+7,  pstd_columns[7]);
-   at.set_entry(r, c+8,  pstd_columns[8]);
-   at.set_entry(r, c+9,  pstd_columns[9]);
-   at.set_entry(r, c+10, pstd_columns[10]);
-   at.set_entry(r, c+11, pstd_columns[11]);
-   at.set_entry(r, c+12, pstd_columns[12]);
-   at.set_entry(r, c+13, pstd_columns[13]);
-   at.set_entry(r, c+14, pstd_columns[14]);
-   at.set_entry(r, c+15, pstd_columns[15]);
-   at.set_entry(r, c+16, pstd_columns[16]);
+   at.set_entry(r, c+0,  (string)pstd_columns[0]);
+   at.set_entry(r, c+1,  (string)pstd_columns[1]);
+   at.set_entry(r, c+2,  (string)pstd_columns[2]);
+   at.set_entry(r, c+3,  (string)pstd_columns[3]);
+   at.set_entry(r, c+4,  (string)pstd_columns[4]);
+   at.set_entry(r, c+5,  (string)pstd_columns[5]);
+   at.set_entry(r, c+6,  (string)pstd_columns[6]);
+   at.set_entry(r, c+7,  (string)pstd_columns[7]);
+   at.set_entry(r, c+8,  (string)pstd_columns[8]);
+   at.set_entry(r, c+9,  (string)pstd_columns[9]);
+   at.set_entry(r, c+10, (string)pstd_columns[10]);
+   at.set_entry(r, c+11, (string)pstd_columns[11]);
+   at.set_entry(r, c+12, (string)pstd_columns[12]);
+   at.set_entry(r, c+13, (string)pstd_columns[13]);
+   at.set_entry(r, c+14, (string)pstd_columns[14]);
+   at.set_entry(r, c+15, (string)pstd_columns[15]);
+   at.set_entry(r, c+16, (string)pstd_columns[16]);
 
    // Write THRESH_i for each threshold
    for(i=0, col=c+17; i<n_thresh; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pstd_columns[17], i+1);
-      at.set_entry(r, col, tmp_str); // Threshold
+      at.set_entry(r, col, (string)tmp_str); // Threshold
       col++;
    }
 
@@ -228,52 +228,52 @@ void write_pjc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PJC line type
-   at.set_entry(r, c+0, pjc_columns[0]);
-   at.set_entry(r, c+1, pjc_columns[1]);
+   at.set_entry(r, c+0, (string)pjc_columns[0]);
+   at.set_entry(r, c+1, (string)pjc_columns[1]);
 
    // Write THRESH_i, OY_TP_i, ON_TP_i, CALIBRATION_i, REFINEMENT_i,
    // LIKELIHOOD_i, and BASER_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[2], i+1);
-      at.set_entry(r, col, tmp_str); // Threshold
+      at.set_entry(r, col, (string)tmp_str); // Threshold
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[3], i+1);
-      at.set_entry(r, col, tmp_str); // Event Count/N (OY_TP)
+      at.set_entry(r, col, (string)tmp_str); // Event Count/N (OY_TP)
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[4], i+1);
-      at.set_entry(r, col, tmp_str); // Non-Event Count/N (ON_TP)
+      at.set_entry(r, col, (string)tmp_str); // Non-Event Count/N (ON_TP)
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[5], i+1);
-      at.set_entry(r, col, tmp_str); // Calibration
+      at.set_entry(r, col, (string)tmp_str); // Calibration
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[6], i+1);
-      at.set_entry(r, col, tmp_str); // Refinement
+      at.set_entry(r, col, (string)tmp_str); // Refinement
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[7], i+1);
-      at.set_entry(r, col, tmp_str); // Likelihood
+      at.set_entry(r, col, (string)tmp_str); // Likelihood
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[8], i+1);
-      at.set_entry(r, col, tmp_str); // Base Rate
+      at.set_entry(r, col, (string)tmp_str); // Base Rate
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pct_columns[2], n_thresh);
-      at.set_entry(r, col, tmp_str);    // Threshold
+      at.set_entry(r, col, (string)tmp_str);    // Threshold
    }
 
    return;
@@ -289,35 +289,35 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PRC line type
-   at.set_entry(r, c+0, prc_columns[0]);
-   at.set_entry(r, c+1, prc_columns[1]);
+   at.set_entry(r, c+0, (string)prc_columns[0]);
+   at.set_entry(r, c+1, (string)prc_columns[1]);
 
    // Write THRESH_i, PODY_i, POFD_i for each row of the Nx2 table
    for(i=0, col=c+2; i<n_thresh-1; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], i+1);
-      at.set_entry(r, col, tmp_str); // Threshold
+      at.set_entry(r, col, (string)tmp_str); // Threshold
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[3], i+1);
-      at.set_entry(r, col, tmp_str); // PODY
+      at.set_entry(r, col, (string)tmp_str); // PODY
       col++;
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[4], i+1);
-      at.set_entry(r, col, tmp_str); // POFD
+      at.set_entry(r, col, (string)tmp_str); // POFD
       col++;
    }
 
    // Write out the last threshold
    if(n_thresh >= 1) {
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], n_thresh);
-      at.set_entry(r, col, tmp_str);    // Threshold
+      at.set_entry(r, col, (string)tmp_str);    // Threshold
    }
 
    return;
@@ -328,30 +328,30 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
                            int r, int c) {
    int i, col;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the ECLV line type
-   at.set_entry(r, c+0, eclv_columns[0]);
-   at.set_entry(r, c+1, eclv_columns[1]);
-   at.set_entry(r, c+2, eclv_columns[2]);
-   at.set_entry(r, c+3, eclv_columns[3]);
+   at.set_entry(r, c+0, (string)eclv_columns[0]);
+   at.set_entry(r, c+1, (string)eclv_columns[1]);
+   at.set_entry(r, c+2, (string)eclv_columns[2]);
+   at.set_entry(r, c+3, (string)eclv_columns[3]);
 
    // Write CL_i and VALUE_i for each bin
    for(i=0, col=c+4; i<n_pnt; i++) {
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", eclv_columns[4], i+1);
+      tmp_str.format("%s%i", eclv_columns[4], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", eclv_columns[5], i+1);
+      tmp_str.format("%s%i", eclv_columns[5], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
    }
@@ -369,20 +369,20 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the RHIST line type
-   at.set_entry(r, c+0, rhist_columns[0]);
-   at.set_entry(r, c+1, rhist_columns[1]);
+   at.set_entry(r, c+0, (string)rhist_columns[0]);
+   at.set_entry(r, c+1, (string)rhist_columns[1]);
 
    // Write RANK_i for each rank
    for(i=0, col=c+2; i<n_rank; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", rhist_columns[2], i+1);
-      at.set_entry(r, col, tmp_str); // Counts for each rank
+      at.set_entry(r, col, (string)tmp_str); // Counts for each rank
       col++;
    }
 
@@ -399,21 +399,21 @@ void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PHIST line type
-   at.set_entry(r, c+0, phist_columns[0]);
-   at.set_entry(r, c+1, phist_columns[1]);
-   at.set_entry(r, c+2, phist_columns[2]);
+   at.set_entry(r, c+0, (string)phist_columns[0]);
+   at.set_entry(r, c+1, (string)phist_columns[1]);
+   at.set_entry(r, c+2, (string)phist_columns[2]);
 
    // Write BIN_i for each bin
    for(i=0, col=c+3; i<n_bin; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", phist_columns[3], i+1);
-      at.set_entry(r, col, tmp_str); // Counts for each bin
+      at.set_entry(r, col, (string)tmp_str); // Counts for each bin
       col++;
    }
 
@@ -430,40 +430,40 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the orank line type
-   at.set_entry(r, c+0,  orank_columns[0]);
-   at.set_entry(r, c+1,  orank_columns[1]);
-   at.set_entry(r, c+2,  orank_columns[2]);
-   at.set_entry(r, c+3,  orank_columns[3]);
-   at.set_entry(r, c+4,  orank_columns[4]);
-   at.set_entry(r, c+5,  orank_columns[5]);
-   at.set_entry(r, c+6,  orank_columns[6]);
-   at.set_entry(r, c+7,  orank_columns[7]);
-   at.set_entry(r, c+8,  orank_columns[8]);
-   at.set_entry(r, c+9,  orank_columns[9]);
-   at.set_entry(r, c+10, orank_columns[10]);
-   at.set_entry(r, c+11, orank_columns[11]);
+   at.set_entry(r, c+0,  (string)orank_columns[0]);
+   at.set_entry(r, c+1,  (string)orank_columns[1]);
+   at.set_entry(r, c+2,  (string)orank_columns[2]);
+   at.set_entry(r, c+3,  (string)orank_columns[3]);
+   at.set_entry(r, c+4,  (string)orank_columns[4]);
+   at.set_entry(r, c+5,  (string)orank_columns[5]);
+   at.set_entry(r, c+6,  (string)orank_columns[6]);
+   at.set_entry(r, c+7,  (string)orank_columns[7]);
+   at.set_entry(r, c+8,  (string)orank_columns[8]);
+   at.set_entry(r, c+9,  (string)orank_columns[9]);
+   at.set_entry(r, c+10, (string)orank_columns[10]);
+   at.set_entry(r, c+11, (string)orank_columns[11]);
 
    // Write ENS_i for each ensemble member
    for(i=0, col=c+12; i<n_ens; i++) {
 
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", orank_columns[12], i+1);
-      at.set_entry(r, col, tmp_str); // Ensemble member value
+     snprintf(tmp_str, sizeof(tmp_str), "%s%i", orank_columns[12], i+1);
+      at.set_entry(r, col, (string)tmp_str); // Ensemble member value
       col++;
    }
 
-   at.set_entry(r, c+12+n_ens, orank_columns[13]);
-   at.set_entry(r, c+13+n_ens, orank_columns[14]);
-   at.set_entry(r, c+14+n_ens, orank_columns[15]);
-   at.set_entry(r, c+15+n_ens, orank_columns[16]);
-   at.set_entry(r, c+16+n_ens, orank_columns[17]);
-   at.set_entry(r, c+17+n_ens, orank_columns[18]);
-   at.set_entry(r, c+18+n_ens, orank_columns[19]);
+   at.set_entry(r, c+12+n_ens, (string)orank_columns[13]);
+   at.set_entry(r, c+13+n_ens, (string)orank_columns[14]);
+   at.set_entry(r, c+14+n_ens, (string)orank_columns[15]);
+   at.set_entry(r, c+15+n_ens, (string)orank_columns[16]);
+   at.set_entry(r, c+16+n_ens, (string)orank_columns[17]);
+   at.set_entry(r, c+17+n_ens, (string)orank_columns[18]);
+   at.set_entry(r, c+18+n_ens, (string)orank_columns[19]);
 
    return;
 }
@@ -478,19 +478,19 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    // Write the header column names if requested
    if(hdr_flag) {
       for(i=0; i<n_header_columns; i++)
-         at.set_entry(r, i+c, hdr_columns[i]);
+         at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the RELP line type
-   at.set_entry(r, c+0, relp_columns[0]);
-   at.set_entry(r, c+1, relp_columns[1]);
+   at.set_entry(r, c+0, (string)relp_columns[0]);
+   at.set_entry(r, c+1, (string)relp_columns[1]);
 
    // Write RELP_i for each ensemble member
    for(i=0, col=c+2; i<n_ens; i++) {
-      snprintf(tmp_str, sizeof(tmp_str), "%s%i", relp_columns[2], i+1);
-      at.set_entry(r, col, tmp_str);
+     snprintf(tmp_str, sizeof(tmp_str), "%s%i", relp_columns[2], i+1);
+      at.set_entry(r, col, (string)tmp_str);
       col++;
    }
 
@@ -1750,7 +1750,7 @@ void write_header_cols(const StatHdrColumns &shc,
    //    COV_THRESH,     ALPHA,
    //    LINE_TYPE
    //
-   at.set_entry(r,  0, met_version);                  // MET version
+   at.set_entry(r,  0, (string)met_version);          // MET version
    at.set_entry(r,  1, shc.get_model());              // Model name
    at.set_entry(r,  2, shc.get_desc());               // Description
    at.set_entry(r,  3, shc.get_fcst_lead_str());      // Fcst lead time
@@ -2756,76 +2756,76 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
    at.set_entry(r, c++, vcnt_info.vcount);         // TOTAL
 
    at.set_entry(r, c++, vcnt_info.FBAR);           // FBAR
-   at.set_entry(r, c++, na_str);                   // FBAR_BCL
-   at.set_entry(r, c++, na_str);                   // FBAR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // FBAR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // FBAR_BCU
 
    at.set_entry(r, c++, vcnt_info.OBAR);           // OBAR
-   at.set_entry(r, c++, na_str);                   // OBAR_BCL
-   at.set_entry(r, c++, na_str);                   // OBAR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // OBAR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // OBAR_BCU
 
    at.set_entry(r, c++, vcnt_info.FS_RMS);         // FS_RMS
-   at.set_entry(r, c++, na_str);                   // FS_RMS_BCL
-   at.set_entry(r, c++, na_str);                   // FS_RMS_BCU
+   at.set_entry(r, c++, (string)na_str);                   // FS_RMS_BCL
+   at.set_entry(r, c++, (string)na_str);                   // FS_RMS_BCU
 
    at.set_entry(r, c++, vcnt_info.OS_RMS);         // OS_RMS
-   at.set_entry(r, c++, na_str);                   // OS_RMS_BCL
-   at.set_entry(r, c++, na_str);                   // OS_RMS_BCU
+   at.set_entry(r, c++, (string)na_str);                   // OS_RMS_BCL
+   at.set_entry(r, c++, (string)na_str);                   // OS_RMS_BCU
 
    at.set_entry(r, c++, vcnt_info.MSVE);           // MSVE
-   at.set_entry(r, c++, na_str);                   // MSVE_BCL
-   at.set_entry(r, c++, na_str);                   // MSVE_BCU
+   at.set_entry(r, c++, (string)na_str);                   // MSVE_BCL
+   at.set_entry(r, c++, (string)na_str);                   // MSVE_BCU
 
    at.set_entry(r, c++, vcnt_info.RMSVE);          // RMSVE
-   at.set_entry(r, c++, na_str);                   // RMSVE_BCL
-   at.set_entry(r, c++, na_str);                   // RMSVE_BCU
+   at.set_entry(r, c++, (string)na_str);                   // RMSVE_BCL
+   at.set_entry(r, c++, (string)na_str);                   // RMSVE_BCU
 
    at.set_entry(r, c++, vcnt_info.FSTDEV);         // FSTDEV
-   at.set_entry(r, c++, na_str);                   // FSTDEV_BCL
-   at.set_entry(r, c++, na_str);                   // FSTDEV_BCU
+   at.set_entry(r, c++, (string)na_str);                   // FSTDEV_BCL
+   at.set_entry(r, c++, (string)na_str);                   // FSTDEV_BCU
 
    at.set_entry(r, c++, vcnt_info.OSTDEV);         // OSTDEV
-   at.set_entry(r, c++, na_str);                   // OSTDEV_BCL
-   at.set_entry(r, c++, na_str);                   // OSTDEV_BCU
+   at.set_entry(r, c++, (string)na_str);                   // OSTDEV_BCL
+   at.set_entry(r, c++, (string)na_str);                   // OSTDEV_BCU
 
    at.set_entry(r, c++, vcnt_info.FDIR);           // FDIR
-   at.set_entry(r, c++, na_str);                   // FDIR_BCL
-   at.set_entry(r, c++, na_str);                   // FDIR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // FDIR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // FDIR_BCU
 
    at.set_entry(r, c++, vcnt_info.ODIR);           // ODIR
-   at.set_entry(r, c++, na_str);                   // ODIR_BCL
-   at.set_entry(r, c++, na_str);                   // ODIR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // ODIR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // ODIR_BCU
 
    at.set_entry(r, c++, vcnt_info.FBAR_SPEED);     // FBAR_SPEED
-   at.set_entry(r, c++, na_str);                   // FBAR_SPEED_BCL
-   at.set_entry(r, c++, na_str);                   // FBAR_SPEED_BCU
+   at.set_entry(r, c++, (string)na_str);                   // FBAR_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);                   // FBAR_SPEED_BCU
 
    at.set_entry(r, c++, vcnt_info.OBAR_SPEED);     // OBAR_SPEED
-   at.set_entry(r, c++, na_str);                   // OBAR_SPEED_BCL
-   at.set_entry(r, c++, na_str);                   // OBAR_SPEED_BCU
+   at.set_entry(r, c++, (string)na_str);                   // OBAR_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);                   // OBAR_SPEED_BCU
 
    at.set_entry(r, c++, vcnt_info.VDIFF_SPEED);    // VDIFF_SPEED
-   at.set_entry(r, c++, na_str);                   // VDIFF_SPEED_BCL
-   at.set_entry(r, c++, na_str);                   // VDIFF_SPEED_BCU
+   at.set_entry(r, c++, (string)na_str);                   // VDIFF_SPEED_BCL
+   at.set_entry(r, c++, (string)na_str);                   // VDIFF_SPEED_BCU
 
    at.set_entry(r, c++, vcnt_info.VDIFF_DIR);      // VDIFF_DIR
-   at.set_entry(r, c++, na_str);                   // VDIFF_DIR_BCL
-   at.set_entry(r, c++, na_str);                   // VDIFF_DIR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // VDIFF_DIR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // VDIFF_DIR_BCU
 
    at.set_entry(r, c++, vcnt_info.SPEED_ERR);      // SPEED_ERR
-   at.set_entry(r, c++, na_str);                   // SPEED_ERR_BCL
-   at.set_entry(r, c++, na_str);                   // SPEED_ERR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // SPEED_ERR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // SPEED_ERR_BCU
 
    at.set_entry(r, c++, vcnt_info.SPEED_ABSERR);   // SPEED_ABSERR
-   at.set_entry(r, c++, na_str);                   // SPEED_ABSERR_BCL
-   at.set_entry(r, c++, na_str);                   // SPEED_ABSERR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // SPEED_ABSERR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // SPEED_ABSERR_BCU
 
    at.set_entry(r, c++, vcnt_info.DIR_ERR);        // DIR_ERR
-   at.set_entry(r, c++, na_str);                   // DIR_ERR_BCL
-   at.set_entry(r, c++, na_str);                   // DIR_ERR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // DIR_ERR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // DIR_ERR_BCU
 
    at.set_entry(r, c++, vcnt_info.DIR_ABSERR);     // DIR_ABSERR
-   at.set_entry(r, c++, na_str);                   // DIR_ABSERR_BCL
-   at.set_entry(r, c++, na_str);                   // DIR_ABSERR_BCU
+   at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCL
+   at.set_entry(r, c++, (string)na_str);                   // DIR_ABSERR_BCU
 
    //
    //
@@ -3289,7 +3289,7 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
       i+1);
 
    at.set_entry(r, c+2,  // Station ID
-      pd_ptr->sid_sa[i]);
+      (string)pd_ptr->sid_sa[i]);
 
    at.set_entry(r, c+3,  // Latitude
       pd_ptr->lat_na[i]);
@@ -3310,7 +3310,7 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
       pd_ptr->o_na[i]);
 
    at.set_entry(r, c+9,  // Observation Quality Control
-      pd_ptr->o_qc_sa[i]);
+      (string)pd_ptr->o_qc_sa[i]);
 
    at.set_entry(r, c+10, // Climatological Mean Value
       pd_ptr->cmn_na[i]);
@@ -3533,7 +3533,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
       i+1);
 
    at.set_entry(r, c+2,  // Station ID
-      pd_ptr->sid_sa[i]);
+      (string)pd_ptr->sid_sa[i]);
 
    at.set_entry(r, c+3,  // Latitude
       pd_ptr->lat_na[i]);
@@ -3574,7 +3574,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
 
    // Observation Quality Control
    at.set_entry(r, c+12+pd_ptr->n_ens,
-      pd_ptr->o_qc_sa[i]);
+      (string)pd_ptr->o_qc_sa[i]);
 
    // Unperturbed ensemble mean values
    at.set_entry(r, c+13+pd_ptr->n_ens,

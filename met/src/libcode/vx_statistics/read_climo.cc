@@ -105,7 +105,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
 
    // Search the files for the requested records
    for(i=0; i<climo_files.n_elements(); i++) {
-      read_climo_file(climo_files[i], ctype, &i_dict, vld_ut,
+      read_climo_file(climo_files[i].c_str(), ctype, &i_dict, vld_ut,
                       match_month, match_day, time_step,
                       vx_grid, regrid_info, dpa);
    }

@@ -46,7 +46,7 @@ bool read_nc_grid(NcFile & f, Grid & g)
    bool status = false;
    ConcatString proj;
    //const ConcatString proj = string_att(f, "Projection");
-   get_att_value_string(&f, "Projection", proj);
+   get_att_value_string(&f, (string)"Projection", proj);
    
    
    g.clear();
@@ -140,7 +140,7 @@ bool read_nc_st_grid(NcFile & f, Grid & g)
    //
 
    //c = string_att(f, "hemisphere");
-   get_att_value_string(&f, "hemisphere", c);
+   get_att_value_string(&f, (string)"hemisphere", c);
 
 data.hemisphere = c[0];
 
@@ -337,8 +337,8 @@ void write_nc_st_grid(NcFile & f, const StereographicData & data)
 
 {
 
-char junk[256];
-char j2[256];
+ConcatString junk;
+ConcatString j2;
 
    //
    //  name
@@ -350,8 +350,7 @@ add_att(&f, "Projection", "Polar Stereographic");
    //  hemisphere
    //
 
-junk[0] = data.hemisphere;
-junk[1] = (char) 0;
+junk = data.hemisphere;
 
 add_att(&f, "hemisphere", junk);
 
@@ -359,11 +358,11 @@ add_att(&f, "hemisphere", junk);
    //  scale latitude
    //
 
-snprintf(j2, sizeof(j2), "%.5f", data.scale_lat);
+ j2.format("%.5f", data.scale_lat);
 
 fix_float(j2);
 
-snprintf(junk, sizeof(junk), "%s degrees_north", j2);
+ junk.format("%s degrees_north", j2.c_str());
 
 add_att(&f, "scale_lat", junk);
 
@@ -371,14 +370,14 @@ add_att(&f, "scale_lat", junk);
    //  lat/lon pin point
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.lat_pin);
+junk.format("%.5f", data.lat_pin);
 
 fix_float(junk);
 
 add_att(&f, "lat_pin", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", -(data.lon_pin));
+ junk.format("%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
@@ -388,14 +387,14 @@ add_att(&f, "lon_pin", junk);
    //  x/y pin point
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.x_pin);
+ junk.format("%.5f", data.x_pin);
 
 fix_float(junk);
 
 add_att(&f, "x_pin", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", data.y_pin);
+ junk.format("%.5f", data.y_pin);
 
 fix_float(junk);
 
@@ -405,7 +404,7 @@ add_att(&f, "y_pin", junk);
    //  orientation longitude
    //
 
-snprintf(junk, sizeof(junk), "%.5f", -(data.lon_orient));
+ junk.format("%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
@@ -415,20 +414,20 @@ add_att(&f, "lon_orient", junk);
    //  D and R
    //
 
-snprintf(j2, sizeof(j2), "%.5f", data.d_km);
+ j2.format("%.5f", data.d_km);
 
 fix_float(j2);
 
-snprintf(junk, sizeof(junk), "%s km", j2);
+ junk.format("%s km", j2.c_str());
 
 add_att(&f, "d_km", junk);
 
 
-snprintf(j2, sizeof(j2), "%.5f", data.r_km);
+ j2.format("%.5f", data.r_km);
 
 fix_float(j2);
 
-snprintf(junk, sizeof(junk), "%s km", j2);
+ junk.format("%s km", j2.c_str());
 
 add_att(&f, "r_km", junk);
 
@@ -436,12 +435,12 @@ add_att(&f, "r_km", junk);
    //  nx and ny
    //
 
-snprintf(junk, sizeof(junk), "%d", data.nx);
+ junk.format("%d", data.nx);
 
 add_att(&f, "nx", junk);
 
 
-snprintf(junk, sizeof(junk), "%d", data.ny);
+ junk.format("%d", data.ny);
 
 add_att(&f, "ny", junk);
 
@@ -462,8 +461,8 @@ void write_nc_lc_grid(NcFile & f, const LambertData & data)
 
 {
 
-char junk[256];
-char j2[256];
+ConcatString junk;
+ConcatString j2;
 
    //
    //  name
@@ -475,14 +474,14 @@ add_att(&f, "Projection", "Lambert Conformal");
    //  scale latitudes
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.scale_lat_1);
+ junk.format("%.5f", data.scale_lat_1);
 
 fix_float(junk);
 
 add_att(&f, "scale_lat_1", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", data.scale_lat_2);
+ junk.format("%.5f", data.scale_lat_2);
 
 fix_float(junk);
 
@@ -492,14 +491,14 @@ add_att(&f, "scale_lat_2", junk);
    //  lat/lon pin point
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.lat_pin);
+ junk.format("%.5f", data.lat_pin);
 
 fix_float(junk);
 
 add_att(&f, "lat_pin", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", -(data.lon_pin));
+ junk.format("%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
@@ -509,14 +508,14 @@ add_att(&f, "lon_pin", junk);
    //  x/y pin point
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.x_pin);
+ junk.format("%.5f", data.x_pin);
 
 fix_float(junk);
 
 add_att(&f, "x_pin", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", data.y_pin);
+ junk.format("%.5f", data.y_pin);
 
 fix_float(junk);
 
@@ -526,7 +525,7 @@ add_att(&f, "y_pin", junk);
    //  orientation longitude
    //
 
-snprintf(junk, sizeof(junk), "%.5f", -(data.lon_orient));
+ junk.format("%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
@@ -536,20 +535,20 @@ add_att(&f, "lon_orient", junk);
    //  D and R
    //
 
-snprintf(j2, sizeof(j2), "%.5f", data.d_km);
+ j2.format("%.5f", data.d_km);
 
 fix_float(j2);
 
-snprintf(junk, sizeof(junk), "%s km", j2);
+ junk.format("%s km", j2.c_str());
 
 add_att(&f, "d_km", junk);
 
 
-snprintf(j2, sizeof(j2), "%.5f", data.r_km);
+ j2.format("%.5f", data.r_km);
 
 fix_float(j2);
 
-snprintf(junk, sizeof(junk), "%s km", j2);
+ junk.format("%s km", j2.c_str());
 
 add_att(&f, "r_km", junk);
 
@@ -557,12 +556,12 @@ add_att(&f, "r_km", junk);
    //  nx and ny
    //
 
-snprintf(junk, sizeof(junk), "%d", data.nx);
+ junk.format("%d", data.nx);
 
 add_att(&f, "nx", junk);
 
 
-snprintf(junk, sizeof(junk), "%d", data.ny);
+ junk.format("%d", data.ny);
 
 add_att(&f, "ny", junk);
 
@@ -583,7 +582,7 @@ void write_nc_latlon_grid (NcFile & f, const LatLonData & data)
 
 {
 
-char junk[256];
+ConcatString junk;
 
 
    //
@@ -596,14 +595,14 @@ add_att(&f, "Projection", "LatLon");
    //  lower left point
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.lat_ll);
+ junk.format("%.5f", data.lat_ll);
 
 fix_float(junk);
 
 add_att(&f, "lat_ll", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", -(data.lon_ll));
+ junk.format("%.5f", -(data.lon_ll));
 
 fix_float(junk);
 
@@ -613,14 +612,14 @@ add_att(&f, "lon_ll", junk);
    //  lat/lon deltas
    //
 
-snprintf(junk, sizeof(junk), "%.5f", data.delta_lat);
+ junk.format("%.5f", data.delta_lat);
 
 fix_float(junk);
 
 add_att(&f, "delta_lat", junk);
 
 
-snprintf(junk, sizeof(junk), "%.5f", data.delta_lon);
+ junk.format("%.5f", data.delta_lon);
 
 fix_float(junk);
 
@@ -630,14 +629,14 @@ add_att(&f, "delta_lon", junk);
    //  grid size
    //
 
-snprintf(junk, sizeof(junk), "%d", data.Nlat);
+ junk.format("%d", data.Nlat);
 
 fix_float(junk);
 
 add_att(&f, "Nlat", junk);
 
 
-snprintf(junk, sizeof(junk), "%d", data.Nlon);
+ junk.format("%d", data.Nlon);
 
 fix_float(junk);
 

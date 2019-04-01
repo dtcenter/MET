@@ -69,8 +69,8 @@ write_centered_text(1, 1, 306.0, 752.0, 0.5, 0.5, title);
 
 choose_font(31, 18.0);
 
-write_centered_text(1, 1, Htab_1, 727.0, 0.5, 0.5, FcstString);
-write_centered_text(1, 1, Htab_2, 727.0, 0.5, 0.5, ObsString);
+write_centered_text(1, 1, Htab_1, 727.0, 0.5, 0.5, FcstString.c_str());
+write_centered_text(1, 1, Htab_2, 727.0, 0.5, 0.5, ObsString.c_str());
 
    ////////////////////////////////////////////////////////////////////
    //
@@ -198,8 +198,8 @@ t0.outline_table(0.2, black);
 
 bold();
 
-t0.write_xy1_to_cell(0, 0, dx, dy, 0.0, 0.0, FcstShortString);
-t0.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0,  ObsShortString);
+t0.write_xy1_to_cell(0, 0, dx, dy, 0.0, 0.0, FcstShortString.c_str());
+t0.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0,  ObsShortString.c_str());
 t0.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  "Interest");
 
 roman();
@@ -222,7 +222,7 @@ for(i=0; i<n; i++) {
       label << cs_erase << eng.info_singles[i].interest_value;
    }
 
-   t0.write_xy1_to_cell(i + 1, 2, dx, dy, 0.0, 0.0, label);
+   t0.write_xy1_to_cell(i + 1, 2, dx, dy, 0.0, 0.0, label.c_str());
 
 }
 
@@ -297,8 +297,8 @@ nextline();
 
 bold();
 
-t1.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString);
-t1.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString);
+t1.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString.c_str());
+t1.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString.c_str());
 
 r = 1;
 
@@ -323,7 +323,7 @@ roman();
 nextline();
 
 // t1.write_xy1_to_cell(1, 1, dx, dy, 0.0, 0.0, eng.conf_info.model);
-t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model);
+t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model.c_str());
 
    //
    // Variable Name
@@ -331,8 +331,8 @@ t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model);
 
 nextline();
 
-t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name());
-t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name());
+t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name().c_str());
+t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name().c_str());
 
    //
    // Level Name
@@ -340,8 +340,8 @@ t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name());
 
 nextline();
 
-t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_name());
-t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name());
+t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_name().c_str());
+t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name().c_str());
 
    //
    // Units
@@ -349,8 +349,8 @@ t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name(
 
 nextline();
 
-t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units());
-t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units());
+t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units().c_str());
+t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units().c_str());
 
    //
    // Initialization Time
@@ -412,10 +412,10 @@ text_y -= 2.0*TextSep;
    // Accumulation time
    //
 
-strcpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()));
+strcpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str());
 t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
 
-strcpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()));
+strcpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str());
 t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 
@@ -653,8 +653,8 @@ t.outline_table(0.2, black);
 
 bold();
 
-t.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString);
-t.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString);
+t.write_xy1_to_cell(0, 1, dx, dy, 0.0, 0.0, FcstString.c_str());
+t.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString.c_str());
 
 j = 1;
 
@@ -697,7 +697,7 @@ roman();
          eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp3_str = "on";
       else                                                  tmp3_str = "off";
       label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
-      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label.c_str());
 
       if(eng.conf_info.mask_missing_flag == FieldType_Both ||
          eng.conf_info.mask_missing_flag == FieldType_Obs)  tmp1_str = "on";
@@ -709,7 +709,7 @@ roman();
          eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp3_str = "on";
       else                                                  tmp3_str = "off";
       label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
-      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label.c_str());
 
       ++r;
       nextline();
@@ -730,10 +730,10 @@ roman();
       // Convolution Threshold
       //
       thresh_str = eng.conf_info.fcst_conv_thresh.get_str(2);
-      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       thresh_str = eng.conf_info.obs_conv_thresh.get_str(2);
-      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       ++r;
       nextline();
@@ -761,7 +761,7 @@ roman();
          snprintf(junk, sizeof(junk), "p%d", eng.conf_info.inten_perc_value);
          label = junk;
       }
-      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label);
+      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label.c_str());
 
       ++r;
       nextline();
@@ -771,10 +771,10 @@ roman();
       //
 
       thresh_str = eng.conf_info.fcst_merge_thresh.get_str(2);
-      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       thresh_str = eng.conf_info.obs_merge_thresh.get_str(2);
-      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       ++r;
       nextline();
@@ -793,13 +793,13 @@ roman();
       else if(eng.conf_info.fcst_merge_flag == MergeType_Engine) label = "engine";
       else if(eng.conf_info.fcst_merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                       label = "none";
-      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label);
+      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label.c_str());
 
            if(eng.conf_info.obs_merge_flag == MergeType_Thresh) label = "thresh";
       else if(eng.conf_info.obs_merge_flag == MergeType_Engine) label = "engine";
       else if(eng.conf_info.obs_merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                      label = "none";
-      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
+      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label.c_str());
 
       ++r;
       nextline();
@@ -812,7 +812,7 @@ roman();
       else if(eng.conf_info.match_flag == MatchType_MergeFcst) label = "match/fcst merge";
       else if(eng.conf_info.match_flag == MatchType_NoMerge)   label = "match/no merge";
       else                                                     label = "none";
-      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label);
+      t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label.c_str());
 
       ++r;
       nextline();
@@ -958,8 +958,8 @@ t.outline_table(0.2, black);
       //
       // Field name
       //
-      t.write_xy1_to_cell(0, fcst_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0, FcstString);
-      t.write_xy1_to_cell(0,  obs_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0,  ObsString);
+      t.write_xy1_to_cell(0, fcst_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0, FcstString.c_str());
+      t.write_xy1_to_cell(0,  obs_col, 0.5*(t.col_width(fcst_col)), dy, 0.5, 0.0,  ObsString.c_str());
       nextline();
 
       /////////////////////////////////////////////////////////////////

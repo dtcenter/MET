@@ -194,6 +194,7 @@ class AsciiTable {
       virtual void set_size(const int NR, const int NC);
       virtual void add_rows(const int NR);
 
+      virtual void set_entry(const int r, const int c, const char*);
       virtual void set_entry(const int r, const int c, const ConcatString &);
       virtual void set_entry(const int r, const int c, int);
       virtual void set_entry(const int r, const int c, char);
@@ -289,7 +290,7 @@ class AsciiTable {
 
       virtual ConcatString padded_entry(const int r, const int c) const;
 
-      virtual const char * operator()(const int r, const int c) const;
+      virtual const ConcatString operator()(const int r, const int c) const;
 
          //
          //  retrieve a whole row

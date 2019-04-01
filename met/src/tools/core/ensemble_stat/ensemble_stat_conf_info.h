@@ -217,7 +217,7 @@ class EnsembleStatConfInfo {
 
       void clear();
 
-      void read_config   (const char *, const char *);
+      void read_config   (const ConcatString , const ConcatString);
       void process_config(GrdFileType, GrdFileType, bool, bool, bool);
       void process_flags ();
       void parse_nc_info ();

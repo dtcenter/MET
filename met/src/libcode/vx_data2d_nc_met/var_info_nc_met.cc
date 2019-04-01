@@ -138,7 +138,7 @@ void VarInfoNcMet::add_dimension(int dim) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
 
    // Validate the magic string
@@ -148,11 +148,11 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    MagicStr << cs_erase << nstr << lstr;
 
    // Set the requested name and default output name
-   set_req_name(nstr);
+   set_req_name(nstr.c_str());
    set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(lstr, '(') == NULL) {
+   if(strchr(lstr.c_str(), '(') == NULL) {
       Level.set_req_name("*,*");
       Level.set_name("*,*");
       Dimension.clear();
@@ -163,10 +163,10 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    else {
 
       // Initialize the temp string
-      strcpy(tmp_str, lstr);
+      tmp_str = lstr;
 
       // Retreive the NetCDF level specification
-      ptr = strtok_r(tmp_str, "()", &save_ptr);
+      ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
 
       // Set the level name
       Level.set_req_name(ptr);
@@ -212,11 +212,11 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if(strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
+   if(strstr(MagicStr.c_str(), "/PROB") != NULL) PFlag = 1;
 
    // Set the long name
-   snprintf(tmp_str, sizeof(tmp_str), "%s(%s)", req_name().text(), Level.req_name().text());
-   set_long_name(tmp_str);
+   tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());
+   set_long_name(tmp_str.c_str());
 
    // Set the units
    set_units(na_str);
@@ -230,9 +230,9 @@ void VarInfoNcMet::set_dict(Dictionary &dict){
 
    VarInfo::set_dict(dict);
 
-   set_magic(dict.lookup_string("name").text(),
-             dict.lookup_string("level").text());
-   set_req_name(dict.lookup_string("name"));
+   set_magic(dict.lookup_string("name"),
+             dict.lookup_string("level"));
+   set_req_name(dict.lookup_string("name").c_str());
 
    // Check for a probability boolean setting
    if(dict.lookup_bool(conf_key_prob, false)) {
@@ -252,7 +252,7 @@ bool VarInfoNcMet::is_precipitation() const {
    //
    return(has_prefix(grib_precipitation_abbr,
                      n_grib_precipitation_abbr,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,7 @@ bool VarInfoNcMet::is_specific_humidity() const {
    //
    return(has_prefix(grib_specific_humidity_abbr,
                      n_grib_specific_humidity_abbr,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -313,7 +313,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    // Consider it a match if the search string begins with the GRIB code
    // abbreviation, ignoring case.
    //
-   if(strncasecmp(str, abbr_str, strlen(abbr_str)) == 0) match = true;
+   if(strncasecmp(str.c_str(), abbr_str.c_str(), abbr_str.length()) == 0) match = true;
 
    return(match);
 }

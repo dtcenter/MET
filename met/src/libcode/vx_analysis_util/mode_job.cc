@@ -340,7 +340,7 @@ if ( n_dump == 0 )  {
 
 // Store the current data line
 for (j=0; j<L.n_items(); ++j)  {
-   dump_at.set_entry(n_dump%dump_at.nrows(), j, L.get_item(j));
+  dump_at.set_entry(n_dump%dump_at.nrows(), j, (string)L.get_item(j));
 }
 n_dump++;
 
@@ -497,18 +497,18 @@ k = 0;
 
 r = 0;
 
-table.set_entry(r, k++, "Field");
-table.set_entry(r, k++, "N");
-table.set_entry(r, k++, "Min");
-table.set_entry(r, k++, "Max");
-table.set_entry(r, k++, "Mean");
-table.set_entry(r, k++, "StdDev");
-table.set_entry(r, k++, "P10");
-table.set_entry(r, k++, "P25");
-table.set_entry(r, k++, "P50");
-table.set_entry(r, k++, "P75");
-table.set_entry(r, k++, "P90");
-table.set_entry(r, k++, "Sum");
+table.set_entry(r, k++, (string)"Field");
+table.set_entry(r, k++, (string)"N");
+table.set_entry(r, k++, (string)"Min");
+table.set_entry(r, k++, (string)"Max");
+table.set_entry(r, k++, (string)"Mean");
+table.set_entry(r, k++, (string)"StdDev");
+table.set_entry(r, k++, (string)"P10");
+table.set_entry(r, k++, (string)"P25");
+table.set_entry(r, k++, (string)"P50");
+table.set_entry(r, k++, (string)"P75");
+table.set_entry(r, k++, (string)"P90");
+table.set_entry(r, k++, (string)"Sum");
 
 
 for (j=0; j<Nfields; ++j)  {
@@ -517,7 +517,7 @@ for (j=0; j<Nfields; ++j)  {
 
    r = j + 2;
 
-   table.set_entry(r, k++, columns[j]);
+   table.set_entry(r, k++, (string)columns[j]);
    table.set_entry(r, k++, accums[j].n_elements());
    table.set_entry(r, k++, accums[j].min());
    table.set_entry(r, k++, accums[j].max());
@@ -587,7 +587,7 @@ void SummaryJob::do_job(const StringArray & mode_files)
 int j;
 const int Nfields = columns.n_elements();
 const int Nfiles  = mode_files.n_elements();
-char junk[256];
+ConcatString junk;
 AsciiTable t;
 
 
@@ -617,7 +617,7 @@ if ( Nfields > 0 )  accums = new NumArray [Nfields];
 
 for (j=0; j<Nfiles; ++j)  {
 
-   process_mode_file(mode_files[j]);
+   process_mode_file(mode_files[j].c_str());
 
 }
 
@@ -685,7 +685,7 @@ while ( in >> L )  {
 
    for (j=0; j<N; ++j)  {
 
-      value = atof(L.get_item(columns[j]));
+      value = atof(L.get_item(columns[j].c_str()));
 
       if ( is_bad_data(value) )   continue;
 
@@ -847,7 +847,7 @@ int j, k;
 int r;
 const int Ncols = 7;
 const int Nrows = 2 + valid_times.n_elements();
-char junk[256];
+ConcatString junk;
 AsciiTable table;
 
 
@@ -869,13 +869,13 @@ k = 0;
 
 r = 0;
 
-table.set_entry(r, k++, "Fcst Valid Time");
-table.set_entry(r, k++, "Area Matched");
-table.set_entry(r, k++, "Area Unmatched");
-table.set_entry(r, k++, "# Fcst Matched");
-table.set_entry(r, k++, "# Fcst Unmatched");
-table.set_entry(r, k++, "# Obs Matched");
-table.set_entry(r, k++, "# Obs Unmatched");
+table.set_entry(r, k++, (string)"Fcst Valid Time");
+table.set_entry(r, k++, (string)"Area Matched");
+table.set_entry(r, k++, (string)"Area Unmatched");
+table.set_entry(r, k++, (string)"# Fcst Matched");
+table.set_entry(r, k++, (string)"# Fcst Unmatched");
+table.set_entry(r, k++, (string)"# Obs Matched");
+table.set_entry(r, k++, (string)"# Obs Unmatched");
 
 
    //
@@ -888,25 +888,25 @@ for (j=0; j<(valid_times.n_elements()); ++j)  {
 
    r = j + 2;
 
-   make_timestring(info[j].valid, junk, sizeof(junk));
+   make_timestring(info[j].valid, junk);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%.0f", info[j].area_matched);
+   junk.format("%.0f", info[j].area_matched);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%.0f", info[j].area_unmatched);
+   junk.format("%.0f", info[j].area_unmatched);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%d", info[j].n_fcst_matched);
+   junk.format("%d", info[j].n_fcst_matched);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%d", info[j].n_fcst_unmatched);
+   junk.format("%d", info[j].n_fcst_unmatched);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%d", info[j].n_obs_matched);
+   junk.format("%d", info[j].n_obs_matched);
    table.set_entry(r, k++, junk);
 
-   snprintf(junk, sizeof(junk), "%d", info[j].n_obs_unmatched);
+   junk.format("%d", info[j].n_obs_unmatched);
    table.set_entry(r, k++, junk);
 
 }   //  for j
@@ -989,7 +989,7 @@ void ByCaseJob::do_job(const StringArray & mode_files)
 
 int j;
 const int Nfiles = mode_files.n_elements();
-char junk[256];
+ConcatString junk;
 int n_valid_times;
 
 
@@ -1005,7 +1005,7 @@ valid_times.clear();
 
 for (j=0; j<Nfiles; ++j)  {
 
-   get_times_from_file(mode_files[j], valid_times, atts);
+   get_times_from_file(mode_files[j].c_str(), valid_times, atts);
 
 }
 
@@ -1030,7 +1030,7 @@ for (j=0; j<n_valid_times; ++j)  {
 
 for (j=0; j<Nfiles; ++j)  {
 
-   process_mode_file(mode_files[j]);
+   process_mode_file(mode_files[j].c_str());
 
 }
 

@@ -37,17 +37,17 @@ static const char netcdf_magic  [] = "CDF";
 static const char hdf_magic     [] = "HDF";
 static const int  netcdf_magic_len = strlen(netcdf_magic);
 
-static const char nccf_att_name[]   = "Conventions";
-static const char nccf_att_name_l[] = "conventions";
-static const char nccf_att_name_U[] = "CONVENTIONS";
-static const char nccf_att_value[]  = "CF-";
-static const char nccf_att_value2[] = "CF ";
+static const string nccf_att_name   = "Conventions";
+static const string nccf_att_name_l = "conventions";
+static const string nccf_att_name_U = "CONVENTIONS";
+static const string nccf_att_value  = "CF-";
+static const string nccf_att_value2 = "CF ";
 
-static const char ncmet_att_version[]    = "MET_version";
-static const char ncmet_att_projection[] = "Projection";
+static const string ncmet_att_version    = "MET_version";
+static const string ncmet_att_projection = "Projection";
 
-static const char ncpinterp_att_name[]  = "TITLE";
-static const char ncpinterp_att_value[] = "ON PRES LEVELS";
+static const string ncpinterp_att_name  = "TITLE";
+static const char ncpinterp_att_value [] = "ON PRES LEVELS";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,6 @@ static const char ncpinterp_att_value[] = "ON PRES LEVELS";
 bool is_netcdf_file(const char * filename)
 
 {
-
    if ( !filename || !(*filename) )  return ( false );
 
    int fd = -1;
@@ -97,8 +96,10 @@ bool is_nccf_file(const char * filename)
          if (!found) found = get_global_att(nc_file, nccf_att_name_l, att_val);
          if (!found) found = get_global_att(nc_file, nccf_att_name_U, att_val);
          if (found) {
-            status = (strncmp(att_val, nccf_att_value, strlen(nccf_att_value)) == 0
-                 || strncmp(att_val, nccf_att_value2, strlen(nccf_att_value2)) == 0);
+	   status = (att_val.compare(0, nccf_att_value.length(),
+				     nccf_att_value) == 0
+		     || att_val.compare(0, nccf_att_value2.length(),
+					nccf_att_value2) == 0);
          }
       }
    }
@@ -145,7 +146,7 @@ bool is_ncpinterp_file(const char * filename)
          // Get the global attribute
          if (get_global_att(nc_file, ncpinterp_att_name, att_val)) {
             // Check the attribute value for the target string
-            status = (strstr(att_val, ncpinterp_att_value));
+            status = (strstr(att_val.c_str(), ncpinterp_att_value));
          }
       }
    }catch(...) {
