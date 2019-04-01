@@ -1118,8 +1118,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       //  determine the hemisphere
       switch(gfld->igdtmpl[16]){
-         case 0:  hem = 'N';  break;
-         case 1:  hem = 'S';  break;
+         case 0:    hem = 'N';  break;
+         case 128:  hem = 'S';  break;
          default:
             mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
                  << "unexpected polar stereo projection center (" << gfld->igdtmpl[16] << ")\n\n";
