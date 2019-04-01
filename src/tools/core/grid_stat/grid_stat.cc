@@ -1234,9 +1234,6 @@ void process_scores() {
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
-               // Set the mask name
-               shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
-
                   // Turn off the mask for missing data values
                   mask_bad_data(mask_mp, fgx_dp);
                   mask_bad_data(mask_mp, fgy_dp);
@@ -1275,7 +1272,7 @@ void process_scores() {
                } // end for m (n_mask)
 
                // Write out the gradients if requested in the config file
-	       
+
                if(conf_info.vx_opt[i].nc_info.do_gradient) {
                   ConcatString cs;
                   cs << cs_erase << "FCST_XGRAD_" << dx;
