@@ -147,13 +147,13 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFProbLine::prob() const {
-   return(parse_int(get_item(ProbOffset)));
+   return(parse_int(get_item(ProbOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFProbLine::prob_item() const {
-   return(parse_int(get_item(ProbItemOffset)));
+   return(parse_int(get_item(ProbItemOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

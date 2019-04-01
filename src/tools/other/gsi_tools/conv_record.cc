@@ -404,9 +404,9 @@ if ( s != 19 && s != 23 )  {
 
 }
 
-memcpy(r.variable, r.Buf, 3);
+ r.variable = (string)(char*)r.Buf;
 
-r.variable[3] = (char) 0;
+//r.variable[3] = (char) 0;
 
 memcpy(&(r.nchar), r.Buf +  3, 4);
 memcpy(&(r.nreal), r.Buf +  7, 4);

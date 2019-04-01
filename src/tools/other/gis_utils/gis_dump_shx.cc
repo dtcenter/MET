@@ -63,12 +63,12 @@ if ( argc != 2 )  usage();
 int fd = -1;
 int n_read, bytes;
 int count;
-ConcatString input_filename = argv[1];
+ConcatString input_filename = (string)argv[1];
 ShxFileHeader h;
 ShxRecord r;
 
 
-if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
+if ( (fd = met_open(input_filename.c_str(), O_RDONLY)) < 0 )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open input file \""
@@ -78,7 +78,7 @@ if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
 }
 
-cout << get_short_name(input_filename) << '\n';
+cout << get_short_name(input_filename.c_str()) << '\n';
 
    //
    //  main header

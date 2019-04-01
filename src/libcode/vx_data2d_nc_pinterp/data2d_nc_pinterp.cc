@@ -133,7 +133,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    plane.clear();
 
    // Read the data
-   status = PinterpNc->data(vinfo_nc->req_name(),
+   status = PinterpNc->data(vinfo_nc->req_name().c_str(),
                             vinfo_nc->dimension(),
                             plane, pressure, info);
 
@@ -167,13 +167,13 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       // Set the VarInfo object's name, long_name, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
       else                                 vinfo.set_name(info->name);
-      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att);
-      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att);
+      if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
+      if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
 
       // Set the VarInfo object's level string for pressure levels
       if(!is_bad_data(pressure)) {
          level_str << cs_erase << "P" << nint(pressure);
-         vinfo.set_level_name(level_str);
+         vinfo.set_level_name(level_str.c_str());
       }
    }
 
@@ -227,7 +227,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
       cur_dim[i_dim] = lower + i;
 
       // Read data for the current level
-      status = PinterpNc->data(vinfo_nc->req_name(),
+      status = PinterpNc->data(vinfo_nc->req_name().c_str(),
                                cur_dim, cur_plane, pressure, info);
 
       // Check that the times match those requested
@@ -271,8 +271,8 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
       if(i==0) {
          if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
          else                                 vinfo.set_name(info->name);
-         if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att);
-         if(info->units_att.length()     > 0) vinfo.set_units(info->units_att);
+         if(info->long_name_att.length() > 0) vinfo.set_long_name(info->long_name_att.c_str());
+         if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
       }
 
    } // end for i
@@ -286,7 +286,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
    else if(is_eq(min_level, max_level)) level_str << cs_erase << "P" << nint(min_level);
    else                                 level_str << cs_erase << "P" << nint(max_level)
                                                   << "-" << nint(min_level);
-   vinfo.set_level_name(level_str);
+   vinfo.set_level_name(level_str.c_str());
 
    return(n_level);
 }

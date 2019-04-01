@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
       //
       // process this directory
       //
-   process_directory(top_dir);
+   process_directory(top_dir.c_str());
 
    exit (0);
 
@@ -236,7 +236,7 @@ void process_directory(const char * dir_name)
          //
          // the TMPDIR environment variable is not set so check if /tmp exists
          //
-      if ((dir = met_opendir(tmp_directory)) == NULL)
+      if ((dir = met_opendir(tmp_directory.c_str())) == NULL)
       {
          mlog << Error << "\nprocess_directory() -> the directory \"/tmp\" does not exist.\n\n";
          exit (1);
@@ -285,7 +285,7 @@ void process_directory(const char * dir_name)
       if (pde->d_type == DT_DIR)
       {
          new_directory << cs_erase << dir_name << '/' << pde->d_name;
-         process_directory(new_directory);
+         process_directory(new_directory.c_str());
          continue;
       }
 
@@ -321,7 +321,7 @@ void process_directory(const char * dir_name)
                // "// ** Copyright UCAR (c) 19". If it reads the whole file
                // without finding it, then we need to add it.
                //
-            fd = open(new_filename, O_RDONLY, 0);
+            fd = open(new_filename.c_str(), O_RDONLY, 0);
 
             if (fd == -1)
             {
@@ -346,7 +346,7 @@ void process_directory(const char * dir_name)
                if (line.empty())
                   continue;
 
-               if (strstr(line, "// ** Copyright UCAR (c) 19") != NULL)
+               if (strstr(line.c_str(), "// ** Copyright UCAR (c) 19") != NULL)
                {
                   notice_found = true;
                   break;
@@ -376,27 +376,27 @@ void process_directory(const char * dir_name)
                   // to a temporary file
                   //
                command << cs_erase << "cp " << copyright_notice_filename << ' ' << tmp_filename;
-               system(command);
+               system(command.c_str());
 
                   //
                   // create the command to append the .h or .cc file
                   // to the temporary file
                   //
                command << cs_erase << "cat " << new_filename << " >> " << tmp_filename;
-               system(command);
+               system(command.c_str());
 
                   //
                   // create the command to copy the temporary file
                   // back to the name of the .h or .cc file
                   //
                command << cs_erase << "cp " << tmp_filename  << ' ' << new_filename;
-               system(command);
+               system(command.c_str());
 
                   //
                   // remove the temporary file
                   //
                command << cs_erase << "rm " << tmp_filename;
-               system(command);
+               system(command.c_str());
             }
 
          }  // end of if this is a .h or .cc file

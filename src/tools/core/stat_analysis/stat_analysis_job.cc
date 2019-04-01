@@ -104,8 +104,8 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    j.boot_interval   = boot_info.interval;
    j.boot_rep_prop   = boot_info.rep_prop;
    j.n_boot_rep      = boot_info.n_rep;
-   j.set_boot_rng(boot_info.rng);
-   j.set_boot_seed(boot_info.seed);
+   j.set_boot_rng(boot_info.rng.c_str());
+   j.set_boot_seed(boot_info.seed.c_str());
 
    j.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    j.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
@@ -134,7 +134,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    //
    // Open up the temp file for reading the intermediate STAT line data
    //
-   if(!f.open(tmp_path)) {
+   if(!f.open(tmp_path.c_str())) {
       mlog << Error << "\ndo_job() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for reading!\n\n";
@@ -405,7 +405,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the line type specified for this job
    //
-   lt = string_to_statlinetype(j.line_type[0]);
+   lt = string_to_statlinetype(j.line_type[0].c_str());
 
    //
    // Check that a valid line type has been selected
@@ -591,8 +591,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the input and output line types for this job
    //
-   in_lt  = string_to_statlinetype(j.line_type[0]);
-   out_lt = string_to_statlinetype(j.out_line_type[0]);
+   in_lt  = string_to_statlinetype(j.line_type[0].c_str());
+   out_lt = string_to_statlinetype(j.out_line_type[0].c_str());
 
    //
    // Valid combinations of input and output line types:
@@ -807,7 +807,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
          // Check for special case of a single probability threshold
          if(j.out_fcst_thresh.n_elements() == 1) {
-            j.out_fcst_thresh = string_to_prob_thresh(j.out_fcst_thresh[0].get_str());
+            j.out_fcst_thresh = string_to_prob_thresh(j.out_fcst_thresh[0].get_str().c_str());
          }
 
          n = j.out_fcst_thresh.n_elements();
@@ -854,7 +854,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       // Parse the input MPR lines
       //
       aggr_mpr_lines(f, j, mpr_map, n_in, n_out);
-      write_job_aggr_mpr(j, out_lt, mpr_map, out_at, tmp_dir, rng_ptr);
+      write_job_aggr_mpr(j, out_lt, mpr_map, out_at, tmp_dir.c_str(), rng_ptr);
    }
 
    //
@@ -920,9 +920,9 @@ void write_job_summary(STATAnalysisJob &j,
    //
    // Write header line
    //
-   at.set_entry(r, c++, "COL_NAME:");
-   at.set_entry(0, c++, "LINE_TYPE");
-   at.set_entry(0, c++, "COLUMN");
+   at.set_entry(r, c++, (string)"COL_NAME:");
+   at.set_entry(0, c++, (string)"LINE_TYPE");
+   at.set_entry(0, c++, (string)"COLUMN");
    for(i=0; i<j.by_column.n(); i++) {
       at.set_entry(0, c++, j.by_column[i]);
    }
@@ -1012,7 +1012,7 @@ void write_job_summary(STATAnalysisJob &j,
          // Write the data row
          //
          c = 0;
-         at.set_entry(r, c++, "SUMMARY:");
+         at.set_entry(r, c++, (string)"SUMMARY:");
 
          //
          // Line type and column name
@@ -1078,7 +1078,7 @@ void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
    // Write the header information
    //
    c = 0;
-   at.set_entry(0, c++, "COL_NAME:");
+   at.set_entry(0, c++, (string)"COL_NAME:");
    for(i=0; i<j.by_column.n_elements(); i++) {
       at.set_entry(0, c++, j.by_column[i]);
    } // end for i
@@ -1154,7 +1154,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // FHO output line
       //
       if(lt == stat_fho) {
-         at.set_entry(r, c++, "FHO:");
+	at.set_entry(r, c++, (string)"FHO:");
          write_case_cols(it->first, at, r, c);
          write_fho_cols(it->second.cts_info, at, r, c);
          if(j.stat_out) write_fho_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
@@ -1163,7 +1163,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // CTC output line
       //
       else if(lt == stat_ctc) {
-         at.set_entry(r, c++, "CTC:");
+	at.set_entry(r, c++, (string)"CTC:");
          write_case_cols(it->first, at, r, c);
          write_ctc_cols(it->second.cts_info, at, r, c);
          if(j.stat_out) write_ctc_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
@@ -1189,7 +1189,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, "CTS:");
+         at.set_entry(r, c++, (string)"CTS:");
          write_case_cols(it->first, at, r, c);
          write_cts_cols(it->second.cts_info, 0, at, r, c);
          if(j.stat_out) write_cts_cols(it->second.cts_info, 0, j.stat_at, r, n_header_columns);
@@ -1198,7 +1198,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // ECLV output line
       //
       else if(lt == stat_eclv) {
-         at.set_entry(r, c++, "ECLV:");
+	at.set_entry(r, c++, (string)"ECLV:");
          write_case_cols(it->first, at, r, c);
          write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, at, r, c);
          if(j.stat_out) write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, j.stat_at, r, n_header_columns);
@@ -1211,7 +1211,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          nbrcts_info.clear();
          nbrcts_info.cts_info = it->second.cts_info;
 
-         at.set_entry(r, c++, "NBRCTC:");
+         at.set_entry(r, c++, (string)"NBRCTC:");
          write_case_cols(it->first, at, r, c);
          write_nbrctc_cols(nbrcts_info, at, r, c);
          if(j.stat_out) write_nbrctc_cols(nbrcts_info, j.stat_at, r, n_header_columns);
@@ -1240,7 +1240,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, "NBRCTS:");
+         at.set_entry(r, c++, (string)"NBRCTS:");
          write_case_cols(it->first, at, r, c);
          write_nbrcts_cols(nbrcts_info, 0, at, r, c);
          if(j.stat_out) write_nbrcts_cols(nbrcts_info, 0, j.stat_at, r, n_header_columns);
@@ -1314,7 +1314,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
       // MCTC output line
       //
       if(lt == stat_mctc) {
-         at.set_entry(r, c++, "MCTC:");
+	at.set_entry(r, c++, (string)"MCTC:");
          write_case_cols(it->first, at, r, c);
          write_mctc_cols(it->second.mcts_info, at, r, c);
          if(j.stat_out) write_mctc_cols(it->second.mcts_info, j.stat_at, r, n_header_columns);
@@ -1340,7 +1340,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, "MCTS:");
+         at.set_entry(r, c++, (string)"MCTS:");
          write_case_cols(it->first, at, r, c);
          write_mcts_cols(it->second.mcts_info, 0, at, r, c);
          if(j.stat_out) write_mcts_cols(it->second.mcts_info, 0, j.stat_at, r, n_header_columns);
@@ -1424,7 +1424,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PCT output line
       //
       if(lt == stat_pct) {
-         at.set_entry(r, c++, "PCT:");
+	at.set_entry(r, c++, (string)"PCT:");
          write_case_cols(it->first, at, r, c);
          write_pct_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_pct_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1450,7 +1450,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
          //
          // Write the data line
          //
-         at.set_entry(r, c++, "PSTD:");
+         at.set_entry(r, c++, (string)"PSTD:");
          write_case_cols(it->first, at, r, c);
          write_pstd_cols(it->second.pct_info, 0, at, r, c);
          if(j.stat_out) write_pstd_cols(it->second.pct_info, 0, j.stat_at, r, n_header_columns);
@@ -1459,7 +1459,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PJC output line
       //
       else if(lt == stat_pjc) {
-         at.set_entry(r, c++, "PJC:");
+	at.set_entry(r, c++, (string)"PJC:");
          write_case_cols(it->first, at, r, c);
          write_pjc_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_pjc_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1468,7 +1468,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PRC output line
       //
       else if(lt == stat_prc) {
-         at.set_entry(r, c++, "PRC:");
+	at.set_entry(r, c++, (string)"PRC:");
          write_case_cols(it->first, at, r, c);
          write_prc_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_prc_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1477,10 +1477,10 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // ECLV output lines
       //
       else if(lt == stat_eclv) {
-         ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str());
+	ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str().c_str());
          for(i=0; i<it->second.pct_info.pct.nrows(); i++, r++) {
             c = 0;
-            at.set_entry(r, c++, "ECLV:");
+            at.set_entry(r, c++, (string)"ECLV:");
             write_case_cols(it->first, at, r, c);
             write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
                             j.out_eclv_points, at, r, c);
@@ -1564,7 +1564,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // SL1L2 output line
       //
       if(lt == stat_sl1l2) {
-         at.set_entry(r, c++, "SL1L2:");
+         at.set_entry(r, c++, (string)"SL1L2:");
          write_case_cols(it->first, at, r, c);
          write_sl1l2_cols(it->second.sl1l2_info, at, r, c);
          if(j.stat_out) write_sl1l2_cols(it->second.sl1l2_info, j.stat_at, r, n_header_columns);
@@ -1573,7 +1573,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // SAL1L2 output line
       //
       else if(lt == stat_sal1l2) {
-         at.set_entry(r, c++, "SAL1L2:");
+         at.set_entry(r, c++, (string)"SAL1L2:");
          write_case_cols(it->first, at, r, c);
          write_sal1l2_cols(it->second.sl1l2_info, at, r, c);
          if(j.stat_out) write_sal1l2_cols(it->second.sl1l2_info, j.stat_at, r, n_header_columns);
@@ -1582,7 +1582,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // VL1L2 output line
       //
       else if(lt == stat_vl1l2) {
-         at.set_entry(r, c++, "VL1L2:");
+         at.set_entry(r, c++, (string)"VL1L2:");
          write_case_cols(it->first, at, r, c);
          write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
          if(j.stat_out) write_vl1l2_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
@@ -1591,7 +1591,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // VAL1L2 output line
       //
       else if(lt == stat_val1l2) {
-         at.set_entry(r, c++, "VAL1L2:");
+         at.set_entry(r, c++, (string)"VAL1L2:");
          write_case_cols(it->first, at, r, c);
          write_val1l2_cols(it->second.vl1l2_info, at, r, c);
          if(j.stat_out) write_val1l2_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
@@ -1617,7 +1617,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
          else
             compute_cntinfo(it->second.sl1l2_info, 1, it->second.cnt_info);
 
-         at.set_entry(r, c++, "CNT:");
+         at.set_entry(r, c++, (string)"CNT:");
          write_case_cols(it->first, at, r, c);
          write_cnt_cols(it->second.cnt_info, 0, at, r, c);
          if(j.stat_out) write_cnt_cols(it->second.cnt_info, 0, j.stat_at, r, n_header_columns);
@@ -1626,7 +1626,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       // VCNT output line
       //
       else if(lt == stat_vcnt) {
-         at.set_entry(r, c++, "VCNT:");
+         at.set_entry(r, c++, (string)"VCNT:");
          write_case_cols(it->first, at, r, c);
          write_vcnt_cols(it->second.vl1l2_info, at, r, c);
          if(j.stat_out) write_vcnt_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
@@ -3049,12 +3049,12 @@ void write_job_ramp(STATAnalysisJob &j,
          vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
          if(j.ramp_type == TimeSeriesType_DyDt) {
-            compute_dydt_ramps(cs, vals_part, ts_part,
+	   compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst,
                ramp_part, dat_part);
          }
          else {
-            compute_swing_ramps(cs, vals_part, ts_part,
+	   compute_swing_ramps(cs.c_str(), vals_part, ts_part,
                j.swing_width, j.ramp_thresh_fcst,
                ramp_part, dat_part);
          }
@@ -3078,12 +3078,12 @@ void write_job_ramp(STATAnalysisJob &j,
          vals_part = it->second.o_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
          if(j.ramp_type == TimeSeriesType_DyDt) {
-            compute_dydt_ramps(cs, vals_part, ts_part,
+            compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs,
                ramp_part, dat_part);
          }
          else {
-            compute_swing_ramps(cs, vals_part, ts_part,
+            compute_swing_ramps(cs.c_str(), vals_part, ts_part,
                j.swing_width, j.ramp_thresh_obs,
                ramp_part, dat_part);
          }
@@ -3905,7 +3905,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
          fcst_job[i].line_type.clear();
          fcst_job[i].line_type.add(j.line_type[i]);
 
-         job_lt[i] = string_to_statlinetype(j.line_type[i]);
+         job_lt[i] = string_to_statlinetype(j.line_type[i].c_str());
          if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
             mlog << Error << "\ncompute_ss_index() -> "
                  << "a Skill Score Index can only be computed using "
@@ -4053,83 +4053,83 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
       fcst_stat = ref_stat = bad_data_double;
 
-      if(strcasecmp(fcst_job[i].column[0], "PR_CORR") == 0) {
+      if(strcasecmp(fcst_job[i].column[0].c_str(), "PR_CORR") == 0) {
          fcst_stat = fcst_cnt.pr_corr.v;
          ref_stat  = ref_cnt.pr_corr.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "ME") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ME") == 0) {
          fcst_stat = fcst_cnt.me.v;
          ref_stat  = ref_cnt.me.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "ESTDEV") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ESTDEV") == 0) {
          fcst_stat = fcst_cnt.estdev.v;
          ref_stat  = ref_cnt.estdev.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "MBIAS") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MBIAS") == 0) {
          fcst_stat = fcst_cnt.mbias.v;
          ref_stat  = ref_cnt.mbias.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "MSE") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "MSE") == 0) {
          fcst_stat = fcst_cnt.mse.v;
          ref_stat  = ref_cnt.mse.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "BCRMSE") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "BCRMSE") == 0) {
          fcst_stat = fcst_cnt.bcmse.v;
          ref_stat  = ref_cnt.bcmse.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "RMSE") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "RMSE") == 0) {
          fcst_stat = fcst_cnt.rmse.v;
          ref_stat  = ref_cnt.rmse.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "BASER") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "BASER") == 0) {
          fcst_stat = fcst_cts[i].baser.v;
          ref_stat  = ref_cts[i].baser.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "FMEAN") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FMEAN") == 0) {
          fcst_stat = fcst_cts[i].fmean.v;
          ref_stat  = ref_cts[i].fmean.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "ACC") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ACC") == 0) {
          fcst_stat = fcst_cts[i].acc.v;
          ref_stat  = ref_cts[i].acc.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "FBIAS") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FBIAS") == 0) {
          fcst_stat = fcst_cts[i].fbias.v;
          ref_stat  = ref_cts[i].fbias.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "PODY") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "PODY") == 0) {
          fcst_stat = fcst_cts[i].pody.v;
          ref_stat  = ref_cts[i].pody.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "PODN") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "PODN") == 0) {
          fcst_stat = fcst_cts[i].podn.v;
          ref_stat  = ref_cts[i].podn.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "POFD") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "POFD") == 0) {
          fcst_stat = fcst_cts[i].pofd.v;
          ref_stat  = ref_cts[i].pofd.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "FAR") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "FAR") == 0) {
          fcst_stat = fcst_cts[i].far.v;
          ref_stat  = ref_cts[i].far.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "CSI") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "CSI") == 0) {
          fcst_stat = fcst_cts[i].csi.v;
          ref_stat  = ref_cts[i].csi.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "GSS") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "GSS") == 0) {
          fcst_stat = fcst_cts[i].gss.v;
          ref_stat  = ref_cts[i].gss.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "HK") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "HK") == 0) {
          fcst_stat = fcst_cts[i].hk.v;
          ref_stat  = ref_cts[i].hk.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "HSS") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "HSS") == 0) {
          fcst_stat = fcst_cts[i].hss.v;
          ref_stat  = ref_cts[i].hss.v;
       }
-      else if(strcasecmp(fcst_job[i].column[0], "ODDS") == 0) {
+      else if(strcasecmp(fcst_job[i].column[0].c_str(), "ODDS") == 0) {
          fcst_stat = fcst_cts[i].odds.v;
          ref_stat  = ref_cts[i].odds.v;
       }

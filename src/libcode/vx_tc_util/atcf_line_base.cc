@@ -149,7 +149,7 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    }
 
    // Set the line type from the technique number column
-   Type = string_to_atcflinetype(get_item(TechniqueNumberOffset));
+   Type = string_to_atcflinetype(get_item(TechniqueNumberOffset).c_str());
 
    return(1);
 }
@@ -157,7 +157,7 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::is_header() const {
-   if(strcasecmp(basin(), "BASIN") == 0) return(1);
+  if(basin().comparecase(0, 5, "BASIN") == 0) return(1);
    else                                  return(0);
 }
 
@@ -207,13 +207,13 @@ ConcatString ATCFLineBase::cyclone_number() const {
 ////////////////////////////////////////////////////////////////////////
 
 unixtime ATCFLineBase::warning_time() const {
-   return(parse_time(get_item(WarningTimeOffset)));
+   return(parse_time(get_item(WarningTimeOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::technique_number() const {
-   return(parse_int(get_item(TechniqueNumberOffset)));
+   return(parse_int(get_item(TechniqueNumberOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -234,19 +234,19 @@ ConcatString ATCFLineBase::technique() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::forecast_period() const {
-   return(parse_int(get_item(ForecastPeriodOffset)));
+   return(parse_int(get_item(ForecastPeriodOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double ATCFLineBase::lat() const {
-   return(parse_lat(get_item(LatTenthsOffset)));
+   return(parse_lat(get_item(LatTenthsOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double ATCFLineBase::lon() const {
-   return(parse_lon(get_item(LonTenthsOffset)));
+   return(parse_lon(get_item(LonTenthsOffset).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1301,6 +1301,7 @@ size_t GribFile::read(off_t buffer_offset, size_t bytes)
 {
 
 size_t n_read;
+int B;
 
 if ( (buffer_offset + bytes) > (rep->buf_size) )  {
 
@@ -1311,11 +1312,13 @@ if ( (buffer_offset + bytes) > (rep->buf_size) )  {
 
 }
 
-n_read = ::read(rep->fd, (rep->buf + buffer_offset), bytes);
+B = min<int>(bytes, rep->buf_size - buffer_offset);   //  to please fortify
 
-if ( n_read != bytes )  {
+n_read = ::read(rep->fd, (rep->buf + buffer_offset), B);
 
-   mlog << Error << "\nGribFile::read() -> file read error ... requested " << bytes << " bytes, got " << n_read << "\n\n";
+if ( n_read != B )  {
+
+   mlog << Error << "\nGribFile::read() -> file read error ... requested " << B << " bytes, got " << n_read << "\n\n";
 
    exit ( 1 );
 //   char temp_str[max_temp_str_length];

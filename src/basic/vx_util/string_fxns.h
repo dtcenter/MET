@@ -28,8 +28,6 @@ extern bool match_met_version(const char *);
 
 extern void check_met_version(const char *);
 
-extern bool less_than_met_version(const char *, const char *);
-
 extern const char * get_short_name(const char * path);
 
 extern void append_char(char *, const char);
@@ -51,7 +49,7 @@ extern ConcatString str_replace_all(const char* data, const char* old, const cha
 
 extern ConcatString str_format(const char *fmt, ...);
 
-extern ConcatString str_trim(const char *str);
+extern ConcatString str_trim(const ConcatString str);
 
 extern int parse_thresh_index(const char *str);
 

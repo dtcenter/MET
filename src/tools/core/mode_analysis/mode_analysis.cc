@@ -154,9 +154,9 @@ if ( config_filename.length() > 0 )  {
       //  and then the user config file.
       //
 
-   config.read(replace_path(config_const_filename));
-   config.read(default_config_file);
-   config.read(config_filename);
+   config.read(replace_path(config_const_filename).c_str());
+   config.read(default_config_file.c_str());
+   config.read(config_filename.c_str());
 
    job->set_precision(config.output_precision());
 
@@ -595,7 +595,7 @@ void set_lookin_path(const StringArray & a)
 
 {
 
-set_lookin(a[0]);
+set_lookin(a[0].c_str());
 
 return;
 
@@ -636,7 +636,7 @@ void set_column_name(const StringArray & a)
 
 {
 
-add_field(a[0]);
+add_field(a[0].c_str());
 
 return;
 
@@ -650,7 +650,7 @@ void set_dump_row(const StringArray & a)
 
 {
 
-set_dumpfile(a[0]);
+set_dumpfile(a[0].c_str());
 
 return;
 
@@ -664,7 +664,7 @@ void set_out_filename(const StringArray & a)
 
 {
 
-set_outfile(a[0]);
+set_outfile(a[0].c_str());
 
 return;
 
@@ -678,7 +678,7 @@ void set_config_filename(const StringArray & a)
 
 {
 
-set_config(a[0]);
+set_config(a[0].c_str());
 
 return;
 
@@ -709,7 +709,7 @@ return;
 void set_verbosity(const StringArray & a)
 {
 
-mlog.set_verbosity_level(atoi(a[0]));
+mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 

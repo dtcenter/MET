@@ -155,14 +155,14 @@ struct ssvar_bin_cmp {
   bool operator()(const ConcatString & cs1, const ConcatString & cs2) const {
 
     // Check for string equality
-    if(strcmp(cs1, cs2) == 0) return(0);
+    if( cs1 == cs2) return(0);
 
     // Otherwise, parse list of numbers and compare each element
     StringArray sa1 = cs1.split(":");
     StringArray sa2 = cs2.split(":");
     for(int i=0; i<min(sa1.n_elements(), sa2.n_elements()); i++) {
-       if(!is_eq(atof(sa1[i]), atof(sa2[i]))) {
-          return(atof(sa1[i]) < atof(sa2[i]));
+       if(!is_eq(atof(sa1[i].c_str()), atof(sa2[i].c_str()))) {
+          return(atof(sa1[i].c_str()) < atof(sa2[i].c_str()));
        }
     }
     return(-1);

@@ -57,23 +57,23 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
       s << pid << '_' << i;
       if(suffix) s << '_' << suffix;
 
-   } while(file_exists(s));
+   } while(file_exists(s.c_str()));
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void remove_temp_file(const char *file_name) {
+void remove_temp_file(const ConcatString file_name) {
    int errno;
 
    //
    // Attempt to remove the file and print out any error message
    //
-   if((errno = remove(file_name)) != 0) {
+   if((errno = remove(file_name.c_str())) != 0) {
       mlog << Error << "\nremove_temp_file() -> "
            << "can't delete temporary file: \""
-           << (file_name ? file_name : "(nul)") << "\" ("
+           << file_name << "\" ("
            << strerror(errno) << ")\n\n";
       exit(1);
    }

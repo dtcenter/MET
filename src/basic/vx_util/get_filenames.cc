@@ -47,7 +47,7 @@ StringArray a;
 
 for (j=0; j<N; ++j)  {
 
-   a.add(get_filenames(search_dir_list[j], prefix, suffix, check_regular));
+  a.add(get_filenames(string(search_dir_list[j]), prefix, suffix, check_regular));
 
 }
 
@@ -68,7 +68,7 @@ StringArray get_filenames(const ConcatString & search_dir,
 StringArray a, b;
 struct stat sbuf;
 
-if ( stat(search_dir, &sbuf) < 0 )  {
+ if ( stat(search_dir.c_str(), &sbuf) < 0 )  {
 
    mlog << Warning << "\nget_filenames() -> "
         << "can't stat \"" << search_dir << "\"\n\n";
@@ -83,7 +83,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
    //  process directory
    //
 
-   b = get_filenames_from_dir(search_dir, prefix, suffix);
+  b = get_filenames_from_dir(search_dir.c_str(), prefix, suffix);
 
    a.add(b);
 
@@ -102,8 +102,8 @@ if ( S_ISDIR(sbuf.st_mode) )  {
       //  get the file name
       //
 
-      const char * ptr = strrchr(search_dir, '/');
-      if ( !ptr )  ptr = search_dir;
+     const char * ptr = strrchr(search_dir.c_str(), '/');
+     if ( !ptr )  ptr = search_dir.c_str();
       else         ++ptr;
 
       if ( check_prefix_suffix(ptr, prefix, suffix) )  {
@@ -213,7 +213,7 @@ bool check_prefix_suffix(const char * path,
 
       regex << cs_erase << "^" << prefix;
 
-      keep = check_reg_exp(regex, path);
+      keep = check_reg_exp(regex.c_str(), path);
 
    }
 
@@ -225,7 +225,7 @@ bool check_prefix_suffix(const char * path,
 
       regex << cs_erase << suffix << "$";
 
-      keep = check_reg_exp(regex, path);
+      keep = check_reg_exp(regex.c_str(), path);
 
    }
 

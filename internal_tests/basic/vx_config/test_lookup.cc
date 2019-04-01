@@ -127,7 +127,7 @@ foo = parse_conf_string(&config, lookup_key);
    //
    //  get mid
    //
-
+/*
 m = ed->lookup("mid");
 
 if ( !e )  {

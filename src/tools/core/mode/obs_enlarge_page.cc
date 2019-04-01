@@ -39,7 +39,7 @@ inc_pagenumber();
 
 choose_font(31, 24.0);
 write_centered_text(1, 1, Htab_cen, 752.0, 0.5, 0.5, title);
-write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, ObsString);
+write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, ObsString.c_str());
 
    /////////////////////////////////////////////////////////////////
    //

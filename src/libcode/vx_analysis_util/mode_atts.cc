@@ -1885,8 +1885,8 @@ const char * c = (const char *) 0;
 j = 0;
 
 while ( j < (a.n_elements()) )  {
-
-   c = a[j];
+  
+   c = a[j].c_str();
 
    if ( c[0] != '-' )  { ++j;  continue; }
 
@@ -1907,128 +1907,128 @@ while ( j < (a.n_elements()) )  {
       //  string array members
       //
 
-   else if ( strcmp(c, "-model"   ) == 0 )  { add_model   (a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-desc"    ) == 0 )  { add_desc    (a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_thr") == 0 )  { add_fcst_thr(a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_thr" ) == 0 )  { add_obs_thr (a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_var") == 0 )  { add_fcst_var(a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_lev") == 0 )  { add_fcst_lev(a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_var" ) == 0 )  { add_obs_var (a[j + 1]);  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_lev" ) == 0 )  { add_obs_lev (a[j + 1]);  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-model"   ) == 0 )  { add_model   (a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-desc"    ) == 0 )  { add_desc    (a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_thr") == 0 )  { add_fcst_thr(a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_thr" ) == 0 )  { add_obs_thr (a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_var") == 0 )  { add_fcst_var(a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_lev") == 0 )  { add_fcst_lev(a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_var" ) == 0 )  { add_obs_var (a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_lev" ) == 0 )  { add_obs_lev (a[j + 1].c_str());  a.shift_down(j, 2); }
 
       //
       //  int array members
       //
 
-   else if ( strcmp(c, "-fcst_lead"       ) == 0 )  { add_fcst_lead       (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_valid_hour" ) == 0 )  { add_fcst_valid_hour (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_init_hour"  ) == 0 )  { add_fcst_init_hour  (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_accum"      ) == 0 )  { add_fcst_accum      (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_lead"        ) == 0 )  { add_obs_lead        (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_valid_hour"  ) == 0 )  { add_obs_valid_hour  (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_init_hour"   ) == 0 )  { add_obs_init_hour   (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_accum"       ) == 0 )  { add_obs_accum       (timestring_to_sec(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_rad"        ) == 0 )  { add_fcst_rad        (atoi(a[j + 1]));               a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_rad"         ) == 0 )  { add_obs_rad         (atoi(a[j + 1]));               a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_lead"       ) == 0 )  { add_fcst_lead       (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_valid_hour" ) == 0 )  { add_fcst_valid_hour (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_init_hour"  ) == 0 )  { add_fcst_init_hour  (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_accum"      ) == 0 )  { add_fcst_accum      (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_lead"        ) == 0 )  { add_obs_lead        (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_valid_hour"  ) == 0 )  { add_obs_valid_hour  (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_init_hour"   ) == 0 )  { add_obs_init_hour   (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_accum"       ) == 0 )  { add_obs_accum       (timestring_to_sec(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_rad"        ) == 0 )  { add_fcst_rad        (atoi(a[j + 1].c_str()));               a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_rad"         ) == 0 )  { add_obs_rad         (atoi(a[j + 1].c_str()));               a.shift_down(j, 2); }
 
       //
       //  int max/min members
       //
 
-   else if ( strcmp(c, "-area_min"             ) == 0 )  { set_area_min             (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_max"             ) == 0 )  { set_area_max             (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_thresh_min"      ) == 0 )  { set_area_thresh_min      (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_thresh_max"      ) == 0 )  { set_area_thresh_max      (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intersection_area_min") == 0 )  { set_intersection_area_min(atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intersection_area_max") == 0 )  { set_intersection_area_max(atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-union_area_min"       ) == 0 )  { set_union_area_min       (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-union_area_max"       ) == 0 )  { set_union_area_max       (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-symmetric_diff_min"   ) == 0 )  { set_symmetric_diff_min   (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-symmetric_diff_max"   ) == 0 )  { set_symmetric_diff_max   (atoi(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_min"             ) == 0 )  { set_area_min             (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_max"             ) == 0 )  { set_area_max             (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_thresh_min"      ) == 0 )  { set_area_thresh_min      (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_thresh_max"      ) == 0 )  { set_area_thresh_max      (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intersection_area_min") == 0 )  { set_intersection_area_min(atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intersection_area_max") == 0 )  { set_intersection_area_max(atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-union_area_min"       ) == 0 )  { set_union_area_min       (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-union_area_max"       ) == 0 )  { set_union_area_max       (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-symmetric_diff_min"   ) == 0 )  { set_symmetric_diff_min   (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-symmetric_diff_max"   ) == 0 )  { set_symmetric_diff_max   (atoi(a[j + 1].c_str()));  a.shift_down(j, 2); }
 
       //
       //  double max/min members
       //
 
-   else if ( strcmp(c, "-centroid_x_min"                ) == 0 )  { set_centroid_x_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_x_max"                ) == 0 )  { set_centroid_x_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_y_min"                ) == 0 )  { set_centroid_y_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_y_max"                ) == 0 )  { set_centroid_y_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_lat_min"              ) == 0 )  { set_centroid_lat_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_lat_max"              ) == 0 )  { set_centroid_lat_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_lon_min"              ) == 0 )  { set_centroid_lon_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_lon_max"              ) == 0 )  { set_centroid_lon_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-axis_ang_min"                  ) == 0 )  { set_axis_ang_min                  (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-axis_ang_max"                  ) == 0 )  { set_axis_ang_max                  (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-length_min"                    ) == 0 )  { set_length_min                    (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-length_max"                    ) == 0 )  { set_length_max                    (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-width_min"                     ) == 0 )  { set_width_min                     (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-width_max"                     ) == 0 )  { set_width_max                     (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_ratio_min"              ) == 0 )  { set_aspect_ratio_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_ratio_max"              ) == 0 )  { set_aspect_ratio_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_min"                 ) == 0 )  { set_curvature_min                 (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_max"                 ) == 0 )  { set_curvature_max                 (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_x_min"               ) == 0 )  { set_curvature_x_min               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_x_max"               ) == 0 )  { set_curvature_x_max               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_y_min"               ) == 0 )  { set_curvature_y_min               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_y_max"               ) == 0 )  { set_curvature_y_max               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-complexity_min"                ) == 0 )  { set_complexity_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-complexity_max"                ) == 0 )  { set_complexity_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_10_min"              ) == 0 )  { set_intensity_10_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_10_max"              ) == 0 )  { set_intensity_10_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_25_min"              ) == 0 )  { set_intensity_25_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_25_max"              ) == 0 )  { set_intensity_25_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_50_min"              ) == 0 )  { set_intensity_50_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_50_max"              ) == 0 )  { set_intensity_50_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_75_min"              ) == 0 )  { set_intensity_75_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_75_max"              ) == 0 )  { set_intensity_75_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_90_min"              ) == 0 )  { set_intensity_90_min              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_90_max"              ) == 0 )  { set_intensity_90_max              (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_user_min"            ) == 0 )  { set_intensity_user_min            (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_user_max"            ) == 0 )  { set_intensity_user_max            (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_sum_min"             ) == 0 )  { set_intensity_sum_min             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intensity_sum_max"             ) == 0 )  { set_intensity_sum_max             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_dist_min"             ) == 0 )  { set_centroid_dist_min             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-centroid_dist_max"             ) == 0 )  { set_centroid_dist_max             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-boundary_dist_min"             ) == 0 )  { set_boundary_dist_min             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-boundary_dist_max"             ) == 0 )  { set_boundary_dist_max             (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-convex_hull_dist_min"          ) == 0 )  { set_convex_hull_dist_min          (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-convex_hull_dist_max"          ) == 0 )  { set_convex_hull_dist_max          (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-angle_diff_min"                ) == 0 )  { set_angle_diff_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-angle_diff_max"                ) == 0 )  { set_angle_diff_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_diff_min"               ) == 0 )  { set_aspect_diff_min               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_diff_max"               ) == 0 )  { set_aspect_diff_max               (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_ratio_min"                ) == 0 )  { set_area_ratio_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_ratio_max"                ) == 0 )  { set_area_ratio_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intersection_over_area_min"    ) == 0 )  { set_intersection_over_area_min    (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-intersection_over_area_max"    ) == 0 )  { set_intersection_over_area_max    (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_ratio_min"           ) == 0 )  { set_curvature_ratio_min           (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-curvature_ratio_max"           ) == 0 )  { set_curvature_ratio_max           (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-complexity_ratio_min"          ) == 0 )  { set_complexity_ratio_min          (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-complexity_ratio_max"          ) == 0 )  { set_complexity_ratio_max          (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-percentile_intensity_ratio_min") == 0 )  { set_percentile_intensity_ratio_min(atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-percentile_intensity_ratio_max") == 0 )  { set_percentile_intensity_ratio_max(atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-interest_min"                  ) == 0 )  { set_interest_min                  (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-interest_max"                  ) == 0 )  { set_interest_max                  (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_x_min"                ) == 0 )  { set_centroid_x_min                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_x_max"                ) == 0 )  { set_centroid_x_max                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_y_min"                ) == 0 )  { set_centroid_y_min                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_y_max"                ) == 0 )  { set_centroid_y_max                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_lat_min"              ) == 0 )  { set_centroid_lat_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_lat_max"              ) == 0 )  { set_centroid_lat_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_lon_min"              ) == 0 )  { set_centroid_lon_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_lon_max"              ) == 0 )  { set_centroid_lon_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-axis_ang_min"                  ) == 0 )  { set_axis_ang_min                  (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-axis_ang_max"                  ) == 0 )  { set_axis_ang_max                  (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-length_min"                    ) == 0 )  { set_length_min                    (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-length_max"                    ) == 0 )  { set_length_max                    (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-width_min"                     ) == 0 )  { set_width_min                     (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-width_max"                     ) == 0 )  { set_width_max                     (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_ratio_min"              ) == 0 )  { set_aspect_ratio_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_ratio_max"              ) == 0 )  { set_aspect_ratio_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_min"                 ) == 0 )  { set_curvature_min                 (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_max"                 ) == 0 )  { set_curvature_max                 (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_x_min"               ) == 0 )  { set_curvature_x_min               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_x_max"               ) == 0 )  { set_curvature_x_max               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_y_min"               ) == 0 )  { set_curvature_y_min               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_y_max"               ) == 0 )  { set_curvature_y_max               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-complexity_min"                ) == 0 )  { set_complexity_min                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-complexity_max"                ) == 0 )  { set_complexity_max                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_10_min"              ) == 0 )  { set_intensity_10_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_10_max"              ) == 0 )  { set_intensity_10_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_25_min"              ) == 0 )  { set_intensity_25_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_25_max"              ) == 0 )  { set_intensity_25_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_50_min"              ) == 0 )  { set_intensity_50_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_50_max"              ) == 0 )  { set_intensity_50_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_75_min"              ) == 0 )  { set_intensity_75_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_75_max"              ) == 0 )  { set_intensity_75_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_90_min"              ) == 0 )  { set_intensity_90_min              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_90_max"              ) == 0 )  { set_intensity_90_max              (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_user_min"            ) == 0 )  { set_intensity_user_min            (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_user_max"            ) == 0 )  { set_intensity_user_max            (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_sum_min"             ) == 0 )  { set_intensity_sum_min             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intensity_sum_max"             ) == 0 )  { set_intensity_sum_max             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_dist_min"             ) == 0 )  { set_centroid_dist_min             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-centroid_dist_max"             ) == 0 )  { set_centroid_dist_max             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-boundary_dist_min"             ) == 0 )  { set_boundary_dist_min             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-boundary_dist_max"             ) == 0 )  { set_boundary_dist_max             (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-convex_hull_dist_min"          ) == 0 )  { set_convex_hull_dist_min          (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-convex_hull_dist_max"          ) == 0 )  { set_convex_hull_dist_max          (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-angle_diff_min"                ) == 0 )  { set_angle_diff_min                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-angle_diff_max"                ) == 0 )  { set_angle_diff_max                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_diff_min"               ) == 0 )  { set_aspect_diff_min               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_diff_max"               ) == 0 )  { set_aspect_diff_max               (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_ratio_min"                ) == 0 )  { set_area_ratio_min                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-area_ratio_max"                ) == 0 )  { set_area_ratio_max                (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intersection_over_area_min"    ) == 0 )  { set_intersection_over_area_min    (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-intersection_over_area_max"    ) == 0 )  { set_intersection_over_area_max    (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_ratio_min"           ) == 0 )  { set_curvature_ratio_min           (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_ratio_max"           ) == 0 )  { set_curvature_ratio_max           (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-complexity_ratio_min"          ) == 0 )  { set_complexity_ratio_min          (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-complexity_ratio_max"          ) == 0 )  { set_complexity_ratio_max          (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-percentile_intensity_ratio_min") == 0 )  { set_percentile_intensity_ratio_min(atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-percentile_intensity_ratio_max") == 0 )  { set_percentile_intensity_ratio_max(atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-interest_min"                  ) == 0 )  { set_interest_min                  (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-interest_max"                  ) == 0 )  { set_interest_max                  (atof(a[j + 1].c_str()));  a.shift_down(j, 2); }
 
       //
       //  unixtime max/min members
       //
 
-   else if ( strcmp(c, "-fcst_valid_min") == 0 )  { set_fcst_valid_min(timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_valid_max") == 0 )  { set_fcst_valid_max(timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_valid_min" ) == 0 )  { set_obs_valid_min (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_valid_max" ) == 0 )  { set_obs_valid_max (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_init_min")  == 0 )  { set_fcst_init_min (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-fcst_init_max")  == 0 )  { set_fcst_init_max (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_init_min" )  == 0 )  { set_obs_init_min  (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-obs_init_max" )  == 0 )  { set_obs_init_max  (timestring_to_unix(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_valid_min") == 0 )  { set_fcst_valid_min(timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_valid_max") == 0 )  { set_fcst_valid_max(timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_valid_min" ) == 0 )  { set_obs_valid_min (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_valid_max" ) == 0 )  { set_obs_valid_max (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_init_min")  == 0 )  { set_fcst_init_min (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_init_max")  == 0 )  { set_fcst_init_max (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_init_min" )  == 0 )  { set_obs_init_min  (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_init_max" )  == 0 )  { set_obs_init_max  (timestring_to_unix(a[j + 1].c_str()));  a.shift_down(j, 2); }
 
       //
       //  misc
       //
 
-   else if ( strcmp(c, "-mask_poly") == 0 )  { set_mask(a[j + 1]);  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-mask_poly") == 0 )  { set_mask(a[j + 1].c_str());  a.shift_down(j, 2); }
 
 
       //
@@ -2093,49 +2093,49 @@ if ( m.is_matched_toggle_set )  {
 
 for (j=0; j<(m.model.n_elements()); ++j)  {
 
-   add_model(m.model[j]);
+   add_model(m.model[j].c_str());
 
 }
 
 for (j=0; j<(m.desc.n_elements()); ++j)  {
 
-   add_desc(m.desc[j]);
+   add_desc(m.desc[j].c_str());
 
 }
 
 for (j=0; j<(m.fcst_thr.n_elements()); ++j)  {
 
-   add_fcst_thr(m.fcst_thr[j]);
+   add_fcst_thr(m.fcst_thr[j].c_str());
 
 }
 
 for (j=0; j<(m.obs_thr.n_elements()); ++j)  {
 
-   add_obs_thr(m.obs_thr[j]);
+   add_obs_thr(m.obs_thr[j].c_str());
 
 }
 
 for (j=0; j<(m.fcst_var.n_elements()); ++j)  {
 
-   add_fcst_var(m.fcst_var[j]);
+   add_fcst_var(m.fcst_var[j].c_str());
 
 }
 
 for (j=0; j<(m.fcst_lev.n_elements()); ++j)  {
 
-   add_fcst_lev(m.fcst_lev[j]);
+   add_fcst_lev(m.fcst_lev[j].c_str());
 
 }
 
 for (j=0; j<(m.obs_var.n_elements()); ++j)  {
 
-   add_obs_var(m.obs_var[j]);
+   add_obs_var(m.obs_var[j].c_str());
 
 }
 
 for (j=0; j<(m.obs_lev.n_elements()); ++j)  {
 
-   add_obs_lev(m.obs_lev[j]);
+   add_obs_lev(m.obs_lev[j].c_str());
 
 }
 

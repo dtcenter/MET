@@ -64,12 +64,12 @@ int fd = -1;
 int j;
 // int pos;
 size_t n_read, bytes;
-ConcatString input_filename = argv[1];
+ConcatString input_filename = (string)argv[1];
 DbfHeader h;
 DbfSubRecord sr;
 
 
-if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
+if ( (fd = met_open(input_filename.c_str(), O_RDONLY)) < 0 )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open input file \""
@@ -79,7 +79,7 @@ if ( (fd = met_open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
 }
 
-cout << get_short_name(input_filename) << '\n';
+cout << get_short_name(input_filename.c_str()) << '\n';
 
    //
    //  main header
@@ -157,8 +157,10 @@ for (j=0; j<(h.n_records); ++j)  {
 
    }
 
-   buf[h.record_length] = 0;
-
+   if ( h.record_length < buf_size) {
+     buf[h.record_length] = 0;
+   }
+   
    cout << "Record " << j << " ...\n";
 
    // cout << "   \"" << ((char *) buf) << "\"\n";

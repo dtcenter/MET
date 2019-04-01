@@ -164,7 +164,7 @@ R_index = T_index = 0;
         << "Merge Config File: "   << merge_config_file   << "\n";
 
    // Read the config files
-   engine.conf_info.read_config(default_config_file, match_config_file);
+   engine.conf_info.read_config(default_config_file.c_str(), match_config_file.c_str());
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -172,7 +172,7 @@ R_index = T_index = 0;
 
 
    // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
@@ -180,7 +180,7 @@ R_index = T_index = 0;
 
 
    // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
@@ -424,7 +424,7 @@ void ModeExecutive::do_match_merge()
 
    // Do the forecast merging
 
-   engine.do_fcst_merging(default_config_file, merge_config_file);
+   engine.do_fcst_merging(default_config_file.c_str(), merge_config_file.c_str());
 
    mlog << Debug(2)
         << "Performing merging ("
@@ -433,7 +433,7 @@ void ModeExecutive::do_match_merge()
 
    // Do the observation merging
 
-   engine.do_obs_merging(default_config_file, merge_config_file);
+   engine.do_obs_merging(default_config_file.c_str(), merge_config_file.c_str());
 
    mlog << Debug(2)
         << "Remaining: " << engine.n_fcst << " forecast objects "
@@ -597,7 +597,7 @@ build_outfile_name(".ps", ps_file);
 //
 mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
 
-plot.open(ps_file);
+plot.open(ps_file.c_str());
 
 plot.make_plot();
 
@@ -715,7 +715,7 @@ void ModeExecutive::write_obj_stats()
    //
    // Open output stat file
    //
-   out.open(stat_file);
+   out.open(stat_file.c_str());
 
    if(!out) {
       mlog << Error << "\nwrite_obj_stats() -> "
@@ -749,7 +749,7 @@ void ModeExecutive::write_obj_stats()
       // Create output stats file for forecast merging
       //
       build_outfile_name("_fcst_merge.txt", stat_file);
-      out.open(stat_file);
+      out.open(stat_file.c_str());
 
       if(!out) {
          mlog << Error << "\nwrite_obj_stats() -> "
@@ -781,7 +781,7 @@ void ModeExecutive::write_obj_stats()
       // Create output stats file for observation merging
       //
       build_outfile_name("_obs_merge.txt", stat_file);
-      out.open(stat_file);
+      out.open(stat_file.c_str());
 
       if(!out) {
          mlog << Error << "\nwrite_obj_stats() -> "
@@ -871,7 +871,7 @@ if ( info.all_false() )  return;
    // NOTE: must multiply longitudes throughout by -1 to convert from
    // degrees_west to degree_east
    //
-   f_out = open_ncfile(out_file, true);
+   f_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "
@@ -884,9 +884,9 @@ if ( info.all_false() )  return;
 
    // Add global attributes
    write_netcdf_global(f_out, out_file.text(), program_name,
-                       engine.conf_info.model,
-                       engine.conf_info.obtype,
-                       engine.conf_info.desc);
+                       engine.conf_info.model.c_str(),
+                       engine.conf_info.obtype.c_str(),
+                       engine.conf_info.desc.c_str());
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
@@ -967,8 +967,8 @@ if ( info.all_false() )  return;
 
    }
 
-   if (    ! put_nc_data(&fcst_thresh_var, (const char *) fcst_thresh)
-        || ! put_nc_data(& obs_thresh_var, (const char *)  obs_thresh) )  {
+   if (    ! put_nc_data(&fcst_thresh_var, fcst_thresh.c_str())
+        || ! put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
 
          mlog << Error
               << "write_obj_netcdf() -> "
@@ -982,14 +982,14 @@ if ( info.all_false() )  return;
       //  fcst and obs values for variable, level and units
       //
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->name(),       "fcst_variable", "fcst_variable_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->name(),         "obs_variable",  "obs_variable_length");
+   nc_add_string(f_out, engine.conf_info.fcst_info->name().c_str(),       "fcst_variable", "fcst_variable_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->name().c_str(),         "obs_variable",  "obs_variable_length");
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->level_name(), "fcst_level",    "fcst_level_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->level_name(),   "obs_level",     "obs_level_length");
+   nc_add_string(f_out, engine.conf_info.fcst_info->level_name().c_str(), "fcst_level",    "fcst_level_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->level_name().c_str(),   "obs_level",     "obs_level_length");
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->units(),      "fcst_units",    "fcst_units_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->units(),        "obs_units",     "obs_units_length");
+   nc_add_string(f_out, engine.conf_info.fcst_info->units().c_str(),      "fcst_units",    "fcst_units_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->units().c_str(),        "obs_units",     "obs_units_length");
 
 
 
@@ -1069,38 +1069,56 @@ if ( info.all_false() )  return;
 
             //
             // Get raw values and object ID's for each grid box
-            //
+            // Extra NULL checks to satisfy Fortify
+	 
+         if ( info.do_raw &&
+	        fcst_raw_data != NULL && obs_raw_data != NULL &&
+	        engine.fcst_raw != NULL && engine.obs_raw != NULL  )  {
 
-         if ( info.do_raw )  {
-
-            fcst_raw_data[n] = engine.fcst_raw->data (x, y);
+             fcst_raw_data[n] = engine.fcst_raw->data (x, y);
              obs_raw_data[n] = engine.obs_raw->data  (x, y);
 
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw )  fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
-            if ( info.do_object_id  )  fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+	   if ( info.do_object_raw && fcst_obj_raw_data != NULL && engine.fcst_raw != NULL ) {
+	     fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
+	   }
+           if ( info.do_object_id && fcst_obj_data != NULL && engine.fcst_split != NULL ) {
+             fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+           }
          }
          else {
-            if ( info.do_object_raw )  fcst_obj_raw_data[n] = bad_data_float;
-            if ( info.do_object_id  )  fcst_obj_data[n] = bad_data_int;
+            if ( info.do_object_raw && fcst_obj_raw_data != NULL ) {
+	      fcst_obj_raw_data[n] = bad_data_float;
+	    }
+            if ( info.do_object_id && fcst_obj_data != NULL ) {
+	      fcst_obj_data[n] = bad_data_int;
+	    }
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw )  obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
-            if ( info.do_object_id  )  obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+	   if ( info.do_object_raw && obs_obj_raw_data != NULL ) {
+	     obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
+	   }
+	   if ( info.do_object_id && obs_obj_data != NULL ) {
+	     obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+	   }
          }
          else {
-            if ( info.do_object_raw )  obs_obj_raw_data[n] = bad_data_float;
-            if ( info.do_object_id  )  obs_obj_data[n] = bad_data_int;
+	   if ( info.do_object_raw && obs_obj_raw_data != NULL) {
+	     obs_obj_raw_data[n] = bad_data_float;
+	   }
+           if ( info.do_object_id && obs_obj_data != NULL ) {
+	     obs_obj_data[n] = bad_data_int;
+	   }
          }
 
             //
             // Get cluster object ID's for each grid box
             //
 
-         if ( info.do_cluster_id )  {
+         if ( info.do_cluster_id && fcst_clus_data != NULL && obs_clus_data != NULL)  {
 
                // Write the index of the cluster object
             if ( engine.fcst_clus_split->data(x, y) > 0 ) {
@@ -1571,7 +1589,7 @@ void ModeExecutive::write_ct_stats()
    //
    // Open output stat file
    //
-   out.open(stat_file);
+   out.open(stat_file.c_str());
 
    if(!out) {
       mlog << Error << "\nwrite_ct_stats() -> "
@@ -1610,7 +1628,7 @@ void ModeExecutive::write_ct_stats()
    // Write out the MODE contingecy table header columns
    //
    for(i=0; i<n_mode_cts_columns; i++) {
-      cts_at.set_entry(0, i + n_mode_hdr_columns, mode_cts_columns[i]);
+     cts_at.set_entry(0, i + n_mode_hdr_columns, (string)mode_cts_columns[i]);
    }
 
    //

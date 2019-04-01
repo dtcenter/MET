@@ -469,7 +469,7 @@ class GribFileRep {
       unsigned char * buf;
       size_t buf_size;
 
-      int n_records;
+      unsigned int n_records;
       int n_alloc;
 
       RecordInfo * record_info;

@@ -135,7 +135,7 @@ void AsciiHeaderLine::set_col_names(const char *s) {
    for(int i=0; i<ColNames.n_elements(); i++) {
 
       // Check for the variable index column
-      if(check_reg_exp(var_index_reg_exp, ColNames[i])) {
+     if(check_reg_exp(var_index_reg_exp, ColNames[i].c_str())) {
 
          // Can only have one variable index column
          if(VarIndexName.nonempty()) {
@@ -152,11 +152,11 @@ void AsciiHeaderLine::set_col_names(const char *s) {
          VarIndexOffset = i;
 
          // Update the variable column name
-         ColNames.set(i, VarIndexName);
+         ColNames.set(i, (string)VarIndexName);
       }
 
       // Check for a variable length column
-      else if(strstr(ColNames[i], var_col_name_str) != 0) {
+     else if(strstr(ColNames[i].c_str(), var_col_name_str) != 0) {
 
          // Check that the variable index column has already been set
          if(VarIndexName.empty()) {
@@ -223,8 +223,8 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
 
       // Search for column names using regular expressions
       for(i=0, match=bad_data_int; i<ColNames.n_elements(); i++) {
-         reg_exp.format("^%s$", ColNames[i]);
-         if(check_reg_exp(reg_exp, name)) {
+	reg_exp.format("^%s$", ColNames[i].c_str());
+	if(check_reg_exp(reg_exp.c_str(), name)) {
             match = i;
             break;
          }
@@ -309,7 +309,7 @@ ConcatString AsciiHeaderLine::col_name(const int offset, int const dim) const {
       else {
          i = VarBegOffset + (offset - VarBegOffset) % NVarCols;
          str << cs_erase << (offset - VarBegOffset) / NVarCols + 1;
-         name = str_replace(ColNames[i], "[0-9]*", str);
+         name = str_replace(ColNames[i].c_str(), "[0-9]*", str.c_str());
       } // end else
    }
 
@@ -402,13 +402,13 @@ void AsciiHeader::read(const char *version) {
    if(!Versions.has(version)) {
 
       // Substitute in the current version and handle MET_BASE
-      file_name = replace_path(str_replace(header_file_tmpl, "VERSION", version));
+     file_name = replace_path(str_replace(header_file_tmpl, "VERSION", version).c_str());
 
       mlog << Debug(4)
            << "Reading MET header columns:\n" << file_name << "\n";
 
       // Open the data file
-      if(!in.open(file_name)) {
+      if(!in.open(file_name.c_str())) {
          mlog << Error << "\nAsciiHeader::read() -> "
               << "trouble reading file:\n" << file_name << "\n\n";
          exit(1);

@@ -249,9 +249,9 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
    set_fcst(fcst_wd);
    set_obs(obs_wd);
 
-   path = replace_path(conf_info.object_pi.color_table);
+   path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   ctable.read(path);
+   ctable.read(path.c_str());
 
    return;
 
@@ -275,9 +275,9 @@ void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs
    set_fcst_no_conv (fcst_wd);
    set_obs_no_conv  ( obs_wd);
 
-   path = replace_path(conf_info.object_pi.color_table);
+   path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   ctable.read(path);
+   ctable.read(path.c_str());
 
    return;
 
@@ -1292,8 +1292,8 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
       fcst_engine->conf_info.read_config(default_config, merge_config);
       fcst_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
                                             conf_info.obs_info->file_type());
-      path = replace_path(fcst_engine->conf_info.object_pi.color_table);
-      fcst_engine->ctable.read(path);
+      path = replace_path(fcst_engine->conf_info.object_pi.color_table.c_str());
+      fcst_engine->ctable.read(path.c_str());
    }
 
    //
@@ -1454,8 +1454,8 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
       obs_engine->conf_info.read_config(default_config, merge_config);
       obs_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
                                            conf_info.obs_info->file_type());
-      path = replace_path(obs_engine->conf_info.object_pi.color_table);
-      obs_engine->ctable.read(path);
+      path = replace_path(obs_engine->conf_info.object_pi.color_table.c_str());
+      obs_engine->ctable.read(path.c_str());
    }
 
    //
@@ -2689,7 +2689,7 @@ void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
 {
 
    int i, c;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    //
    // Write out the MODE header columns
@@ -2710,13 +2710,13 @@ void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
    //
    c = METHdrTable.header(met_version, "MODE", "OBJ")->col_offset("INTENSITY_USER");
    if(nint(eng.conf_info.inten_perc_value) == 101) {
-      strcpy(tmp_str, "INTENSITY_MEAN");
+      tmp_str = "INTENSITY_MEAN";
    }
    else if(nint(eng.conf_info.inten_perc_value) == 102) {
-      strcpy(tmp_str, "INTENSITY_SUM");
+      tmp_str = "INTENSITY_SUM";
    }
    else {
-      snprintf(tmp_str, sizeof(tmp_str), "INTENSITY_%d",
+     tmp_str.format("INTENSITY_%d",
                nint(eng.conf_info.inten_perc_value));
    }
    at.set_entry(row, c, tmp_str);
@@ -2735,7 +2735,7 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
    // Version
    at.set_entry(row, c++,
-                met_version);
+                (string)met_version);
 
    // Model Name
    at.set_entry(row, c++,
@@ -2821,7 +2821,7 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                        AsciiTable &at, const int row) {
    int i, c;
    double lat, lon;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    if(n >= eng.n_fcst) {
       mlog << Error << "\nwrite_fcst_single(const ModeFuzzyEngine &, int, "
@@ -2836,12 +2836,12 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "F%03d", (n+1));
+   tmp_str.format("F%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.fcst_set_number(n + 1);
-   snprintf(tmp_str, sizeof(tmp_str), "CF%03d", (i + 1));
+   tmp_str.format("CF%03d", (i + 1));
    at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
@@ -2938,7 +2938,7 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                       AsciiTable &at, const int row) {
    int i, c;
    double lat, lon;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    if(n >= eng.n_obs) {
       mlog << Error << "\nwrite_obs_single(const ModeFuzzyEngine &, int, "
@@ -2953,12 +2953,12 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "O%03d", (n+1));
+   tmp_str.format("O%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.obs_set_number(n + 1);
-   snprintf(tmp_str, sizeof(tmp_str), "CO%03d", (i + 1));
+   tmp_str.format("CO%03d", (i + 1));
    at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
@@ -3054,7 +3054,7 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const int n_o,
                 AsciiTable &at, int &row) {
    int n, i, c, fcst_i, obs_i;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    if(n_f >= eng.n_fcst || n_o >= eng.n_obs) {
       mlog << Error << "\nwrite_pair(const ModeFuzzyEngine &, int, int, "
@@ -3079,13 +3079,13 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "F%03d_O%03d", (n_f+1), (n_o+1));
+   tmp_str.format("F%03d_O%03d", (n_f+1), (n_o+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    fcst_i = eng.collection.fcst_set_number(n_f+1);
    obs_i  = eng.collection.obs_set_number(n_o+1);
-   snprintf(tmp_str, sizeof(tmp_str), "CF%03d_CO%03d", (fcst_i+1), (obs_i+1));
+   tmp_str.format("CF%03d_CO%03d", (fcst_i+1), (obs_i+1));
    at.set_entry(row, c++, tmp_str);
 
    //
@@ -3160,7 +3160,7 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                           AsciiTable &at, const int row) {
    int i, c;
    double lat, lon;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    // Write out the common header columns
    write_header_columns(eng, grid, at, row);
@@ -3168,7 +3168,7 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "CF%03d", (n+1));
+   tmp_str.format("CF%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
@@ -3268,7 +3268,7 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                          AsciiTable &at, const int row) {
    int i, c;
    double lat, lon;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    // Write out the common header columns
    write_header_columns(eng, grid, at, row);
@@ -3276,7 +3276,7 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "CO%03d", (n+1));
+   tmp_str.format("CO%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
@@ -3375,7 +3375,7 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
                           AsciiTable &at, const int row) {
    int i, c;
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
 
    // Write out the common header columns
    write_header_columns(eng, grid, at, row);
@@ -3383,7 +3383,7 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    c = n_mode_hdr_columns;
 
    // Object ID
-   snprintf(tmp_str, sizeof(tmp_str), "CF%03d_CO%03d", (n+1), (n+1));
+   tmp_str.format("CF%03d_CO%03d", (n+1), (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category

@@ -77,10 +77,10 @@ int main(int argc, char *argv[]) {
    blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", NULL);
 
    // Block the PrepBufr file and open it for reading.
-   pblock(pb_file, blk_file, block);
+   pblock(pb_file.c_str(), blk_file.c_str(), block);
 
    // Open the blocked temp PrepBufr file for reading
-   openpb_(blk_file, &file_unit);
+   openpb_(blk_file.c_str(), &file_unit);
 
    // Read the first PrepBufr message
    ireadns_(&file_unit, hdr_typ, &i_date);

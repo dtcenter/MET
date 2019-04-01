@@ -92,7 +92,7 @@ nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
    //
 
 write_netcdf_global(&out, output_filename, "MTD",
-                    config.model, config.obtype, config.desc);
+                    config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
 write_nc_grid(out, fcst_raw.grid());
 
@@ -191,7 +191,7 @@ nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
    //
 
 write_netcdf_global(&out, output_filename, "MTD",
-                    config.model, config.obtype, config.desc);
+                    config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
 write_nc_grid(out, raw.grid());
 

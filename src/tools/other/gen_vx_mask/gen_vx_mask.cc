@@ -109,7 +109,7 @@ void process_command_line(int argc, char **argv) {
    if(argc == 1) usage();
 
    // Initialize the configuration object
-   config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_const_filename).c_str());
 
    // Parse the command line into tokens
    cline.set(argc, argv);
@@ -165,11 +165,11 @@ void process_input_file(DataPlane &dp) {
 
    // Get the gridded file type from the data config string, if present
    if(input_field_str.length() > 0) {
-      config.read_string(input_field_str);
+      config.read_string(input_field_str.c_str());
       ftype = parse_conf_file_type(&config);
    }
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename, ftype);
+   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename.c_str(), ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\nprocess_input_file() -> "
            << "can't open input file \"" << input_filename << "\"\n\n";
@@ -181,7 +181,7 @@ void process_input_file(DataPlane &dp) {
 
    // Read the input data plane, if requested
    if(input_field_str.length() > 0) {
-      get_data_plane(mtddf_ptr, input_field_str, dp);
+      get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
    }
    // Check for the output of a previous call to this tool
    else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
@@ -226,7 +226,7 @@ void process_mask_file(DataPlane &dp)
       mask_type == MaskType_Track) {
 
       poly_mask.clear();
-      poly_mask.load(mask_filename);
+      poly_mask.load(mask_filename.c_str());
 
       mlog << Debug(2)
            << "Parsed Lat/Lon Mask:\t" << poly_mask.name()
@@ -248,9 +248,9 @@ void process_mask_file(DataPlane &dp)
 
    // For solar masking, check for a date/time string
    else if(is_solar_masktype(mask_type) &&
-           is_datestring(mask_filename)) {
+           is_datestring(mask_filename.c_str())) {
 
-      solar_ut = timestring_to_unix(mask_filename);
+      solar_ut = timestring_to_unix(mask_filename.c_str());
 
       mlog << Debug(2)
            << "Solar Time String:\t"
@@ -267,11 +267,11 @@ void process_mask_file(DataPlane &dp)
 
       // Get the gridded file type from the mask config string, if present
       if(mask_field_str.length() > 0) {
-         config.read_string(mask_field_str);
+         config.read_string(mask_field_str.c_str());
          ftype = parse_conf_file_type(&config);
       }
 
-      mtddf_ptr = mtddf_factory.new_met_2d_data_file(mask_filename, ftype);
+      mtddf_ptr = mtddf_factory.new_met_2d_data_file(mask_filename.c_str(), ftype);
       if(!mtddf_ptr) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "can't open gridded mask data file \"" << mask_filename << "\"\n\n";
@@ -308,7 +308,7 @@ void process_mask_file(DataPlane &dp)
               << "\"solar_azi\" masking.\n\n";
          exit(1);
       }
-      get_data_plane(mtddf_ptr, mask_field_str, dp);
+      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
       solar_ut = dp.valid();
       dp.clear();
 
@@ -328,7 +328,7 @@ void process_mask_file(DataPlane &dp)
               << "\"data\" masking.\n\n";
          exit(1);
       }
-      get_data_plane(mtddf_ptr, mask_field_str, dp);
+      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
 
    } else { // Otherwise, initialize the masking data
 
@@ -447,7 +447,7 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
    MetNcMetDataFile *mnmdf_ptr = (MetNcMetDataFile *) mtddf_ptr;
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, "MET_tool", tool)) return(status);
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string)"MET_tool", tool)) return(status);
 
    // Check for gen_vx_mask output
    if(tool != program_name) return(status);
@@ -461,7 +461,7 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
       // Read the first non-lat/lon variable
       config_str << "'name=\"" << mnmdf_ptr->MetNc->Var[i].name << "\"; level=\"(*,*)\";'";
-      get_data_plane(mtddf_ptr, config_str, dp);
+      get_data_plane(mtddf_ptr, config_str.c_str(), dp);
       status = true;
       break;
    }
@@ -1156,7 +1156,7 @@ void write_netcdf(const DataPlane &dp) {
    NcVar mask_var;
 
    // Create a new NetCDF file and open it.
-   f_out = open_ncfile(out_filename, true);
+   f_out = open_ncfile(out_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
@@ -1169,7 +1169,7 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    // Add global attributes
-   write_netcdf_global(f_out, out_filename, program_name);
+   write_netcdf_global(f_out, out_filename.c_str(), program_name);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
@@ -1207,9 +1207,9 @@ void write_netcdf(const DataPlane &dp) {
 
    // Write the solar time
    if(is_solar_masktype(mask_type)) {
-      char time_str[max_str_len];
+      ConcatString time_str;
       unix_to_yyyymmdd_hhmmss(solar_ut, time_str);
-      add_att(&mask_var, "solar_time", time_str);
+      add_att(&mask_var, "solar_time", time_str.text());
    }
 
    // Write out the times
@@ -1388,7 +1388,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_type(const StringArray & a) {
-   mask_type = string_to_masktype(a[0]);
+   mask_type = string_to_masktype(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1430,25 +1430,25 @@ void set_symdiff(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_thresh(const StringArray & a) {
-   thresh.set(a[0]);
+   thresh.set(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_height(const StringArray & a) {
-   height = atoi(a[0]);
+   height = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_width(const StringArray & a) {
-   width = atoi(a[0]);
+   width = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_value(const StringArray & a) {
-   mask_val = atof(a[0]);
+   mask_val = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1470,13 +1470,13 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1486,7 +1486,7 @@ void set_shapeno(const StringArray & a)
 
 {
 
-shape_number = atoi(a[0]);
+shape_number = atoi(a[0].c_str());
 
 if ( shape_number < 0 )  {
 
@@ -1510,7 +1510,7 @@ void get_shapefile_outline(ShpPolyRecord & cur_shape)
 
 
 int j;
-const char * const shape_filename = mask_filename;
+const char * const shape_filename = mask_filename.c_str();
 ShpFile f;
 ShpPolyRecord & pr = cur_shape;
 

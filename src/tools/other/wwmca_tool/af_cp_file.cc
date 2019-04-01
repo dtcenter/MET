@@ -190,6 +190,8 @@ if ( ::read(fd, Buf, bytes) != bytes )  {
    mlog << Error << "\nAFCloudPctFile::read(const char *) -> "
         << "read error on file \"" << filename << "\"\n\n";
 
+   ::close(fd);
+
    return ( false );
 
 }

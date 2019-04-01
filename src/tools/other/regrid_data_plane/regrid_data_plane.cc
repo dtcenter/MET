@@ -239,9 +239,9 @@ void process_command_line(int argc, char **argv) {
    }
 
    ConcatString att_val;
-   if (get_global_att(InputFilename, "scene_id", att_val)) {
-      if (0 == strcmp(att_val,"Full Disk") || 0 == strcmp(att_val,"CONUS")
-          || 0 == strcmp(att_val,"Mesoscale"))
+   if (get_global_att(InputFilename.c_str(), (string)"scene_id", att_val)) {
+      if ( att_val == "Full Disk" ||  att_val =="CONUS"
+          || att_val == "Mesoscale" )
       set_goes_interpolate_option();
    }
 
@@ -268,8 +268,8 @@ void process_data_file() {
    
    // Initialize configuration object
    MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read_string(FieldSA[0]);
+   config.read(replace_path(config_const_filename).c_str());
+   config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
    if (compress_level < 0) compress_level = config.nc_compression();
@@ -283,7 +283,7 @@ void process_data_file() {
 
    // Determine the "from" grid
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
-   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename, ftype);
+   fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!fr_mtddf) {
       mlog << Error << "\nprocess_data_file() -> "
@@ -309,7 +309,7 @@ void process_data_file() {
    // For python types read the first field to set the grid
    if(ftype == FileType_Python_Numpy ||
       ftype == FileType_Python_Xarray) {
-      config.read_string(FieldSA[0]);
+      config.read_string(FieldSA[0].c_str());
       vinfo->set_dict(config);
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
          mlog << Error << "\nTrouble reading data from file \""
@@ -321,7 +321,7 @@ void process_data_file() {
    fr_grid = fr_mtddf->grid();
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
 
-   bool is_geostationary = (0 == strcmp(fr_grid.name(), "geostationary"));
+   bool is_geostationary = ( fr_grid.name() == "geostationary" );
    
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
@@ -346,14 +346,14 @@ void process_data_file() {
       grid_map_file.add(make_geostationary_filename(fr_grid, to_grid));
       geostationary_file.add("/");
       geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, false));
-      if (file_exists(grid_map_file)) {
+      if (file_exists(grid_map_file.c_str())) {
          run_cs << " with " << grid_map_file;
       }
       else if ((env_coord_name != NULL) && (strlen(env_coord_name) > 0)
                 && file_exists(env_coord_name)) {
          run_cs << " with " << env_coord_name;
       }
-      else if (file_exists(geostationary_file)) {
+      else if (file_exists(geostationary_file.c_str())) {
          run_cs << " with " << geostationary_file;
       }
    }
@@ -372,7 +372,7 @@ void process_data_file() {
          exit(1);
       }
       
-      nc_in = open_ncfile(InputFilename);
+      nc_in = open_ncfile(InputFilename.c_str());
       
       multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
       
@@ -399,7 +399,7 @@ void process_data_file() {
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i]);
+      config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
       if (is_geostationary) {
@@ -449,13 +449,13 @@ void process_data_file() {
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname);
+      write_nc(to_dp, to_grid, vinfo, vname.c_str());
       
       if (is_geostationary) {
-         NcVar to_var = get_nc_var(nc_out, vname);
-         NcVar var_data = get_nc_var(nc_in, vinfo->name());
+         NcVar to_var = get_nc_var(nc_out, vname.c_str());
+         NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
          for (int idx=0; idx<global_attr_count; idx++) {
-            copy_nc_att(nc_in, &to_var, GOES_global_attr_names[idx]);
+	   copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
          }
          copy_nc_atts(&var_data, &to_var, opt_all_attrs);
       }
@@ -490,7 +490,7 @@ void process_data_file() {
 void open_nc(const Grid &grid, ConcatString run_cs) {
 
    // Create output file
-   nc_out = open_ncfile(OutputFilename, true);
+   nc_out = open_ncfile(OutputFilename.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nopen_nc() -> "
@@ -500,7 +500,7 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, OutputFilename, program_name);
+   write_netcdf_global(nc_out, OutputFilename.c_str(), program_name.c_str());
 
    // Add the run command
    add_att(nc_out, "RunCommand", run_cs);
@@ -625,7 +625,7 @@ unixtime find_valid_time(multimap<string,NcVar> mapVar) {
       if ((*itVar).first == "t" || (*itVar).first == "time") {
          from_var = (*itVar).second;
          get_nc_data(&from_var, time_values);
-         get_nc_att(&from_var, "units", time_unit);
+	 get_nc_att(&from_var, (string)"units", time_unit);
          valid_time = get_reference_unixtime(time_unit);
          valid_time += (unixtime)nint(time_values[0]);
          mlog << Debug(2) << method_name << "valid time: " << time_values[0]
@@ -667,7 +667,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       cur_coord_name = tmp_coord_name;
    }
    else {
-      if (file_exists(geostationary_file)) {
+      if (file_exists(geostationary_file.c_str())) {
          has_coord_input = true;
          cur_coord_name = geostationary_file;
       }
@@ -677,7 +677,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    NcFile *coord_nc_in = (NcFile *)0;
    if (has_coord_input) {
       mlog << Debug(2)  << method_name << " Reading coord file: " << cur_coord_name << "\n";
-      coord_nc_in = open_ncfile(cur_coord_name);
+      coord_nc_in = open_ncfile(cur_coord_name.c_str());
       if (!IS_INVALID_NC_P(coord_nc_in)) {
          from_lat_count = get_lat_count(coord_nc_in);
          from_lon_count = get_lon_count(coord_nc_in);
@@ -722,7 +722,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
             }
          }
          else {
-            FILE *pFile = fopen ( cur_coord_name, "rb" );
+            FILE *pFile = met_fopen ( cur_coord_name.c_str(), "rb" );
             fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
             fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
@@ -776,7 +776,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
             grid_data.compute_lat_lon();
             latitudes = grid_data.lat_values;
             longitudes = grid_data.lon_values;
-            if (!file_exists(geostationary_file)) {
+            if (!file_exists(geostationary_file.c_str())) {
                save_geostationary_data(geostationary_file,
                      latitudes, longitudes, grid_data);
             }
@@ -911,12 +911,12 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
          if (str_arr.n_elements() == 2) {
             if (map_data) {
                cell_index_arr.clear();
-               to_offset = atoi(str_arr[0]);
+               to_offset = atoi(str_arr[0].c_str());
                if ((to_offset >= 0) && (to_offset < map_size)) {
                   cell_index_arr.parse_delim(str_arr[1], ",");
                   if (0 < cell_index_arr.n_elements()) map_count++;
                   for (int idx=0; idx<cell_index_arr.n_elements(); idx++) {
-                     coord_offset = atoi(cell_index_arr[idx]);
+                     coord_offset = atoi(cell_index_arr[idx].c_str());
                      if (coord_offset >= 0) {
                         cellMapping[to_offset].add(coord_offset);
                      }
@@ -927,8 +927,8 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                        << to_offset  << "is out of range\n";
                }
             }
-            else if ( strcasecmp(str_arr[0], "nx") == 0 )  {
-               nx = atoi(str_arr[1]);
+            else if ( strcasecmp(str_arr[0].c_str(), "nx") == 0 )  {
+ 	       nx = atoi(str_arr[1].c_str());
                if ((nx > 0) && (ny > 0)) {
                   if (cellMapping == 0) {
                      map_size = nx * ny;
@@ -939,8 +939,8 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                   }
                }
             }
-            else if ( strcasecmp(str_arr[0], "ny") == 0 )  {
-               ny = atoi(str_arr[1]);
+            else if ( strcasecmp(str_arr[0].c_str(), "ny") == 0 )  {
+	       ny = atoi(str_arr[1].c_str());
                if ((nx > 0) && (ny > 0)) {
                   if (cellMapping == 0) {
                      map_size = nx * ny;
@@ -988,15 +988,15 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    memset(qc_data, -99, from_data_size*sizeof(ncbyte));
    
    NcVar var_qc;
-   NcVar var_data = get_nc_var(nc_in, vinfo->name());
+   NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
    if (IS_INVALID_NC(var_data)) {
       mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
       exit(1);
    }
    
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
-   if (get_att_value_string(&var_data, "ancillary_variables", qc_var_name)) {
-      var_qc = get_nc_var(nc_in, qc_var_name);
+   if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
+      var_qc = get_nc_var(nc_in, qc_var_name.c_str());
       get_nc_data(&var_qc, qc_data);
       has_qc_var = true;
       mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
@@ -1154,7 +1154,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    add_att(nc_file, "Conventions", "CF-1.6");
    
    if (has_error) {
-      remove(geostationary_file);
+      remove(geostationary_file.c_str());
       mlog << Warning << "The geostationary data file ("
            << geostationary_file << ") was not saved!\n";
    }
@@ -1320,14 +1320,14 @@ void set_field(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_method(const StringArray &a) {
-   RGInfo.method = string_to_interpmthd(a[0]);
+   RGInfo.method = string_to_interpmthd(a[0].c_str());
    opt_override_method = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_width(const StringArray &a) {
-   RGInfo.width = atoi(a[0]);
+   RGInfo.width = atoi(a[0].c_str());
    opt_override_width = true;
 }
 
@@ -1342,7 +1342,7 @@ void set_shape(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_vld_thresh(const StringArray &a) {
-   RGInfo.vld_thresh = atof(a[0]);
+   RGInfo.vld_thresh = atof(a[0].c_str());
    if(RGInfo.vld_thresh > 1 || RGInfo.vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
            << "-vld_thresh may only be set between 0 and 1: "
@@ -1370,13 +1370,13 @@ void set_logfile(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray &a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1387,7 +1387,7 @@ void set_qc_flags(const StringArray & a) {
 
    sa.parse_css(a[0]);
    for (int idx=0; idx<sa.n_elements(); idx++) {
-      qc_flag = atoi(sa[idx]);
+      qc_flag = atoi(sa[idx].c_str());
       if ( !qc_flags.has(qc_flag) ) qc_flags.add(qc_flag);
    }
 }

@@ -126,7 +126,7 @@ static int verbosity = 2;
 static int          n_files;
 static StringArray  req_field_list;
 static bool         field_option_used = false;
-static ConcatString field_string = "";
+static ConcatString field_string;
 static ConcatString out_filename;
 static StringArray  req_out_var_name;
 static int          i_out_var = 0;
@@ -142,7 +142,7 @@ static int          in_accum;
 static unixtime     valid_time;
 static int          out_accum;
 static StringArray  pcp_dir;
-static ConcatString pcp_reg_exp = default_reg_exp;
+static ConcatString pcp_reg_exp = (string)default_reg_exp;
 
 // Variables for the derive command
 static StringArray  file_list;
@@ -327,7 +327,7 @@ void process_command_line(int argc, char **argv) {
    //
    // Initialize the MetConfig object.
    //
-   config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_const_filename).c_str());
 
    //
    // Check the -name option.
@@ -445,7 +445,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
       if(cline.n() == 2) {
          Met2dDataFileFactory mtddf_factory;
          Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-         config.read_string(parse_config_str(req_field_list[0]));
+         config.read_string(parse_config_str(req_field_list[0].c_str()).c_str());
          GrdFileType type = parse_conf_file_type(&config);
 
          //
@@ -640,7 +640,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
       //
       for(j=0; j<pcp_dir.n_elements(); j++) {
 
-         pcp_recs[i] = search_pcp_dir(pcp_dir[j], pcp_times[i],
+         pcp_recs[i] = search_pcp_dir(pcp_dir[j].c_str(), pcp_times[i],
                                       pcp_files[i]);
 
          if(pcp_recs[i] != -1) {
@@ -686,7 +686,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
       //
       // Read data for the file.
       //
-      get_field(pcp_files[i], cur_field, init_time, pcp_times[i],
+      get_field(pcp_files[i].c_str(), cur_field.c_str(), init_time, pcp_times[i],
                 cur_grid, part);
 
       //
@@ -780,7 +780,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
       //
       // Check the file name for a matching regular expression.
       //
-      if(check_reg_exp(pcp_reg_exp, dirp->d_name) == true) {
+      if(check_reg_exp(pcp_reg_exp.c_str(), dirp->d_name) == true) {
 
          //
          // Check the current file for matching initialization,
@@ -796,7 +796,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Create a data file object.
          //
-         mtddf = factory.new_met_2d_data_file(cur_file);
+         mtddf = factory.new_met_2d_data_file(cur_file.c_str());
          if(!mtddf) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "can't open data file \"" << cur_file << "\"\n";
@@ -820,7 +820,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          ConcatString cs = field_string;
          if(cs.empty()) cs << sec_to_hhmmss(in_accum);
-         config.read_string(parse_config_str(cs));
+         config.read_string(parse_config_str(cs.c_str()).c_str());
          cur_var->set_dict(config);
 
          cur_var->set_valid(cur_ut);
@@ -880,11 +880,11 @@ void do_sub_command() {
    //
    mlog << Debug(1)
         << "Reading input file: " << file_list[0] << "\n";
-   get_field(file_list[0], field_list[0], 0, 0, grid1, plus);
+   get_field(file_list[0].c_str(), field_list[0].c_str(), 0, 0, grid1, plus);
 
    mlog << Debug(1)
         << "Reading input file: " << file_list[1] << "\n";
-   get_field(file_list[1], field_list[1], 0, 0, grid2, minus);
+   get_field(file_list[1].c_str(), field_list[1].c_str(), 0, 0, grid2, minus);
 
    //
    // Check for the same grid dimensions
@@ -995,7 +995,7 @@ void do_derive_command() {
       //
       // Read the current field.
       //
-      get_field(file_list[i], field_list[i], 0, 0, cur_grid, cur_dp);
+      get_field(file_list[i].c_str(), field_list[i].c_str(), 0, 0, cur_grid, cur_dp);
 
       //
       // Initialize
@@ -1128,19 +1128,19 @@ void do_derive_command() {
       //
       // Write the current derived field.
       //
-      if(strcasecmp(derive_list[i], "sum") == 0) {
+      if(strcasecmp(derive_list[i].c_str(), "sum") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum_sum,
-                       sum_dp, derive_list[i], "Sum of ");
+                       sum_dp, derive_list[i].c_str(), "Sum of ");
       }
-      else if(strcasecmp(derive_list[i], "min") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "min") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       min_dp, derive_list[i], "Minimum Value of ");
+                       min_dp, derive_list[i].c_str(), "Minimum Value of ");
       }
-      else if(strcasecmp(derive_list[i], "max") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "max") == 0) {
       write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                    max_dp, derive_list[i], "Maximum Value of ");
+                    max_dp, derive_list[i].c_str(), "Maximum Value of ");
       }
-      else if(strcasecmp(derive_list[i], "range") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "range") == 0) {
          der_dp = max_dp;
          for(j=0; j<nxy; j++) {
             if(is_bad_data(max_dp.data()[j]) ||
@@ -1152,9 +1152,9 @@ void do_derive_command() {
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       der_dp, derive_list[i], "Range of ");
+                       der_dp, derive_list[i].c_str(), "Range of ");
       }
-      else if(strcasecmp(derive_list[i], "mean") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "mean") == 0) {
          der_dp = sum_dp;
          for(j=0; j<nxy; j++) {
             if(is_bad_data(sum_dp.data()[j]) ||
@@ -1167,9 +1167,9 @@ void do_derive_command() {
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       der_dp, derive_list[i], "Mean Value of ");
+                       der_dp, derive_list[i].c_str(), "Mean Value of ");
       }
-      else if(strcasecmp(derive_list[i], "stdev") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "stdev") == 0) {
          der_dp = sum_dp;
          for(j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
@@ -1186,12 +1186,12 @@ void do_derive_command() {
             }
          }
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       der_dp, derive_list[i],
+                       der_dp, derive_list[i].c_str(),
                        "Standard Deviation of ");
       }
-      else if(strcasecmp(derive_list[i], "vld_count") == 0) {
+      else if(strcasecmp(derive_list[i].c_str(), "vld_count") == 0) {
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
-                       vld_dp, derive_list[i], "Valid Data Count of ");
+                       vld_dp, derive_list[i].c_str(), "Valid Data Count of ");
       }
    } // end for i
 
@@ -1221,7 +1221,7 @@ void get_field(const char *filename, const char *cur_field,
    //
    // Parse the config string
    //
-   config.read_string(config_str);
+   config.read_string(config_str.c_str());
 
    //
    // Get the gridded file type from config string, if present.
@@ -1297,7 +1297,7 @@ void open_nc(const Grid &grid) {
         << "Creating output file: " << out_filename << "\n";
 
    // Create a new NetCDF file and open it.
-   nc_out = open_ncfile(out_filename, true);
+   nc_out = open_ncfile(out_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nopen_nc() -> "
@@ -1309,7 +1309,7 @@ void open_nc(const Grid &grid) {
    }
 
    // Add global attributes.
-   write_netcdf_global(nc_out, out_filename, program_name);
+   write_netcdf_global(nc_out, out_filename.c_str(), program_name.c_str());
 
    if(run_command == sum) {
       command_str << cs_erase
@@ -1331,7 +1331,7 @@ void open_nc(const Grid &grid) {
                   << n_files << " files.";
    }
 
-   add_att(nc_out, "RunCommand", (const char *) command_str);
+   add_att(nc_out, "RunCommand", command_str.c_str());
 
    // Add the projection information.
    write_netcdf_proj(nc_out, grid);
@@ -1373,7 +1373,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       if(nc_accum == 0) {
          var_str = var_info->name();
          cs      = var_info->level_name();
-         if(!check_reg_exp("[\\(\\*\\,\\)]", cs)) var_str << "_" << cs;
+         if(!check_reg_exp("[\\(\\*\\,\\)]", cs.c_str())) var_str << "_" << cs;
       }
       //
       // For non-zero accum, use the name and accumulation interval.
@@ -1417,15 +1417,15 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    if(deflate_level < 0) deflate_level = config.nc_compression();
 
    // Define Variable.
-   nc_var = add_var(nc_out, (const char *) var_str, ncFloat,
+   nc_var = add_var(nc_out, var_str.c_str(), ncFloat,
                     lat_dim, lon_dim, deflate_level);
 
    // Add variable attributes.
-   add_att(&nc_var, "name",  (const char *) var_str);
+   add_att(&nc_var, "name",  var_str.c_str());
    if(run_command == der) cs = long_name_prefix;
    else                   cs.clear();
    cs << var_info->long_name();
-   add_att(&nc_var, "long_name", (const char *) cs);
+   add_att(&nc_var, "long_name", cs.c_str());
 
    // Ouput level string.
    if(nc_accum != 0) {
@@ -1438,8 +1438,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       var_str << cs_erase << var_info->level().name();
    }
 
-   add_att(&nc_var, "level", (const char *) var_str);
-   add_att(&nc_var, "units", (const char *) var_info->units());
+   add_att(&nc_var, "level", var_str.c_str());
+   add_att(&nc_var, "units", var_info->units().c_str());
    add_att(&nc_var, "_FillValue", bad_data_float);
 
    //
@@ -1671,7 +1671,7 @@ void set_derive(const StringArray & a) {
    // Parse the derivation options
    //
    for(int i=0; i<sa.n(); i++) {
-      if(!strcasestr(derive_options, sa[i])) {
+      if(!strcasestr(derive_options, sa[i].c_str())) {
          mlog << Error << "\nset_derive() -> "
            << "\"" << sa[i] << "\" is not a supported option for the "
            << "\"-derive\" command!\n\n";
@@ -1694,7 +1694,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   verbosity = atoi(a[0]);
+   verbosity = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1725,7 +1725,7 @@ void set_name(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_vld_thresh(const StringArray & a) {
-   vld_thresh = atof(a[0]);
+   vld_thresh = atof(a[0].c_str());
    if(vld_thresh > 1 || vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
            << "the \"-vld_thresh\" command line option (" << vld_thresh
@@ -1737,7 +1737,7 @@ void set_vld_thresh(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

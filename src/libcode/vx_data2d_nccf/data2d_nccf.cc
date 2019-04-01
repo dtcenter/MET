@@ -90,14 +90,14 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
    NcVarInfo *first_data_var = NULL;
    // Store the name of the first data variable
    for (int i = 0; i < _file->Nvars; ++i) {
-      if (is_nc_unit_time(_file->Var[i].units_att) || 
-          is_nc_unit_longitude(_file->Var[i].units_att) || 
-          is_nc_unit_latitude(_file->Var[i].units_att) ||
+      if (is_nc_unit_time(_file->Var[i].units_att.c_str()) || 
+          is_nc_unit_longitude(_file->Var[i].units_att.c_str()) || 
+          is_nc_unit_latitude(_file->Var[i].units_att.c_str()) ||
           _file->get_time_var_info() == &_file->Var[i]
          ) continue;
      
-      if (strcmp(_file->Var[i].name, nccf_lat_var_name) != 0 &&
-          strcmp(_file->Var[i].name, nccf_lon_var_name) != 0) {
+      if (strcmp(_file->Var[i].name.c_str(), nccf_lat_var_name) != 0 &&
+          strcmp(_file->Var[i].name.c_str(), nccf_lon_var_name) != 0) {
          first_data_var = &(_file->Var[i]);
          break;
       }
@@ -168,17 +168,17 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   plane.clear();
 
   // Check for NA in the requested name
-  if (strcmp(vinfo_nc->req_name(), na_str) == 0)
+  if ( vinfo_nc->req_name() == na_str )
   {
     // Store the name of the first data variable
     data_var = find_first_data_var();
-    if (NULL != data_var) vinfo_nc->set_req_name(data_var->name);
+    if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
   }
 
   LongArray dimension = vinfo_nc->dimension();
 
   long time_cnt = (long)_file->ValidTime.n_elements();
-  data_var = _file->find_var_name(vinfo_nc->req_name());
+  data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
   if (NULL != data_var) {
     int time_dim_slot = data_var->t_slot;
     if (0 <= time_dim_slot) {
@@ -210,7 +210,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   // Read the data
   NcVarInfo *info = (NcVarInfo *) 0;
 
-  bool status = _file->getData(vinfo_nc->req_name(),
+  bool status = _file->getData(vinfo_nc->req_name().c_str(),
                                dimension,
                                plane, info);
 
@@ -260,13 +260,13 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       vinfo.set_name(info->name);
 
     if (info->long_name_att.length() > 0)
-      vinfo.set_long_name(info->long_name_att);
+      vinfo.set_long_name(info->long_name_att.c_str());
 
     if (info->level_att.length() > 0)
-      vinfo.set_level_name(info->level_att);
+      vinfo.set_level_name(info->level_att.c_str());
 
     if (info->units_att.length() > 0)
-      vinfo.set_units(info->units_att);
+      vinfo.set_units(info->units_att.c_str());
 
     //  print a report
     double plane_min, plane_max;
@@ -301,13 +301,13 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-   if (strcmp(vinfo_nc->req_name(), na_str) == 0) {
+   if ( vinfo_nc->req_name() == na_str ) {
       // Store the name of the first data variable
       NcVarInfo *data_var = find_first_data_var();
-      if (NULL != data_var) vinfo_nc->set_req_name(data_var->name);
+      if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
    }
 
-   NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name());
+   NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
    if (NULL == info) return(n_rec);
    
    DataPlane plane;
@@ -516,7 +516,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
 int MetNcCFDataFile::index(VarInfo &vinfo){
 
-   if( NULL == _file->find_var_name( vinfo.name() ) ) return -1;
+   if( NULL == _file->find_var_name( vinfo.name().c_str() ) ) return -1;
 
    if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
        ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||

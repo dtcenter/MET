@@ -218,7 +218,7 @@ E = g.E;
 
 F = g.F;
 
-set_name(g.Name);
+set_name(g.Name.c_str());
 
 return;
 

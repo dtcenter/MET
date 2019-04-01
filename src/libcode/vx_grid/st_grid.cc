@@ -431,7 +431,8 @@ void StereographicGrid::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
-char junk[256];
+
+ConcatString junk;
 
 
 
@@ -446,19 +447,19 @@ out << prefix << "Projection = Stereographic\n";
 
 out << prefix << "Hemisphere = " << (is_north() ? "North" : "South") << "\n";
 
-snprintf(junk, sizeof(junk), "%.5f", Lon_orient);
+junk.format("%.5f", Lon_orient);
 fix_float(junk);
 out << prefix << "Lon_orient       = " << junk << "\n";
 
-snprintf(junk, sizeof(junk), "%.5f", Alpha);
+junk.format("%.5f", Alpha);
 fix_float(junk);
 out << prefix << "Alpha      = " << junk << "\n";
 
-snprintf(junk, sizeof(junk), "%.5f", Bx);
+junk.format("%.5f", Bx);
 fix_float(junk);
 out << prefix << "Bx         = " << junk << "\n";
 
-snprintf(junk, sizeof(junk), "%.5f", By);
+junk.format("%.5f", By);
 fix_float(junk);
 out << prefix << "By         = " << junk << "\n";
 

@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void comma_string(long long i, char * output);
+extern void comma_string(long long i, ConcatString output);
 
 extern ConcatString comma_string(long long i);
 

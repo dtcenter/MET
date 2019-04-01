@@ -150,6 +150,8 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
 
 plot.file() << "\n>>\n\nimage\n\n";
 
+if ( out == NULL) { return; }
+
 for (r=0; r<(image.nrows()); ++r)  {
 
    for (c=0; c<(image.ncols()); ++c)  {

@@ -161,6 +161,8 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
 plot.file() << "\n"
             <<  ">>\n\nimage\n\n";
 
+if ( out == NULL) { return; }
+
 for (r=0; r<ny; ++r)  {
 
    for (c=0; c<nx; ++c)  {

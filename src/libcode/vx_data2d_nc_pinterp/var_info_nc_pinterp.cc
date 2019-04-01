@@ -138,7 +138,7 @@ void VarInfoNcPinterp::set_dimension(int i_dim, int dim) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
-   char tmp_str[max_str_len];
+   ConcatString tmp_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
 
    // Validate the magic string
@@ -148,11 +148,11 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
    MagicStr << cs_erase << nstr << lstr;
 
    // Set the requested name and default output name
-   set_req_name(nstr);
+   set_req_name(nstr.c_str());
    set_name(nstr);
 
    // If there's no level specification, assume (0,*, *)
-   if(strchr(lstr, '(') == NULL) {
+   if(strchr(lstr.c_str(), '(') == NULL) {
       Level.set_req_name("0,*,*");
       Level.set_name("0,*,*");
       Dimension.clear();
@@ -164,10 +164,10 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
    else {
 
       // Initialize the temp string
-      strcpy(tmp_str, lstr);
+      tmp_str = lstr;
 
       // Retreive the NetCDF level specification
-      ptr = strtok_r(tmp_str, "()", &save_ptr);
+      ptr = strtok_r((char*)tmp_str.c_str(), "()", &save_ptr);
 
       // Set the level name
       Level.set_req_name(ptr);
@@ -217,11 +217,11 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if(strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
+   if(strstr(MagicStr.c_str(), "/PROB") != NULL) PFlag = 1;
 
    // Set the long name
-   snprintf(tmp_str, sizeof(tmp_str), "%s(%s)", name().text(), Level.name().text());
-   set_long_name(tmp_str);
+   tmp_str.format("%s(%s)", name().text(), Level.name().text());
+   set_long_name(tmp_str.c_str());
 
    // Set the units
    set_units(na_str);
@@ -235,9 +235,9 @@ void VarInfoNcPinterp::set_dict(Dictionary & dict) {
 
    VarInfo::set_dict(dict);
 
-   set_magic(dict.lookup_string("name").text(),
-             dict.lookup_string("level").text());
-   set_req_name( dict.lookup_string("name") );
+   set_magic(dict.lookup_string("name"),
+             dict.lookup_string("level"));
+   set_req_name( dict.lookup_string("name").c_str() );
 
    // Check for a probability boolean setting
    if(dict.lookup_bool(conf_key_prob, false)) {
@@ -257,7 +257,7 @@ bool VarInfoNcPinterp::is_precipitation() const {
    //
    return(has_prefix(pinterp_precipitation_names,
                      n_pinterp_precipitation_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -270,7 +270,7 @@ bool VarInfoNcPinterp::is_specific_humidity() const {
    //
    return(has_prefix(pinterp_specific_humidity_names,
                      n_pinterp_specific_humidity_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -283,7 +283,7 @@ bool VarInfoNcPinterp::is_u_wind() const {
    //
    return(has_prefix(pinterp_u_wind_names,
                      n_pinterp_u_wind_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,7 +296,7 @@ bool VarInfoNcPinterp::is_v_wind() const {
    //
    return(has_prefix(pinterp_v_wind_names,
                      n_pinterp_v_wind_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ bool VarInfoNcPinterp::is_wind_speed() const {
    //
    return(has_prefix(pinterp_wind_speed_names,
                      n_pinterp_wind_speed_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -329,7 +329,7 @@ bool VarInfoNcPinterp::is_grid_relative() const {
    //
    return(has_prefix(pinterp_grid_relative_names,
                      n_pinterp_grid_relative_names,
-                     Name));
+                     Name.c_str()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

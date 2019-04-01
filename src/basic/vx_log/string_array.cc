@@ -108,13 +108,13 @@ bool StringArray::operator==(const StringArray & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return ( false );
+if ( s.size() != a.s.size() )  return ( false );
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<s.size(); ++j)  {
 
-   if ( strcmp(s[j], a.s[j]) != 0 )  return ( false );
+  if ( s[j] != a.s[j] )  return ( false );
 
 }
 
@@ -129,8 +129,6 @@ return ( true );
 void StringArray::init_from_scratch()
 
 {
-
-s = (char **) 0;
 
 IgnoreCase = 0;
 
@@ -150,25 +148,7 @@ return;
 void StringArray::clear()
 
 {
-
-if ( s )  {
-
-   int j;
-
-   for (j=0; j<Nalloc; ++j)  {
-
-      if ( s[j] )  { delete [] s[j];  s[j] = (char *) 0; }
-
-   }
-
-   delete [] s;  s = (char **) 0;
-
-}   //  if s
-
-
-Nelements  = Nalloc = 0;
-
-MaxLength  = 0;
+s.clear();
 
 return;
 
@@ -184,19 +164,7 @@ void StringArray::assign(const StringArray & a)
 
 clear();
 
-extend(a.Nelements);
-
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
-
-   if ( a.s[j] )  add(a.s[j]);
-
-}
-
-Nelements  = a.Nelements;
-
-MaxLength  = a.MaxLength;
+s = a.s;
 
 IgnoreCase = a.IgnoreCase;
 
@@ -215,14 +183,11 @@ void StringArray::dump(ostream & out, int depth) const
 Indent prefix(depth);
 Indent prefix2(depth + 1);
 
-out << prefix << "Nelements  = " << Nelements  << "\n";
-out << prefix << "Nalloc     = " << Nalloc     << "\n";
-out << prefix << "MaxLength  = " << MaxLength  << "\n";
 out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<s.size(); ++j)  {
 
    out << prefix2 << "Element # " << j << " = \"" << s[j] << "\"\n";
 
@@ -243,56 +208,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::extend(int len)
+const std::string StringArray::operator[](int len) const
 
 {
 
-if ( len <= Nalloc )  return;
+  if ( (len < 0) || (len >= s.size()) )  {
 
-int k;
-
-k = len/stringarray_alloc_inc;
-
-if ( len%stringarray_alloc_inc )  ++k;
-
-len = k*stringarray_alloc_inc;
-
-char ** u = (char **) 0;
-
-u = new char * [len];
-
-int j;
-
-for (j=0; j<len; ++j)  u[j] = (char *) 0;
-
-if ( s )  {
-
-   for (j=0; j<Nelements; ++j)  u[j] = s[j];
-
-   delete [] s;  s = (char **) 0;
-
-}
-
-s = u;  u = (char **) 0;
-
-
-Nalloc = len;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-const char * StringArray::operator[](int len) const
-
-{
-
-if ( (len < 0) || (len >= Nelements) )  {
-
-   mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
+    mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -306,6 +228,8 @@ return ( s[len] );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
 
 
 void StringArray::set_ignore_case(const bool b)
@@ -322,28 +246,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::add(const char * text)
+void StringArray::add(const std::string text)
 
 {
 
-extend(Nelements + 1);
-
-// Add an empty string for a null pointer
-if ( !text ) text = "";
-
-int len = strlen(text);
-
-if ( len > MaxLength )  MaxLength = len;
-
-s[Nelements] = new char [1 + len];
-
-strcpy(s[Nelements], text);
-
-s[Nelements][len] = (char) 0;
-
-++Nelements;
-
-
+s.push_back(text);
 
 return;
 
@@ -357,19 +264,10 @@ void StringArray::add(const StringArray & a)
 
 {
 
-if ( a.n_elements() == 0 )  return;
+if ( a.s.size() == 0 )  return;
 
-extend(Nelements + a.n_elements());
-
-int j;
-
-for (j=0; j<(a.n_elements()); ++j)  {
-
-   add(a[j]);
-
-}
-
-
+s.insert(s.end(), a.s.begin(), a.s.end());
+ 
 return;
 
 }
@@ -378,7 +276,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::add_css(const char *text)
+void StringArray::add_css(const std::string text)
 
 {
 
@@ -387,22 +285,22 @@ void StringArray::add_css(const char *text)
    // in the FCST_LEV and OBS_LEV columns of the MET output.
    //
 
-if ( strstr(text, "*,*") != NULL ) {
+  if (text.find("*,*") != std::string::npos) {
 
    add(text);
 
-}
-else {
+  }
+  else {
 
-   StringArray sa;
+    StringArray sa;
 
-   sa.parse_css(text);
+    sa.parse_css(text);
 
-   add(sa);
+    add(sa);
 
-}
+  }
 
-return;
+  return;
 
 }
 
@@ -410,30 +308,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::set(int i, const char * text)
+void StringArray::set(int i, const std::string text)
 
 {
 
-if ( (i < 0) || (i >= Nelements) )  {
+  if ( (i < 0) || (i >= s.size()) )  {
 
-   mlog << Error << "\nStringArray::set(int, const char *) -> range check error\n\n";
+   mlog << Error << "\nStringArray::set(int, const string) -> range check error\n\n";
 
    exit ( 1 );
 
 }
 
-int len = strlen(text);
-
-if ( len > MaxLength )  MaxLength = len;
-
-if ( s[i] )  { delete [] s[i];  s[i] = (char *) 0; }
-
-s[i] = new char [1 + len];
-
-strcpy(s[i], text);
-
-s[i][len] = (char) 0;
-
+s[i] = text;
 
 return;
 
@@ -447,32 +334,17 @@ void StringArray::insert(int i, const char * text)
 
 {
 
-if ( (i < 0) || (i > Nelements) )  {
+  if ( (i < 0) || (i > s.size()) )  {
 
-   mlog << Error << "\nStringArray::insert(int, const char *) -> range check error\n\n";
+    mlog << Error << "\nStringArray::insert(int, const char *) -> range check error\n\n";
 
-   exit ( 1 );
+    exit ( 1 );
 
-}
+  }
 
-int len = strlen(text);
+  s.insert(s.begin()+i, text);
 
-if ( len > MaxLength )  MaxLength = len;
-
-extend(Nelements + 1);
-
-int j;
-
-for (j=Nelements; j>i; --j) s[j] = s[j-1];
-
-++Nelements;
-
-s[i] = 0;
-
-set(i, text);
-
-
-return;
+  return;
 
 }
 
@@ -480,13 +352,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const char * text) const
+bool StringArray::has(const std::string text) const
 
 {
 
-int index;
+  int index;
 
-return ( has(text, index) );
+  return ( has(text, index) );
 
 }
 
@@ -494,44 +366,48 @@ return ( has(text, index) );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const char * text, int & index) const
+bool StringArray::has(const std::string text, int & index) const
 
 {
 
-index = -1;
+  index = -1;
 
-if ( Nelements == 0 || !text )  return ( false );
+  std::string str = text;
 
-int j;
+  std::vector<std::string>::const_iterator it;
+  int count = 0;
 
-for (j=0; j<Nelements; ++j)  {
+  for(it = s.begin(); it != s.end(); it++, count++) {
+    if ( IgnoreCase ) {
+      std::string lower_s = *it;
+      transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+      std::string lower_text = text;
+      transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+      if ( lower_s == lower_text) {
+	//      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
+        index = count;
+	break;
+      }
+    }
+    else {
+      if ( *it == text ) {
+        index = count;
+	break;
+      }
+    }
+  }
 
-   if ( IgnoreCase ) {
-
-      if ( strcasecmp(s[j], text) == 0 )  { index = j;  return ( true ); }
-
-   }
-   else {
-
-      if ( strcmp(s[j], text) == 0 )  { index = j;  return ( true ); }
-
-   }
+  if (it != s.end()) {
+    return true;
+  }
+  return false;
 
 }
-
-   //
-   //  nope
-   //
-
-return ( false );
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_wsss(const char * text)
+void StringArray::parse_wsss(const std::string text)
 
 {
 
@@ -545,7 +421,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_css(const char * text)
+void StringArray::parse_css(const std::string text)
 
 {
 
@@ -559,45 +435,26 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_delim(const char * text, const char *delim)
+void StringArray::parse_delim(const std::string text, const char *delim)
 
 {
 
-// check for null pointer
-if ( !text ) return;
+  clear();
 
-char * line = (char *) 0;
-char * c    = (char *) 0;
-char * lp   = (char *) 0;
-const int len = strlen(text);
+  std::string str = text;
+    
+  size_t start = 0;
+  size_t end = str.find_first_of(delim);
+  while (end != string::npos) {
+      if (start != end)
+          s.push_back(str.substr(start, end-start).c_str());
+      start = end + 1;
+      end = str.find_first_of(delim, start);
+  }
+  if (start < str.length())
+      s.push_back(str.substr(start).c_str());
 
-clear();
-
-line = new char [1 + len];
-
-memset(line, 0, 1 + len);
-
-strcpy(line, text);
-
-lp = line;
-
-while ( (c = strtok(lp, delim)) != NULL )  {
-
-   add(c);
-
-   lp = (char *) 0;
-
-}   //  while
-
-   //
-   //  done
-   //
-
-if ( line )  { delete [] line;  line = (char *) 0; }
-
-lp = (char *) 0;
-
-return;
+  return;
 
 }
 
@@ -609,7 +466,7 @@ void StringArray::shift_down(int pos, int shift)
 
 {
 
-if ( (pos < 0) || (pos >= Nelements) )  {
+if ( (pos < 0) || (pos >= s.size()) )  {
 
    mlog << Error << "\nStringArray::shift_down() -> bad value for pos\n\n";
 
@@ -617,7 +474,7 @@ if ( (pos < 0) || (pos >= Nelements) )  {
 
 }
 
-if ( (shift <= 0) || ((pos + shift) > Nelements) )  {
+if ( (shift <= 0) || ((pos + shift) > s.size()) )  {
 
    mlog << Error << "\nStringArray::shift_down() -> bad value for shift\n\n";
 
@@ -625,34 +482,9 @@ if ( (shift <= 0) || ((pos + shift) > Nelements) )  {
 
 }
 
-int j;
+ s.erase(s.begin() + pos, s.begin() + pos + shift);
 
-for (j=0; j<shift; ++j)  {
-
-   delete [] s[pos + j];  s[pos + j] = (char *) 0;
-
-}
-
-for (j=pos; j<(Nelements - shift); ++j)  {
-
-   s[j] = s[j + shift];
-
-}
-
-
-for (j=0; j<shift; ++j)  {
-
-   s[Nelements - shift + j] = (char *) 0;
-
-}
-
-Nelements -= shift;
-
-   //
-   //  done
-   //
-
-return;
+ return;
 
 }
 
@@ -668,7 +500,7 @@ index = -1;
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+for (j=0; j<s.size(); ++j)  {
 
    if ( s[j][0] == '-' )  {
 
@@ -693,13 +525,13 @@ bool StringArray::reg_exp_match(const char * text) const
 
 {
 
-if ( Nelements == 0 || !text )  return ( false );
+if ( s.size() == 0 || !text )  return ( false );
 
 int j;
 
-for (j=0; j<Nelements; ++j)  {
+ for (j=0; j<s.size(); ++j)  {
 
-   if ( check_reg_exp(s[j], text) )  { return ( true ); }
+   if ( check_reg_exp(s[j].c_str(), text) )  { return ( true ); }
 
 }
 
@@ -719,7 +551,7 @@ int StringArray::length(int k) const
 
 {
 
-if ( (k < 0) || (k >= Nelements) )  {
+if ( (k < 0) || (k >= s.size()) )  {
 
    mlog << Error << "\nStringArray::length(int) const -> range check error\n\n";
 
@@ -727,7 +559,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( strlen(s[k]) );
+return ( s[k].length() );
 
 }
 
@@ -739,10 +571,10 @@ void StringArray::sort()
 
 {
 
-if ( Nelements <= 1 )  return;
+if ( s.size() <= 1 )  return;
 
-qsort(s, Nelements, sizeof(char *), lex_comp);
-
+ std::sort(s.begin(), s.end());
+ 
 return;
 
 }
@@ -755,17 +587,17 @@ StringArray StringArray::uniq()
 
 {
 
-StringArray sa;
+  StringArray sa;
 
-int j;
+  sa.s = s;
+  
+  std::vector<std::string>::iterator it;
 
-for (j=0; j<Nelements; ++j)  {
+  it = std::unique(sa.s.begin(), sa.s.end());
 
-   if ( !sa.has(s[j]) )  sa.add(s[j]);
+  sa.s.resize(std::distance(sa.s.begin(), it));
 
-}
-
-return ( sa );
+  return sa;
 
 }
 

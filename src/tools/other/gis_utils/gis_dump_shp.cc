@@ -94,13 +94,13 @@ cline.parse();
 if ( cline.n() != 1 )  usage();
 
 
-ConcatString input_filename = cline[0];
+ ConcatString input_filename = (string)cline[0];
 ShpFile f;
 
 
-cout << "file = \"" << get_short_name(input_filename) << "\"\n\n";
+cout << "file = \"" << get_short_name(input_filename.c_str()) << "\"\n\n";
 
-if ( ! f.open(input_filename) )  {
+if ( ! f.open(input_filename.c_str()) )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open input file \""

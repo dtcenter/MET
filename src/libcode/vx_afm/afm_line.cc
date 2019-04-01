@@ -68,10 +68,10 @@ AfmLine::~AfmLine()
 
 {
 
-if ( Line )  { delete [] Line;  Line = (char *) 0; }
+if ( Line != "" )  { Line.clear(); }
 
-strtok_pointer = (char *) 0;
-tok_pointer = (char *) 0;
+LineItems.clear();
+item_index = 0;
 
 }
 
@@ -113,7 +113,7 @@ void AfmLine::init_from_scratch()
 
 {
 
-Line = new char [afm_line_size];
+Line = "";
 
 clear();
 
@@ -130,13 +130,9 @@ void AfmLine::clear()
 
 {
 
-memset(Line, 0, afm_line_size);
-
 LineLength = 0;
-
-strtok_pointer = (char *) 0;
-tok_pointer = (char *) 0;
-
+LineItems.clear();
+item_index = 0;
 line_number = 0;
 
 
@@ -152,20 +148,26 @@ void AfmLine::assign(const AfmLine & a)
 
 {
 
-memcpy(Line, a.Line, afm_line_size);
-
-strtok_pointer = a.strtok_pointer;
-
-tok_pointer = a.tok_pointer;
+Line = a.Line;
 
 LineLength  = a.LineLength;
 
 line_number = a.line_number;
 
+ LineItems = a.LineItems;
+ item_index = a.item_index;
+
 
 
 return;
 
+}
+
+
+
+void AfmLine::split_line()
+{
+  LineItems = Line.split(delim);
 }
 
 
@@ -180,13 +182,14 @@ int k;
 AfmToken tok;
 AfmKeyword key;
 
+if(LineItems.n() == 0 || item_index == LineItems.n()) {
+   tok.type = afm_token_endofline;
+   return ( tok );
+}
 
+ConcatString tok_pointer = LineItems[item_index++];
 
-tok_pointer = strtok(strtok_pointer, delim);
-
-strtok_pointer = (char *) 0;
-
-if ( !tok_pointer )  {
+if ( tok_pointer == "" )  {
 
    tok.type = afm_token_endofline;
 
@@ -195,23 +198,21 @@ if ( !tok_pointer )  {
 }
 
 
-tok.column = 1 + ((int) (tok_pointer - Line));
-
 tok.line_number = line_number;
 
 tok.set_string(tok_pointer);
 
 
 
-if ( is_integer(tok_pointer) )  {
+if ( is_integer(tok_pointer.c_str()) )  {
 
-   tok.i = atoi(tok_pointer);
+   tok.i = atoi(tok_pointer.c_str());
 
    tok.type = afm_token_integer;
 
-} else if ( is_float(tok_pointer) )  {
+} else if ( is_float(tok_pointer.c_str()) )  {
 
-   tok.d = atof(tok_pointer);
+   tok.d = atof(tok_pointer.c_str());
 
    tok.type = afm_token_number;
 
@@ -221,7 +222,7 @@ if ( is_integer(tok_pointer) )  {
 
    tok.keyword = key;
 
-} else if ( is_boolean(tok_pointer, k) )  {
+} else if ( is_boolean(tok_pointer.c_str(), k) )  {
 
    tok.type = afm_token_boolean;
 
@@ -238,11 +239,6 @@ if ( is_integer(tok_pointer) )  {
 
 }
 
-
-
-
-
-
 return ( tok );
 
 }
@@ -257,19 +253,9 @@ AfmToken AfmLine::rest_as_string()
 
 AfmToken tok;
 
-
-tok_pointer += 1 + strlen(tok_pointer);
-
-int j = strlen(tok_pointer) - 1;
-
-while ( (j > 0) && !is_keeper(tok_pointer[j]) )  {
-
-   tok_pointer[j] = (char) 0;
-
+ if(item_index < LineItems.n()) {
+   tok.set_string(LineItems[item_index]);
 }
-
-tok.set_string(tok_pointer);
-
 
 
 return ( tok );
@@ -288,7 +274,6 @@ int j;
 
 
 for (j=0; j<LineLength; ++j)  {
-
    if ( is_keeper(Line[j]) )  return ( 1 );
 
 }
@@ -350,21 +335,20 @@ extern istream & operator>>(istream & in, AfmLine & L)
 
 L.clear();
 
-L.strtok_pointer = L.Line;
-
 while ( 1 )  {
 
-   in.getline(L.Line, afm_line_size);
+  L.Line.read_line(in);
 
-   L.LineLength = strlen(L.Line);
+  L.LineLength = L.Line.length();
 
    if ( !in )  {
 
       L.clear();
-
       return ( in );
 
    }
+
+   L.split_line();
 
    if ( L.is_ok() )  return ( in );
 

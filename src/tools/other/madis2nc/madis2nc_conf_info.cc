@@ -62,11 +62,11 @@ void Madis2NcConfInfo::read_config(const string &default_filename,
 {
   // Read the config file constants
 
-  _conf.read(replace_path(config_const_filename));
+  _conf.read(replace_path(config_const_filename).c_str());
   
   // Read the default config file
 
-  _conf.read(replace_path(default_filename.c_str()));
+  _conf.read(replace_path(default_filename).c_str());
 
   // Read the user config file
 
@@ -85,7 +85,7 @@ void Madis2NcConfInfo::process_config()
 {
   
   _version = parse_conf_version(&_conf);
-  check_met_version(_version);
+  check_met_version(_version.c_str());
 
   _timeSummaryInfo = parse_conf_time_summary(&_conf);
   

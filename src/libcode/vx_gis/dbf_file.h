@@ -107,7 +107,7 @@ class DbfSubRecord {
       void clear();
 
 
-      char field_name[11];   //  nul-terminated
+      std::string field_name;
 
       char field_type;
 

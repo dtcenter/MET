@@ -159,7 +159,7 @@ void process_binary() {
    for(i=0; i<(n_bin-1); i++) dpa.add(dp, i+1, i+1);
 
    // Open the input file
-   if((fd = ::open(bin_file, O_RDONLY)) < 0) {
+   if((fd = ::open(bin_file.c_str(), O_RDONLY)) < 0) {
       mlog << Error << "\nprocess_binary() -> "
            << "trouble opening input binary file "
            << bin_file << "\n\n";
@@ -217,8 +217,8 @@ void process_mean_stdev() {
    DataPlane mn_dp, sd_dp, cur_dp;
 
    // Read the climo mean and standard deviation fields
-   get_field(mean_file, field_str, mn_dp);
-   get_field(stdev_file, field_str, sd_dp);
+   get_field(mean_file.c_str(), field_str.c_str(), mn_dp);
+   get_field(stdev_file.c_str(), field_str.c_str(), sd_dp);
 
    // Setup the output file
    setup_nc_file();
@@ -238,7 +238,7 @@ void process_mean_stdev() {
 void setup_nc_file() {
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_file, true);
+   nc_out = open_ncfile(out_file.c_str(), true);
 
    if(!nc_out || IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -248,7 +248,7 @@ void setup_nc_file() {
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_file.text(), program_name, "Climatology", "NA");
+   write_netcdf_global(nc_out, out_file.text(), program_name.c_str(), "Climatology", "NA");
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -341,7 +341,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
 
    // Parse the config string
    MetConfig config;
-   config.read(replace_path(config_const_filename));
+   config.read(replace_path(config_const_filename).c_str());
    config.read_string(config_str);
 
    // Get the gridded file type from config string, if present
@@ -431,14 +431,14 @@ void my_memcpy(void * to, unsigned char * & from, int n_bytes) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_out_file  (const StringArray & a) { out_file   = a[0];       return; }
-void set_n_bin     (const StringArray & a) { n_bin      = atoi(a[0]); return; }
+void set_n_bin     (const StringArray & a) { n_bin      = atoi(a[0].c_str()); return; }
 void set_bin_file  (const StringArray & a) { bin_file   = a[0];       return; }
 void set_mean_file (const StringArray & a) { mean_file  = a[0];       return; }
 void set_stdev_file(const StringArray & a) { stdev_file = a[0];       return; }
 void set_field_str (const StringArray & a) { field_str  = a[0];       return; }
 void set_var_name  (const StringArray & a) { var_name   = a[0];       return; }
 void set_verbosity (const StringArray & a) {
-                          mlog.set_verbosity_level(atoi(a[0]));       return; }
+                          mlog.set_verbosity_level(atoi(a[0].c_str()));       return; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -38,7 +38,7 @@ unixtime get_att_value_unixtime(const NcAtt *att) {
       case NC_CHAR:
          ConcatString s;
          get_att_value_chars(att, s);
-         time_value = string_to_unixtime(s);
+         time_value = string_to_unixtime(s.c_str());
          break;
 
       //default:

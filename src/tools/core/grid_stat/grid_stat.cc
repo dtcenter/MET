@@ -165,7 +165,7 @@ static void write_nbrhd_nc(const DataPlane &, const DataPlane &, int,
                            const SingleThresh &, const SingleThresh &,
                            int);
 
-static void add_var_att_local(NcVar *, const char *, const char *);
+static void add_var_att_local(NcVar *, const char *, const ConcatString);
 
 static void finish_txt_files();
 
@@ -245,21 +245,21 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file);
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file, ftype))) {
+   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file, otype))) {
+   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
@@ -299,16 +299,16 @@ void process_command_line(int argc, char **argv) {
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
 
    // Set the model name
-   shc.set_model(conf_info.model);
+   shc.set_model(conf_info.model.c_str());
 
    // Set the obtype column
-   shc.set_obtype(conf_info.obtype);
+   shc.set_obtype(conf_info.obtype.c_str());
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
    rng_set(rng_ptr,
-           conf_info.vx_opt[0].boot_info.rng,
-           conf_info.vx_opt[0].boot_info.seed);
+           conf_info.vx_opt[0].boot_info.rng.c_str(),
+           conf_info.vx_opt[0].boot_info.seed.c_str());
 
    // List the input files
    mlog << Debug(1)
@@ -383,7 +383,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec)
    stat_file << base_name << stat_file_ext;
 
    // Create the output STAT file
-   open_txt_file(stat_out, stat_file);
+   open_txt_file(stat_out, stat_file.c_str());
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
@@ -415,7 +415,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec)
                      << txt_file_ext;
 
          // Create the output text file
-         open_txt_file(txt_out[i], txt_file[i]);
+         open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Get the maximum number of columns for this line type
          switch(i) {
@@ -525,7 +525,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, true);
+   nc_out = open_ncfile(out_nc_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -535,8 +535,8 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file, program_name,
-                       conf_info.model, conf_info.obtype);
+   write_netcdf_global(nc_out, out_nc_file.c_str(), program_name,
+                       conf_info.model.c_str(), conf_info.obtype.c_str());
    if(nc_info.do_diff) {
       add_att(nc_out, "Difference", "Forecast Value - Observation Value");
    }
@@ -734,19 +734,19 @@ void process_scores() {
       if(is_first_pass) setup_first_pass(fcst_dp);
 
       // Store the description
-      shc.set_desc(conf_info.vx_opt[i].desc);
+      shc.set_desc(conf_info.vx_opt[i].desc.c_str());
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].fcst_info->level_name());
+      shc.set_fcst_lev(conf_info.vx_opt[i].fcst_info->level_name().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].obs_info->name());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].obs_info->level_name());
+      shc.set_obs_lev(conf_info.vx_opt[i].obs_info->level_name().c_str());
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -757,7 +757,7 @@ void process_scores() {
       for(j=0; j<conf_info.vx_opt[i].get_n_interp(); j++) {
 
          // Current interpolation method
-         InterpMthd interp_mthd = string_to_interpmthd(interp->method[j]);
+         InterpMthd interp_mthd = string_to_interpmthd(interp->method[j].c_str());
 
          // Create grid template to find the number of points
          GridTemplateFactory gtf;
@@ -818,7 +818,7 @@ void process_scores() {
             apply_mask(wgt_dp,         mask_mp, w_na);
 
             // Set the mask name
-            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
             mlog << Debug(2)
                  << "Processing " << conf_info.vx_opt[i].fcst_info->magic_str()
@@ -994,10 +994,10 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
 
                // Store the forecast variable name
-               shc.set_fcst_var(ugrd_vgrd_abbr_str);
+	      shc.set_fcst_var(ugrd_vgrd_abbr_str);
 
                // Store the observation variable name
-               shc.set_obs_var(ugrd_vgrd_abbr_str);
+	      shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
@@ -1120,7 +1120,7 @@ void process_scores() {
                   // Store the verification masking region
                   cs = conf_info.vx_opt[i].mask_name[k];
                   if(n_cdf_bin > 1) cs << "_BIN" << m+1;
-                  shc.set_mask(cs);
+                  shc.set_mask(cs.c_str());
 
                   // Compute PCT
                   do_pct(pct_info, i, f_na, o_na, cmn_na, csd_na, w_na,
@@ -1175,7 +1175,7 @@ void process_scores() {
             } // end Compute PCT
 
             // Reset the verification masking region
-            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
          } // end for k
 
@@ -1185,25 +1185,25 @@ void process_scores() {
 
          // Write out the data fields if requested in the config file
          if(conf_info.vx_opt[i].nc_info.do_raw) {
-            write_nc("FCST", fcst_dp_smooth, i, mthd, pnts,
+	   write_nc((string)"FCST", fcst_dp_smooth, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
-            write_nc("OBS",  obs_dp_smooth, i, mthd, pnts,
+	   write_nc((string)"OBS",  obs_dp_smooth, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_diff) {
-            write_nc("DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+	   write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty()) {
-            write_nc("CLIMO_MEAN", cmn_dp, i, mthd, pnts,
+	   write_nc((string)"CLIMO_MEAN", cmn_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !csd_dp.is_empty()) {
-            write_nc("CLIMO_STDEV", csd_dp, i, mthd, pnts,
+	   write_nc((string)"CLIMO_STDEV", csd_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-            write_nc("CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
+	   write_nc((string)"CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
 
@@ -1234,8 +1234,8 @@ void process_scores() {
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
-                  // Store the current mask
-                  mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
+               // Set the mask name
+               shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
                   // Turn off the mask for missing data values
                   mask_bad_data(mask_mp, fgx_dp);
@@ -1251,7 +1251,7 @@ void process_scores() {
                   apply_mask(wgt_dp, mask_mp, w_na);
 
                   // Set the mask name
-                  shc.set_mask(conf_info.vx_opt[i].mask_name[m]);
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
 
                   mlog << Debug(2) << "Computing Gradient DX(" << dx << ")/DY("
                        << dy << ") Statistics " << "over region " << shc.get_mask()
@@ -1275,6 +1275,7 @@ void process_scores() {
                } // end for m (n_mask)
 
                // Write out the gradients if requested in the config file
+	       
                if(conf_info.vx_opt[i].nc_info.do_gradient) {
                   ConcatString cs;
                   cs << cs_erase << "FCST_XGRAD_" << dx;
@@ -1432,7 +1433,7 @@ void process_scores() {
                   if(f_na.n_elements() == 0) continue;
 
                   // Set the mask name
-                  shc.set_mask(conf_info.vx_opt[i].mask_name[m]);
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
 
                   // Compute NBRCTS scores
                   if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
@@ -1588,7 +1589,7 @@ void process_scores() {
             apply_mask(wgt_dp,         mask_mp, w_na);
 
             // Set the mask name
-            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
 
             mlog << Debug(2)
                  << "Processing " << conf_info.vx_opt[i].fcst_info->magic_str()
@@ -1670,10 +1671,10 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
 
                // Store the forecast variable name
-               shc.set_fcst_var(ugrd_vgrd_abbr_str);
+	      shc.set_fcst_var(ugrd_vgrd_abbr_str);
 
                // Store the observation variable name
-               shc.set_obs_var(ugrd_vgrd_abbr_str);
+	      shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
@@ -1774,18 +1775,18 @@ void process_scores() {
 
             // Write out the data fields if requested in the config file
             if(conf_info.vx_opt[i].nc_info.do_raw) {
-               write_nc("FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
+	      write_nc((string)"FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType_Both);
-               write_nc("OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
+	      write_nc((string)"OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int, FieldType_Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_diff) {
-               write_nc("DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+	      write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
                         i, shc.get_interp_mthd(), bad_data_int,
                         FieldType_Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp_smooth.is_empty()) {
-               write_nc("CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
+	      write_nc((string)"CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType_Both);
             }
          } // end if
@@ -1845,7 +1846,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          cts_info, n_cts,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
-         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir);
+         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
@@ -1853,7 +1854,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          cts_info, n_cts,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
-         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir);
+         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -1893,7 +1894,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          mcts_info,
          conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
-         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir);
+         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
       compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
@@ -1901,7 +1902,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          mcts_info,
          conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
-         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir);
+         conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -1967,7 +1968,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
             pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep,
-            cnt_info[i], conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir.c_str());
       }
       else {
          compute_cnt_stats_ci_perc(rng_ptr,
@@ -1975,7 +1976,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep,
             conf_info.vx_opt[i_vx].boot_info.rep_prop,
-            cnt_info[i], conf_info.tmp_dir);
+            cnt_info[i], conf_info.tmp_dir.c_str());
       }
    } // end for i
 
@@ -2192,7 +2193,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcts_info, n_nbrcts,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType_None,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
    else {
       compute_nbrcts_stats_ci_perc(rng_ptr, f_na, o_na,
@@ -2200,7 +2201,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcts_info, n_nbrcts,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType_None,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -2255,7 +2256,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcnt_info,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType_None,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
    else {
       compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
@@ -2264,7 +2265,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcnt_info,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType_None,
-         conf_info.tmp_dir);
+         conf_info.tmp_dir.c_str());
    }
 
    return;
@@ -2382,8 +2383,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].obs_info->level_name()
                    << var_str << "_" << mask_str;
          // Append interpolation string for Fourier decomposition
-         if(interp_str) {
-            if(strncmp(interp_str, "_WV", 3) == 0) var_name << interp_str;
+         if(interp_str != "") {
+            if( interp_str == "_WV" ) var_name << interp_str;
          }
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
@@ -2421,8 +2422,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
-      else if(check_reg_exp("FCST_XGRAD_", field_name) ||
-              check_reg_exp("FCST_YGRAD_", field_name)) {
+      else if(check_reg_exp("FCST_XGRAD_", field_name.c_str()) ||
+              check_reg_exp("FCST_YGRAD_", field_name.c_str())) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
@@ -2440,8 +2441,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_fcst_lev();
          units_att = conf_info.vx_opt[i_vx].fcst_info->units();
       }
-      else if(check_reg_exp("OBS_XGRAD_", field_name) ||
-              check_reg_exp("OBS_YGRAD_", field_name)) {
+      else if(check_reg_exp("OBS_XGRAD_", field_name.c_str()) ||
+              check_reg_exp("OBS_YGRAD_", field_name.c_str())) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name() << "_"
@@ -2703,9 +2704,9 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) {
+void add_var_att_local(NcVar *var, const char *att_name, const ConcatString att_value) {
 
-   if(att_value) add_att(var, att_name, att_value);
+   if(att_value != "") add_att(var, att_name, att_value.c_str());
    else          add_att(var, att_name, na_str);
 
    return;
@@ -2720,7 +2721,7 @@ void finish_txt_files() {
    // close the STAT output files
    if(stat_out) {
       *stat_out << stat_at;
-      close_txt_file(stat_out, stat_file);
+      close_txt_file(stat_out, stat_file.c_str());
    }
 
    // Finish up each of the optional text files
@@ -2732,7 +2733,7 @@ void finish_txt_files() {
          // Write the AsciiTable to a file
          if(txt_out[i]) {
             *txt_out[i] << txt_at[i];
-            close_txt_file(txt_out[i], txt_file[i]);
+            close_txt_file(txt_out[i], txt_file[i].c_str());
          }
       }
    }
@@ -2827,13 +2828,13 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -37,7 +37,7 @@ int main(int argc, char * argv [])
 
 {
 
-ConcatString program_name = get_short_name(argv[0]);
+  ConcatString program_name = (string)get_short_name(argv[0]);
 
 if ( argc != 2 )  {
 

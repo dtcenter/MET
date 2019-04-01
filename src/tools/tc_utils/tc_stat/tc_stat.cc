@@ -138,7 +138,7 @@ void process_command_line(int argc, char **argv) {
            << "Config File User: " << config_file << "\n";
 
       // Read the config files
-      conf_info.read_config(default_config_file, config_file);
+      conf_info.read_config(default_config_file.c_str(), config_file.c_str());
    }
 
    return;
@@ -197,7 +197,7 @@ void process_jobs() {
       }
 
       // Allocate a new job
-      cur_job = factory.new_tc_stat_job(jobstring);
+      cur_job = factory.new_tc_stat_job(jobstring.c_str());
 
       // Set the job output file stream
       cur_job->JobOut = tc_stat_out;
@@ -272,7 +272,7 @@ void open_out_file() {
 
    // Create an output file and point to it
    tc_stat_out = new ofstream;
-   tc_stat_out->open(out_file);
+   tc_stat_out->open(out_file.c_str());
 
    if(!(*tc_stat_out)) {
       mlog << Error << "\nopen_out_file()-> "
@@ -371,7 +371,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

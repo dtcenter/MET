@@ -270,7 +270,8 @@ double NumArray::operator[](int i) const
 if ( (i < 0) || (i >= Nelements) )  {
 
    mlog << Error << "\nNumArray::operator[](int) const -> "
-       << "range check error\n\n";
+       << "range check error ... Nelements = " << Nelements
+       << ", i = " << i << "\n\n";
 
    exit ( 1 );
 
@@ -388,7 +389,7 @@ int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
 
-   add(atof(sa[j]));
+  add(atof(sa[j].c_str()));
 
 }
 
@@ -416,7 +417,7 @@ int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
 
-   add(timestring_to_sec(sa[j]));
+  add(timestring_to_sec(sa[j].c_str()));
 
 }
 
@@ -842,9 +843,10 @@ ConcatString NumArray::serialize() const
 
 {
 
-if(Nelements == 0) return("");
-
 ConcatString s;
+
+if(Nelements == 0) return(s);
+
 int j;
 
 s << e[0];

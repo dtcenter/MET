@@ -303,9 +303,9 @@ if ( n_swaths > 1 )  {
 
 Swath = new CloudsatSwath;
 
-Swath->set_name(a[0]);
+Swath->set_name(a[0].c_str());
 
-if ( (k = SWattach(FileId, (char *) (a[0]))) < 0 )  {
+if ( (k = SWattach(FileId, (char *) a[0].c_str())) < 0 )  {
 
    mlog << Error
         << "\n\n  ModisFile::open(const char *) -> unable to attach swath in file \"" << _filename << "\"\n\n";
@@ -624,7 +624,7 @@ start[1] = n1;
 
 ConcatString _field_name = field->name();
 
-char * field_name = (char *) (const char *) _field_name;
+char * field_name = (char *) _field_name.c_str();
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
@@ -677,7 +677,7 @@ start[1] = n1;
 
 ConcatString _field_name = field->name();
 
-char * field_name = (char *) (const char *) _field_name;
+char * field_name = (char *) _field_name.c_str();
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
@@ -730,7 +730,7 @@ start[1] = n1;
 
 ConcatString _field_name = field->name();
 
-char * field_name = (char *) (const char *) _field_name;
+char * field_name = (char *) _field_name.c_str();
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
@@ -783,7 +783,7 @@ start[1] = n1;
 
 ConcatString _field_name = field->name();
 
-char * field_name = (char *) (const char *) _field_name;
+char * field_name = (char *) _field_name.c_str();
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
@@ -957,7 +957,7 @@ ConcatString ModisFile::short_name() const
 
 ConcatString s;
 
-if ( Filename.nonempty() )  s = get_short_name(Filename);
+if ( Filename.nonempty() )  s = get_short_name(Filename.c_str());
 
 return ( s );
 

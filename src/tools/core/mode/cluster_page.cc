@@ -68,8 +68,8 @@ write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
                           0.5, 0.5, "Cluster Object Information");
 
 choose_font(31, 18.0);
-write_centered_text(1, 1, Htab_a, 727.0, 0.5, 0.5, FcstString);
-write_centered_text(1, 1, Htab_b, 727.0, 0.5, 0.5, ObsString);
+write_centered_text(1, 1, Htab_a, 727.0, 0.5, 0.5, FcstString.c_str());
+write_centered_text(1, 1, Htab_b, 727.0, 0.5, 0.5, ObsString.c_str());
 
    /////////////////////////////////////////////////////////////////
    //

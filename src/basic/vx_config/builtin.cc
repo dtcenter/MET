@@ -481,7 +481,7 @@ return ( 1.8*C + 32.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_builtin(const char * text, int & index)
+bool is_builtin(const ConcatString text, int & index)
 
 {
 
@@ -491,7 +491,7 @@ index = -1;
 
 for (j=0; j<n_binfos; ++j)  {
 
-   if ( strcmp(binfo[j].name, text) == 0 )  { index = j;  return ( true ); }
+   if ( binfo[j].name == text )  { index = j;  return ( true ); }
 
 }
 

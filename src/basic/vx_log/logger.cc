@@ -516,24 +516,11 @@ void Logger::set_exit_on_warning(bool b)
 }
 
 
-//////////////////////////////////////////////////////////////////
-
-
-void Logger::open_log_file(const char * path)
-
-{
-
-open_log_file(ConcatString(path));
-
-return;
-
-}
-
 
 //////////////////////////////////////////////////////////////////
 
 
-void Logger::open_log_file(ConcatString & s)
+void Logger::open_log_file(const ConcatString s)
 {
       //
       // check if the filename is empty
@@ -555,7 +542,7 @@ void Logger::open_log_file(ConcatString & s)
       // open file and check for error
       //
 
-   out->open(LogFilename);
+   out->open(LogFilename.c_str());
 
    if (!(*out))
    {
@@ -566,9 +553,169 @@ void Logger::open_log_file(ConcatString & s)
 
 }
 
-
 //////////////////////////////////////////////////////////////////
 
+
+Logger & Logger::operator<<(const string s)
+{
+   ConcatString msg;
+   StringArray messages;
+   int i, len, msg_len;
+   
+
+   if (s.empty())
+   {
+      //
+      // if s is null or the length of s is zero, then print "(nul)"
+      //
+     messages.add((string)"(nul)");
+   }
+   else
+   {
+     //     StringArray temp = msg.split("\n");
+     
+     //     messages.add(temp);
+
+     len = s.length();
+      
+         //
+         // Search through s, looking for newline characters. Copy each
+         // non_newline character to msg. When we reach a newline character
+         // put it in msg, then put that msg into the StringArray messages,
+         // clear msg, and continue. When we have found all the sub-messages
+         // in s, then write them out to the appropriate places putting a
+         // message type header at the beginning of each line.
+         //
+
+      for (i = 0; i < len; i++)
+      {
+            //
+            // put the next character into the ConcatString msg
+            //
+	//         tmp[0] = s[i];
+         msg.add(s[i]);
+
+         if (s[i] == '\n')
+         {
+               //
+               // this was a newline, so
+               // put msg into the StringArray messages
+               //
+	   messages.add((string)msg);
+
+               //
+               // clear msg, and continue checking s
+               //
+            msg.clear();
+
+         }
+
+      }
+         //
+         // Check if the last string did not end in '\n'.
+         // If it did not then we need to add it to messages.
+         //
+
+      if (s.length() > 0)
+      {
+         if (s[s.length() - 1] != '\n')
+         {
+	   messages.add((string)msg);
+            msg.clear();
+
+         }
+
+      }
+
+   }  // end of else s is not empty
+
+      //
+      // now we've broken the string s up into substrings each of
+      // which ends with a single newline or no newline if at the
+      // end of s, so we will write each substring out prepending
+      // the "ERROR:", "WARNING:", or "DEBUG num:" string in front
+      // if needed.
+      //
+   for (i = 0; i < messages.n_elements(); i++)
+   {
+         //
+         // prepend the message type if needed
+         //
+      if (need_to_output_type)
+      {
+         write_msg_type();
+         need_to_output_type = false;
+      }
+
+         //
+         // if the message level is -1, then this is an ERROR type message,
+         // so write it to cerr
+         //
+      if (message_level == ErrorMessageLevel)
+      {
+         cerr << messages[i] << flush;
+
+            //
+            // if the file is open, then also write it to the log file
+            //
+         if (is_open())
+            (*out) << messages[i] << flush;
+
+      }
+         //
+         // else if the message level is 0, then this is a WARNING type message,
+         // so write it to cerr
+         //
+      else if (message_level == WarningMessageLevel)
+      {
+         cerr << messages[i] << flush;
+
+            //
+            // if the file is open, then also write it to the log file
+            //
+         if (is_open())
+            (*out) << messages[i] << flush;
+
+      }
+         //
+         // else if the message level is greater than 0, then this is a DEBUG
+         // type message, so write it to cout, but only if it is less than or
+         // equal to the verbosity level
+         //
+      else
+      {
+         if (message_level <= VerbosityLevel)
+         {
+            cout << messages[i] << flush;
+
+            //
+            // if the file is open, then also write it to the log file
+            //
+         if (is_open())
+               (*out) << messages[i] << flush;
+
+         }
+      }
+
+         //
+         // only want to set this to true if there is a newline at the end
+         // of this message.
+         //
+      msg = messages[i];
+      msg_len = msg.length();
+
+      if (msg[msg_len - 1] == '\n')
+         need_to_output_type = true;
+
+   }
+
+   return (*this);
+
+}
+
+
+
+//////////////////////////////////////////////////////////////////
 
 Logger & Logger::operator<<(const char * s)
 {
@@ -724,10 +871,6 @@ Logger & Logger::operator<<(const char * s)
    return (*this);
 
 }
-
-
-
-//////////////////////////////////////////////////////////////////
 
 
 Logger & Logger::operator<<(const int n)

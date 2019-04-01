@@ -121,7 +121,7 @@ static bool do_anno = true;
 static bool do_data_rescale = false;
 
 static ConcatString ctable_filename;
-static ConcatString output_directory = ".";
+static ConcatString output_directory = (string)".";
 
    //
    //  default plot info
@@ -278,7 +278,7 @@ void read_config()
 mlog << Debug(1)
      << "Config file: " << config_filename << "\n";
 
-if ( ! config.read(config_filename) )  {
+if ( ! config.read(config_filename.c_str()) )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": read_config() -> unable to read config file \""
@@ -492,7 +492,7 @@ mlog << Debug(1)
    //  read the colortable
    //
 
-if ( ! ctable.read(ctable_filename) )  {
+if ( ! ctable.read(ctable_filename.c_str()) )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": unable to open colortable file \""
@@ -531,7 +531,7 @@ if ( do_anno )  {
    //  open the plot
    //
 
-plot.open(output_filename, whole_box.width(), whole_box.height());
+plot.open(output_filename.c_str(), whole_box.width(), whole_box.height());
 
 plot.set_family(family);
 
@@ -752,7 +752,7 @@ void set_verbosity(const StringArray & a)
 
 {
 
-mlog.set_verbosity_level(atoi(a[0]));
+mlog.set_verbosity_level(atoi(a[0].c_str()));
 
 return;
 
@@ -1016,7 +1016,7 @@ map_linewidth = get_dict_double (dict, linewidth_name);
 
 map_color     = get_dict_color  (dict, linecolor_name);
 
-in.open(map_filename);
+in.open(map_filename.c_str());
 
 if ( !in )  {
 
@@ -1381,22 +1381,22 @@ title << cs_erase
 
 plot.bold(title_font_size);
 
-scale = calc_text_scale(plot, map_width - 10.0, title);
+scale = calc_text_scale(plot, map_width - 10.0, title.c_str());
 
 if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*title_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - plot.current_font_size() - 10.0, 0.5, 0.0, title);
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - plot.current_font_size() - 10.0, 0.5, 0.0, title.c_str());
 
 
 plot.roman(anno_font_size);
 
 s = mode_in.short_filename();
 
-scale = calc_text_scale(plot, map_width - 10.0, s);
+scale = calc_text_scale(plot, map_width - 10.0, s.c_str());
 
 if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*anno_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, s);
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, s.c_str());
 
 
 vtab1 = anno_height + 0.5*anno_font_size;

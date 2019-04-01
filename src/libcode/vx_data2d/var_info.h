@@ -116,6 +116,7 @@ class VarInfo
 
       void set_req_name(const char *);
       void set_name(const char *);
+      void set_name(const string);
       void set_units(const char *);
       void set_level_info(const LevelInfo &);
       void set_req_level_name(const char *);

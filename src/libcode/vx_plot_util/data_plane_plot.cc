@@ -71,18 +71,18 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
    Box grid_bb, image_bb, cbar_bb;
    Box page, view, map_box;
    ConcatString short_filename;
-   char junk[64];
+   ConcatString junk;
    int i;
    double mag;
    double tick_m, val_m, tick_val, x1, x2, y1;
 
-   short_filename = get_short_name(inname);
+   short_filename = get_short_name(inname.c_str());
 
       //
       // open the PostScript file using the default media
       // and landscape mode
       //
-   plot.open(outname, OrientationLandscape);
+   plot.open(outname.c_str(), OrientationLandscape);
 
       //
       // get plot started by setting page number
@@ -187,7 +187,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       // at the (x,y) point.
       //
    if (title.length() > 0)
-      plot.write_centered_text(1, 1, 0.5 * page.width(), map_box.top() + 0.5 * one_inch, 0.5, 1.0, title);
+      plot.write_centered_text(1, 1, 0.5 * page.width(), map_box.top() + 0.5 * one_inch, 0.5, 1.0, title.c_str());
 
       //
       // put the filename 1/2 inch below the bottom of the image and beginning at
@@ -200,7 +200,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       // text at the (x,y) point, and the delta_y at 0.0 means to place the
       // bottom of the text at the (x,y) point.
       //
-   plot.write_centered_text(1, 1, map_box.left(), map_box.bottom() - 0.5 * one_inch, 0.0, 0.0, short_filename);
+   plot.write_centered_text(1, 1, map_box.left(), map_box.bottom() - 0.5 * one_inch, 0.0, 0.0, short_filename.c_str());
 
       //
       // now fill in the colorbar and draw a border around it
@@ -255,7 +255,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
          //
       tick_val = val_m * i + colortable.data_min(bad_data_double);
 
-      snprintf(junk, sizeof(junk), "%.3f", tick_val);
+      junk.format("%.3f", tick_val);
 
          //
          // 2 means to center text both horizontally and vertically,
@@ -265,7 +265,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
          // text at the (x,y) point, and the delta_y at 0.5 means to place the
          // center of the text at the (x,y) point.
          //
-      plot.write_centered_text(2, 1, x2 + 2.5, y1, 0.0, 0.5, junk);
+      plot.write_centered_text(2, 1, x2 + 2.5, y1, 0.0, 0.5, junk.c_str());
 
    }
 

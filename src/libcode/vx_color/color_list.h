@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "color_parser.h"
-
+#include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +36,7 @@ class ClistEntry {
 
       Dcolor D;
 
-      char * Name;
+      ConcatString Name;
 
    public:
 
@@ -49,7 +49,7 @@ class ClistEntry {
 
       void dump(ostream &, int depth = 0) const;
 
-      void set_name(const char *);
+      void set_name(const std::string);
 
       void set_color(const Dcolor &);
 
@@ -65,7 +65,7 @@ class ClistEntry {
 
 inline Dcolor ClistEntry::dc() const { return ( D ); }
 
-inline const char * ClistEntry::name() const { return ( Name ); }
+inline const char * ClistEntry::name() const { return ( Name.c_str() ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ class ColorList {
 
       void add(const ClistEntry &);
 
-      int has_name(const char *, int & index);
+      int has_name(const std::string, int & index);
 
 };
 

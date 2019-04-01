@@ -107,7 +107,7 @@ static void range_check(Dcolor &);
 
 static void range_check(double &);
 
-static void assign_color_1(const char * name, const Dcolor &);
+static void assign_color_1(const std::string name, const Dcolor &);
 static void assign_color_2(int, const Dcolor &);
 
 static void add_to_table(const ColorNumber &, const Dcolor &);
@@ -498,7 +498,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void assign_color_1(const char * name, const Dcolor & d)
+void assign_color_1(const std::string name, const Dcolor & d)
 
 {
 

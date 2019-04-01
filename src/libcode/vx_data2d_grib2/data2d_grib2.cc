@@ -108,7 +108,7 @@ bool MetGrib2DataFile::open(const char * _filename) {
 
    //  attempt to opent he
    Filename = _filename;
-   if( NULL == (FileGrib2 = fopen(Filename, "r")) ){
+   if( NULL == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() -> "
            << "unable to open input GRIB2 file " << _filename << "\n\n";
       exit(1);
@@ -204,7 +204,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    //  verify that a only single record was found
    if( 1 < listMatch.size() ){
-      ConcatString msg = "";
+      ConcatString msg;
       for(size_t i=0; i < listMatch.size(); i++) {
          msg << "record " << listMatch[i]->RecNum
              << " field " << listMatch[i]->FieldNum
@@ -267,7 +267,7 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
 
       //  report on the exact match(es)
       if( 1 < listMatchExact.size() ){
-         ConcatString msg = "";
+         ConcatString msg;
          for(size_t i=0; i < listMatchExact.size(); i++) {
             msg << "record " << listMatchExact[i]->RecNum
                 << " field " << listMatchExact[i]->FieldNum
@@ -301,7 +301,7 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
    //  otherwise, if range matches were found, use them
    else if( 0 < listMatchRange.size() ){
 
-      ConcatString msg = "";
+      ConcatString msg;
       for(size_t i=0; i < listMatchRange.size(); i++) {
          msg << (i ? ", " : "") << listMatchRange[i]->RecNum;
       }
@@ -403,7 +403,9 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          //  if the  string is numeric
          if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number = atoi(ens_number_str);
+         delete[] ens_number_str;
       }
+
       // if one of the parameters was not set - error
       if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
          mlog << Error << "\nfind_record_matches() -> "
@@ -904,7 +906,9 @@ void MetGrib2DataFile::read_grib2_record_list() {
          NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
-         delete [] cgrib;
+	 //	 if (cgrib != NULL) {
+	 //	   delete [] cgrib;
+	 //	 }
 
          //  if there are more fields in the current record, read the next one
          if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, cgrib, numfields);
@@ -1381,7 +1385,6 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    mlog << Debug(4) << "\n";
 
    g2_free(gfld);
-   delete [] cgrib;
 
    return true;
 }
@@ -1423,13 +1426,13 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
 ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
 
-   ConcatString lvl = "";
+   ConcatString lvl;
    int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
    switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
       case LevelType_Accum:
          lvl = "A";
          lvl_val1 = rec->RangeVal * (int)VarInfoGrib2::g2_time_range_unit_to_sec(rec->RangeTyp);
-         lvl_val1 = atoi( sec_to_hhmmss( lvl_val1 ) );
+         lvl_val1 = atoi( sec_to_hhmmss( lvl_val1 ).c_str() );
          lvl_val1 = (0 == lvl_val1 % 10000 ? lvl_val1 / 10000 : lvl_val1);
          lvl_val2 = lvl_val1;
          break;

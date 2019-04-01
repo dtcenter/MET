@@ -41,9 +41,6 @@ typedef signed char ncbyte; // from ncvalues.h
 #define GET_NC_SIZE(ncObj)          ncObj.getSize()
 #define GET_NC_SIZE_P(ncObjPtr)     ncObjPtr->getSize()
 
-//#define GET_NC_TYPE(ncObj)          ncObj.getType()
-//#define GET_NC_TYPE_P(ncObjPtr)     ncObjPtr->getType()
-
 #define GET_NC_TYPE_ID(ncObj)           ncObj.getType().getId()
 #define GET_NC_TYPE_ID_P(ncObjPtr)      ncObjPtr->getType().getId()
 #define GET_NC_TYPE_NAME(ncObj)         ncObj.getType().getName()
@@ -118,7 +115,7 @@ static const char nc_var_obs_qty[]      = "obs_qty";
 static const char nc_var_obs_qty_tbl[]  = "obs_qty_table";
 static const char nc_var_obs_var[]      = "obs_var";
 static const char nc_var_unit[]         = "obs_unit";
-static const char nc_att_use_var_id[]   = "use_var_id";
+static const string nc_att_use_var_id   = "use_var_id";
 static const char nc_att_obs_version[]  = "MET_Obs_version";
 
 static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* since [0-9]\\{4\\}";
@@ -134,9 +131,6 @@ static const int exit_code_no_obs_vars = 4;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-//extern bool find_att(const NcFile *, const ConcatString &, NcGroupAtt &);
-//extern bool find_att(const NcVar  *, const ConcatString &, NcVarAtt   &);
 
 extern bool      get_att_value(const NcAtt *, int    &value);
 extern bool      get_att_value(const NcAtt *, float  &value);
@@ -163,31 +157,25 @@ extern bool      get_att_no_leap_year(const NcVar *);
 
 extern NcVarAtt    *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = false);
 extern NcGroupAtt  *get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = false);
-//extern NcVarAtt   *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = true);
-//extern NcGroupAtt *get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = true);
-//extern NcGroupAtt get_att(const NcFile *, const ConcatString &, bool exit_on_error = true);
 
-
-extern bool get_nc_att(const NcVarAtt *, ConcatString &);
+extern bool get_nc_att(const NcVarAtt *, string &);
 extern bool get_nc_att(const NcVarAtt *, int          &, bool exit_on_error = true);
 extern bool get_nc_att(const NcVarAtt *, float        &, bool exit_on_error = true);
 extern bool get_nc_att(const NcVarAtt *, double       &, bool exit_on_error = true);
 extern bool get_nc_att(const NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
 extern bool get_nc_att(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
-//extern NcVarAtt *get_var_att(const NcVar *, const ConcatString &, bool exit_on_error = true);
 
-extern bool has_att(NcFile *, const char * name, bool exit_on_error = false);
+extern bool has_att(NcFile *, const ConcatString name, bool exit_on_error = false);
 
 extern bool get_global_att(const NcGroupAtt *, ConcatString &);
-//extern bool get_global_att(const NcFile *, NcGroupAtt *, const char *, bool error_out = false);
 extern bool get_global_att(const char *, const ConcatString &, bool &);
 extern bool get_global_att(const char *, const ConcatString &, ConcatString &);
 extern bool get_global_att(const NcFile *, const ConcatString &, ConcatString &, bool error_out = false);
-extern bool get_global_att(const NcFile *, const char *, int &, bool error_out = false);
-extern bool get_global_att(const NcFile *, const char *, bool &, bool error_out = false);
-extern bool get_global_att(const NcFile *, const char *, float &, bool error_out = false);
-extern bool get_global_att(const NcFile *, const char *, double &, bool error_out = false);
+extern bool get_global_att(const NcFile *, const ConcatString&, int &, bool error_out = false);
+extern bool get_global_att(const NcFile *, const ConcatString&, bool &, bool error_out = false);
+extern bool get_global_att(const NcFile *, const ConcatString&, float &, bool error_out = false);
+extern bool get_global_att(const NcFile *, const ConcatString&, double &, bool error_out = false);
 extern bool get_global_att_double(const NcFile *, const ConcatString &, double &, bool error_out = false);
 
 extern  int get_version_no(const NcFile *);
@@ -196,6 +184,7 @@ extern bool is_version_less_than_1_02(const NcFile *nc);
 extern void add_att(NcFile *, const string, const int   );
 extern void add_att(NcFile *, const string, const string);
 extern void add_att(NcFile *, const string, const char *);
+extern void add_att(NcFile *, const string, const ConcatString);
 extern void add_att(NcVar  *, const string, const string);
 extern void add_att(NcVar  *, const string, const int   );
 extern void add_att(NcVar  *, const string, const float );
@@ -273,7 +262,6 @@ extern bool get_nc_data(NcFile *, const char *var_name, ncbyte *data, const long
 extern bool get_nc_data_to_array(NcVar  *, StringArray *);
 extern bool get_nc_data_to_array(NcFile *, const char *, StringArray *);
 extern int  get_nc_string_length(NcVar  *);
-//extern int  get_nc_string_length(NcFile *, const char *);
 extern int  get_nc_string_length(NcFile *, NcVar, const char *var_name);
 
 extern bool put_nc_data(NcVar *, const int    *data );
@@ -313,15 +301,13 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
 extern NcVar    get_var(NcFile *, const char * var_name);
 extern NcVar get_nc_var(NcFile *, const char * var_name);
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
-//extern void   copy_nc_att(NcFile *, NcFile *, const char * attr_name);
-extern void   copy_nc_att(NcFile *, NcVar *, const char * attr_name);
-extern void   copy_nc_att( NcVar *,  NcVar *, const char * attr_name);
+extern void   copy_nc_att(NcFile *, NcVar *, const ConcatString attr_name);
+extern void   copy_nc_att( NcVar *,  NcVar *, const ConcatString attr_name);
 extern void  copy_nc_atts(NcFile *, NcFile *, const bool all_attrs=true);
 extern void  copy_nc_atts( NcVar *,  NcVar *, const bool all_attrs=true);
 extern void copy_nc_var_data(NcVar *, NcVar *);
 
 extern bool has_var(NcFile *, const char * var_name);
-//extern int get_var_count(NcFile *);
 
 extern NcVar  add_var(NcFile *, const string, const NcType, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern NcVar  add_var(NcFile *, const string, const NcType, const NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
@@ -331,7 +317,6 @@ extern NcVar  add_var(NcFile *, const string, const NcType, const NcDim, const N
 extern NcVar  add_var(NcFile *, const string, const NcType, const vector<NcDim>, const int deflate_level=DEF_DEFLATE_LEVEL);
 
 extern NcDim  add_dim(NcFile *, string);
-//extern NcDim  add_dim(NcFile *, string, long);
 extern NcDim  add_dim(NcFile *, string, size_t);
 extern bool   has_dim(NcFile *, const char * dim_name);
 extern bool   get_dim(const NcFile *, const ConcatString &, int &, bool error_out = false);
@@ -344,7 +329,6 @@ extern NcDim  get_nc_dim(const NcVar *, string dim_name);
 extern NcDim  get_nc_dim(const NcVar *, int dim_offset);
 extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
-//extern multimap<string,NcDim> get_global_dims(const NcFile *nc, int *dim_count);
 
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 

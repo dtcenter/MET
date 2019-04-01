@@ -452,54 +452,54 @@ double ShapeData::get_attr(const ConcatString &attr_name,
                            bool precip_flag) const {
    double v1, v2, v3, attr_val;
 
-   if(strcasecmp(attr_name, "CENTROID_X") == 0) {
+   if(strcasecmp(attr_name.c_str(), "CENTROID_X") == 0) {
       centroid(attr_val, v2);
    }
-   else if(strcasecmp(attr_name, "CENTROID_Y") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CENTROID_Y") == 0) {
       centroid(v1, attr_val);
    }
-   else if(strcasecmp(attr_name, "CENTROID_LAT") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CENTROID_LAT") == 0) {
       centroid(v1, v2);
       grid->xy_to_latlon(v1, v2, attr_val, v3);
    }
-   else if(strcasecmp(attr_name, "CENTROID_LON") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CENTROID_LON") == 0) {
       centroid(v1, v2);
       grid->xy_to_latlon(v1, v2, v3, attr_val);
    }
-   else if(strcasecmp(attr_name, "AXIS_ANG") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "AXIS_ANG") == 0) {
       attr_val = angle_degrees();
    }
-   else if(strcasecmp(attr_name, "LENGTH") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "LENGTH") == 0) {
       attr_val = length();
    }
-   else if(strcasecmp(attr_name, "WIDTH") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "WIDTH") == 0) {
       attr_val = width();
    }
-   else if(strcasecmp(attr_name, "ASPECT_RATIO") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "ASPECT_RATIO") == 0) {
       calc_length_width(v1, v2);
       attr_val = v2/v1;
    }
-   else if(strcasecmp(attr_name, "AREA") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "AREA") == 0) {
       attr_val = area();
    }
-   else if(strcasecmp(attr_name, "AREA_THRESH") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "AREA_THRESH") == 0) {
       attr_val = area_thresh(raw_ptr, obj_thresh);
    }
-   else if(strcasecmp(attr_name, "CURVATURE") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CURVATURE") == 0) {
       attr_val = curvature(v1, v2);
    }
-   else if(strcasecmp(attr_name, "CURVATURE_X") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CURVATURE_X") == 0) {
       v1 = curvature(attr_val, v2);
    }
-   else if(strcasecmp(attr_name, "CURVATURE_Y") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "CURVATURE_Y") == 0) {
       v1 = curvature(v1, attr_val);
    }
-   else if(strcasecmp(attr_name, "COMPLEXITY") == 0) {
+   else if(strcasecmp(attr_name.c_str(), "COMPLEXITY") == 0) {
       attr_val = complexity();
    }
-   else if(strncasecmp(attr_name, "INTENSITY_", strlen("INTENSITY_")) == 0) {
+   else if(strncasecmp(attr_name.c_str(), "INTENSITY_", strlen("INTENSITY_")) == 0) {
       StringArray sa = attr_name.split("_");
-      attr_val = intensity_percentile(raw_ptr, atoi(sa[1]), precip_flag);
+      attr_val = intensity_percentile(raw_ptr, atoi(sa[1].c_str()), precip_flag);
    }
    else {
       mlog << Warning << "\nShapeData::get_attr() -> "

@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
    in_file_name << argv[1];
 
    // Create an instance of this file type
-   mtddf_cur = mtddf_factory.new_met_2d_data_file(in_file_name);
+   mtddf_cur = mtddf_factory.new_met_2d_data_file(in_file_name.c_str());
    if(mtddf_cur == (Met2dDataFile *) 0) {
       mlog << "\n\n  test_factory() -> "
            << "trouble reading input file \"" << in_file_name << "\"\n\n";
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
       // Set up the VarInfo object
       vinfo_cur->clear();
-      vinfo_cur->set_magic(name_str.c_str(), level_str.c_str());
+      vinfo_cur->set_magic(name_str, level_str);
 
       // Dump the contents
       mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";

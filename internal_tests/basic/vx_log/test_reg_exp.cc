@@ -56,7 +56,7 @@ int main(int argc, char * argv []) {
    mlog << Debug(1) << "Regex  = '" << RegexCS << "'\n";
    mlog << Debug(1) << "Test   = '" << TestCS  << "'\n";
    mlog << Debug(1) << "Result = "
-        << bool_to_string(check_reg_exp(RegexCS, TestCS)) << "\n";
+        << bool_to_string(check_reg_exp(RegexCS.c_str(), TestCS.c_str())) << "\n";
 
    return(0);
 }

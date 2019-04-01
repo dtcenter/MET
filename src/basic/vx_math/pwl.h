@@ -45,7 +45,7 @@ class PiecewiseLinear {
 
       int n_alloc;
 
-      char * Name;
+      ConcatString Name;
 
       double * X;
       double * Y;
@@ -68,7 +68,7 @@ class PiecewiseLinear {
          //  set stuff
          //
 
-      void set_name(const char *);
+      void set_name(const ConcatString);
 
          //
          //  get stuff
@@ -97,7 +97,7 @@ class PiecewiseLinear {
 
 inline int PiecewiseLinear::n_points() const { return ( N ); }
 
-inline const char * PiecewiseLinear::name() const { return ( (const char *) Name ); }
+inline const char * PiecewiseLinear::name() const { return ( Name.c_str() ); }
 
 
 ////////////////////////////////////////////////////////////////////////

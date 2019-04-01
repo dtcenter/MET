@@ -225,7 +225,7 @@ bool ProbInfoBase::is_match(const TrackInfo &t) const {
       match = false;
 
    // Check that technique is defined
-   if(!Technique || !t.technique()) return(false);
+   if(Technique == "" || t.technique() == "") return(false);
 
    // Check that init times match for non-BEST, non-analysis tracks
    if(!t.is_best_track() &&
@@ -300,9 +300,9 @@ void ProbInfoBase::set(const TCStatLine &l) {
    NProb = atoi(l.get_item("N_THRESH"));
    for(int i=1; i<=NProb; i++) {
       cs << cs_erase << "PROB_" << i;
-      Prob.add(atof(l.get_item(cs)));
+      Prob.add(atof(l.get_item(cs.c_str())));
       cs << cs_erase << "THRESH_" << i;
-      ProbItem.add(atof(l.get_item(cs)));
+      ProbItem.add(atof(l.get_item(cs.c_str())));
    }
 
    return;

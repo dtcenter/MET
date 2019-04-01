@@ -105,7 +105,6 @@ void PairBase::clear() {
 
 void PairBase::extend(int n) {
 
-   sid_sa.extend(n);
    lat_na.extend(n);
    lon_na.extend(n);
    x_na.extend(n);
@@ -115,12 +114,9 @@ void PairBase::extend(int n) {
    lvl_na.extend(n);
    elv_na.extend(n);
    o_na.extend(n);
-   o_qc_sa.extend(n);
    cmn_na.extend(n);
    csd_na.extend(n);
    cdf_na.extend(n);
-
-   map_key.extend(n);
 
    return;
 }
@@ -131,7 +127,7 @@ void PairBase::set_mask_name(const char *c) {
 
    mask_name = c;
 
-   return;
+  return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,7 +259,7 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
    //
    for(i=0, i_obs=-1; i<n_obs; i++) {
 
-      if(strcmp(sid_sa[i], sid) == 0 &&
+      if(sid_sa[i] == sid &&
          is_eq(lat_na[i], lat) &&
          is_eq(lon_na[i], lon) &&
          is_eq(lvl_na[i], lvl) &&
@@ -539,7 +535,7 @@ void PairBase::calc_obs_summary(){
       //  parse the single key string
       char** mat = NULL;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
-                           map_key[i], mat) ){
+                           map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
               << "regex_apply failed to parse '"
               << map_key[i] << "'\n\n";

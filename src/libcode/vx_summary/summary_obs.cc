@@ -476,8 +476,8 @@ bool SummaryObs::addObservationObj(const Observation &obs)
    // Do not filter by grib_code or obs_var here
    observations.push_back(obs);
 
-   const char *var_name = obs.getVarName().c_str();
-   if (0 < strlen(var_name) && !obs_names.has(var_name)) {
+   const ConcatString var_name = obs.getVarName();
+   if (0 < var_name.length() && !obs_names.has(var_name)) {
       obs_names.add(var_name);
    }
    result = true;

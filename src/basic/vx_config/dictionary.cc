@@ -172,7 +172,7 @@ void DictionaryEntry::assign(const DictionaryEntry & entry)
 clear();
 
 switch ( entry.Type )  {
-
+  
    case IntegerType:
       set_int(entry.Name, entry.Ival);
       break;
@@ -186,7 +186,7 @@ switch ( entry.Type )  {
       break;
 
    case StringType:
-      set_string(entry.Name, *(entry.Text));
+     set_string(entry.Name, entry.Text->c_str());
       break;
 
    case DictionaryType:
@@ -203,7 +203,7 @@ switch ( entry.Type )  {
       break;
 
    case PwlFunctionType:
-      set_pwl(entry.Name, *(entry.PWL));
+     set_pwl(entry.Name, *(entry.PWL));
       break;
 
    // case VariableType:
@@ -211,7 +211,7 @@ switch ( entry.Type )  {
    //    break;
 
    case UserFunctionType:
-      set_user_function(entry.Name, *(entry.v), entry.Nargs);
+     set_user_function(entry.Name, *(entry.v), entry.Nargs);
       break;
 
    default:
@@ -420,11 +420,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_name (const char * _name)
+void DictionaryEntry::set_name (const std::string _name)
 
 {
 
-if ( empty(_name) )  {
+  if ( _name.empty() )  {
 
    mlog << Error
         << "\nDictionaryEntry::set_name (const char *) -> "
@@ -462,7 +462,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_int (const char * _name, int k)
+void DictionaryEntry::set_int (const std::string _name, int k)
 
 {
 
@@ -470,7 +470,7 @@ clear();
 
 Type = IntegerType;
 
-if ( nonempty(_name) )   set_name(_name);
+if ( _name != "" )   set_name(_name);
 
 Ival = k;
 
@@ -499,7 +499,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_user_function (const char * _name, const IcodeVector & _icv, int _n_args)
+void DictionaryEntry::set_user_function (const std::string _name, const IcodeVector & _icv, int _n_args)
 
 {
 
@@ -519,7 +519,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_double (const char * _name, double x)
+void DictionaryEntry::set_double (const std::string _name, double x)
 
 {
 
@@ -527,7 +527,7 @@ clear();
 
 Type = FloatType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 Dval = x;
 
@@ -540,7 +540,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_string (const char * _name, const char * _text)
+void DictionaryEntry::set_string (const std::string _name, const std::string _text)
 
 {
 
@@ -548,11 +548,11 @@ clear();
 
 Type = StringType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 Text = new ConcatString;
 
-if ( nonempty(_text) )  *Text = _text;
+if ( _text != "" )  *Text = _text;
 
 return;
 
@@ -562,7 +562,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_boolean(const char * _name, bool tf)
+void DictionaryEntry::set_boolean(const std::string _name, bool tf)
 
 {
 
@@ -570,7 +570,7 @@ clear();
 
 Type = BooleanType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 Bval = tf;
 
@@ -582,7 +582,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_dict(const char * _name, const Dictionary & d)
+void DictionaryEntry::set_dict(const std::string _name, const Dictionary & d)
 
 {
 
@@ -591,7 +591,7 @@ clear();
 if ( d.is_array() )  Type = ArrayType;
 else                 Type = DictionaryType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 Dict = new Dictionary;
 
@@ -605,7 +605,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_pwl(const char * _name, const PiecewiseLinear & _pwl)
+void DictionaryEntry::set_pwl(const std::string _name, const PiecewiseLinear & _pwl)
 
 {
 
@@ -613,7 +613,7 @@ clear();
 
 Type = PwlFunctionType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 PWL = new PiecewiseLinear;
 
@@ -629,7 +629,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_threshold(const char * _name, const SingleThresh & t)
+void DictionaryEntry::set_threshold(const std::string _name, const SingleThresh & t)
 
 {
 
@@ -637,7 +637,7 @@ clear();
 
 Type = ThresholdType;
 
-if ( nonempty(_name) )  set_name(_name);
+if ( _name != "" )  set_name(_name);
 
 Thresh = new SingleThresh;
 
@@ -1256,7 +1256,7 @@ return ( e[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup(const char * name)
+const DictionaryEntry * Dictionary::lookup(const std::string name)
 
 {
 
@@ -1289,7 +1289,7 @@ if ( scope.n_elements() == 1 )  {
 
 for (j=0; j<(scope.n_elements() - 1); ++j)  {
 
-   E = D->lookup(scope[j]);
+  E = D->lookup(scope[j].c_str());
 
    if ( !E )  {
 
@@ -1313,7 +1313,7 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
    //  try current dictionary
    //
 
-const char * stub = scope[scope.n_elements() - 1];
+ const char * stub = scope[scope.n_elements() - 1].c_str();
 
 E = D->lookup_simple(stub);
 
@@ -1346,7 +1346,7 @@ return ( E );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup_simple(const char * name)
+const DictionaryEntry * Dictionary::lookup_simple(const std::string name)
 
 {
 
@@ -2033,7 +2033,7 @@ ConcatString cs = lookup_string(name, false);
 
 if ( LastLookupStatus )  {
    if ( cs.empty() )  return ( bad_data_int );
-   else               return ( timestring_to_sec( cs ) );
+   else               return ( timestring_to_sec( cs.c_str() ) );
 }
 
 return ( lookup_int(name, error_out) );
@@ -2053,7 +2053,7 @@ IntArray ia;
 
 int j;
 
-for (j=0; j<sa.n_elements(); ++j)  ia.add( timestring_to_sec( sa[j] ));
+ for (j=0; j<sa.n_elements(); ++j)  ia.add( timestring_to_sec( sa[j].c_str() ));
 
 return ( ia );
 
@@ -2069,7 +2069,7 @@ unixtime Dictionary::lookup_unixtime(const char * name, bool error_out)
 ConcatString cs = lookup_string(name, error_out);
 
 if ( cs.empty() )  return ( (unixtime) 0 );
-else               return ( timestring_to_unix( cs ) );
+ else               return ( timestring_to_unix( cs.c_str() ) );
 
 }
 
@@ -2085,7 +2085,7 @@ TimeArray ta;
 
 int j;
 
-for (j=0; j<sa.n_elements(); ++j)  ta.add( timestring_to_unix( sa[j] ));
+ for (j=0; j<sa.n_elements(); ++j)  ta.add( timestring_to_unix( sa[j].c_str() ));
 
 return ( ta );
 
@@ -2495,7 +2495,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryStack::pop_dict(const char * name)
+void DictionaryStack::pop_dict(const std::string name)
 
 {
 
@@ -2582,7 +2582,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * DictionaryStack::lookup(const char * name) const
+const DictionaryEntry * DictionaryStack::lookup(const std::string name) const
 
 {
 

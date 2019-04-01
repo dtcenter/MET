@@ -26,7 +26,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-int is_afm_keyword(const char * text, AfmKeyword & a)
+int is_afm_keyword(ConcatString text, AfmKeyword & a)
 
 {
 
@@ -36,7 +36,7 @@ a = no_afm_keyword;
 
 for (j=0; j<n_kw_infos; ++j)  {
 
-  if ( strncmp(text, kw_info[j].text, strlen(kw_info[j].text)+1) == 0 )  {
+  if ( text == kw_info[j].text )  {
 
       a = kw_info[j].key;
 

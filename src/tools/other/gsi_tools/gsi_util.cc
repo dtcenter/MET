@@ -219,7 +219,7 @@ void setup_header(StatHdrColumns &shc,
 
    // MODEL
    if(name.has("MODEL", index)) {
-      shc.set_model(value[index]);
+      shc.set_model(value[index].c_str());
    }
    else {
       shc.set_model(default_model);
@@ -227,7 +227,7 @@ void setup_header(StatHdrColumns &shc,
 
    // DESC
    if(name.has("DESC", index)) {
-      shc.set_desc(value[index]);
+      shc.set_desc(value[index].c_str());
    }
    else {
       shc.set_desc(default_desc);
@@ -235,7 +235,7 @@ void setup_header(StatHdrColumns &shc,
 
    // FCST_LEAD
    if(name.has("FCST_LEAD", index)) {
-      shc.set_fcst_lead_sec(timestring_to_sec(value[index]));
+      shc.set_fcst_lead_sec(timestring_to_sec(value[index].c_str()));
    }
    else {
       shc.set_fcst_lead_sec(default_lead);
@@ -243,17 +243,17 @@ void setup_header(StatHdrColumns &shc,
 
    // FCST_VALID_BEG, FCST_VALID_END
    if(name.has("FCST_VALID_BEG", index)) {
-      shc.set_fcst_valid_beg(timestring_to_unix(value[index]));
+      shc.set_fcst_valid_beg(timestring_to_unix(value[index].c_str()));
       not_has_FCST_VALID_BEG = false;
    }
    if(name.has("FCST_VALID_END", index)) {
-      shc.set_fcst_valid_end(timestring_to_unix(value[index]));
+      shc.set_fcst_valid_end(timestring_to_unix(value[index].c_str()));
       not_has_FCST_VALID_END = false;
    }
 
    // OBS_LEAD
    if(name.has("OBS_LEAD", index)) {
-      shc.set_obs_lead_sec(timestring_to_sec(value[index]));
+      shc.set_obs_lead_sec(timestring_to_sec(value[index].c_str()));
    }
    else {
       shc.set_obs_lead_sec(default_lead);
@@ -261,11 +261,11 @@ void setup_header(StatHdrColumns &shc,
 
    // OBS_VALID_BEG, OBS_VALID_END
    if(name.has("OBS_VALID_BEG", index)) {
-      shc.set_obs_valid_beg(timestring_to_unix(value[index]));
+      shc.set_obs_valid_beg(timestring_to_unix(value[index].c_str()));
       not_has_OBS_VALID_BEG = false;
    }
    if(name.has("OBS_VALID_END", index)) {
-      shc.set_obs_valid_end(timestring_to_unix(value[index]));
+      shc.set_obs_valid_end(timestring_to_unix(value[index].c_str()));
       not_has_OBS_VALID_END = false;
    }
 
@@ -277,7 +277,7 @@ void setup_header(StatHdrColumns &shc,
 
    // FCST_LEV
    if(name.has("FCST_LEV", index)) {
-      shc.set_fcst_lev(value[index]);
+      shc.set_fcst_lev(value[index].c_str());
    }
    else {
       shc.set_fcst_lev(default_lev);
@@ -291,7 +291,7 @@ void setup_header(StatHdrColumns &shc,
 
    // OBS_LEV
    if(name.has("OBS_LEV", index)) {
-      shc.set_obs_lev(value[index]);
+      shc.set_obs_lev(value[index].c_str());
    }
    else {
       shc.set_obs_lev(default_lev);
@@ -299,7 +299,7 @@ void setup_header(StatHdrColumns &shc,
 
    // OBTYPE
    if(name.has("OBTYPE", index)) {
-      shc.set_obtype(value[index]);
+      shc.set_obtype(value[index].c_str());
       not_has_OBTYPE = false;
    }
    else {
@@ -308,7 +308,7 @@ void setup_header(StatHdrColumns &shc,
 
    // VX_MASK
    if(name.has("VX_MASK", index)) {
-      shc.set_mask(value[index]);
+      shc.set_mask(value[index].c_str());
    }
    else {
       shc.set_mask(default_vx_mask);
@@ -319,35 +319,35 @@ void setup_header(StatHdrColumns &shc,
       shc.set_interp_mthd(value[index]);
    }
    else {
-      shc.set_interp_mthd(default_interp_mthd);
+     shc.set_interp_mthd((string)default_interp_mthd);
    }
 
    // INTERP_PNTS
    if(name.has("INTERP_PNTS", index)) {
-      shc.set_interp_wdth(nint(sqrt(atof(value[index]))));
+      shc.set_interp_wdth(nint(sqrt(atof(value[index].c_str()))));
    }
    else {
       shc.set_interp_wdth(default_interp_wdth);
    }
 
    // FCST_THRESH
-   if(name.has("FCST_THRESH", index)) st.set(value[index]);
+   if(name.has("FCST_THRESH", index)) st.set(value[index].c_str());
    else                                   st.set(default_thresh);
    shc.set_fcst_thresh(st);
 
    // OBS_THRESH
-   if(name.has("OBS_THRESH", index))  st.set(value[index]);
+   if(name.has("OBS_THRESH", index))  st.set(value[index].c_str());
    else                                   st.set(default_thresh);
    shc.set_obs_thresh(st);
 
    // COV_THRESH
-   if(name.has("COV_THRESH", index))  st.set(value[index]);
+   if(name.has("COV_THRESH", index))  st.set(value[index].c_str());
    else                                   st.set(default_thresh);
    shc.set_cov_thresh(st);
 
    // ALPHA
    if(name.has("ALPHA", index)) {
-      shc.set_alpha(atof(value[index]));
+      shc.set_alpha(atof(value[index].c_str()));
    }
    else {
       shc.set_alpha(default_alpha);
@@ -355,7 +355,7 @@ void setup_header(StatHdrColumns &shc,
 
    // LINE_TYPE
    if(name.has("LINE_TYPE", index)) {
-      shc.set_line_type(value[index]);
+      shc.set_line_type(value[index].c_str());
    }
    else {
       shc.set_line_type(default_line_type);

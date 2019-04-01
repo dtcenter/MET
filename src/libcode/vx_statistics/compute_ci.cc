@@ -33,7 +33,7 @@ static void write_cntinfo(ofstream &, const CNTInfo &);
 static void write_ctsinfo(ofstream &, const CTSInfo &);
 static void write_mctsinfo(ofstream &, const MCTSInfo &);
 static void write_nbrcntinfo(ofstream &, const NBRCNTInfo &);
-static void read_ldf(const char *, int, NumArray &);
+static void read_ldf(const ConcatString, int, NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -344,10 +344,10 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_cts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_cts_i_" << i;
-      cts_i_file[i] = make_temp_file_name(prefix, NULL);
+      cts_i_file[i] = make_temp_file_name(prefix.c_str(), NULL);
 
       prefix << cs_erase << tmp_dir << "/tmp_cts_r_" << i;
-      cts_r_file[i] = make_temp_file_name(prefix, NULL);
+      cts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
    }
 
    //
@@ -360,13 +360,30 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Open up the temp files
       //
       for(i=0; i<n_cts; i++) {
-         cts_i_out[i].open(cts_i_file[i]);
-         cts_r_out[i].open(cts_r_file[i]);
+         cts_i_out[i].open(cts_i_file[i].c_str());
+         cts_r_out[i].open(cts_r_file[i].c_str());
          if(!cts_i_out[i] || !cts_r_out[i]) {
             mlog << Error << "\ncompute_cts_stats_ci_bca() -> "
                  << "can't open one or more temporary files for writing:\n"
                  << cts_i_file[i] << "\n"
                  << cts_r_file[i] << "\n\n";
+
+            //
+            // Attempt to delete temp files
+            //
+      for(i=0; i<n_cts; i++) {
+         remove_temp_file(cts_i_file[i]);
+         remove_temp_file(cts_r_file[i]);
+      }
+
+      // deallocate memory
+      if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
+      if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
+      if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
+      if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
+      if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+
+	    
             throw(1);
          }
       }
@@ -671,13 +688,6 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
            << ".  Deleting temp files before exiting.\n\n"
           ;
 
-      //
-      // Attempt to delete temp files
-      //
-      for(i=0; i<n_cts; i++) {
-         remove_temp_file(cts_i_file[i]);
-         remove_temp_file(cts_r_file[i]);
-      }
 
       exit(i_err);
    } // end catch block
@@ -771,10 +781,10 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_mcts_i";
-   mcts_i_file = make_temp_file_name(prefix, NULL);
+   mcts_i_file = make_temp_file_name(prefix.c_str(), NULL);
 
    prefix << cs_erase << tmp_dir << "/tmp_mcts_r";
-   mcts_r_file = make_temp_file_name(prefix, NULL);
+   mcts_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -785,8 +795,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Open up the temp files
       //
-      mcts_i_out.open(mcts_i_file);
-      mcts_r_out.open(mcts_r_file);
+      mcts_i_out.open(mcts_i_file.c_str());
+      mcts_r_out.open(mcts_r_file.c_str());
       if(!mcts_i_out || !mcts_r_out) {
          mlog << Error << "\ncompute_mcts_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
@@ -975,10 +985,10 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_cnt_i";
-   cnt_i_file = make_temp_file_name(prefix, NULL);
+   cnt_i_file = make_temp_file_name(prefix.c_str(), NULL);
 
    prefix << cs_erase << tmp_dir << "/tmp_cnt_r";
-   cnt_r_file = make_temp_file_name(prefix, NULL);
+   cnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -989,8 +999,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Open up the temp files
       //
-      cnt_i_out.open(cnt_i_file);
-      cnt_r_out.open(cnt_r_file);
+      cnt_i_out.open(cnt_i_file.c_str());
+      cnt_r_out.open(cnt_r_file.c_str());
       if(!cnt_i_out || !cnt_r_out) {
          mlog << Error << "\ncompute_cnt_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
@@ -1434,7 +1444,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_cts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_cts_r_" << i;
-      cts_r_file[i] = make_temp_file_name(prefix, NULL);
+      cts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
    }
 
    //
@@ -1447,11 +1457,20 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
       // Open up the temp files
       //
       for(i=0; i<n_cts; i++) {
-         cts_r_out[i].open(cts_r_file[i]);
+         cts_r_out[i].open(cts_r_file[i].c_str());
          if(!cts_r_out[i]) {
             mlog << Error << "\ncompute_cts_stats_ci_perc() -> "
                  << "can't open the temporary file for writing:\n"
                  << cts_r_file[i] << "\n\n";
+           //
+           // Attempt to delete temp files
+           //
+           for(i=0; i<n_cts; i++) remove_temp_file(cts_r_file[i]);
+
+           if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
+           if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
+           if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+
             throw(1);
          }
       }
@@ -1721,11 +1740,6 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
            << ".  Deleting temp files before exiting.\n\n"
           ;
 
-      //
-      // Attempt to delete temp files
-      //
-      for(i=0; i<n_cts; i++) remove_temp_file(cts_r_file[i]);
-
       exit(i_err);
    } // end catch block
 
@@ -1816,7 +1830,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_mcts_r";
-   mcts_r_file = make_temp_file_name(prefix, NULL);
+   mcts_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1827,7 +1841,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Open up the temp file
       //
-      mcts_r_out.open(mcts_r_file);
+      mcts_r_out.open(mcts_r_file.c_str());
       if(!mcts_r_out) {
          mlog << Error << "\ncompute_mcts_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
@@ -1997,7 +2011,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_cnt_r";
-   cnt_r_file = make_temp_file_name(prefix, NULL);
+   cnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2008,7 +2022,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Open up the temp files
       //
-      cnt_r_out.open(cnt_r_file);
+      cnt_r_out.open(cnt_r_file.c_str());
       if(!cnt_r_out) {
          mlog << Error << "\ncompute_cnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
@@ -2408,10 +2422,10 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_nbrcts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_i_" << i;
-      nbrcts_i_file[i] = make_temp_file_name(prefix, NULL);
+      nbrcts_i_file[i] = make_temp_file_name(prefix.c_str(), NULL);
 
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_r_" << i;
-      nbrcts_r_file[i] = make_temp_file_name(prefix, NULL);
+      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
    }
 
    //
@@ -2424,13 +2438,28 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Open up the temp files
       //
       for(i=0; i<n_nbrcts; i++) {
-         nbrcts_i_out[i].open(nbrcts_i_file[i]);
-         nbrcts_r_out[i].open(nbrcts_r_file[i]);
+         nbrcts_i_out[i].open(nbrcts_i_file[i].c_str());
+         nbrcts_r_out[i].open(nbrcts_r_file[i].c_str());
          if(!nbrcts_i_out[i] || !nbrcts_r_out[i]) {
             mlog << Error << "\ncompute_nbrcts_stats_ci_bca() -> "
                  << "can't open one or more temporary files for writing:\n"
                  << nbrcts_i_file[i] << "\n"
                  << nbrcts_r_file[i] << "\n\n";
+	    //
+            // Attempt to delete temp files
+            //
+            for(i=0; i<n_nbrcts; i++) {
+               remove_temp_file(nbrcts_i_file[i]);
+               remove_temp_file(nbrcts_r_file[i]);
+            }
+
+            // deallocate memory
+            if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
+             if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     0; }
+            if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
+            if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) 0; }
+            if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+
             throw(1);
          }
       }
@@ -2734,15 +2763,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
            << "encountered an error value of " << i_err
            << ".  Deleting temp files before exiting.\n\n"
           ;
-
-      //
-      // Attempt to delete temp files
-      //
-      for(i=0; i<n_nbrcts; i++) {
-         remove_temp_file(nbrcts_i_file[i]);
-         remove_temp_file(nbrcts_r_file[i]);
-      }
-
+      
       exit(i_err);
    } // end catch block
 
@@ -2820,10 +2841,10 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_i";
-   nbrcnt_i_file = make_temp_file_name(prefix, NULL);
+   nbrcnt_i_file = make_temp_file_name(prefix.c_str(), NULL);
 
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_r";
-   nbrcnt_r_file = make_temp_file_name(prefix, NULL);
+   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2834,8 +2855,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       // Open up the temp files
       //
-      nbrcnt_i_out.open(nbrcnt_i_file);
-      nbrcnt_r_out.open(nbrcnt_r_file);
+      nbrcnt_i_out.open(nbrcnt_i_file.c_str());
+      nbrcnt_r_out.open(nbrcnt_r_file.c_str());
       if(!nbrcnt_i_out || !nbrcnt_r_out) {
          mlog << Error << "\ncompute_nbrcnt_stats_ci_bca() -> "
               << "can't open one or more temporary files for writing:\n"
@@ -3055,7 +3076,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_nbrcts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_r_" << i;
-      nbrcts_r_file[i] = make_temp_file_name(prefix, NULL);
+      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
    }
 
    //
@@ -3068,11 +3089,22 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
       // Open up the temp files
       //
       for(i=0; i<n_nbrcts; i++) {
-         nbrcts_r_out[i].open(nbrcts_r_file[i]);
+         nbrcts_r_out[i].open(nbrcts_r_file[i].c_str());
          if(!nbrcts_r_out[i]) {
             mlog << Error << "\ncompute_nbrcts_stats_ci_perc() -> "
                  << "can't open the temporary file for writing:\n"
                  << nbrcts_r_file[i] << "\n\n";
+
+            //
+          // Attempt to delete temp files
+          //
+          for(i=0; i<n_nbrcts; i++) remove_temp_file(nbrcts_r_file[i]);
+         // Deallocate memory
+         //
+         if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
+         if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
+         if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+	 
             throw(1);
          }
       }
@@ -3343,11 +3375,6 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
            << ".  Deleting temp files before exiting.\n\n"
           ;
 
-      //
-      // Attempt to delete temp files
-      //
-      for(i=0; i<n_nbrcts; i++) remove_temp_file(nbrcts_r_file[i]);
-
       exit(i_err);
    } // end catch block
 
@@ -3423,7 +3450,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_r";
-   nbrcnt_r_file = make_temp_file_name(prefix, NULL);
+   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -3434,7 +3461,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
       //
       // Open up the temp files
       //
-      nbrcnt_r_out.open(nbrcnt_r_file);
+      nbrcnt_r_out.open(nbrcnt_r_file.c_str());
       if(!nbrcnt_r_out) {
          mlog << Error << "\ncompute_nbrcnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
@@ -3893,7 +3920,7 @@ void write_nbrcntinfo(ofstream &tmp_out, const NBRCNTInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_ldf(const char *file_name, int col, NumArray &na) {
+void read_ldf(const ConcatString file_name, int col, NumArray &na) {
    LineDataFile ldf_in;
    DataLine line;
    double v;
@@ -3901,7 +3928,7 @@ void read_ldf(const char *file_name, int col, NumArray &na) {
    //
    // Open up the input file for reading
    //
-   if(!ldf_in.open(file_name)) {
+   if(!ldf_in.open(file_name.c_str())) {
       mlog << Error << "\nread_ldf() -> "
            << "can't open file: " << file_name << "\n\n"
           ;

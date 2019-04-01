@@ -569,7 +569,7 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
 int index;
 
-if ( (! is_lhs) && is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+ if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
    //  local variable ?
@@ -754,7 +754,7 @@ while ( n < max_id_length )  {
 if ( (pos > 0) && (lexeme[pos - 1] == '\"') )  { lexeme[pos - 1] = (char) 0;  --pos; }
 
 
-ConcatString s = (char *) lexeme;
+ ConcatString s = (string)(char*)lexeme;
 
 while ( replace_env(s) )  {
 
@@ -775,7 +775,7 @@ clear_lexeme();
 
 if ( s.nonempty() )  {
 
-   strncpy((char *) lexeme, s.contents(), max_id_length);
+   strncpy((char *) lexeme, s.c_str(), max_id_length);
 
    strncpy(configlval.text, line, max_id_length);
 

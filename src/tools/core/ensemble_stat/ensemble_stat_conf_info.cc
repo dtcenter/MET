@@ -107,17 +107,17 @@ void EnsembleStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::read_config(const char *default_file_name,
-                                       const char *user_file_name) {
+void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
+                                       const ConcatString user_file_name) {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
-   conf.read(default_file_name);
+   conf.read(default_file_name.c_str());
 
    // Read the user-specified config file
-   conf.read(user_file_name);
+   conf.read(user_file_name.c_str());
 
    return;
 }
@@ -158,7 +158,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    rng_seed = conf.lookup_string(conf_key_rng_seed);
 
    // Set the random number generator and seed value
-   rng_set(rng_ptr, rng_type, rng_seed);
+   rng_set(rng_ptr, rng_type.c_str(), rng_seed.c_str());
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
@@ -170,7 +170,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
    // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
+   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "\"" << conf_key_message_type_group_map
            << "\" must contain an entry for \""
@@ -178,7 +178,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       exit(1);
    }
    else {
-      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
+     msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
    }
 
    // Conf: ensemble_flag
@@ -772,7 +772,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Conf: desc
-   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
+   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc).c_str());
 
    // Conf: sid_exc
    vx_pd.set_sid_exc_filt(parse_conf_sid_exc(&odict));
@@ -830,7 +830,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
    // Define the verifying message type name and values
    for(i=0; i<n_msg_typ; i++) {
-      vx_pd.set_msg_typ(i, msg_typ[i]);
+      vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
       if(sa.n_elements() == 0) sa.add(msg_typ[i]);
       vx_pd.set_msg_typ_vals(i, sa);
@@ -841,33 +841,33 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
    // Define the grid masks
    for(i=0; i<mask_grid.n_elements(); i++) {
       n = i;
-      vx_pd.set_mask_area(n, mask_name[n],
+      vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
    for(i=0; i<mask_poly.n_elements(); i++) {
       n = i + mask_grid.n_elements();
-      vx_pd.set_mask_area(n, mask_name[n],
+      vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
    for(i=0; i<mask_sid.n_elements(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements();
-      vx_pd.set_mask_sid(n, mask_name[n],
+      vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
    for(i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
-      vx_pd.set_mask_llpnt(n, mask_name[n], &mask_llpnt[i]);
+      vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
    // Define the interpolation methods
    for(i=0; i<n_interp; i++) {
-      vx_pd.set_interp(i, interp_info.method[i], interp_info.width[i],
+      vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
    }
 

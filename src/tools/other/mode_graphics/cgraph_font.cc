@@ -275,7 +275,7 @@ short_afm_name = junk;
 
 full_afm_name << gs_font_dir << '/' << gs_font_dir << '/' << short_afm_name;
 
-if ( !file_exists(full_afm_name) )  {
+if ( !file_exists(full_afm_name.c_str()) )  {
 
    mlog << Error << "\n\n  CgFont::set_by_number(int) -> can't find afm file \"" << full_afm_name << "\"\n\n";
 
@@ -652,7 +652,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(e[j]->ps_name, name) == 0 )  return ( e[j] );
+   if ( e[j]->ps_name == name )  return ( e[j] );
 
 }
 
@@ -697,7 +697,7 @@ bool same_font(const CgFont & a, const CgFont & b)
 
 {
 
-if ( strcmp(a.ps_name, b.ps_name) == 0 )  return ( true );
+if (  a.ps_name == b.ps_name )  return ( true );
 
 return ( false );
 

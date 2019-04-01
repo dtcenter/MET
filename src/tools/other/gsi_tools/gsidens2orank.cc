@@ -131,7 +131,7 @@ int main(int argc, char * argv []) {
    // Initialize the random number generator
    if(rng_name.length() == 0) rng_name = default_rng_name;
    if(rng_seed.length() == 0) rng_seed = default_rng_seed;
-   rng_set(rng_ptr, rng_name, rng_seed);
+   rng_set(rng_ptr, rng_name.c_str(), rng_seed.c_str());
 
    // Process each ensemble member
    for(int i=0; i<ens_file_list.n_elements(); i++) {
@@ -167,15 +167,15 @@ int main(int argc, char * argv []) {
            << "\nReading Ensemble Mean: " << ens_mean_filename << "\n";
 
       // Check for consistent ensemble mean file type
-      if(is_conv(ens_mean_filename) != conv_flag) {
+      if(is_conv(ens_mean_filename.c_str()) != conv_flag) {
          mlog << Error
               << "\nThe ensemble mean binary GSI diagnostic file must "
               << "be of the same type as the members.\n\n.";
          exit(1);
       }
       // Process by file type
-      if(conv_flag) process_conv(ens_mean_filename, -1);
-      else          process_rad (ens_mean_filename, -1);
+      if(conv_flag) process_conv(ens_mean_filename.c_str(), -1);
+      else          process_rad (ens_mean_filename.c_str(), -1);
    }
 
    // Write the output
@@ -256,17 +256,17 @@ void process_conv_data(ConvData &d, int i_mem) {
    ConcatString key = get_conv_key(d);
 
    // Add entry for new observation
-   if(!has_key(key)) {
+   if(!has_key(key.c_str())) {
 
       // Store the current key
-      add_key(key);
+      add_key(key.c_str());
 
       // Store the current pair data
       conv_data.push_back(d);
 
       // Store the current observation info
       // Store default weight value of 1
-      ens_pd.add_obs(d.sid, d.lat, d.lon,
+      ens_pd.add_obs(d.sid.c_str(), d.lat, d.lon,
                      bad_data_double, bad_data_double,
                      d.obs_ut, d.prs, d.elv, d.obs, na_str,
                      bad_data_double, bad_data_double);
@@ -278,15 +278,15 @@ void process_conv_data(ConvData &d, int i_mem) {
    } // end if
 
    // Get the current observation index
-   if(!has_key(key, i_obs)) {
+   if(!has_key(key.c_str(), i_obs)) {
       mlog << Error << "\nprocess_conv_data() -> "
            << "can't find entry for case \"" << key << "\"\n\n";
       exit(1);
    }
 
    // Check for consistentcy
-   check_int(d.prep_use, conv_data[i_obs].prep_use, "PREP_USE", key);
-   check_int(d.setup_qc, conv_data[i_obs].setup_qc, "SETUP_QC", key);
+   check_int(d.prep_use, conv_data[i_obs].prep_use, "PREP_USE", key.c_str());
+   check_int(d.setup_qc, conv_data[i_obs].setup_qc, "SETUP_QC", key.c_str());
 
    // Store current ensemble data
    if(mn) {
@@ -413,7 +413,7 @@ void process_rad_data(RadData &d, int i_mem) {
    bool mn = (i_mem < 0);
 
    // Build current key
-   ConcatString key = get_rad_key(d);
+   const char * key = get_rad_key(d).c_str();
 
    // Add entry for new observation
    if(!has_key(key)) {
@@ -539,7 +539,7 @@ void write_orank() {
         << "\nWriting: " << output_filename << "\n";
 
    // Open output file
-   out.open(output_filename);
+   out.open(output_filename.c_str());
    if(!out) {
       mlog << Error << "\nwrite_orank_conv() -> "
            << "can't open output file \"" << output_filename << "\"\n\n";
@@ -599,7 +599,7 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(d->obs_ut);
    if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(d->var);
    if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(d->var);
-   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(d->obtype);
+   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(d->obtype.c_str());
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -890,7 +890,7 @@ void set_swap(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_channel(const StringArray & a) {
-   channel.add_css(a[0]);
+   channel.add_css(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -925,7 +925,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_verbosity(const StringArray & a) {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

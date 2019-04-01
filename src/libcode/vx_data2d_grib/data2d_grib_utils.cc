@@ -104,6 +104,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
             ens_number_str[vinfo_ens.length()-1] = (char) 0;
             //  if the  string is numeric
             if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number= atoi(ens_number_str);
+            delete[] ens_number_str;
          }
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
@@ -133,7 +134,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    }
 
    // if it is one of APCP names - (APCP_Z0) - use 'APCP' only
-   if ( check_reg_exp("^APCP_[0-9]*$", field_name) )  field_name = "APCP";
+   if ( check_reg_exp("^APCP_[0-9]*$", field_name.c_str()) )  field_name = "APCP";
 
    Grib1TableEntry tab;
    int tab_match = -1;
@@ -142,10 +143,10 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib1(field_name, vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
+      if( !GribTable.lookup_grib1(field_name.c_str(), vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
       {
          //  if did not find with params from the header - try default
-         if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
+         if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
             //  if the lookup still fails, then it's not a match
             return ( false );
@@ -181,8 +182,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       }
    }
    vinfo.set_code      ( tab.code         );
-   vinfo.set_units     ( tab.units        );
-   vinfo.set_long_name ( tab.full_name    );
+   vinfo.set_units     ( tab.units.c_str());
+   vinfo.set_long_name ( tab.full_name.c_str()    );
 
    //
    //  test the level type number, if specified

@@ -127,7 +127,7 @@ void set_table_number(const StringArray & a)
 
 {
 
-table_number = atoi(a[0]);
+table_number = atoi(a[0].c_str());
 
 table_number_set = true;
 
@@ -189,7 +189,7 @@ found = false;
 
 while ( line.read_line(in) )  {
 
-   if ( strstr(line, target_start) != 0 )  { found = true;  break; }
+   if ( strstr(line.c_str(), target_start) != 0 )  { found = true;  break; }
 
 }
 
@@ -212,7 +212,7 @@ while ( 1 )  {
 
    line.read_line(in);
 
-   if ( ! parse_line(line) )  break;
+   if ( ! parse_line(line.c_str()) )  break;
 
 }
 

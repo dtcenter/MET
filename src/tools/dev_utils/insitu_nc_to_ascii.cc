@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -45,7 +45,7 @@ int main(int argc, char * argv [])
   
   // Check the command line and extract the arguments
 
-  ConcatString program_name = get_short_name(argv[0]);
+  ConcatString program_name = (string)get_short_name(argv[0]);
 
   if (argc != 3)
   {
@@ -100,7 +100,7 @@ int main(int argc, char * argv [])
 //      mlog << Error << "\n" << method_name << " -> "
 //	   << "error converting time value to time structure" << endl;
       cerr << "Error converting time value to time structure" << endl;
-      
+      fclose(output_file);
       exit(1);
     }
 
@@ -126,7 +126,7 @@ int main(int argc, char * argv [])
 	    qc_confidence, max_edr);
     
   }
-  
+  fclose(output_file);  
   return 0;
 }
 

@@ -371,30 +371,30 @@ void TrackPairInfo::add(const TCStatLine &l) {
       tp->set_valid(l.valid());
       tp->set_lead(l.lead());
       cs << cs_erase << deck[i] << "LAT";
-      tp->set_lat(atof(l.get_item(cs)));
+      tp->set_lat(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "LON";
-      tp->set_lon(atof(l.get_item(cs)));
+      tp->set_lon(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "MAX_WIND";
-      tp->set_v_max(atof(l.get_item(cs)));
+      tp->set_v_max(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "MSLP";
-      tp->set_mslp(atof(l.get_item(cs)));
+      tp->set_mslp(atof(l.get_item(cs.c_str())));
       tp->set_level(string_to_cyclonelevel(l.get_item("LEVEL")));
       cs << cs_erase << deck[i] << "RADP";
-      tp->set_radp(atof(l.get_item(cs)));
+      tp->set_radp(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "RRP";
-      tp->set_rrp(atof(l.get_item(cs)));
+      tp->set_rrp(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "MRD";
-      tp->set_mrd(atof(l.get_item(cs)));
+      tp->set_mrd(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "GUSTS";
-      tp->set_gusts(atof(l.get_item(cs)));
+      tp->set_gusts(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "EYE";
-      tp->set_eye(atof(l.get_item(cs)));
+      tp->set_eye(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "DIR";
-      tp->set_direction(atof(l.get_item(cs)));
+      tp->set_direction(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "SPEED";
-      tp->set_speed(atof(l.get_item(cs)));
+      tp->set_speed(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "DEPTH";
-      tp->set_eye(string_to_systemsdepth(l.get_item(cs)));
+      tp->set_eye(string_to_systemsdepth(l.get_item(cs.c_str())));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
       // Loop over the winds
@@ -408,15 +408,15 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
          // Set the wind radius values
          cs << cs_erase << deck[i] << "AL_WIND_" << WindIntensity[j];
-         wind.set_al_val(atof(l.get_item(cs)));
+         wind.set_al_val(atof(l.get_item(cs.c_str())));
          cs << cs_erase << deck[i] << "NE_WIND_" << WindIntensity[j];
-         wind.set_ne_val(atof(l.get_item(cs)));
+         wind.set_ne_val(atof(l.get_item(cs.c_str())));
          cs << cs_erase << deck[i] << "SE_WIND_" << WindIntensity[j];
-         wind.set_se_val(atof(l.get_item(cs)));
+         wind.set_se_val(atof(l.get_item(cs.c_str())));
          cs << cs_erase << deck[i] << "SW_WIND_" << WindIntensity[j];
-         wind.set_sw_val(atof(l.get_item(cs)));
+         wind.set_sw_val(atof(l.get_item(cs.c_str())));
          cs << cs_erase << deck[i] << "NW_WIND_" << WindIntensity[j];
-         wind.set_nw_val(atof(l.get_item(cs)));
+         wind.set_nw_val(atof(l.get_item(cs.c_str())));
 
          // Add wind to TrackInfo
          tp->set_wind(j, wind);

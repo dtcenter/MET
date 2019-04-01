@@ -310,7 +310,7 @@ bool ShpFile::open(const char * path)
 
 close();
 
-if ( (fd = ::open(path, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(path, O_RDONLY)) < 0 )  {
 
    fd = -1;
 

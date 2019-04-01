@@ -172,9 +172,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    clear();
 
-   set_mask_name(pd.mask_name);
+   set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
-   set_msg_typ(pd.msg_typ);
+   set_msg_typ(pd.msg_typ.c_str());
    set_msg_typ_vals(pd.msg_typ_vals);
 
    set_interp_mthd(pd.interp_mthd);
@@ -1387,7 +1387,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
    // Check whether the GRIB code for the observation matches
    // the specified code (rej_gc)
    if ((var_name != 0) && (0 < strlen(var_name))) {
-      if (0 != strcmp(var_name, obs_info->name())) {
+      if ( var_name != obs_info->name() ) {
          return;
       }
    }
@@ -1399,7 +1399,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
    if(obs_qty_filt.n_elements() && strcmp(obs_qty, "")) {
       bool qty_match = false;
       for(i=0; i<obs_qty_filt.n_elements() && !qty_match; i++)
-         if(strcmp(obs_qty, obs_qty_filt[i]) == 0) qty_match = true;
+         if( obs_qty == obs_qty_filt[i]) qty_match = true;
 
       if(!qty_match) return;
    }
@@ -1506,7 +1506,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
       else {
 
          // Check for table entries for this variable and message type
-         if(!obs_error_table.has(obs_info->name(), hdr_typ_str)) {
+         if(!obs_error_table.has(obs_info->name().c_str(), hdr_typ_str)) {
             mlog << Warning << "\nVxPairDataEnsemble::add_obs() -> "
                  << "Disabling observation error logic since the "
                  << "obs error table contains no entry for OBS_VAR("
@@ -1518,7 +1518,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
          }
          else {
             oerr_ptr = obs_error_table.lookup(
-               obs_info->name(), hdr_typ_str, hdr_sid_str,
+               obs_info->name().c_str(), hdr_typ_str, hdr_sid_str,
                hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
                obs_lvl, obs_hgt, obs_v);
          }

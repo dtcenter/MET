@@ -133,8 +133,8 @@ static bool           check_dup = true;
 static NumArray       channel;
 static StringArray    hdr_name;
 static StringArray    hdr_value;
-static ConcatString   suffix = ".stat";
-static ConcatString   output_directory = ".";
+static ConcatString   suffix = (string)".stat";
+static ConcatString   output_directory = (string)".";
 static StatHdrColumns shc;
 
 // Store observation keys to search for duplicates

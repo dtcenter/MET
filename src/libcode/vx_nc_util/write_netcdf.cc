@@ -278,12 +278,12 @@ void write_netcdf_var_times(NcVar *var, const unixtime init_ut,
 
 {
 
-char time_str[max_str_len];
+ConcatString time_str;
 ConcatString s;
 
    // Init time
    unix_to_yyyymmdd_hhmmss(init_ut, time_str);
-   add_att(var, "init_time", time_str);
+   add_att(var, "init_time", time_str.text());
 
    s = unixtime_to_string(init_ut);
 
@@ -291,7 +291,7 @@ ConcatString s;
 
    // Valid time
    unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
-   add_att(var, "valid_time", time_str);
+   add_att(var, "valid_time", time_str.text());
 
    s = unixtime_to_string(valid_ut);
 
@@ -299,8 +299,8 @@ ConcatString s;
 
    // Accumulation time
    if(accum_sec != 0) {
-      sec_to_hhmmss(accum_sec, time_str);
-      add_att(var, "accum_time", time_str);
+     sec_to_hhmmss(accum_sec, time_str);
+      add_att(var, "accum_time", time_str.text());
       var->putAtt("accum_time_sec", ncInt, accum_sec);
    }
 

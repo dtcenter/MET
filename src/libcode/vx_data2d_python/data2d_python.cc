@@ -184,8 +184,8 @@ file_argc = sa.n_elements();
 if ( file_argc > 0 )  {
    file_argv = new char * [ file_argc ];
    for ( i=0; i<sa.n_elements(); i++ )  {
-      file_argv[i] = new char [ strlen(sa[i]) + 1 ];
-      strcpy(file_argv[i], sa[i]);
+     file_argv[i] = new char [ sa[i].length() + 1 ];
+      strcpy(file_argv[i], sa[i].c_str());
    }
 }
 
@@ -210,7 +210,7 @@ file_name = sa[sa.n_elements() - 1];
    //  Set the PYTHONPATH
    //
 
-setenv("PYTHONPATH", path_name, 1);
+setenv("PYTHONPATH", path_name.c_str(), 1);
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
@@ -239,7 +239,7 @@ Filename = file_name;
 
 Raw_Grid = new Grid;
 
-python_dataplane(file_name, file_argc, file_argv, use_xarray, Plane, *Raw_Grid, VInfo);
+python_dataplane(file_name.c_str(), file_argc, file_argv, use_xarray, Plane, *Raw_Grid, VInfo);
 
 Dest_Grid = new Grid;
 
@@ -362,7 +362,7 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   open(vinfo.req_name());
+   open(vinfo.req_name().c_str());
 
 }
 
@@ -377,9 +377,9 @@ plane = Plane;
    //
 
 vinfo.set_name(VInfo.name());
-vinfo.set_long_name(VInfo.long_name());
-vinfo.set_level_name(VInfo.level_name());
-vinfo.set_units(VInfo.units());
+vinfo.set_long_name(VInfo.long_name().c_str());
+vinfo.set_level_name(VInfo.level_name().c_str());
+vinfo.set_units(VInfo.units().c_str());
 vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );
@@ -403,7 +403,7 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   open(vinfo.req_name());
+   open(vinfo.req_name().c_str());
 
 }
 
@@ -420,9 +420,9 @@ plane_array.add(Plane, 0.0, 0.0);
    //
 
 vinfo.set_name(VInfo.name());
-vinfo.set_long_name(VInfo.long_name());
-vinfo.set_level_name(VInfo.level_name());
-vinfo.set_units(VInfo.units());
+vinfo.set_long_name(VInfo.long_name().c_str());
+vinfo.set_level_name(VInfo.level_name().c_str());
+vinfo.set_units(VInfo.units().c_str());
 vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
 return ( true );

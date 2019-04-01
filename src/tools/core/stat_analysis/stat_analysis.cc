@@ -106,8 +106,8 @@ int main(int argc, char * argv []) {
    default_config_file = replace_path(default_config_filename);
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n";
-   conf.read(replace_path(config_const_filename));
-   conf.read(default_config_file);
+   conf.read(replace_path(config_const_filename).c_str());
+   conf.read(default_config_file.c_str());
 
    //
    // Read the user config file
@@ -115,7 +115,7 @@ int main(int argc, char * argv []) {
    if(config_file.length() > 0) {
       mlog << Debug(1)
            << "User Config File: " << config_file << "\n";
-      conf.read(config_file);
+      conf.read(config_file.c_str());
    }
 
    //
@@ -149,7 +149,7 @@ int main(int argc, char * argv []) {
       mlog << Debug(4)
            << "Amending default job with command line options: \""
            << command_line_job_options << "\"\n";
-      default_job.parse_job_command(command_line_job_options);
+      default_job.parse_job_command(command_line_job_options.c_str());
 
       //
       // Process the STAT files found in the search directories.
@@ -164,14 +164,14 @@ int main(int argc, char * argv []) {
          jobs_sa = conf.lookup_string_array(conf_key_jobs);
 
          for(i=0; i<jobs_sa.n_elements(); i++) {
-            process_job(jobs_sa[i], i+1);
+            process_job(jobs_sa[i].c_str(), i+1);
          }
       }
       //
       // Otherwise, process the job specified on the command line.
       //
       else {
-         process_job(command_line_job_options, 1);
+         process_job(command_line_job_options.c_str(), 1);
       }
 
    }
@@ -374,7 +374,7 @@ void set_out_file(const char *path) {
    // Create an output file and set the sa_out ofstream to it.
    //
    sa_out = new ofstream;
-   sa_out->open(out_file);
+   sa_out->open(out_file.c_str());
 
    if(!(*sa_out)) {
       mlog << Error << "\nset_out_file()-> "
@@ -433,8 +433,8 @@ void process_search_dirs() {
       // Read config file constants followed by the config file which
       // defines the GO Index.
       //
-      go_conf.read(replace_path(config_const_filename));
-      go_conf.read(replace_path(go_index_config_file));
+      go_conf.read(replace_path(config_const_filename).c_str());
+      go_conf.read(replace_path(go_index_config_file).c_str());
 
       //
       // Parse the contents of the GO Index config file into the
@@ -445,7 +445,7 @@ void process_search_dirs() {
       //
       // Amend the default job with GO Index filtering criteria.
       //
-      default_job.parse_job_command(go_job.get_jobstring());
+      default_job.parse_job_command(go_job.get_jobstring().c_str());
 
    } // end if go_index
 
@@ -466,12 +466,12 @@ void process_search_dirs() {
    // Build the temp file name
    //
    tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
-   tmp_path = make_temp_file_name(tmp_file, NULL);
+   tmp_path = make_temp_file_name(tmp_file.c_str(), NULL);
 
    //
    // Open the temp file
    //
-   tmp_out.open(tmp_path);
+   tmp_out.open(tmp_path.c_str());
    if(!tmp_out) {
       mlog << Error << "\nprocess_search_dirs() -> "
            << "can't open the temporary file \"" << tmp_path
@@ -486,7 +486,7 @@ void process_search_dirs() {
    max_len = 0;
 
    for(i=0; i<n; i++)  {
-      j = strlen(files[i]);
+     j = files[i].length();
       if(j > max_len) max_len = j;
    }
    max_len += 3;
@@ -498,7 +498,7 @@ void process_search_dirs() {
 
          mlog << Debug(3) << "Processing STAT file \"" << files[i] << "\" ";
 
-         for(j=strlen(files[i]); j<max_len; j++) mlog << '.';
+         for(j=files[i].length(); j<max_len; j++) mlog << '.';
 
          mlog << " " << i+1 << " of " << n << "\n";
 
@@ -506,7 +506,7 @@ void process_search_dirs() {
 
       }
 
-      process_stat_file(files[i], default_job, n_read, n_keep);
+      process_stat_file(files[i].c_str(), default_job, n_read, n_keep);
    }
 
    mlog << Debug(2) << "STAT Lines read     = " << n_read << "\n";
@@ -591,8 +591,8 @@ void process_job(const char * jobstring, int n_job) {
       // Read config file constants followed by the config file which
       // defines the GO Index.
       //
-      go_conf.read(replace_path(config_const_filename));
-      go_conf.read(replace_path(go_index_config_file));
+      go_conf.read(replace_path(config_const_filename).c_str());
+      go_conf.read(replace_path(go_index_config_file).c_str());
 
       //
       // Parse the contents of the GO Index config file into the
@@ -606,7 +606,7 @@ void process_job(const char * jobstring, int n_job) {
       mlog << Debug(4)
            << "\nAmending Job " << n_job << " with GO Index configuration file: "
            << replace_path(go_index_config_file) << "\n";
-      job.parse_job_command(go_job.get_jobstring());
+      job.parse_job_command(go_job.get_jobstring().c_str());
 
    } // end if go_index
 
@@ -617,7 +617,7 @@ void process_job(const char * jobstring, int n_job) {
       mlog << Debug(4)
            << "\nAmending Job " << n_job << " with command line options: \""
            << command_line_job_options << "\"\n";
-      job.parse_job_command(command_line_job_options);
+      job.parse_job_command(command_line_job_options.c_str());
    }
 
    //
@@ -695,14 +695,14 @@ void usage() {
 void set_lookin_path(const StringArray & a)
 {
    for (int i = 0; i < a.n_elements(); i++)
-      set_search_dir(a[i]);
+      set_search_dir(a[i].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_out_filename(const StringArray & a)
 {
-   set_out_file(a[0]);
+   set_out_file(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -710,13 +710,13 @@ void set_out_filename(const StringArray & a)
 void set_tmp_dir(const StringArray & a)
 {
    tmp_dir << a[0];
-   if(met_opendir(tmp_dir) == NULL ) {
+   if(met_opendir(tmp_dir.c_str()) == NULL ) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
    }
-   setenv("MET_TMP_DIR", tmp_dir, 1);
+   setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -734,14 +734,14 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity_level(const StringArray & a)
 {
-   set_verbosity(atoi(a[0]));
+   set_verbosity(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_config_file(const StringArray & a)
 {
-   set_config(a[0]);
+   set_config(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

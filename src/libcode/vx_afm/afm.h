@@ -265,7 +265,7 @@ class Afm {
 
       void dump(ostream &, int depth = 0) const;
 
-      int read(const char *);
+      int read(const ConcatString&);
 
       int lookup_cm(int ascii_code)     const;
       int lookup_cm(const char * name)  const;

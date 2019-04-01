@@ -48,10 +48,10 @@ program_name = get_short_name(argv[0]);
 
 if ( argc != 3 )  usage();
 
-ConcatString  input_filename = argv[1];
-ConcatString output_filename = argv[2];
+ char *  input_filename = argv[1];
+ char * output_filename = argv[2];
 
-reformat(input_filename, output_filename);
+ reformat(input_filename, output_filename);
 
 
    //
@@ -99,7 +99,7 @@ char out_line[512];
    //  open the files
    //
 
-in.open(input_filename);
+met_open(in, input_filename);
 
 if ( !in )  {
 
@@ -109,7 +109,7 @@ if ( !in )  {
 
 }
 
-out.open(output_filename);
+met_open(out, output_filename);
 
 if ( !out )  {
 

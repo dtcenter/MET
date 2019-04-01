@@ -71,14 +71,14 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static ConcatString output_directory = ".";
+static ConcatString output_directory = (string)".";
 
 static StringArray fcst_filenames;
 static StringArray  obs_filenames;
 
 static StringArray  single_filenames;
 
-static ConcatString local_config_filename = "";
+static ConcatString local_config_filename;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -156,7 +156,7 @@ if ( local_config_filename.empty() )  {
 
 default_config_filename = replace_path(default_config_path);
 
-config.read_config(default_config_filename, local_config_filename);
+config.read_config(default_config_filename.c_str(), local_config_filename.c_str());
 
 
 
@@ -179,7 +179,7 @@ if ( single_filenames.n() > 0 )  {
 
    single_filenames = parse_file_list(single_filenames, stype);
 
-   if ( stype == FileType_None ) stype = grd_file_type(single_filenames[0]);
+   if ( stype == FileType_None ) stype = grd_file_type(single_filenames[0].c_str());
 
    config.process_config(stype, stype);
 
@@ -201,8 +201,8 @@ otype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
 fcst_filenames = parse_file_list(fcst_filenames, ftype);
 obs_filenames  = parse_file_list(obs_filenames,  otype);
 
-if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0]);
-if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0]);
+if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0].c_str());
+if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0].c_str());
 
 config.process_config(ftype, otype);
 
@@ -350,7 +350,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
    mask = fcst_obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, fcst_raw, config.model);
+   att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str());
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -371,7 +371,7 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
    mask = obs_obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, obs_raw, config.model);
+   att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str());
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -567,7 +567,7 @@ if ( have_pairs )  {
 
       mask = fcst_obj.select_cluster(a);   //  1-based
 
-      att_3 = calc_3d_single_atts(mask, fcst_raw, config.model);
+      att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str());
 
       att_3.set_object_number(j + 1);   //  1-based
 
@@ -592,7 +592,7 @@ if ( have_pairs )  {
 
       mask = obs_obj.select_cluster(a);   //  1-based
 
-      att_3 = calc_3d_single_atts(mask, obs_raw, config.model);
+      att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str());
 
       // if ( att.Xvelocity > 20.0 )  mask.write("w.nc");
 
@@ -773,7 +773,7 @@ mlog << Debug(2)
      << path << "\"\n";
 
 do_2d_txt_output(fcst_simple_att_2d,  obs_simple_att_2d,
-                 fcst_cluster_att_2d, obs_cluster_att_2d, config, path);
+                 fcst_cluster_att_2d, obs_cluster_att_2d, config, path.c_str());
 
    //
    //  write simple single attributes
@@ -787,7 +787,7 @@ mlog << Debug(2)
      << "Creating 3D single simple attributes file: \""
      << path << "\"\n";
 
-do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
+do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path.c_str());
 
    //
    //  write simple pair attributes
@@ -803,7 +803,7 @@ if ( have_pairs )  {
         << "Creating 3D pair simple attributes file: \""
         << path << "\"\n";
 
-   do_3d_pair_txt_output(pa_simple, config, false, path);
+   do_3d_pair_txt_output(pa_simple, config, false, path.c_str());
 
 }
 
@@ -821,7 +821,7 @@ if ( have_pairs )  {
         << "Creating 3D cluster single attributes file: \""
         << path << "\"\n";
 
-   do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
+   do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path.c_str());
 
 }
 
@@ -839,7 +839,7 @@ if ( have_pairs )  {
         << "Creating 3D cluster pair attributes file: \""
         << path << "\"\n";
 
-   do_3d_pair_txt_output(pa_cluster, config, true, path);
+   do_3d_pair_txt_output(pa_cluster, config, true, path.c_str());
 
 }
 
@@ -856,7 +856,7 @@ mlog << Debug(2)
      << path << "\"\n";
 
 
-do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
+do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path.c_str());
 
 
    //
@@ -987,7 +987,7 @@ void set_verbosity  (const StringArray & a)
 
 {
 
-int k = atoi(a[0]);
+int k = atoi(a[0].c_str());
 
 mlog.set_verbosity_level(k);
 
@@ -1052,14 +1052,14 @@ if(a.n_elements() == 0) {
    //
    //  attempt to read the first file as a gridded data file
    //
-mtddf = factory.new_met_2d_data_file(a[0], type);
+mtddf = factory.new_met_2d_data_file(a[0].c_str(), type);
 
    //
    //  if the read was successful, store the list of gridded files.
    //  otherwise, process entries as ASCII files.
    //
 if(mtddf)                            list.add(a);
-else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
+else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0].c_str());
 
 return ( list );
 
@@ -1173,7 +1173,7 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
    select_mask = obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(select_mask, raw, config.model);
+   att_3 = calc_3d_single_atts(select_mask, raw, config.model.c_str());
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -1231,7 +1231,7 @@ mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
-do_2d_txt_output(att_2d, config, path);
+do_2d_txt_output(att_2d, config, path.c_str());
 
    //
    //  write simple single attributes
@@ -1245,7 +1245,7 @@ mlog << Debug(2)
      << "Creating 3D single simple attributes file: \""
      << path << "\"\n";
 
-do_3d_single_txt_output(single_att, config, path);
+do_3d_single_txt_output(single_att, config, path.c_str());
 
    //
    //  netcdf output
@@ -1260,7 +1260,7 @@ mlog << Debug(2)
      << path << "\"\n";
 
 
-do_mtd_nc_output(config.nc_info, raw, obj, config, path);
+do_mtd_nc_output(config.nc_info, raw, obj, config, path.c_str());
 
 
 

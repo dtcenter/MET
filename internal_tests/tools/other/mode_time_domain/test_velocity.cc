@@ -49,7 +49,7 @@ using namespace std;
 
 static ConcatString program_name;
 
-static ConcatString output_filename = "a.nc";
+static ConcatString output_filename = (string)"a.nc";
 
 static LatLonData grid_data = {
 
@@ -163,7 +163,7 @@ V[0] = vol;
 
 obj.set_volumes(1, V);
 
-obj.write(output_filename);
+obj.write(output_filename.c_str());
 
    //
    //  get the velocity

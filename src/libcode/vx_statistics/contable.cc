@@ -172,8 +172,8 @@ void ContingencyTable::dump(ostream & out, int depth) const
 
 int r, c;
 Indent prefix(depth);
-char junk[256];
-char j2[128];
+ConcatString junk;
+ConcatString j2;
 
 
 out << prefix << "Name  = ";
@@ -192,7 +192,7 @@ for (r=0; r<Nrows; ++r)  {
 
    comma_string(row_total(r), j2);
 
-   snprintf(junk, sizeof(junk), "Sum for row %2d is %12s", r, j2);
+   junk.format("Sum for row %2d is %12s", r, j2.c_str());
 
    out << prefix << junk << "\n";
 
@@ -206,7 +206,7 @@ for (c=0; c<Ncols; ++c)  {
 
    comma_string(col_total(c), j2);
 
-   snprintf(junk, sizeof(junk), "Sum for col %2d is %12s", c, j2);
+   junk.format("Sum for col %2d is %12s", c, j2.c_str());
 
    out << prefix << junk << "\n";
 
@@ -241,11 +241,11 @@ for (c=0; c<Ncols; ++c)  {
 
    comma_string(c, junk);
 
-   col_width[c] = strlen(junk);
+   col_width[c] = junk.length();
 
-   snprintf(junk, sizeof(junk), "%d", (int) col_total(c));
+   junk.format("%d", (int) col_total(c));
 
-   k = strlen(junk);
+   k = junk.length();
 
    if ( k > col_width[c] )  col_width[c] = k;
 
@@ -255,7 +255,7 @@ for (c=0; c<Ncols; ++c)  {
 
       comma_string((*E)[n], junk);
 
-      k = strlen(junk);
+      k = junk.length();
 
       if ( k > col_width[c] )  col_width[c] = k;
 
@@ -373,7 +373,7 @@ for (r=0; r<Nrows; ++r)  {
 
       comma_string((*E)[n], junk);
 
-      k = strlen(junk);
+      k = junk.length();
 
       c_table -= k + hpad;
 

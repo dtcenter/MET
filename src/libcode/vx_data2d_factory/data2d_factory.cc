@@ -235,12 +235,12 @@ bool is_2d_data_file(const ConcatString &filename,
    // Check for a requested file type
    if(config_str.nonempty()) {
       MetConfig config;
-      config.read(replace_path(config_const_filename));
-      config.read_string(config_str);
+      config.read(replace_path(config_const_filename).c_str());
+      config.read_string(config_str.c_str());
       type = parse_conf_file_type(&config);
    }
 
-   mtddf = mtddf_factory.new_met_2d_data_file(filename, type);
+   mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
    bool status = (mtddf != 0);
 
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }

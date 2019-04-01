@@ -247,7 +247,7 @@ void ThreshArray::add_css(const char *text) {
 
    extend(Nelements + sa.n_elements());
 
-   for(j=0; j<sa.n_elements(); j++) add(sa[j]);
+   for(j=0; j<sa.n_elements(); j++) add(sa[j].c_str());
 
    return;
 }
@@ -490,10 +490,10 @@ ThreshArray string_to_prob_thresh(const char *s) {
       ta.clear();
       for(i=0; i*v<1.0; i++) {
          cs << cs_erase << ">=" << i*v;
-         ta.add(cs);
+         ta.add(cs.c_str());
       }
       cs << cs_erase << ">=" << 1.0;
-      ta.add(cs);
+      ta.add(cs.c_str());
    }
 
    // Check probability thresholds
@@ -520,7 +520,7 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
    // and check for equality
    if(status) {
       s << "==" << ta[1].get_value();
-      prob_ta = string_to_prob_thresh(s);
+      prob_ta = string_to_prob_thresh(s.c_str());
       status = (ta == prob_ta);
    }
 

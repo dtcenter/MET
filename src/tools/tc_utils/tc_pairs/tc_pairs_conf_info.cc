@@ -102,7 +102,7 @@ void TCPairsConfInfo::read_config(const char *default_file_name,
                                   const char *user_file_name) {
 
    // Read the config file constants
-   Conf.read(replace_path(config_const_filename));
+   Conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    Conf.read(default_file_name);
@@ -126,7 +126,7 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
-   check_met_version(Version);
+   check_met_version(Version.c_str());
 
    // Conf: Desc
    Desc = parse_conf_string(&Conf, conf_key_desc);
@@ -153,17 +153,17 @@ void TCPairsConfInfo::process_config() {
    // Conf: InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
    for(i=0; i<sa.n_elements(); i++)
-      InitInc.add(timestring_to_unix(sa[i]));
+      InitInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
    for(i=0; i<sa.n_elements(); i++)
-      InitExc.add(timestring_to_unix(sa[i]));
+      InitExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: InitHour
    sa = Conf.lookup_string_array(conf_key_init_hour);
    for(i=0; i<sa.n_elements(); i++)
-      InitHour.add(timestring_to_sec(sa[i]));
+      InitHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
@@ -172,11 +172,11 @@ void TCPairsConfInfo::process_config() {
    // Conf: LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
    for(i=0; i<sa.n_elements(); i++){
-      LeadReq.add(timestring_to_sec(sa[i]));
+      LeadReq.add(timestring_to_sec(sa[i].c_str()));
    }
 
    // Conf: InitMask
-   if(nonempty(Conf.lookup_string(conf_key_init_mask))) {
+   if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
       poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
       mlog << Debug(2)
            << "Init Points Masking File: " << poly_file << "\n";
@@ -185,7 +185,7 @@ void TCPairsConfInfo::process_config() {
    }
 
    // Conf: ValidMask
-   if(nonempty(Conf.lookup_string(conf_key_valid_mask))) {
+   if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
       poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
       mlog << Debug(2)
            << "Valid Point Masking File: " << poly_file << "\n";
@@ -234,7 +234,7 @@ void TCPairsConfInfo::process_config() {
    // Conf: LagTime
    sa = Conf.lookup_string_array(conf_key_lag_time);
    for(i=0; i<sa.n_elements(); i++)
-      LagTime.add(timestring_to_sec(sa[i]));
+      LagTime.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);

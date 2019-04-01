@@ -476,13 +476,13 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
        << stat_file << "\n";
 
    out << prefix << "mask_grid_str = "
-       << (mask_grid_str.nonempty() ? mask_grid_str : na_str) << "\n";
+       << (mask_grid_str.nonempty() ? mask_grid_str.c_str() : na_str) << "\n";
 
    out << prefix << "mask_poly_str = "
-       << (mask_poly_str.nonempty() ? mask_poly_str : na_str) << "\n";
+       << (mask_poly_str.nonempty() ? mask_poly_str.c_str() : na_str) << "\n";
 
    out << prefix << "mask_sid_str = "
-       << (mask_sid_str.nonempty() ? mask_sid_str : na_str) << "\n";
+       << (mask_sid_str.nonempty() ? mask_sid_str.c_str() : na_str) << "\n";
 
    out << prefix << "out_line_type ...\n";
    out_line_type.dump(out, depth + 1);
@@ -822,7 +822,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check if the current value is in the list for the column
       //
-      if(!str_it->second.has(L.get_item(str_it->first, false))) return(0);
+      if(!str_it->second.has(L.get_item(str_it->first.c_str(), false))) return(0);
    }
 
    //
@@ -851,7 +851,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
    int i;
 
    // Check for absolute value
-   if(strncasecmp(col_name, "ABS", 3) == 0) {
+   if(strncasecmp(col_name.c_str(), "ABS", 3) == 0) {
       abs_flag = true;
       sa = col_name.split("()");
       in = sa[1];
@@ -864,7 +864,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
    sa = in.split("-");
 
    // Get the first value
-   v = atof(L.get_item(sa[0]));
+   v = atof(L.get_item(sa[0].c_str()));
 
    // If multiple columns, compute the requested difference
    if(sa.n_elements() > 1) {
@@ -873,7 +873,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
       for(i=1; i<sa.n_elements(); i++) {
 
          // Get the current column value
-         v_cur = atof(L.get_item(sa[i]));
+         v_cur = atof(L.get_item(sa[i].c_str()));
 
          // Compute the difference, checking for bad data
          if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
@@ -934,82 +934,82 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    for(i=0; i<jc_array.n_elements(); i++) {
 
-      if(     strcmp(jc_array[i], "-model"          ) == 0)
+      if(     jc_array[i] == "-model"          )
          model.clear();
-      else if(strcmp(jc_array[i], "-desc"           ) == 0)
+      else if(jc_array[i] == "-desc"           )
          desc.clear();
-      else if(strcmp(jc_array[i], "-fcst_lead"      ) == 0)
+      else if(jc_array[i] == "-fcst_lead"      )
          fcst_lead.clear();
-      else if(strcmp(jc_array[i], "-obs_lead"       ) == 0)
+      else if(jc_array[i] == "-obs_lead"       )
          obs_lead.clear();
-      else if(strcmp(jc_array[i], "-fcst_valid_hour") == 0)
+      else if(jc_array[i] == "-fcst_valid_hour")
          fcst_valid_hour.clear();
-      else if(strcmp(jc_array[i], "-obs_valid_hour" ) == 0)
+      else if(jc_array[i] == "-obs_valid_hour" )
          obs_valid_hour.clear();
-      else if(strcmp(jc_array[i], "-fcst_init_hour" ) == 0)
+      else if(jc_array[i] == "-fcst_init_hour" )
          fcst_init_hour.clear();
-      else if(strcmp(jc_array[i], "-obs_init_hour"  ) == 0)
+      else if(jc_array[i] == "-obs_init_hour"  )
          obs_init_hour.clear();
-      else if(strcmp(jc_array[i], "-fcst_var"       ) == 0)
+      else if(jc_array[i] == "-fcst_var"       )
          fcst_var.clear();
-      else if(strcmp(jc_array[i], "-fcst_lev"       ) == 0)
+      else if(jc_array[i] == "-fcst_lev"       )
          fcst_lev.clear();
-      else if(strcmp(jc_array[i], "-obs_var"        ) == 0)
+      else if(jc_array[i] == "-obs_var"        )
          obs_var.clear();
-      else if(strcmp(jc_array[i], "-obs_lev"        ) == 0)
+      else if(jc_array[i] == "-obs_lev"        )
          obs_lev.clear();
-      else if(strcmp(jc_array[i], "-obtype"         ) == 0)
+      else if(jc_array[i] == "-obtype"         )
          obtype.clear();
-      else if(strcmp(jc_array[i], "-vx_mask"        ) == 0)
+      else if(jc_array[i] == "-vx_mask"        )
          vx_mask.clear();
-      else if(strcmp(jc_array[i], "-interp_mthd"    ) == 0)
+      else if(jc_array[i] == "-interp_mthd"    )
          interp_mthd.clear();
-      else if(strcmp(jc_array[i], "-interp_pnts"    ) == 0)
+      else if(jc_array[i] == "-interp_pnts"    )
          interp_pnts.clear();
-      else if(strcmp(jc_array[i], "-fcst_thresh"    ) == 0)
+      else if(jc_array[i] == "-fcst_thresh"    )
          fcst_thresh.clear();
-      else if(strcmp(jc_array[i], "-obs_thresh"     ) == 0)
+      else if(jc_array[i] == "-obs_thresh"     )
          obs_thresh.clear();
-      else if(strcmp(jc_array[i], "-cov_thresh"     ) == 0)
+      else if(jc_array[i] == "-cov_thresh"     )
          cov_thresh.clear();
-      else if(strcmp(jc_array[i], "-alpha"          ) == 0)
+      else if(jc_array[i] == "-alpha"          )
          alpha.clear();
-      else if(strcmp(jc_array[i], "-line_type"      ) == 0)
+      else if(jc_array[i] == "-line_type"      )
          line_type.clear();
-      else if(strcmp(jc_array[i], "-column"         ) == 0)
+      else if(jc_array[i] == "-column"         )
          column.clear();
-      else if(strcmp(jc_array[i], "-weight"         ) == 0)
+      else if(jc_array[i] == "-weight"         )
          weight.clear();
-      else if(strcmp(jc_array[i], "-column_min"     ) == 0 ||
-              strcmp(jc_array[i], "-column_max"     ) == 0 ||
-              strcmp(jc_array[i], "-column_eq"      ) == 0 ||
-              strcmp(jc_array[i], "-column_thresh"  ) == 0) {
+      else if(jc_array[i] == "-column_min"      ||
+              jc_array[i] == "-column_max"      ||
+              jc_array[i] == "-column_eq"       ||
+              jc_array[i] == "-column_thresh"  ) {
          column_thresh_map.clear();
       }
-      else if(strcmp(jc_array[i], "-column_str"     ) == 0) {
+      else if(jc_array[i] == "-column_str"     ) {
          column_str_map.clear();
       }
-      else if(strcmp(jc_array[i], "-set_hdr"        ) == 0) {
+      else if(jc_array[i] == "-set_hdr"        ) {
          hdr_name.clear();
          hdr_value.clear();
       }
-      else if(strcmp(jc_array[i], "-by"             ) == 0) {
+      else if(jc_array[i] == "-by"             ) {
          by_column.clear();
       }
-      else if(strcmp(jc_array[i], "-out_line_type"  ) == 0) {
+      else if(jc_array[i] == "-out_line_type"  ) {
          out_line_type.clear();
       }
-      else if(strcmp(jc_array[i], "-out_eclv_points") == 0) {
+      else if(jc_array[i] == "-out_eclv_points") {
          out_eclv_points.clear();
       }
-      else if(strcmp(jc_array[i], "-out_thresh"     ) == 0) {
+      else if(jc_array[i] == "-out_thresh"     ) {
          out_fcst_thresh.clear();
          out_obs_thresh.clear();
       }
-      else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0) {
+      else if(jc_array[i] == "-out_fcst_thresh") {
          out_fcst_thresh.clear();
       }
-      else if(strcmp(jc_array[i], "-out_obs_thresh" ) == 0) {
+      else if(jc_array[i] == "-out_obs_thresh" ) {
          out_obs_thresh.clear();
       }
    }
@@ -1023,9 +1023,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       // Parse the job command line switches
       //
 
-      if(strcmp(jc_array[i], "-job") == 0) {
+      if(jc_array[i] == "-job") {
 
-         if(set_job_type(jc_array[i+1]) != 0) {
+         if(set_job_type(jc_array[i+1].c_str()) != 0) {
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
@@ -1034,164 +1034,164 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          }
          i++;
       }
-      else if(strcmp(jc_array[i], "-model") == 0) {
+      else if(jc_array[i] == "-model") {
          model.add_css(jc_array[i+1]);
          i++;
       }
-      else if(strcmp(jc_array[i], "-desc") == 0) {
+      else if(jc_array[i] == "-desc") {
          desc.add_css(jc_array[i+1]);
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_lead") == 0) {
-         fcst_lead.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_lead") {
+         fcst_lead.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_lead") == 0) {
-         obs_lead.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_lead") {
+         obs_lead.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_valid_beg") == 0) {
-         fcst_valid_beg = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_valid_beg") {
+         fcst_valid_beg = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_valid_end") == 0) {
-         fcst_valid_end = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_valid_end") {
+         fcst_valid_end = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_valid_hour") == 0) {
-         fcst_valid_hour.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_valid_hour") {
+         fcst_valid_hour.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_valid_beg") == 0) {
-         obs_valid_beg = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_valid_beg") {
+         obs_valid_beg = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_valid_end") == 0) {
-         obs_valid_end = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_valid_end") {
+         obs_valid_end = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_valid_hour") == 0) {
-         obs_valid_hour.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_valid_hour") {
+         obs_valid_hour.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_init_beg") == 0) {
-         fcst_init_beg = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_init_beg") {
+         fcst_init_beg = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_init_end") == 0) {
-         fcst_init_end = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_init_end") {
+         fcst_init_end = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_init_hour") == 0) {
-         fcst_init_hour.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_init_hour") {
+         fcst_init_hour.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_init_beg") == 0) {
-         obs_init_beg = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_init_beg") {
+         obs_init_beg = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_init_end") == 0) {
-         obs_init_end = timestring_to_unix(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_init_end") {
+         obs_init_end = timestring_to_unix(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_init_hour") == 0) {
-         obs_init_hour.add_css_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_init_hour") {
+         obs_init_hour.add_css_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_var") == 0) {
-         fcst_var.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_var") {
+         fcst_var.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_lev") == 0) {
-         fcst_lev.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_lev") {
+         fcst_lev.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_var") == 0) {
-         obs_var.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_var") {
+         obs_var.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_lev") == 0) {
-         obs_lev.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_lev") {
+         obs_lev.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obtype") == 0) {
-         obtype.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-obtype") {
+         obtype.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-vx_mask") == 0) {
-         vx_mask.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-vx_mask") {
+         vx_mask.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-interp_mthd") == 0) {
-         interp_mthd.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-interp_mthd") {
+         interp_mthd.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-interp_pnts") == 0) {
-         interp_pnts.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-interp_pnts") {
+         interp_pnts.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-fcst_thresh") == 0) {
-         fcst_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-fcst_thresh") {
+         fcst_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-obs_thresh") == 0) {
-         obs_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-obs_thresh") {
+         obs_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-cov_thresh") == 0) {
-         cov_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-cov_thresh") {
+         cov_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-thresh_logic") == 0) {
-         thresh_logic = string_to_setlogic(jc_array[i+1]);
+      else if(jc_array[i] == "-thresh_logic") {
+         thresh_logic = string_to_setlogic(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-alpha") == 0) {
-         alpha.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-alpha") {
+         alpha.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-line_type") == 0) {
-         line_type.add_css(to_upper(jc_array[i+1]));
+      else if(jc_array[i] == "-line_type") {
+         line_type.add_css(to_upper((string)jc_array[i+1]));
          i++;
       }
-      else if(strcmp(jc_array[i], "-column") == 0) {
-         column.add_css(to_upper(jc_array[i+1]));
+      else if(jc_array[i] == "-column") {
+         column.add_css(to_upper((string)jc_array[i+1]));
          i++;
       }
-      else if(strcmp(jc_array[i], "-column_union") == 0) {
-         column_union = string_to_bool(jc_array[i+1]);
+      else if(jc_array[i] == "-column_union") {
+         column_union = string_to_bool(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-weight") == 0) {
-         weight.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-weight") {
+         weight.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-derive") == 0) {
+      else if(jc_array[i] == "-derive") {
          do_derive = true;
       }
-      else if(strcmp(jc_array[i], "-column_min") == 0) {
+      else if(jc_array[i] == "-column_min") {
          thresh_cs << cs_erase << ">=" << jc_array[i+2];
-         add_column_thresh(jc_array[i+1], thresh_cs);
+         add_column_thresh(jc_array[i+1].c_str(), thresh_cs.c_str());
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-column_max") == 0) {
+      else if(jc_array[i] == "-column_max") {
          thresh_cs << cs_erase << "<=" << jc_array[i+2];
-         add_column_thresh(jc_array[i+1], thresh_cs);
+         add_column_thresh(jc_array[i+1].c_str(), thresh_cs.c_str());
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-column_eq") == 0) {
+      else if(jc_array[i] == "-column_eq") {
          thresh_cs << cs_erase << "==" << jc_array[i+2];
-         add_column_thresh(jc_array[i+1], thresh_cs);
+         add_column_thresh(jc_array[i+1].c_str(), thresh_cs.c_str());
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-column_thresh") == 0) {
-         add_column_thresh(jc_array[i+1], jc_array[i+2]);
+      else if(jc_array[i] == "-column_thresh") {
+         add_column_thresh(jc_array[i+1].c_str(), jc_array[i+2].c_str());
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-column_str") == 0) {
+      else if(jc_array[i] == "-column_str") {
 
          // Parse the column name and value
-         col_name = to_upper(jc_array[i+1]);
+         col_name = to_upper((string)jc_array[i+1]);
          col_value.clear();
          col_value.set_ignore_case(1);
          col_value.add_css(jc_array[i+2]);
@@ -1206,181 +1206,181 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          }
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-set_hdr") == 0) {
-         n = METHdrTable.header(met_version, "STAT", na_str)->col_offset(to_upper(jc_array[i+1]));
+      else if(jc_array[i] == "-set_hdr") {
+         n = METHdrTable.header(met_version, "STAT", na_str)->col_offset(to_upper(jc_array[i+1]).c_str());
          if(is_bad_data(n)) {
             mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
                  << "no match found for header column named: \""
-                 << to_upper(jc_array[i+1]) << "\"\n\n";
+                 << to_upper((string)jc_array[i+1]) << "\"\n\n";
             throw(1);
          }
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
       }
-      else if(strcmp(jc_array[i], "-by") == 0) {
+      else if(jc_array[i] == "-by") {
          by_column.add_css(to_upper(jc_array[i+1]));
          i+=1;
       }
-      else if(strcmp(jc_array[i], "-dump_row") == 0) {
-         set_dump_row(jc_array[i+1]);
+      else if(jc_array[i] == "-dump_row") {
+         set_dump_row(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_stat") == 0) {
-         set_stat_file(jc_array[i+1]);
+      else if(jc_array[i] == "-out_stat") {
+         set_stat_file(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-mask_grid") == 0) {
-         set_mask_grid(jc_array[i+1]);
+      else if(jc_array[i] == "-mask_grid") {
+         set_mask_grid(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-mask_poly") == 0) {
-         set_mask_poly(jc_array[i+1]);
+      else if(jc_array[i] == "-mask_poly") {
+         set_mask_poly(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-mask_sid") == 0) {
-         set_mask_sid(jc_array[i+1]);
+      else if(jc_array[i] == "-mask_sid") {
+         set_mask_sid(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_line_type") == 0) {
+      else if(jc_array[i] == "-out_line_type") {
          out_line_type.add_css(to_upper(jc_array[i+1]));
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_thresh") == 0) {
-         out_fcst_thresh.add_css(jc_array[i+1]);
-         out_obs_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-out_thresh") {
+         out_fcst_thresh.add_css(jc_array[i+1].c_str());
+         out_obs_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_fcst_thresh") == 0) {
-         out_fcst_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-out_fcst_thresh") {
+         out_fcst_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_obs_thresh") == 0) {
-         out_obs_thresh.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-out_obs_thresh") {
+         out_obs_thresh.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_cnt_logic") == 0) {
-         out_cnt_logic = string_to_setlogic(jc_array[i+1]);
+      else if(jc_array[i] == "-out_cnt_logic") {
+         out_cnt_logic = string_to_setlogic(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_wind_thresh") == 0) {
-         out_fcst_wind_thresh.set(jc_array[i+1]);
-         out_obs_wind_thresh.set(jc_array[i+1]);
+      else if(jc_array[i] == "-out_wind_thresh") {
+         out_fcst_wind_thresh.set(jc_array[i+1].c_str());
+         out_obs_wind_thresh.set(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_fcst_wind_thresh") == 0) {
-         out_fcst_wind_thresh.set(jc_array[i+1]);
+      else if(jc_array[i] == "-out_fcst_wind_thresh") {
+         out_fcst_wind_thresh.set(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_obs_wind_thresh") == 0) {
-         out_obs_wind_thresh.set(jc_array[i+1]);
+      else if(jc_array[i] == "-out_obs_wind_thresh") {
+         out_obs_wind_thresh.set(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_wind_logic") == 0) {
-         out_wind_logic = string_to_setlogic(jc_array[i+1]);
+      else if(jc_array[i] == "-out_wind_logic") {
+         out_wind_logic = string_to_setlogic(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_alpha") == 0) {
-         out_alpha = atof(jc_array[i+1]);
+      else if(jc_array[i] == "-out_alpha") {
+         out_alpha = atof(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_type") == 0) {
-         ramp_type = string_to_timeseriestype(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_type") {
+         ramp_type = string_to_timeseriestype(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_time") == 0) {
-         ramp_time_fcst = ramp_time_obs = timestring_to_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_time") {
+         ramp_time_fcst = ramp_time_obs = timestring_to_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_time_fcst") == 0) {
-         ramp_time_fcst = timestring_to_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_time_fcst") {
+         ramp_time_fcst = timestring_to_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_time_obs") == 0) {
-         ramp_time_obs = timestring_to_sec(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_time_obs") {
+         ramp_time_obs = timestring_to_sec(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_exact") == 0) {
-         ramp_exact_fcst = ramp_exact_obs = string_to_bool(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_exact") {
+         ramp_exact_fcst = ramp_exact_obs = string_to_bool(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_exact_fcst") == 0) {
-         ramp_exact_fcst = string_to_bool(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_exact_fcst") {
+         ramp_exact_fcst = string_to_bool(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_exact_obs") == 0) {
-         ramp_exact_obs = string_to_bool(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_exact_obs") {
+         ramp_exact_obs = string_to_bool(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_thresh") == 0) {
-         ramp_thresh_fcst.set(jc_array[i+1]);
-         ramp_thresh_obs.set(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_thresh") {
+         ramp_thresh_fcst.set(jc_array[i+1].c_str());
+         ramp_thresh_obs.set(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_thresh_fcst") == 0) {
-         ramp_thresh_fcst.set(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_thresh_fcst") {
+         ramp_thresh_fcst.set(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-ramp_thresh_obs") == 0) {
-         ramp_thresh_obs.set(jc_array[i+1]);
+      else if(jc_array[i] == "-ramp_thresh_obs") {
+         ramp_thresh_obs.set(jc_array[i+1].c_str());
          i++;
       }
       // May be specified using 1 or 2 arguments:
       //  - 2 arguments for beginning and ending times
       //  - 1 argument for a symmetric time window
-      else if(strcmp(jc_array[i], "-ramp_window") == 0) {
+      else if(jc_array[i] == "-ramp_window") {
 
          // Parse beginning and ending times
-         if(i+2 < jc_array.n_elements() && is_number(jc_array[i+2])) {
-            ramp_window_beg = timestring_to_sec(jc_array[i+1]);
-            ramp_window_end = timestring_to_sec(jc_array[i+2]);
+         if(i+2 < jc_array.n_elements() && is_number(jc_array[i+2].c_str())) {
+            ramp_window_beg = timestring_to_sec(jc_array[i+1].c_str());
+            ramp_window_end = timestring_to_sec(jc_array[i+2].c_str());
             i+=2;
          }
          // Parse symmetric time window
          else {
-            ramp_window_end = timestring_to_sec(jc_array[i+1]);
+            ramp_window_end = timestring_to_sec(jc_array[i+1].c_str());
             ramp_window_beg = -1 * ramp_window_end;
             i+=1;
          }
       }
-      else if(strcmp(jc_array[i], "-swing_width") == 0) {
-         swing_width = atof(jc_array[i+1]);
+      else if(jc_array[i] == "-swing_width") {
+         swing_width = atof(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_bin_size") == 0) {
-         out_bin_size = atof(jc_array[i+1]);
+      else if(jc_array[i] == "-out_bin_size") {
+         out_bin_size = atof(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-out_eclv_points") == 0) {
-         out_eclv_points.add_css(jc_array[i+1]);
+      else if(jc_array[i] == "-out_eclv_points") {
+         out_eclv_points.add_css(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-boot_interval") == 0) {
-         boot_interval = atoi(jc_array[i+1]);
+      else if(jc_array[i] == "-boot_interval") {
+         boot_interval = atoi(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-boot_rep_prop") == 0) {
-         boot_rep_prop = atof(jc_array[i+1]);
+      else if(jc_array[i] == "-boot_rep_prop") {
+         boot_rep_prop = atof(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-n_boot_rep") == 0) {
-         n_boot_rep = atoi(jc_array[i+1]);
+      else if(jc_array[i] == "-n_boot_rep") {
+         n_boot_rep = atoi(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-boot_rng") == 0) {
-         set_boot_rng(jc_array[i+1]);
+      else if(jc_array[i] == "-boot_rng") {
+         set_boot_rng(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-boot_seed") == 0) {
-         set_boot_seed(jc_array[i+1]);
+      else if(jc_array[i] == "-boot_seed") {
+         set_boot_seed(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-rank_corr_flag") == 0) {
-         rank_corr_flag = atoi(jc_array[i+1]);
+      else if(jc_array[i] == "-rank_corr_flag") {
+         rank_corr_flag = atoi(jc_array[i+1].c_str());
          i++;
       }
-      else if(strcmp(jc_array[i], "-vif_flag") == 0) {
-         vif_flag = atoi(jc_array[i+1]);
+      else if(jc_array[i] == "-vif_flag") {
+         vif_flag = atoi(jc_array[i+1].c_str());
          i++;
       }
       else {
@@ -1417,12 +1417,12 @@ void STATAnalysisJob::add_column_thresh(const char *col_name, const char *thresh
    col_thresh.add_css(thresh_str);
 
    // If the column name is already present in the map, add to it
-   if(column_thresh_map.count(col_name) > 0) {
-      column_thresh_map[col_name].add(col_thresh);
+   if(column_thresh_map.count((string)col_name) > 0) {
+      column_thresh_map[(ConcatString)col_name].add(col_thresh);
    }
    // Otherwise, add a new map entry
    else {
-      column_thresh_map.insert(pair<ConcatString, ThreshArray>(col_name, col_thresh));
+      column_thresh_map.insert(pair<ConcatString, ThreshArray>((string)col_name, col_thresh));
    }
 
    return;
@@ -1588,7 +1588,7 @@ void STATAnalysisJob::open_dump_row_file() {
    if(!dump_row) return;
 
    dr_out = new ofstream;
-   dr_out->open(dump_row);
+   met_open(*dr_out, dump_row);
    n_dump = 0;
 
    if(!(*dr_out)) {
@@ -1631,7 +1631,7 @@ void STATAnalysisJob::open_stat_file() {
    if(!stat_file) return;
 
    stat_out = new ofstream;
-   stat_out->open(stat_file);
+   met_open(*stat_out, stat_file);
 
    if(!(*stat_out)) {
       mlog << Error << "\nSTATAnalysisJob::open_stat_file()-> "
@@ -1662,14 +1662,14 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    out_sa = (out_line_type.n_elements() > 0 ?
              out_line_type : line_type);
    out_lt = (out_sa.n_elements() == 1 ?
-             string_to_statlinetype(out_sa[0]) : no_stat_line_type);
+             string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
 
    //
    // Loop through the output line types and determine the number of
    // output columns
    //
    for(i=0, n_col=0; i<out_sa.n_elements(); i++) {
-      cur_lt = string_to_statlinetype(out_sa[i]);
+      cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
          case stat_sl1l2:  c = n_sl1l2_columns;        break;
          case stat_sal1l2: c = n_sal1l2_columns;       break;
@@ -1826,7 +1826,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
       //
       if(line_type.n_elements() == 1) {
 
-         switch(string_to_statlinetype(line_type[0])) {
+         switch(string_to_statlinetype(line_type[0].c_str())) {
             case(stat_fho):
                write_header_row(fho_columns, n_fho_columns, 1, dump_at, 0, 0);
                break;
@@ -1926,7 +1926,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    // Store the data line
    //
    for(i=0; i<line.n_items(); i++) {
-     dump_at.set_entry(n_dump%dump_at.nrows(), i, line.get_item(i));
+     dump_at.set_entry(n_dump%dump_at.nrows(), i, (string)line.get_item(i));
    }
    n_dump++;
 
@@ -1945,14 +1945,14 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
 
 ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    int i;
-   ConcatString key = "";
+   ConcatString key;
 
    //
    // Retrieve value for each by_column option
    //
    for(i=0; i<by_column.n_elements(); i++) {
       key << (i == 0 ? "" : ":")
-          << L.get(by_column[i], false);
+          << L.get(by_column[i].c_str(), false);
    }
 
    return(key);
@@ -2142,7 +2142,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // line_type
    if(line_type.n_elements() > 0) {
       for(i=0; i<line_type.n_elements(); i++) {
-         type = string_to_statlinetype(line_type[i]);
+         type = string_to_statlinetype(line_type[i].c_str());
          js << "-line_type " << statlinetype_to_string(type) << " ";
       }
    }
@@ -2342,7 +2342,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // Jobs which use out_bin_size
    if(line_type.n_elements() > 0) {
-      if(string_to_statlinetype(line_type[0]) == stat_orank &&
+      if(string_to_statlinetype(line_type[0].c_str()) == stat_orank &&
          out_line_type.has(stat_phist_str)) {
 
          // out_bin_size
@@ -2352,7 +2352,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // Jobs which use out_eclv_points
    if(line_type.n_elements() > 0) {
-      if(string_to_statlinetype(line_type[0]) == stat_mpr &&
+      if(string_to_statlinetype(line_type[0].c_str()) == stat_mpr &&
          out_line_type.has(stat_eclv_str)) {
 
          // out_eclv_points
@@ -2364,7 +2364,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // Jobs which perform bootstrapping
    if(line_type.n_elements() > 0) {
-      type = string_to_statlinetype(line_type[0]);
+      type = string_to_statlinetype(line_type[0].c_str());
       if(type == stat_mpr                    &&
          (out_line_type.has(stat_cts_str)    ||
           out_line_type.has(stat_mcts_str)   ||

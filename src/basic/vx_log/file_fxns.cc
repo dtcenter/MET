@@ -27,21 +27,25 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString replace_path(const char *path) {
-   ConcatString s, met_base_val;
+ConcatString replace_path(const ConcatString path) {
+  ConcatString s, met_base_val;
    char *ptr;
 
-   // Initialize
+   // initialize
    s = path;
-
+   
    // Use the MET_BASE environment variable, if set.
    // Otherwise, use the compile-time value.
    if((ptr = get_env(met_base_str)) != NULL) met_base_val = ptr;
    else                                      met_base_val = MET_BASE;
 
-   s.replace(met_base_str, met_base_val);
+   s.replace(met_base_str, met_base_val.c_str());
 
    return(s);
+}
+
+ConcatString replace_path(const char * path) {
+  return replace_path((string)path);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,26 +57,33 @@ ConcatString replace_path(const char *path) {
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
-   return(open(replace_path(path), oflag));
+  return(open(replace_path(path).c_str(), oflag));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void met_open(ifstream &in, const char *path) {
-   in.open(replace_path(path));
+  in.open(replace_path(path).c_str());
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void met_open(ofstream &out, const char *path) {
+  out.open(replace_path(path).c_str());
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 FILE *met_fopen(const char *path, const char *mode) {
-   return(fopen(replace_path(path), mode));
+  return(fopen(replace_path(path).c_str(), mode));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DIR *met_opendir(const char *path) {
-   return(opendir(replace_path(path)));
+  return(opendir(replace_path(path).c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

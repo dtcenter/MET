@@ -57,7 +57,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    TCStatJobType type = NoTCStatJobType;
 
    // Determine the TCStatJobType
-   type = string_to_tcstatjobtype(type_str);
+   type = string_to_tcstatjobtype((string)type_str);
 
    // Switch on job type and instantiate the appropriate class.
    // The TCStatJob object is allocated and needs to be deleted by caller.
@@ -95,7 +95,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
    TCStatJob *job = (TCStatJob *) 0;
    StringArray a;
-   ConcatString type_str = na_str;
+   ConcatString type_str = na_string;
    ConcatString err_str;
    int i;
 
@@ -106,7 +106,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
    if(a.has("-job", i)) type_str = a[i+1];
 
    // Allocate a new job of the requested type
-   job = new_tc_stat_job_type(type_str);
+   job = new_tc_stat_job_type(type_str.c_str());
 
    // Parse the jobstring into the new job
    a = job->parse_job_command(jobstring);
@@ -573,7 +573,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
 
          // Retrieve the column value
-         v_str = pair.line(i_init)->get_item(str_it->first);
+         v_str = pair.line(i_init)->get_item(str_it->first.c_str());
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
@@ -645,7 +645,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    else if(Desc.n_elements() > 0 &&
      !Desc.has(line.desc()))            { keep = false; n.RejDesc++;      }
    else if(StormId.n_elements() > 0 &&
-     !has_storm_id(StormId, line.basin(), line.cyclone(), line.init()))
+   !has_storm_id(StormId, (string)line.basin(), (string)line.cyclone(), line.init()))
                                         { keep = false; n.RejStormId++;   }
    else if(Basin.n_elements() > 0 &&
      !Basin.has(line.basin()))          { keep = false; n.RejBasin++;     }
@@ -715,7 +715,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
 
          // Retrieve the column value
-         v_str = line.get_item(str_it->first);
+         v_str = line.get_item(str_it->first.c_str());
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
@@ -782,14 +782,14 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    int i;
 
    // Check for PROBRIRW_PROB special case
-   if(strcasecmp(column, "PROBRIRW_PROB") == 0 &&
+   if(strcasecmp(column.c_str(), "PROBRIRW_PROB") == 0 &&
       line.type() == TCStatLineType_ProbRIRW) {
       v = get_probrirw_value(line, ProbRIRWThresh);
       return(v);
    }
 
    // Check for absolute value
-   if(strncasecmp(column, "ABS", 3) == 0) {
+   if(strncasecmp(column.c_str(), "ABS", 3) == 0) {
       abs_flag = true;
       sa = column.split("()");
       in = sa[1];
@@ -802,7 +802,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    sa = in.split("-");
 
    // Get the first value
-   v = atof(line.get_item(sa[0]));
+   v = atof(line.get_item(sa[0].c_str()));
 
    // If multiple columns, compute the requested difference
    if(sa.n_elements() > 1) {
@@ -811,7 +811,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
       for(i=1; i<sa.n_elements(); i++) {
 
          // Get the current column value
-         v_cur = atof(line.get_item(sa[i]));
+         v_cur = atof(line.get_item(sa[i].c_str()));
 
          // Compute the difference, checking for bad data
          if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
@@ -838,7 +838,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
    // Loop over the StringArray elements
    for(i=0; i<a.n_elements(); i++) {
 
-      c = a[i];
+      c = a[i].c_str();
 
       // Skip newline characters
       if(strcasecmp(c, "\n") == 0) continue;
@@ -858,64 +858,64 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                   a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead_req"          ) == 0) { LeadReq.add_css_sec(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1]);                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1]);            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1], a[i+2], ColumnThreshMap);
+      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1].c_str());              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead_req"          ) == 0) { LeadReq.add_css_sec(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1].c_str());             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1].c_str());                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1].c_str());            a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), ColumnThreshMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1], a[i+2], ColumnStrMap);
+      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1], a[i+2], InitThreshMap);
+      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitThreshMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1], a[i+2], InitStrMap);
+      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrMap);
                                                                                                       a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1]);   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time"         ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1]);
-                                                           RIRWTimeBDeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time_adeck"   ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time_bdeck"   ) == 0) { RIRWTimeBDeck = timestring_to_sec(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact"        ) == 0) { RIRWExactADeck = string_to_bool(a[i+1]);
-                                                           RIRWExactBDeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact_adeck"  ) == 0) { RIRWExactADeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact_bdeck"  ) == 0) { RIRWExactBDeck = string_to_bool(a[i+1]);   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh"       ) == 0) { RIRWThreshADeck.set(a[i+1]);
-                                                           RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_time"         ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str());
+                                                           RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_time_adeck"   ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_time_bdeck"   ) == 0) { RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_exact"        ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());
+                                                           RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_exact_adeck"  ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_exact_bdeck"  ) == 0) { RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_thresh"       ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());
+                                                           RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_window"       ) == 0) {
-         if(i+2 < a.n_elements() && is_number(a[i+2]))   { RIRWWindowBeg = timestring_to_sec(a[i+1]);
-                                                           RIRWWindowEnd = timestring_to_sec(a[i+2]); a.shift_down(i, 2); }
-         else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1]);
+         if(i+2 < a.n_elements() && is_number(a[i+2].c_str()))   { RIRWWindowBeg = timestring_to_sec(a[i+1].c_str());
+                                                           RIRWWindowEnd = timestring_to_sec(a[i+2].c_str()); a.shift_down(i, 2); }
+         else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1].c_str());
                                                            RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
       }
-      else if(strcasecmp(c, "-probrirw_thresh"   ) == 0) { ProbRIRWThresh = atof(a[i+1]);             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probrirw_thresh"   ) == 0) { ProbRIRWThresh = atof(a[i+1].c_str());             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1].c_str());         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_window")    == 0) {
                                                            Landfall = true; // For -landfall_window, set -landfall true
-         if(i+2 < a.n_elements() && is_number(a[i+2]))   { LandfallBeg = timestring_to_sec(a[i+1]);
-                                                           LandfallEnd = timestring_to_sec(a[i+2]);   a.shift_down(i, 2); }
-         else                                            { LandfallEnd = timestring_to_sec(a[i+1]);
+         if(i+2 < a.n_elements() && is_number(a[i+2].c_str()))   { LandfallBeg = timestring_to_sec(a[i+1].c_str());
+                                                           LandfallEnd = timestring_to_sec(a[i+2].c_str());   a.shift_down(i, 2); }
+         else                                            { LandfallEnd = timestring_to_sec(a[i+1].c_str());
                                                            LandfallBeg = -1 * LandfallEnd;            a.shift_down(i, 1); }
       }
-      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1]);      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1]);       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1]);        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1].c_str());       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1].c_str());        a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1].c_str());                 a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1].c_str());                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();       a.shift_down(i, 1); }
       else                                               {                                            b.add(a[i]);        }
@@ -965,7 +965,7 @@ void TCStatJob::open_dump_file() {
    if(DumpFile.empty()) return;
 
    DumpOut = new ofstream;
-   DumpOut->open(DumpFile);
+   met_open(*DumpOut, DumpFile.c_str());
 
    if(!DumpOut) {
       mlog << Error << "\nTCStatJob::open_dump_file()-> "
@@ -1003,7 +1003,7 @@ void TCStatJob::open_stat_file() {
    if(StatFile.empty()) return;
 
    StatOut = new ofstream;
-   StatOut->open(StatFile);
+   met_open(*StatOut, StatFile.c_str());
 
    if(!StatOut) {
       mlog << Error << "\nTCStatJob::open_stat_file()-> "
@@ -1070,9 +1070,9 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
    tchc.set_storm_name(pair.bdeck().storm_name());
 
    if(OutInitMaskName.nonempty())  tchc.set_init_mask(OutInitMaskName);
-   else                            tchc.set_init_mask(na_str);
+   else                            tchc.set_init_mask(na_string);
    if(OutValidMaskName.nonempty()) tchc.set_valid_mask(OutValidMaskName);
-   else                            tchc.set_valid_mask(na_str);
+   else                            tchc.set_valid_mask(na_string);
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
@@ -1571,7 +1571,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
 
       // TCMPR and non-TCMPR LineTypes cannot be mixed
       for(i=0; i<LineType.n_elements(); i++) {
-         if(strcasecmp(LineType[i], TCStatLineType_TCMPR_Str) != 0) {
+         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
             mlog << Error << "\nTCStatJobFilter::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
                  << " line type cannot be mixed with the "
@@ -1792,7 +1792,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i];
+      c = a[i].c_str();
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -1802,11 +1802,11 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
-                                                     add_column(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1]); a.shift_down(i, 1); }
+                                                     add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
       else if(strcasecmp(c, "-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1]);              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
       else                                         {                                       b.add(a[i]);        }
    }
 
@@ -1826,23 +1826,23 @@ void TCStatJobSummary::add_column(const char *c) {
    for(i=0; i<sa.n_elements(); i++) {
 
       // Track errors
-      if(strcasecmp(sa[i], "TRACK") == 0) {
+      if(strcasecmp(sa[i].c_str(), "TRACK") == 0) {
          for(j=0; j<n_tc_cols_track; j++) Column.add(tc_cols_track[j]);
       }
       // Wind errors
-      else if(strcasecmp(sa[i], "WIND") == 0) {
+      else if(strcasecmp(sa[i].c_str(), "WIND") == 0) {
          for(j=0; j<n_tc_cols_wind; j++) Column.add(tc_cols_wind[j]);
       }
       // Track and Intensity (TI)
-      else if(strcasecmp(sa[i], "TI") == 0) {
+      else if(strcasecmp(sa[i].c_str(), "TI") == 0) {
          for(j=0; j<n_tc_cols_ti; j++) Column.add(tc_cols_ti[j]);
       }
       // Along and Cross Track (AC)
-      else if(strcasecmp(sa[i], "AC") == 0) {
+      else if(strcasecmp(sa[i].c_str(), "AC") == 0) {
          for(j=0; j<n_tc_cols_ac; j++) Column.add(tc_cols_ac[j]);
       }
       // Lat/Lon Difference (XY)
-      else if(strcasecmp(sa[i], "XY") == 0) {
+      else if(strcasecmp(sa[i].c_str(), "XY") == 0) {
          for(j=0; j<n_tc_cols_xy; j++) Column.add(tc_cols_xy[j]);
       }
       // Otherwise, just add the column name
@@ -1910,7 +1910,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
       // TCMPR and non-TCMPR LineTypes cannot be mixed
       for(i=0; i<LineType.n_elements(); i++) {
-         if(strcasecmp(LineType[i], TCStatLineType_TCMPR_Str) != 0) {
+         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
             mlog << Error << "\nTCStatJobSummary::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
                  << " line type cannot be mixed with the "
@@ -2041,7 +2041,7 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
          // For -column_union, put all columns in the same key
          if(ColumnUnion) prefix = write_css(ReqColumn);
          else            prefix = Column[j];
-         key = build_map_key(prefix, *pair.line(i), ByColumn);
+         key = build_map_key(prefix.c_str(), *pair.line(i), ByColumn);
          val = get_column_double(*pair.line(i), Column[j]);
 
          // Add map entry for this key, if necessary
@@ -2083,7 +2083,7 @@ void TCStatJobSummary::process_line(TCStatLine &line) {
       // For -column_union, put all columns in the same key
       if(ColumnUnion) prefix = write_css(Column);
       else            prefix = Column[i];
-      key = build_map_key(prefix, line, ByColumn);
+      key = build_map_key(prefix.c_str(), line, ByColumn);
       val = get_column_double(line, Column[i]);
 
       // Add map entry for this key, if necessary
@@ -2356,7 +2356,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
       // Check if FSP should be computed for this column
       s = to_upper(Column[i]);
-      if(strstr(s, "-") == NULL && strstr(s, "ERR") == NULL) {
+      if(strstr(s.c_str(), "-") == NULL && strstr(s.c_str(), "ERR") == NULL) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
               << "column \"" << Column[i] << "\" since it is not an "
@@ -2378,9 +2378,9 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
             for(k=0; k<it->second.Hdr.n_elements(); k++) {
 
                // Check if entry matches the current case
-               if(strncasecmp(Column[i], it->first,
-                              strlen(Column[i])) != 0 ||
-                  strcmp(case_list[j], it->second.Hdr[k]) != 0)
+               if(strncasecmp(Column[i].c_str(), it->first.c_str(),
+                              Column[i].length()) != 0 ||
+                  case_list[j] != it->second.Hdr[k] )
                   continue;
 
                // Store the value
@@ -2421,8 +2421,8 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
          for(it=SummaryMap.begin(),n=0; it!=SummaryMap.end(); it++,n++) {
 
             // Check if entry has the current case
-            if(strncasecmp(Column[i], it->first,
-                           strlen(Column[i])) != 0 ||
+            if(strncasecmp(Column[i].c_str(), it->first.c_str(),
+                           Column[i].length()) != 0 ||
                !it->second.Hdr.has(case_list[j]))
                continue;
 
@@ -2430,11 +2430,11 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
             total.set(n, total[n]+1);
 
             // See if this entry is the top performer
-            if(strcmp(best_mod, it->second.AModel[0]) == 0)
+            if( best_mod == it->second.AModel[0] )
                best.set(n, best[n]+1);
 
             // See if there was a tie
-            if(strcmp(best_mod, "TIE") == 0)
+            if( best_mod == "TIE" )
                ties.set(n, ties[n]+1);
 
          } // end for it
@@ -2451,13 +2451,13 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCStatJobType string_to_tcstatjobtype(const char *s) {
+TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    TCStatJobType t;
 
-        if(strcasecmp(s, TCStatJobType_FilterStr)   == 0) t = TCStatJobType_Filter;
-   else if(strcasecmp(s, TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
-   else if(strcasecmp(s, TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
-   else if(strcasecmp(s, TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
+        if(strcasecmp(s.c_str(), TCStatJobType_FilterStr)   == 0) t = TCStatJobType_Filter;
+   else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
+   else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
+   else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
    else                                                   t = NoTCStatJobType;
 
    return(t);
@@ -2629,12 +2629,12 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
 
 void parse_thresh_option(const char *col_name, const char *col_val,
                          map<ConcatString,ThreshArray> &m) {
-   ConcatString cs = to_upper(col_name);
+  ConcatString cs = to_upper((string)col_name);
    ThreshArray ta;
    ta.add_css(col_val);
 
    // Add data to the map
-   if(m.count(cs) > 0) m[col_name].add(ta);
+   if(m.count(cs) > 0) m[(string)col_name].add(ta);
    else                m.insert(pair<ConcatString, ThreshArray>(cs, ta));
 
    return;
@@ -2644,13 +2644,13 @@ void parse_thresh_option(const char *col_name, const char *col_val,
 
 void parse_string_option(const char *col_name, const char *col_val,
                          map<ConcatString,StringArray> &m) {
-   ConcatString cs = to_upper(col_name);
+  ConcatString cs = to_upper((string)col_name);
    StringArray sa;
    sa.set_ignore_case(1);
    sa.add_css(col_val);
 
    // Add data to the map
-   if(m.count(cs) > 0) m[col_name].add(sa);
+   if(m.count(cs) > 0) m[(string)col_name].add(sa);
    else                m.insert(pair<ConcatString, StringArray>(cs, sa));
 
    return;
@@ -2769,7 +2769,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i];
+      c = a[i].c_str();
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -2779,8 +2779,8 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1])); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
       else                                           {                                        b.add(a[i]);        }
    }
 
@@ -2802,7 +2802,7 @@ void TCStatJobRIRW::open_dump_file() {
 
       DumpFileCTC[i] << cs_erase << DumpFile << "_"  << category[i] << ".tcst";
       DumpOutCTC[i] = new ofstream;
-      DumpOutCTC[i]->open(DumpFileCTC[i]);
+      DumpOutCTC[i]->open(DumpFileCTC[i].c_str());
 
       if(!DumpOutCTC[i]) {
          mlog << Error << "\nTCStatJob::open_dump_file()-> "
@@ -3515,7 +3515,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i];
+      c = a[i].c_str();
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -3525,11 +3525,11 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 
       // Check job command options
            if(strcasecmp(c, "-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1]);                               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1]);                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1])); a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1].c_str())); a.shift_down(i, 1); }
       else                                                   {                                                        b.add(a[i]);        }
    }
 
@@ -3568,7 +3568,7 @@ void TCStatJobProbRIRW::close_dump_file() {
    out_at.set_delete_trailing_blank_rows(1);
 
    // Open the dump file back up for reading
-   if(!f.open(DumpFile)) {
+   if(!f.open(DumpFile.c_str())) {
       mlog << Error << "\nTCStatJobProbRIRW::close_dump_file() -> "
            << "can't open the dump file \"" << DumpFile
            << "\" for reading!\n\n";
@@ -3793,7 +3793,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
    for(i=0; i<OutLineType.n_elements(); i++) {
 
       // Parse the output line type
-      out_lt = string_to_statlinetype(OutLineType[i]);
+      out_lt = string_to_statlinetype(OutLineType[i].c_str());
 
       // Write the header columns
            if(out_lt == stat_pct)  lt_cols = get_n_pct_columns (n);
@@ -3920,17 +3920,17 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    // Build case information for the map key
    for(i=0; i<case_cols.n_elements(); i++) {
 
-      cur = l.get(case_cols[i]);
+     cur = l.get(case_cols[i].c_str());
 
       // For bad data, use the NA string
-      if(is_bad_data(atoi(cur))) cur = na_str;
+      if(is_bad_data(atoi(cur.c_str()))) cur = na_string;
 
       // Special handling for lead time:
       // Switch 2-digit hours to 3-digit hours so that the
       // summary job output is sorted nicely.
-      if(strcasecmp(case_cols[i], "LEAD") == 0 &&
+      if(strcasecmp(case_cols[i].c_str(), "LEAD") == 0 &&
          cur != na_str &&
-         abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
+         abs(lead = timestring_to_sec(cur.c_str())) < 100*sec_per_hour) {
 
          // Handle positive and negative lead times
          key << (lead < 0 ? ":-0" : ":0")
@@ -4000,9 +4000,9 @@ double get_probrirw_value(const TCStatLine &line, double ProbRIRWThresh) {
    // Rescale probabilities from [0, 100] to [0, 1]
    for(i=1; i<=n; i++) {
       cs << cs_erase << "THRESH_" << i;
-      if(is_eq(ProbRIRWThresh, atof(line.get_item(cs)))) {
+      if(is_eq(ProbRIRWThresh, atof(line.get_item(cs.c_str())))) {
          cs << cs_erase << "PROB_" << i;
-         p = atof(line.get_item(cs)) / 100.0;
+         p = atof(line.get_item(cs.c_str())) / 100.0;
          break;
       }
    }

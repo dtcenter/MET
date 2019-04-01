@@ -35,7 +35,7 @@ void pblock(const char *infile, const char *outfile, Action action) {
    //
    // Open the input file
    //
-   if( (in = open(infile, O_RDONLY)) < 0)  {
+   if( (in = met_open(infile, O_RDONLY)) < 0)  {
       mlog << Error << "\npblock() -> "
            << "unable to open input file \"" << infile << "\"\n\n";
 

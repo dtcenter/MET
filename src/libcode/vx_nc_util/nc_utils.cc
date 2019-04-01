@@ -25,10 +25,10 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char  level_att_name         [] = "level";
-static const char  units_att_name         [] = "units";
-static const char  missing_value_att_name [] = "missing_value";
-static const char  fill_value_att_name    [] = "_FillValue";
+static const string  level_att_name         = "level";
+static const string  units_att_name         = "units";
+static const string  missing_value_att_name = "missing_value";
+static const string  fill_value_att_name  = "_FillValue";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -330,13 +330,13 @@ double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
 
 bool    get_att_no_leap_year(const NcVar *var) {
    bool no_leap_year = false;
-   NcVarAtt *calendar_att = get_nc_att(var, "calendar", false);
+   NcVarAtt *calendar_att = get_nc_att(var, string("calendar"), false);
    if (!IS_INVALID_NC_P(calendar_att)) {
       ConcatString calendar_value;
       if (get_att_value_chars(calendar_att, calendar_value)) {
-         no_leap_year = (strcmp("noleap",calendar_value) == 0)
-                        || (strcmp("365_day",calendar_value) == 0)
-                        || (strcmp("365 days",calendar_value) == 0);
+         no_leap_year = ( "noleap" == calendar_value
+                        || "365_day" == calendar_value
+                        || "365 days" == calendar_value);
       }
    }
    if (calendar_att) delete calendar_att;
@@ -360,7 +360,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
       multimap<string,NcVarAtt>::iterator itAtt;
       map<string,NcVarAtt> mapAttrs = var->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
-         if (0 == (strcmp(att_name, ((*itAtt).first).c_str()))) {
+         if ( att_name == (*itAtt).first) {
             att = new NcVarAtt();
             *att = (*itAtt).second;
             break;
@@ -394,7 +394,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
       multimap<string,NcGroupAtt>::iterator itAtt;
       multimap<string,NcGroupAtt> mapAttrs = nc->getAtts();
       for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
-         if (0 == (strcmp(att_name, ((*itAtt).first).c_str()))) {
+	if ( att_name == (*itAtt).first ) {
             att = new NcGroupAtt();
             *att = (*itAtt).second;
             break;
@@ -602,7 +602,7 @@ bool get_nc_att(const NcVarAtt *att, double &att_val, bool exit_on_error) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool has_att(NcFile * ncfile, const char * att_name, bool exit_on_error)
+bool has_att(NcFile * ncfile, const ConcatString att_name, bool exit_on_error)
 {
    bool status = false;
    NcGroupAtt *att;
@@ -704,7 +704,7 @@ bool get_global_att(const NcFile *nc, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_global_att(const NcFile *nc, const char *att_name,
+bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     int &att_val, bool error_out) {
    bool status = false;
    static const char *method_name = "\nget_global_att(int) -> ";
@@ -735,7 +735,7 @@ bool get_global_att(const NcFile *nc, const char *att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_global_att(const NcFile *nc, const char *att_name,
+bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     bool &att_val, bool error_out) {
    bool status = false;
    ConcatString att_value;
@@ -761,7 +761,7 @@ bool get_global_att(const NcFile *nc, const char *att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_global_att(const NcFile *nc, const char *att_name,
+bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     float &att_val, bool error_out) {
    bool status = false;
    static const char *method_name = "\nget_global_att(float) -> ";
@@ -792,7 +792,7 @@ bool get_global_att(const NcFile *nc, const char *att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_global_att(const NcFile *nc, const char *att_name,
+bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     double &att_val, bool error_out) {
    bool status = false;
    bool exit_on_error = true;
@@ -856,7 +856,7 @@ bool get_global_att_double(const NcFile *nc, const ConcatString &att_name,
 int get_version_no(const NcFile *nc) {
    int version_no = 0;
    float att_version_no;
-   get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   get_global_att(nc, (const ConcatString)nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);
    return version_no;
 }
@@ -866,7 +866,7 @@ int get_version_no(const NcFile *nc) {
 bool is_version_less_than_1_02(const NcFile *nc) {
    int version_no = get_version_no(nc);
    float att_version_no;
-   get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   get_global_att(nc, (const ConcatString) nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);
    return (version_no < 102);
 }
@@ -887,6 +887,12 @@ void add_att(NcFile *nc, const string att_name, const string att_val) {
 
 void add_att(NcFile *nc, const string att_name, const char *att_val) {
    nc->putAtt(att_name, att_val);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void add_att(NcFile *nc, const string att_name, const ConcatString att_val) {
+  nc->putAtt(att_name, att_val.text());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -922,14 +928,13 @@ int get_var_names(NcFile *nc, StringArray *varNames) {
    NcVar var;
 
    varCount = nc->getVarCount();
-   varNames->extend(varCount);
 
    i = 0;
    multimap<string,NcVar>::iterator itVar;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    for (itVar = mapVar.begin(); itVar != mapVar.end(); ++itVar) {
       var = (*itVar).second;
-      varNames->add(var.getName().c_str());
+      varNames->add(var.getName());
       i++;
    }
 
@@ -1414,16 +1419,16 @@ bool get_nc_data(NcVar *var, float *data) {
          float add_offset = 0.;
          float scale_factor = 1.;
          bool unsigned_value = false;
-         NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
-         NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
-         NcVarAtt *att_unsigned     = get_nc_att(var, "_Unsigned");
-         NcVarAtt *att_fill_value   = get_nc_att(var, "_FillValue");
+         NcVarAtt *att_add_offset   = get_nc_att(var, string("add_offset"));
+	 NcVarAtt *att_scale_factor = get_nc_att(var, string("scale_factor"));
+         NcVarAtt *att_unsigned     = get_nc_att(var, string("_Unsigned"));
+         NcVarAtt *att_fill_value   = get_nc_att(var, string("_FillValue"));
          if (!IS_INVALID_NC_P(att_add_offset)) add_offset = get_att_value_float(att_add_offset);
          if (!IS_INVALID_NC_P(att_scale_factor)) scale_factor = get_att_value_float(att_scale_factor);
          if (!IS_INVALID_NC_P(att_unsigned)) {
             ConcatString att_value;
             get_att_value_chars(att_unsigned, att_value);
-            unsigned_value = (0 == strcmp("true", att_value));
+            unsigned_value = ( att_value == "true" );
          }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
@@ -1747,10 +1752,10 @@ bool get_nc_data(NcVar *var, double *data) {
          double add_offset = 0.;
          double scale_factor = 1.;
          bool unsigned_value = false;
-         NcVarAtt *att_add_offset   = get_nc_att(var, "add_offset");
-         NcVarAtt *att_scale_factor = get_nc_att(var, "scale_factor");
-         NcVarAtt *att_unsigned     = get_nc_att(var, "_Unsigned");
-         NcVarAtt *att_fill_value   = get_nc_att(var, "_FillValue");
+         NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
+         NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
+         NcVarAtt *att_unsigned     = get_nc_att(var, (string)"_Unsigned");
+         NcVarAtt *att_fill_value   = get_nc_att(var, (string)"_FillValue");
          if (!IS_INVALID_NC_P(att_add_offset)) {
             add_offset = get_att_value_double(att_add_offset);
          }
@@ -1760,7 +1765,7 @@ bool get_nc_data(NcVar *var, double *data) {
          if (!IS_INVALID_NC_P(att_unsigned)) {
             ConcatString att_value;
             get_att_value_chars(att_unsigned, att_value);
-            unsigned_value = (0 == strcmp("true", att_value));
+            unsigned_value = ("true" == att_value);
          }
          mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
@@ -2125,6 +2130,7 @@ bool get_nc_data(NcVar *var, char *data, const long *dim, const long *cur) {
       var->getVar(start, count, data);
       return_status = true;
    }
+
    return(return_status);
 }
 
@@ -2921,7 +2927,7 @@ NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att(NcFile *nc_from, NcVar *var_to, const char * attr_name) {
+void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
    NcGroupAtt *from_att = get_nc_att(nc_from, attr_name);
    if (!IS_INVALID_NC_P(from_att)) {
       int dataType = GET_NC_TYPE_ID_P(from_att);
@@ -2956,7 +2962,7 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const char * attr_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att(NcVar *var_from, NcVar *var_to, const char * attr_name) {
+void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
    NcVarAtt *from_att = get_nc_att(var_from, attr_name);
    if (!IS_INVALID_NC_P(from_att)) {
       int dataType = GET_NC_TYPE_ID_P(from_att);
@@ -3407,17 +3413,14 @@ bool get_dim_names(const NcFile *nc, StringArray *dimNames) {
    int i, dimCount;
    //NcDim dim;
    bool status = false;
-
+   
    dimCount = nc->getDimCount();
-   dimNames->extend(dimCount);
 
    i = 0;
    multimap<string, NcDim>::iterator itDim;
    multimap<string, NcDim> dims = nc->getDims();
    for (itDim = dims.begin(); itDim != dims.end(); ++itDim) {
-      //dim = (*itDim.second);
-      //dimNames->add(dim.getName().c_str());
-      dimNames->add((*itDim).first.c_str());
+      dimNames->add((*itDim).first);
       i++;
    }
 
@@ -3437,14 +3440,13 @@ bool get_dim_names(const NcVar *var, StringArray *dimNames) {
    bool status = false;
 
    dimCount = var->getDimCount();
-   dimNames->extend(dimCount);
-
+   
    i = 0;
    vector<NcDim>::iterator itDim;
    vector<NcDim> dims = var->getDims();
    for (itDim = dims.begin(); itDim != dims.end(); ++itDim) {
       dim = (*itDim);
-      dimNames->add(dim.getName().c_str());
+      dimNames->add(dim.getName());
       i++;
    }
 
@@ -3508,12 +3510,12 @@ unixtime get_reference_unixtime(ConcatString time_str) {
    unixtime ut;
    int offset, array_count;
    int year, month, day, hour, minute, second;
-   
+
    StringArray time_units = time_str.split(" -:ZT");
    offset = 0;
    array_count = time_units.n_elements();
    for (int idx=0; idx<array_count; idx++) {
-      if (0 != atoi(time_units[idx])) break;
+     if (0 != atoi(time_units[idx].c_str())) break;
       //if (0 == strcmp(time_units[idx],"seconds")) {
       offset++;
    }
@@ -3524,15 +3526,15 @@ unixtime get_reference_unixtime(ConcatString time_str) {
       exit(1);
    }
 
-   year  = atoi(time_units[offset++]);
-   month = atoi(time_units[offset++]);
-   day   = atoi(time_units[offset++]);
+   year  = atoi(time_units[offset++].c_str());
+   month = atoi(time_units[offset++].c_str());
+   day   = atoi(time_units[offset++].c_str());
    hour   = 0;
    minute = 0;
    second = 0;
-   if (offset < array_count) hour   = atoi(time_units[offset++]);
-   if (offset < array_count) minute = atoi(time_units[offset++]);
-   if (offset < array_count) second = nint(atof(time_units[offset++]));
+   if (offset < array_count) hour   = atoi(time_units[offset++].c_str());
+   if (offset < array_count) minute = atoi(time_units[offset++].c_str());
+   if (offset < array_count) second = nint(atof(time_units[offset++].c_str()));
    ut = mdyhms_to_unix(month, day, year, hour, minute, second);
    return ut;
 }

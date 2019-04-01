@@ -88,7 +88,7 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
 
     LineDataFile ascii_file;
 
-    if (!ascii_file.open(*ascii_filename))
+    if (!ascii_file.open((*ascii_filename).c_str()))
     {
       mlog << Error << "\nFileHandler::processFiles() -> "
            << "can't open input ASCII file \"" << *ascii_filename

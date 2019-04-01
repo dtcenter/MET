@@ -190,17 +190,17 @@ MetDataDir = ConfInfo->met_data_dir;
 
 ConcatString s;
 
-s = replace_path(ConfInfo->fcst_raw_pi.color_table);
+ s = replace_path(ConfInfo->fcst_raw_pi.color_table.c_str());
 
 mlog << Debug(1) << "Loading forecast raw color table: " << s << "\n";
 
-FcstRawCtable.read(s);
+ FcstRawCtable.read(s.c_str());
 
-s = replace_path(ConfInfo->obs_raw_pi.color_table);
+ s = replace_path(ConfInfo->obs_raw_pi.color_table.c_str());
 
 mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
 
-ObsRawCtable.read(s);
+ ObsRawCtable.read(s.c_str());
 
    //
    // If the forecast and observation fields are the same and if the range
@@ -350,7 +350,7 @@ void ModePsFile::choose_font(int _font_number, double _font_size)
 
 {
 
-PSfile::choose_font_with_dir(_font_number, _font_size, MetDataDir);
+  PSfile::choose_font_with_dir(_font_number, _font_size, MetDataDir.c_str());
 
 return;
 
@@ -551,7 +551,7 @@ s << cs_erase
   << ConfInfo->obs_info->name() << " at "
   << ConfInfo->obs_info->level_name();
 
-plot_engine(*Engine, FOEng, s);
+ plot_engine(*Engine, FOEng, s.c_str());
 
 if ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) )  {
 

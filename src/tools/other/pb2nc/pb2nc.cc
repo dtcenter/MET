@@ -184,7 +184,7 @@ static int nmsg_percent = -1;
 
 // Dump contents of PrepBufr file to ASCII files
 static bool dump_flag = false;
-static ConcatString dump_dir = ".";
+static ConcatString dump_dir = (string)".";
 
 static bool obs_to_vector    = true;
 static bool do_all_vars      = false;
@@ -510,7 +510,7 @@ void process_command_line(int argc, char **argv) {
         << "User Config File: "    << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file, config_file);
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Process the configuration
    conf_info.process_config();
@@ -545,18 +545,18 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    ConcatString tbl_filename, tbl_prefix;
 
    tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
-   tbl_filename = make_temp_file_name(tbl_prefix, "tbl");
+   tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
    if (file_id > MAX_FORTRAN_FILE_ID || file_id < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\nsave_bufr_table_to_file() -> "
            << "Invalid file ID [" << file_id << "] between 1 and 99.\n\n";
    }
    openpb_(blk_file, &file_id);
-   dump_tbl_(blk_file, &file_id, tbl_filename, &len);
+   dump_tbl_(blk_file, &file_id, tbl_filename.c_str(), &len);
    closepb_(&file_id);
    close(file_id);
    // Delete the temporary blocked file
-   remove_temp_file(blk_file);
+   remove_temp_file((string)blk_file);
    return tbl_filename;
 }
 
@@ -701,7 +701,7 @@ void open_netcdf() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out = open_ncfile(ncfile, true);
+   f_out = open_ncfile(ncfile.c_str(), true);
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_out)) {
@@ -749,9 +749,9 @@ void process_pbfile(int i_pb) {
    unixtime min_msg_ut, max_msg_ut;
 
    ConcatString file_name, blk_prefix, blk_file, log_message;
-   char     prefix[max_str_len];
+   ConcatString prefix;
    char     time_str[max_str_len];
-   char     start_time_str[max_str_len], end_time_str[max_str_len];
+   ConcatString  start_time_str, end_time_str;
    char     min_time_str[max_str_len], max_time_str[max_str_len];
 
    char     hdr_typ[max_str_len], hdr_sid[max_str_len];
@@ -793,13 +793,13 @@ void process_pbfile(int i_pb) {
 
    // Build the temporary block file name
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
-   blk_file = make_temp_file_name(blk_prefix, NULL);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), NULL);
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
-   pblock(file_name, blk_file, block);
+   pblock(file_name.c_str(), blk_file.c_str(), block);
 
    // Dump the contents of the PrepBufr file to ASCII files
    if(dump_flag) {
@@ -824,11 +824,11 @@ void process_pbfile(int i_pb) {
          mlog << Error << "\n" << method_name << " -> "
               << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
       }
-      strncpy(prefix, get_short_name(pbfile[i_pb]), sizeof(prefix));
-      len1 = strlen(dump_dir);
-      len2 = strlen(prefix);
-      dumppb_(blk_file, &unit, dump_dir.text(), &len1,
-              prefix, &len2, msg_typ_ret);
+      prefix = get_short_name(pbfile[i_pb].c_str());
+      len1 = dump_dir.length();
+      len2 = prefix.length();
+      dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
+              prefix.c_str(), &len2, msg_typ_ret);
    }
 
    // Open the blocked temp PrepBufr file for reading
@@ -837,7 +837,7 @@ void process_pbfile(int i_pb) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
-   openpb_(blk_file, &unit);
+   openpb_(blk_file.c_str(), &unit);
 
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
@@ -897,8 +897,8 @@ void process_pbfile(int i_pb) {
 
    int bin_count = nint(npbmsg/20.0);
    int bufr_hdr_length = bufr_hdrs.length();
-   char bufr_hdr_names[(bufr_hdr_length+1)*2];
-   strncpy(bufr_hdr_names, bufr_hdrs.text(), sizeof(bufr_hdr_names));
+   ConcatString bufr_hdr_names;
+   bufr_hdr_names = bufr_hdrs.text();
 
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
@@ -959,14 +959,14 @@ void process_pbfile(int i_pb) {
             unix_to_yyyymmdd_hhmmss(beg_ut, start_time_str);
          }
          else {
-            strncpy(start_time_str, "NO_BEG_TIME", sizeof(start_time_str));
+	   start_time_str = "NO_BEG_TIME";
          }
 
          if(end_ut != (unixtime) 0) {
             unix_to_yyyymmdd_hhmmss(end_ut, end_time_str);
          }
          else {
-            strncpy(end_time_str, "NO_END_TIME", sizeof(end_time_str));
+            end_time_str = "NO_END_TIME";
          }
 
          mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
@@ -985,11 +985,11 @@ void process_pbfile(int i_pb) {
 
       if (!is_prepbufr) {
          int index, req_hdr_level = 1;
-         char tmp_str[mxr8lv*mxr8pm];
+         ConcatString tmp_str;
 
          //Read header (station id, lat, lon, ele, time)
-         strncpy(tmp_str, bufr_hdrs.text(), sizeof(tmp_str));
-         readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
+	 tmp_str = bufr_hdrs;
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, (char*)bufr_hdr_names.c_str(),
                     &bufr_hdr_length, &req_hdr_level );
 
          // Copy sid, lat, lon, and dhr
@@ -1168,16 +1168,16 @@ void process_pbfile(int i_pb) {
       // Special handling for "AIRNOW"
       bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
 
-      if (0 < message_type_map.count(hdr_typ)) {
-         ConcatString mappedMessageType = message_type_map[hdr_typ];
+      if (0 < message_type_map.count((string)hdr_typ)) {
+	ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
          mlog << Debug(6) << "\n" << method_name << " -> "
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
          if (mappedMessageType.length() < HEADER_STR_LEN) {
-            strncpy(modified_hdr_typ, mappedMessageType, sizeof(modified_hdr_typ));
+            strncpy(modified_hdr_typ, mappedMessageType.c_str(), sizeof(modified_hdr_typ));
          }
          else {
-            strncpy(modified_hdr_typ, mappedMessageType.text(), HEADER_STR_LEN);
+            strncpy(modified_hdr_typ, mappedMessageType.c_str(), HEADER_STR_LEN);
          }
       }
       else {
@@ -1355,9 +1355,9 @@ void process_pbfile(int i_pb) {
             // continue to the next observation variable
             if(!keep_bufr_obs_index(bufr_var_index)) continue;
 
-            addObservation(obs_arr, hdr_typ, hdr_sid, hdr_vld_ut,
+            addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                   hdr_lat, hdr_lon, hdr_elv, quality_mark,
-                  OBS_BUFFER_SIZE);
+			   OBS_BUFFER_SIZE);
 
             // Increment the current and total observations counts
             n_file_obs++;
@@ -1393,7 +1393,7 @@ void process_pbfile(int i_pb) {
 
                if(is_eq(obs_arr[4], fill_value)) continue;
 
-               addObservation(obs_arr, hdr_typ, hdr_sid, hdr_vld_ut,
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                      hdr_lat, hdr_lon, hdr_elv, quality_mark,
                      OBS_BUFFER_SIZE);
 
@@ -1433,10 +1433,10 @@ void process_pbfile(int i_pb) {
          int var_count = bufr_obs_name_arr.n_elements();
          for (int vIdx=0; vIdx<var_count; vIdx++) {
             int nlev2;
-            char *var_name;
+            ConcatString var_name;
             int var_name_len;
-            var_name = (char *)bufr_obs_name_arr[vIdx];
-            var_name_len = strlen(var_name);
+            var_name = bufr_obs_name_arr[vIdx];
+            var_name_len = var_name.length();
             if (is_prepbufr &&
                   (prepbufr_vars.has(var_name)
                    || prepbufr_event_members.has(var_name)
@@ -1447,18 +1447,18 @@ void process_pbfile(int i_pb) {
             isMilliBar = false;
             if (var_names.has(var_name, var_index)) {
                //mlog << Debug(7) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
-               if (0 == strcmp("DEG C", var_units[var_index])) {
+	      if ("DEG C" == var_units[var_index]) {
                   isDegC = true;
                }
-               else if (0 == strcmp("MB", var_units[var_index])) {
+               else if ("MB" == var_units[var_index]) {
                   isMilliBar = true;
                }
-               else if (0 == strcmp("MG/KG", var_units[var_index])) {
+               else if ("MG/KG" == var_units[var_index]) {
                   isMgKg = true;
                }
             }
 
-            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &nlev_max_req);
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
             if (0 >= nlev2) continue;
 
             buf_nlev = nlev2;
@@ -1524,7 +1524,7 @@ void process_pbfile(int i_pb) {
                   }
                }
 
-               addObservation(obs_arr, hdr_typ, hdr_sid, hdr_vld_ut,
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                      hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
 
                // Increment the current and total observations counts
@@ -1686,31 +1686,31 @@ void process_pbfile_metadata(int i_pb) {
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
 
-   blk_file = make_temp_file_name(blk_prefix2, NULL);
+   blk_file = make_temp_file_name(blk_prefix2.c_str(), NULL);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
-   pblock(file_name, blk_file, block);
+   pblock(file_name.c_str(), blk_file.c_str(), block);
 
    unit = dump_unit + i_pb + 5;
-   ConcatString tbl_filename = save_bufr_table_to_file(blk_file, unit);
-   get_variable_info(tbl_filename);
+   ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
+   get_variable_info(tbl_filename.c_str());
    if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix, NULL);
-   pblock(file_name, blk_file, block);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), NULL);
+   pblock(file_name.c_str(), blk_file.c_str(), block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
 
    // Open the blocked temp PrepBufr file for reading
-   openpb_(blk_file, &unit);
+   openpb_(blk_file.c_str(), &unit);
 
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
@@ -1795,7 +1795,7 @@ void process_pbfile_metadata(int i_pb) {
 
          int hdr_level = 1;
          char tmp_str[mxr8lv*mxr8pm];
-         char var_name[BUFR_NAME_LEN+1];
+         ConcatString var_name;
          ConcatString hdr_name_str;
 
          strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
@@ -1821,7 +1821,7 @@ void process_pbfile_metadata(int i_pb) {
             }
          }
          else {
-            strncpy(var_name, default_sid_name, sizeof(var_name));
+  	   var_name = default_sid_name;
             strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
             length = strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
@@ -1830,7 +1830,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
+		    var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found station id: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1845,10 +1845,10 @@ void process_pbfile_metadata(int i_pb) {
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
-               strncpy(var_name, default_lon_name, sizeof(var_name));
+               var_name = default_lon_name;
                for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
+		    var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found  longitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1856,10 +1856,10 @@ void process_pbfile_metadata(int i_pb) {
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
                hdr_name_str.add(var_name);
 
-               strncpy(var_name, default_lat_name, sizeof(var_name));
+               var_name = default_lat_name;
                for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-                     strncpy(var_name, tmp_hdr_array[index], sizeof(var_name));
+		    var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found   latitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1945,7 +1945,7 @@ void process_pbfile_metadata(int i_pb) {
          }
          else {
             for (index=0; index<bufr_target_variables.n_elements(); index++) {
-               const char *bufr_var_name = bufr_target_variables[index];
+               const char *bufr_var_name = bufr_target_variables[index].c_str();
                if (!tableB_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
                   mlog << Error << "\n" << method_name << " -> variable \""
                        << bufr_var_name <<"\" does not exist at BUFR file\n\n";
@@ -1968,11 +1968,11 @@ void process_pbfile_metadata(int i_pb) {
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
          int nlev2, buf_nlev;
          int var_name_len;
-         char var_name[BUFR_NAME_LEN];
-         strncpy(var_name, (char *)unchecked_var_list[vIdx], sizeof(var_name));
-         var_name_len = strlen(var_name);
+         ConcatString var_name;
+         var_name = unchecked_var_list[vIdx];
+         var_name_len = var_name.length();
 
-         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &tmp_nlev_max_req);
+         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &tmp_nlev_max_req);
          if (0 >= nlev2) continue;
 
          // Search through the vertical levels
@@ -1985,7 +1985,7 @@ void process_pbfile_metadata(int i_pb) {
                   tmp_bufr_obs_name_arr.add(var_name);
                }
                if (do_all_vars) {
-                  int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
+		 int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
                   if (0 == count) {
                      mlog << Debug(5) << " found valid data: " << var_name
                           << " (" << bufr_obs[lv][0] << ")\n";
@@ -1995,7 +1995,7 @@ void process_pbfile_metadata(int i_pb) {
                      unchecked_var_list.shift_down(vIdx, 1);
                   }
                   else {
-                     variableCountMap[var_name] = count;
+		    variableCountMap[var_name] = count;
                   }
                }
                else {
@@ -2018,7 +2018,7 @@ void process_pbfile_metadata(int i_pb) {
    const char * tmp_var_name;
    bufr_obs_name_arr.clear();
    for (index=0; index<prepbufr_vars.n_elements(); index++) {
-      tmp_var_name = prepbufr_vars[index];
+      tmp_var_name = prepbufr_vars[index].c_str();
       if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
          if (tableB_vars.has(tmp_var_name)) {
             bufr_obs_name_arr.add(tmp_var_name);
@@ -2030,7 +2030,7 @@ void process_pbfile_metadata(int i_pb) {
    }
    if (has_prepbufr_vars) {
       for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
-         tmp_var_name = prepbufr_derive_vars[vIdx];
+         tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
          if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
             bufr_obs_name_arr.add(tmp_var_name);
             bufr_derive_code[vIdx] = bufr_var_index;
@@ -2090,7 +2090,7 @@ void write_netcdf_hdr_data() {
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
 
       // Delete the NetCDF file
-      if(remove(ncfile) != 0) {
+      if(remove(ncfile.c_str()) != 0) {
          mlog << Error << method_name << " -> "
               << "can't remove output NetCDF file \"" << ncfile
               << "\"\n\n";
@@ -2144,14 +2144,14 @@ void write_netcdf_hdr_data() {
    map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
    for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
       int var_index;
-      const char *var_name;
+      std::string var_name;
       const char *unit_str;
       const char *desc_str;
 
       unit_str = "";
       var_name = bufr_obs_name_arr[i];
       if (var_names.has(var_name, var_index)) {
-         unit_str = var_units[var_index];
+         unit_str = var_units[var_index].c_str();
          if (0 == strcmp("DEG C", unit_str)) {
             unit_str = "KELVIN";
          }
@@ -2165,13 +2165,13 @@ void write_netcdf_hdr_data() {
       nc_var_unit_arr.add(unit_str);
 
       desc_str = (tableB_vars.has(var_name, var_index))
-            ? tableB_descs[var_index]
+            ? tableB_descs[var_index].c_str()
             : "";
       nc_var_desc_arr.add(desc_str);
 
       ConcatString grib_name = obs_var_map[var_name];
       if (0 < grib_name.length()) {
-         var_name = grib_name.text();
+         var_name = grib_name;
       }
       nc_var_name_arr.add(var_name);
 
@@ -2507,28 +2507,28 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
 void display_bufr_variables(const StringArray &all_vars, const StringArray &all_descs,
                             const StringArray &hdr_arr, const StringArray &obs_arr) {
    int i, index;
-   char description[BUFR_DESCRIPTION_LEN+1];
-   char line_buf[(BUFR_DESCRIPTION_LEN+1)*2];
+   ConcatString description;
+   ConcatString line_buf;
 
    mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
       if (all_vars.has(hdr_arr[i], index)) {
-         strncpy(description, all_descs[index], sizeof(description));
+	description = all_descs[index];
       }
       else {
-         strncpy(description, "", sizeof(description));
+	description = "";
       }
-      snprintf(line_buf, sizeof(line_buf), "   %8s: %s\n", hdr_arr[i], description);
+      line_buf.format("   %8s: %s\n", hdr_arr[i].c_str(), description.c_str());
       mlog << Debug(1) << line_buf;
    }
 
    mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements() << ") :\n";
    for(i=0; i<obs_arr.n_elements(); i++) {
       if (all_vars.has(obs_arr[i], index)) {
-         strncpy(description, all_descs[index], sizeof(description));
+	description = all_descs[index];
       }
       else {
-         strncpy(description, "", sizeof(description));
+	description = "";
       }
       if (0 < variableTypeMap.count(obs_arr[i])) {
          StringArray typeArray = variableTypeMap[obs_arr[i]];
@@ -2537,12 +2537,12 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
          message_types[0] = '\0';
          for (int ii=0; ii<type_cnt; ii++) {
             if (strlen(message_types) < (sizeof(message_types) - 1)) snprintf(message_types, sizeof(message_types), "%s ", message_types);
-            snprintf(message_types, sizeof(message_types), "%s%s", message_types, typeArray[ii]);
+            snprintf(message_types, sizeof(message_types), "%s%s", message_types, typeArray[ii].c_str());
          }
-         snprintf(line_buf, sizeof(line_buf), "   %8s: %-48s\t\ttypes: %s\n", obs_arr[i], description, message_types);
+         line_buf.format("   %8s: %-48s\t\ttypes: %s\n", obs_arr[i].c_str(), description.c_str(), message_types);
       }
       else {
-         snprintf(line_buf, sizeof(line_buf), "   %8s: %s\n", obs_arr[i], description);
+	line_buf.format("   %8s: %s\n", obs_arr[i].c_str(), description.c_str());
       }
       mlog << Debug(1) << line_buf;
    }
@@ -2625,22 +2625,22 @@ void set_pbfile(const StringArray & a)
 
 void set_valid_beg_time(const StringArray & a)
 {
-   valid_beg_ut = timestring_to_unix(a[0]);
+   valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_valid_end_time(const StringArray & a)
 {
-   valid_end_ut = timestring_to_unix(a[0]);
+   valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_nmsg(const StringArray & a)
 {
-   nmsg = atoi(a[0]);
-   int tmp_len = strlen(a[0]);
+   nmsg = atoi(a[0].c_str());
+   int tmp_len = a[0].length();
    if (1 < tmp_len) {
       if (a[0][tmp_len-1] == '%') {
          nmsg_percent = nmsg;
@@ -2667,7 +2667,7 @@ void set_collect_metadata(const StringArray & a)
 
 void set_target_variables(const StringArray & a)
 {
-   if (0 == strcmp("_all_", a[0])) {
+   if ("_all_" == a[0]) {
       do_all_vars = true;
    }
    else {
@@ -2692,13 +2692,13 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
+   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

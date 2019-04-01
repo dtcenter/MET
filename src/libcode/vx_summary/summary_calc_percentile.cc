@@ -50,8 +50,8 @@ SummaryCalcPercentile::SummaryCalcPercentile(const string &type_string) :
   
   // Construct the type string
 
-  char type_buffer[80];
-  snprintf(type_buffer, sizeof(type_buffer), "P%02d", (int)((_percentile * 100.0) + 0.25));
+  ConcatString type_buffer;
+  type_buffer.format("P%02d", (int)((_percentile * 100.0) + 0.25));
   _type = type_buffer;
 }
 

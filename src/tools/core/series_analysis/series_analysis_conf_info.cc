@@ -114,7 +114,7 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
                                    const char *user_file_name) {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    conf.read(default_file_name);
@@ -314,7 +314,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Verifying a probability field
       if(fcst_info[0]->is_prob()) {
-         fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
+         fcat_ta = string_to_prob_thresh(fcat_ta.get_str().c_str());
       }
 
       // Verifying non-probability fields

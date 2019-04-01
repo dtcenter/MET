@@ -21,7 +21,7 @@
 #include <iostream>
 
 #include "afm_token.h"
-
+#include "concat_string.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -36,13 +36,13 @@ class AfmLine {
 
       void assign(const AfmLine &);
 
-      char * Line;
+      ConcatString Line;
+
+      StringArray LineItems;
+
+      unsigned int item_index;
 
       int LineLength;
-
-      char * strtok_pointer;
-
-      char * tok_pointer;
 
 
    public:
@@ -55,6 +55,8 @@ class AfmLine {
       int line_number;
 
       void clear();
+
+      void split_line();
 
       AfmToken nexttoken();
 

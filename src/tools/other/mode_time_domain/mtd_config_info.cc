@@ -179,8 +179,8 @@ void MtdConfigInfo::read_config(const char *default_file_name, const char *user_
 
    // Read the config file constants
 
-conf.read(replace_path(config_const_filename));
-conf.read(replace_path(config_map_data_filename));
+conf.read(replace_path(config_const_filename).c_str());
+conf.read(replace_path(config_map_data_filename).c_str());
 
    // Read the default config file
 

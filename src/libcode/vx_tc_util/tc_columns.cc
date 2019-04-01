@@ -144,7 +144,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
    int i;
 
    // TCMPR line type
-   hdr.set_line_type(TCStatLineType_TCMPR_Str);
+   hdr.set_line_type((string)TCStatLineType_TCMPR_Str);
 
    // Loop through the TrackPairInfo points
    for(i=0; i<p.n_points(); i++) {
@@ -160,7 +160,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
 
       // Set the description
       if(p.n_lines() > i) {
-         hdr.set_desc(p.line(i)->get_item("DESC", false));
+	hdr.set_desc((string)p.line(i)->get_item("DESC", false));
       }
 
       // Write the header columns
@@ -182,7 +182,7 @@ void write_prob_rirw_row(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
                          AsciiTable &at, int &i_row) {
 
    // PROBRIRW line type
-   hdr.set_line_type("PROBRIRW");
+  hdr.set_line_type((string)"PROBRIRW");
 
    // Timing information
    hdr.set_init (p.prob_rirw().init());
@@ -191,7 +191,7 @@ void write_prob_rirw_row(TcHdrColumns &hdr, const ProbRIRWPairInfo &p,
 
    // Pass the description from the input line to the output
    if(p.line().n_items() > 0) {
-      hdr.set_desc(p.line().get_item("DESC", false));
+     hdr.set_desc((string)p.line().get_item("DESC", false));
    }
 
    // Write one line for all the probabilities
@@ -313,7 +313,7 @@ void write_prob_rirw_cols(const ProbRIRWPairInfo &p, int i,
    at.set_entry(r, c++, p.prob_rirw().lon());
    at.set_entry(r, c++, p.blat());
    at.set_entry(r, c++, p.blon());
-   if(p.prob_rirw().initials()) at.set_entry(r, c++, na_str);
+   if(p.prob_rirw().initials() != "") at.set_entry(r, c++, na_str);
    else                         at.set_entry(r, c++, p.prob_rirw().initials());
    at.set_entry(r, c++, p.track_err());
    at.set_entry(r, c++, p.x_err());

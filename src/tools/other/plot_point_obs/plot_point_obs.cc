@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
       Met2dDataFile * met_ptr = (Met2dDataFile *) 0;
       Met2dDataFileFactory m_factory;
 
-      met_ptr = m_factory.new_met_2d_data_file(data_plane_filename);
+      met_ptr = m_factory.new_met_2d_data_file(data_plane_filename.c_str());
 
       if (!met_ptr)
       {
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
    //
    mlog << Debug(1) << "Opening netCDF file: " << nc_file << "\n";
 
-   f_in = open_ncfile(nc_file);
+   f_in = open_ncfile(nc_file.c_str());
 
    if(!f_in || IS_INVALID_NC_P(f_in)) {
       mlog << Error << "\nmain() -> trouble opening netCDF file "
@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
    // Create a PostScript file
    //
    mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
-   plot.open(ps_file, OrientationLandscape);
+   plot.open(ps_file.c_str(), OrientationLandscape);
    plot.pagenumber(1);
    plot.setlinewidth(l_width);
 
@@ -346,14 +346,14 @@ int main(int argc, char *argv[]) {
    //
    plot.choose_font(31, 24.0);
    plot.write_centered_text(1, 1, 0.5 * page.width(), map_box.top() + margin_size, 0.5, 0.5,
-                            get_short_name(nc_file));
+                            get_short_name(nc_file.c_str()));
 
    //
    // read config file defaults
    //
    MetConfig config;
-   config.read(replace_path(config_const_filename));
-   config.read(replace_path(config_map_data_filename));
+   config.read(replace_path(config_const_filename).c_str());
+   config.read(replace_path(config_map_data_filename).c_str());
 
    //
    // draw the map first and then put a border around it
@@ -496,21 +496,21 @@ int main(int argc, char *argv[]) {
          hdr_arr[2] = header_data.elv_array[h];
 
          hdr_idx = use_obs_arr ? h : header_data.typ_idx_array[h];
-         str_length = strlen(header_data.typ_array[hdr_idx]);
+         str_length = header_data.typ_array[hdr_idx].length();
          if (str_length >= typ_len) str_length = typ_len - 1;
-         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
+         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx].c_str(), str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          hdr_idx = use_obs_arr ? h : header_data.sid_idx_array[h];
-         str_length = strlen(header_data.sid_array[hdr_idx]);
+         str_length = header_data.sid_array[hdr_idx].length();
          if (str_length >= sid_len) str_length = sid_len - 1;
-         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
+         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx].c_str(), str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          hdr_idx = use_obs_arr ? h : header_data.vld_idx_array[h];
-         str_length = strlen(header_data.vld_array[hdr_idx]);
+         str_length = header_data.vld_array[hdr_idx].length();
          if (str_length >= vld_len) str_length = vld_len - 1;
-         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
+         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx].c_str(), str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
          //
@@ -673,7 +673,7 @@ void usage() {
 
 void set_grib_code(const StringArray & a)
 {
-   ivar.add(atoi(a[0]));
+   ivar.add(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -701,7 +701,7 @@ void set_data_filename(const StringArray & a)
 
 void set_dotsize(const StringArray & a)
 {
-   dotsize = atof(a[0]);
+   dotsize = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -719,7 +719,7 @@ void set_logfile(const StringArray & a)
 
 void set_verbosity(const StringArray & a)
 {
-   mlog.set_verbosity_level(atoi(a[0]));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -106,7 +106,7 @@ inline double Spheroid::b_km() const { return ( B_km ); }
 inline double Spheroid::f() const { return ( F ); }
 inline double Spheroid::e() const { return ( E ); }
 
-inline const char * Spheroid::name() const { return ( Name ); }
+inline const char * Spheroid::name() const { return ( Name.c_str() ); }
 
 inline bool Spheroid::is_sphere() const { return ( A_km == B_km ); }
 

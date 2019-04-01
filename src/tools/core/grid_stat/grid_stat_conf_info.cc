@@ -90,7 +90,7 @@ void GridStatConfInfo::read_config(const char *default_file_name,
                                    const char *user_file_name) {
 
    // Read the config file constants
-   conf.read(replace_path(config_const_filename));
+   conf.read(replace_path(config_const_filename).c_str());
 
    // Read the default config file
    conf.read(default_file_name);
@@ -628,7 +628,7 @@ void GridStatVxOpt::process_config(
 
    // Verifying a probability field
    if(fcst_info->is_prob()) {
-      fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
+      fcat_ta = string_to_prob_thresh(fcat_ta.get_str().c_str());
    }
 
    // Check for equal threshold length for non-probability fields
@@ -685,7 +685,7 @@ void GridStatVxOpt::process_config(
    // Loop through interpolation options
    for(i=0; i<interp_info.n_interp; i++) {
 
-      mthd = string_to_interpmthd(interp_info.method[i]);
+      mthd = string_to_interpmthd(interp_info.method[i].c_str());
 
       // Check for unsupported interpolation methods
       if(mthd == InterpMthd_DW_Mean ||

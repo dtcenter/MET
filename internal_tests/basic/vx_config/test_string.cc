@@ -81,7 +81,7 @@ ConcatString s;
 
 read_file_into_string(argv[1], s);
 
-status = config.read_string(s);
+status = config.read_string(s.c_str());
 
 if ( ! status )  {
 
@@ -93,7 +93,7 @@ if ( ! status )  {
 
 s = "b = 10;";
 
-status = config.read_string(s);
+status = config.read_string(s.c_str());
 
 if ( ! status )  {
 

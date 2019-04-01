@@ -357,7 +357,7 @@ int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
 
-   add(timestring_to_unix(sa[j]));
+  add(timestring_to_unix(sa[j].c_str()));
 
 }
 
