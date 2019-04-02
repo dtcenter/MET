@@ -56,12 +56,12 @@ static void write_orank();
 static void write_orank_row_conv(AsciiTable &at, int row, int i_obs);
 static void write_orank_row_rad (AsciiTable &at, int row, int i_obs);
 
-static void add_key(const char * key);
-static bool has_key(const char * key);
-static bool has_key(const char * key, int & index);
+static void add_key(const ConcatString &key);
+static bool has_key(const ConcatString &key);
+static bool has_key(const ConcatString &key, int & index);
 
-static void check_int(int i1, int i2, const char *col, const char *key);
-static void check_dbl(double d1, double d2, const char *col, const char *key);
+static void check_int(int i1, int i2, const char *col, const ConcatString &key);
+static void check_dbl(double d1, double d2, const char *col, const ConcatString &key);
 
 static void usage();
 static void set_out(const StringArray &);
@@ -256,10 +256,10 @@ void process_conv_data(ConvData &d, int i_mem) {
    ConcatString key = get_conv_key(d);
 
    // Add entry for new observation
-   if(!has_key(key.c_str())) {
+   if(!has_key(key)) {
 
       // Store the current key
-      add_key(key.c_str());
+      add_key(key);
 
       // Store the current pair data
       conv_data.push_back(d);
@@ -278,15 +278,15 @@ void process_conv_data(ConvData &d, int i_mem) {
    } // end if
 
    // Get the current observation index
-   if(!has_key(key.c_str(), i_obs)) {
+   if(!has_key(key, i_obs)) {
       mlog << Error << "\nprocess_conv_data() -> "
            << "can't find entry for case \"" << key << "\"\n\n";
       exit(1);
    }
 
    // Check for consistentcy
-   check_int(d.prep_use, conv_data[i_obs].prep_use, "PREP_USE", key.c_str());
-   check_int(d.setup_qc, conv_data[i_obs].setup_qc, "SETUP_QC", key.c_str());
+   check_int(d.prep_use, conv_data[i_obs].prep_use, "PREP_USE", key);
+   check_int(d.setup_qc, conv_data[i_obs].setup_qc, "SETUP_QC", key);
 
    // Store current ensemble data
    if(mn) {
@@ -413,7 +413,7 @@ void process_rad_data(RadData &d, int i_mem) {
    bool mn = (i_mem < 0);
 
    // Build current key
-   const char * key = get_rad_key(d).c_str();
+   ConcatString key = get_rad_key(d);
 
    // Add entry for new observation
    if(!has_key(key)) {
@@ -743,8 +743,8 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_key(const char *key) {
-   int int_key = key_to_integer(key);
+void add_key(const ConcatString &key) {
+   int int_key = key_to_integer(key.c_str());
    StringArray key_array = obs_key_map[int_key];
    if (key_array.n_elements()) {
       if (key_array.has(key)) {
@@ -766,10 +766,10 @@ void add_key(const char *key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_key(const char *key) {
+bool has_key(const ConcatString &key) {
    bool found_key;
    found_key = false;
-   int int_key = key_to_integer(key);
+   int int_key = key_to_integer(key.c_str());
    StringArray key_array = obs_key_map[int_key];
    if (key_array.n_elements()) {
       if (key_array.has(key)) {
@@ -781,10 +781,10 @@ bool has_key(const char *key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_key(const char *key, int & index) {
+bool has_key(const ConcatString &key, int & index) {
    bool found_key;
    found_key = false;
-   int int_key = key_to_integer(key);
+   int int_key = key_to_integer(key.c_str());
    StringArray key_array = obs_key_map[int_key];
    if (key_array.n_elements()) {
       if (key_array.has(key)) {
@@ -802,7 +802,7 @@ bool has_key(const char *key, int & index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_int(int i1, int i2, const char *col, const char *key) {
+void check_int(int i1, int i2, const char *col, const ConcatString &key) {
    if(i1 != i2) {
       mlog << Warning
            << "\nThe \"" << col << "\" value unexpectedly changed ("
@@ -813,7 +813,7 @@ void check_int(int i1, int i2, const char *col, const char *key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_dbl(double d1, double d2, const char *col, const char *key) {
+void check_dbl(double d1, double d2, const char *col, const ConcatString &key) {
    if(!is_eq(d1, d2)) {
       mlog << Warning
            << "\nThe \"" << col << "\" value unexpectedly changed ("
