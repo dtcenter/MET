@@ -84,7 +84,6 @@ MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::grib2_init_from_scratch() {
-
    ScanMode = -1;
 
    PairMap[ugrd_abbr_str] = vgrd_abbr_str;
@@ -96,7 +95,6 @@ void MetGrib2DataFile::grib2_init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::close() {
-
    fclose(FileGrib2);
 
    return;
@@ -105,8 +103,6 @@ void MetGrib2DataFile::close() {
 ////////////////////////////////////////////////////////////////////////
 
 bool MetGrib2DataFile::open(const char * _filename) {
-
-   //  attempt to opent he
    Filename = _filename;
    if( NULL == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() -> "
@@ -128,7 +124,6 @@ bool MetGrib2DataFile::open(const char * _filename) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::dump(ostream & out, int depth) const {
-
    Indent prefix(depth);
 
    out << prefix << "File = ";
@@ -150,8 +145,8 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
    }
 
    out.flush();
-   return;
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -243,14 +238,12 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if(read_success) process_data_plane(vinfo_g2, plane);
 
    return read_success;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
-                                        DataPlaneArray &plane_array
-                                      ){
+                                        DataPlaneArray &plane_array ){
 
    // Initialize
    plane_array.clear();
@@ -571,6 +564,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
    }  //  END:  for( vector<Grib2Record*>::iterator it = RecList.begin(); ...)
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -613,13 +607,11 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
    else                        { plane = v2d_rot; }
 
    return plane;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
-
    DataPlaneArray array_ret;
 
    //  if the requested field cannot be derived, bail
@@ -679,13 +671,11 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
    }
 
    return array_ret;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MetGrib2DataFile::read_grib2_record_list() {
-
    gribfield  *gfld;
    unsigned char *cgrib;
    long offset = 0, offset_next;
@@ -906,9 +896,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
          NameRecMap[rec_mag] = rec;
 
          g2_free(gfld);
-	 //	 if (cgrib != NULL) {
-	 //	   delete [] cgrib;
-	 //	 }
 
          //  if there are more fields in the current record, read the next one
          if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, cgrib, numfields);
@@ -921,13 +908,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
    }  //  END:  while( read_grib2_record() )
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
-
-{
+void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
    double d;
    int ResCompFlag;
@@ -1104,10 +1090,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       data.dump();
 
-
-
-
-
    }   //  else
 
    //////////////////////////////////////////////////////////////////////////
@@ -1117,14 +1099,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       ScanMode = gfld->igdtmpl[17];
 
       //  determine the hemisphere
-      switch(gfld->igdtmpl[16]){
-         case 0:    hem = 'N';  break;
-         case 128:  hem = 'S';  break;
-         default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
-                 << "unexpected polar stereo projection center (" << gfld->igdtmpl[16] << ")\n\n";
-            exit(1);
-      }
+      if( gfld->igdtmpl[16] & 128 ) hem = 'S';
+      else                          hem = 'N';
 
       //  build a StereographicData struct with the projection information
       StereographicData data;
@@ -1189,14 +1165,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       ScanMode = gfld->igdtmpl[17];
 
       //  determine the hemisphere
-      switch(gfld->igdtmpl[16]){
-         case 0:  hem = 'N';  break;
-         case 1:  hem = 'S';  break;
-         default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
-                 << "unexpected lambert conformal projection center (" << gfld->igdtmpl[16] << ")\n\n";
-            exit(1);
-      }
+      if( gfld->igdtmpl[16] & 128 ) hem = 'S';
+      else                          hem = 'N';
 
       //  build a LambertData struct with the projection information
       LambertData data;
@@ -1246,9 +1216,6 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
          //  check that the earth is spherical, not oblate
 
-
-
-
       gauss.lon_zero = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
 
 
@@ -1275,16 +1242,13 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
    }
 
-
-
-return;
-
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
-                                                     DataPlane &plane ){
+bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
+                                                     DataPlane &plane) {
 
    //  attempt to read the record
    gribfield *gfld;
@@ -1403,7 +1367,7 @@ long MetGrib2DataFile::read_grib2_record( long offset,
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
 
    //  g2c fields
-   g2int  listsec0[3], listsec1[13], numlocal, lskip, lgrib;
+   g2int listsec0[3], listsec1[13], numlocal, lskip, lgrib;
 
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
@@ -1419,13 +1383,11 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
    //  return the offset of the next record
    return lskip + lgrib;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
-
    ConcatString lvl;
    int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
    switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
@@ -1453,18 +1415,16 @@ ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
    } else {
       ret.format("%s/%s%d-%d", rec->ParmName.c_str(), lvl.text(), lvl_val1, lvl_val2);
    }
-   return ret;
 
+   return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib2DataFile::index( VarInfo &vinfo ){
-
    vector<Grib2Record*> listMatchExact, listMatchRange;
    find_record_matches((VarInfoGrib2*)(&vinfo), listMatchExact, listMatchRange);
    return 1 > listMatchExact.size() ? -1 : listMatchExact[0]->Index;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
