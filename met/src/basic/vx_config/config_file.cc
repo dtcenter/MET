@@ -201,7 +201,6 @@ out << prefix << "Config File Entries ...\n";
 
 Dictionary::dump(out, depth + 1);
 
-
    //
    //  done
    //
@@ -322,10 +321,7 @@ temp_filename = make_temp_file_name("met_config", 0);
 
 recursive_envs(name, temp_filename.c_str());
 
-
-
-
- bison_input_filename = (const char *) temp_filename.c_str();
+bison_input_filename = (const char *) temp_filename.c_str();
 
 dict_stack = &DS;
 
@@ -450,7 +446,7 @@ out.close();
 
 bool status = read(temp_filename.c_str());
 
- remove_temp_file(temp_filename);
+remove_temp_file(temp_filename);
 
 return ( status );
 
@@ -514,7 +510,7 @@ met_open(in, infile);
 if ( ! in )  {
 
    mlog << Error
-        << "\n\n  recursive_envs() -> unable to open input file \""
+        << "\nrecursive_envs() -> unable to open input file \""
         << infile << "\"\n\n";
 
    exit ( 1 );
@@ -527,7 +523,7 @@ met_open(out, outfile);
 if ( ! out )  {
 
    mlog << Error
-        << "\n\n  recursive_envs() -> unable to open output file \""
+        << "\nrecursive_envs() -> unable to open output file \""
         << outfile << "\"\n\n";
 
    in.close();
@@ -544,7 +540,6 @@ while ( getline(in, line) )  {
    out << line << '\n';
 
 }
-
 
    //
    //  done
@@ -571,7 +566,6 @@ while ( 1 )  {
 
 }
 
-
 return;
 
 }
@@ -597,7 +591,6 @@ if ( (pos1 = line.find("//")) != string::npos )  {
 
 }
 
-
    //
    //  look for environment variables
    //
@@ -613,8 +606,7 @@ if ( pos1 == string::npos )  return ( false );
 if ( (pos2 = line.find('}', pos1)) == string::npos )  {
 
    mlog << Error
-   // cerr
-        << "replace_env(string &) -> can't closing brackent in string \""
+        << "\nreplace_env(string &) -> can't closing brackent in string \""
         << line << "\"\n\n";
 
    exit ( 1 );
@@ -631,8 +623,7 @@ env_value = getenv(env.c_str());
 if ( ! env_value )  {
 
    mlog << Error
-   // cerr
-        << "\n\n  replace_env() -> unable to get value for environment variable \""
+        << "\nreplace_env() -> unable to get value for environment variable \""
         << (env.c_str()) << "\"\n\n";
 
    exit ( 1 );
@@ -644,11 +635,6 @@ out = line.substr(0, pos1);
 out += env_value;
 
 out += line.substr(pos2 + 1);
-
-
-// cout << "\n\n   out = \"" << (out.c_str()) << "\n\n" << flush;
-
-
 
    //
    //  done
@@ -662,8 +648,3 @@ return ( true );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
