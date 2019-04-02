@@ -87,10 +87,8 @@ class ConcatString {
       ConcatString(int _alloc_inc);
      ~ConcatString();
       ConcatString(const ConcatString &);
-      //      ConcatString(const char *);
       ConcatString(const std::string &);
       ConcatString & operator=(const ConcatString &);
-      //      ConcatString & operator=(const char *);
       ConcatString & operator=(const std::string &);
       bool operator==(const ConcatString &) const;
       bool operator==(const char *) const;
@@ -137,8 +135,6 @@ class ConcatString {
          //  do stuff
          //
 
-      //      void add(const char *);
-
       void add(const char);
 
       void add(const ConcatString &);
@@ -151,7 +147,6 @@ class ConcatString {
 
       void chomp(const char *);   //  removes trailing suffix, if possible
 
-      //      operator const char * () const;
       operator const std::string () const;
 
       bool startswith(const char *) const;
@@ -190,7 +185,7 @@ class ConcatString {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * ConcatString::text()         const { return ( s ? s->c_str() : 0); }
+inline const char * ConcatString::text()          const { return ( s ? s->c_str() : 0); }
 inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : 0); }
 inline const std::string & ConcatString::string() const { return ( *s ); }
 
@@ -202,10 +197,8 @@ inline const char * ConcatString::float_format() const { return ( FloatFormat );
 
 inline int          ConcatString::alloc_inc()    const { return ( AllocInc ); }
 
-inline bool         ConcatString::empty()        const { return ( s->empty() == true ); }
-inline bool         ConcatString::nonempty()     const { return ( s->empty() == false ); }
-
-//inline              ConcatString::operator const char * () const { return ( s ? s->c_str() : 0 ); }
+inline bool         ConcatString::empty()        const { return ( s ?  s->empty() : true ); }
+inline bool         ConcatString::nonempty()     const { return ( s ? !s->empty() : false ); }
 
 inline              ConcatString::operator const std::string () const { return ( s ? *s : 0 ); }
 
@@ -235,7 +228,6 @@ extern std::ostream & operator<<(std::ostream &, const ConcatString &);
 
 
 extern ConcatString & operator << (ConcatString &, const char);
-//extern ConcatString & operator << (ConcatString &, const char *);
 extern ConcatString & operator << (ConcatString &, const std::string&);
 extern ConcatString & operator << (ConcatString &, const ConcatString &);
 extern ConcatString & operator << (ConcatString &, int);
@@ -252,8 +244,6 @@ extern ConcatString & operator << (ConcatString &, const Indent &);
    //
 
 
-//extern bool operator == (const ConcatString &, const ConcatString &);
-//extern bool operator == (const ConcatString &, const char *);
 extern bool operator == (const char *, const ConcatString &);
 
 extern bool operator != (const ConcatString &, const ConcatString &);
