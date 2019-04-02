@@ -931,7 +931,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       ScanMode    = t[18];
       ResCompFlag = t[13];
-      
+
          //
          //  build a RotatedLatLonData struct with the projection information
          //
@@ -988,7 +988,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
          //  auxilliary rotation around the rotated polar axis
          //
 
-      data.aux_rotation = (t[21])*angle_factor; 
+      data.aux_rotation = (t[21])*angle_factor;
 
          //
          //  if y scan order is -y, move lat_ll
@@ -1016,7 +1016,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
 
 
-   
+
 
    }   //  else
 
@@ -1027,14 +1027,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       ScanMode = gfld->igdtmpl[17];
 
       //  determine the hemisphere
-      switch(gfld->igdtmpl[16]){
-         case 0:  hem = 'N';  break;
-         case 1:  hem = 'S';  break;
-         default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
-                 << "unexpected polar stereo projection center (" << gfld->igdtmpl[16] << ")\n\n";
-            exit(1);
-      }
+      if( gfld->igdtmpl[16] & 128 ) hem = 'S';
+      else                          hem = 'N';
 
       //  build a StereographicData struct with the projection information
       StereographicData data;
@@ -1099,14 +1093,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       ScanMode = gfld->igdtmpl[17];
 
       //  determine the hemisphere
-      switch(gfld->igdtmpl[16]){
-         case 0:  hem = 'N';  break;
-         case 1:  hem = 'S';  break;
-         default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
-                 << "unexpected lambert conformal projection center (" << gfld->igdtmpl[16] << ")\n\n";
-            exit(1);
-      }
+      if( gfld->igdtmpl[16] & 128 ) hem = 'S';
+      else                          hem = 'N';
 
       //  build a LambertData struct with the projection information
       LambertData data;
