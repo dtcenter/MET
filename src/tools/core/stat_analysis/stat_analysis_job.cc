@@ -1154,7 +1154,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // FHO output line
       //
       if(lt == stat_fho) {
-	at.set_entry(r, c++, (string)"FHO:");
+         at.set_entry(r, c++, (string)"FHO:");
          write_case_cols(it->first, at, r, c);
          write_fho_cols(it->second.cts_info, at, r, c);
          if(j.stat_out) write_fho_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
@@ -1163,7 +1163,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // CTC output line
       //
       else if(lt == stat_ctc) {
-	at.set_entry(r, c++, (string)"CTC:");
+         at.set_entry(r, c++, (string)"CTC:");
          write_case_cols(it->first, at, r, c);
          write_ctc_cols(it->second.cts_info, at, r, c);
          if(j.stat_out) write_ctc_cols(it->second.cts_info, j.stat_at, r, n_header_columns);
@@ -1198,7 +1198,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       // ECLV output line
       //
       else if(lt == stat_eclv) {
-	at.set_entry(r, c++, (string)"ECLV:");
+         at.set_entry(r, c++, (string)"ECLV:");
          write_case_cols(it->first, at, r, c);
          write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, at, r, c);
          if(j.stat_out) write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, j.stat_at, r, n_header_columns);
@@ -1314,7 +1314,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
       // MCTC output line
       //
       if(lt == stat_mctc) {
-	at.set_entry(r, c++, (string)"MCTC:");
+         at.set_entry(r, c++, (string)"MCTC:");
          write_case_cols(it->first, at, r, c);
          write_mctc_cols(it->second.mcts_info, at, r, c);
          if(j.stat_out) write_mctc_cols(it->second.mcts_info, j.stat_at, r, n_header_columns);
@@ -1424,7 +1424,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PCT output line
       //
       if(lt == stat_pct) {
-	at.set_entry(r, c++, (string)"PCT:");
+         at.set_entry(r, c++, (string)"PCT:");
          write_case_cols(it->first, at, r, c);
          write_pct_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_pct_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1459,7 +1459,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PJC output line
       //
       else if(lt == stat_pjc) {
-	at.set_entry(r, c++, (string)"PJC:");
+         at.set_entry(r, c++, (string)"PJC:");
          write_case_cols(it->first, at, r, c);
          write_pjc_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_pjc_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1468,7 +1468,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // PRC output line
       //
       else if(lt == stat_prc) {
-	at.set_entry(r, c++, (string)"PRC:");
+         at.set_entry(r, c++, (string)"PRC:");
          write_case_cols(it->first, at, r, c);
          write_prc_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_prc_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
@@ -1477,7 +1477,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       // ECLV output lines
       //
       else if(lt == stat_eclv) {
-	ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str().c_str());
+         ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str().c_str());
          for(i=0; i<it->second.pct_info.pct.nrows(); i++, r++) {
             c = 0;
             at.set_entry(r, c++, (string)"ECLV:");
@@ -3049,12 +3049,12 @@ void write_job_ramp(STATAnalysisJob &j,
          vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
          if(j.ramp_type == TimeSeriesType_DyDt) {
-	   compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
+            compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst,
                ramp_part, dat_part);
          }
          else {
-	   compute_swing_ramps(cs.c_str(), vals_part, ts_part,
+            compute_swing_ramps(cs.c_str(), vals_part, ts_part,
                j.swing_width, j.ramp_thresh_fcst,
                ramp_part, dat_part);
          }
