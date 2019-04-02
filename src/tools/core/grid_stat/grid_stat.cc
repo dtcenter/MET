@@ -994,10 +994,10 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
 
                // Store the forecast variable name
-	      shc.set_fcst_var(ugrd_vgrd_abbr_str);
+               shc.set_fcst_var(ugrd_vgrd_abbr_str);
 
                // Store the observation variable name
-	      shc.set_obs_var(ugrd_vgrd_abbr_str);
+               shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
@@ -1185,25 +1185,25 @@ void process_scores() {
 
          // Write out the data fields if requested in the config file
          if(conf_info.vx_opt[i].nc_info.do_raw) {
-	   write_nc((string)"FCST", fcst_dp_smooth, i, mthd, pnts,
+            write_nc((string)"FCST", fcst_dp_smooth, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
-	   write_nc((string)"OBS",  obs_dp_smooth, i, mthd, pnts,
+            write_nc((string)"OBS",  obs_dp_smooth, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_diff) {
-	   write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+            write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty()) {
-	   write_nc((string)"CLIMO_MEAN", cmn_dp, i, mthd, pnts,
+            write_nc((string)"CLIMO_MEAN", cmn_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !csd_dp.is_empty()) {
-	   write_nc((string)"CLIMO_STDEV", csd_dp, i, mthd, pnts,
+            write_nc((string)"CLIMO_STDEV", csd_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
          if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-	   write_nc((string)"CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
+            write_nc((string)"CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
 
@@ -1272,7 +1272,6 @@ void process_scores() {
                } // end for m (n_mask)
 
                // Write out the gradients if requested in the config file
-
                if(conf_info.vx_opt[i].nc_info.do_gradient) {
                   ConcatString cs;
                   cs << cs_erase << "FCST_XGRAD_" << dx;
@@ -1668,10 +1667,10 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None) ) {
 
                // Store the forecast variable name
-	      shc.set_fcst_var(ugrd_vgrd_abbr_str);
+               shc.set_fcst_var(ugrd_vgrd_abbr_str);
 
                // Store the observation variable name
-	      shc.set_obs_var(ugrd_vgrd_abbr_str);
+               shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
@@ -1772,18 +1771,18 @@ void process_scores() {
 
             // Write out the data fields if requested in the config file
             if(conf_info.vx_opt[i].nc_info.do_raw) {
-	      write_nc((string)"FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
+               write_nc((string)"FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType_Both);
-	      write_nc((string)"OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
+               write_nc((string)"OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int, FieldType_Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_diff) {
-	      write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+               write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
                         i, shc.get_interp_mthd(), bad_data_int,
                         FieldType_Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp_smooth.is_empty()) {
-	      write_nc((string)"CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
+               write_nc((string)"CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType_Both);
             }
          } // end if
@@ -2380,8 +2379,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].obs_info->level_name()
                    << var_str << "_" << mask_str;
          // Append interpolation string for Fourier decomposition
-         if(interp_str != "") {
-            if( interp_str == "_WV" ) var_name << interp_str;
+         if(interp_str.nonempty()) {
+            if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
          }
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
@@ -2701,10 +2700,11 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name, const ConcatString att_value) {
+void add_var_att_local(NcVar *var, const char *att_name,
+                       const ConcatString att_value) {
 
-   if(att_value != "") add_att(var, att_name, att_value.c_str());
-   else          add_att(var, att_name, na_str);
+   if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
+   else                     add_att(var, att_name, na_str);
 
    return;
 }
