@@ -25,7 +25,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float(ConcatString s)
+void fix_float(ConcatString &s)
 
 {
 
@@ -39,7 +39,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float_with_blanks(ConcatString s)
+void fix_float_with_blanks(ConcatString &s)
 
 {
 
@@ -53,7 +53,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fix_float_with_char(ConcatString s, const char replacement)
+void fix_float_with_char(ConcatString &s, const char replacement)
 
 {
 
@@ -71,20 +71,19 @@ void fix_float_with_char(ConcatString s, const char replacement)
    //  no decimal point? ... just return
    //
 
-//if ( strchr(s, '.') == NULL )  return;
- if ( s.find('.') == -1 )  return;
+if ( s.find('.') == -1 )  return;
 
    //
    //  scientific notation? ... just return
    //
 
- if ( s.find('e') != -1 || s.find('E') != -1 )  return;
+if ( s.find('e') != -1 || s.find('E') != -1 )  return;
 
    //
    //  get to work
    //
 
- int j = s.length() - 1;
+int j = s.length() - 1;
 
 while ( j >= 0 )  {
 
@@ -100,7 +99,7 @@ while ( j >= 0 )  {
    //  test again for "-0" or "+0"
    //
 
- if ( s == (string)"-0" || s == (string)"+0" )  {
+if ( s == (string)"-0" || s == (string)"+0" )  {
 
    s = '0';
 
