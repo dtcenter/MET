@@ -123,6 +123,7 @@ class SetCollection {
 
       int n_alloc;
 
+
          //
          //  functions
          //
@@ -149,6 +150,9 @@ class SetCollection {
 
       void clear_empty_sets();
 
+
+      void make_room(const int = 1);
+
 };
 
 
@@ -156,6 +160,9 @@ class SetCollection {
 
 
 extern ostream & operator<<(ostream &, const SetCollection &);
+
+
+inline void SetCollection::make_room(const int __n)  { if ( __n > 0 )  extend(n_sets + __n);  return; }
 
 
 ///////////////////////////////////////////////////////////////////////////////
