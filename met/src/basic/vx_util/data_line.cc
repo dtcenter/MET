@@ -705,7 +705,7 @@ int j, n;
 n = strlen(path);
 
 Filename.assign(path);
-ShortFilename.assign(basename(path));
+ShortFilename.assign(get_short_name(path));
 
 
    //
