@@ -63,7 +63,7 @@ void fix_float_with_char(ConcatString &s, const char replacement)
 
   if (  s == (string)"-0" || s == (string)"+0" )  {
 
-   s = '0';
+   s = "0";
 
 }
 
@@ -101,7 +101,7 @@ while ( j >= 0 )  {
 
 if ( s == (string)"-0" || s == (string)"+0" )  {
 
-   s = '0';
+   s = "0";
 
 }
 
