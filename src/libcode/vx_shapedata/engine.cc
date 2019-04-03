@@ -1099,6 +1099,8 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
 
          if(intersection >= fcst_shape[k].area()) {
 
+            collection.make_room();
+
             //
             // Keep track of the first embedded shape.  You only want to
             // create a composite if there are more than 1 shapes in it.
@@ -1218,6 +1220,8 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
          // intersection area >= obs area
          //
          if(intersection >= obs_shape[k].area()) {
+
+            collection.make_room();
 
             //
             // Keep track of the first embedded shape.  You only want to
@@ -1360,6 +1364,7 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    //
    for(i=0; i<collection.n_sets; i++) {
       if(collection.set[i].n_fcst > 0) {
+         fcst_engine->collection.make_room();
          for(j=0; j<collection.set[i].n_fcst; j++) {
 
             fcst_engine->collection.set[fcst_engine->collection.n_sets].add_pair(
@@ -1395,7 +1400,7 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
       //
       if(fcst_engine->collection.set[i].n_fcst >= 2) {
          for(j=0; j<fcst_engine->collection.set[i].n_fcst; j++) {
-
+            collection.make_room();
             collection.set[collection.n_sets].add_pair(
                fcst_engine->collection.set[i].fcst_number[j], -1);
          }
@@ -1523,7 +1528,10 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    //
    for(i=0; i<collection.n_sets; i++) {
       if(collection.set[i].n_obs > 0) {
+         obs_engine->collection.make_room();
          for(j=0; j<collection.set[i].n_obs; j++) {
+
+            obs_engine->collection.make_room();
 
             obs_engine->collection.set[obs_engine->collection.n_sets].add_pair(
                -1, collection.set[i].obs_number[j]);
@@ -1557,6 +1565,7 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
       // more simple objects.
       //
       if(obs_engine->collection.set[i].n_obs >= 2) {
+         collection.make_room();
          for(j=0; j<obs_engine->collection.set[i].n_obs; j++) {
 
             collection.set[collection.n_sets].add_pair(
