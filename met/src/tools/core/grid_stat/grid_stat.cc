@@ -1234,6 +1234,9 @@ void process_scores() {
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
+                  // Store the current mask
+                  mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
+
                   // Turn off the mask for missing data values
                   mask_bad_data(mask_mp, fgx_dp);
                   mask_bad_data(mask_mp, fgy_dp);
