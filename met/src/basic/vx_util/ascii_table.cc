@@ -940,7 +940,6 @@ void AsciiTable::set_entry(const int r, const int c, double x)
 
 {
 
-  //ConcatString junk;
 ConcatString str;
 
 if ( fabs(x - BadDataValue) < 0.0001 )  str = BadDataStr;
@@ -951,7 +950,7 @@ else  {
 
 }
 
- fix_float(str);
+fix_float(str);
 
 if ( DoCommaString )  {
   char * junk;

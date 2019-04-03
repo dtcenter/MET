@@ -174,15 +174,15 @@ void SO3::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
-char junk[256];
 double ax, ay, az, angle;
+ConcatString junk;
 
 
    //
    // 1st row
    //
 
-snprintf(junk, sizeof(junk), "%13.10f  %13.10f  %13.10f", M11, M12, M13);
+junk.format("%13.10f  %13.10f  %13.10f", M11, M12, M13);
 
 out << prefix << junk << "\n";
 
@@ -190,7 +190,7 @@ out << prefix << junk << "\n";
    // 2nd row
    //
 
-snprintf(junk, sizeof(junk), "%13.10f  %13.10f  %13.10f", M21, M22, M23);
+junk.format("%13.10f  %13.10f  %13.10f", M21, M22, M23);
 
 out << prefix << junk << "\n";
 
@@ -198,7 +198,7 @@ out << prefix << junk << "\n";
    // 3rd row
    //
 
-snprintf(junk, sizeof(junk), "%13.10f  %13.10f  %13.10f", M31, M32, M33);
+junk.format("%13.10f  %13.10f  %13.10f", M31, M32, M33);
 
 out << prefix << junk << "\n";
 
@@ -214,13 +214,13 @@ out << prefix << "\n";
 
 get_axis_angle(ax, ay, az, angle);
 
-snprintf(junk, sizeof(junk), "%13.10f", angle);
+junk.format("%13.10f", angle);
 
- fix_float(string(junk));
+fix_float(junk);
 
 out << prefix << "Angle = " << junk << "\n";
 
-snprintf(junk, sizeof(junk), "%13.10f  %13.10f  %13.10f", ax, ay, az);
+junk.format("%13.10f  %13.10f  %13.10f", ax, ay, az);
 
 out << prefix << "Axis  = " << junk << "\n";
 
@@ -382,7 +382,7 @@ void SO3::invert()
 {
 
    //
-   //  the inverse is just the transpose, 
+   //  the inverse is just the transpose,
    //    so swap the off-diagonal elements
    //
 

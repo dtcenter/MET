@@ -19,11 +19,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void fix_float(ConcatString);
+extern void fix_float(ConcatString &);
 
-extern void fix_float_with_blanks(ConcatString);
+extern void fix_float_with_blanks(ConcatString &);
 
-extern void fix_float_with_char(ConcatString, const char replacement_char);
+extern void fix_float_with_char(ConcatString &, const char replacement_char);
 
 
 ////////////////////////////////////////////////////////////////////////
