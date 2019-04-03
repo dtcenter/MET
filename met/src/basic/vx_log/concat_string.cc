@@ -104,7 +104,7 @@ ConcatString::ConcatString(const std::string & Text)
 
 init_from_scratch();
 
-add(Text);
+add(Text.c_str());
 
 }
 
