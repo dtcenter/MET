@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.1_beta1 (February 11, 2019)
+Model Evaluation Tools METv8.1_beta2 (April 4, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -321,6 +321,27 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
+Version 8.1 Beta 2 Release Notes:
+--------------------------------
+
+- The met-8.1_beta2 release greatly reduces the number of Fortify issues.
+- Enhance Grid-Stat by making the X and Y gradient sizes configurable.
+- Enhance PCP-Combine by adding the -derive functionality to compute the sum,
+  min, max, range, mean, standard deviation, or valid data count.
+- Enhance PCP-Combine by adding the -vld_thresh command line option.
+- Enhance Gen-Vx-Mask to calculate GOES-16 pixel locations from metadata.
+- Enhance STAT-Analysis to reference the -by columns when using the -set_hdr
+  job command option.
+- Enhance ascii2nc to support the -format aeronetv2 and aeronetv3 options.
+- Enhance the NetCDF library to request data using a timestring rather than
+  the explicit index of the time dimension.
+- Enhance the NetCDF library to handle a wider variety of data types.
+- Add GRIB2 filtering options, GRIB2_ipdtmpl_index and GRIB2_ipdtmpl_val.
+- Support the file_type option when parsing the poly config file setting.
+- Fix GRIB2 support for Polar Stereographic and Lambert Conformal grids in the
+  southern hemisphere.
+- Fix bug in MODE for memory corruption.
+ 
 Version 8.1 Beta 1 Release Notes:
 --------------------------------
 
