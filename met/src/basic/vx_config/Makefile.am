@@ -72,8 +72,7 @@ endif
 # If we are in development mode, clean up extra local files in a "make clean".
 
 if ENABLE_DEVELOPMENT
-    CLEANFILES = config_scanner.cc \
-        	config.tab.cc \
+    CLEANFILES = config.tab.cc \
         	config.tab.h \
         	lex.config.cc
 endif
@@ -81,6 +80,5 @@ endif
 # Extra distribution files
 
 EXTRA_DIST = config.tab.cc \
-	config.tab.h \
-	config_scanner.cc
+	config.tab.h
 
