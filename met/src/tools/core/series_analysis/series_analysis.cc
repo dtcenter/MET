@@ -2056,6 +2056,8 @@ void add_nc_var(const ConcatString &var_name,
    // Store the new NcVarData object in the map
    stat_data[var_name] = d;
 
+   if ( d.var )  { delete d.var;  d.var = 0; }   //  fortify seems to want this
+
    return;
 }
 

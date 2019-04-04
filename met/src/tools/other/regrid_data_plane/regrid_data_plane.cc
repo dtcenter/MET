@@ -821,16 +821,16 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
             mlog << Error << method_name << " Fail to get longitudes\n";
       }
       if (has_coord_input || latlon_allocated ) {
-         if (latitudes) delete [] latitudes;
-         if (longitudes) delete [] longitudes;
+         if (latitudes)  { delete [] latitudes;   latitudes  = 0; }
+         if (longitudes) { delete [] longitudes;  longitudes = 0; }
       }
       grid_data.release();
 
-   }
+   }   //  if data_size > 0
 
 
    if(coord_nc_in) {
-      delete coord_nc_in;
+      delete coord_nc_in;  coord_nc_in = 0;
    }
 }
 

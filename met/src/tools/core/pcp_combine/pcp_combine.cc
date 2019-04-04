@@ -808,6 +808,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          cur_var = var_fac.new_var_info(mtddf->file_type());
          if(!cur_var) {
+            delete mtddf;  mtddf = 0;
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -840,13 +841,15 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
 
          //  check for a valid match
-         if( -1 != i_rec ) break;
+         if( -1 != i_rec ) { met_closedir(dp);  break; }
 	 
       } // end if
 
    } // end while
 
-   if(closedir(dp) < 0) {
+   if( dp != 0 ) {
+      met_closedir(dp);
+      dp = 0;
       mlog << Error << "\nsearch_pcp_dir() -> "
            << "cannot close search directory: " << cur_dir << "\n\n";
       exit(1);

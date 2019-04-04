@@ -45,7 +45,7 @@ extern FILE *       met_fopen(const char *path, const char *mode);
 
 extern DIR *        met_opendir(const char *path);
 
-extern void         met_closedir(DIR *);
+extern void         met_closedir(DIR * &);
 
 
 ////////////////////////////////////////////////////////////////////////

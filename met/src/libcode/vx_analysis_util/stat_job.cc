@@ -909,9 +909,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Create a temporary copy of the jobstring for use in parsing
    //
-   line = new char [n + 1];
-   memset(line, 0, n + 1);
-   strcpy(line, jobstring);
+   const int line_size = n + 1;
+   line = new char [line_size];
+   memset(line, 0, line_size);
+   strncpy(line, jobstring, line_size);
+   line[line_size - 1] = (char) 0;
 
    lp = line;
 
@@ -1026,6 +1028,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       if(jc_array[i] == "-job") {
 
          if(set_job_type(jc_array[i+1].c_str()) != 0) {
+            delete [] line;  line = 0;  lp = 0;
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";

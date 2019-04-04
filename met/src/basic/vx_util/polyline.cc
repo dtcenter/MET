@@ -864,8 +864,10 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    char *c = (char *) 0;
    double lat, lon;
 
-   tmp_str = new char[strlen(poly_str) + 1];
-   strncpy(tmp_str, poly_str, sizeof(tmp_str));
+   const int tmp_str_len = strlen(poly_str) + 1;
+
+   tmp_str = new char[tmp_str_len];
+   strncpy(tmp_str, poly_str, tmp_str_len);
 
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
@@ -900,6 +902,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    }
 
    if(poly.n_points < 3) {
+      if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
       mlog << Error << "\nparse_latlon_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") must contain at least 3 pairs of points "
@@ -981,12 +984,15 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
    char *c = (char *) 0;
    double x, y;
 
-   tmp_str = new char[strlen(poly_str) + 1];
-   strncpy(tmp_str, poly_str, sizeof(tmp_str));
+   const int tmp_str_len = strlen(poly_str) + 1;
+
+   tmp_str = new char[tmp_str_len];
+   strncpy(tmp_str, poly_str, tmp_str_len);
 
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
    if(!c) {
+      if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
       mlog << Error << "\nparse_xy_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") is empty.\n\n";
