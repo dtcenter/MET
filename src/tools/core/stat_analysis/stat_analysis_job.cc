@@ -3749,6 +3749,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    fcst_cts = new CTSInfo   [n_terms];
    ref_cts  = new CTSInfo   [n_terms];
 
+
    //
    // Define array of line types to be aggregated for each term in the
    // Skill Score Index.
@@ -3907,6 +3908,13 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
 
          job_lt[i] = string_to_statlinetype(j.line_type[i].c_str());
          if(job_lt[i] != stat_sl1l2 && job_lt[i] != stat_ctc) {
+            if ( fcst_job )  { delete [] fcst_job;  fcst_job = 0; }
+            if ( ref_job  )  { delete [] ref_job;   ref_job  = 0; }
+            if ( fcst_si  )  { delete [] fcst_si;   fcst_si  = 0; }
+            if ( ref_si   )  { delete [] ref_si;    ref_si   = 0; }
+            if ( fcst_cts )  { delete [] fcst_cts;  fcst_cts = 0; }
+            if ( ref_cts  )  { delete [] ref_cts;   ref_cts  = 0; }
+            if ( job_lt   )  { delete [] job_lt;    job_lt   = 0; }
             mlog << Error << "\ncompute_ss_index() -> "
                  << "a Skill Score Index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."

@@ -1778,7 +1778,7 @@ void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
            << "), using " << hira_pd.n_obs << " pairs.\n";
 
       // Check for zero matched pairs
-      if(hira_pd.o_na.n_elements() == 0) continue;
+      if(hira_pd.o_na.n_elements() == 0) { delete gt;  gt = 0;  continue;}
 
       // Compute ensemble statistics
       hira_pd.compute_pair_vals(rng_ptr);

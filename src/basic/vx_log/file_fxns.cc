@@ -93,11 +93,13 @@ DIR *met_opendir(const char *path) {
 ////////////////////////////////////////////////////////////////////////
 
 
-void met_closedir(DIR * dp)
+void met_closedir(DIR * & dp)
 
 {
 
 int status = ::closedir(dp);
+
+dp = 0;
 
 if ( status < 0 )  {
 
