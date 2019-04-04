@@ -106,6 +106,12 @@ if ( s == (string)"-0" || s == (string)"+0" )  {
 }
 
    //
+   //  store result of c_str() to delete trailing nulls
+   //
+
+s = s.c_str();
+
+   //
    //  done
    //
 
