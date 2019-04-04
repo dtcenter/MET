@@ -125,7 +125,6 @@
     </output>
   </test>
 
-<!-- DISABLE THE MODE_CUT_LINE UNIT TEST WHICH KEEPS FAILING IN THE NIGHTLY BUILD
  <test name="mode_CUT_LINE">
     <exec>&MET_BIN;/mode</exec>
     <env>
@@ -144,7 +143,6 @@
       <ps>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A.ps</ps>
     </output>
   </test>
--->
 
   <test name="mode_QUILT">
     <exec>&MET_BIN;/mode</exec>
