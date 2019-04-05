@@ -2056,8 +2056,6 @@ void add_nc_var(const ConcatString &var_name,
    // Store the new NcVarData object in the map
    stat_data[var_name] = d;
 
-   if ( d.var )  { delete d.var;  d.var = 0; }   //  fortify seems to want this
-
    return;
 }
 
@@ -2126,13 +2124,18 @@ void set_range(const int &t, int &beg, int &end) {
 
 void clean_up() {
 
+   // Deallocate NetCDF variable for each map entry
+   map<ConcatString, NcVarData>::const_iterator it;
+   for(it=stat_data.begin(); it!=stat_data.end(); it++) {
+      if(it->second.var) { delete it->second.var; }
+   }
+
    // Close the output NetCDF file
    if(nc_out) {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
-      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
    }
