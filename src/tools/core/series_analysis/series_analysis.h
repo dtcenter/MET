@@ -90,8 +90,6 @@ static SeriesAnalysisConfInfo conf_info;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
-//static NcDim  *lat_dim = (NcDim *)  0;
-//static NcDim  *lon_dim = (NcDim *)  0;
 static NcDim  lat_dim;
 static NcDim  lon_dim ;
 
