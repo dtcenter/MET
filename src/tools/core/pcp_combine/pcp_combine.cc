@@ -850,12 +850,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    if( dp != 0 ) {
       met_closedir(dp);
       dp = 0;
-      mlog << Error << "\nsearch_pcp_dir() -> "
-           << "cannot close search directory: " << cur_dir << "\n\n";
-      exit(1);
    }
-
-   dp = 0;
 
    return(i_rec);
 }
