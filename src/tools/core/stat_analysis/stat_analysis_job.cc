@@ -36,6 +36,7 @@
 //                    or MPR to ECLV lines.
 //   016    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   017    03/01/18  Halley Gotway   Update summary job type.
+//   018    04/04/19  Fillmore        Added FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,6 +85,8 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    j.obs_init_hour   = c.lookup_seconds_array(conf_key_obs_init_hour, false);
    j.fcst_var        = c.lookup_string_array(conf_key_fcst_var, false);
    j.obs_var         = c.lookup_string_array(conf_key_obs_var, false);
+   j.fcst_units      = c.lookup_string_array(conf_key_fcst_units, false);
+   j.obs_units       = c.lookup_string_array(conf_key_obs_units, false);
    j.fcst_lev        = c.lookup_string_array(conf_key_fcst_lev, false);
    j.obs_lev         = c.lookup_string_array(conf_key_obs_lev, false);
    j.obtype          = c.lookup_string_array(conf_key_obtype, false);
@@ -277,6 +280,8 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
            << jobstring << "\n\n";
       throw(1);
    }
+
+   mlog << Debug(3) << "Filter Test jobstring:\n" << jobstring << "\n";
 
    //
    // Process the STAT lines

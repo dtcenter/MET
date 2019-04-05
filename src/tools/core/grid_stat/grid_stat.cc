@@ -93,6 +93,7 @@
 //   043    02/14/17  Halley Gotway  Add nbrhd.field option to skip the
 //                    computation of fractional coverage fields.
 //   044    02/22/19  Halley Gotway  Make gradient dx/dy configurable.
+//   045    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -739,11 +740,17 @@ void process_scores() {
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.vx_opt[i].fcst_info->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].fcst_info->level_name().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].obs_info->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.vx_opt[i].obs_info->units());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].obs_info->level_name().c_str());

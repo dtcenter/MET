@@ -58,12 +58,14 @@ class StatHdrColumns {
       unixtime     obs_valid_end;
       ConcatString obs_valid_end_str;
 
-      // Fcst variable and level
+      // Fcst variable, units, and level
       ConcatString fcst_var;
+      ConcatString fcst_units;
       ConcatString fcst_lev;
 
-      // Obs variable and level
+      // Obs variable, units, and level
       ConcatString obs_var;
+      ConcatString obs_units;
       ConcatString obs_lev;
 
       // Obs type
@@ -120,9 +122,11 @@ class StatHdrColumns {
       void set_obs_valid_end (const unixtime);
 
       void set_fcst_var      (const ConcatString);
+      void set_fcst_units    (const ConcatString);
       void set_fcst_lev      (const char *);
 
       void set_obs_var       (const ConcatString);
+      void set_obs_units     (const ConcatString);
       void set_obs_lev       (const char *);
 
       void set_obtype        (const char *);
@@ -170,9 +174,11 @@ class StatHdrColumns {
       ConcatString get_obs_valid_end_str () const;
 
       ConcatString get_fcst_var          () const;
+      ConcatString get_fcst_units        () const;
       ConcatString get_fcst_lev          () const;
 
       ConcatString get_obs_var           () const;
+      ConcatString get_obs_units         () const;
       ConcatString get_obs_lev           () const;
 
       ConcatString get_obtype            () const;
@@ -222,9 +228,11 @@ inline unixtime     StatHdrColumns::get_obs_valid_end     () const { return(obs_
 inline ConcatString StatHdrColumns::get_obs_valid_end_str () const { return(obs_valid_end_str.contents(na_str));  }
 
 inline ConcatString StatHdrColumns::get_fcst_var          () const { return(fcst_var.contents(na_str));           }
+inline ConcatString StatHdrColumns::get_fcst_units        () const { return(fcst_units.contents(na_str));           }
 inline ConcatString StatHdrColumns::get_fcst_lev          () const { return(fcst_lev.contents(na_str));           }
 
 inline ConcatString StatHdrColumns::get_obs_var           () const { return(obs_var.contents(na_str));            }
+inline ConcatString StatHdrColumns::get_obs_units         () const { return(obs_units.contents(na_str));            }
 inline ConcatString StatHdrColumns::get_obs_lev           () const { return(obs_lev.contents(na_str));            }
 
 inline ConcatString StatHdrColumns::get_obtype            () const { return(obtype.contents(na_str));             }

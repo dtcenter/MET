@@ -87,6 +87,8 @@ void STATAnalysisJob::init_from_scratch() {
    desc.set_ignore_case(1);
    fcst_var.set_ignore_case(1);
    obs_var.set_ignore_case(1);
+   fcst_units.set_ignore_case(1);
+   obs_units.set_ignore_case(1);
    fcst_lev.set_ignore_case(1);
    obs_lev.set_ignore_case(1);
    obtype.set_ignore_case(1);
@@ -130,6 +132,9 @@ void STATAnalysisJob::clear() {
 
    fcst_var.clear();
    obs_var.clear();
+
+   fcst_units.clear();
+   obs_units.clear();
 
    fcst_lev.clear();
    obs_lev.clear();
@@ -253,6 +258,9 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    fcst_var             = aj.fcst_var;
    obs_var              = aj.obs_var;
+
+   fcst_units           = aj.fcst_units;
+   obs_units            = aj.obs_units;
 
    fcst_lev             = aj.fcst_lev;
    obs_lev              = aj.obs_lev;
@@ -397,6 +405,12 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "obs_var ...\n";
    obs_var.dump(out, depth + 1);
+
+   out << prefix << "fcst_units ...\n";
+   fcst_units.dump(out, depth + 1);
+
+   out << prefix << "obs_units ...\n";
+   obs_units.dump(out, depth + 1);
 
    out << prefix << "fcst_lev ...\n";
    fcst_lev.dump(out, depth + 1);
@@ -707,6 +721,13 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    }
 
    //
+   // fcst_units
+   //
+   if(fcst_units.n_elements() > 0) {
+      if(!(fcst_units.has(L.fcst_units()))) return(0);
+   }
+
+   //
    // fcst_lev
    //
    if(fcst_lev.n_elements() > 0) {
@@ -718,6 +739,13 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(obs_var.n_elements() > 0) {
       if(!(obs_var.has(L.obs_var()))) return(0);
+   }
+
+   //
+   // obs_units
+   //
+   if(obs_units.n_elements() > 0) {
+      if(!(obs_units.has(L.obs_units()))) return(0);
    }
 
    //
@@ -954,10 +982,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          obs_init_hour.clear();
       else if(jc_array[i] == "-fcst_var"       )
          fcst_var.clear();
+      else if(jc_array[i] == "-fcst_units"     )
+         fcst_units.clear();
       else if(jc_array[i] == "-fcst_lev"       )
          fcst_lev.clear();
       else if(jc_array[i] == "-obs_var"        )
          obs_var.clear();
+      else if(jc_array[i] == "-obs_units"      )
+         obs_units.clear();
       else if(jc_array[i] == "-obs_lev"        )
          obs_lev.clear();
       else if(jc_array[i] == "-obtype"         )
@@ -1105,12 +1137,20 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          fcst_var.add_css(jc_array[i+1].c_str());
          i++;
       }
+      else if(jc_array[i] == "-fcst_units") {
+         fcst_units.add_css(jc_array[i+1].c_str());
+         i++;
+      }
       else if(jc_array[i] == "-fcst_lev") {
          fcst_lev.add_css(jc_array[i+1].c_str());
          i++;
       }
       else if(jc_array[i] == "-obs_var") {
          obs_var.add_css(jc_array[i+1].c_str());
+         i++;
+      }
+      else if(jc_array[i] == "-obs_units") {
+         obs_units.add_css(jc_array[i+1].c_str());
          i++;
       }
       else if(jc_array[i] == "-obs_lev") {
@@ -2072,6 +2112,18 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(obs_var.n_elements() > 0) {
       for(i=0; i<obs_var.n_elements(); i++)
          js << "-obs_var " << obs_var[i] << " ";
+   }
+
+   // fcst_units
+   if(fcst_units.n_elements() > 0) {
+      for(i=0; i<fcst_units.n_elements(); i++)
+         js << "-fcst_units " << fcst_units[i] << " ";
+   }
+
+   // obs_units
+   if(obs_units.n_elements() > 0) {
+      for(i=0; i<obs_units.n_elements(); i++)
+         js << "-obs_units " << obs_units[i] << " ";
    }
 
    // fcst_lev

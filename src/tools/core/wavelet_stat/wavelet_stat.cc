@@ -34,6 +34,7 @@
 //                    from the config file to the output files.
 //   010    02/25/15  Halley Gotway  Add automated regridding.
 //   011    05/15/17  Prestopnik P.  Add shape to regrid options.
+//   012    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -363,11 +364,17 @@ void process_scores() {
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.fcst_info[i]->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.fcst_info[i]->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.fcst_info[i]->level_name().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.obs_info[i]->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.obs_info[i]->units());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.obs_info[i]->level_name().c_str());

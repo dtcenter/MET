@@ -187,6 +187,9 @@ class STATAnalysisJob {
       StringArray fcst_var;
       StringArray obs_var;
 
+      StringArray fcst_units;
+      StringArray obs_units;
+
       StringArray fcst_lev;
       StringArray obs_lev;
 

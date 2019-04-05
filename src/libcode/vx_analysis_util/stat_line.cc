@@ -188,9 +188,11 @@ out << prefix << "Obs Valid End  = "   << obs_valid_end()
     << "  ( " << unix_to_yyyymmdd_hhmmss(obs_valid_end()) << " )\n";
 
 out << prefix << "Fcst Var       = \"" << fcst_var()   << "\"\n";
+out << prefix << "Fcst Units     = \"" << fcst_units() << "\"\n";
 out << prefix << "Fcst Level     = \"" << fcst_lev()   << "\"\n";
 
 out << prefix << "Obs Var        = \"" << obs_var()    << "\"\n";
+out << prefix << "Obs Units      = \"" << obs_units()  << "\"\n";
 out << prefix << "Obs Level      = \"" << obs_lev()    << "\"\n";
 
 out << prefix << "Obs Type       = \"" << obtype()     << "\"\n";
@@ -646,6 +648,20 @@ return ( c );
 ////////////////////////////////////////////////////////////////////////
 
 
+const char * STATLine::fcst_units() const
+
+{
+
+const char * c = get_item("FCST_UNITS", false);
+
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 const char * STATLine::fcst_lev() const
 
 {
@@ -665,6 +681,20 @@ const char * STATLine::obs_var() const
 {
 
 const char * c = get_item("OBS_VAR", false);
+
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * STATLine::obs_units() const
+
+{
+
+const char * c = get_item("OBS_UNITS", false);
 
 return ( c );
 

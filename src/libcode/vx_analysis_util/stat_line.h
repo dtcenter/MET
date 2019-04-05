@@ -81,8 +81,10 @@ class STATLine : public DataLine {
       int          obs_valid_hour () const;
 
       const char * fcst_var       () const;
+      const char * fcst_units     () const;
       const char * fcst_lev       () const;
       const char * obs_var        () const;
+      const char * obs_units      () const;
       const char * obs_lev        () const;
       const char * obtype         () const;
       const char * vx_mask        () const;

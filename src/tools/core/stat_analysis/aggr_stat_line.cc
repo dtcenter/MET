@@ -31,6 +31,7 @@
 //   011    06/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   012    03/01/18  Halley Gotway   Update summary job type.
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
+//   014    04/01/19  Fillmore        Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,8 +77,10 @@ void StatHdrInfo::clear() {
    obs_lead.clear();
    obs_valid_beg = obs_valid_end = (unixtime) 0;
    fcst_var.clear();
+   fcst_units.clear();
    fcst_lev.clear();
    obs_var.clear();
+   obs_units.clear();
    obs_lev.clear();
    obtype.clear();
    vx_mask.clear();
@@ -116,10 +119,14 @@ void StatHdrInfo::add(const STATLine &line) {
       obs_valid_end = line.obs_valid_end();
    if(!fcst_var.has(line.fcst_var()))
       fcst_var.add(line.fcst_var());
+   if(!fcst_units.has(line.fcst_units()))
+      fcst_units.add(line.fcst_units());
    if(!fcst_lev.has(line.fcst_lev()))
       fcst_lev.add(line.fcst_lev());
    if(!obs_var.has(line.obs_var()))
       obs_var.add(line.obs_var());
+   if(!obs_units.has(line.obs_units()))
+      obs_units.add(line.obs_units());
    if(!obs_lev.has(line.obs_lev()))
       obs_lev.add(line.obs_lev());
    if(!obtype.has(line.obtype()))
@@ -196,6 +203,15 @@ void StatHdrInfo::check_shc(const ConcatString &cur_case) {
            << write_css(fcst_var) << "\n";
    }
 
+   // FCST_UNITS
+   if(fcst_units.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << fcst_units.n_elements()
+           << " unique FCST_UNITS values: "
+           << write_css(fcst_units) << "\n";
+   }
+
    // FCST_LEV
    if(fcst_lev.n_elements() > 1) {
       mlog << Debug(2)
@@ -212,6 +228,15 @@ void StatHdrInfo::check_shc(const ConcatString &cur_case) {
            << obs_var.n_elements()
            << " unique OBS_VAR values: "
            << write_css(obs_var) << "\n";
+   }
+
+   // OBS_UNITS
+   if(obs_units.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << obs_units.n_elements()
+           << " unique OBS_UNITS values: "
+           << write_css(obs_units) << "\n";
    }
 
    // OBS_LEV
@@ -392,6 +417,11 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
                   "FCST_VAR", fcst_var, false));
 
+   // FCST_UNITS
+   shc.set_fcst_units(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "FCST_UNITS", fcst_units, false));
+
    // FCST_LEV
    shc.set_fcst_lev(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
@@ -401,6 +431,11 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    shc.set_obs_var(
       get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
                   "OBS_VAR", obs_var, false));
+
+   // OBS_UNITS
+   shc.set_obs_units(
+      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
+                  "OBS_UNITS", obs_units, false));
 
    // OBS_LEV
    shc.set_obs_lev(
