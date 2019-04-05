@@ -34,6 +34,9 @@ obs_init_hour   = [];
 fcst_var = [];
 obs_var  = [];
 
+fcst_units = [];
+obs_units  = [];
+
 fcst_lev = [];
 obs_lev  = [];
 

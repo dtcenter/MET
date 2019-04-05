@@ -75,9 +75,11 @@ void StatHdrColumns::clear() {
    obs_valid_end_str.clear();
 
    fcst_var.clear();
+   fcst_units.clear();
    fcst_lev.clear();
 
    obs_var.clear();
+   obs_units.clear();
    obs_lev.clear();
 
    obtype.clear();
@@ -163,6 +165,17 @@ void StatHdrColumns::set_obs_valid_end(const unixtime ut) {
 
 void StatHdrColumns::set_fcst_var(const ConcatString s) {
    fcst_var = check_hdr_str(s);
+   mlog << Debug(4) << "set FCST_VAR:" << s << "\n";
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::set_fcst_units(const ConcatString s) {
+   ConcatString s_underscores = s;
+   s_underscores.replace(" ", "_");
+   fcst_units = check_hdr_str(s_underscores);
+   mlog << Debug(4) << "set FCST_UNITS:" << s_underscores << "\n";
    return;
 }
 
@@ -177,6 +190,17 @@ void StatHdrColumns::set_fcst_lev(const char *s) {
 
 void StatHdrColumns::set_obs_var(const ConcatString s) {
    obs_var = check_hdr_str(s);
+   mlog << Debug(4) << "set OBS_VAR:" << s << "\n";
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::set_obs_units(const ConcatString s) {
+   ConcatString s_underscores = s;
+   s_underscores.replace(" ", "_");
+   obs_units = check_hdr_str(s_underscores);
+   mlog << Debug(4) << "set OBS_UNITS:" << s_underscores << "\n";
    return;
 }
 

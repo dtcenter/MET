@@ -49,6 +49,7 @@
 //   021    03/21/18  Halley Gotway  Add obs_error perturbation.
 //   022    04/05/18  Halley Gotway  Replace -ssvar_mean with -ens_mean.
 //   023    08/15/18  Halley Gotway  Add mask.llpnt type.
+//   024    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1140,11 +1141,17 @@ void process_point_scores() {
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());

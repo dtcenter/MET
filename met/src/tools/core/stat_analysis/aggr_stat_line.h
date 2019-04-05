@@ -27,6 +27,7 @@
 //   008    06/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   009    03/01/18  Halley Gotway   Update summary job type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
+//   011    04/01/19  Fillmore        Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +59,9 @@ static const int min_time_series = 10;
 ////////////////////////////////////////////////////////////////////////
 
 struct StatHdrInfo {
-   StringArray model, desc, fcst_var, fcst_lev, obs_var, obs_lev;
+   StringArray model, desc;
+   StringArray fcst_var, fcst_units, fcst_lev;
+   StringArray obs_var, obs_units, obs_lev;
    StringArray obtype, vx_mask, interp_mthd;
    StringArray fcst_thresh, obs_thresh, cov_thresh;
    NumArray fcst_lead, obs_lead, interp_pnts, alpha;

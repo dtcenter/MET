@@ -1742,8 +1742,9 @@ void write_header_cols(const StatHdrColumns &shc,
    //    FCST_VALID_BEG, FCST_VALID_END,
    //    OBS_LEAD,
    //    OBS_VALID_BEG,  OBS_VALID_END,
-   //    FCST_VAR,       FCST_LEV,
-   //    OBS_VAR,        OBS_LEV,
+   //    FCST_VAR,       FCST_UNITS,
+   //    FCST_LEV,       OBS_VAR,
+   //    OBS_UNITS,      OBS_LEV,
    //    OBTYPE,         VX_MASK,
    //    INTERP_MTHD,    INTERP_PNTS,
    //    FCST_THRESH,    OBS_THRESH,
@@ -1760,18 +1761,20 @@ void write_header_cols(const StatHdrColumns &shc,
    at.set_entry(r,  7, shc.get_obs_valid_beg_str());  // Obs valid time
    at.set_entry(r,  8, shc.get_obs_valid_end_str());  // Obs valid time
    at.set_entry(r,  9, shc.get_fcst_var());           // Fcst variable
-   at.set_entry(r, 10, shc.get_fcst_lev());           // Fcst level
-   at.set_entry(r, 11, shc.get_obs_var());            // Obs variable
-   at.set_entry(r, 12, shc.get_obs_lev());            // Obs level
-   at.set_entry(r, 13, shc.get_obtype());             // Verifying observation type
-   at.set_entry(r, 14, shc.get_mask());               // Verification masking region
-   at.set_entry(r, 15, shc.get_interp_mthd());        // Interpolation method
-   at.set_entry(r, 16, shc.get_interp_pnts_str());    // Interpolation points
-   at.set_entry(r, 17, shc.get_fcst_thresh_str());    // Fcst threshold
-   at.set_entry(r, 18, shc.get_obs_thresh_str());     // Obs threshold
-   at.set_entry(r, 19, shc.get_cov_thresh_str());     // Coverage threshold
-   at.set_entry(r, 20, shc.get_alpha());              // Alpha value
-   at.set_entry(r, 21, shc.get_line_type());          // Line type
+   at.set_entry(r, 10, shc.get_fcst_units());         // Fcst units
+   at.set_entry(r, 11, shc.get_fcst_lev());           // Fcst level
+   at.set_entry(r, 12, shc.get_obs_var());            // Obs variable
+   at.set_entry(r, 13, shc.get_obs_units());          // Obs units
+   at.set_entry(r, 14, shc.get_obs_lev());            // Obs level
+   at.set_entry(r, 15, shc.get_obtype());             // Verifying observation type
+   at.set_entry(r, 16, shc.get_mask());               // Verification masking region
+   at.set_entry(r, 17, shc.get_interp_mthd());        // Interpolation method
+   at.set_entry(r, 18, shc.get_interp_pnts_str());    // Interpolation points
+   at.set_entry(r, 19, shc.get_fcst_thresh_str());    // Fcst threshold
+   at.set_entry(r, 20, shc.get_obs_thresh_str());     // Obs threshold
+   at.set_entry(r, 21, shc.get_cov_thresh_str());     // Coverage threshold
+   at.set_entry(r, 22, shc.get_alpha());              // Alpha value
+   at.set_entry(r, 23, shc.get_line_type());          // Line type
 
    return;
 }

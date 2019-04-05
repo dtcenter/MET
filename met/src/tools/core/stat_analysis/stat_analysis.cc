@@ -150,6 +150,9 @@ int main(int argc, char * argv []) {
            << "Amending default job with command line options: \""
            << command_line_job_options << "\"\n";
       default_job.parse_job_command(command_line_job_options.c_str());
+      mlog << Debug(4)
+           << "New default jobstring: \""
+           << default_job.get_jobstring() << "\"\n";
 
       //
       // Process the STAT files found in the search directories.
@@ -563,6 +566,9 @@ void process_job(const char * jobstring, int n_job) {
    STATAnalysisJob job, go_job;
    ConcatString full_jobstring;
    MetConfig go_conf;
+
+   mlog << Debug(4) << "process_job(jobstring):"
+        << jobstring << "\"\n";
 
    //
    // Initialize to the default job

@@ -85,6 +85,7 @@
 //                    all options settable for each verification task.
 //   038    08/15/18  Halley Gotway  Add mask.llpnt type.
 //   039    08/24/18  Halley Gotway  Add ECNT output for HiRA.
+//   040    04/01/10  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -939,11 +940,17 @@ void process_scores() {
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().c_str());
