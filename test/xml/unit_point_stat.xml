@@ -30,7 +30,7 @@
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
-      -outdir &OUTPUT_DIR;/point_stat -v 1
+      -outdir &OUTPUT_DIR;/point_stat -v 3
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat</stat>
