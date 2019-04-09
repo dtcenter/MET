@@ -36,7 +36,7 @@ class FlateEncodeFilter : public PSFilter {
 
       z_stream * s;   //  allocated
 
-      int inbytes;   //  # of bytes stored in the input buffer
+      unsigned int inbytes;   //  # of bytes stored in the input buffer
 
       unsigned char *  inbuf;   //  allocated
 

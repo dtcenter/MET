@@ -30,7 +30,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-static void write_pad(int fd, int value, PadSize);
+static void write_pad(int fd, unsigned int value, PadSize);
 
 static int find_magic_cookie(int fd);
 
@@ -44,8 +44,8 @@ void do_blocking(int in, int out, PadSize padsize)
 
 {
 
-int nullpad;
-int rec_size;
+unsigned int nullpad;
+unsigned int rec_size;
 int n_written;
 unsigned char buf[8];
 
@@ -103,7 +103,7 @@ return;
 //////////////////////////////////////////////////////////////////////////////////
 
 
-void write_pad(int fd, int value, PadSize padsize)
+void write_pad(int fd, unsigned int value, PadSize padsize)
 
 {
 

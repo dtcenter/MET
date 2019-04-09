@@ -702,7 +702,7 @@ void do_quoted_string()
 clear_lexeme();
 
 int n;
-char c;
+int c;
 char * line = (char *) lexeme;
 
 clear_lexeme();
@@ -711,15 +711,13 @@ n = 0;
 
 while ( n < max_id_length )  {
 
-   // c = nextchar();
-      c = fgetc(configin);
+  c = fgetc(configin);
 
    if ( c == '\"' )  break;
 
    if ( c == '\\' )  {
 
-      // c = nextchar();
-         c = fgetc(configin);
+     c = fgetc(configin);
 
       switch ( c )  {
 

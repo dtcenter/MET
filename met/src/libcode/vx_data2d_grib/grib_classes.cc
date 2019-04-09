@@ -1513,7 +1513,7 @@ double char4_to_dbl(const unsigned char *c)
 
    positive = (c[0] & 0x80) == 0;
    power = (int) (c[0] & 0x7f) - 64;
-   abspower = power > 0 ? power : -power;
+   abspower = abs(power);
 
 
    /* calc exp */

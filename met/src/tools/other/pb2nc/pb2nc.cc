@@ -317,7 +317,7 @@ static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 
 static int    get_event_index(int, int, int);
 static int    get_event_index_temp(int, int, int);
-static void   dbl2str(double *, char *, size_t);
+static void   dbl2str(double *, ConcatString&);
 
 static bool   keep_message_type(const char *);
 static bool   keep_station_id(const char *);
@@ -754,7 +754,8 @@ void process_pbfile(int i_pb) {
    ConcatString  start_time_str, end_time_str;
    char     min_time_str[max_str_len], max_time_str[max_str_len];
 
-   char     hdr_typ[max_str_len], hdr_sid[max_str_len];
+   char     hdr_typ[max_str_len];
+   ConcatString hdr_sid;
    char     modified_hdr_typ[max_str_len];
    double   hdr_lat, hdr_lon, hdr_elv;
    float    pb_report_type, in_report_type, instrument_type;
@@ -1036,19 +1037,16 @@ void process_pbfile(int i_pb) {
          continue;
       }
 
-      // Convert the SID to a string and null terminate
-      dbl2str(&hdr[0], hdr_sid, sizeof(hdr_sid));
-      hdr_sid[mxr8nm] = '\0';
-      // Change the trailing blank space to a null
-      for (i=mxr8nm-1; i>0; i--) {
-         if (' ' != hdr_sid[i]) break;
-         hdr_sid[i] = '\0';
-      }
+      // Convert the SID to a string, then
+      // crop to 8 characters and remove whitespace
+      dbl2str(&hdr[0], hdr_sid);
+      hdr_sid = hdr_sid.string().substr(0, mxr8nm);
+      hdr_sid.ws_strip();
 
       // If the station id is not listed in the configuration
       // file and it is not the case that all station ids should be
       // retained, continue to the next PrepBufr message
-      if(!keep_station_id(hdr_sid)) {
+      if(!keep_station_id(hdr_sid.c_str())) {
          rej_sid++;
          continue;
       }
@@ -1544,7 +1542,7 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-         add_nc_header_to_array(modified_hdr_typ, hdr_sid, hdr_vld_ut,
+         add_nc_header_to_array(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
                                 hdr_lat, hdr_lon, hdr_elv);
          if (is_prepbufr) {
             add_nc_header_prepbufr(pb_report_type, in_report_type, instrument_type);
@@ -2339,12 +2337,12 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void dbl2str(double *d, char *str, size_t len) {
+void dbl2str(double *d, ConcatString & str) {
    const char *fmt_str = "%s";
 
-   snprintf(str, len, fmt_str, d);
-   if (0 == strlen(str)) {
-      strncpy(str, "NA", len);
+   str.format(fmt_str, d);
+   if (0 == str.length()) {
+     str = "NA";
    }
 
    return;
