@@ -35,6 +35,7 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
+   sigma = bad_data_int;
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -98,6 +99,24 @@ void RegridInfo::validate() {
            << width << " to 2 for regridding method \""
            << interpmthd_to_string(method) << "\".\n\n";
       width = 2;
+   }
+
+   // Check the Gaussian filter
+   if(method == InterpMthd_Gaussian) {
+      if (width <= 2) {
+         mlog << Warning << "\n"
+             << "Resetting the regridding width from "
+             << width << " to 3 for regridding method \""
+             << interpmthd_to_string(method) << "\".\n\n";
+         width = 3;
+      }
+      if (sigma < 1) {
+         mlog << Warning << "\n"
+             << "Resetting the regridding sigma from "
+             << sigma << " to 1 for regridding method \""
+             << interpmthd_to_string(method) << "\".\n\n";
+         sigma = 1;
+      }
    }
 
 }
@@ -1087,6 +1106,9 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
       // If not specified, use the default square shape
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
+
+   // Conf: sigma
+   info.sigma = regrid_dict->lookup_int(conf_key_sigma, false);
 
    info.validate();
 

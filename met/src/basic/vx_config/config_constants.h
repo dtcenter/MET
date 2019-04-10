@@ -244,6 +244,7 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
+   int         sigma;      // Sigma for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
    void        clear();
@@ -265,6 +266,7 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
+   int          sigma;      // Sigma for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
@@ -573,6 +575,7 @@ static const char conf_key_do_3d_att_flag[]    = "attributes_3d";
 static const char conf_key_grib_ens_hi_res_ctl[]  = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 static const char conf_key_shape[]             = "shape";
+static const char conf_key_sigma[]             = "sigma";
 static const char conf_key_eclv_points[]       = "eclv_points";
 
 //

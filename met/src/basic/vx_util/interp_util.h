@@ -78,7 +78,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
-                                  double interp_thresh,
+                                  double interp_thresh, const int sigma = 0,
                                   const SingleThresh *cat_thresh = 0);
 
 extern double compute_vert_pinterp(double, double, double, double, double);

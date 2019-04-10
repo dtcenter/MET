@@ -395,6 +395,68 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Compute the Gaussian filter
+// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * pi * sigma**2))
+////////////////////////////////////////////////////////////////////////
+
+double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
+                      double obs_x, double obs_y, const int sigma, double t) {
+
+   // Search the neighborhood for valid data points
+   double count = 0;
+double data_sum = 0;
+   double wght_sum = 0;
+   double numerator = 0;
+
+   //int x, y;
+   double dx, dy;
+   double gaussian_const = 2 * M_PI * sigma * sigma;
+   double gaussian_const_2 = 1 / gaussian_const;
+   int x = nint(obs_x);
+   int y = nint(obs_y);
+
+   // if width is even, push center to lower left instead of nearest
+   if((gt.getWidth() % 2 ) == 0) {
+      x = floor(obs_x);
+      y = floor(obs_y);
+   }
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
+
+      x = gp->x;
+      y = gp->y;
+      double data = dp.get(x, y);
+
+      if(is_bad_data(data)) continue;
+
+      dx = obs_x - x;
+      dy = obs_y - y;
+      // compute the weight and accumulate numerator and denominator
+      double weight = gaussian_const_2 * exp(-(dx*dx + dy*dy) / gaussian_const);
+      wght_sum  += weight;
+      numerator += (weight * data);
+data_sum += data;
+      count++;
+   }
+//cout << " DEBUG HS   count: " << count << ", gt.size(): " << gt.size() << ", t: " << t <<"\n";
+   // Check whether enough valid grid points were found to compute
+   // a distance weighted mean value
+   if( (double) count/(gt.size()) < t || count == 0) {
+      return bad_data_double;
+   }
+
+cout << " DEBUG HS interp_gaussian()  gaussian_const: " << gaussian_const << ", sigma: " << sigma << ", width: " << gt.getWidth() << "\n";
+//cout << " DEBUG HS                    count: " << count << ", gt.size(): " << gt.size() << ", t: " << t <<"\n";
+cout << "  DEBUG HS interp_gaussian() sigma: " << sigma << ", wght_sum: " << wght_sum
+     << ", numerator: " << numerator << ", data_sum: " << data_sum << ", count: " << count
+     << ", data_sum/count: " << (data_sum / count ) << ", value: " << (numerator/wght_sum)
+     << "\n";
+   return(numerator/wght_sum);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+//
 // Compute a least-squares fit interpolation
 //
 ////////////////////////////////////////////////////////////////////////
@@ -690,7 +752,7 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
-                           double interp_thresh,
+                           double interp_thresh, const int sigma,
                            const SingleThresh *cat_thresh) {
    double v;
    int x = nint(obs_x);
@@ -765,6 +827,10 @@ double compute_horz_interp(const DataPlane &dp,
 
       case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
          v = interp_xy(dp, floor(obs_x), floor(obs_y));
+         break;
+
+      case(InterpMthd_Gaussian):   // Gaussian filter of the grid box
+         v = interp_gaussian(dp, *gt, obs_x, obs_y, sigma, interp_thresh);
          break;
 
       default:
