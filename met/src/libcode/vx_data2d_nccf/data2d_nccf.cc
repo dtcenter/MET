@@ -467,6 +467,8 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
          }
       }
    }
+   else if (0 <= time_dim_slot && dim_offset < time_dim_size)
+      time_offsets.add(dim_offset);
    else error_code = error_code_unknown;
 
    if (0 < time_offsets.n_elements())
@@ -528,7 +530,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
       else {
          log_msg.clear();
          log_msg << "variable \"" << vinfo_nc->req_name()
-                 << "\" has unknown error";
+                 << "\" has unknown error (" << error_code << ")";
       }
       mlog << Error << "\n" << method_name << log_msg << ".\n\n";
       exit(1);
