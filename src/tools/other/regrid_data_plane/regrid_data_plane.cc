@@ -57,6 +57,7 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
+static const int        DefaultInterpSigma = 1;
 static const double     DefaultVldThresh  = 0.5;
 
 static const float      MISSING_LATLON = -999.0;
@@ -115,6 +116,7 @@ static void usage();
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
+static void set_sigma(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
@@ -181,6 +183,7 @@ void process_command_line(int argc, char **argv) {
    RGInfo.field      = FieldType_None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
+   RGInfo.sigma      = DefaultInterpSigma;
    RGInfo.vld_thresh = DefaultVldThresh;
    RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
 
@@ -198,6 +201,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_method,     "-method",     1);
    cline.add(set_shape,      "-shape",      1);
    cline.add(set_width,      "-width",      1);
+   cline.add(set_sigma,      "-sigma",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
@@ -1276,6 +1280,7 @@ void usage() {
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
+        << "\t[-sigma n]\n"
         << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
@@ -1305,6 +1310,9 @@ void usage() {
 
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
+
+        << "\t\t\"-sigma n\" overrides the default regridding "
+        << "sigma (" << RGInfo.sigma << "). Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
@@ -1346,6 +1354,12 @@ void set_method(const StringArray &a) {
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
    opt_override_width = true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_sigma(const StringArray &a) {
+   RGInfo.sigma = atoi(a[0].c_str());
 }
 
 
