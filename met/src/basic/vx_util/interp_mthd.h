@@ -39,7 +39,8 @@ enum InterpMthd {
    InterpMthd_Upper_Left,
    InterpMthd_Upper_Right,
    InterpMthd_Lower_Right,
-   InterpMthd_Lower_Left
+   InterpMthd_Lower_Left,
+   InterpMthd_Gaussian
 };
 
 //
@@ -63,6 +64,7 @@ static const char interpmthd_upper_left_str[]  = "UPPER_LEFT";
 static const char interpmthd_upper_right_str[] = "UPPER_RIGHT";
 static const char interpmthd_lower_right_str[] = "LOWER_RIGHT";
 static const char interpmthd_lower_left_str[]  = "LOWER_LEFT";
+static const char interpmthd_gaussian_str[]    = "GAUSSIAN";
 
 ///////////////////////////////////////////////////////////////////////////////
 
