@@ -36,7 +36,8 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       void nccf_init_from_scratch();
       NcVarInfo *find_first_data_var();
-      long get_time_offset(long time_dim_value);
+      long convert_time_to_offset(long time_dim_value);
+      LongArray collect_time_offsets(VarInfo &vinfo);
 
       MetNcCFDataFile(const MetNcCFDataFile &);
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
