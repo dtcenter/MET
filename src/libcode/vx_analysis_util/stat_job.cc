@@ -1431,7 +1431,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
-
+         if(line) { delete [] line; line = (char *) 0; }
          throw(1);
       } // end if
 

@@ -301,7 +301,7 @@ void process_distances() {
    }
 
    // Delete allocated memory
-   if(dland) { delete dland;  dland = (float *) 0; }
+   if(dland) { delete [] dland;  dland = (float *) 0; }
 
    // Close the output NetCDF file
    delete f_out;
