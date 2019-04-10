@@ -557,7 +557,7 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 long MetNcCFDataFile::convert_time_to_offset(long time_value) {
    long time_offset = time_value;
    int dim_size = _file->ValidTime.n_elements();
-   long time_threshold_cnt = (time_cnt + 1000) * 1000;
+   long time_threshold_cnt = (dim_size + 1000) * 1000;
    if (time_value >= time_threshold_cnt) {
       for (int idx=0; idx<dim_size; idx++) {
          if (_file->ValidTime[idx] == time_value) {
