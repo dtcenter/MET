@@ -230,6 +230,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    if( 0 != (rc = regcomp(re, pat, REG_EXTENDED)) ){
       regfree(re);  re = 0;
       mlog << Error << "\napply_regex - regcomp() error: " << rc << "\n\n";
+      if ( re )  { delete re;  re = 0; }
       exit(1);
    }
 
