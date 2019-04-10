@@ -783,21 +783,21 @@ double compute_interp(const DataPlaneArray &dpa,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
-                      const SingleThresh *cat_thresh) {
+                      const SingleThresh *cat_thresh, const int sigma) {
    double v, v_blw, v_abv, t;
 
    // Check for no data
    if(dpa.n_planes() == 0) return(bad_data_double);
 
    v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
-                               method, width, shape, thresh, cat_thresh);
+                               method, width, shape, thresh, sigma, cat_thresh);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
       v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
-                                  method, width, shape, thresh, cat_thresh);
+                                  method, width, shape, thresh, sigma, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
       if(is_bad_data(v_blw) || is_bad_data(v_abv)) {

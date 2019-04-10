@@ -40,6 +40,7 @@ switch ( info.method )  {
    case InterpMthd_LS_Fit:
    case InterpMthd_Bilin:
    case InterpMthd_Nearest:
+   case InterpMthd_Gaussian:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 
@@ -118,7 +119,8 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
-                                     info.method,  info.width, info.shape, info.vld_thresh);
+                                     info.method,  info.width, info.shape,
+                                     info.vld_thresh, info.sigma);
 
       }
 
