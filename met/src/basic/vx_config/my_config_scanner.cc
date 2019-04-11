@@ -711,13 +711,17 @@ n = 0;
 
 while ( n < max_id_length )  {
 
-  c = fgetc(configin);
+   c = fgetc(configin);
+
+   if ( c == EOF )  break;
 
    if ( c == '\"' )  break;
 
    if ( c == '\\' )  {
 
      c = fgetc(configin);
+
+     if ( c == EOF )  break;
 
       switch ( c )  {
 
@@ -728,7 +732,7 @@ while ( n < max_id_length )  {
          case '\\':  line[n++] = '\\';  break;
 
         default:
-            line[n++] = c;
+            line[n++] = (char) c;
             break;
 
       }   //  switch
