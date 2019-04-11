@@ -1064,7 +1064,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
-
+            if(line) { delete [] line; line = (char *) 0; }
             throw(1);
          }
          i++;
@@ -1255,6 +1255,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
             mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
                  << "no match found for header column named: \""
                  << to_upper((string)jc_array[i+1]) << "\"\n\n";
+            if(line) { delete [] line; line = (char *) 0; }
             throw(1);
          }
          hdr_name.add_css(to_upper(jc_array[i+1]));
