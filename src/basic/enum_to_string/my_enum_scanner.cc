@@ -238,7 +238,7 @@ if ( k == char_class_other )  return ( skip );
 
 clear_lexeme();
 
-lexeme[0] = (char) c;
+lexeme[0] = (unsigned char) c;
 
 int count = 1;
 
@@ -246,7 +246,7 @@ while ( count < max_lexeme_size )  {
 
    c = nextchar();
 
-   if ( char_ok(c) )  lexeme[count++] = (char) c;
+   if ( char_ok(c) )  lexeme[count++] = (unsigned char) c;
    else               { ungetc(c, yyin);  break; }
 
 }   //  while

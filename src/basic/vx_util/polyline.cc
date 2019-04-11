@@ -872,6 +872,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
    // Parse out the first token, the name of the polyline
    c = strtok(tmp_str, " ");
    if(!c) {
+      if ( tmp_str )  { delete [] tmp_str;  tmp_str = 0; }
       mlog << Error << "\nparse_latlon_poly_str() -> "
            << "The polyline string supplied ("
            << poly_str << ") is empty.\n\n";
@@ -885,6 +886,7 @@ void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
       lat = atof(c);
 
       if((c = strtok(0, " ")) == NULL) {
+         if ( tmp_str )  { delete [] tmp_str;  tmp_str = 0; }
          mlog << Error << "\nparse_latlon_poly_str() -> "
               << "The mask_poly string ("
               << poly_str << ") must contain an even number of entries.\n\n";
@@ -1006,6 +1008,7 @@ void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
       x = atof(c);
 
       if((c = strtok(0, " ")) == NULL) {
+         if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
          mlog << Error << "\nparse_xy_poly_str() -> "
               << "The mask_poly string ("
               << poly_str << ") must contain an even number of entries.\n\n";

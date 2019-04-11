@@ -240,7 +240,7 @@ if ( c == '\"' )  { do_quoted_string();   return ( token ( QUOTED_STRING ) ); }
 
 clear_lexeme();
 
-lexeme[0] = (char) c;
+lexeme[0] = (unsigned char) c;
 
 int count = 1;
 
@@ -248,8 +248,8 @@ while ( count < max_lexeme_size )  {
 
    c = nextchar();
 
-   if ( char_ok(c) )  lexeme[count++] = (char) c;
-   else               { ungetc(c, colorin);  break; }
+   if ( char_ok((unsigned char) c) )  lexeme[count++] = (unsigned char) c;
+   else                               { ungetc(c, colorin);  break; }
 
 }   //  while
 
