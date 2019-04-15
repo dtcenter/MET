@@ -707,20 +707,21 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       int    idx_x, idx_y;
       int    coord_offset, to_offset;
       int    count_in_grid;
-      float  *latitudes  = (float  *)0;
-      float  *longitudes = (float  *)0;
+      float  *latitudes  = (float *)NULL;
+      float  *longitudes = (float *)NULL;
       bool latlon_allocated = false;
-      //float  *latitudes  = new float[data_size];
-      //float  *longitudes = new float[data_size];
+      float  *latitudes_buf  = (float *)NULL;
+      float  *longitudes_buf = (float *)NULL;
       int buff_size = data_size*sizeof(float);
       GoesImagerData grid_data;
       grid_data.reset();
 
       if (has_coord_input) {
-         latitudes  = new float[data_size];
-         longitudes = new float[data_size];
-         latlon_allocated = true;
-
+         latitudes_buf  = new float[data_size];
+         longitudes_buf = new float[data_size];
+         
+         latitudes = latitudes_buf;
+         longitudes = longitudes_buf;
          memset(latitudes,  0, buff_size);
          memset(longitudes, 0, buff_size);
          
@@ -825,8 +826,8 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
             mlog << Error << method_name << " Fail to get longitudes\n";
       }
 
-      if (latitudes)  { delete [] latitudes;   latitudes  = 0; }
-      if (longitudes) { delete [] longitudes;  longitudes = 0; }
+      if (latitudes_buf)  { delete [] latitudes_buf;   latitudes_buf  = NULL; }
+      if (longitudes_buf) { delete [] longitudes_buf;  longitudes_buf = NULL; }
 
       grid_data.release();
 
