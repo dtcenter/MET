@@ -860,59 +860,36 @@ double min_dist_linesegment(double px, double py, double qx, double qy,
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_latlon_poly_str(const char *poly_str, Polyline &poly) {
-   char *tmp_str = (char *) 0;
-   char *c = (char *) 0;
+   ConcatString cs;
+   StringArray sa;
    double lat, lon;
 
-   const int tmp_str_len = strlen(poly_str) + 1;
+   cs << poly_str;
+   sa = cs.split(" ");
 
-   tmp_str = new char[tmp_str_len];
-   strncpy(tmp_str, poly_str, tmp_str_len);
-
-   // Parse out the first token, the name of the polyline
-   c = strtok(tmp_str, " ");
-   if(!c) {
-      if ( tmp_str )  { delete [] tmp_str;  tmp_str = 0; }
+   // Must have at least 7 tokens and be odd:
+   //   name followed by at least 3 lat/lon pairs
+   if(sa.n() < 7 || sa.n()%2 != 1) {
       mlog << Error << "\nparse_latlon_poly_str() -> "
-           << "The polyline string supplied ("
-           << poly_str << ") is empty.\n\n";
+           << "The polyline string (" << poly_str
+           << ") must begin with a name and contain at least 3 pairs of "
+           << "points to define a masking region.\n\n";
       exit(1);
    }
-   poly.set_name(c);
 
-   // Parse the lat/lon pairs out of the string
-   while((c = strtok(0, " ")) != NULL) {
+   // Store the name
+   poly.set_name(sa[0]);
 
-      lat = atof(c);
+   // Store the lat/lon pairs
+   for(int i=1; i<sa.n(); i+=2) {
 
-      if((c = strtok(0, " ")) == NULL) {
-         if ( tmp_str )  { delete [] tmp_str;  tmp_str = 0; }
-         mlog << Error << "\nparse_latlon_poly_str() -> "
-              << "The mask_poly string ("
-              << poly_str << ") must contain an even number of entries.\n\n";
-         exit(1);
-      }
-
-      // Convert from degrees east to degrees west
-      lon = -1.0*atof(c);
-
-      // Rescale the longitude value to -180 to 180
-      lon = rescale_lon(lon);
+      // Convert longitude from degrees east to west and rescale to (-180, 180).
+      lat = atof(sa[i].c_str());
+      lon = rescale_lon(-1.0*atof(sa[i+1].c_str()));
 
       // Add the subsequent lat/lon polyline points
       poly.add_point(lon, lat);
    }
-
-   if(poly.n_points < 3) {
-      if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
-      mlog << Error << "\nparse_latlon_poly_str() -> "
-           << "The polyline string supplied ("
-           << poly_str << ") must contain at least 3 pairs of points "
-           << "to define a masking region.\n\n";
-      exit(1);
-   }
-
-   if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
 
    return;
 }
@@ -982,44 +959,29 @@ void parse_latlon_poly_file(const char *poly_file, Polyline &poly) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_xy_poly_str(const char *poly_str, Polyline &poly) {
-   char *tmp_str = (char *) 0;
-   char *c = (char *) 0;
-   double x, y;
+   ConcatString cs;
+   StringArray sa;
 
-   const int tmp_str_len = strlen(poly_str) + 1;
+   cs << poly_str;
+   sa = cs.split(" ");
 
-   tmp_str = new char[tmp_str_len];
-   strncpy(tmp_str, poly_str, tmp_str_len);
-
-   // Parse out the first token, the name of the polyline
-   c = strtok(tmp_str, " ");
-   if(!c) {
-      if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
+   // Must have at least 7 tokens and be odd:
+   //   name followed by at least 3 lat/lon pairs
+   if(sa.n() < 7 || sa.n()%2 != 1) {
       mlog << Error << "\nparse_xy_poly_str() -> "
-           << "The polyline string supplied ("
-           << poly_str << ") is empty.\n\n";
+           << "The polyline string (" << poly_str
+           << ") must begin with a name and contain at least 3 pairs of "
+           << "points to define a masking region.\n\n";
       exit(1);
    }
-   poly.set_name(c);
 
-   // Parse the grid x/y pairs out of the string
-   while((c = strtok(0, " ")) != NULL) {
+   // Store the name
+   poly.set_name(sa[0]);
 
-      x = atof(c);
-
-      if((c = strtok(0, " ")) == NULL) {
-         if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
-         mlog << Error << "\nparse_xy_poly_str() -> "
-              << "The mask_poly string ("
-              << poly_str << ") must contain an even number of entries.\n\n";
-      }
-      y = atof(c);
-
-      // Add the subsequent x/y polyline points
-      poly.add_point(x, y);
+   // Store the x/y points
+   for(int i=1; i<sa.n(); i+=2) {
+      poly.add_point(atof(sa[i].c_str()), atof(sa[i+1].c_str()));
    }
-
-   if(tmp_str) { delete tmp_str; tmp_str = (char *) 0; }
 
    return;
 }
