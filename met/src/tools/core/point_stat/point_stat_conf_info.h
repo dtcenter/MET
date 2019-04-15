@@ -159,6 +159,8 @@ class PointStatVxOpt {
       void set_vx_pd(PointStatConfInfo *);
       bool is_uv_match(const PointStatVxOpt &) const;
 
+      void set_perc_thresh(const PairDataPoint *);
+
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
 

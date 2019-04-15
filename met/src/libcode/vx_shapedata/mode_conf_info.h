@@ -76,6 +76,8 @@ class ModeConfInfo {
 
       void process_config (GrdFileType ftype, GrdFileType otype);
 
+      void set_perc_thresh(const DataPlane &, const DataPlane &);
+
       void parse_nc_info  ();
 
       void set_conv_radius_by_index  (int);

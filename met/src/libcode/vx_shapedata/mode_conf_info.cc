@@ -571,6 +571,60 @@ PlotInfo plot_info;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
+                                   const DataPlane &o_dp)
+
+{
+
+   //
+   // Compute percentiles for forecast and observation thresholds.
+   //
+   if( !fcst_conv_thresh_array.need_perc()  &&
+       !obs_conv_thresh_array.need_perc()   &&
+       !fcst_merge_thresh_array.need_perc() &&
+       !obs_merge_thresh_array.need_perc() )  return;
+
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort, osort;
+   int nxy = f_dp.nx() * f_dp.ny();
+
+   fsort.extend(nxy);
+   osort.extend(nxy);
+
+   for(int i=0; i<nxy; i++) {
+      if(!is_bad_data(f_dp.data()[i])) fsort.add(f_dp.data()[i]);
+      if(!is_bad_data(o_dp.data()[i])) osort.add(o_dp.data()[i]);
+   }
+
+   fsort.sort_array();
+   osort.sort_array();
+
+   //
+   // Compute percentiles
+   //
+    fcst_conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                    &fcst_conv_thresh_array,
+                                     &obs_conv_thresh_array);
+     obs_conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                    &fcst_conv_thresh_array,
+                                     &obs_conv_thresh_array);
+   fcst_merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                    &fcst_merge_thresh_array,
+                                     &obs_merge_thresh_array);
+    obs_merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+                                    &fcst_merge_thresh_array,
+                                     &obs_merge_thresh_array);
+
+   return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeConfInfo::parse_nc_info()
 
 {

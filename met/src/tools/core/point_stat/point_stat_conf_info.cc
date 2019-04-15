@@ -908,6 +908,38 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
+
+   //
+   // Compute percentiles for forecast and observation thresholds,
+   // but not for wind speed or climatology CDF thresholds.
+   //
+   if(!fcat_ta.need_perc() && !ocat_ta.need_perc() &&
+      !fcnt_ta.need_perc() && !ocnt_ta.need_perc()) return;
+
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort = pd_ptr->f_na;
+   NumArray osort = pd_ptr->o_na;
+   NumArray csort = pd_ptr->cmn_na;
+   fsort.sort_array();
+   osort.sort_array();
+   csort.sort_array();
+
+   //
+   // Compute percentiles
+   //
+   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    int n;
 

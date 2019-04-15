@@ -142,6 +142,8 @@ class STATAnalysisJob {
       void set_boot_rng (const char *);
       void set_boot_seed(const char *);
 
+      void set_perc_thresh(const NumArray &, const NumArray &, const NumArray &);
+
       void open_dump_row_file ();
       void close_dump_row_file();
       void dump_stat_line     (const STATLine &);

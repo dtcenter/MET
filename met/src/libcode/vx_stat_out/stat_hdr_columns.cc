@@ -264,7 +264,7 @@ void StatHdrColumns::set_interp_mthd(const InterpMthd m,
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_interp_wdth(const int w) {
-   interp_pnts = w * w;
+   interp_pnts = (is_bad_data(w) ? bad_data_int : w * w);
    interp_pnts_str << cs_erase << interp_pnts;
    return;
 }

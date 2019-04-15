@@ -50,6 +50,7 @@
 //   022    04/05/18  Halley Gotway  Replace -ssvar_mean with -ens_mean.
 //   023    08/15/18  Halley Gotway  Add mask.llpnt type.
 //   024    04/01/19  Fillmore       Add FCST and OBS units.
+//   025    04/15/19  Halley Gotway  Add percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1200,6 +1201,9 @@ void process_point_scores() {
                // Continue if there are no points
                if(pd_ptr->n_obs == 0) continue;
 
+               // Process percentile thresholds
+               conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
+
                // Compute observation ranks and pair values
                pd_ptr->compute_pair_vals(conf_info.rng_ptr);
 
@@ -1633,6 +1637,9 @@ void process_grid_vx() {
 
             // Continue if there are no points
             if(pd_all.n_obs == 0) continue;
+
+            // Process percentile thresholds
+            conf_info.vx_opt[i].set_perc_thresh(&pd_all);
 
             // Compute observation ranks and pair values
             pd_all.compute_pair_vals(conf_info.rng_ptr);

@@ -427,30 +427,69 @@ bool ThreshArray::check_dbl(double v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool ThreshArray::need_perc() {
+   bool status = false;
 
-void ThreshArray::multiply_by(const double x)
+   for(int i=0; i<Nelements; i++) {
+      if(t[i].need_perc()) {
+         status = true;
+         break;
+      }
+   }
 
-{
-
-if ( Nelements == 0 )  return;
-
-int j;
-
-for (j=0; j<Nelements; ++j)  {
-
-   t[j].multiply_by(x);
-
+   return(status);
 }
 
+////////////////////////////////////////////////////////////////////////
 
-   //
-   //  done
-   //
+void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
+                           const NumArray *cptr) {
 
-return;
+   set_perc(fptr, optr, cptr, 0, 0);
 
+   return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
+                           const NumArray *cptr, const ThreshArray *farr,
+                           const ThreshArray *oarr) {
+
+   if(Nelements == 0) return;
+
+   if(!farr || !oarr) {
+      mlog << Error << "\nThreshArray::set_perc() -> "
+           << "no thresholds provided!\n\n";
+      exit(1);
+   }
+
+   if(farr->n_elements() != Nelements ||
+      oarr->n_elements() != Nelements) {
+      mlog << Error << "\nThreshArray::set_perc() -> "
+           << "not enough thresholds provided!\n\n";
+      exit(1);
+   }
+
+   for(int i=0; i<Nelements; i++) {
+      t[i].set_perc(fptr, optr, cptr,
+                    &(farr->thresh()[i]), &(oarr->thresh()[i]));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::multiply_by(const double x) {
+
+   if(Nelements == 0) return;
+
+   for(int i=0; i<Nelements; i++) t[i].multiply_by(x);
+
+   return;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 //

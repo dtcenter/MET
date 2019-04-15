@@ -88,6 +88,7 @@ class NumArray {
       void   reorder(const NumArray &);
       int    rank_array(int &);
       double percentile_array(double);
+      double compute_percentile(double, bool) const;
       double iqr();
       void   compute_mean_stdev(double &, double &) const;
       double sum() const;

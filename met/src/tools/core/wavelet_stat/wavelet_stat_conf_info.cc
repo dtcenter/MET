@@ -394,70 +394,84 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
+void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
+                                          const DataPlane &o_dp) {
 
-void WaveletStatConfInfo::parse_nc_info()
+   //
+   // Compute percentiles for forecast and observation thresholds,
+   // but not for wind speed or climatology CDF thresholds.
+   //
+   if(!fcat_ta->need_perc() && !ocat_ta->need_perc()) return;
 
-{
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort, osort;
+   int nxy = f_dp.nx() * f_dp.ny();
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   fsort.extend(nxy);
+   osort.extend(nxy);
 
-e = conf.lookup(conf_key_nc_pairs_flag);
+   for(int i=0; i<nxy; i++) {
+      if(!is_bad_data(f_dp.data()[i])) fsort.add(f_dp.data()[i]);
+      if(!is_bad_data(o_dp.data()[i])) osort.add(o_dp.data()[i]);
+   }
 
-if ( !e )  {
+   fsort.sort_array();
+   osort.sort_array();
 
-   mlog << Error
-        << "\n\n  WaveletStatConfInfo::parse_nc_info() -> lookup failed for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-const ConfigObjectType type = e->type();
-
-if ( type == BooleanType )  {
-
-   bool value = e->b_value();
-
-   if ( ! value )  nc_info.set_all_false();
+   //
+   // Compute percentiles
+   //
+   fcat_ta->set_perc(&fsort, &osort, (NumArray *) 0, fcat_ta, ocat_ta);
+   ocat_ta->set_perc(&fsort, &osort, (NumArray *) 0, fcat_ta, ocat_ta);
 
    return;
-
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void WaveletStatConfInfo::parse_nc_info() {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = conf.lookup(conf_key_nc_pairs_flag);
+
+   if(!e) {
+      mlog << Error << "\nWaveletStatConfInfo::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+      if(!value) nc_info.set_all_false();
+      return;
+   }
 
    //
    //  it should be a dictionary
    //
-
-if ( type != DictionaryType )  {
-
-   mlog << Error
-        << "\n\n  WaveletStatConfInfo::parse_nc_info() -> bad type ("
-        << configobjecttype_to_string(type)
-        << ") for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
-
-   exit ( 1 );
-
-}
+   if(type != DictionaryType) {
+      mlog << Error << "\nWaveletStatConfInfo::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
+      exit(1);
+   }
 
    //
    //  parse the various entries
    //
 
-Dictionary * d = e->dict_value();
+   Dictionary * d = e->dict_value();
 
-nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
-nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
+   nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
+   nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
 
-   //
-   //  done
-   //
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 

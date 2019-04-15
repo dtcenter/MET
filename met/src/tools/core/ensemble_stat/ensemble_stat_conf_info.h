@@ -133,6 +133,8 @@ class EnsembleStatVxOpt {
                           gsl_rng *, bool, bool, bool);
       void set_vx_pd(EnsembleStatConfInfo *);
 
+      void set_perc_thresh(const PairDataEnsemble *);
+
       // Compute the number of output lines for this task
       int n_txt_row(int i) const;
 
