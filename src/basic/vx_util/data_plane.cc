@@ -273,7 +273,7 @@ void DataPlane::threshold(const SingleThresh &st) {
 
       if( is_bad_data(Data[j]) )  continue;
       if( st.check(Data[j]) )     Data[j] = 1.0;
-      else                           Data[j] = 0.0;
+      else                        Data[j] = 0.0;
 
    }
 

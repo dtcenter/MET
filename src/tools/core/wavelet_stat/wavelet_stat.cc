@@ -30,10 +30,11 @@
 //   008    05/01/12  Halley Gotway   Move -fcst_valid, -fcst_lead,
 //                    -obs_valid, -obs_lead, -ps, -nc command line
 //                    options to config file.
-//   009    11/12/14  Halley Gotway  Pass the obtype entry from the
+//   009    11/12/14  Halley Gotway   Pass the obtype entry from the
 //                    from the config file to the output files.
-//   010    02/25/15  Halley Gotway  Add automated regridding.
-//   011    05/15/17  Prestopnik P.  Add shape to regrid options.
+//   010    02/25/15  Halley Gotway   Add automated regridding.
+//   011    05/15/17  Prestopnik P.   Add shape to regrid options.
+//   012    04/08/19  Halley Gotway   Add percentile thresholds.
 //   012    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -427,11 +428,14 @@ void process_scores() {
          isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n_elements()];
       }
 
+      // Process percentile thresholds
+      conf_info.set_perc_thresh(fcst_dp, obs_dp);
+
       // Loop through the tiles to be applied
       for(j=0; j<conf_info.get_n_tile(); j++) {
 
          // Set the mask name
-	ConcatString mask = (string)"TILE_TOT";
+         ConcatString mask = (string)"TILE_TOT";
          if(conf_info.get_n_tile() > 1) mask.format("TILE%i", j+1);
          shc.set_mask(mask.text());
 

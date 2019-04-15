@@ -394,6 +394,17 @@ void ConcatString::strip_cpp_comment()
 ////////////////////////////////////////////////////////////////////////
 
 
+void ConcatString::strip_paren()
+{
+    size_t pos = s->find("(");
+    if (pos != string::npos)
+        s->erase(pos);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int ConcatString::format(const char *fmt, ...)
 {
     va_list vl;
@@ -1054,7 +1065,7 @@ char *get_env(const char* env_name)
    static const char *method_name = "get_env() ";
 
    if (env_val.find('/') != string::npos) return env_value;
-   
+
    if((env_value = getenv(env_name)) != NULL) {
       env_val = env_value;
       mlog << Debug(10) << method_name << " " << env_name
@@ -1107,7 +1118,7 @@ char *get_env(const char* env_name)
               << env_val.c_str() << "\"\n";
       }
    }
-    
+
    return env_value;
 }
 

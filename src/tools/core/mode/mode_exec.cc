@@ -342,6 +342,10 @@ void ModeExecutive::setup_fcst_obs_data()
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
+      // Process percentile thresholds
+
+   engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
+
    //
    //  done
    //
@@ -1070,7 +1074,7 @@ if ( info.all_false() )  return;
             //
             // Get raw values and object ID's for each grid box
             // Extra NULL checks to satisfy Fortify
-	 
+
          if ( info.do_raw &&
 	        fcst_raw_data != NULL && obs_raw_data != NULL &&
 	        engine.fcst_raw != NULL && engine.obs_raw != NULL  )  {

@@ -32,6 +32,7 @@ using namespace std;
 #include "icode.h"
 #include "idstack.h"
 #include "calculator.h"
+#include "fix_float.h"
 
 #include "scanner_stuff.h"
 #include "threshold.h"
@@ -77,8 +78,6 @@ ThreshNode *      result                = 0;   //  for testing
 
 bool              test_mode             = false;
 
-// ConcatString   number_string;
-
 char number_string [max_id_length + 1];
 
 IdentifierArray  ida;
@@ -112,6 +111,7 @@ static ConcatString function_name;
 
 static const char apm = 'b';   //  assign_prefix mark
 static const char fcm = 'f';   //  function def mark
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -169,6 +169,8 @@ static ThreshNode * do_not_thresh    (ThreshNode *);
 static ThreshNode * do_paren_thresh  (ThreshNode *);
 static ThreshNode * do_simple_thresh (ThreshType, const Number &);
 
+static ThreshNode * do_simple_perc_thresh (const ThreshType, const PC_info &);
+static ThreshNode * do_compound_perc_thresh (const ThreshType, const PC_info &, const Number &);
 static ThreshNode * do_fortran_thresh(const char *);
 
 
@@ -206,6 +208,8 @@ static void do_user_function_def();
 
    const DictionaryEntry * entry;
 
+   PC_info pc_info;
+
 }
 
 
@@ -215,6 +219,7 @@ static void do_user_function_def();
 %token FORTRAN_THRESHOLD
 %token BUILTIN
 %token LOCAL_VAR
+%token SIMPLE_PERC_THRESH
 
 %token USER_FUNCTION
 %token PRINT
@@ -222,7 +227,6 @@ static void do_user_function_def();
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
 
-// %type <nval> INTEGER FLOAT number expression
 %type <nval> INTEGER FLOAT number
 
 %type <index> BUILTIN
@@ -235,6 +239,8 @@ static void do_user_function_def();
 %type <cval> COMPARISON NA_COMPARISON
 
 %type <node> simple_thresh thresh_node
+
+%type <pc_info> SIMPLE_PERC_THRESH
 
 
 %left '+' '-'
@@ -331,6 +337,7 @@ threshold : thresh_node            { do_thresh    ($1); }
           | NA_COMPARISON          { do_na_thresh (); }
           ;
 
+
 thresh_node : simple_thresh                          { $$ = $1; }
             | thresh_node LOGICAL_OP_AND thresh_node { $$ = do_and_thresh   ($1, $3); }
             | thresh_node LOGICAL_OP_OR  thresh_node { $$ = do_or_thresh    ($1, $3); }
@@ -339,8 +346,10 @@ thresh_node : simple_thresh                          { $$ = $1; }
             ;
 
 
-simple_thresh : COMPARISON number { $$ = do_simple_thresh($1, $2); }
-              | FORTRAN_THRESHOLD { $$ = do_fortran_thresh($1); }
+simple_thresh : COMPARISON number                                  { $$ = do_simple_thresh($1, $2);     }
+              | COMPARISON SIMPLE_PERC_THRESH                      { $$ = do_simple_perc_thresh($1, $2); }
+              | COMPARISON SIMPLE_PERC_THRESH '(' number ')'       { $$ = do_compound_perc_thresh($1, $2, $4); }
+              | FORTRAN_THRESHOLD                                  { $$ = do_fortran_thresh($1);        }
               ;
 
 
@@ -563,8 +572,7 @@ switch ( op )  {
    case '*':  C = A * B;  break;
    case '/':
       if ( B == 0 )  {
-         mlog << Error
-              << "\ndo_integer_op() -> "
+         mlog << Error << "\ndo_integer_op() -> "
               << "division by zero!\n\n";
          exit ( 1 );
       }
@@ -572,8 +580,7 @@ switch ( op )  {
       break;
 
    default:
-      mlog << Error
-           << "\ndo_integer_op() -> "
+      mlog << Error << "\ndo_integer_op() -> "
            << "bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
@@ -725,8 +732,7 @@ const DictionaryEntry * e = dict_stack->lookup(RHS);
 
 if ( !e )  {
 
-   mlog << Error
-        << "\ndo_assign_id() -> "
+   mlog << Error << "\ndo_assign_id() -> "
         << "identifier \"" << RHS
         << "\" not defined in this scope!\n\n";
 
@@ -1188,8 +1194,8 @@ else if ( strncmp(text, "ne", 2) == 0 )  op = thresh_ne;
 
 else {
 
-   mlog << Error
-        << "do_fortran_thresh(const char *) -> can't parse threshold text \""
+   mlog << Error << "do_fortran_thresh(const char *) -> "
+        << "can't parse threshold text \""
         << text << "\"\n\n";
 
    exit ( 1 );
@@ -1585,13 +1591,6 @@ void do_user_function_def()
 
 {
 
-// cout << "\n\n  in do_user_function_def() ...\n\n";
-// cout << "   icvs ...\n";
-// icvs.dump(cout, 1);
-// cout << "\n\n   ida ...\n";
-// ida.dump(cout, 1);
-// cout << "\n\n";
-
 DictionaryEntry e;
 
 if ( ida.n_elements() > max_user_function_args )  {
@@ -1625,6 +1624,152 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+ThreshNode * do_simple_perc_thresh (const ThreshType op, const PC_info & info)
+
+{
+
+Simple_Node * s = new Simple_Node;
+
+s->op = op;
+
+if ( (info.perc_index < 0) || (info.perc_index >= n_perc_thresh_infos) )  {
+
+   mlog << Error
+        << "\ndo_simple_perc_thresh() -> bad perc_index ... "
+        << (info.perc_index) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+s->T     = bad_data_double;
+
+s->PT    = info.value;
+
+s->Ptype = perc_thresh_info[info.perc_index].type;
+
+   //
+   //  sanity check
+   //
+
+if ( s->PT < 0 || s->PT > 100 )  {
+
+   mlog << Error << "\ndo_simple_perc_thresh() -> "
+        << "the percentile (" << s->PT << ") must be between 0 and 100!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( s->Ptype == perc_thresh_freq_bias && !is_eq(s->PT, 1.0) )  {
+
+   mlog << Error << "\ndo_simple_perc_thresh() -> "
+        << "unsupported frequency bias percentile threshold!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  update the strings
+   //
+
+if ( op >= 0 )  {
+
+   ConcatString cs;
+   cs << perc_thresh_info[info.perc_index].short_name;
+   cs << info.value;
+   fix_float(cs);
+
+   s->s      << thresh_type_str[op] << cs;
+   s->abbr_s << thresh_abbr_str[op] << cs;
+
+}
+
+   //
+   //  done
+   //
+
+return ( s );
+
+}
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshNode * do_compound_perc_thresh (const ThreshType op, const PC_info & info, const Number & num)
+
+{
+
+Simple_Node * s = new Simple_Node;
+
+s->op = op;
+
+if ( (info.perc_index < 0) || (info.perc_index >= n_perc_thresh_infos) )  {
+
+   mlog << Error
+        << "\ndo_compound_perc_thresh() -> bad perc_index ... "
+        << (info.perc_index) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( num.is_int )  s->T     = (double) (num.i);
+else               s->T     = num.d;
+
+s->PT    = info.value;
+
+s->Ptype = perc_thresh_info[info.perc_index].type;
+
+   //
+   //  sanity check
+   //
+
+if ( s->PT < 0 || s->PT > 100 )  {
+
+   mlog << Error << "\ndo_compound_perc_thresh() -> "
+        << "the percentile (" << s->PT << ") must be between 0 and 100!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( s->Ptype == perc_thresh_freq_bias && !is_eq(s->PT, 1.0) )  {
+
+   mlog << Error << "\ndo_compound_perc_thresh() -> "
+        << "unsupported frequency bias percentile threshold!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  update the strings
+   //
+
+if ( op >= 0 )  {
+
+   ConcatString cs;
+   cs << perc_thresh_info[info.perc_index].short_name;
+   cs << info.value;
+   fix_float(cs);
+   cs << "(" << number_string << ")";
+
+   s->s      << thresh_type_str[op] << cs;
+   s->abbr_s << thresh_abbr_str[op] << cs;
+
+}
+
+   //
+   //  done
+   //
+
+return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 

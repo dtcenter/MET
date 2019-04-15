@@ -169,6 +169,8 @@ static bool replace_env(ConcatString &);
 
 static bool is_fort_thresh_no_spaces();
 
+static int  do_simple_perc_thresh();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -519,15 +521,18 @@ int do_id()
 
 {
 
-int j;
+int j, k;
 
 Column += strlen(configtext);
+
+if ( is_lhs )  { strncpy(configlval.text, configtext, max_id_length);  return ( IDENTIFIER );  }
 
    //
    //  print?
    //
 
 if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
+
 
    //
    //  boolean?
@@ -549,19 +554,9 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
 }
 
-   //
-   //  fortran threshold without spaces?  (example: "le150")
-   //
 
-if ( (strncmp(configtext, "lt", 2) == 0) && is_number(configtext + 2, max_id_length - 2) )  { return ( do_fort_thresh() ); }
 
-for (j=0; j<n_fort_thresh_strings; ++j)  {
 
-   if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
-        && (is_number(configtext + 2, max_id_length - 2))
-        )  { configlval.cval = thresh_lt;  return ( do_fort_thresh() ); }
-
-}
 
    //
    //  builtin ?
@@ -572,13 +567,13 @@ int index;
  if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
-   //  local variable ?
+   //  local variable ?   //  ie, in argument list
    //
 
 if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return ( LOCAL_VAR ); }
 
    //
-   //  number?
+   //  seen_before?
    //
 
 const DictionaryEntry * e = dict_stack->lookup(configtext);
@@ -617,6 +612,47 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
    return ( USER_FUNCTION );
 
 }
+
+
+    ///////////////////////////////////////////////////////////////////////
+
+
+
+
+
+   //
+   //  fortran threshold without spaces?  (example: "le150")
+   //
+
+if ( (strncmp(configtext, "lt", 2) == 0) && is_number(configtext + 2, max_id_length - 2) )  { return ( do_fort_thresh() ); }
+
+for (j=0; j<n_fort_thresh_strings; ++j)  {
+
+   if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
+        && (is_number(configtext + 2, max_id_length - 2))
+        )  { configlval.cval = thresh_lt;  return ( do_fort_thresh() ); }
+
+}
+
+
+   //
+   //  simple percentile threshold?  (example: "SOP50")
+   //
+
+for (j=0; j<n_perc_thresh_infos; ++j)  {
+
+   k = perc_thresh_info[j].short_name_length;
+
+   if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
+        && (is_number(configtext + k, max_id_length - k))  )
+           { return ( do_simple_perc_thresh() ); }
+
+}
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+
 
    //
    //  nope
@@ -1396,6 +1432,57 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
 
 return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int do_simple_perc_thresh()
+
+{
+
+int j, k;
+int index = -1;
+double value;
+
+
+for (j=0; j<n_perc_thresh_infos; ++j)  {
+
+   k = perc_thresh_info[j].short_name_length;
+
+   if ( strncmp(configtext, perc_thresh_info[j].short_name, k) == 0 )  {
+
+      index = j;
+
+      value = atof(configtext + k);
+
+      break;
+
+   }
+
+}
+
+
+if ( index < 0 )   {
+
+   mlog << Error
+         << "\n\n  do_simple_perc_thresh() -> unable to parse string \""
+        << configtext << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+
+configlval.pc_info.perc_index = index;
+// configlval.pc_info.is_simple  = true;
+configlval.pc_info.value     = value;
+// configlval.pc_info.value2     = bad_data_double;;
+
+
+return ( SIMPLE_PERC_THRESH );
 
 }
 

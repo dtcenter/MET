@@ -63,6 +63,11 @@ class ThreshArray {
       int has(const SingleThresh &) const;
       int has(const SingleThresh &, int & index) const;
 
+      bool need_perc();
+      void set_perc(const NumArray *, const NumArray *, const NumArray *);
+      void set_perc(const NumArray *, const NumArray *, const NumArray *,
+                    const ThreshArray *, const ThreshArray *);
+
       void multiply_by(const double);
 
       ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;

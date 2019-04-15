@@ -22,6 +22,7 @@
 //   004    11/15/16  Halley Gotway   Add solar masking types.
 //   005    04/08/17  Halley Gotway   Add lat/lon masking types.
 //   006    07/09/18  Bullock         Add shapefile masking type.
+//   007    04/08/19  Halley Gotway   Add percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -782,7 +783,6 @@ void apply_grid_mask(DataPlane &dp) {
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void apply_data_mask(DataPlane &dp) {
@@ -801,6 +801,17 @@ void apply_data_mask(DataPlane &dp) {
            << "to specify a threshold for data masking, the raw data "
            << "values will be written.\n\n";
       return;
+   }
+
+   // Process percentile thresholds
+   if(thresh.need_perc()) {
+      NumArray d;
+      int nxy = dp.nx()*dp.ny();
+      d.extend(nxy);
+      for(int i=0; i<nxy; i++) {
+         if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
+      }
+      thresh.set_perc(&d, &d, &d);
    }
 
    // For each grid point, apply the data threshold

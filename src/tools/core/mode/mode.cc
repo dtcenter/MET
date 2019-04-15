@@ -51,6 +51,7 @@
 //                                   to config file.
 //   016    02/25/15  Halley Gotway  Add automated regridding.
 //   017    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
+//   018    04/08/19  Halley Gotway  Add percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 

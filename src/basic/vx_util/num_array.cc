@@ -619,6 +619,35 @@ return ( v );
 ////////////////////////////////////////////////////////////////////////
 
 
+double NumArray::compute_percentile(double v, bool inclusive) const
+
+{
+
+int i, n, nvld;
+double ptile;
+
+for ( i=0,n=0,nvld=0; i<Nelements; i++ )  {
+
+   if ( is_bad_data(e[i]) )  continue;
+
+   nvld++;
+
+   if ( (  inclusive && e[i] <= v ) ||
+        ( !inclusive && e[i] <  v ) )  n++;
+
+}
+
+if ( nvld == 0 )  ptile = bad_data_double;
+else              ptile = (double) n / nvld;
+
+return ( ptile );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double NumArray::iqr()
 
 {

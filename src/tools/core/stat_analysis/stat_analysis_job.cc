@@ -2646,6 +2646,11 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    for(it = m.begin(), r=1; it != m.end(); it++, r++) {
 
       //
+      // Process percentile thresholds.
+      //
+      j.set_perc_thresh(it->second.f_na, it->second.o_na, it->second.cmn_na);
+
+      //
       // Write the output STAT header columns
       //
       shc = it->second.hdr.get_shc(it->first, j.by_column,

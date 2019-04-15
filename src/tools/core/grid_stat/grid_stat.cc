@@ -93,7 +93,8 @@
 //   043    02/14/17  Halley Gotway  Add nbrhd.field option to skip the
 //                    computation of fractional coverage fields.
 //   044    02/22/19  Halley Gotway  Make gradient dx/dy configurable.
-//   045    04/01/19  Fillmore       Add FCST and OBS units.
+//   045    04/08/19  Halley Gotway  Add percentile thresholds.
+//   046    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +165,7 @@ static void write_nc(const ConcatString &, const DataPlane &, int,
                      const ConcatString &, int, FieldType);
 static void write_nbrhd_nc(const DataPlane &, const DataPlane &, int,
                            const SingleThresh &, const SingleThresh &,
-                           int);
+                           int, int);
 
 static void add_var_att_local(NcVar *, const char *, const ConcatString);
 
@@ -839,6 +840,9 @@ void process_scores() {
             // Continue if no pairs were found
             if(f_na.n_elements() == 0) continue;
 
+            // Process percentile thresholds
+            conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+
             // Compute CTS scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                       &&
                 conf_info.vx_opt[i].fcat_ta.n_elements() > 0                   &&
@@ -1326,77 +1330,109 @@ void process_scores() {
             // Loop through and apply each of the raw threshold values
             for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
 
-               // Process the forecast data
-               if(nbrhd->field == FieldType_Fcst ||
-                  nbrhd->field == FieldType_Both) {
-
-                  // Compute fractional coverage
-                  fractional_coverage(fcst_dp, fcst_dp_smooth,
-                                      nbrhd->width[j], nbrhd->shape,
-                                      conf_info.vx_opt[i].fcat_ta[k],
-                                      nbrhd->vld_thresh);
-
-                  // Compute the binary threshold field
-                  fcst_dp_thresh = fcst_dp;
-                  fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
-               }
-               // Do not compute fractional coverage
-               else {
-                  mlog << Debug(3) << "Skipping forecast fractional "
-                       << "coverage computations since \"nbrhd.field\" = "
-                       << fieldtype_to_string(nbrhd->field) << "\n";
-                  fcst_dp_smooth = fcst_dp;
-                  fcst_dp_thresh = fcst_dp;
-                  fcst_dp_thresh.set_constant(bad_data_double);
-
-                  // Check range of forecast values
-                  fcst_dp_smooth.data_range(dmin, dmax);
-                  if(dmin < 0.0 || dmax > 1.0) {
-                     mlog << Warning << "\nThe range of forecast "
-                          << "fractional coverage values [" << dmin
-                          << ", " << dmax << "] falls outside the "
-                          << "expected [0, 1] range.\n\n";
-                  }
-               }
-
-               // Process the observation data
-               if(nbrhd->field == FieldType_Obs ||
-                  nbrhd->field == FieldType_Both) {
-
-                  // Compute fractional coverage
-                  fractional_coverage(obs_dp, obs_dp_smooth,
-                                      nbrhd->width[j], nbrhd->shape,
-                                      conf_info.vx_opt[i].ocat_ta[k],
-                                      nbrhd->vld_thresh);
-
-                  // Compute the binary threshold field
-                  obs_dp_thresh = obs_dp;
-                  obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
-               }
-               // Do not compute fractional coverage
-               else {
-                  mlog << Debug(3) << "Skipping observation fractional "
-                       << "coverage computations since \"nbrhd.field\" = "
-                       << fieldtype_to_string(nbrhd->field) << "\n";
-                  obs_dp_smooth = obs_dp;
-                  obs_dp_thresh = obs_dp;
-                  obs_dp_thresh.set_constant(bad_data_double);
-
-                  // Check range of observation values
-                  obs_dp_smooth.data_range(dmin, dmax);
-                  if(dmin < 0.0 || dmax > 1.0) {
-                     mlog << Warning << "\nThe range of observation "
-                          << "fractional coverage values [" << dmin
-                          << ", " << dmax << "] falls outside the "
-                          << "expected [0, 1] range.\n\n";
-                  }
-               }
+               // Initialize
+               fcst_dp_smooth.clear();
+               fcst_dp_thresh.clear();
+               obs_dp_smooth.clear();
+               obs_dp_thresh.clear();
 
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
+                  // Set the mask name
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
+
                   // Store the current mask
                   mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
+
+                  // Process percentile thresholds
+                  if(conf_info.vx_opt[i].fcat_ta.need_perc() ||
+                     conf_info.vx_opt[i].ocat_ta.need_perc()) {
+
+                     // Apply the current mask
+                     apply_mask(fcst_dp, mask_mp, f_na);
+                     apply_mask(obs_dp,  mask_mp, o_na);
+                     apply_mask(cmn_dp,  mask_mp, cmn_na);
+
+                     // Process percentile thresholds
+                     conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+                  }
+
+                  // Process the forecast data
+                  if(nbrhd->field == FieldType_Fcst ||
+                     nbrhd->field == FieldType_Both) {
+
+                     // Compute fractional coverage field, if necessary.
+                     if(fcst_dp_smooth.is_empty() ||
+                        conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
+
+                        // Compute fractional coverage
+                        fractional_coverage(fcst_dp, fcst_dp_smooth,
+                                            nbrhd->width[j], nbrhd->shape,
+                                            conf_info.vx_opt[i].fcat_ta[k],
+                                            nbrhd->vld_thresh);
+
+                        // Compute the binary threshold field
+                        fcst_dp_thresh = fcst_dp;
+                        fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
+                     }
+                  }
+                  // Do not compute fractional coverage
+                  else {
+                     mlog << Debug(3) << "Skipping forecast fractional "
+                          << "coverage computations since \"nbrhd.field\" = "
+                          << fieldtype_to_string(nbrhd->field) << "\n";
+                     fcst_dp_smooth = fcst_dp;
+                     fcst_dp_thresh = fcst_dp;
+                     fcst_dp_thresh.set_constant(bad_data_double);
+
+                     // Check range of forecast values
+                     fcst_dp_smooth.data_range(dmin, dmax);
+                     if(dmin < 0.0 || dmax > 1.0) {
+                        mlog << Warning << "\nThe range of forecast "
+                             << "fractional coverage values [" << dmin
+                             << ", " << dmax << "] falls outside the "
+                             << "expected [0, 1] range.\n\n";
+                     }
+                  }
+
+                  // Process the observation data
+                  if(nbrhd->field == FieldType_Obs ||
+                     nbrhd->field == FieldType_Both) {
+
+                     // Compute fractional coverage field, if necessary.
+                     if(obs_dp_smooth.is_empty() ||
+                        conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
+
+                        // Compute fractional coverage
+                        fractional_coverage(obs_dp, obs_dp_smooth,
+                                            nbrhd->width[j], nbrhd->shape,
+                                            conf_info.vx_opt[i].ocat_ta[k],
+                                            nbrhd->vld_thresh);
+
+                        // Compute the binary threshold field
+                        obs_dp_thresh = obs_dp;
+                        obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
+                     }
+                  }
+                  // Do not compute fractional coverage
+                  else {
+                     mlog << Debug(3) << "Skipping observation fractional "
+                          << "coverage computations since \"nbrhd.field\" = "
+                          << fieldtype_to_string(nbrhd->field) << "\n";
+                     obs_dp_smooth = obs_dp;
+                     obs_dp_thresh = obs_dp;
+                     obs_dp_thresh.set_constant(bad_data_double);
+
+                     // Check range of observation values
+                     obs_dp_smooth.data_range(dmin, dmax);
+                     if(dmin < 0.0 || dmax > 1.0) {
+                        mlog << Warning << "\nThe range of observation "
+                             << "fractional coverage values [" << dmin
+                             << ", " << dmax << "] falls outside the "
+                             << "expected [0, 1] range.\n\n";
+                     }
+                  }
 
                   // Turn off the mask for bad forecast or observation values
                   mask_bad_data(mask_mp, fcst_dp_smooth);
@@ -1437,9 +1473,6 @@ void process_scores() {
 
                   // Continue if no pairs were found
                   if(f_na.n_elements() == 0) continue;
-
-                  // Set the mask name
-                  shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
 
                   // Compute NBRCTS scores
                   if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
@@ -1498,15 +1531,15 @@ void process_scores() {
                            txt_at[i_nbrcnt], i_txt_row[i_nbrcnt]);
                      }
                   } // end compute NBRCNT
-               } // end for m
 
-               // Write out the neighborhood fractional coverage fields
-               // if requested in the config file
-               if(conf_info.vx_opt[i].nc_info.do_nbrhd) {
-                  write_nbrhd_nc(fcst_dp_smooth, obs_dp_smooth, i,
-                     conf_info.vx_opt[i].fcat_ta[k], conf_info.vx_opt[i].ocat_ta[k],
-                     conf_info.vx_opt[i].nbrhd_info.width[j]);
-               }
+                  // Write out the neighborhood fractional coverage fields
+                  // if requested in the config file
+                  if(conf_info.vx_opt[i].nc_info.do_nbrhd) {
+                     write_nbrhd_nc(fcst_dp_smooth, obs_dp_smooth, i,
+                        conf_info.vx_opt[i].fcat_ta[k], conf_info.vx_opt[i].ocat_ta[k],
+                        m, conf_info.vx_opt[i].nbrhd_info.width[j]);
+                  }
+               } // end for m
 
                // If not computing fractional coverage, all finished with thresholds
                if(nbrhd->field == FieldType_None) break;
@@ -2540,8 +2573,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
 void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     int i_vx, const SingleThresh &fcst_st,
-                    const SingleThresh &obs_st, int wdth) {
-   int i, n, x, y, n_masks;
+                    const SingleThresh &obs_st, int i_mask, int wdth) {
+   int n, x, y;
    int fcst_flag, obs_flag;
    ConcatString fcst_var_name, obs_var_name, var_str, mask_str;
    ConcatString att_str, mthd_str, nbrhd_str;
@@ -2552,9 +2585,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       var_str << "_" << conf_info.vx_opt[i_vx].var_str;
    }
 
-   // Determine the number of masking regions
+   // Store the apply_mask option
    apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
-   n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
 
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
@@ -2566,140 +2598,134 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);
    if(wdth > 1) nbrhd_str << "_" << mthd_str << "_" << wdth*wdth;
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+
+   // If apply_mask is true, create fields for each masking region.
+   // Otherwise create only fields for the FULL domain.
+   mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i_mask] : "FULL");
+
+   // Build the forecast variable name
+   fcst_var_name << cs_erase
+                 << "FCST_"
+                 << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
+                 << conf_info.vx_opt[i_vx].fcst_info->level_name()
+                 << var_str << "_" << mask_str << "_"
+                 << fcst_st.get_abbr_str() << nbrhd_str;
+
+   // Build the observation variable name
+   obs_var_name << cs_erase
+                << "OBS_"
+                << conf_info.vx_opt[i_vx].obs_info->name() << "_"
+                << conf_info.vx_opt[i_vx].obs_info->level_name()
+                << var_str << "_" << mask_str << "_"
+                << obs_st.get_abbr_str() << nbrhd_str;
+
+   // Figure out which fields should be written
+   fcst_flag = !nc_var_sa.has(fcst_var_name);
+   obs_flag  = !nc_var_sa.has(obs_var_name);
+
+   // Check for nothing to do
+   if(!fcst_flag && !obs_flag) return;
+
    // Allocate memory for the forecast and observation fields
    fcst_data = new float [grid.nx()*grid.ny()];
    obs_data  = new float [grid.nx()*grid.ny()];
 
-   int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+   // Add the forecast variable
+   if(fcst_flag) {
 
-   // Process each of the masking regions
-   for(i=0; i<n_masks; i++) {
+      // Define the forecast variable
+      fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+                         lat_dim, lon_dim, deflate_level);
 
-      // If apply_mask is true, create fields for each masking region.
-      // Otherwise create only fields for the FULL domain.
-      mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i] : "FULL");
+      // Add to the list of previously defined variables
+      nc_var_sa.add(fcst_var_name);
 
-      // Build the forecast variable name
-      fcst_var_name << cs_erase
-                    << "FCST_"
-                    << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                    << conf_info.vx_opt[i_vx].fcst_info->level_name()
-                    << var_str << "_" << mask_str << "_"
-                    << fcst_st.get_abbr_str() << nbrhd_str;
+      // Add variable attributes for the forecast field
+      add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
+      att_str << cs_erase << conf_info.vx_opt[i_vx].fcst_info->name()
+              << " at "
+              << conf_info.vx_opt[i_vx].fcst_info->level_name();
+      add_var_att_local(&fcst_var, "long_name", att_str);
+      add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
+      add_var_att_local(&fcst_var, "units", conf_info.vx_opt[i_vx].fcst_info->units());
+      write_netcdf_var_times(&fcst_var, fcst_dp);
+      add_att(&fcst_var, "_FillValue", bad_data_float);
+      add_var_att_local(&fcst_var, "masking_region", mask_str);
+      add_var_att_local(&fcst_var, "smoothing_method", mthd_str);
+      add_var_att_local(&fcst_var, "threshold", fcst_st.get_abbr_str());
+      add_att(&fcst_var, "smoothing_neighborhood", wdth*wdth);
+   } // end fcst_flag
 
-      // Build the observation variable name
-      obs_var_name << cs_erase
-                   << "OBS_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str << "_"
-                   << obs_st.get_abbr_str() << nbrhd_str;
+   // Add the observation variable
+   if(obs_flag) {
 
-      // Figure out which fields should be written
-      fcst_flag = !nc_var_sa.has(fcst_var_name);
-      obs_flag  = !nc_var_sa.has(obs_var_name);
-
-      // Check for nothing to do
-      if(!fcst_flag && !obs_flag) continue;
-
-      // Add the forecast variable
-      if(fcst_flag) {
-
-         // Define the forecast variable
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+      // Define the observation variable
+      obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
                             lat_dim, lon_dim, deflate_level);
 
-         // Add to the list of previously defined variables
-         nc_var_sa.add(fcst_var_name);
+      // Add to the list of previously defined variables
+      nc_var_sa.add(obs_var_name);
 
-         // Add variable attributes for the forecast field
-         add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
-         att_str << cs_erase << conf_info.vx_opt[i_vx].fcst_info->name()
-                 << " at "
-                 << conf_info.vx_opt[i_vx].fcst_info->level_name();
-         add_var_att_local(&fcst_var, "long_name", att_str);
-         add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
-         add_var_att_local(&fcst_var, "units", conf_info.vx_opt[i_vx].fcst_info->units());
-         write_netcdf_var_times(&fcst_var, fcst_dp);
-         add_att(&fcst_var, "_FillValue", bad_data_float);
-         add_var_att_local(&fcst_var, "masking_region", mask_str);
-         add_var_att_local(&fcst_var, "smoothing_method", mthd_str);
-         add_var_att_local(&fcst_var, "threshold", fcst_st.get_abbr_str());
-         add_att(&fcst_var, "smoothing_neighborhood", wdth*wdth);
-      } // end fcst_flag
+      // Add variable attributes for the observation field
+      add_var_att_local(&obs_var, "name", shc.get_obs_var());
+      att_str << cs_erase
+              << conf_info.vx_opt[i_vx].obs_info->name() << " at "
+              << conf_info.vx_opt[i_vx].obs_info->level_name();
+      add_var_att_local(&obs_var, "long_name", att_str);
+      add_var_att_local(&obs_var, "level", shc.get_obs_lev());
+      add_var_att_local(&obs_var, "units", conf_info.vx_opt[i_vx].obs_info->units());
+      write_netcdf_var_times(&obs_var, obs_dp);
+      add_att(&obs_var, "_FillValue", bad_data_float);
+      add_var_att_local(&obs_var, "masking_region", mask_str);
+      add_var_att_local(&obs_var, "smoothing_method", mthd_str);
+      add_var_att_local(&obs_var, "threshold", obs_st.get_abbr_str());
+      add_att(&obs_var, "smoothing_neighborhood", wdth*wdth);
+   } // end obs_flag
 
-      // Add the observation variable
-      if(obs_flag) {
+   // Pointer to the current mask
+   MaskPlane * mask_ptr =
+      &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i_mask]];
 
-         // Define the observation variable
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            lat_dim, lon_dim, deflate_level);
+   // Store the forecast and observation values
+   for(x=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
 
-         // Add to the list of previously defined variables
-         nc_var_sa.add(obs_var_name);
+         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-         // Add variable attributes for the observation field
-         add_var_att_local(&obs_var, "name", shc.get_obs_var());
-         att_str << cs_erase
-                 << conf_info.vx_opt[i_vx].obs_info->name() << " at "
-                 << conf_info.vx_opt[i_vx].obs_info->level_name();
-         add_var_att_local(&obs_var, "long_name", att_str);
-         add_var_att_local(&obs_var, "level", shc.get_obs_lev());
-         add_var_att_local(&obs_var, "units", conf_info.vx_opt[i_vx].obs_info->units());
-         write_netcdf_var_times(&obs_var, obs_dp);
-         add_att(&obs_var, "_FillValue", bad_data_float);
-         add_var_att_local(&obs_var, "masking_region", mask_str);
-         add_var_att_local(&obs_var, "smoothing_method", mthd_str);
-         add_var_att_local(&obs_var, "threshold", obs_st.get_abbr_str());
-         add_att(&obs_var, "smoothing_neighborhood", wdth*wdth);
-      } // end obs_flag
-
-      // Pointer to the current mask
-      MaskPlane * mask_ptr =
-         &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
-
-      // Store the forecast and observation values
-      for(x=0; x<grid.nx(); x++) {
-         for(y=0; y<grid.ny(); y++) {
-
-            n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-
-            // Check apply_mask
-            if(!apply_mask ||
-               (apply_mask && mask_ptr->s_is_on(x, y))) {
-               fcst_data[n] = fcst_dp.get(x, y);
-                obs_data[n] =  obs_dp.get(x, y);
-            }
-            else {
-               fcst_data[n] = bad_data_float;
-                obs_data[n] = bad_data_float;
-            }
-
-         } // end for y
-      } // end for x
-
-      // Write out the forecast field
-      if(fcst_flag) {
-         if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\nwrite_nbrhd_nc() -> "
-                 << "error with the fcst_var->put for forecast variable "
-                 << fcst_var_name << "\n\n";
-            exit(1);
+         // Check apply_mask
+         if(!apply_mask ||
+            (apply_mask && mask_ptr->s_is_on(x, y))) {
+             fcst_data[n] = fcst_dp.get(x, y);
+              obs_data[n] =  obs_dp.get(x, y);
          }
-      }
-
-      // Write out the observation field
-      if(obs_flag) {
-         if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
-            mlog << Error << "\nwrite_nbrhd_nc() -> "
-                 << "error with the obs_var->put for observation variable "
-                 << obs_var_name << "\n\n";
-            exit(1);
+         else {
+            fcst_data[n] = bad_data_float;
+             obs_data[n] = bad_data_float;
          }
-      }
+      } // end for y
+   } // end for x
 
-   } // end for i
+   // Write out the forecast field
+   if(fcst_flag) {
+      if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
+         mlog << Error << "\nwrite_nbrhd_nc() -> "
+              << "error with the fcst_var->put for forecast variable "
+              << fcst_var_name << "\n\n";
+         exit(1);
+      }
+   }
+
+   // Write out the observation field
+   if(obs_flag) {
+      if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
+         mlog << Error << "\nwrite_nbrhd_nc() -> "
+              << "error with the obs_var->put for observation variable "
+              << obs_var_name << "\n\n";
+         exit(1);
+      }
+   }
 
    // Deallocate and clean up
    if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }

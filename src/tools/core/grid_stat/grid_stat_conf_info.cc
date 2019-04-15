@@ -831,6 +831,40 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
+                                    const NumArray &o_na,
+                                    const NumArray &cmn_na) {
+
+   //
+   // Compute percentiles for forecast and observation thresholds,
+   // but not for wind speed or climatology CDF thresholds.
+   //
+   if(!fcat_ta.need_perc() && !ocat_ta.need_perc() &&
+      !fcnt_ta.need_perc() && !ocnt_ta.need_perc()) return;
+
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort = f_na;
+   NumArray osort = o_na;
+   NumArray csort = cmn_na;
+   fsort.sort_array();
+   osort.sort_array();
+   csort.sort_array();
+
+   //
+   // Compute percentiles
+   //
+   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    int n;
 
@@ -1019,6 +1053,8 @@ int GridStatVxOpt::get_n_oprob_thresh() const {
    return((!fcst_info || !fcst_info->is_prob()) ?
           0 : ocat_ta.n_elements());
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////
 //

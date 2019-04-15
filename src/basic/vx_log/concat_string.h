@@ -138,7 +138,7 @@ class ConcatString {
       void add(const char);
 
       void add(const ConcatString &);
-      
+
       void add(const std::string &);
 
       void chomp();   //  removes possible trailing newline
@@ -155,6 +155,8 @@ class ConcatString {
       void ws_strip();   //  strip leading and trailing whitespace, if any
 
       void strip_cpp_comment();   //  strip trailing C++ comment, if any
+
+      void strip_paren();   //  strip contents of trailing parenthesis, if any
 
       StringArray split(const char * delim) const;
 
@@ -175,7 +177,7 @@ class ConcatString {
 
       void set_upper();
       void set_lower();
-      
+
       int find(int c);
       int compare(size_t pos, size_t len, std::string str);
       int comparecase(size_t pos, size_t len, std::string str);

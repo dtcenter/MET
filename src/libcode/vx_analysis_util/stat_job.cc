@@ -1625,6 +1625,36 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
+                                      const NumArray &o_na,
+                                      const NumArray &cmn_na) {
+
+   if(!out_fcst_thresh.need_perc() &&
+      !out_obs_thresh.need_perc()) return;
+
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort = f_na;
+   NumArray osort = o_na;
+   NumArray csort = cmn_na;
+   fsort.sort_array();
+   osort.sort_array();
+   csort.sort_array();
+
+   //
+   // Compute percentiles
+   //
+   out_fcst_thresh.set_perc(&fsort, &osort, &csort,
+                            &out_fcst_thresh, &out_obs_thresh);
+    out_obs_thresh.set_perc(&fsort, &osort, &csort,
+                            &out_fcst_thresh, &out_obs_thresh);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void STATAnalysisJob::open_dump_row_file() {
 
    close_dump_row_file();
@@ -1989,14 +2019,19 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
 
 ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    int i;
-   ConcatString key;
+   ConcatString key, cs;
 
    //
    // Retrieve value for each by_column option
    //
    for(i=0; i<by_column.n_elements(); i++) {
-      key << (i == 0 ? "" : ":")
-          << L.get(by_column[i].c_str(), false);
+      cs = L.get(by_column[i].c_str(), false);
+      if(by_column[i] == "FCST_THRESH" ||
+         by_column[i] == "OBS_THRESH"  || 
+         by_column[i] == "COV_THRESH") {
+         cs.strip_paren();
+      }
+      key << (i == 0 ? "" : ":") << cs;
    }
 
    return(key);

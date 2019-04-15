@@ -884,6 +884,32 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
+
+   if(!othr_ta.need_perc()) return;
+
+   //
+   // Sort the input arrays
+   //
+   NumArray fsort;
+   for(int i=0; i<pd_ptr->n_ens; i++) fsort.add(pd_ptr->e_na[i]);
+   NumArray osort = pd_ptr->o_na;
+   NumArray csort = pd_ptr->cmn_na;
+   fsort.sort_array();
+   osort.sort_array();
+   csort.sort_array();
+
+   //
+   // Compute percentiles, passing the observation thresholds in for
+   // the fcst and obs slots.
+   //
+   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    int n;
 

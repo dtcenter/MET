@@ -101,6 +101,7 @@ void StatHdrInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrInfo::add(const STATLine &line) {
+   ConcatString cs;
    if(!model.has(line.model()))
       model.add(line.model());
    if(!desc.has(line.desc()))
@@ -137,12 +138,15 @@ void StatHdrInfo::add(const STATLine &line) {
       interp_mthd.add(line.interp_mthd());
    if(!interp_pnts.has(line.interp_pnts()))
       interp_pnts.add(line.interp_pnts());
-   if(!fcst_thresh.has(line.get_item("FCST_THRESH", false)))
-      fcst_thresh.add(line.get_item("FCST_THRESH", false));
-   if(!obs_thresh.has(line.get_item("OBS_THRESH", false)))
-      obs_thresh.add(line.get_item("OBS_THRESH", false));
-   if(!cov_thresh.has(line.get_item("COV_THRESH", false)))
-      cov_thresh.add(line.get_item("COV_THRESH", false));
+   cs = line.get_item("FCST_THRESH", false);
+   cs.strip_paren();
+   if(!fcst_thresh.has(cs)) fcst_thresh.add(cs);
+   cs = line.get_item("OBS_THRESH", false);
+   cs.strip_paren();
+   if(!obs_thresh.has(cs)) obs_thresh.add(cs);
+   cs = line.get_item("COV_THRESH", false);
+   cs.strip_paren();
+   if(!cov_thresh.has(cs)) cov_thresh.add(cs);
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
 

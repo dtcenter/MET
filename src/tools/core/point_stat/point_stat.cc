@@ -86,6 +86,7 @@
 //   038    08/15/18  Halley Gotway  Add mask.llpnt type.
 //   039    08/24/18  Halley Gotway  Add ECNT output for HiRA.
 //   040    04/01/10  Fillmore       Add FCST and OBS units.
+//   041    04/08/19  Halley Gotway  Add percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -823,9 +824,9 @@ void process_obs_file(int i_nc) {
 
          // Check for wind components
          is_ugrd = ( use_var_id &&         var_name == ugrd_abbr_str ) ||
-                   (!use_var_id && nint(obs_arr[1]) == ugrd_grib_code); 
+                   (!use_var_id && nint(obs_arr[1]) == ugrd_grib_code);
          is_vgrd = ( use_var_id &&         var_name == vgrd_abbr_str ) ||
-                   (!use_var_id && nint(obs_arr[1]) == vgrd_grib_code); 
+                   (!use_var_id && nint(obs_arr[1]) == vgrd_grib_code);
 
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
@@ -1021,6 +1022,9 @@ void process_scores() {
 
                // Continue for no matched pairs
                if(pd_ptr->n_obs == 0) continue;
+
+               // Process percentile thresholds
+               conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
 
                // Write out the MPR lines
                if(conf_info.vx_opt[i].output_flag[i_mpr] != STATOutputType_None) {
@@ -1352,6 +1356,9 @@ void process_scores() {
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
 
+               // Process percentile thresholds
+               conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
+
                // Appy HiRA verification and write ensemble output
                do_hira_ens(i, pd_ptr);
 
@@ -1367,6 +1374,9 @@ void process_scores() {
                 conf_info.vx_opt[i].output_flag[i_prc]  != STATOutputType_None)) {
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
+
+               // Process percentile thresholds
+               conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
 
                // Appy HiRA verification and write probabilistic output
                do_hira_prob(i, pd_ptr);

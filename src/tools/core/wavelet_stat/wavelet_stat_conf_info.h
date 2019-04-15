@@ -126,6 +126,8 @@ class WaveletStatConfInfo {
       void center_tiles  (int, int);
       void pad_tiles     (int, int);
 
+      void set_perc_thresh(const DataPlane &, const DataPlane &);
+
       void parse_nc_info();
 
       // Dump out the counts
