@@ -338,14 +338,19 @@ obtype = "ANALYS";
 //         - UPPER_RIGHT for the upper right grid point (width = 1)
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
+//         - GAUSSIAN    for the Gaussian filtering (width = at least 3)
 //
 //         The BEST interpolation option is not valid for regridding.
 //
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;     To regrid using a 4x4 box or circle with diameter 4.
 //
-//    - The "shape" entry defines the shape of the neighborhood.
-//      Valid values are "SQUARE" or "CIRCLE"
+//   - The "shape" entry defines the shape of the neighborhood.
+//     Valid values are "SQUARE" or "CIRCLE"
+//
+//   - The "sigma" entry defines the sigma for the gaussiam filtering.
+//     It's only valid with GAUSSIAN interpolation method
+//      - sigma = 1;
 //
 regrid = {
    to_grid    = NONE;
