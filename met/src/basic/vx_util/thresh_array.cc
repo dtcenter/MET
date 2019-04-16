@@ -445,7 +445,11 @@ bool ThreshArray::need_perc() {
 void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
                            const NumArray *cptr) {
 
-   set_perc(fptr, optr, cptr, 0, 0);
+   if(Nelements == 0) return;
+
+   for(int i=0; i<Nelements; i++) {
+      t[i].set_perc(fptr, optr, cptr);
+   }
 
    return;
 }
