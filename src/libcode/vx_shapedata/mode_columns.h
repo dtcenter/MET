@@ -33,52 +33,54 @@ static const string mode_hdr_columns [] = {
    "OBS_RAD",                    //  14
    "OBS_THR",                    //  15
    "FCST_VAR",                   //  16
-   "FCST_LEV",                   //  17
-   "OBS_VAR",                    //  18
-   "OBS_LEV",                    //  19
+   "FCST_UNITS",                 //  17
+   "FCST_LEV",                   //  18
+   "OBS_VAR",                    //  19
+   "OBS_UNITS",                  //  20
+   "OBS_LEV",                    //  21
 
-   "OBTYPE",                     //  20
+   "OBTYPE",                     //  22
 
 };
 
 static const string mode_obj_columns [] = {
 
-   "OBJECT_ID",                  //  21
-   "OBJECT_CAT",                 //  22
-   "CENTROID_X",                 //  23
-   "CENTROID_Y",                 //  24
-   "CENTROID_LAT",               //  25
-   "CENTROID_LON",               //  26
-   "AXIS_ANG",                   //  27
-   "LENGTH",                     //  28
-   "WIDTH",                      //  29
-   "AREA",                       //  30
-   "AREA_THRESH",                //  31
-   "CURVATURE",                  //  32
-   "CURVATURE_X",                //  33
-   "CURVATURE_Y",                //  34
-   "COMPLEXITY",                 //  35
-   "INTENSITY_10",               //  36
-   "INTENSITY_25",               //  37
-   "INTENSITY_50",               //  38
-   "INTENSITY_75",               //  39
-   "INTENSITY_90",               //  40
-   "INTENSITY_USER",             //  41
-   "INTENSITY_SUM",              //  42
-   "CENTROID_DIST",              //  43
-   "BOUNDARY_DIST",              //  44
-   "CONVEX_HULL_DIST",           //  45
-   "ANGLE_DIFF",                 //  46
-   "ASPECT_DIFF",                //  47
-   "AREA_RATIO",                 //  48
-   "INTERSECTION_AREA",          //  49
-   "UNION_AREA",                 //  50
-   "SYMMETRIC_DIFF",             //  51
-   "INTERSECTION_OVER_AREA",     //  52
-   "CURVATURE_RATIO",            //  53
-   "COMPLEXITY_RATIO",           //  54
-   "PERCENTILE_INTENSITY_RATIO", //  55
-   "INTEREST"                    //  56
+   "OBJECT_ID",                  //  23
+   "OBJECT_CAT",                 //  24
+   "CENTROID_X",                 //  25
+   "CENTROID_Y",                 //  26
+   "CENTROID_LAT",               //  27
+   "CENTROID_LON",               //  28
+   "AXIS_ANG",                   //  29
+   "LENGTH",                     //  30
+   "WIDTH",                      //  31
+   "AREA",                       //  32
+   "AREA_THRESH",                //  33
+   "CURVATURE",                  //  34
+   "CURVATURE_X",                //  35
+   "CURVATURE_Y",                //  36
+   "COMPLEXITY",                 //  37
+   "INTENSITY_10",               //  38
+   "INTENSITY_25",               //  39
+   "INTENSITY_50",               //  40
+   "INTENSITY_75",               //  41
+   "INTENSITY_90",               //  42
+   "INTENSITY_USER",             //  43
+   "INTENSITY_SUM",              //  44
+   "CENTROID_DIST",              //  45
+   "BOUNDARY_DIST",              //  46
+   "CONVEX_HULL_DIST",           //  47
+   "ANGLE_DIFF",                 //  48
+   "ASPECT_DIFF",                //  49
+   "AREA_RATIO",                 //  50
+   "INTERSECTION_AREA",          //  51
+   "UNION_AREA",                 //  52
+   "SYMMETRIC_DIFF",             //  53
+   "INTERSECTION_OVER_AREA",     //  54
+   "CURVATURE_RATIO",            //  55
+   "COMPLEXITY_RATIO",           //  56
+   "PERCENTILE_INTENSITY_RATIO", //  57
+   "INTEREST"                    //  58
 };
 
 static const int n_mode_single_columns = 20; // CENTROID_X thru INTENSITY_SUM
@@ -86,25 +88,25 @@ static const int n_mode_pair_columns   = 14; // CENTROID_DIST thru INTEREST
 
 static const char * mode_cts_columns [] = {
 
-   "FIELD",                      //  21
-   "TOTAL",                      //  22
-   "FY_OY",                      //  23
-   "FY_ON",                      //  24
-   "FN_OY",                      //  25
-   "FN_ON",                      //  26
-   "BASER",                      //  27
-   "FMEAN",                      //  28
-   "ACC",                        //  29
-   "FBIAS",                      //  30
-   "PODY",                       //  31
-   "PODN",                       //  32
-   "POFD",                       //  33
-   "FAR",                        //  34
-   "CSI",                        //  35
-   "GSS",                        //  36
-   "HK",                         //  37
-   "HSS",                        //  38
-   "ODDS"                        //  39
+   "FIELD",                      //  23
+   "TOTAL",                      //  24
+   "FY_OY",                      //  25
+   "FY_ON",                      //  26
+   "FN_OY",                      //  27
+   "FN_ON",                      //  28
+   "BASER",                      //  29
+   "FMEAN",                      //  30
+   "ACC",                        //  31
+   "FBIAS",                      //  32
+   "PODY",                       //  33
+   "PODN",                       //  34
+   "POFD",                       //  35
+   "FAR",                        //  36
+   "CSI",                        //  37
+   "GSS",                        //  38
+   "HK",                         //  39
+   "HSS",                        //  40
+   "ODDS"                        //  41
 };
 
 ////////////////////////////////////////////////////////////////////////

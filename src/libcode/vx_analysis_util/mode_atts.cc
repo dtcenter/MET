@@ -139,8 +139,10 @@ is_matched            = 0;
 fcst_thr.clear();
  obs_thr.clear();
 fcst_var.clear();
+fcst_units.clear();
 fcst_lev.clear();
  obs_var.clear();
+ obs_units.clear();
  obs_lev.clear();
 
    //
@@ -448,8 +450,10 @@ desc     = A.desc;
 fcst_thr = A.fcst_thr;
 obs_thr  = A.obs_thr;
 fcst_var = A.fcst_var;
+fcst_units = A.fcst_units;
 fcst_lev = A.fcst_lev;
 obs_var  = A.obs_var;
+obs_units  = A.obs_units;
 obs_lev  = A.obs_lev;
 
    //
@@ -861,6 +865,22 @@ if ( fcst_var.n_elements() > 0 )  {
 
 }
 
+if ( fcst_units.n_elements() > 0 )  {
+
+   out << prefix << "fcst_units = { ";
+
+   for (j=0; j<(fcst_units.n_elements()); ++j)  {
+
+      out << "\"" << fcst_units[j] << "\"";
+
+      if ( j < (fcst_units.n_elements() - 1) )  out << ", ";
+
+   }
+
+   out << " }\n";
+
+}
+
 if ( fcst_lev.n_elements() > 0 )  {
 
    out << prefix << "fcst_lev = { ";
@@ -886,6 +906,22 @@ if ( obs_var.n_elements() > 0 )  {
       out << "\"" << obs_var[j] << "\"";
 
       if ( j < (obs_var.n_elements() - 1) )  out << ", ";
+
+   }
+
+   out << " }\n";
+
+}
+
+if ( obs_units.n_elements() > 0 )  {
+
+   out << prefix << "obs_units = { ";
+
+   for (j=0; j<(obs_units.n_elements()); ++j)  {
+
+      out << "\"" << obs_units[j] << "\"";
+
+      if ( j < (obs_units.n_elements() - 1) )  out << ", ";
 
    }
 
@@ -1387,6 +1423,10 @@ c = L.fcst_var();
 
 if ( (fcst_var.n_elements() > 0) && !(fcst_var.has(c)) )  return ( 0 );
 
+c = L.fcst_units();
+
+if ( (fcst_units.n_elements() > 0) && !(fcst_units.has(c)) )  return ( 0 );
+
 c = L.fcst_lev();
 
 if ( (fcst_lev.n_elements() > 0) && !(fcst_lev.has(c)) )  return ( 0 );
@@ -1394,6 +1434,10 @@ if ( (fcst_lev.n_elements() > 0) && !(fcst_lev.has(c)) )  return ( 0 );
 c = L.obs_var();
 
 if ( (obs_var.n_elements() > 0) && !(obs_var.has(c)) )  return ( 0 );
+
+c = L.obs_units();
+
+if ( (obs_units.n_elements() > 0) && !(obs_units.has(c)) )  return ( 0 );
 
 c = L.obs_lev();
 
@@ -1912,8 +1956,10 @@ while ( j < (a.n_elements()) )  {
    else if ( strcmp(c, "-fcst_thr") == 0 )  { add_fcst_thr(a[j + 1].c_str());  a.shift_down(j, 2); }
    else if ( strcmp(c, "-obs_thr" ) == 0 )  { add_obs_thr (a[j + 1].c_str());  a.shift_down(j, 2); }
    else if ( strcmp(c, "-fcst_var") == 0 )  { add_fcst_var(a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-fcst_units") == 0 )  { add_fcst_units(a[j + 1].c_str());  a.shift_down(j, 2); }
    else if ( strcmp(c, "-fcst_lev") == 0 )  { add_fcst_lev(a[j + 1].c_str());  a.shift_down(j, 2); }
    else if ( strcmp(c, "-obs_var" ) == 0 )  { add_obs_var (a[j + 1].c_str());  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-obs_units" ) == 0 )  { add_obs_units (a[j + 1].c_str());  a.shift_down(j, 2); }
    else if ( strcmp(c, "-obs_lev" ) == 0 )  { add_obs_lev (a[j + 1].c_str());  a.shift_down(j, 2); }
 
       //
@@ -2121,6 +2167,12 @@ for (j=0; j<(m.fcst_var.n_elements()); ++j)  {
 
 }
 
+for (j=0; j<(m.fcst_units.n_elements()); ++j)  {
+
+   add_fcst_units(m.fcst_units[j].c_str());
+
+}
+
 for (j=0; j<(m.fcst_lev.n_elements()); ++j)  {
 
    add_fcst_lev(m.fcst_lev[j].c_str());
@@ -2130,6 +2182,12 @@ for (j=0; j<(m.fcst_lev.n_elements()); ++j)  {
 for (j=0; j<(m.obs_var.n_elements()); ++j)  {
 
    add_obs_var(m.obs_var[j].c_str());
+
+}
+
+for (j=0; j<(m.obs_units.n_elements()); ++j)  {
+
+   add_obs_units(m.obs_units[j].c_str());
 
 }
 
@@ -2561,6 +2619,20 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeAttributes::add_fcst_units(const char * text)
+
+{
+
+if ( !(fcst_units.has(text)) )   fcst_units.add(text);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeAttributes::add_fcst_lev(const char * text)
 
 {
@@ -2580,6 +2652,20 @@ void ModeAttributes::add_obs_var(const char * text)
 {
 
 if ( !(obs_var.has(text)) )   obs_var.add(text);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::add_obs_units(const char * text)
+
+{
+
+if ( !(obs_units.has(text)) )   obs_units.add(text);
 
 return;
 
@@ -4066,8 +4152,10 @@ s << "   -desc     value\n";
 s << "   -fcst_thr value\n";
 s << "   -obs_thr  value\n";
 s << "   -fcst_var value\n";
+s << "   -fcst_units value\n";
 s << "   -fcst_lev value\n";
 s << "   -obs_var  value\n";
+s << "   -obs_units  value\n";
 s << "   -obs_lev  value\n";
 
 s << "\n"

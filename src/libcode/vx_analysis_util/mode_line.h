@@ -87,8 +87,10 @@ class ModeLine : public DataLine {
       const char * obs_thr                    () const;
 
       const char * fcst_var                   () const;
+      const char * fcst_units                 () const;
       const char * fcst_lev                   () const;
       const char * obs_var                    () const;
+      const char * obs_units                  () const;
       const char * obs_lev                    () const;
 
       const char * object_id                  () const;
