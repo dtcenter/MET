@@ -76,12 +76,12 @@ void Node::clear() {
 
    if(child) {
       child->clear();
-      child = (Node *) 0;
+      delete child;  child = (Node *) 0;
    }
 
    if(sibling) {
       sibling->clear();
-      sibling = (Node *) 0;
+      delete sibling;  sibling = (Node *) 0;
    }
 
    p.clear();
@@ -126,7 +126,7 @@ void Node::assign_tree(const Node *n_ptr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Node::add_child(const Polyline *poly) {
+void Node::add_child(const Polyline * poly) {
    Node *n_ptr = (Node *) 0;
 
    // Check for first child

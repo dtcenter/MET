@@ -156,7 +156,7 @@ void FlateEncodeFilter::eod()
    //  finish the data processing
    //
 
-s->avail_in = inbytes;
+s->avail_in = (uInt) inbytes;
 
 s->next_in = inbuf;
 
