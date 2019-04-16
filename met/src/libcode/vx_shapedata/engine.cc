@@ -2742,6 +2742,7 @@ void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
 void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at, const int row)
 
 {
+   mlog << Debug(3) << "write_header_columns().\n";
 
    int c = 0;
 
@@ -2809,6 +2810,12 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    at.set_entry(row, c++,
                 eng.conf_info.fcst_info->name());
 
+   // Forecast Variable Units
+   ConcatString fcst_units = eng.conf_info.fcst_info->units();
+   fcst_units.replace(" ", "_");
+   mlog << Debug(4) << "fcst_info->units():" << fcst_units << "\n";
+   at.set_entry(row, c++, fcst_units);
+
    // Forecast Variable Level
    at.set_entry(row, c++,
                 eng.conf_info.fcst_info->level_name());
@@ -2816,6 +2823,12 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    // Observation Variable Name
    at.set_entry(row, c++,
                 eng.conf_info.obs_info->name());
+
+   // Observation Variable Units
+   ConcatString obs_units = eng.conf_info.obs_info->units();
+   obs_units.replace(" ", "_");
+   mlog << Debug(4) << "obs_info->units():" << obs_units << "\n";
+   at.set_entry(row, c++, obs_units);
 
    // Observation Variable Level
    at.set_entry(row, c++,

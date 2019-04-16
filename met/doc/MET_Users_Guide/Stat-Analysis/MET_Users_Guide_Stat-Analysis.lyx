@@ -2254,6 +2254,48 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+fcst_units = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_units  = [];
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The user may specify a comma-separated list of forecast and observation
+ units to be used for any analyses to be performed.
+ If multiple units are listed, the analyses will be performed on
+ their union.
+ These selections may be further refined by using the "
+\series bold
+-fcst_units
+\series default
+" and "
+\series bold
+-obs_units
+\series default
+" options within the job command lines.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 fcst_lev = [];
 \end_layout
 

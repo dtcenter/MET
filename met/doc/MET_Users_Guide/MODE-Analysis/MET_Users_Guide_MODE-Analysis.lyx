@@ -869,6 +869,37 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+-fcst_units value
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-obs_units  value
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+These options indicate the units to be used in the analysis
+ for forecast and observed fields.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 -fcst_lev value
 \end_layout
 

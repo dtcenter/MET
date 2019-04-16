@@ -106,9 +106,13 @@ atts.obs_thr.add( config.lookup_string_array(conf_key_obs_thr, error_out) );
 
 atts.fcst_var.add( config.lookup_string_array(conf_key_fcst_var, error_out) );
 
+atts.fcst_units.add( config.lookup_string_array(conf_key_fcst_units, error_out) );
+
 atts.fcst_lev.add( config.lookup_string_array(conf_key_fcst_lev, error_out) );
 
 atts.obs_var.add( config.lookup_string_array(conf_key_obs_var, error_out) );
+
+atts.obs_units.add( config.lookup_string_array(conf_key_obs_units, error_out) );
 
 atts.obs_lev.add( config.lookup_string_array(conf_key_obs_lev, error_out) );
 

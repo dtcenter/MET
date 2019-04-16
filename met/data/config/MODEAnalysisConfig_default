@@ -31,8 +31,10 @@ unmatched = FALSE;
 //fcst_thr = [];
 //obs_thr  = [];
 //fcst_var = [];
+//fcst_units = [];
 //fcst_lev = [];
 //obs_var  = [];
+//obs_units  = [];
 //obs_lev  = [];
 
 ////////////////////////////////////////////////////////////////////////////////

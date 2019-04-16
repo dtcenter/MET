@@ -100,8 +100,10 @@ class ModeAttributes {
       StringArray fcst_thr;
       StringArray obs_thr;
       StringArray fcst_var;
+      StringArray fcst_units;
       StringArray fcst_lev;
       StringArray obs_var;
+      StringArray obs_units;
       StringArray obs_lev;
 
          //
@@ -400,9 +402,13 @@ class ModeAttributes {
 
       void add_fcst_var (const char *);
 
+      void add_fcst_units (const char *);
+
       void add_fcst_lev (const char *);
 
       void add_obs_var  (const char *);
+
+      void add_obs_units  (const char *);
 
       void add_obs_lev  (const char *);
 

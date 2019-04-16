@@ -654,11 +654,23 @@ return ( c );
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * ModeLine::fcst_lev() const
+const char * ModeLine::fcst_units() const
 
 {
 
+const char * c = get_item("FCST_UNITS", false);
 
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * ModeLine::fcst_lev() const
+
+{
 
 const char * c = get_item("FCST_LEV", false);
 
@@ -674,9 +686,21 @@ const char * ModeLine::obs_var() const
 
 {
 
-
-
 const char * c = get_item("OBS_VAR", false);
+
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * ModeLine::obs_units() const
+
+{
+
+const char * c = get_item("OBS_UNITS", false);
 
 return ( c );
 
@@ -689,8 +713,6 @@ return ( c );
 const char * ModeLine::obs_lev() const
 
 {
-
-
 
 const char * c = get_item("OBS_LEV", false);
 
