@@ -2338,7 +2338,7 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 ////////////////////////////////////////////////////////////////////////
 
 void dbl2str(double *d, ConcatString & str) {
-   const char *fmt_str = "%s";
+   const char *fmt_str = "%f";
 
    str.format(fmt_str, d);
    if (0 == str.length()) {

@@ -118,7 +118,7 @@ switch ( padsize )  {
    case padsize_4:
       bytes = 4;
       b = (unsigned char *) (&I);
-      I = value;
+      I = (unsigned int) value;
       break;
 
    case padsize_8:
