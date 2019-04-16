@@ -31,7 +31,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * atts_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
+extern bool dataplane_from_numpy_array(PyObject * numpy_array, PyObject * atts_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////

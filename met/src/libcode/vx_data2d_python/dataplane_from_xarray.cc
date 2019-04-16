@@ -19,8 +19,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const char data_attr_name  [] = "data";
-static const char  data_attr_name  [] = "values";
+static const char  data_attr_name [] = "values";
 static const char attrs_attr_name [] = "attrs";
 
 
@@ -34,7 +33,7 @@ static const char attrs_attr_name [] = "attrs";
    //    off to dataplane_from_numpy_array
    //
 
-void dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
+bool dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -50,13 +49,13 @@ attrs_dict  = PyObject_GetAttrString(data_array, attrs_attr_name);
 
    /////////////////////
 
-dataplane_from_numpy_array(numpy_array, attrs_dict, dp_out, grid_out, vinfo);
+bool status = dataplane_from_numpy_array(numpy_array, attrs_dict, dp_out, grid_out, vinfo);
 
    //
    //  done
    //
 
-return;
+return ( status );
 
 }
 

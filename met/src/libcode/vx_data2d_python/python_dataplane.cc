@@ -34,7 +34,7 @@ static const char python_path_env [] = "PYTHONPATH";
 ////////////////////////////////////////////////////////////////////////
 
 
-void python_dataplane(const char * script_name,
+bool python_dataplane(const char * script_name,
                       int script_argc, char ** script_argv,
                       const bool use_xarray, DataPlane & met_dp_out,
                       Grid & met_grid_out, VarInfoPython &vinfo)
@@ -62,12 +62,10 @@ GP.initialize();
 
 if ( PyErr_Occurred() )  {
 
-   mlog << Error << "\npython_dataplane() -> "
+   mlog << Warning << "\npython_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
-   PyErr_PrintEx(1);
-
-   exit ( 1 );
+   return ( false );
 
 }
 
@@ -103,22 +101,21 @@ if ( do_reload )  {
 
 if ( PyErr_Occurred() )  {
 
-   mlog << Error << "\npython_dataplane() -> "
+   mlog << Warning << "\npython_dataplane() -> "
         << "an error occurred importing module \"" << get_env("PYTHONPATH")
         << "/" << script_name << ".py\"\n\n";
 
-   PyErr_PrintEx(1);
-
-   exit ( 1 );
+   return ( false );
 
 }
 
 if ( ! module )  {
 
-   mlog << Error << "\npython_dataplane() -> "
+   mlog << Warning << "\npython_dataplane() -> "
         << "error running python script \"" << get_env("PYTHONPATH")
         << "/" << script_name << ".py\"\n\n";
-   exit ( 1 );
+
+   return ( false );
 
 }
 
@@ -144,13 +141,11 @@ if ( use_xarray )  {
 
    if ( !data_array )  {
 
-      mlog << Error << "\npython_dataplane() -> "
+      mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
 
-      PyErr_PrintEx(1);
-
-      exit ( 1 );
+      return ( false );
    }
 
    dataplane_from_xarray(data_array, met_dp_out, met_grid_out, vinfo);
@@ -169,13 +164,11 @@ if ( use_xarray )  {
 
    if ( !numpy_array || !attrs_dict )  {
 
-      mlog << Error << "\npython_dataplane() -> "
+      mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \"" << get_env("PYTHONPATH")
            << "/" << script_name << ".py\"\n\n";
 
-      PyErr_PrintEx(1);
-
-      exit ( 1 );
+      return ( false );
    }
 
    dataplane_from_numpy_array(numpy_array, attrs_dict, met_dp_out, met_grid_out, vinfo);
@@ -186,7 +179,7 @@ if ( use_xarray )  {
    //  done
    //
 
-return;
+return ( true );
 
 }
 

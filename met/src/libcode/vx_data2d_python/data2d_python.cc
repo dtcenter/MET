@@ -70,10 +70,6 @@ mlog << Error << "\nMetPythonDataFile::MetPythonDataFile(const MetPythonDataFile
 
 exit ( 1 );
 
-// python_init_from_scratch();
-//
-// assign(f);
-
 }
 
 
@@ -88,10 +84,6 @@ mlog << Error << "\nMetPythonDataFile::operator=(const MetPythonDataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-// if ( this == &f )  return ( * this );
-//
-// assign(f);
 
 return ( * this );
 
@@ -239,7 +231,8 @@ Filename = file_name;
 
 Raw_Grid = new Grid;
 
-python_dataplane(file_name.c_str(), file_argc, file_argv, use_xarray, Plane, *Raw_Grid, VInfo);
+bool status = python_dataplane(file_name.c_str(), file_argc, file_argv,
+                               use_xarray, Plane, *Raw_Grid, VInfo);
 
 Dest_Grid = new Grid;
 
@@ -262,7 +255,7 @@ if ( file_argv )  {
    //  done
    //
 
-return ( true );
+return ( status );
 
 }
 
@@ -353,6 +346,8 @@ bool MetPythonDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
 {
 
+bool status = true;
+
    //
    //  the python command is specified by VarInfo::Name
    //  only open if the python command is empty or has changed
@@ -362,9 +357,11 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   open(vinfo.req_name().c_str());
+   status = open(vinfo.req_name().c_str());
 
 }
+
+if ( !status )  return ( false );
 
    //
    //  ok
@@ -394,6 +391,8 @@ int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_ar
 
 {
 
+bool status = true;
+
    //
    //  the python command is specified by VarInfo::Name
    //  only open if the python command is empty or has changed
@@ -403,9 +402,11 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
    close();
 
-   open(vinfo.req_name().c_str());
+   status = open(vinfo.req_name().c_str());
 
 }
+
+if ( !status )  return ( 0 );
 
    //
    //  ok
@@ -425,7 +426,7 @@ vinfo.set_level_name(VInfo.level_name().c_str());
 vinfo.set_units(VInfo.units().c_str());
 vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
-return ( true );
+return ( 1 );
 
 }
 
