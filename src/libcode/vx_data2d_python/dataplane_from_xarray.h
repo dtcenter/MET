@@ -31,7 +31,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
+extern bool dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////
