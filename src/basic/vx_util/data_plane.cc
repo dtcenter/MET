@@ -99,7 +99,7 @@ void DataPlane::assign(const DataPlane &d) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::clear() {
-    
+
    Data.clear();
 
    Nx = 0;
@@ -184,7 +184,7 @@ void DataPlane::set_size(int x, int y) {
       //
       //  resize and initialize data
       //
-   
+
    Data.resize(Nxy);
    Data.assign(Nxy, 0);
 
@@ -262,6 +262,20 @@ double DataPlane::get(int x, int y) const {
 
 void DataPlane::threshold(const SingleThresh &st) {
    int j;
+   SingleThresh thresh = st;
+
+   //
+   // Check for percentile thresholds
+   //
+
+   if( thresh.need_perc() )  {
+      NumArray d;
+      d.extend(Nxy);
+      for(j=0; j<Nxy; ++j)  {
+         if( !is_bad_data(Data[j]) ) d.add(Data[j]);
+      }
+      thresh.set_perc(&d, &d, &d);
+   }
 
    //
    // Loop through the data and apply the threshold to all valid values
@@ -271,9 +285,9 @@ void DataPlane::threshold(const SingleThresh &st) {
 
    for(j=0; j<Nxy; ++j) {
 
-      if( is_bad_data(Data[j]) )  continue;
-      if( st.check(Data[j]) )     Data[j] = 1.0;
-      else                        Data[j] = 0.0;
+      if(  is_bad_data(Data[j]) )  continue;
+      if( thresh.check(Data[j]) )  Data[j] = 1.0;
+      else                         Data[j] = 0.0;
 
    }
 
@@ -285,22 +299,33 @@ void DataPlane::threshold(const SingleThresh &st) {
 void DataPlane::censor(const ThreshArray &censor_thresh,
                        const NumArray &censor_val) {
    int i, j, count;
+   ThreshArray ta = censor_thresh;
 
    // Check for no work to do
    if(censor_thresh.n_elements() == 0) return;
 
+   // Check for percentile thresholds
+   if(ta.need_perc()) {
+      NumArray d;
+      d.extend(Nxy);
+      for(i=0; i<Nxy; i++) {
+         if(!is_bad_data(Data[i])) d.add(Data[i]);
+      }
+      ta.set_perc(&d, &d, &d);
+   }
+
    mlog << Debug(3)
-        << "Applying censor thresholds \"" << censor_thresh.get_str(" ")
+        << "Applying censor thresholds \"" << ta.get_str(" ")
         << "\" and replacing with values \"" << censor_val.serialize()
         << "\".\n";
 
    // Loop through the points and apply all the censor thresholds.
    for(i=0,count=0; i<Nxy; i++) {
 
-      for(j=0; j<censor_thresh.n_elements(); j++) {\
+      for(j=0; j<ta.n_elements(); j++) {
 
          // Break out after the first match.
-         if(censor_thresh[j].check(Data[i])) {
+         if(ta[j].check(Data[i])) {
             Data[i] = censor_val[j];
             count++;
             break;
