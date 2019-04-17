@@ -452,7 +452,7 @@ void initialize() {
    for (int idx=0; idx<(sizeof(hdr) / sizeof(hdr[0])); idx++) {
       hdr[idx] = r8bfms * 10;
    }
-   
+
    summary_obs = new SummaryObs();
    return;
 }
@@ -960,7 +960,7 @@ void process_pbfile(int i_pb) {
             unix_to_yyyymmdd_hhmmss(beg_ut, start_time_str);
          }
          else {
-	   start_time_str = "NO_BEG_TIME";
+            start_time_str = "NO_BEG_TIME";
          }
 
          if(end_ut != (unixtime) 0) {
@@ -989,7 +989,7 @@ void process_pbfile(int i_pb) {
          ConcatString tmp_str;
 
          //Read header (station id, lat, lon, ele, time)
-	 tmp_str = bufr_hdrs;
+         tmp_str = bufr_hdrs;
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, (char*)bufr_hdr_names.c_str(),
                     &bufr_hdr_length, &req_hdr_level );
 
@@ -1162,12 +1162,12 @@ void process_pbfile(int i_pb) {
 
       // Get the next PrepBufr message
       readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
-      
+
       // Special handling for "AIRNOW"
       bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
 
       if (0 < message_type_map.count((string)hdr_typ)) {
-	ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
+         ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
          mlog << Debug(6) << "\n" << method_name << " -> "
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
@@ -1355,7 +1355,7 @@ void process_pbfile(int i_pb) {
 
             addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                   hdr_lat, hdr_lon, hdr_elv, quality_mark,
-			   OBS_BUFFER_SIZE);
+                  OBS_BUFFER_SIZE);
 
             // Increment the current and total observations counts
             n_file_obs++;
@@ -1445,7 +1445,7 @@ void process_pbfile(int i_pb) {
             isMilliBar = false;
             if (var_names.has(var_name, var_index)) {
                //mlog << Debug(7) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
-	      if ("DEG C" == var_units[var_index]) {
+            if ("DEG C" == var_units[var_index]) {
                   isDegC = true;
                }
                else if ("MB" == var_units[var_index]) {
@@ -1819,7 +1819,7 @@ void process_pbfile_metadata(int i_pb) {
             }
          }
          else {
-  	   var_name = default_sid_name;
+            var_name = default_sid_name;
             strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str));
             length = strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
@@ -1828,7 +1828,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-		    var_name = tmp_hdr_array[index];
+                     var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found station id: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1846,7 +1846,7 @@ void process_pbfile_metadata(int i_pb) {
                var_name = default_lon_name;
                for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-		    var_name = tmp_hdr_array[index];
+                     var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found  longitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1857,7 +1857,7 @@ void process_pbfile_metadata(int i_pb) {
                var_name = default_lat_name;
                for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
-		    var_name = tmp_hdr_array[index];
+                     var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found   latitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
@@ -1983,7 +1983,7 @@ void process_pbfile_metadata(int i_pb) {
                   tmp_bufr_obs_name_arr.add(var_name);
                }
                if (do_all_vars) {
-		 int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
+                  int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
                   if (0 == count) {
                      mlog << Debug(5) << " found valid data: " << var_name
                           << " (" << bufr_obs[lv][0] << ")\n";
@@ -1993,7 +1993,7 @@ void process_pbfile_metadata(int i_pb) {
                      unchecked_var_list.shift_down(vIdx, 1);
                   }
                   else {
-		    variableCountMap[var_name] = count;
+                     variableCountMap[var_name] = count;
                   }
                }
                else {
@@ -2338,7 +2338,7 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 ////////////////////////////////////////////////////////////////////////
 
 void dbl2str(double *d, ConcatString & str) {
-   const char *fmt_str = "%f";
+   const char *fmt_str = "%s";
 
    str.format(fmt_str, d);
    if (0 == str.length()) {
@@ -2511,10 +2511,10 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
    mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
       if (all_vars.has(hdr_arr[i], index)) {
-	description = all_descs[index];
+         description = all_descs[index];
       }
       else {
-	description = "";
+         description = "";
       }
       line_buf.format("   %8s: %s\n", hdr_arr[i].c_str(), description.c_str());
       mlog << Debug(1) << line_buf;
@@ -2523,10 +2523,10 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
    mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements() << ") :\n";
    for(i=0; i<obs_arr.n_elements(); i++) {
       if (all_vars.has(obs_arr[i], index)) {
-	description = all_descs[index];
+         description = all_descs[index];
       }
       else {
-	description = "";
+         description = "";
       }
       if (0 < variableTypeMap.count(obs_arr[i])) {
          StringArray typeArray = variableTypeMap[obs_arr[i]];
@@ -2540,7 +2540,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
          line_buf.format("   %8s: %-48s\t\ttypes: %s\n", obs_arr[i].c_str(), description.c_str(), message_types);
       }
       else {
-	line_buf.format("   %8s: %s\n", obs_arr[i].c_str(), description.c_str());
+         line_buf.format("   %8s: %s\n", obs_arr[i].c_str(), description.c_str());
       }
       mlog << Debug(1) << line_buf;
    }
