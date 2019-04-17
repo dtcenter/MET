@@ -172,10 +172,8 @@ void StatHdrColumns::set_fcst_var(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_units(const ConcatString s) {
-   ConcatString s_underscores = s;
-   s_underscores.replace(" ", "_");
-   fcst_units = check_hdr_str(s_underscores);
-   mlog << Debug(4) << "set FCST_UNITS:" << s_underscores << "\n";
+   fcst_units = check_hdr_str(s);
+   mlog << Debug(4) << "set FCST_UNITS:" << fcst_units << "\n";
    return;
 }
 
@@ -197,10 +195,8 @@ void StatHdrColumns::set_obs_var(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_units(const ConcatString s) {
-   ConcatString s_underscores = s;
-   s_underscores.replace(" ", "_");
-   obs_units = check_hdr_str(s_underscores);
-   mlog << Debug(4) << "set OBS_UNITS:" << s_underscores << "\n";
+   obs_units = check_hdr_str(s);
+   mlog << Debug(4) << "set OBS_UNITS:" << obs_units << "\n";
    return;
 }
 
