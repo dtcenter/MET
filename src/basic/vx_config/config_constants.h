@@ -244,7 +244,7 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   int         sigma;      // Sigma for Gaussian
+   double      sigma;      // Sigma for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
    void        clear();
@@ -266,7 +266,7 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-   int          sigma;      // Sigma for Gaussian
+   double       sigma;      // Sigma for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 

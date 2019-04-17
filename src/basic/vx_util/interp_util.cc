@@ -396,11 +396,11 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute the Gaussian filter
-// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * pi * sigma**2))
+// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
 ////////////////////////////////////////////////////////////////////////
 
 double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
-                      double obs_x, double obs_y, const int sigma, double t) {
+                      double obs_x, double obs_y, const double sigma, double t) {
 
    // Search the neighborhood for valid data points
    double count = 0;
@@ -409,8 +409,8 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
    double interp_value = bad_data_double;
 
    double dx, dy;
-   double gaussian_const = 2 * M_PI * sigma * sigma;
-   double gaussian_const_2 = 1 / gaussian_const;
+   double sigma_const = 2 * sigma * sigma;
+   double gaussian_const = M_PI * sigma_const;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -432,7 +432,7 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
       dx = obs_x - x;
       dy = obs_y - y;
       // compute the weight and accumulate numerator and denominator
-      double weight = gaussian_const_2 * exp(-(dx*dx + dy*dy) / gaussian_const);
+      double weight = exp(-(dx*dx + dy*dy) / sigma_const) / gaussian_const; 
       wght_sum  += weight;
       numerator += (weight * data);
       count++;
@@ -442,7 +442,6 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
    if( (double) count/(gt.size()) >= t && count > 0) {
       if (wght_sum != 0 ) interp_value = numerator/wght_sum;
    }
-
    return(interp_value);
 }
 
@@ -744,7 +743,7 @@ double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
-                           double interp_thresh, const int sigma,
+                           double interp_thresh, const double sigma,
                            const SingleThresh *cat_thresh) {
    double v;
    int x = nint(obs_x);

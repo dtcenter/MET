@@ -57,7 +57,7 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
-static const int        DefaultInterpSigma = 1;
+static const double     DefaultInterpSigma = 1.476;
 static const double     DefaultVldThresh  = 0.5;
 
 static const float      MISSING_LATLON = -999.0;
@@ -1360,7 +1360,7 @@ void set_width(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_sigma(const StringArray &a) {
-   RGInfo.sigma = atoi(a[0].c_str());
+   RGInfo.sigma = atof(a[0].c_str());
 }
 
 
