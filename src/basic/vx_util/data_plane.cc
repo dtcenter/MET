@@ -262,20 +262,6 @@ double DataPlane::get(int x, int y) const {
 
 void DataPlane::threshold(const SingleThresh &st) {
    int j;
-   SingleThresh thresh = st;
-
-   //
-   // Check for percentile thresholds
-   //
-
-   if( thresh.need_perc() )  {
-      NumArray d;
-      d.extend(Nxy);
-      for(j=0; j<Nxy; ++j)  {
-         if( !is_bad_data(Data[j]) ) d.add(Data[j]);
-      }
-      thresh.set_perc(&d, &d, &d);
-   }
 
    //
    // Loop through the data and apply the threshold to all valid values
@@ -285,9 +271,9 @@ void DataPlane::threshold(const SingleThresh &st) {
 
    for(j=0; j<Nxy; ++j) {
 
-      if(  is_bad_data(Data[j]) )  continue;
-      if( thresh.check(Data[j]) )  Data[j] = 1.0;
-      else                         Data[j] = 0.0;
+      if( is_bad_data(Data[j]) )  continue;
+      if( st.check(Data[j]) )     Data[j] = 1.0;
+      else                        Data[j] = 0.0;
 
    }
 
