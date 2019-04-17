@@ -17,7 +17,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString check_hdr_str(const ConcatString);
+static ConcatString check_hdr_str(const ConcatString,
+   bool space_to_underscore = false);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -165,14 +166,13 @@ void StatHdrColumns::set_obs_valid_end(const unixtime ut) {
 
 void StatHdrColumns::set_fcst_var(const ConcatString s) {
    fcst_var = check_hdr_str(s);
-   mlog << Debug(4) << "set FCST_VAR:" << s << "\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_units(const ConcatString s) {
-   fcst_units = check_hdr_str(s);
+   fcst_units = check_hdr_str(s, true);
    mlog << Debug(4) << "set FCST_UNITS:" << fcst_units << "\n";
    return;
 }
@@ -188,14 +188,13 @@ void StatHdrColumns::set_fcst_lev(const char *s) {
 
 void StatHdrColumns::set_obs_var(const ConcatString s) {
    obs_var = check_hdr_str(s);
-   mlog << Debug(4) << "set OBS_VAR:" << s << "\n";
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_units(const ConcatString s) {
-   obs_units = check_hdr_str(s);
+   obs_units = check_hdr_str(s, true);
    mlog << Debug(4) << "set OBS_UNITS:" << obs_units << "\n";
    return;
 }
@@ -427,7 +426,14 @@ void StatHdrColumns::set_obs_valid_end_str() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString check_hdr_str(const ConcatString s) {
+ConcatString check_hdr_str(const ConcatString s,
+   bool space_to_underscore) {
+
+   if (space_to_underscore) {
+      ConcatString t = s;
+      t.replace(" ", "_", false);
+      return t;
+   }
 
    if(s == "") {
       mlog << Warning << "\ncheck_hdr_str() -> "
