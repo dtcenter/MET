@@ -783,7 +783,7 @@ double compute_interp(const DataPlaneArray &dpa,
                       const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
-                      const SingleThresh *cat_thresh, const int sigma) {
+                      const SingleThresh *cat_thresh, const double sigma) {
    double v, v_blw, v_abv, t;
 
    // Check for no data

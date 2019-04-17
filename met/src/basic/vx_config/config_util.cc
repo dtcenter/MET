@@ -35,7 +35,7 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
-   sigma = bad_data_int;
+   sigma = bad_data_double;
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -1108,7 +1108,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
 
    // Conf: sigma
-   info.sigma = regrid_dict->lookup_int(conf_key_sigma, false);
+   info.sigma = regrid_dict->lookup_double(conf_key_sigma, false);
 
    info.validate();
 
