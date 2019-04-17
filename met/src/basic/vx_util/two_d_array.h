@@ -173,9 +173,8 @@ void TwoD_Array<T>::set_size(int _nx, int _ny)
 
 if ( (_nx <= 0) || (_ny <= 0) )  {
 
-   mlog << Error
-        << "TwoD_Array::set_size() -> bad size ... ("
-        << _nx << ", " << _ny << ")\n\n";
+   mlog << Error << "\nTwoD_Array::set_size() -> "
+        << "bad size ... (" << _nx << ", " << _ny << ")\n\n";
 
    exit ( 1 );
 
@@ -299,8 +298,8 @@ int TwoD_Array<T>::x_left(const int _y) const
 
 if ( (_y < 0) || (_y >= Ny) )  {
 
-   mlog << Error
-        << "\n\n  TwoD_Array<T>::x_left(const int _y) const -> range check error ... y = " << _y << "\n\n";
+   mlog << Error << "\nTwoD_Array<T>::x_left(const int _y) const -> "
+        << "range check error ... y = " << _y << "\n\n";
 
    exit ( 1 );
 
@@ -331,8 +330,8 @@ int TwoD_Array<T>::x_right(const int _y) const
 
 if ( (_y < 0) || (_y >= Ny) )  {
 
-   mlog << Error
-        << "\n\n  TwoD_Array<T>::x_right(const int _y) const -> range check error ... y = " << _y << "\n\n";
+   mlog << Error << "\nTwoD_Array<T>::x_right(const int _y) const -> "
+        << "range check error ... y = " << _y << "\n\n";
 
    exit ( 1 );
 
