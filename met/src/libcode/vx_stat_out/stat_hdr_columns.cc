@@ -428,27 +428,24 @@ void StatHdrColumns::set_obs_valid_end_str() {
 
 ConcatString check_hdr_str(const ConcatString s,
    bool space_to_underscore) {
+   ConcatString s_tmp = s;
 
-   if (space_to_underscore) {
-      ConcatString t = s;
-      t.replace(" ", "_", false);
-      return t;
-   }
+   if (space_to_underscore) s_tmp.replace(" ", "_", false);
 
-   if(s == "") {
+   if(s_tmp == "") {
       mlog << Warning << "\ncheck_hdr_str() -> "
            << "null string!\n\n";
       return(na_string);
    }
 
-   if(check_reg_exp(ws_reg_exp, s.c_str())) {
+   if(check_reg_exp(ws_reg_exp, s_tmp.c_str())) {
       mlog << Error << "\ncheck_hdr_str() -> "
-           << "output header column value (\"" << s
+           << "output header column value (\"" << s_tmp
            << "\") should contain no embedded whitespace!\n\n";
       exit(1);
    }
 
-   return(s);
+   return(s_tmp);
 }
 
 ////////////////////////////////////////////////////////////////////////
