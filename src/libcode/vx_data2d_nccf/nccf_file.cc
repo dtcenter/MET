@@ -2531,10 +2531,11 @@ void NcCfFile::get_grid_mapping_geostationary(
   double param_c = data.H * data.H - semi_major_axis_sqr;
 
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
-  ConcatString scale_id;
-  if (get_global_att(_ncFile, (string)"scene_id", scale_id)) {
-    char* scene_id_str = new char[scale_id.length()+1];
-    strncpy(scene_id_str, scale_id.text(), scale_id.length());
+  ConcatString scene_id;
+  if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
+    char* scene_id_str = new char[scene_id.length()+1];
+    strncpy(scene_id_str, scene_id.text(), scene_id.length());
+    scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
   }
   
