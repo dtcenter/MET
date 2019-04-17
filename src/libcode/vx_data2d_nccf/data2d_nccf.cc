@@ -193,11 +193,12 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
         if (time_as_value && time_offset > time_threshold_cnt)   // convert the unixtime to offset
           time_offset = convert_time_to_offset(time_offset);
       }
+      
       if ((0 <= time_offset) && (time_offset < time_cnt))
         dimension[time_dim_slot] = time_offset;
       else {
-        bool is_time = (time_offset > time_threshold_cnt);
-        if (is_time)
+        bool do_stop = true;
+        if (time_offset > time_threshold_cnt)   // is from time string (yyyymmdd_hh)
           mlog << Warning << "\n" << method_name << "the requested time "
                << unix_to_yyyymmdd_hhmmss(time_offset) << " for \""
                << vinfo.req_name() << "\" variable does not exist (" 
@@ -207,12 +208,18 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
           mlog << Warning << "\n" << method_name << "the requested offset for \""
                << vinfo.req_name() << "\" variable "
                << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+        else if (org_time_offset == vx_data2d_star) {
+          do_stop = false;
+          dimension[time_dim_slot] = 0;
+          mlog << Warning << "\n" << method_name << "returns the first available time for \""
+               << vinfo.req_name() << "\" variable).\n\n";
+        }
         else
           mlog << Warning << "\n" << method_name << "the requested offset "
                << org_time_offset << " for \"" << vinfo.req_name() << "\" variable "
                << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
 
-        return false;
+        if (do_stop) return false;
       }
     }
   }
