@@ -2745,6 +2745,7 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    mlog << Debug(3) << "write_header_columns().\n";
 
    int c = 0;
+   ConcatString s;
 
 
    // Version
@@ -2752,8 +2753,8 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 (string)met_version);
 
    // Model Name
-   at.set_entry(row, c++,
-                eng.conf_info.model);
+   s = check_hdr_str(eng.conf_info.model);
+   at.set_entry(row, c++, s.text());
 
      //  N_valid
    at.set_entry(row, c++, eng.n_valid);
@@ -2763,8 +2764,8 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
 
    // Description
-   at.set_entry(row, c++,
-                eng.conf_info.desc);
+   s = check_hdr_str(eng.conf_info.desc);
+   at.set_entry(row, c++, s.text());
 
    // Forecast lead time
    at.set_entry(row, c++,
@@ -2807,36 +2808,32 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 eng.conf_info.obs_conv_thresh.get_str());
 
    // Forecast Variable Name
-   at.set_entry(row, c++,
-                eng.conf_info.fcst_info->name());
+   s = check_hdr_str(eng.conf_info.fcst_info->name());
+   at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   ConcatString fcst_units = eng.conf_info.fcst_info->units();
-   fcst_units.replace(" ", "_");
-   mlog << Debug(4) << "fcst_info->units():" << fcst_units << "\n";
-   at.set_entry(row, c++, fcst_units);
+   s = check_hdr_str(eng.conf_info.fcst_info->units(), true);
+   at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   at.set_entry(row, c++,
-                eng.conf_info.fcst_info->level_name());
+   s = check_hdr_str(eng.conf_info.fcst_info->level_name());
+   at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   at.set_entry(row, c++,
-                eng.conf_info.obs_info->name());
+   s = check_hdr_str(eng.conf_info.obs_info->name());
+   at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   ConcatString obs_units = eng.conf_info.obs_info->units();
-   obs_units.replace(" ", "_");
-   mlog << Debug(4) << "obs_info->units():" << obs_units << "\n";
-   at.set_entry(row, c++, obs_units);
+   s = check_hdr_str(eng.conf_info.obs_info->units(), true);
+   at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   at.set_entry(row, c++,
-                eng.conf_info.obs_info->level_name());
-
+   s = check_hdr_str(eng.conf_info.obs_info->level_name());
+   at.set_entry(row, c++, s.text());
 
    // Observation type
-   at.set_entry(row, c++, eng.conf_info.obtype);
+   s =  check_hdr_str(eng.conf_info.obtype);
+   at.set_entry(row, c++, s.text());
 
    return;
 }

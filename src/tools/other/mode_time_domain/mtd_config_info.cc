@@ -696,11 +696,15 @@ table.set_entry(row, c++, version.text());
 
    //  model
 
-table.set_entry(row, c++, model.text());
+s = check_hdr_str(model);
+
+table.set_entry(row, c++, s.text());
 
    //  description
 
-table.set_entry(row, c++, desc.text());
+s = check_hdr_str(desc);
+
+table.set_entry(row, c++, s.text());
 
    //  fcst lead
 
@@ -710,14 +714,6 @@ table.set_entry(row, c++, sec_to_hhmmss(fcst_info->lead()));
 
 table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(fcst_info->valid()));
 
-   //  fcst time delta ... don't know this
-
-// c++;
-
-   //  fcst accum
-
-// c++;
-
    //  obs lead
 
 table.set_entry(row, c++, sec_to_hhmmss(obs_info->lead()));
@@ -725,14 +721,6 @@ table.set_entry(row, c++, sec_to_hhmmss(obs_info->lead()));
    //  obs valid
 
 table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(obs_info->valid()));
-
-   //  obs time delta ... don't know this
-
-// c++;
-
-   //  obs accum
-
-// c++;
 
    //  time delta
 
@@ -760,39 +748,39 @@ table.set_entry(row, c++, s.text());
 
    //  fcst var
 
-s = fcst_info->name();
+s = check_hdr_str(fcst_info->name());
+
+table.set_entry(row, c++, s.text());
+
+   //  fcst units
+
+s = check_hdr_str(fcst_info->units(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  fcst level
 
-s = fcst_info->level_name();
+s = check_hdr_str(fcst_info->level_name());
 
 table.set_entry(row, c++, s.text());
 
    //  obs var
 
-s = obs_info->name();
+s = check_hdr_str(obs_info->name());
+
+table.set_entry(row, c++, s.text());
+
+   //  obs units
+
+s = check_hdr_str(obs_info->units(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  obs level
 
-s = obs_info->level_name();
+s = check_hdr_str(obs_info->level_name());
 
 table.set_entry(row, c++, s.text());
-
-   //  object id
-
-// c++;
-
-   //  object cat
-
-// c++;
-
-
-
-
 
    //
    //  done

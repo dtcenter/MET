@@ -365,6 +365,10 @@ extern void copy_ascii_table_row(const AsciiTable &at_from, const int r_from, As
 
 extern void justify_met_at(AsciiTable &at, const int n_hdr_cols);
 
+extern ConcatString check_hdr_str(const ConcatString,
+                                  bool space_to_underscore = false);
+
+
 ////////////////////////////////////////////////////////////////////////
 
 

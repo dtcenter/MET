@@ -27,13 +27,13 @@ static const char txt_2d_suffix                [] = "2d.txt";
 
 // static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
 // static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
-// 
+//
 // static const char txt_3d_single_cluster_suffix [] = "3d_sc.txt";
 // static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
 
 static const char txt_3d_single_simple_suffix  [] = "3d_single_simple.txt";
 static const char txt_3d_pair_simple_suffix    [] = "3d_pair_simple.txt";
- 
+
 static const char txt_3d_single_cluster_suffix [] = "3d_single_cluster.txt";
 static const char txt_3d_pair_cluster_suffix   [] = "3d_pair_cluster.txt";
 
@@ -1119,6 +1119,16 @@ ConcatString path;
    //
 
 mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
+
+   //
+   //  copy forecast name/units/level to observation
+   //
+
+config.obs_info->set_name(config.fcst_info->name().text());
+
+config.obs_info->set_units(config.fcst_info->units().text());
+
+config.obs_info->set_level_name(config.fcst_info->level_name().text());
 
 config.delta_t_seconds = raw.delta_t();
 

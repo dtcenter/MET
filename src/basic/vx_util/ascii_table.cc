@@ -20,11 +20,12 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "vx_cal.h"
 
 #include "ascii_table.h"
 #include "comma_string.h"
 #include "fix_float.h"
-
+#include "util_constants.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1650,6 +1651,33 @@ void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
    at.set_row_just(0, LeftJust);
 
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString check_hdr_str(const ConcatString s, bool space_to_underscore) {
+   ConcatString s_tmp = s;
+
+   if(space_to_underscore) s_tmp.replace(" ", "_", false);
+
+   // Check for empty string
+   if(s_tmp.length() == 0) {
+      mlog << Warning << "\ncheck_hdr_str() -> "
+           << "null string!\n\n";
+      return(na_string);
+   }
+
+   // Check for embedded whitespace
+   if(check_reg_exp(ws_reg_exp, s_tmp.c_str())) {
+      mlog << Error << "\ncheck_hdr_str() -> "
+           << "output header column value (\"" << s_tmp
+           << "\") should contain no embedded whitespace!\n\n";
+      exit(1);
+   }
+
+   return(s_tmp);
 }
 
 
