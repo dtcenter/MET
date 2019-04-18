@@ -15,10 +15,6 @@ using namespace std;
 
 #include "stat_hdr_columns.h"
 
-////////////////////////////////////////////////////////////////////////
-
-static ConcatString check_hdr_str(const ConcatString,
-   bool space_to_underscore = false);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -418,34 +414,6 @@ void StatHdrColumns::set_obs_valid_end_str() {
    obs_valid_end_str = unix_to_yyyymmdd_hhmmss(obs_valid_end);
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Miscellaneous utility functions.
-//
-////////////////////////////////////////////////////////////////////////
-
-ConcatString check_hdr_str(const ConcatString s,
-   bool space_to_underscore) {
-   ConcatString s_tmp = s;
-
-   if (space_to_underscore) s_tmp.replace(" ", "_", false);
-
-   if(s_tmp == "") {
-      mlog << Warning << "\ncheck_hdr_str() -> "
-           << "null string!\n\n";
-      return(na_string);
-   }
-
-   if(check_reg_exp(ws_reg_exp, s_tmp.c_str())) {
-      mlog << Error << "\ncheck_hdr_str() -> "
-           << "output header column value (\"" << s_tmp
-           << "\") should contain no embedded whitespace!\n\n";
-      exit(1);
-   }
-
-   return(s_tmp);
 }
 
 ////////////////////////////////////////////////////////////////////////
