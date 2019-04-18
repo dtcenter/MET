@@ -52,6 +52,7 @@
 //   016    02/25/15  Halley Gotway  Add automated regridding.
 //   017    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   018    04/08/19  Halley Gotway  Add percentile thresholds.
+//   019    04/01/19  Fillmore       Add FCST and OBS units.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -190,8 +191,8 @@ const int NCR = conf.n_conv_radii();
 if ( NCT != NCR )  {
 
    mlog << Error
-        << "\n\n  " 
-        << program_name 
+        << "\n\n  "
+        << program_name
         << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
 
    exit ( 1 );
