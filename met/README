@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.1_beta2 (April 4, 2019)
+Model Evaluation Tools METv8.1_beta3 (April 18, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -321,6 +321,17 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
+Version 8.1 Beta 3 Release Notes:
+--------------------------------
+
+- Add support for percentile thresholds.
+- Add two new header columns for the forecast and observation units to the
+  output of MODE and the statistics tools.
+- Add support for Gaussian interpolation method, including the sigma option.
+- Update the embedded python logic so that a failure results in a warning
+  instead of an error.
+- Additional reductions in Fortify issues.
+
 Version 8.1 Beta 2 Release Notes:
 --------------------------------
 
@@ -341,7 +352,7 @@ Version 8.1 Beta 2 Release Notes:
 - Fix GRIB2 support for Polar Stereographic and Lambert Conformal grids in the
   southern hemisphere.
 - Fix bug in MODE for memory corruption.
- 
+
 Version 8.1 Beta 1 Release Notes:
 --------------------------------
 
