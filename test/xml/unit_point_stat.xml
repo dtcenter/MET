@@ -30,7 +30,7 @@
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
+      -outdir &OUTPUT_DIR;/point_stat -v 1 
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat</stat>
@@ -431,6 +431,26 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_name_120000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_LAND_TOPO_MASK">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>GEOG_FILE</name>      <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>LAND_TOPO_MASK</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_LAND_TOPO_MASK \
+      -outdir &OUTPUT_DIR;/point_stat -v 2 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
