@@ -307,6 +307,9 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
    // Process the masks
    conf_info.process_masks(grid);
 
+   // Process the geography data
+   conf_info.process_geog(grid, fcst_file.c_str());
+
    // Setup the VxPairDataPoint objects
    conf_info.set_vx_pd();
 
@@ -1013,6 +1016,7 @@ void process_scores() {
                     << "Rejected: valid time     = " << conf_info.vx_opt[i].vx_pd.rej_vld << "\n"
                     << "Rejected: bad obs value  = " << conf_info.vx_opt[i].vx_pd.rej_obs << "\n"
                     << "Rejected: off the grid   = " << conf_info.vx_opt[i].vx_pd.rej_grd << "\n"
+                    << "Rejected: topography     = " << conf_info.vx_opt[i].vx_pd.rej_topo << "\n"
                     << "Rejected: level mismatch = " << conf_info.vx_opt[i].vx_pd.rej_lvl << "\n"
                     << "Rejected: quality marker = " << conf_info.vx_opt[i].vx_pd.rej_qty << "\n"
                     << "Rejected: message type   = " << conf_info.vx_opt[i].vx_pd.rej_typ[j][k][l] << "\n"

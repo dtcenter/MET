@@ -28,6 +28,25 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for struct SurfaceInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+void SurfaceInfo::clear() {
+   land_ptr = (MaskPlane *) 0;
+   topo_ptr = (DataPlane *) 0;
+   topo_use_obs_thresh.clear();
+   topo_interp_fcst_thresh.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SurfaceInfo::SurfaceInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Utility functions for horizontal interpolation on a DataPlane
 //
 ////////////////////////////////////////////////////////////////////////
@@ -53,7 +72,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y
    // Search the neighborhood, storing any points off the grid as bad data
    GridPoint *gp = NULL;
    for(gp = gt.getFirst(x, y, dp.nx(), dp.ny() );
-        gp != NULL; gp = gt.getNext()){
+       gp != NULL; gp = gt.getNext()){
       if(gp->x < 0 || gp->x >= dp.nx() ||
          gp->y < 0 || gp->y >= dp.ny()) {
          points.add(bad_data_double);
@@ -68,7 +87,8 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y
 
 ////////////////////////////////////////////////////////////////////////
 
-double interp_min(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+double interp_min(const DataPlane &dp, const GridTemplate &gt,
+                  int x, int y, double t, const MaskPlane *mp) {
 
    int num_good_points = 0;
    int num_points = gt.size();
@@ -76,13 +96,18 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt, int x, int y, dou
 
    // Search the neighborhood
    GridPoint *gp = NULL;
-   for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny() );
-        gp != NULL; gp = gt.getNextInGrid()){
+   for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()){
 
-      double v = dp.get(gp->x,gp->y);
-      if (is_bad_data(v)) continue;
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
 
-      if (is_bad_data(min_v) || v < min_v){
+      double v = dp.get(gp->x, gp->y);
+      if(is_bad_data(v)) continue;
+
+      if(is_bad_data(min_v) || v < min_v){
          min_v = v;
       }
       num_good_points++;
@@ -91,8 +116,8 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt, int x, int y, dou
 
    // Check whether enough valid grid points were found to trust
    // the value computed
-   if ( (num_points == 0) ||
-        ((static_cast<double>(num_good_points) / num_points) < t ))
+   if((num_points == 0) ||
+      ((static_cast<double>(num_good_points) / num_points) < t))
       min_v = bad_data_double;
 
    return min_v;
@@ -122,7 +147,7 @@ double interp_min_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 
    // Check whether enough valid grid points were found to trust
    // the minimum value computed
-   if( (double) count/(wdth*wdth) < t || count == 0) {
+   if((double) count/(wdth*wdth) < t || count == 0) {
       min_v = bad_data_double;
    }
 
@@ -131,7 +156,8 @@ double interp_min_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 
 ////////////////////////////////////////////////////////////////////////
 
-double interp_max(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+double interp_max(const DataPlane &dp, const GridTemplate &gt,
+                  int x, int y, double t, const MaskPlane *mp) {
 
    int num_good_points = 0;
    int num_points = gt.size();
@@ -141,10 +167,15 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt, int x, int y, dou
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
-      double v = dp.get(gp->x,gp->y);
-      if (is_bad_data(v)) continue;
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
 
-      if (is_bad_data(max_v) || v > max_v){
+      double v = dp.get(gp->x, gp->y);
+      if(is_bad_data(v)) continue;
+
+      if(is_bad_data(max_v) || v > max_v){
          max_v = v;
       }
       num_good_points++;
@@ -152,8 +183,8 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt, int x, int y, dou
 
    // Check whether enough valid grid points were found to trust
    // the value computed
-   if ((num_points == 0) ||
-       ((static_cast<double>(num_good_points) / num_points) < t ))
+   if((num_points == 0) ||
+      ((static_cast<double>(num_good_points) / num_points) < t))
       max_v = bad_data_double;
 
    return max_v;
@@ -183,7 +214,7 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 
    // Check whether enough valid grid points were found to trust
    // the maximum value computed
-   if( (double) count/(wdth*wdth) < t || count == 0) {
+   if((double) count/(wdth*wdth) < t || count == 0) {
       max_v = bad_data_double;
    }
 
@@ -192,7 +223,8 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 
 ////////////////////////////////////////////////////////////////////////
 
-double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+double interp_median(const DataPlane &dp, const GridTemplate &gt,
+                     int x, int y, double t, const MaskPlane *mp) {
 
    double *data = (double *) 0;
    int num_good_points = 0;
@@ -206,8 +238,13 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, 
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
-      double v = dp.get(gp->x,gp->y);
-      if (is_bad_data(v)) continue;
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
+
+      double v = dp.get(gp->x, gp->y);
+      if(is_bad_data(v)) continue;
 
       data[num_good_points] = v;
       num_good_points++;
@@ -215,8 +252,8 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, 
 
    // Check whether enough valid grid points were found to trust
    // the value computed
-   if ((num_points == 0) ||
-       ((static_cast<double>(num_good_points) / num_points) < t )){
+   if((num_points == 0) ||
+      ((static_cast<double>(num_good_points) / num_points) < t )) {
       median_v = bad_data_double;
    }
    else {
@@ -257,7 +294,7 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
 
    // Check whether enough valid grid points were found to compute
    // a median value
-   if( (double) count/(wdth*wdth) < t || count == 0) {
+   if((double) count/(wdth*wdth) < t || count == 0) {
       median_v = bad_data_double;
    }
    else {
@@ -272,7 +309,8 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
 
 ////////////////////////////////////////////////////////////////////////
 
-double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
+                      int x, int y, double t, const MaskPlane *mp) {
 
    double sum = 0;
    int num_good_points = 0;
@@ -283,7 +321,12 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
-      double v = dp.get(gp->x,gp->y);
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
+
+      double v = dp.get(gp->x, gp->y);
       if (is_bad_data(v)) continue;
       sum += v;
       num_good_points++;
@@ -291,8 +334,8 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt, int x, int y,
 
    // Check whether enough valid grid points were found to trust
    // the value computed
-   if ((num_points == 0) ||
-       ((static_cast<double>(num_good_points) / num_points) < t )){
+   if((num_points == 0) ||
+      ((static_cast<double>(num_good_points) / num_points) < t )){
       uw_mean_v = bad_data_double;
    }
    else {
@@ -327,7 +370,7 @@ double interp_uw_mean_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doub
 
    // Check whether enough valid grid points were found to compute
    // a mean value
-   if( (double) count/(wdth*wdth) < t || count == 0) {
+   if((double) count/(wdth*wdth) < t || count == 0) {
       uw_mean_v = bad_data_double;
    }
    else {
@@ -344,7 +387,8 @@ double interp_uw_mean_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doub
 ////////////////////////////////////////////////////////////////////////
 
 double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
-                      double obs_x, double obs_y, int i_pow, double t) {
+                      double obs_x, double obs_y, int i_pow, double t,
+                      const MaskPlane *mp) {
 
    // Search the neighborhood for valid data points
    double count = 0;
@@ -362,6 +406,11 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
+
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
 
       x = gp->x;
       y = gp->y;
@@ -385,7 +434,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
    // Check whether enough valid grid points were found to compute
    // a distance weighted mean value
-   if( (double) count/(gt.size()) < t || count == 0) {
+   if((double) count/(gt.size()) < t || count == 0) {
       return bad_data_double;
    }
 
@@ -397,10 +446,11 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 //
 // Compute the Gaussian filter
 // g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
+//
 ////////////////////////////////////////////////////////////////////////
 
 double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
-                      double obs_x, double obs_y, const double sigma, double t) {
+                       double obs_x, double obs_y, const double sigma, double t) {
 
    // Search the neighborhood for valid data points
    double count = 0;
@@ -419,7 +469,7 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
       x = floor(obs_x);
       y = floor(obs_y);
    }
-   
+
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
@@ -432,7 +482,7 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
       dx = obs_x - x;
       dy = obs_y - y;
       // compute the weight and accumulate numerator and denominator
-      double weight = exp(-(dx*dx + dy*dy) / sigma_const) / gaussian_const; 
+      double weight = exp(-(dx*dx + dy*dy) / sigma_const) / gaussian_const;
       wght_sum  += weight;
       numerator += (weight * data);
       count++;
@@ -453,7 +503,8 @@ double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
-                     double obs_x, double obs_y, double t) {
+                     double obs_x, double obs_y, double t,
+                     const MaskPlane *mp) {
 
    // DEV NOTE: We are restricting the GridTemplate to a square,
    // because the LS methods in this function are designed around a square shape.
@@ -512,6 +563,11 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
          if(y < 0 || y >= dp.ny())     continue;
          if(is_bad_data(dp.get(x, y))) continue;
 
+         // Check the optional mask
+         if(mp) {
+            if(!(*mp)(x, y)) continue;
+         }
+
          z = dp.get(x, y);
          count++;
 
@@ -528,7 +584,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
    z = A*u_test + B*v_test + C;
 
    // Check for not enough valid data
-   if( (double) count/N2 < t || count == 0) {
+   if((double) count/N2 < t || count == 0) {
       z = bad_data_double;
    }
 
@@ -542,7 +598,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
-                    double t, const SingleThresh *st) {
+                    double t, const SingleThresh *st, const MaskPlane *mp) {
    int count, count_thr;
 
    // Compute the ratio of events within the neighborhood
@@ -551,15 +607,20 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()){
 
-      double data = dp.get(gp->x,gp->y);
-      if (is_bad_data(data)) continue;
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
+
+      double data = dp.get(gp->x, gp->y);
+      if(is_bad_data(data)) continue;
 
       count++;
       if(st->check(data)) count_thr++;
    }
 
    // Check whether enough valid grid points were found
-   if( (double) count/(gt.size()) < t || count == 0) {
+   if((double) count/(gt.size()) < t || count == 0) {
       return bad_data_double;
    }
 
@@ -572,13 +633,22 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
 //
 ////////////////////////////////////////////////////////////////////////
 
-double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
+double interp_bilin(const DataPlane &dp, double obs_x, double obs_y,
+                    const MaskPlane *mp) {
    int x, y;
    double bilin_v, dx, dy;
    double wtsw, wtse, wtnw, wtne;
 
    x = nint(floor(obs_x));
    y = nint(floor(obs_y));
+
+   // Check the optional mask
+   if(mp) {
+      if(!(*mp)(x,   y  ) ||
+         !(*mp)(x+1, y  ) ||
+         !(*mp)(x,   y+1) ||
+         !(*mp)(x+1, y+1)) return(bad_data_double);
+   }
 
    // Compute dx and dy
    dx = obs_x - x;
@@ -661,8 +731,14 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-double interp_xy(const DataPlane &dp, int x, int y) {
+double interp_xy(const DataPlane &dp, int x, int y,
+                 const MaskPlane *mp) {
    double v;
+
+   // Check the optional mask
+   if(mp) {
+      if(!(*mp)(x, y)) return(bad_data_double);
+   }
 
    if(x < 0 || x >= dp.nx() || y < 0 || y >= dp.ny()) v = bad_data_double;
    else                                               v = dp.get(x, y);
@@ -677,7 +753,8 @@ double interp_xy(const DataPlane &dp, int x, int y) {
 ////////////////////////////////////////////////////////////////////////
 
 double interp_best(const DataPlane &dp, const GridTemplate &gt,
-                   int x, int y, double obs_v, double t) {
+                   int x, int y, double obs_v, double t,
+                   const MaskPlane *mp) {
    int count;
    double v, min_d, min_v;
 
@@ -687,7 +764,12 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()) {
 
-      v = dp.get(gp->x,gp->y);
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(x, y)) continue;
+      }
+
+      v = dp.get(gp->x, gp->y);
       if (is_bad_data(v)) continue;
 
       if(is_bad_data(min_d) || fabs(v - obs_v) < min_d) {
@@ -731,6 +813,160 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
    else         y_ll = nint(floor(y) - (h/2 - 1));
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Do horizontal interpolation at the surface
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_sfc_interp(const DataPlane &dp,
+                          double obs_x,   double obs_y,
+                          double obs_elv, double obs_v,
+                          const InterpMthd mthd, const int width,
+                          const GridTemplateFactory::GridTemplates shape,
+                          double interp_thresh, const SurfaceInfo &sfc_info,
+                          bool is_land_obs) {
+   double v;
+   int x = nint(obs_x);
+   int y = nint(obs_y);
+
+   // if width is even, push center to lower left point instead of nearest
+   if((width % 2 ) == 0) {
+      x = static_cast<int>(floor(obs_x));
+      y = static_cast<int>(floor(obs_y));
+   }
+
+   GridTemplateFactory gtf;
+   const GridTemplate* gt = gtf.buildGT(shape,width);
+
+   MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
+
+   // Compute the interpolated value for the fields above and below
+   switch(mthd) {
+
+      case(InterpMthd_Min):         // Minimum
+         v = interp_min(dp, *gt, x, y, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_Max):         // Maximum
+         v = interp_max(dp, *gt, x, y, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_Median):      // Median
+         v = interp_median(dp, *gt, x, y, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_UW_Mean):     // Unweighted Mean
+         v = interp_uw_mean(dp, *gt, x, y, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
+         v = interp_dw_mean(dp, *gt, obs_x, obs_y,
+                            dw_mean_pow, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_LS_Fit):      // Least-squares fit
+         v = interp_ls_fit(dp, *gt, obs_x, obs_y,
+                           interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_Bilin):       // Bilinear interpolation
+         v = interp_bilin(dp, obs_x, obs_y, &sfc_mask);
+         break;
+
+      case(InterpMthd_Nearest):     // Nearest Neighbor
+         v = interp_xy(dp, x, y, &sfc_mask);
+         break;
+
+      case(InterpMthd_Best):        // Best Match
+         v = interp_best(dp, *gt, x, y, obs_v, interp_thresh, &sfc_mask);
+         break;
+
+      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
+         v = interp_xy(dp, floor(obs_x), ceil(obs_y), &sfc_mask);
+         break;
+
+      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
+         v = interp_xy(dp, ceil(obs_x), ceil(obs_y), &sfc_mask);
+         break;
+
+      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
+         v = interp_xy(dp, ceil(obs_x), floor(obs_y), &sfc_mask);
+         break;
+
+      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
+         v = interp_xy(dp, floor(obs_x), floor(obs_y), &sfc_mask);
+         break;
+
+      default:
+         mlog << Error << "\ncompute_sfc_interp() -> "
+              << "unsupported interpolation method encountered: "
+              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+         exit(1);
+         break;
+   }
+
+   delete gt;
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
+                           const SurfaceInfo &sfc_info,
+                           bool is_land_obs, double obs_elv) {
+   MaskPlane mp;
+   int nx, ny;
+   bool land_ok, topo_ok;
+
+   // Initialize the mask
+   if(sfc_info.land_ptr) {
+      nx = sfc_info.land_ptr->nx();
+      ny = sfc_info.land_ptr->ny();
+   }
+   else if(sfc_info.topo_ptr) {
+      nx = sfc_info.topo_ptr->nx();
+      ny = sfc_info.topo_ptr->ny();
+   }
+   else {
+      mlog << Error << "\ncompute_sfc_mask() -> "
+           << "the land and topography pointers are not set!\n\n";
+      exit(1);
+   }
+
+   //
+   // Search the neighborhood
+   //
+   mp.set_size(nx, ny, false);
+   GridPoint *gp = NULL;
+   for(gp = gt.getFirstInGrid(x, y, nx, ny);
+       gp != NULL; gp = gt.getNextInGrid()){
+
+      // Check the land mask
+      if(sfc_info.land_ptr) {
+         bool is_land_grid = (*sfc_info.land_ptr)(gp->x, gp->y);
+         land_ok = (( is_land_obs &&  is_land_grid) ||
+                    (!is_land_obs && !is_land_grid));
+      }
+      else {
+         land_ok = true;
+      }
+
+      // Check the topo mask
+      if(sfc_info.topo_ptr) {
+         double topo_grid = sfc_info.topo_ptr->get(gp->x, gp->y);
+         topo_ok = sfc_info.topo_interp_fcst_thresh.check(topo_grid - obs_elv);
+      }
+      else {
+         topo_ok = true;
+      }
+
+      mp.put((land_ok & topo_ok), x, y);
+   }
+
+   return(mp);
 }
 
 ////////////////////////////////////////////////////////////////////////

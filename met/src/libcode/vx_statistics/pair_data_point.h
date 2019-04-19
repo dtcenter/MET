@@ -108,8 +108,6 @@ class VxPairDataPoint {
                                  // interpolating the forecasts to the
                                  // observation location.
 
-      StringArray  msg_typ_sfc;  // List of surface message types
-
       //////////////////////////////////////////////////////////////////
       //
       // Forecast and climatology fields falling between the requested
@@ -134,6 +132,14 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray msg_typ_sfc;   // List of surface message types
+      StringArray msg_typ_lnd;   // List of surface land message types
+      StringArray msg_typ_wtr;   // List of surface water message types
+
+      SurfaceInfo sfc_info;      // Land/sea mask and topography info
+
+      //////////////////////////////////////////////////////////////////
+
       int      n_msg_typ;        // Number of verifying message types
 
       int      n_mask;           // Total number of masking regions
@@ -153,6 +159,7 @@ class VxPairDataPoint {
       int rej_vld;               // Reject based on valid time
       int rej_obs;               // Reject observation bad data
       int rej_grd;               // Reject based on location
+      int rej_topo;              // Reject based on topography
       int rej_lvl;               // Reject based on vertical level
       int rej_qty;               // Reject based on obs quality
 
@@ -173,7 +180,6 @@ class VxPairDataPoint {
       void set_desc(const char *);
 
       void set_interp_thresh(double);
-      void set_msg_typ_sfc(const StringArray &);
 
       void set_fcst_dpa(const DataPlaneArray &);
       void set_climo_mn_dpa(const DataPlaneArray &);
@@ -199,6 +205,12 @@ class VxPairDataPoint {
                       GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
+
+      void set_msg_typ_sfc(const StringArray &);
+      void set_msg_typ_lnd(const StringArray &);
+      void set_msg_typ_wtr(const StringArray &);
+
+      void set_sfc_info(const SurfaceInfo &);
 
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &, const char * = 0,

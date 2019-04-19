@@ -307,7 +307,6 @@ void VxPairDataPoint::clear() {
    desc.clear();
 
    interp_thresh = 0;
-   msg_typ_sfc.clear();
 
    fcst_dpa.clear();
    climo_mn_dpa.clear();
@@ -315,18 +314,19 @@ void VxPairDataPoint::clear() {
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
-   fcst_ut       = (unixtime) 0;
-   beg_ut        = (unixtime) 0;
-   end_ut        = (unixtime) 0;
+   fcst_ut     = (unixtime) 0;
+   beg_ut      = (unixtime) 0;
+   end_ut      = (unixtime) 0;
 
-   n_try         = 0;
-   rej_sid_exc   = 0;
-   rej_gc        = 0;
-   rej_vld       = 0;
-   rej_obs       = 0;
-   rej_grd       = 0;
-   rej_lvl       = 0;
-   rej_qty       = 0;
+   n_try       = 0;
+   rej_sid_exc = 0;
+   rej_gc      = 0;
+   rej_vld     = 0;
+   rej_obs     = 0;
+   rej_grd     = 0;
+   rej_lvl     = 0;
+   rej_topo    = 0;
+   rej_qty     = 0;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
@@ -343,6 +343,12 @@ void VxPairDataPoint::clear() {
    n_msg_typ     = 0;
    n_mask        = 0;
    n_interp      = 0;
+
+   msg_typ_sfc.clear();
+   msg_typ_lnd.clear();
+   msg_typ_wtr.clear();
+
+   sfc_info.clear();
 
    return;
 }
@@ -374,7 +380,6 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    rej_dup     = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
-   msg_typ_sfc   = vx_pd.msg_typ_sfc;
 
    fcst_dpa     = vx_pd.fcst_dpa;
    climo_mn_dpa = vx_pd.climo_mn_dpa;
@@ -394,6 +399,12 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
          }
       }
    }
+
+   msg_typ_sfc = vx_pd.msg_typ_sfc;
+   msg_typ_lnd = vx_pd.msg_typ_lnd;
+   msg_typ_wtr = vx_pd.msg_typ_wtr;
+
+   sfc_info = vx_pd.sfc_info;
 
    return;
 }
@@ -456,15 +467,6 @@ void VxPairDataPoint::set_desc(const char *s) {
 void VxPairDataPoint::set_interp_thresh(double t) {
 
    interp_thresh = t;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ_sfc(const StringArray &sa) {
-
-   msg_typ_sfc = sa;
 
    return;
 }
@@ -707,13 +709,49 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::set_msg_typ_sfc(const StringArray &sa) {
+
+   msg_typ_sfc = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_msg_typ_lnd(const StringArray &sa) {
+
+   msg_typ_lnd = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_msg_typ_wtr(const StringArray &sa) {
+
+   msg_typ_wtr = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_sfc_info(const SurfaceInfo &si) {
+
+   sfc_info = si;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
                               const char *hdr_sid_str, unixtime hdr_ut,
                               const char *obs_qty, float *obs_arr,
                               Grid &gr, const char *var_name,
                               const DataPlane *wgt_dp) {
    int i, j, k, x, y;
-   double hdr_lat, hdr_lon;
+   double hdr_lat, hdr_lon, hdr_elv;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
    double fcst_v, cmn_v, csd_v, obs_v, wgt_v;
    int f_lvl_blw, f_lvl_abv;
@@ -731,7 +769,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the GRIB code for the observation matches
    // the specified code
-   if ((var_name != 0) && (0 < strlen(var_name))) {
+   if((var_name != 0) && (0 < strlen(var_name))) {
       if ( var_name != obs_info->name() ) {
          rej_gc++;
          return;
@@ -743,7 +781,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // Check if the observation quality flag is included in the list
-   if( obs_qty_filt.n_elements() && strcmp(obs_qty, "") ) {
+   if(obs_qty_filt.n_elements() && strcmp(obs_qty, "")) {
       bool qty_match = false;
       for(i=0; i<obs_qty_filt.n_elements() && !qty_match; i++)
          if( obs_qty == obs_qty_filt[i] ) qty_match = true;
@@ -763,6 +801,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    hdr_lat = hdr_arr[0];
    hdr_lon = hdr_arr[1];
+   hdr_elv = hdr_arr[2];
 
    obs_lvl = obs_arr[2];
    obs_hgt = obs_arr[3];
@@ -786,6 +825,44 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
       y < 0 || y >= gr.ny()) {
       rej_grd++;
       return;
+   }
+
+   // Check for a large topography difference
+   if(sfc_info.topo_ptr && msg_typ_sfc.has(hdr_typ_str)) {
+
+      // Interpolate model topography to observation location
+      double topo = compute_horz_interp(
+                       *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
+                        InterpMthd_Bilin, 2,
+                        GridTemplateFactory::GridTemplate_Square, 1.0);
+
+      // Skip bad topography values
+      if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
+         mlog << Debug(4)
+              << "Skipping observation due to missing topography values for "
+              << "[msg_typ:sid:lat:lon:elevation] = ["
+              << hdr_typ_str << ":" << hdr_sid_str << ":"
+              << hdr_lat << ":" << -1.0*hdr_lon << ":"
+              << hdr_elv << "] and model topography = "
+              << topo << ".\n";
+         rej_topo++;
+         return;
+      }
+
+      // Check the topography difference threshold
+      if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
+         mlog << Debug(4)
+              << "Skipping observation for topography difference since "
+              << topo - hdr_elv << " is not "
+              << sfc_info.topo_use_obs_thresh.get_str() << " for "
+              << "[msg_typ:sid:lat:lon:elevation] = ["
+              << hdr_typ_str << ":" << hdr_sid_str << ":"
+              << hdr_lat << ":" << -1.0*hdr_lon << ":"
+              << hdr_elv << "] and model topography = "
+              << topo << ".\n";
+         rej_topo++;
+         return;
+      }
    }
 
    // For pressure levels, check if the observation pressure level
@@ -924,12 +1001,37 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // observation pressure level or height
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
-            fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
-                                    pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                                    pd[0][0][k].interp_shape,
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, f_lvl_blw, f_lvl_abv);
+
+            // For surface verification, apply land/sea and topo masks
+            if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
+               (msg_typ_sfc.has(hdr_typ_str))) {
+
+               bool is_land = msg_typ_lnd.has(hdr_typ_str);
+
+               // Check for a single forecast DataPlane
+               if(fcst_dpa.n_planes() != 1) {
+                  mlog << Error << "\nVxPairDataPoint::add_obs() -> "
+                       << "unexpected number of forecast levels ("
+                       << fcst_dpa.n_planes()
+                       << ") for surface verification! Set \"land_mask.flag\" and "
+                       << "\"topo_mask.flag\" to false to disable this check.\n\n";
+                  exit(1);
+               }
+
+               fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
+                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                           pd[0][0][k].interp_shape, interp_thresh, sfc_info,
+                           is_land);
+            }
+            // Otherwise, compute interpolated value
+            else {
+               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
+                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                           pd[0][0][k].interp_shape,
+                           interp_thresh, spfh_flag,
+                           fcst_info->level().type(),
+                           to_lvl, f_lvl_blw, f_lvl_abv);
+            }
 
             if(is_bad_data(fcst_v)) {
                inc_count(rej_fcst, i, j, k);
@@ -938,11 +1040,11 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                                   pd[0][0][k].interp_shape,
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
+                       pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                       pd[0][0][k].interp_shape,
+                       interp_thresh, spfh_flag,
+                       fcst_info->level().type(),
+                       to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
@@ -959,11 +1061,11 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
-                        pd[0][0][k].interp_mthd,  pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape,
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, csd_lvl_blw, csd_lvl_abv);
+                       pd[0][0][k].interp_mthd,  pd[0][0][k].interp_wdth,
+                       pd[0][0][k].interp_shape,
+                       interp_thresh, spfh_flag,
+                       fcst_info->level().type(),
+                       to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Compute weight for current point
             wgt_v = (wgt_dp == (DataPlane *) 0 ?

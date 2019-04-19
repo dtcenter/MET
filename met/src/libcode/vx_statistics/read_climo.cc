@@ -45,7 +45,7 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
    if(!dict) return(dp);
 
    // Read array of climatology fields
-   dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid); 
+   dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid);
 
    // Check for multiple matches
    if(dpa.n_planes() > 1) {
@@ -134,7 +134,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
    DataPlaneArray cur_dpa;
    DataPlane dp;
-   
+
    int n_climo, i;
    int vld_month, vld_day, vld_year;
    int month, day, year, hour, minute, second;
@@ -154,10 +154,10 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
    // Read data planes
    n_climo = mtddf->data_plane_array(*info, cur_dpa);
- 
+
    // Compute the valid month and day
    unix_to_mdyhms(vld_ut, vld_month, vld_day, vld_year, hour, minute, second);
-   
+
    // Loop through matching records
    for(i=0; i<n_climo; i++) {
 
@@ -192,13 +192,13 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       cur_ut = mdyhms_to_unix(vld_month, vld_day, vld_year, hour, minute, second);
 
       // Check the time step
-      if(labs(cur_ut - vld_ut) >= time_step) { 
+      if(labs(cur_ut - vld_ut) >= time_step) {
          mlog << Debug(3) << "Skipping climatology field since time offset "
               << "exceeds the specified \"" << conf_key_time_step << "\" ("
               << labs(cur_ut - vld_ut) << " >= " << time_step << ") from file: "
               << climo_file << "\n";
          continue;
-      }       
+      }
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
@@ -282,7 +282,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa,
       }
       // Error out
       else {
-         mlog << Error << "\nclimo_time_interp() -> " 
+         mlog << Error << "\nclimo_time_interp() -> "
               << "Expecting 1 or 2 climatology fields but found "
               << it->second.n_elements() << "\n\n";
          exit(1);

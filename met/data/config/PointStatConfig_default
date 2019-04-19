@@ -105,7 +105,9 @@ message_type_group_map = [
    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
    { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
    { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
+   { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
+   { key = "WATERSF"; val = "SFCSHP";                             }
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +139,40 @@ climo_stdev = {
 }
 
 climo_cdf_bins = 1;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Land/Sea mask
+// For LANDSF message types, only use forecast grid points where land = TRUE.
+// For WATERSF message types, only use forecast grid points where land = FALSE.
+// land_mask.flag may be set separately in each "obs.field" entry.
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// Topography
+// For SURFACE message types, only use observations where the topo - station
+// elevation difference meets the use_obs_thresh threshold.
+// For the observations kept, when interpolating forecast data to the
+// observation location, only use forecast grid points where the topo - station
+// difference meets the interp_fcst_thresh threshold.
+// topo_mask.flag may be set separately in each "obs.field" entry.
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [];
+   field              = { name = "TOPO"; level = "L0"; }
+   regrid             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
