@@ -568,4 +568,96 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
    return;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
+                          const char *fcst_file) {
+   DataPlane dp;
+   StringArray geog_files;
+   RegridInfo regrid_info;
+   GrdFileType ftype;
+   Dictionary *field_dict = (Dictionary *) 0;
+   bool found = false;
+   int i;
+
+   Met2dDataFileFactory mtddf_factory;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   VarInfoFactory info_factory;
+   VarInfo *info = (VarInfo *) 0;
+
+   if(!dict) {
+      mlog << Error << "\nparse_geog_data() -> "
+           << "null pointer!\n\n";
+         exit(1);
+   }
+
+   // Parse the file names and append the forecast file
+   geog_files = dict->lookup_string_array(conf_key_file_name, false);
+   geog_files.add(fcst_file);
+
+   // Parse the field
+   if(!(field_dict = dict->lookup_dictionary(conf_key_field))) {
+      mlog << Error << "\nparse_geog_data() -> "
+           << "error parsing \"" << conf_key_field << "\" dictionary.\n\n";
+           exit(1);
+   }
+
+   // Check for specified file type
+   ftype = parse_conf_file_type(field_dict);
+
+   // Search each input file for a match
+   for(i=0; !found && i<geog_files.n(); i++) {
+
+      // Allocate memory for data file
+      if(!(mtddf = mtddf_factory.new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
+         mlog << Error << "\nparse_geog_data() -> "
+              << "Trouble reading geography mask file \""
+              << geog_files[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Parse the variable name and level
+      info = info_factory.new_var_info(mtddf->file_type());
+      info->set_dict(*field_dict);
+
+      // Read the data
+      found = mtddf->data_plane(*info, dp);
+
+      if(found) {
+
+         mlog << Debug(3)
+              << "Geography mask data " << info->magic_str()
+              << " found in \"" << geog_files[i] << "\".\n\n";
+
+         // Regrid, if needed
+         if(!(mtddf->grid() == vx_grid)) {
+            regrid_info = parse_conf_regrid(dict);
+            mlog << Debug(2)
+                 << "Regridding geography mask data " << info->magic_str()
+                 << " to the verification grid.\n";
+            dp = met_regrid(dp, mtddf->grid(), vx_grid, regrid_info);
+         }
+      }
+      else {
+         mlog << Debug(3)
+              << "Geography mask data " << info->magic_str()
+              << " not found in \"" << geog_files[i] << "\".\n\n";
+      }
+
+      // Deallocate memory
+      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+      if(info)  { delete info;  info  = (VarInfo       *) 0; }
+   }
+
+   if(!found) {
+      mlog << Error << "\nparse_geog_data() -> "
+           << "Geography mask data not found!\n\n";
+      exit(1);
+   }
+
+   return(dp);
+}
+
 ////////////////////////////////////////////////////////////////////////

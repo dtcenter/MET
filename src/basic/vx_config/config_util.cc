@@ -23,6 +23,10 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static const double default_vld_thresh = 1.0;
+
+///////////////////////////////////////////////////////////////////////////////
+
 // MetConfig object containing config value constants
 static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
@@ -1092,10 +1096,13 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
       info.enable = true;
    }
 
-   // Parse valid data threshold, method, and width
-   info.vld_thresh = regrid_dict->lookup_double(conf_key_vld_thresh);
-   info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
-   info.width      = regrid_dict->lookup_int(conf_key_width);
+   // Parse valid data threshold
+   double thr      = regrid_dict->lookup_double(conf_key_vld_thresh, false);
+   info.vld_thresh = ( is_bad_data(thr) ? default_vld_thresh : thr );
+
+   // Parse the method and width
+   info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
+   info.width  = regrid_dict->lookup_int(conf_key_width);
 
    // Conf: shape
    v = regrid_dict->lookup_int(conf_key_shape, false);

@@ -61,8 +61,11 @@ void PointStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   land_mask.clear();
+   topo_dp.clear();
+   topo_use_obs_thresh.clear();
+   topo_interp_fcst_thresh.clear();
    msg_typ_group_map.clear();
-   msg_typ_sfc.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
    tmp_dir.clear();
@@ -132,9 +135,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
            << "\" must contain an entry for \""
            << surface_msg_typ_group_str << "\".\n\n";
       exit(1);
-   }
-   else {
-     msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
    }
 
    // Conf: fcst.field and obs.field
@@ -252,10 +252,8 @@ void PointStatConfInfo::process_flags() {
             output_flag[j] = STATOutputType_Stat;
             output_ascii_flag = true;
          }
-
-      }   //  for j
-
-   }   //  for i
+      } //  for j
+   } //  for i
 
    // Check for at least one output line type
    if(!output_ascii_flag) {
@@ -366,6 +364,66 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::process_geog(const Grid &grid,
+                                     const char *fcst_file) {
+   int i;
+   bool land, topo;
+   Dictionary *dict;
+   DataPlane geog_dp;
+   SurfaceInfo sfc_info;
+
+   // Loop over the verification tasks and check flags
+   for(i=0, land = topo = false; i<n_vx; i++) {
+
+      // Set to true if requested by any sub-task
+      if(vx_opt[i].land_flag) land = true;
+      if(vx_opt[i].topo_flag) topo = true;
+   }
+
+   mlog << Debug(2)
+        << "Processing geography data.\n";
+
+   // Conf: land
+   if(land) {
+      dict      = conf.lookup_dictionary(conf_key_land_mask);
+      geog_dp   = parse_geog_data(dict, grid, fcst_file);
+      geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
+      land_mask = geog_dp.mask_plane();
+   }
+
+   // Conf: topo
+   if(topo) {
+      dict                    = conf.lookup_dictionary(conf_key_topo_mask);
+      topo_dp                 = parse_geog_data(dict, grid, fcst_file);
+      topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
+      topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
+   }
+
+   // Loop over the verification tasks and set the geography info
+   for(i=0; i<n_vx; i++) {
+      sfc_info.clear();
+      if(vx_opt[i].land_flag) {
+         sfc_info.land_ptr = &land_mask;
+      }
+      else {
+         sfc_info.land_ptr = 0;
+      }
+      if(vx_opt[i].topo_flag) {
+         sfc_info.topo_ptr = &topo_dp;
+         sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
+         sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
+      }
+      else {
+         sfc_info.topo_ptr = 0;
+      }
+      vx_opt[i].vx_pd.set_sfc_info(sfc_info);
+   }
 
    return;
 }
@@ -537,6 +595,9 @@ void PointStatVxOpt::clear() {
    owind_ta.clear();
    wind_logic = SetLogic_None;
 
+   land_flag = false;
+   topo_flag = false;
+
    mask_grid.clear();
    mask_poly.clear();
    mask_sid.clear();
@@ -589,6 +650,8 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 
    if(!(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
+      !(land_flag      == v.land_flag     ) ||
+      !(topo_flag      == v.topo_flag     ) ||
       !(mask_grid      == v.mask_grid     ) ||
       !(mask_poly      == v.mask_poly     ) ||
       !(mask_sid       == v.mask_sid      ) ||
@@ -753,6 +816,12 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       check_mctc_thresh(ocat_ta);
    }
 
+   // Conf: land.flag
+   land_flag = odict.lookup_bool(conf_key_land_mask_flag);
+
+   // Conf: topo.flag
+   topo_flag = odict.lookup_bool(conf_key_topo_mask_flag);
+
    // Conf: mask_grid
    mask_grid = odict.lookup_string_array(conf_key_mask_grid);
 
@@ -817,6 +886,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    int n_msg_typ = msg_typ.n_elements();
    int n_mask    = mask_name.n_elements();
    int n_interp  = interp_info.n_interp;
+   ConcatString cs;
    StringArray sa;
 
    // Setup the VxPairDataPoint object with these dimensions:
@@ -852,8 +922,41 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
-   // Store the list of surface message types
-   vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
+   // Store the surface message type group
+   cs = surface_msg_typ_group_str;
+   if(conf_info->msg_typ_group_map.count(cs) == 0) {
+      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \"" << cs << "\".\n\n";
+      exit(1);
+   }
+   else {
+      vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
+   }
+
+   // Store the surface land message type group
+   cs = landsf_msg_typ_group_str;
+   if(conf_info->msg_typ_group_map.count(cs) == 0) {
+      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \"" << cs << "\".\n\n";
+      exit(1);
+   }
+   else {
+      vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
+   }
+
+   // Store the surface water message type group
+   cs = watersf_msg_typ_group_str;
+   if(conf_info->msg_typ_group_map.count(cs) == 0) {
+      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \"" << cs << "\".\n\n";
+      exit(1);
+   }
+   else {
+      vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
+   }
 
    // Define the verifying message type name and values
    for(i=0; i<n_msg_typ; i++) {
