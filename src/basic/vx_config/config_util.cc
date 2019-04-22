@@ -54,7 +54,8 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best) {
+   if(method == InterpMthd_Best ||
+      method == InterpMthd_Geog_Match) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -109,16 +110,16 @@ void RegridInfo::validate() {
    if(method == InterpMthd_Gaussian) {
       if (width <= 2) {
          mlog << Warning << "\n"
-             << "Resetting the regridding width from "
-             << width << " to 3 for regridding method \""
-             << interpmthd_to_string(method) << "\".\n\n";
+              << "Resetting the regridding width from "
+              << width << " to 3 for regridding method \""
+              << interpmthd_to_string(method) << "\".\n\n";
          width = 3;
       }
       if (sigma < 1) {
          mlog << Warning << "\n"
-             << "Resetting the regridding sigma from "
-             << sigma << " to 1 for regridding method \""
-             << interpmthd_to_string(method) << "\".\n\n";
+              << "Resetting the regridding sigma from "
+              << sigma << " to 1 for regridding method \""
+              << interpmthd_to_string(method) << "\".\n\n";
          sigma = 1;
       }
    }
@@ -1661,7 +1662,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
          mlog << Error << "\nparse_conf_tmp_dir() -> "
               << "empty dictionary!\n\n";
          if(tmp_dir != NULL) met_closedir(tmp_dir);
-         if(ptr != NULL) delete ptr; 
+         if(ptr != NULL) delete ptr;
          exit(1);
       }
       // Read the temporary directory
@@ -1952,6 +1953,8 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd_Upper_Right;
    else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
    else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
+   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i

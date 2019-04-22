@@ -71,8 +71,8 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y
 
    // Search the neighborhood, storing any points off the grid as bad data
    GridPoint *gp = NULL;
-   for(gp = gt.getFirst(x, y, dp.nx(), dp.ny() );
-       gp != NULL; gp = gt.getNext()){
+   for(gp = gt.getFirst(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNext()) {
       if(gp->x < 0 || gp->x >= dp.nx() ||
          gp->y < 0 || gp->y >= dp.ny()) {
          points.add(bad_data_double);
@@ -97,7 +97,7 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt,
    // Search the neighborhood
    GridPoint *gp = NULL;
    for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -107,7 +107,7 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt,
       double v = dp.get(gp->x, gp->y);
       if(is_bad_data(v)) continue;
 
-      if(is_bad_data(min_v) || v < min_v){
+      if(is_bad_data(min_v) || v < min_v) {
          min_v = v;
       }
       num_good_points++;
@@ -165,7 +165,7 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt,
 
    // Search the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -175,7 +175,7 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt,
       double v = dp.get(gp->x, gp->y);
       if(is_bad_data(v)) continue;
 
-      if(is_bad_data(max_v) || v > max_v){
+      if(is_bad_data(max_v) || v > max_v) {
          max_v = v;
       }
       num_good_points++;
@@ -236,7 +236,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
 
    // Search the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -319,7 +319,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
 
    // Sum the valid data in the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -335,7 +335,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
    // Check whether enough valid grid points were found to trust
    // the value computed
    if((num_points == 0) ||
-      ((static_cast<double>(num_good_points) / num_points) < t )){
+      ((static_cast<double>(num_good_points) / num_points) < t )) {
       uw_mean_v = bad_data_double;
    }
    else {
@@ -405,7 +405,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
    }
 
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -420,8 +420,8 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
       double dist = sqrt(pow((obs_x-x), 2.0) + pow((obs_y-y), 2.0));
 
-      //if the distance is tiny, just use the value at this point.
-      if(dist <= 0.001){
+      // if the distance is tiny, just use the value at this point.
+      if(dist <= 0.001) {
          return data;
       }
 
@@ -440,61 +440,6 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
    return(numerator/wght_sum);
 }
-
-
-////////////////////////////////////////////////////////////////////////
-//
-// Compute the Gaussian filter
-// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
-//
-////////////////////////////////////////////////////////////////////////
-
-double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
-                       double obs_x, double obs_y, const double sigma, double t) {
-
-   // Search the neighborhood for valid data points
-   double count = 0;
-   double wght_sum = 0;
-   double numerator = 0;
-   double interp_value = bad_data_double;
-
-   double dx, dy;
-   double sigma_const = 2 * sigma * sigma;
-   double gaussian_const = M_PI * sigma_const;
-   int x = nint(obs_x);
-   int y = nint(obs_y);
-
-   // if width is even, push center to lower left instead of nearest
-   if((gt.getWidth() % 2 ) == 0) {
-      x = floor(obs_x);
-      y = floor(obs_y);
-   }
-
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
-
-      x = gp->x;
-      y = gp->y;
-      double data = dp.get(x, y);
-
-      if(is_bad_data(data)) continue;
-
-      dx = obs_x - x;
-      dy = obs_y - y;
-      // compute the weight and accumulate numerator and denominator
-      double weight = exp(-(dx*dx + dy*dy) / sigma_const) / gaussian_const;
-      wght_sum  += weight;
-      numerator += (weight * data);
-      count++;
-   }
-   // Check whether enough valid grid points were found to compute
-   // a distance weighted mean value
-   if( (double) count/(gt.size()) >= t && count > 0) {
-      if (wght_sum != 0 ) interp_value = numerator/wght_sum;
-   }
-   return(interp_value);
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -593,6 +538,134 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Compute the Gaussian filter
+// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_gaussian(const DataPlane &dp, const GridTemplate &gt,
+                       double obs_x, double obs_y,
+                       const double sigma, double t,
+                       const MaskPlane *mp) {
+
+   // Search the neighborhood for valid data points
+   double count = 0;
+   double wght_sum = 0;
+   double numerator = 0;
+   double interp_value = bad_data_double;
+
+   double dx, dy;
+   double sigma_const = 2 * sigma * sigma;
+   double gaussian_const = M_PI * sigma_const;
+   int x = nint(obs_x);
+   int y = nint(obs_y);
+
+   // if width is even, push center to lower left instead of nearest
+   if((gt.getWidth() % 2 ) == 0) {
+      x = floor(obs_x);
+      y = floor(obs_y);
+   }
+
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()) {
+
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
+
+      x = gp->x;
+      y = gp->y;
+      double data = dp.get(x, y);
+
+      if(is_bad_data(data)) continue;
+
+      dx = obs_x - x;
+      dy = obs_y - y;
+      // compute the weight and accumulate numerator and denominator
+      double weight = exp(-(dx*dx + dy*dy) / sigma_const) / gaussian_const;
+      wght_sum  += weight;
+      numerator += (weight * data);
+      count++;
+   }
+   // Check whether enough valid grid points were found to compute
+   // a distance weighted mean value
+   if( (double) count/(gt.size()) >= t && count > 0) {
+      if (wght_sum != 0 ) interp_value = numerator/wght_sum;
+   }
+   return(interp_value);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Search the interpolation region for the nearest grid point where
+// the mask is valid.
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
+                         double obs_x, double obs_y, double obs_v,
+                         const MaskPlane *mp) {
+
+   // Search the neighborhood for valid data points
+   int interp_x, interp_y;
+   double d, interp_d;
+   double dx, dy, v, interp_v;
+   int x = nint(obs_x);
+   int y = nint(obs_y);
+
+   // if width is even, push center to lower left instead of nearest
+   if((gt.getWidth() % 2 ) == 0) {
+      x = floor(obs_x);
+      y = floor(obs_y);
+   }
+
+   // Initialize
+   interp_x = interp_y = bad_data_int;
+   interp_d = interp_v = bad_data_double;
+
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+       gp != NULL; gp = gt.getNextInGrid()) {
+
+      // Check the optional mask
+      if(mp) {
+         if(!(*mp)(gp->x, gp->y)) continue;
+      }
+
+      // Get the current value
+      x = gp->x;
+      y = gp->y;
+      v = dp.get(x, y);
+
+      // Skip bad data
+      if(is_bad_data(v)) continue;
+
+      // Compute the distance
+      dx = obs_x - x;
+      dy = obs_y - y;
+      d  = sqrt(dx*dx + dy*dy);
+
+      if(is_bad_data(interp_d) || d < interp_d) {
+         interp_d = d;
+         interp_x = x;
+         interp_y = y;
+         interp_v = v;
+      }
+   }
+
+   if(!is_bad_data(interp_v)) {
+      mlog << Debug(4)
+           << "For observation value " << obs_v << " at grid (x, y) = ("
+           << obs_x << ", " << obs_y << ") found forecast value "
+           << interp_v << " at nearest matching geography point ("
+           << interp_x << ", " << interp_y << ").\n";
+   }
+
+   return(interp_v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Compute neighborhood fractional coverage.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -605,7 +678,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    count = count_thr = 0;
 
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
       if(mp) {
@@ -900,6 +973,10 @@ double compute_sfc_interp(const DataPlane &dp,
          v = interp_xy(dp, floor(obs_x), floor(obs_y), &sfc_mask);
          break;
 
+      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+         v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v, &sfc_mask);
+         break;
+
       default:
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
@@ -942,7 +1019,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
    mp.set_size(nx, ny, false);
    GridPoint *gp = NULL;
    for(gp = gt.getFirstInGrid(x, y, nx, ny);
-       gp != NULL; gp = gt.getNextInGrid()){
+       gp != NULL; gp = gt.getNextInGrid()) {
 
       // Check the land mask
       if(sfc_info.land_ptr) {
@@ -963,7 +1040,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
          topo_ok = true;
       }
 
-      mp.put((land_ok & topo_ok), x, y);
+      mp.put((land_ok & topo_ok), gp->x, gp->y);
    }
 
    return(mp);
@@ -1056,8 +1133,12 @@ double compute_horz_interp(const DataPlane &dp,
          v = interp_xy(dp, floor(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Gaussian):   // Gaussian filter of the grid box
+      case(InterpMthd_Gaussian):    // Gaussian filter of the grid box
          v = interp_gaussian(dp, *gt, obs_x, obs_y, sigma, interp_thresh);
+         break;
+
+      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+         v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v);
          break;
 
       default:
