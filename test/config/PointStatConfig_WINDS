@@ -40,7 +40,8 @@ message_type_group_map = [
    { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
    { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
    { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
-   { key = "WATERSF"; val = "SFCSHP";                             }
+   { key = "WATERSF"; val = "SFCSHP";                             },
+   { key = "USERSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 
 fcst = {
