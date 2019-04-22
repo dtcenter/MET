@@ -409,6 +409,7 @@ void process_command_line(int argc, char **argv) {
    // Process ensemble mean information
    ens_mean_flag = false;
    bool need_ens_mean = (
+      conf_info.output_flag[i_ecnt] != STATOutputType_None ||
       conf_info.output_flag[i_orank] != STATOutputType_None ||
       conf_info.output_flag[i_ssvar] != STATOutputType_None);
 
