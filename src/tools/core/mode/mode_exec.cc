@@ -228,7 +228,9 @@ void ModeExecutive::setup_fcst_obs_data()
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), Fcst_sd.data)) )  {
 
       mlog << Error << "\nsetup_fcst_obs_data() -> "
-           << "can't get data from file \"" << fcst_file << "\"\n\n";
+           << "can't get forecast data \""
+           << engine.conf_info.fcst_info->magic_str()
+           << "\" from file \"" << fcst_file << "\"\n\n";
       exit(1);
    }
 
@@ -237,7 +239,9 @@ void ModeExecutive::setup_fcst_obs_data()
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.obs_info), Obs_sd.data)) )  {
 
       mlog << Error << "\nsetup_fcst_obs_data() -> "
-           << "can't get data from file \"" << obs_file << "\"\n\n";
+           << "can't get observation data \""
+           << engine.conf_info.obs_info->magic_str()
+           << "\" from file \"" << obs_file << "\"\n\n";
       exit(1);
    }
 
