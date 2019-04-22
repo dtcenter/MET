@@ -130,10 +130,8 @@ interp = {
    vld_thresh = 1.0;
 
    type = [
-      {
-         method = NEAREST;
-         width  = 1;
-      }
+      { method = NEAREST;    width = 1; },
+      { method = GEOG_MATCH; width = 3; }
    ];
 }
 

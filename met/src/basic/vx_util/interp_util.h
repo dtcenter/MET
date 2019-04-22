@@ -74,8 +74,10 @@ extern double   interp_median_ll  (const DataPlane &dp, int x_ll, int y_ll, int 
 extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
 
 // GridTemplate version takes center x/y
-extern double   interp_dw_mean (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
-extern double   interp_ls_fit  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
+extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
+extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
+extern double   interp_gaussian  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, const double sigma, double t, const MaskPlane *mp = 0);
+extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *, const MaskPlane *mp = 0);
 extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y, const MaskPlane *mp = 0);
