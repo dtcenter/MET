@@ -49,7 +49,7 @@
       &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &OUTPUT_DIR;/perc_thresh/gen_vx_mask_SFP75.nc \
       -type data -mask_field 'name="TMP"; level="Z2";' \
-      -thresh 'gt200' -name "TMP_Z2_gtSFP75" -v 3
+      -thresh '>SFP75' -name "TMP_Z2_gtSFP75" -v 3
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/perc_thresh/gen_vx_mask_SFP75.nc</grid_nc>
