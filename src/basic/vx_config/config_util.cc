@@ -23,6 +23,9 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// Default sigma value used for Gaussian interpolation and regridding options.
+// Chosen by Hazardous Weather Testbed.
+static const double default_sigma      = 1.5;
 static const double default_vld_thresh = 1.0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,9 +121,9 @@ void RegridInfo::validate() {
       if (sigma < 1) {
          mlog << Warning << "\n"
               << "Resetting the regridding sigma from "
-              << sigma << " to 1 for regridding method \""
+              << sigma << " to 1.0 for regridding method \""
               << interpmthd_to_string(method) << "\".\n\n";
-         sigma = 1;
+         sigma = 1.0;
       }
    }
 
@@ -1097,9 +1100,9 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
       info.enable = true;
    }
 
-   // Parse valid data threshold
+   // Conf: vld_thresh
    double thr      = regrid_dict->lookup_double(conf_key_vld_thresh, false);
-   info.vld_thresh = ( is_bad_data(thr) ? default_vld_thresh : thr );
+   info.vld_thresh = (is_bad_data(thr) ? default_vld_thresh : thr);
 
    // Parse the method and width
    info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
@@ -1116,7 +1119,8 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
 
    // Conf: sigma
-   info.sigma = regrid_dict->lookup_double(conf_key_sigma, false);
+   double sig = regrid_dict->lookup_double(conf_key_sigma, false);
+   info.sigma = (is_bad_data(sig) ? default_sigma : sig);
 
    info.validate();
 
@@ -1183,6 +1187,24 @@ void InterpInfo::validate() {
               << method[i] << "\".\n\n";
          width.set(i, 2);
       }
+
+      // Check the Gaussian filter
+      if(methodi == InterpMthd_Gaussian) {
+         if (width[i] <= 2) {
+            mlog << Warning << "\n"
+                 << "Resetting the interpolation width from "
+                 << width[i] << " to 3 for interpolation method \""
+                 << method[i] << "\".\n\n";
+            width.set(i, 3);
+         }
+         if (sigma < 1) {
+            mlog << Warning << "\n"
+                 << "Resetting the interpolation sigma from "
+                 << sigma << " to 1.0 for interpolation method \""
+                 << method[i] << "\".\n\n";
+            sigma = 1.0;
+         }
+      }
    }
 }
 
@@ -1232,7 +1254,8 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    else                                  info.field = FieldType_None;
 
    // Conf: vld_thresh
-   info.vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
+   double thr      = interp_dict->lookup_double(conf_key_vld_thresh, false);
+   info.vld_thresh = (is_bad_data(thr) ? default_vld_thresh : thr);
 
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
@@ -1252,6 +1275,10 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       // If not specified, use the default square shape
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
+
+   // Conf: sigma
+   double sig = interp_dict->lookup_double(conf_key_sigma, false);
+   info.sigma = (is_bad_data(sig) ? default_sigma : sig);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
