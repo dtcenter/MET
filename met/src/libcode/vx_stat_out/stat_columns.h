@@ -260,10 +260,10 @@ static const char * nbrcnt_columns [] = {
 };
 
 static const char * grad_columns [] = {
-   "TOTAL",       "DX",          "DY",
+   "TOTAL",
    "FGBAR",       "OGBAR",       "MGBAR",
    "EGBAR",       "S1",          "S1_OG",
-   "FGOG_RATIO"
+   "FGOG_RATIO",  "DX",          "DY"
 };
 
 static const char * isc_columns [] = {
