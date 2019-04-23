@@ -258,6 +258,25 @@
     </output>
   </test>
 
+  <test name="regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5.nc \
+      -field 'name="APCP"; level="A6";' \
+      -field 'name="TMP";  level="Z2";' \
+      -field 'name="UGRD"; level="Z10";' \
+      -field 'name="VGRD"; level="Z10";' \
+      -field 'name="HGT";  level="P500";' \
+      -method GAUSSIAN -width 5 -sigma 2 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="regrid_data_plane_GFS_TO_HMT_MEDIAN_3">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
