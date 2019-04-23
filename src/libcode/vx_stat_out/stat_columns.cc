@@ -3233,40 +3233,40 @@ void write_grad_cols(const GRADInfo &grad_info,
 
    //
    // Gradient Line Type (GRAD)
-   //    TOTAL,       DX,          DY,
+   //    TOTAL,
    //    FGBAR,       OGBAR,       MGBAR,
    //    EGBAR,       S1,          S1_OG,
-   //    FGOG_RATIO
+   //    FGOG_RATIO,  DX,          DY
    //
    at.set_entry(r, c+0,  // Total Count
       grad_info.total);
 
-   at.set_entry(r, c+1,  // DX
-      grad_info.dx);
-
-   at.set_entry(r, c+2,  // DY
-      grad_info.dy);
-
-   at.set_entry(r, c+3,  // FGBAR
+   at.set_entry(r, c+1,  // FGBAR
       grad_info.fgbar);
 
-   at.set_entry(r, c+4,  // OGBAR
+   at.set_entry(r, c+2,  // OGBAR
       grad_info.ogbar);
 
-   at.set_entry(r, c+5,  // MGBAR
+   at.set_entry(r, c+3,  // MGBAR
       grad_info.mgbar);
 
-   at.set_entry(r, c+6,  // EGBAR
+   at.set_entry(r, c+4,  // EGBAR
       grad_info.egbar);
 
-   at.set_entry(r, c+7,  // S1
+   at.set_entry(r, c+5,  // S1
       grad_info.s1());
 
-   at.set_entry(r, c+8,  // S1_OG
+   at.set_entry(r, c+6,  // S1_OG
       grad_info.s1_og());
 
-   at.set_entry(r, c+9,  // FGOG_RATIO
+   at.set_entry(r, c+7,  // FGOG_RATIO
       grad_info.fgog_ratio());
+
+   at.set_entry(r, c+8,  // DX
+      grad_info.dx);
+
+   at.set_entry(r, c+9,  // DY
+      grad_info.dy);
 
    return;
 }
