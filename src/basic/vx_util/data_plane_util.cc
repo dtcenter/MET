@@ -95,7 +95,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t) {
+                  double sigma, double t) {
    double v;
    int x, y;
 
@@ -122,25 +122,29 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          // Compute the smoothed value based on the interpolation method
          switch(mthd) {
 
-            case(InterpMthd_Min):     // Minimum
+            case(InterpMthd_Min):      // Minimum
                v = interp_min(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Max):     // Maximum
+            case(InterpMthd_Max):      // Maximum
                v = interp_max(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Median):  // Median
+            case(InterpMthd_Median):   // Median
                v = interp_median(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_UW_Mean): // Unweighted Mean
+            case(InterpMthd_UW_Mean):  // Unweighted Mean
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
+            case(InterpMthd_Gaussian): // Unweighted Mean
+               v = interp_gaussian(dp, *gt, (double) x, (double) y, sigma, t);
+               break;
+
             // Distance-weighted mean, area-weighted mean, least-squares
-            // fit, and bilinear interpolation are omitted here since
-            // they are not options for gridded data
+            // fit, bilinear, and gaussian interpolation are omitted
+            // here since they are not options for gridded data.
 
             default:
                mlog << Error << "\nsmooth_field() -> "
@@ -170,10 +174,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double t) {
+                       double sigma, double t) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, t);
+   smooth_field(dp, smooth_dp, mthd, width, shape, sigma, t);
 
    return(smooth_dp);
 }

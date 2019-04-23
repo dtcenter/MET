@@ -1529,6 +1529,7 @@ void process_grid_vx() {
          ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
          InterpMthd   mthd       = string_to_interpmthd(mthd_str.c_str());
          int          wdth       = conf_info.vx_opt[i].interp_info.width[j];
+         double       sigma      = conf_info.vx_opt[i].interp_info.sigma;
          double       vld_thresh = conf_info.vx_opt[i].interp_info.vld_thresh;
          GridTemplateFactory::GridTemplates shape = conf_info.vx_opt[i].interp_info.shape;
          FieldType    field      = conf_info.vx_opt[i].interp_info.field;
@@ -1553,13 +1554,13 @@ void process_grid_vx() {
          if(ens_mean_flag &&
             (field == FieldType_Fcst || field == FieldType_Both)) {
             emn_dp = smooth_field(emn_dp, mthd, wdth, shape,
-                                  vld_thresh);
+                                  sigma, vld_thresh);
          }
 
          // Smooth the observation field, if requested
          if(field == FieldType_Obs || field == FieldType_Both) {
             obs_dp = smooth_field(obs_dp, mthd, wdth, shape,
-                                  vld_thresh);
+                                  sigma, vld_thresh);
          }
 
          // Store a copy of the unperturbed observation field
@@ -1582,7 +1583,7 @@ void process_grid_vx() {
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
                fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth,
-                                         shape, vld_thresh);
+                                         shape, sigma, vld_thresh);
             }
 
             // Store a copy of the unperturbed ensemble field
