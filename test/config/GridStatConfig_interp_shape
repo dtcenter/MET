@@ -93,10 +93,11 @@ interp = {
    shape      = ${SHAPE};
 
    type = [
-      { method = NEAREST; width = 1; },
-      { method = UW_MEAN; width = 11; },
-      { method = MIN;     width = 11; },
-      { method = MAX;     width = 11; }
+      { method = NEAREST;  width = 1;  },
+      { method = UW_MEAN;  width = 11; },
+      { method = MIN;      width = 11; },
+      { method = MAX;      width = 11; },
+      { method = GAUSSIAN; width = 11; }
    ];
 }
 

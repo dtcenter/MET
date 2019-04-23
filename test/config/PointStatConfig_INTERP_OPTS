@@ -75,6 +75,8 @@ boot = {
 
 interp = {
    vld_thresh = 1.0;
+   shape = SQUARE;
+   sigma = 1.5;
 
    type = [
       { method = MIN;         width = [2, 5]; },
@@ -89,7 +91,8 @@ interp = {
       { method = UPPER_LEFT;  width = 1;      },
       { method = UPPER_RIGHT; width = 1;      },
       { method = LOWER_RIGHT; width = 1;      },
-      { method = LOWER_LEFT;  width = 1;      }
+      { method = LOWER_LEFT;  width = 1;      },
+      { method = GAUSSIAN;    width = [3, 9]; }
    ];
 }
 
