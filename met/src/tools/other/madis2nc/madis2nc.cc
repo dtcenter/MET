@@ -31,6 +31,7 @@
 //   005    10-01-15  Chaudhuri      Added support for acarsProfiles
 //                                   observation type.
 //   006    07-23-18  Halley Gotway  Support masks from gen_vx_mask.
+//   007    01-11-19  Howard Soh     Added config file option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -145,7 +146,7 @@ int main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    nc_obs_initialize();
-   
+
    //
    // Process the MADIS file
    //
@@ -158,7 +159,7 @@ int main(int argc, char *argv[]) {
    bool use_var_id = true;
    bool do_header = false;
    int nhdr = get_nc_hdr_cur_index();
-   
+
    if (conf_info.getSummaryInfo().flag) {
       int summmary_hdr_cnt = 0;
       TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
    //create_nc_table_vars(obs_vars, f_out);
    //write_nc_table_vars(obs_vars);
    //write_nc_arr_headers(obs_vars);
-   
+
    //
    // Deallocate memory and clean up
    //
@@ -238,13 +239,13 @@ void process_command_line(int argc, char **argv) {
    //
    // add the options function calls
    //
-   cline.add(set_type, "-type", 1);
-   cline.add(set_qc_dd, "-qc_dd", 1);
-   cline.add(set_lvl_dim, "-lvl_dim", 1);
-   cline.add(set_rec_beg, "-rec_beg", 1);
-   cline.add(set_rec_end, "-rec_end", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
+   cline.add(set_type,      "-type",      1);
+   cline.add(set_qc_dd,     "-qc_dd",     1);
+   cline.add(set_lvl_dim,   "-lvl_dim",   1);
+   cline.add(set_rec_beg,   "-rec_beg",   1);
+   cline.add(set_rec_end,   "-rec_end",   1);
+   cline.add(set_logfile,   "-log",       1);
+   cline.add(set_verbosity, "-v",         1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
    cline.add(set_mask_sid,  "-mask_sid",  1);
@@ -270,7 +271,7 @@ void process_command_line(int argc, char **argv) {
    ncfile = cline[cline.n() - 1];
 
    conf_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
-   
+
    do_summary = conf_info.getSummaryInfo().flag;
    save_summary_only = false;
    if (do_summary) {
@@ -284,7 +285,7 @@ void process_command_line(int argc, char **argv) {
 
 void process_madis_file(const char *madis_file) {
    MadisType my_mtype = mtype;
-   
+
    // Print out current file name
    mlog << Debug(1) << "Reading MADIS File:\t" << madis_file << "\n";
 
@@ -401,7 +402,7 @@ void setup_netcdf_out(int nhdr) {
         << "\tobs_cnt:\t" << obs_vars.obs_cnt << "\n";
    //create_nc_hdr_vars(obs_vars, f_out, nhdr, deflate_level);
    //create_nc_obs_vars(obs_vars, f_out, deflate_level, use_var_id);
-   
+
    nc_out_data.processed_hdr_cnt = 0;
    nc_out_data.deflate_level = compress_level;
    nc_out_data.observations = obs_vector;
@@ -583,7 +584,7 @@ int process_obs(const int in_gc, const float conversion,
    if(!is_bad_data(obs_arr[4])) {
       char  var_name[max_str_len];
       sprintf(var_name, "GRIB_%d", (int) obs_arr[1]);
-      
+
       obs_arr[4] *= conversion;
 
       ConcatString qty_str;
@@ -601,7 +602,7 @@ int process_obs(const int in_gc, const float conversion,
             in_gc,
             obs_arr[2], obs_arr[3], obs_arr[4],
             var_name);
-                            
+
       //obs.setHeaderIndex(get_nc_hdr_cur_index());
       obs_vector.push_back(obs);
       if (do_summary) summary_obs->addObservationObj(obs);
@@ -1778,7 +1779,7 @@ void process_madis_raob(NcFile *&f_in) {
                         hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
          } // end for i_lvl
-         
+
       } // end for i_hdr
 
    } // end for i_hdr
@@ -2827,7 +2828,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          count += process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var,
                      hdr_typ, hdr_sid, hdr_vld,
                      hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-         
+
       }
 
    } // end for i
@@ -3145,7 +3146,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             count += process_obs(34, conversion, obs_arr, qty, in_windSpeed_var,
                         hdr_typ, hdr_sid, hdr_vld,
                         hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-            
+
          } // end for i_lvl
       }
    } // end for i_hdr
@@ -3175,6 +3176,7 @@ void usage() {
         << "\tmadis_file [madis_file2 ... madis_filen]\n"
         << "\tout_file\n"
         << "\t-type str\n"
+        << "\t[-config file]\n"
         << "\t[-qc_dd list]\n"
         << "\t[-lvl_dim list]\n"
         << "\t[-rec_beg n]\n"
@@ -3194,6 +3196,9 @@ void usage() {
         << "\t\t\"-type str\" specifies the type of MADIS observations "
         << "(metar, raob, profiler, maritime, mesonet, or acarsProfiles) "
         << "(required).\n"
+
+        << "\t\t\"-config file\" uses the specified configuration file "
+        << "to generate time summaries of the MADIS data (optional).\n"
 
         << "\t\t\"-qc_dd list\" specifies a comma-separated list of "
         << "QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B) "
