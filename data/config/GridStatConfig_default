@@ -230,6 +230,6 @@ nc_pairs_flag = {
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "";
-version          = "V8.0";
+version          = "V8.1";
 
 ////////////////////////////////////////////////////////////////////////////////
