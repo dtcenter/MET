@@ -221,6 +221,14 @@ float * d = Data;
 
 for (j=0; j<n3; ++j)  *d++ = 0.0;
 
+Lead_Times.extend(Nt);
+
+for (j=0; j<Nt; ++j)  {
+
+   Lead_Times.add(0);
+
+}
+
 return;
 
 }
@@ -443,6 +451,12 @@ out.clear();
 out.base_assign(*this);
 
 out.set_size(Nx, Ny, Nt);
+
+for (j=0; j<Nt; ++j)  {
+
+   out.set_lead_time(j, lead_time(j));
+
+}
 
 float * d = Data;
 int * i = out.Data;
@@ -800,7 +814,7 @@ f.Nt = 1;
 
 f.DeltaT = 0;
 
-f.StartTime = StartTime + t*DeltaT;
+f.StartValidTime = StartValidTime + t*DeltaT;
 
 f.Radius = Radius;
 
@@ -852,7 +866,7 @@ if ( (t < 0) || (t >= Nt) )  {
 
 if ( (out.nx() != Nx) || (out.ny() != Ny) )  out.set_size(Nx, Ny);
 
-out.set_valid(StartTime + t*DeltaT);
+out.set_valid(StartValidTime + t*DeltaT);
 
    //  we really don't need these anyway, so just set them to zero
 

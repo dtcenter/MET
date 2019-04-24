@@ -303,7 +303,7 @@ out.set_size(Nx, Ny, Nt);
 
 out.set_grid(*G);
 
-out.set_start_time(StartTime);
+out.set_start_valid_time(StartValidTime);
 
 out.set_delta_t(DeltaT);
 
@@ -312,6 +312,12 @@ out.set_data_minmax(min_conv_value, max_conv_value);
 out.set_filetype(mtd_file_conv);
 
 out.set_radius(R);
+
+for (j=0; j<Nt; ++j)  {
+
+   out.set_lead_time(j, lead_time(j));
+
+}
 
 
    //

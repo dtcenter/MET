@@ -267,6 +267,14 @@ int * d = Data;
 
 for (j=0; j<n3; ++j)  *d++ = 0;
 
+Lead_Times.extend(Nt);
+
+for (j=0; j<Nt; ++j)  {
+
+   Lead_Times.add(0);
+
+}
+
 return;
 
 }
@@ -637,7 +645,7 @@ f.Nt = 1;
 
 f.DeltaT = 0;
 
-f.StartTime = StartTime + t*DeltaT;
+f.StartValidTime = StartValidTime + t*DeltaT;
 
 f.Radius = Radius;
 
@@ -701,7 +709,7 @@ f.Nt = 1;
 
 f.DeltaT = 0;
 
-f.StartTime = StartTime + t*DeltaT;
+f.StartValidTime = StartValidTime + t*DeltaT;
 
 f.Radius = Radius;
 
