@@ -23,9 +23,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// Default sigma value used for Gaussian interpolation and regridding options.
-// Chosen by Hazardous Weather Testbed.
-static const double default_sigma      = 1.5;
 static const double default_vld_thresh = 1.0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1120,7 +1117,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
 
    // Conf: sigma
    double sig = regrid_dict->lookup_double(conf_key_sigma, false);
-   info.sigma = (is_bad_data(sig) ? default_sigma : sig);
+   info.sigma = (is_bad_data(sig) ? default_interp_sigma : sig);
 
    info.validate();
 
@@ -1278,7 +1275,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 
    // Conf: sigma
    double sig = interp_dict->lookup_double(conf_key_sigma, false);
-   info.sigma = (is_bad_data(sig) ? default_sigma : sig);
+   info.sigma = (is_bad_data(sig) ? default_interp_sigma : sig);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);

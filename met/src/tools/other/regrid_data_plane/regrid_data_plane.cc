@@ -57,7 +57,7 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
-static const double     DefaultInterpSigma = 1.476;
+static const double     DefaultInterpSigma = default_interp_sigma;
 static const double     DefaultVldThresh  = 0.5;
 
 static const float      MISSING_LATLON = -999.0;
@@ -151,7 +151,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
       const GoesImagerData grid_data);
 static void set_goes_interpolate_option();
 static void set_qc_flags(const StringArray &);
-static void write_grid_mapping(const char *grid_map_file, 
+static void write_grid_mapping(const char *grid_map_file,
       IntArray *cellMapping, Grid fr_grid, Grid to_grid);
 
 ////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ void process_data_file() {
    NcFile *nc_in = (NcFile *)0;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_data_file() ";
-   
+
    // Initialize configuration object
    MetConfig config;
    config.read(replace_path(config_const_filename).c_str());
@@ -326,7 +326,7 @@ void process_data_file() {
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
 
    bool is_geostationary = ( fr_grid.name() == "geostationary" );
-   
+
    // Determine the "to" grid
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
@@ -340,7 +340,7 @@ void process_data_file() {
 
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
-   
+
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
    ConcatString grid_map_file(tmp_dir);
@@ -375,11 +375,11 @@ void process_data_file() {
               << "\" is not supported for GOES 16.\n\n";
          exit(1);
       }
-      
+
       nc_in = open_ncfile(InputFilename.c_str());
-      
+
       multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
-      
+
       valid_time = find_valid_time(mapVar);
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
@@ -395,7 +395,7 @@ void process_data_file() {
                fr_grid, to_grid);
       }
    }
-  
+
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n_elements(); i++) {
 
@@ -420,7 +420,7 @@ void process_data_file() {
                  << FieldSA[i] << "\" from file \"" << InputFilename << "\"\n\n";
             exit(1);
          }
-         
+
          // Regrid the data plane
          to_dp = met_regrid(fr_dp, fr_grid, to_grid, RGInfo);
       }
@@ -454,7 +454,7 @@ void process_data_file() {
 
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
-      
+
       if (is_geostationary) {
          NcVar to_var = get_nc_var(nc_out, vname.c_str());
          NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
@@ -478,13 +478,13 @@ void process_data_file() {
       }
       //copy_nc_atts(_nc_in, nc_out, opt_all_attrs);
    }
-   
+
    // Close the output file
    close_nc();
 
    // nc_in->close();
    delete nc_in;  nc_in = 0;
-   
+
    delete [] cellMapping;   cellMapping = 0;
 
    // Clean up
@@ -626,7 +626,7 @@ unixtime find_valid_time(multimap<string,NcVar> mapVar) {
    ConcatString time_unit, tmp_time_unit;
    double time_values [100];
    static const char *method_name = "find_valid_time() ";
-   
+
    valid_time = 0;
    time_values[0] = 0;
    for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
@@ -719,12 +719,12 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       if (has_coord_input) {
          latitudes_buf  = new float[data_size];
          longitudes_buf = new float[data_size];
-         
+
          latitudes = latitudes_buf;
          longitudes = longitudes_buf;
          memset(latitudes,  0, buff_size);
          memset(longitudes, 0, buff_size);
-         
+
          if (!IS_INVALID_NC_P(coord_nc_in)) {
             NcVar var_lat = get_nc_var(coord_nc_in, var_name_lat);
             NcVar var_lon = get_nc_var(coord_nc_in, var_name_lon);
@@ -738,13 +738,13 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
             (void) fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
             (void) fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
-            
+
             bool compare_binary_and_computation = false;
             if (compare_binary_and_computation && fr_grid.info().gi) {
                grid_data.copy(fr_grid.info().gi);
                grid_data.compute_lat_lon();
                grid_data.test();
-               
+
                int lat_matching_count = 0;
                int lat_mis_matching_count = 0;
                int lon_matching_count = 0;
@@ -796,9 +796,9 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
       }
       if (latitudes && longitudes) {
          check_lat_lon(data_size, latitudes, longitudes);
-         
+
          count_in_grid = 0;
-         
+
          //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
          for (int xIdx=0; xIdx<from_lat_count; xIdx++) {
             for (int yIdx=0; yIdx<from_lon_count; yIdx++) {
@@ -808,7 +808,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
                to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
                idx_x = nint(x);
                idx_y = nint(y);
-         
+
                if (0 <= idx_x && idx_x < to_lon_count && 0 <= idx_y && idx_y < to_lat_count) {
                   to_offset = to_dp.two_to_one(idx_x, idx_y);
                   cellMapping[to_offset].add(coord_offset);
@@ -920,7 +920,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
             map_data = false;
             continue;
          }
-         
+
          str_arr.clear();
          str_arr.parse_delim(line.c_str(), "=");
          if (str_arr.n_elements() == 2) {
@@ -1001,14 +1001,14 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
    // -99 is arbitrary number as invalid QC value
    memset(qc_data, -99, from_data_size*sizeof(ncbyte));
-   
+
    NcVar var_qc;
    NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
    if (IS_INVALID_NC(var_data)) {
       mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
       exit(1);
    }
-   
+
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
@@ -1018,7 +1018,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
 
    get_nc_data(&var_data, (float *)from_data);
-   
+
    fr_dp.set_size(from_lon_count, from_lat_count);
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
@@ -1131,11 +1131,11 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    bool has_error = false;
    int deflate_level = 0;
    static const char *method_name = "save_geostationary_data() ";
-   
+
    NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
    NcDim xdim = add_dim(nc_file, dim_name_lat, grid_data.nx);
    NcDim ydim = add_dim(nc_file, dim_name_lon, grid_data.ny);
-   
+
    NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, xdim, ydim, deflate_level);
    NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, xdim, ydim, deflate_level);
 
@@ -1169,9 +1169,9 @@ static void save_geostationary_data(const ConcatString geostationary_file,
          mlog << Error << "Can not save longitudes\n";
       }
    }
-   
+
    add_att(nc_file, "Conventions", "CF-1.6");
-   
+
    if (has_error) {
       remove(geostationary_file.c_str());
       mlog << Warning << "The geostationary data file ("
