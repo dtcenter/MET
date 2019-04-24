@@ -33,6 +33,18 @@
     </output>
   </test>
 
+  <test name="madis2nc_METAR_time_summary">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000_time_summary.nc \
+      -type metar -config &CONFIG_DIR/Madis2ncJHG -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000_time_summary.nc</point_nc>
+    </output>
+  </test>
+
   <test name="madis2nc_METAR_mask_sid">
     <exec>&MET_BIN;/madis2nc</exec>
     <param> \
