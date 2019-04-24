@@ -268,7 +268,7 @@ ConcatString prefix;
 // int year, month, day, hour, minute, second;
 // char junk[256];
 
-prefix = make_output_prefix(config, obs_raw.start_time());
+prefix = make_output_prefix(config, obs_raw.start_valid_time());
 
 
    //
@@ -452,7 +452,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
-      att_2.set_valid_time(fcst_obj.start_time() + t*(fcst_obj.delta_t()));
+      att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+
+      att_2.set_lead_time(fcst_obj.lead_time(t));
 
       att_2.set_object_number(j + 1);   //  1-based
 
@@ -480,7 +482,9 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       att_2.set_obs();
 
-      att_2.set_valid_time(obs_obj.start_time() + t*(obs_obj.delta_t()));
+      att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+
+      att_2.set_lead_time(obs_obj.lead_time(t));
 
       att_2.set_object_number(j + 1);   //  1-based
 
@@ -689,7 +693,9 @@ if ( have_pairs )  {
 
          att_2.set_fcst();
 
-         att_2.set_valid_time(fcst_obj.start_time() + t*(fcst_obj.delta_t()));
+         att_2.set_valid_time(fcst_obj.start_valid_time() + t*(fcst_obj.delta_t()));
+
+         att_2.set_lead_time(fcst_obj.lead_time(t));
 
          att_2.set_cluster_number (j + 1);   //  1-based
 
@@ -724,7 +730,9 @@ if ( have_pairs )  {
 
          att_2.set_obs();
 
-         att_2.set_valid_time(obs_obj.start_time() + t*(obs_obj.delta_t()));
+         att_2.set_valid_time(obs_obj.start_valid_time() + t*(obs_obj.delta_t()));
+
+         att_2.set_lead_time(obs_obj.lead_time(t));
 
          att_2.set_cluster_number (j + 1);   //  1-based
 
@@ -1148,7 +1156,7 @@ raw.regrid(to_grid, config.fcst_info->regrid());
    //  make the output file prefix
    //
 
-prefix = make_output_prefix(config, raw.start_time());
+prefix = make_output_prefix(config, raw.start_valid_time());
 
    //
    //  convolve

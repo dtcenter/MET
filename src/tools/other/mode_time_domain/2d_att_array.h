@@ -73,6 +73,8 @@ class SingleAtt2DArray {
 
       unixtime valid_time(int index) const;
 
+      int      lead_time(int index) const;
+
 };
 
 

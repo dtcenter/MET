@@ -360,3 +360,26 @@ return ( e[index].valid_time() );
 ////////////////////////////////////////////////////////////////////////
 
 
+int SingleAtt2DArray::lead_time(int index) const
+
+{
+
+if ( (index < 0) || (index >= Nelements) )  {
+
+   mlog << Error
+        << "SingleAtt2DArray::lead_time(int) const -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[index].lead_time() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+

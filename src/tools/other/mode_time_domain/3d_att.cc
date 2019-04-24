@@ -1315,6 +1315,8 @@ for (j=0; j<nt; ++j)  {
 
 }
 
+a.set_cdist_travelled(dist);
+
    //
    //  percentiles
    //

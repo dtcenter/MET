@@ -28,6 +28,8 @@ using namespace netCDF;
 #include "vx_math.h"
 #include "vx_grid.h"
 
+#include "int_array.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,9 +85,11 @@ class MtdFileBase {
 
       int Nx, Ny, Nt;
 
-      unixtime StartTime;
+      unixtime StartValidTime;
 
       int DeltaT;   //  seconds
+
+      IntArray Lead_Times;
 
       ConcatString Filename;
 
@@ -108,8 +112,10 @@ class MtdFileBase {
 
       void set_grid(const Grid &);
 
-      void set_start_time (unixtime);
-      void set_delta_t    (int);   //  seconds
+      void set_start_valid_time (unixtime);
+      void set_delta_t          (int);   //  seconds
+
+      void set_lead_time(int index, int value);
 
       void set_filetype(MtdFileType);
 
@@ -129,10 +135,12 @@ class MtdFileBase {
 
       const Grid * grid_p() const;
 
-      unixtime start_time () const;
-      int      delta_t    () const;   //  seconds
+      unixtime start_valid_time () const;
+      int      delta_t          () const;   //  seconds
 
       unixtime valid_time (int) const;
+
+      int lead_time (int index) const;
 
          //
          //  do stuff
@@ -151,7 +159,7 @@ inline int MtdFileBase::nx() const { return ( Nx ); }
 inline int MtdFileBase::ny() const { return ( Ny ); }
 inline int MtdFileBase::nt() const { return ( Nt ); }
 
-inline unixtime MtdFileBase::start_time() const { return ( StartTime ); }
+inline unixtime MtdFileBase::start_valid_time() const { return ( StartValidTime ); }
 
 inline int MtdFileBase::delta_t() const { return ( DeltaT ); }
 

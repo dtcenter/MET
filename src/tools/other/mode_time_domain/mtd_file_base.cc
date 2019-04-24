@@ -89,7 +89,7 @@ if ( G )  { delete G;  G = (Grid *) 0; }
 
 Nx = Ny = Nt = 0;
  
-StartTime = (unixtime) 0;
+StartValidTime = (unixtime) 0;
 
 DeltaT = 0;
 
@@ -119,7 +119,9 @@ Nx         = f.Nx;
 Ny         = f.Ny;
 Nt         = f.Nt;
 
-StartTime  = f.StartTime;
+StartValidTime  = f.StartValidTime;
+
+Lead_Times = f.Lead_Times;
 
 DeltaT     = f.DeltaT;
 
@@ -155,12 +157,12 @@ out << prefix << "Filename          = ";
 if ( Filename.nonempty() )  out << '\"' << Filename << "\"\n";
 else                        out << "(nul)\n";
 
-unix_to_mdyhms(StartTime, month, day, year, hour, minute, second);
+unix_to_mdyhms(StartValidTime, month, day, year, hour, minute, second);
 
 snprintf(junk, sizeof(junk), "%s %d, %d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
 
-out << prefix << "StartTime         = " << StartTime << " ... (" << junk << ")\n";
+out << prefix << "StartValidTime    = " << StartValidTime << " ... (" << junk << ")\n";
 out << prefix << "DeltaT            = " << DeltaT    << '\n';
 out << prefix << "FileType          = " << mtdfiletype_to_string(FileType) << '\n';
 
@@ -280,11 +282,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MtdFileBase::set_start_time(unixtime t)
+void MtdFileBase::set_start_valid_time(unixtime t)
 
 {
 
-StartTime = t;
+StartValidTime = t;
 
 return;
 
@@ -343,7 +345,27 @@ if ( (t < 0) || ( t >= Nt) )  {
 }
 
 
-return ( StartTime + t*DeltaT );
+return ( StartValidTime + t*DeltaT );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int MtdFileBase::lead_time(int index) const
+
+{
+
+if ( (index < 0) || ( index >= Nt) )  {
+
+   mlog << Error << "\n\n  MtdFileBase::lead_time(int t) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( Lead_Times[index] );
 
 }
 
@@ -379,7 +401,7 @@ read_nc_grid(f, *G);
 
    //  timestamp info
 
-StartTime = parse_start_time(string_att(f, start_time_att_name));
+StartValidTime = parse_start_time(string_att(f, start_time_att_name));
 
 DeltaT    = string_att_as_int (f, delta_t_att_name);
 
@@ -434,7 +456,7 @@ write_nc_grid(f, *G);
 
    //  timestamp info
 
-s = start_time_string(StartTime);
+s = start_time_string(StartValidTime);
 
 add_att(&f, start_time_att_name, s.text());
 
@@ -454,6 +476,30 @@ add_att(&f, filetype_att_name, s.text());
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFileBase::set_lead_time(int index, int value)
+
+{
+
+if ( (index < 0) || (index >= Nt) )  {
+
+   mlog << Error
+        << "MtdFileBase::set_lead_time(int index, int value) -> range check error on index ... "
+        << index << "\n\n";
+
+   exit ( 1 );
+
+}
+
+Lead_Times.set(index, value);
 
 return;
 

@@ -83,11 +83,13 @@ for (j=0; j<(filenames.n()); ++j)  {
 
       raw.set_size(plane.nx(), plane.ny(), filenames.n());
 
-      raw.set_start_time(valid_times[0]);
+      raw.set_start_valid_time(valid_times[0]);
 
       raw.set_grid(data_2d_file->grid());
 
    }
+
+   raw.set_lead_time(j, plane.lead());
 
    raw.put(plane, j);
 

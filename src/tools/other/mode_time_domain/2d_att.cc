@@ -138,6 +138,8 @@ IsFcst = true;
 
 ValidTime = (unixtime) 0;
 
+Lead_Time = 0;
+
 return;
 
 }
@@ -171,6 +173,8 @@ CentroidLon = a.CentroidLon;
 IsFcst = a.IsFcst;
 
 ValidTime = a.ValidTime;
+
+Lead_Time = a.Lead_Time;
 
 return;
 
@@ -207,6 +211,7 @@ out << prefix << "Area          = " << Area << "\n";
 out << prefix << "Centroid      = " << '(' << Xbar << ", " << Ybar << ")\n";
 out << prefix << "AxisAngle     = " << AxisAngle     << "\n";
 out << prefix << "ValidTime     = " << ValidTime     << "\n";
+out << prefix << "LeadTime      = " << Lead_Time     << "\n";
 
    //
    //  done
@@ -290,6 +295,20 @@ void SingleAtt2D::set_valid_time(const unixtime t)
 {
 
 ValidTime = t;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_lead_time(const int t)
+
+{
+
+Lead_Time = t;
 
 return;
 

@@ -62,6 +62,8 @@ class SingleAtt2D {
 
       unixtime ValidTime;
 
+      int Lead_Time;
+
    public:
 
       SingleAtt2D();
@@ -93,6 +95,8 @@ class SingleAtt2D {
 
       void set_valid_time(const unixtime);
 
+      void set_lead_time(const int);
+
          //
          //  get stuff
          //
@@ -118,6 +122,8 @@ class SingleAtt2D {
       bool is_obs  () const;
 
       unixtime valid_time() const;
+
+      int lead_time() const;
 
          //
          //  do stuff
@@ -159,6 +165,8 @@ inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
 inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
 
 inline unixtime SingleAtt2D::valid_time () const { return ( ValidTime ); }
+
+inline int      SingleAtt2D::lead_time  () const { return ( Lead_Time ); }
 
 
 ////////////////////////////////////////////////////////////////////////

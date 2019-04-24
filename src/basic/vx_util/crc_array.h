@@ -398,7 +398,10 @@ void CRC_Array<T>::set(int ix, const T & elem)
    if ( (ix < 0) || (ix >= Nelements) )  {
 
       mlog << Error << "\nCRC_Array::set(int, T) const -> "
-           << "range check error\n\n";
+           << "range check error ... index = " << ix 
+           << ", Nelements = " << Nelements 
+           << ", Nalloc = " << Nalloc
+           << "\n\n";
 
       exit ( 1 );
 
@@ -418,7 +421,10 @@ T CRC_Array<T>::operator[](int i) const
 if ( (i < 0) || (i >= Nelements) )  {
 
    mlog << Error << "\nCRC_Array::operator[](int) const -> "
-        << "range check error\n\n";
+        << "range check error ... index = " << i 
+        << ", Nelements = " << Nelements 
+        << ", Nalloc = " << Nalloc 
+        << "\n\n";
 
    exit ( 1 );
 
