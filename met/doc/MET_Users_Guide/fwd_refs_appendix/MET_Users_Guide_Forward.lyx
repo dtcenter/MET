@@ -101,7 +101,7 @@ This User's guide is provided as an aid to users of the Model Evaluation
 \series medium
 It is important to note here that MET is an evolving software package.
  Previous releases of MET have occurred each year since 2008.
- This documentation describes the 8.0 release from September 2018.
+ This documentation describes the 8.1 release from May 2019.
  Intermediate releases may include bug fixes.
  MET is also be able to accept new modules contributed by the community.
  If you have code you would like to contribute, we will gladly consider
@@ -125,13 +125,13 @@ type "mailto:"
 This User's Guide was prepared by the developers of the MET, including Tressa
  Fowler, John Halley Gotway, Randy Bullock, Kathryn Newman, Julie Prestopnik,
  Lisa Goodrich, Tara Jensen, Barbara Brown, Howard Soh, Tatiana Burek, Minna
- Win-Gildenmeister, George McCabe, Paul Prestopnik, Eric Gilleland, Nancy
- Rehak, Paul Oldenburg, Anne Holmes, Lacey Holland, David Ahijevych and
- Bonny Strong.
+ Win-Gildenmeister, George McCabe, David Fillmore, Paul Prestopnik, Eric
+ Gilleland, Nancy Rehak, Paul Oldenburg, Anne Holmes, Lacey Holland, David
+ Ahijevych and Bonny Strong.
 \end_layout
 
 \begin_layout Section*
-New for MET v8.0
+New for MET v8.1
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -144,14 +144,9 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-METv8.0 includes some major enhancements, including python embedding, observation
- error logic, shapefiles for masking regions, point observation format overhaul,
- and rotated lat/lon projections.
-\end_layout
-
-\begin_layout Standard
-Three new utilities were add to dump shapefile information (gis_dump_dbf,
- gis_dump_shp, and gis_dump_shx).
+MET version 8.1 includes some major enhancements, including Fortify compliance,
+ percentile thresholds, land/sea mask and topography in Point-Stat, the
+ derive option in PCP-Combine, and gaussian interpolation.
 \end_layout
 
 \begin_layout Subsection*
@@ -159,22 +154,45 @@ Changes to output formats:
 \end_layout
 
 \begin_layout Itemize
-Added new Ensemble Continuous Statistics line type (ECNT) for Ensemble-Stat
- and Point-Stat HiRA.
+Added header columns, 
+\begin_inset Quotes eld
+\end_inset
+
+FCST_UNITS
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+OBS_UNITS
+\begin_inset Quotes erd
+\end_inset
+
+, to indicate the units of the data processed to the STAT, MODE, and MTD
+ ASCII output files.
 \end_layout
 
 \begin_layout Itemize
-Removed CRPS, IGN, CRPSS, and SPREAD columns from the RHIST line type and
- move them to the new ECNT line type.
-\end_layout
+Added 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Itemize
-Added ENS_MEAN_OERR, SPREAD_OERR, SPREAD_PLUS_OERR columns to the ORANK
- line type.
-\end_layout
+DX
+\begin_inset Quotes erd
+\end_inset
 
-\begin_layout Itemize
-Added ASPECT_DIFF and CURVATURE_RATIO columns to the MODE output.
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+DY
+\begin_inset Quotes erd
+\end_inset
+
+ columns to the GRAD line type to indicate the gradient step sizes which
+ are now configurable for Grid-Stat.
 \end_layout
 
 \begin_layout Subsection*
@@ -184,49 +202,19 @@ Enhancements to Existing Tools:
 \begin_layout Itemize
 
 \series medium
-Distributed the latest set of bugfixes (details not listed here).
+Fixed bugs related to MET's Python interface, Fourier decomposition in Grid-Stat
+, HiRA in Point-Stat, and memory management in MODE.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Removed many compilation warnings.
+Fortify is a static code analyzer tool which identifies potential security
+ vulnerabilities.
+ Scanned the MET code base with Fortify and restructured it to address all
+ high priority Fortify issues.
 \end_layout
 
-\begin_layout Itemize
-
-\series medium
-Python Embedding
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Enhanced the MET tools to read gridded data by calling a Python script which
- loads data and metadata into a NumPy object.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Note that users must configure MET using "--enable-python" to enable this
- functionality.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Example "scripts/python" and "data/python" directories are now included.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-See Appendix F of the MET User's Guide for more information.
-\end_layout
-
-\end_deeper
 \begin_layout Itemize
 
 \series medium
@@ -237,318 +225,342 @@ Common Libraries
 \begin_layout Itemize
 
 \series medium
-Added support for Rotated Lat/Lon projections.
+Added support for defining thresholds as percentiles of data (see the user's
+ guide for details and examples).
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Updated the MRMS GRIB2 table.
+Added support for the Gaussian interpolation and regridding method, including
+ the sigma option to define the shape.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Updated the embedded python logic so that a failures result in a warning
+ instead of an error.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhanced the NetCDF library to request data using a timestring instead of
+ requiring an explicit index for the time dimension.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhanced the NetCDF library to handle a wider variety of data types.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Added support for specifying the 
+\begin_inset Quotes eld
+\end_inset
+
+file_type
+\begin_inset Quotes erd
+\end_inset
+
+ option when parsing the 
+\begin_inset Quotes eld
+\end_inset
+
+poly
+\begin_inset Quotes erd
+\end_inset
+
+ configuration setting.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Added GRIB2 configuration filtering options, 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_ipdtmpl_index
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_ipdtmpl_val
+\begin_inset Quotes erd
+\end_inset
+
+, to explicitly request product description template values.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Fixed GRIB2 support for Polar Stereographic and Lambert Conformal grids
+ in the southern hemisphere.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Point Pre-Processing Tools
+PCP-Combine
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Made a major change to the NetCDF point observation format written by PB2NC,
- ASCII2NC, MADIS2NC, and LIDAR2NC.
- Data are now split out into multiple 1-dimensional arrays.
- Created "table" variables to store unique strings and, for each observation,
- to store the indices for those tables.
+Added the 
+\begin_inset Quotes eld
+\end_inset
+
+-derive
+\begin_inset Quotes erd
+\end_inset
+
+ functionality to compute the sum, min, max, range, mean, standard deviation,
+ or valid data count of data from a series of input files.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Updated the NetCDF point observation format by replacing the UNLIMITED dimension
- with a fixed dimension, resulting in smaller file sizes.
+Added the 
+\begin_inset Quotes eld
+\end_inset
+
+-vld_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ command line option to specify the required ratio of valid data at each
+ grid point to compute an output value.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Multiple Tools
-\end_layout
 
-\begin_deeper
-\begin_layout Itemize
-For the statistics tools, changed the default config file "output_flag"
- settings from BOTH to NONE.
-\end_layout
-
-\begin_layout Itemize
-For climatologies, added the "match_month" flag to the "climo_mean" and
- "climo_stdev" config file dictionaries.
- Setting "match_month" to FALSE now enable the use of persistence to define
- the climatology.
-\end_layout
-
-\begin_layout Itemize
-Added support for area-weighted (AW_MEAN) regridding logic.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the ASCII2NC, MADIS2NC, PB2NC, STAT-Analysis, TC-Pairs, and TC-STAT
- to support the "mask.poly" config file option or "-mask_poly" command line
- option to process masking regions consistently across all the MET tools.
- They can now process the output of the Gen-Vx-Mask tool.
-\end_layout
-
-\begin_layout Itemize
-Enabled "vld_thresh = 0" in Ensemble-Stat and Series-Analysis config files.
-\end_layout
-
-\begin_layout Itemize
-Switched from using double precision to booleans for storing mask fields
- in Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and Series-Analysis.
- When processing many masking regions, this will run faster and consume
- less memory.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the logic for finding matching UGRD/VGRD verification tasks in
- Point-Stat and Grid-Stat to make it more robust.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Gen-Vx-Mask
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Added support for the using shapefiles to define masking regions with the
- "-type shape" option.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
+\series medium
 Regrid-Data-Plane
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Added the capability to read GOES-16 AOD data using the new "-coord" and
- "-qc" command line options.
+
+\series medium
+Calculate GOES-16/17 pixel locations from metadata of the input files so
+ that it can process multiple scenes of GOES-16/17 data.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
+
+\series medium
 ASCII2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Added support for the AERONET version 3 point observation format.
-\end_layout
 
-\begin_layout Itemize
-Added support for longer observation variable names.
+\series medium
+Added support to the 
+\begin_inset Quotes eld
+\end_inset
+
+-format
+\begin_inset Quotes erd
+\end_inset
+
+ command line option to handle 
+\begin_inset Quotes eld
+\end_inset
+
+aeronetv2
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+aeronetv3
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-PB2NC
+
+\series medium
+MADIS2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Enhanced the output to include the PrepBufr values for report type, input
- report type, and instrument type for use in the observation error table
- lookup.
-\end_layout
 
-\begin_layout Itemize
-Fixed the computation of valid time for AIRNOW observations.
-\end_layout
-
-\begin_layout Itemize
-Added special handling for ANOWPM message types.
-\end_layout
-
-\begin_layout Itemize
-Rounded timestamps to the nearest second instead of truncating.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the "-nmsg" command line option to be specified as the exact number
- of messages to be processed (e.g.
- -nmsg 25) or as a percentage of the messages (e.g.
- -nmsg 25%).
+\series medium
+Added configuration file to control the computation of time summaries.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Time Summaries
-\end_layout
 
-\begin_deeper
-\begin_layout Itemize
-Time summaries are now computed across multiple input files for ASCII2NC
- and PB2NC.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the "time_summary" config file option by adding a "raw_data" flag
- to control whether the raw input values are written or only the time summary
- values.
-\end_layout
-
-\begin_layout Itemize
-Generalized the "time_summary.width" config file option to an integer for
- centered time windows (existing) or a dictionary with begin and end time
- offsets for uncentered windows (new).
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Grid-Stat
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Fixed the very slow computation of neighborhood methods fractional coverage
- fields introduced in met-7.0 when supporting circular neighborhoods.
- (This was also posted as a bugfix for met-7.0.)
-\end_layout
-
-\begin_layout Itemize
-Fixed a memory allocation issue, leading to faster run times.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
+\series medium
 Point-Stat
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-The ECNT line type is now computed when applying the HiRA methodology, in
- which nearby grid points are treated as ensemble member values.
+
+\series medium
+Added 
+\begin_inset Quotes eld
+\end_inset
+
+land_mask
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+topo_mask
+\begin_inset Quotes erd
+\end_inset
+
+ config file entries to define land/sea mask and model topography information
+ which control how matched pairs are computed when verifying at the surface.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Added new interpolation method named 
+\begin_inset Quotes eld
+\end_inset
+
+GEOG_MATCH
+\begin_inset Quotes erd
+\end_inset
+
+ to search the interpolation area for the closest grid point where the land/sea
+ mask and topography criteria are satisfied.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Point-Stat and Ensemble-Stat
+
+\series medium
+Grid-Stat
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Added the "mask.llpnt" config file option to appply thresholds to filter
- point observations by applying thresholds to their lat/lon values directly.
+
+\series medium
+Added 
+\begin_inset Quotes eld
+\end_inset
+
+gradient
+\begin_inset Quotes erd
+\end_inset
+
+ config file entry to define the size of the gradients to be computed in
+ both the x (
+\begin_inset Quotes eld
+\end_inset
+
+dx
+\begin_inset Quotes erd
+\end_inset
+
+) and y (
+\begin_inset Quotes eld
+\end_inset
+
+dy
+\begin_inset Quotes erd
+\end_inset
+
+) directions.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Ensemble-Stat
+
+\series medium
+Stat-Analysis
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Added support for observation error perturbations (See "data/config/README"
- for details on these settings).
+
+\series medium
+When using the 
+\begin_inset Quotes eld
+\end_inset
+
+-by
+\begin_inset Quotes erd
+\end_inset
+
+ job command option, enable 
+\begin_inset Quotes eld
+\end_inset
+
+-set_hdr
+\begin_inset Quotes erd
+\end_inset
+
+ to reference the current values of the 
+\begin_inset Quotes eld
+\end_inset
+
+-by
+\begin_inset Quotes erd
+\end_inset
+
+ columns.
+ For example, the following job sets the output VX_MASK column to each observati
+on station name found:
 \end_layout
 
+\begin_deeper
 \begin_layout Itemize
-Added a default lookup table in "data/table_files/obs_error_table.txt" but
- also support the MET_OBS_ERROR_TABLE environment variable for user-specified
- table.
-\end_layout
 
-\begin_layout Itemize
-Added the "obs_error" dictionary to the config file to specify how observation
- error perturbations should be applied.
-\end_layout
+\series medium
+-job aggregate_stat -line_type MPR -out_line_type CNT 
+\series bold
 
-\begin_layout Itemize
-Added the capability to write statistics for perturbed and unperturbed data
- to the new ECNT line type.
-\end_layout
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Itemize
-Removed the columns from the RHIST line type that were moved to ECNT.
-\end_layout
 
-\begin_layout Itemize
-Renamed the "-ssvar_mean" command line option as "-ens_mean", but the "-ssvar_me
-an" option is still quietly supported.
+\series medium
+-by OBS_SID -set_hdr VX_MASK OBS_SID
+\series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series medium
+-out_stat mpr_to_cnt_by_sid.stat
 \end_layout
 
 \end_deeper
-\begin_layout Itemize
-MODE
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Replaced the "area_thresh" and "inten_perc_thresh" config file options with
- the more generic "filter_attr_name" and "filter_attr_thresh" options.
-\end_layout
-
-\begin_layout Itemize
-Added "aspect_diff" and "curvature_ratio" as new inputs to the fuzzy logic
- engine and added corresponding columns to the output file.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Series-Analysis
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Added debug messages to inform the user about missing data.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-STAT-Analysis
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Added the capability to aggregate the ECNT line type and derive it from
- input ORANK lines.
-\end_layout
-
-\begin_layout Itemize
-Updated the computation of MSVE statistic in the VCNT line type to be done
- using partial sums rather than matched pair values.
- This enables it to be computed from VL1L2 lines in STAT-Analysis.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-STAT-Analysis and TC-STAT
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Added the "-column_union" job command option to summarize values across
- multiple columns.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Scripting
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Added a sample Rscript (scripts/Rscripts/plot_ensemble.R) for plotting ensemble
- line types.
-\end_layout
-
-\begin_layout Itemize
-Updated the pntnc2ascii.R Rscript to handle the obs_var variable.
-\end_layout
-
 \end_deeper
 \begin_layout Chapter*
 TERMS OF USE
@@ -800,23 +812,23 @@ The citation for this User's Guide should be:
 \end_layout
 
 \begin_layout Standard
-J.
- Halley Gotway, K.
+K.
  Newman, T.
  Jensen, Brown, B., R.
- Bullock, and T.
- Fowler, 2018:
+ Bullock, T.
+ Fowler, 2018, and J.
+ Halley Gotway:
 \begin_inset Newline newline
 \end_inset
 
-The Model Evaluation Tools v8.0 (METv8.0) User’s Guide.
+The Model Evaluation Tools v8.1 (METv8.1) User’s Guide.
  Developmental Testbed Center.
 \begin_inset Newline newline
 \end_inset
 
 Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_v
-8.0.pdf.
- 407 pp.
+8.1.pdf.
+ #JHG# pp.
 \end_layout
 
 \begin_layout Chapter*

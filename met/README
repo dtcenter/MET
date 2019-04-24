@@ -1,4 +1,4 @@
-Model Evaluation Tools METv8.1_beta3 (April 18, 2019)
+Model Evaluation Tools version 8.1 (May 3, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -121,7 +121,7 @@ Dependencies
    - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
       - jasperlib, libpng, and zlib also required for GRIB2 support
       - http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
-   - Python, if wishing to compile Python support
+   - Python 2.7, if wishing to compile Python support
    - HDF4 and HDF-EOS2 libraries, if wishing to compile MODIS-Regrid
       - http://www.hdfgroup.org/products/hdf4
       - http://www.hdfgroup.org/hdfeos.html
@@ -321,47 +321,74 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
-Version 8.1 Beta 3 Release Notes:
---------------------------------
+Version 8.1 Release Notes:
+-------------------------
 
-- Add support for percentile thresholds.
-- Add two new header columns for the forecast and observation units to the
-  output of MODE and the statistics tools.
-- Add support for Gaussian interpolation method, including the sigma option.
-- Update the embedded python logic so that a failure results in a warning
-  instead of an error.
-- Additional reductions in Fortify issues.
+- What's New:
+   - Major Enhancements: Fortify compliance, percentile thresholds, land/sea
+     mask and topography in Point-Stat, the derive option in PCP-Combine, and
+     gaussian interpolation
+   - New Tools: No new tools
 
-Version 8.1 Beta 2 Release Notes:
---------------------------------
+- Changes to Output Formats:
+   - Added header columns, "FCST_UNITS" and "OBS_UNITS", to indicate the units
+     of the data processed to the STAT, MODE, and MTD ASCII output files.
+   - Added "DX" and "DY" columns to the GRAD line type to indicate the gradient
+     step sizes which are now configurable for Grid-Stat.
 
-- The met-8.1_beta2 release greatly reduces the number of Fortify issues.
-- Enhance Grid-Stat by making the X and Y gradient sizes configurable.
-- Enhance PCP-Combine by adding the -derive functionality to compute the sum,
-  min, max, range, mean, standard deviation, or valid data count.
-- Enhance PCP-Combine by adding the -vld_thresh command line option.
-- Enhance Gen-Vx-Mask to calculate GOES-16 pixel locations from metadata.
-- Enhance STAT-Analysis to reference the -by columns when using the -set_hdr
-  job command option.
-- Enhance ascii2nc to support the -format aeronetv2 and aeronetv3 options.
-- Enhance the NetCDF library to request data using a timestring rather than
-  the explicit index of the time dimension.
-- Enhance the NetCDF library to handle a wider variety of data types.
-- Add GRIB2 filtering options, GRIB2_ipdtmpl_index and GRIB2_ipdtmpl_val.
-- Support the file_type option when parsing the poly config file setting.
-- Fix GRIB2 support for Polar Stereographic and Lambert Conformal grids in the
-  southern hemisphere.
-- Fix bug in MODE for memory corruption.
-
-Version 8.1 Beta 1 Release Notes:
---------------------------------
-
-- The met-8.1_beta1 release serves as a baseline for Fortify development work.
-- Fix several bugs related to MET's Python interface, Fourier decomposition
-  (Grid-Stat), and HiRA (Point-Stat)
-- Enhance regrid_data_plane to compute GOES lat/lon locations using metadata in
-  the input NetCDF file.
-- Add configuration file for the madis2nc tool.
+- Enhancements to Existing Tools:
+   - Fixed bugs related to MET's Python interface, Fourier decomposition in
+     Grid-Stat, HiRA in Point-Stat, and memory management in MODE.
+   - Fortify is a static code analyzer tool which identifies potential security
+     vulnerabilities.  Scanned the MET code base with Fortify and restructured
+     it to address all high priority Fortify issues.
+   - Common Libraries
+      - Added support for defining thresholds as percentiles of data (see the
+        user's guide for details and examples).
+      - Added support for the Gaussian interpolation and regridding method,
+        including the sigma option to define the shape.
+      - Updated the embedded python logic so that a failures result in a warning
+        instead of an error.
+      - Enhanced the NetCDF library to request data using a timestring
+        instead of requiring an explicit index for the time dimension.
+      - Enhanced the NetCDF library to handle a wider variety of data types.
+      - Added support for specifying the "file_type" option when parsing the
+        "poly" configuration setting.
+      - Added GRIB2 configuration filtering options, "GRIB2_ipdtmpl_index" and
+        "GRIB2_ipdtmpl_val", to explicitly request product description template
+        values.
+      - Fixed GRIB2 support for Polar Stereographic and Lambert Conformal grids
+        in the southern hemisphere.
+   - PCP-Combine
+      - Added the "-derive" functionality to compute the sum, min, max, range,
+        mean, standard deviation, or valid data count of data from a series of
+        input files.
+      - Added the "-vld_thresh" command line option to specify the required
+        ratio of valid data at each grid point to compute an output value.
+   - Regrid-Data-Plane
+      - Calculate GOES-16/17 pixel locations from metadata of the input files so
+        that it can process multiple scenes of GOES-16/17 data.
+   - ASCII2NC
+      - Added support to the "-format" command line option to handle "aeronetv2"
+        and "aeronetv3".
+   - MADIS2NC
+      - Added configuration file to control the computation of time summaries.
+   - Point-Stat
+      - Added "land_mask" and "topo_mask" config file entries to define
+        land/sea mask and model topography information which control how
+        matched pairs are computed when verifying at the surface.
+      - Added new interpolation method named "GEOG_MATCH" to search the
+        interpolation area for the closest grid point where the land/sea mask
+        and topography criteria are satisfied.
+   - Grid-Stat
+      - Added "gradient" config file entry to define the size of the gradients
+        to be computed in both the x ("dx") and y ("dy") directions.
+   - Stat-Analysis
+      - When using the "-by" job command option, enable "-set_hdr" to reference
+        the current values of the "-by" columns.  For example, the following job
+        sets the output VX_MASK column to each observation station name found:
+        -job aggregate_stat -line_type MPR -out_line_type CNT -by OBS_SID
+        -set_hdr VX_MASK OBS_SID -out_stat mpr_to_cnt_by_sid.stat
 
 Version 8.0 Release Notes:
 -------------------------
