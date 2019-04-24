@@ -252,6 +252,10 @@ struct InterpInfo {
    bool        operator==(const InterpInfo &) const;
 };
 
+// Default sigma value used for Gaussian interpolation and regridding options.
+// Chosen by Hazardous Weather Testbed.
+static const double default_interp_sigma = 1.476;
+
 ////////////////////////////////////////////////////////////////////////
 
 //
