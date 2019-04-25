@@ -56,6 +56,12 @@ class SingleAtt2D {
 
       double AxisAngle;
 
+      double Ptile_10;
+      double Ptile_25;
+      double Ptile_50;
+      double Ptile_75;
+      double Ptile_90;
+
       int TimeIndex;
 
       bool IsFcst;
@@ -63,6 +69,7 @@ class SingleAtt2D {
       unixtime ValidTime;
 
       int Lead_Time;
+
 
    public:
 
@@ -116,6 +123,12 @@ class SingleAtt2D {
 
       double axis() const;
 
+      double ptile_10() const;
+      double ptile_25() const;
+      double ptile_50() const;
+      double ptile_75() const;
+      double ptile_90() const;
+
       int time_index () const;
 
       bool is_fcst () const;
@@ -161,6 +174,12 @@ inline double SingleAtt2D::centroid_lon() const { return ( CentroidLon ); }
 
 inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
 
+inline double SingleAtt2D::ptile_10() const { return ( Ptile_10 ); }
+inline double SingleAtt2D::ptile_25() const { return ( Ptile_25 ); }
+inline double SingleAtt2D::ptile_50() const { return ( Ptile_50 ); }
+inline double SingleAtt2D::ptile_75() const { return ( Ptile_75 ); }
+inline double SingleAtt2D::ptile_90() const { return ( Ptile_90 ); }
+
 inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
 inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
 
@@ -172,7 +191,7 @@ inline int      SingleAtt2D::lead_time  () const { return ( Lead_Time ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const int obj_number);   //  1-based 
+extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const DataPlane & raw_2d, const int obj_number);   //  1-based
 
 
 ////////////////////////////////////////////////////////////////////////

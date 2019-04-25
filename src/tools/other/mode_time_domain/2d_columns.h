@@ -21,20 +21,26 @@
 static const char * att_2d_cols [] = {
 
 
-   "OBJECT_ID",       
+   "OBJECT_ID",
 
-   "OBJECT_CAT",       
+   "OBJECT_CAT",
 
-   "TIME_INDEX",       
+   "TIME_INDEX",
 
-   "AREA",       
+   "AREA",
 
-   "CENTROID_X",       
-   "CENTROID_Y",       
-   "CENTROID_LAT",       
-   "CENTROID_LON",       
+   "CENTROID_X",
+   "CENTROID_Y",
+   "CENTROID_LAT",
+   "CENTROID_LON",
 
-   "AXIS_ANG",       
+   "AXIS_ANG",
+
+   "INTENSITY_10",
+   "INTENSITY_25",
+   "INTENSITY_50",
+   "INTENSITY_75",
+   "INTENSITY_90",
 
 };
 
