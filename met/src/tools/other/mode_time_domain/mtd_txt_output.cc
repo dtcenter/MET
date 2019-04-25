@@ -203,6 +203,22 @@ for (j=0; j<Nobj; ++j)  {
 }
 
    //
+   //  overwrite the obs valid entry in the header columns
+   //
+
+const int  obs_valid_column = 6;   //  0-based
+
+r = 0;
+
+for (j=0; j<(att.n()); ++j)  {
+
+   ++r;
+
+   table.set_entry(r,  obs_valid_column, na_str);
+
+}
+
+   //
    //  attributes
    //
 
@@ -213,8 +229,6 @@ for (j=0; j<(att.n()); ++j)  {
    att[j].write_txt(table, r++);
 
 }
-
-
 
    //
    //  done
@@ -234,7 +248,7 @@ return;
 
 void do_3d_pair_txt_output(const PairAtt3DArray & pa,
                            const MtdConfigInfo & config,
-                           const bool is_cluster, 
+                           const bool is_cluster,
                            const char * output_filename)
 
 {
@@ -335,20 +349,6 @@ for (j=0; j<(array.n()); ++j)  {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    //
    //  done
    //
@@ -433,11 +433,8 @@ for (j=0; j<n_total; ++j)  {
 }
 
    //
-   //  overwrite the fcst valid and obs valid entries in the header columns
+   //  overwrite the fcst and obs valid and lead entries in the header columns
    //
-
-// const int fcst_valid_column = 3;   //  0-based
-// const int  obs_valid_column = 5;   //  0-based
 
 const int fcst_valid_column = 4;   //  0-based
 const int  obs_valid_column = 6;   //  0-based
@@ -598,6 +595,27 @@ for (j=0; j<n_total; ++j)  {
    r = j + 1;
 
    config.write_header_cols(table, r);
+
+}
+
+   //
+   //  overwrite the fcst and obs valid and lead entries in the header columns
+   //
+
+const int fcst_valid_column = 4;   //  0-based
+const int  obs_valid_column = 6;   //  0-based
+
+r = 0;
+
+for (j=0; j<(att.n()); ++j)  {
+
+   ++r;
+
+   table.set_entry(r, fcst_valid_column - 1, sec_to_hhmmss(att.lead_time(j)));
+   table.set_entry(r,  obs_valid_column - 1, na_str);
+
+   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(att.valid_time(j)));
+   table.set_entry(r,  obs_valid_column, na_str);
 
 }
 

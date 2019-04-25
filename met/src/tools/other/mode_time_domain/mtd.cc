@@ -18,6 +18,7 @@
 //   000    10-15-15  Bullock        New
 //   001    05-15-17  Prestopnik P.  Added regrid shape
 //   002    04-18-19  Halley Gotway  Add FCST and OBS units.
+//   003    04-25-19  Halley Gotway  Add percentiles to 2D output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -435,6 +436,7 @@ int t;
 SingleAtt2DArray fcst_simple_att_2d, obs_simple_att_2d;
 SingleAtt2D att_2;
 MtdIntFile mask_2d;
+DataPlane raw_2d;
 
    //   fcst simple objects
 
@@ -448,7 +450,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       mask_2d = fcst_obj.const_t_mask(t, j + 1);   //  1-based
 
-      att_2 = calc_2d_single_atts(mask_2d, j + 1);
+      fcst_raw.get_data_plane(t, raw_2d);
+
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
 
       att_2.set_fcst();
 
@@ -478,7 +482,9 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       mask_2d = obs_obj.const_t_mask(t, j + 1);   //  1-based
 
-      att_2 = calc_2d_single_atts(mask_2d, j + 1);
+      obs_raw.get_data_plane(t, raw_2d);
+
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
 
       att_2.set_obs();
 
@@ -689,7 +695,9 @@ if ( have_pairs )  {
 
          // cout << "j = " << j << ",   vol = " << mask_2d.object_volume(0) << '\n';
 
-         att_2 = calc_2d_single_atts(mask_2d, j + 1);
+         fcst_raw.get_data_plane(t, raw_2d);
+
+         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
 
          att_2.set_fcst();
 
@@ -726,7 +734,9 @@ if ( have_pairs )  {
          // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
          mask_2d = mask.const_t_mask(t, 1);   //  1-based
 
-         att_2 = calc_2d_single_atts(mask_2d, j + 1);
+         obs_raw.get_data_plane(t, raw_2d);
+
+         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
 
          att_2.set_obs();
 
@@ -1218,6 +1228,7 @@ int t;
 SingleAtt2DArray att_2d;
 SingleAtt2D att_2;
 MtdIntFile mask_2d;
+DataPlane raw_2d;
 
 
 mlog << Debug(2) << "Calculating 2D fcst attributes\n";
@@ -1230,9 +1241,15 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
       mask_2d = obj.const_t_mask(t, j + 1);   //  1-based
 
-      att_2 = calc_2d_single_atts(mask_2d, j + 1);
+      raw.get_data_plane(t, raw_2d);
+
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
 
       att_2.set_fcst();
+
+      att_2.set_valid_time(obj.start_valid_time() + t*(obj.delta_t()));
+
+      att_2.set_lead_time(obj.lead_time(t));
 
       att_2.set_object_number(j + 1);   //  1-based
 
@@ -1243,6 +1260,7 @@ for (j=0; j<(obj.n_objects()); ++j)  {
    }   //  for k
 
 }   //  for j
+
 
    //
    //  write 2d attributes for each simple object for each time slice

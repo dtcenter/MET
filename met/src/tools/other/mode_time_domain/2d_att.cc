@@ -132,6 +132,12 @@ CentroidLat = CentroidLon = 0.0;
 
 AxisAngle = 0.0;
 
+Ptile_10 = 0.0;
+Ptile_25 = 0.0;
+Ptile_50 = 0.0;
+Ptile_75 = 0.0;
+Ptile_90 = 0.0;
+
 TimeIndex = -1;
 
 IsFcst = true;
@@ -164,6 +170,12 @@ Xbar = a.Xbar;
 Ybar = a.Ybar;
 
 AxisAngle = a.AxisAngle;
+
+Ptile_10 = a.Ptile_10;
+Ptile_25 = a.Ptile_25;
+Ptile_50 = a.Ptile_50;
+Ptile_75 = a.Ptile_75;
+Ptile_90 = a.Ptile_90;
 
 TimeIndex = a.TimeIndex;
 
@@ -210,6 +222,11 @@ out << prefix << "ClusterNumber = " << ClusterNumber << "\n";
 out << prefix << "Area          = " << Area << "\n";
 out << prefix << "Centroid      = " << '(' << Xbar << ", " << Ybar << ")\n";
 out << prefix << "AxisAngle     = " << AxisAngle     << "\n";
+out << prefix << "Ptile_10      = " << Ptile_10      << "\n";
+out << prefix << "Ptile_25      = " << Ptile_25      << "\n";
+out << prefix << "Ptile_50      = " << Ptile_50      << "\n";
+out << prefix << "Ptile_75      = " << Ptile_75      << "\n";
+out << prefix << "Ptile_90      = " << Ptile_90      << "\n";
 out << prefix << "ValidTime     = " << ValidTime     << "\n";
 out << prefix << "LeadTime      = " << Lead_Time     << "\n";
 
@@ -326,13 +343,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const int obj_number)   //  zero-based
+SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const DataPlane & raw_2d, const int obj_number)   //  zero-based
 
 {
 
 SingleAtt2D a;
 Mtd_2D_Moments moments;
-
+float * values = (float *) 0;
+const int    * i = 0;
+const double * r = 0;
+const int nxy = (mask_2d.nx())*(mask_2d.ny());
+int j, n;
 
 a.ObjectNumber = obj_number;
 
@@ -363,10 +384,9 @@ a.AxisAngle = moments.calc_2D_axis_plane_angle();
    //
    //  percentiles
    //
-/*
-Vol = a.Volume;
 
-values = new float [Vol];
+
+values = new float [a.Area];
 
 if ( !values )  {
 
@@ -376,12 +396,11 @@ if ( !values )  {
 
 }
 
+i = mask_2d.data();
+r = raw_2d.data();
 n = 0;
 
-i = obj.data();
-r = raw.data();
-
-for (j=0; j<n3; ++j)  {
+for (j=0; j<nxy; ++j)  {
 
    if ( *i )  {
 
@@ -390,7 +409,7 @@ for (j=0; j<n3; ++j)  {
    }
 
    ++i; ++r;
- 
+
 }
 
 
@@ -401,15 +420,13 @@ a.Ptile_25 = percentile_f(values, n, 0.25);
 a.Ptile_50 = percentile_f(values, n, 0.50);
 a.Ptile_75 = percentile_f(values, n, 0.75);
 a.Ptile_90 = percentile_f(values, n, 0.90);
-*/
+
 
    //
    //   done
    //
 
-// if ( values )  { delete [] values;  values = 0; }
-
-// a.dump(cout);
+if ( values )  { delete [] values;  values = 0; }
 
 return ( a );
 
@@ -446,9 +463,9 @@ s << junk;
 
 table.set_entry(row, c++, s.text());
 
-   // 
+   //
    //   cluster number
-   // 
+   //
 
 s.erase();
 
@@ -514,6 +531,33 @@ format = format_2_decimals;
 snprintf(junk, sizeof(junk), format, AxisAngle);
 
 table.set_entry(row, c++, junk);
+
+
+   //
+   //  intensities 10, 25, 50, 75, 90
+   //
+
+   format = format_2_decimals;
+
+snprintf(junk, sizeof(junk), format, Ptile_10);
+
+   table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, Ptile_25);
+
+   table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, Ptile_50);
+
+   table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, Ptile_75);
+
+   table.set_entry(row, c++, junk);
+
+snprintf(junk, sizeof(junk), format, Ptile_90);
+
+   table.set_entry(row, c++, junk);
 
 
    //
