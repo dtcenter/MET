@@ -695,7 +695,7 @@ ConcatString s;
 
    //  version
 
-table.set_entry(row, c++, version.text());
+table.set_entry(row, c++, (string)met_version);
 
    //  model
 
