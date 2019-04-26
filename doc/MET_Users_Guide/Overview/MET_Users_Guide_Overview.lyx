@@ -954,5 +954,42 @@ met_help@ucar.edu
 .
 \end_layout
 
+\begin_layout Section
+Fortify
+\end_layout
+
+\begin_layout Standard
+Since the previous release of MET, requrements from various government agencies
+ that use MET have resulted in our code being analyzed by Fortify, a proprietary
+ static source code analyzer owned by HP Enterprise Security Products.
+ Briefly, Fortify looks at source code and analyzes it for security risks,
+ memory leaks, uninitialized variables, and other such weaknesses and bad
+ coding practices.
+ Fortify categorizes any issues it finds as low priority, high priority,
+ or critical, and reports these issues back to the developers for them to
+ address.
+ A development cycle is thus established, with Fortify analyzing code and
+ reporting back to the developers, who then make changes in the source code
+ to address these issues, and hand the new code off to Fortify again for
+ re-analysis.
+ The goal is to drive the counts of both high priority and critical issues
+ down to zero.
+\end_layout
+
+\begin_layout Standard
+The MET developers are pleased to report that after several months of work
+ we have achieved this goal.
+ Fortify now reports 
+\shape italic
+zero
+\shape default
+ high priority or critical issues in the MET code.
+ Users of MET tools who work in high security environments can therefore
+ rest assured about the possibility of security risks when using MET, since
+ the quality of the code has now been vetted by unbiased third-party experts.
+ The MET developers plan to continue using Fortify regularly to ensure that
+ these counts remain at zero in all future releases.
+\end_layout
+
 \end_body
 \end_document
