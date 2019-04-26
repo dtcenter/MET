@@ -959,9 +959,10 @@ Fortify
 \end_layout
 
 \begin_layout Standard
-Since the previous release of MET, requrements from various government agencies
- that use MET have resulted in our code being analyzed by Fortify, a proprietary
- static source code analyzer owned by HP Enterprise Security Products.
+Since the previous release of MET, requirements from various government
+ agencies that use MET have resulted in our code being analyzed by Fortify,
+ a proprietary static source code analyzer owned by HP Enterprise Security
+ Products.
  Briefly, Fortify looks at source code and analyzes it for security risks,
  memory leaks, uninitialized variables, and other such weaknesses and bad
  coding practices.
