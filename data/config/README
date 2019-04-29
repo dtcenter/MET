@@ -39,6 +39,36 @@ The configuration file language supports the following data types:
       - Multiple thresholds may be combined by specifying the logic type of AND
         (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
         and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
+   - Percentile Thresholds:
+      - Thresholds may be defined as a percentile of the data being processed in
+        several places.  The following percentile threshold types are supported:
+         - "SFP" for a percentile of the sample forecast values.
+           e.g. ">SFP50" means greater than the 50-th forecast percentile.
+         - "SOP" for a percentile of the sample observation values.
+           e.g. ">SOP75" means greater than the 75-th observation percentile.
+         - "SCP" for a percentile of the sample climatology values.
+           e.g. ">SCP90" means greater than the 90-th climatology percentile.
+         - "USP" for a user-specified percentile threshold.
+           e.g. "<USP90(2.5)" means less than the 90-th percentile values which
+           the user has already determined to be 2.5 outside of MET.
+         - "==FBIAS1" to automatically de-bias the data.  This option must be
+           used in conjunction with a simple threshold in the other field.
+           For example, when "obs.cat_thresh = >5.0" and
+           "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
+           observations and then chooses a forecast threshold which results in a
+           frequency bias of 1.
+      - When percentile thresholds are requested and computed, MET recomputes
+        the actual percentile that the threshold represents. If the requested
+        percentile and actual percentile differ by more than 5%, a warning
+        message is printed. This may occur when the sample size is small or the
+        data values are not truly continuous.
+      - When percentile thresholds are used, the actual threshold value is
+        appended to the FCST_THRESH and OBS_THRESH output columns.  For example,
+        if the 90-th percentile of the current set of forecast values is 3.5,
+        then the requested threshold "<=SFP90" is written to the output as
+        "<=SFP90(3.5)".
+      - When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
+        ignores the actual percentile values listed in parentheses.
    - Piecewise-Linear Function (currently used only by MODE):
       - A list of (x, y) points enclosed in parenthesis ().
       - The (x, y) points are *NOT* separated by commas.
@@ -340,7 +370,8 @@ obtype = "ANALYS";
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
 //         - GAUSSIAN    for the Gaussian filtering (width = at least 3)
 //
-//         The BEST interpolation option is not valid for regridding.
+//         The BEST and GEOG_MATCH interpolation options are not valid for
+//         regridding.
 //
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;     To regrid using a 4x4 box or circle with diameter 4.
@@ -348,8 +379,9 @@ obtype = "ANALYS";
 //   - The "shape" entry defines the shape of the neighborhood.
 //     Valid values are "SQUARE" or "CIRCLE"
 //
-//   - The "sigma" entry defines the sigma for the gaussiam filtering.
-//     It's only valid with GAUSSIAN interpolation method
+//   - The "sigma" entry defines the gaussian filter shape by specifying in
+//     grid units the radius for one standard deviation. It only applies to the
+//     GAUSSIAN interpolation method
 //      - sigma = 1;
 //
 regrid = {
@@ -1096,6 +1128,8 @@ boot = {
 //         - UPPER_RIGHT for the upper right grid point (width = 1)
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
+//         - GEOG_MATCH  for the nearest grid point where the land/sea mask
+//                          and geography criteria are satisfied.
 //
 //         The BUDGET and FORCE regridding options are not valid for
 //         interpolating. For grid-to-grid comparisons, the only valid options
@@ -1195,6 +1229,55 @@ fourier = {
 gradient = {
    dx = [ 1 ];
    dy = [ 1 ];
+}
+
+//
+// The "land_mask" dictionary defines the land/sea mask field which is used
+// when verifying at the surface. For point observations whose message type
+// appears in the "LANDSF" entry of the "message_type_group_map" setting,
+// only use forecast grid points where land = TRUE. For point observations
+// whose message type appears in the "WATERSF" entry of the
+// "message_type_group_map" setting, only use forecast grid points where
+// land = FALSE. The "flag" entry enables/disables this logic. If the
+// "file_name" entry is left empty, then the land/sea is assumed to exist in
+// the input forecast file. Otherwise, the specified file(s) are searched for
+// the data specified in the "field" entry. The "regrid" settings specify how
+// this field should be regridded to the verification domain. Lastly, the
+// "thresh" entry is the threshold which defines land (threshold is true) and
+// water (threshold is false).
+// land_mask.flag may be set separately in each "obs.field" entry.
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// The "topo_mask" dictionary defines the model topography field which is used
+// when verifying at the surface. This logic is applied to point observations
+// whose message type appears in the "SURFACE" entry of the
+// "message_type_group_map" setting. Only use point observations where the
+// topo - station elevation difference meets the "use_obs_thresh" threshold
+// entry. For the observations kept, when interpolating forecast data to the
+// observation location, only use forecast grid points where the topo - station
+// difference meets the "interp_fcst_thresh" threshold entry. The flag entry
+// enables/disables this logic. If the "file_name" is left empty, then the
+// topography data is assumed to exist in the input forecast file. Otherwise,
+// the specified file(s) are searched for the data specified in the "field"
+// entry. The "regrid" settings specify how this field should be regridded to
+// the verification domain.
+// topo_mask.flag may be set separately in each "obs.field" entry.
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [];
+   field              = { name = "TOPO"; level = "L0"; }
+   regrid             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
 }
 
 //
