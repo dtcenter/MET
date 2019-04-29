@@ -335,6 +335,7 @@ Version 8.1 Release Notes:
      of the data processed to the STAT, MODE, and MTD ASCII output files.
    - Added "DX" and "DY" columns to the GRAD line type to indicate the gradient
      step sizes which are now configurable for Grid-Stat.
+   - Added percentile intensity columns to the MTD 2D output files.
 
 - Enhancements to Existing Tools:
    - Fixed bugs related to MET's Python interface, Fourier decomposition in
@@ -366,8 +367,8 @@ Version 8.1 Release Notes:
       - Added the "-vld_thresh" command line option to specify the required
         ratio of valid data at each grid point to compute an output value.
    - Regrid-Data-Plane
-      - Calculate GOES-16/17 pixel locations from metadata of the input files so
-        that it can process multiple scenes of GOES-16/17 data.
+      - Calculated GOES-16/17 pixel locations from metadata of the input files
+        so that it can process multiple scenes of GOES-16/17 data.
    - ASCII2NC
       - Added support to the "-format" command line option to handle "aeronetv2"
         and "aeronetv3".
@@ -383,6 +384,10 @@ Version 8.1 Release Notes:
    - Grid-Stat
       - Added "gradient" config file entry to define the size of the gradients
         to be computed in both the x ("dx") and y ("dy") directions.
+   - MTD
+      - Added percentile intensity columns to the MTD 2D output files:
+        INTENSITY_10, INTENSITY_25, INTENSITY_50, INTENSITY_75, INTENSITY_90
+      - Corrected timestamps in the header columns.
    - Stat-Analysis
       - When using the "-by" job command option, enable "-set_hdr" to reference
         the current values of the "-by" columns.  For example, the following job
