@@ -19,6 +19,7 @@
 
 
 #include "mtd_file_int.h"
+#include "mtd_file_float.h"
 #include "mtd_config_info.h"
 #include "3d_att_single_array.h"
 #include "3d_att_single_array.h"
@@ -45,7 +46,9 @@ extern void do_3d_pair_txt_output(const PairAtt3DArray &,
                                   const char * output_filename);
 
 
-extern void do_2d_txt_output(const SingleAtt2DArray & fcst_single_att, 
+extern void do_2d_txt_output(const MtdFloatFile & fcst_raw, 
+                             const MtdFloatFile &  obs_raw, 
+                             const SingleAtt2DArray & fcst_single_att, 
                              const SingleAtt2DArray &  obs_single_att, 
                              const SingleAtt2DArray & fcst_cluster_att, 
                              const SingleAtt2DArray &  obs_cluster_att, 
@@ -56,7 +59,9 @@ extern void do_2d_txt_output(const SingleAtt2DArray & fcst_single_att,
    //  for single fields
    //
 
-extern void do_2d_txt_output(const SingleAtt2DArray &, 
+extern void do_2d_txt_output(const MtdFloatFile & fcst_raw, 
+                             const MtdFloatFile &  obs_raw, 
+                             const SingleAtt2DArray &, 
                              const MtdConfigInfo &, 
                              const char * output_filename);
 

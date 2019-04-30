@@ -75,6 +75,9 @@ class SingleAtt2DArray {
 
       int      lead_time(int index) const;
 
+
+      int      time_index(int index) const;
+
 };
 
 
