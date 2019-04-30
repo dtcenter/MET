@@ -112,8 +112,9 @@ The Grid-Stat tool provides verification statistics for a matched forecast
  However, the interpolation parameters may be used to perform a smoothing
  operation on the forecast and observation fields prior to verification.
  In addition to traditional verification approaches, the Grid-Stat tool
- includes neighborhood methods, designed to examine forecast performance
- as a function of spatial scale.
+ includes fourier decompositions, gradient statistics, and neighborhood
+ methods, designed to examine forecast performance as a function of spatial
+ scale.
 \end_layout
 
 \begin_layout Standard
@@ -256,7 +257,15 @@ reference "chap:App_C-Verification-Measures"
 
 \series medium
 A user may wish to eliminate certain values of the forecasts from the calculatio
-n of statistics, a process referred to here as``'conditional verification''.
+n of statistics, a process referred to here as 
+\begin_inset Quotes eld
+\end_inset
+
+conditional verification
+\begin_inset Quotes erd
+\end_inset
+
+.
  For example, a user may eliminate all temperatures above freezing and then
  calculate the error statistics only for those forecasts of below freezing
  temperatures.
@@ -2182,7 +2191,7 @@ name "table_GS_header_info_gs_outputs"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -2544,11 +2553,40 @@ Model variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
 \end_layout
 
 \end_inset
@@ -2577,7 +2615,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -2602,11 +2640,40 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -2635,7 +2702,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -2664,7 +2731,7 @@ User provided text string designating the observation type
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
@@ -2694,7 +2761,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -2723,7 +2790,7 @@ Interpolation method applied to forecast field
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -2752,7 +2819,7 @@ Number of points used by interpolation method
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -2781,7 +2848,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -2810,7 +2877,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -2840,7 +2907,7 @@ h
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -2869,7 +2936,7 @@ Error percent value used in confidence intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3026,7 +3093,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3055,7 +3122,7 @@ Neighborhood Contingency Table Counts line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3084,7 +3151,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3113,7 +3180,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3142,7 +3209,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3171,7 +3238,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -3317,7 +3384,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3346,7 +3413,7 @@ Neighborhood Contingency Table Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3375,7 +3442,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-28
+26-30
 \end_layout
 
 \end_inset
@@ -3416,7 +3483,7 @@ Base rate including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-29-33
+31-35
 \end_layout
 
 \end_inset
@@ -3458,7 +3525,7 @@ Forecast mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-38
+36-40
 \end_layout
 
 \end_inset
@@ -3503,7 +3570,7 @@ Accuracy including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-39-41
+41-43
 \end_layout
 
 \end_inset
@@ -3540,7 +3607,7 @@ Frequency Bias including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-42-46
+44-48
 \end_layout
 
 \end_inset
@@ -3582,7 +3649,7 @@ Probability of detecting yes including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-47-51
+49-53
 \end_layout
 
 \end_inset
@@ -3624,7 +3691,7 @@ Probability of detecting no including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-52-56
+54-58
 \end_layout
 
 \end_inset
@@ -3666,7 +3733,7 @@ Probability of false detection including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-57-61
+59-63
 \end_layout
 
 \end_inset
@@ -3712,7 +3779,7 @@ False alarm ratio including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-62-66
+64-68
 \end_layout
 
 \end_inset
@@ -3758,7 +3825,7 @@ Critical Success Index including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-67-69
+69-71
 \end_layout
 
 \end_inset
@@ -3881,7 +3948,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-70-74
+72-76
 \end_layout
 
 \end_inset
@@ -3927,7 +3994,7 @@ Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-75-77
+77-79
 \end_layout
 
 \end_inset
@@ -3964,7 +4031,7 @@ Heidke Skill Score including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-78-82
+80-84
 \end_layout
 
 \end_inset
@@ -4009,7 +4076,7 @@ Odds Ratio including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-83-87
+85-89
 \end_layout
 
 \end_inset
@@ -4055,7 +4122,7 @@ Logarithm of the Odds Ratio including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-88-92
+90-94
 \end_layout
 
 \end_inset
@@ -4101,7 +4168,7 @@ Odds Ratio Skill Score including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-93-97
+95-99
 \end_layout
 
 \end_inset
@@ -4147,7 +4214,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-98-102
+100-104
 \end_layout
 
 \end_inset
@@ -4193,7 +4260,7 @@ Symmetric Extreme Depenency Score including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-103-107
+105-109
 \end_layout
 
 \end_inset
@@ -4239,7 +4306,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-108-112
+110-114
 \end_layout
 
 \end_inset
@@ -4285,7 +4352,7 @@ Symmetric Extremal Depenency Index including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-113-115
+115-117
 \end_layout
 
 \end_inset
@@ -4436,7 +4503,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4465,7 +4532,7 @@ Neighborhood Continuous statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4494,7 +4561,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-26
+26-28
 \end_layout
 
 \end_inset
@@ -4531,7 +4598,7 @@ Fractions Brier Score including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-27-29
+29-31
 \end_layout
 
 \end_inset
@@ -4568,7 +4635,7 @@ Fractions Skill Score including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-30-32
+32-34
 \end_layout
 
 \end_inset
@@ -4606,7 +4673,7 @@ Asymptotic Fractions Skill Score including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-35
+35-37
 \end_layout
 
 \end_inset
@@ -4644,7 +4711,7 @@ Uniform Fractions Skill Score including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-36-38
+38-40
 \end_layout
 
 \end_inset
@@ -4682,7 +4749,7 @@ Forecast event frequency including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-39-41
+41-43
 \end_layout
 
 \end_inset
@@ -4832,7 +4899,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4861,7 +4928,7 @@ Gradient Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4880,64 +4947,6 @@ TOTAL
 
 \begin_layout Plain Layout
 Total number of matched pairs
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-24
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-DX
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Gradient size in the X-direction
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-25
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-DY
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Gradient size in the Y-direction
 \end_layout
 
 \end_inset
@@ -5118,7 +5127,7 @@ S1 score with respect to observed gradient
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5127,7 +5136,7 @@ S1 score with respect to observed gradient
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5136,11 +5145,69 @@ FGOG_RATIO
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Ratio of forecast and observed gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gradient size in the X-direction
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+34
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gradient size in the Y-direction
 \end_layout
 
 \end_inset

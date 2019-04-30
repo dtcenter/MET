@@ -1666,7 +1666,7 @@ This section contains a description of running the regrid_data_plane tool.
  This tool may be run to read data from any gridded file MET supports (i.e
  GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a user-specified
  grid, and write the field(s) out in NetCDF format.
- In addition, regrid_data_plane can read GOES-16 AOD input files in NetCDF
+ In addition, regrid_data_plane can read GOES-16/17 input files in NetCDF
  format.
  The user may specify the method of interpolation used for regridding as
  well as which fields to regrid.
@@ -1766,7 +1766,23 @@ hskip 0.5in}
 
 \end_inset
 
--field string 
+-field string
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-qc flags]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1830,6 +1846,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-shape type] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-vld_thresh n] 
 \end_layout
 
@@ -1847,22 +1879,6 @@ hskip 0.5in}
 \end_inset
 
 [-name list]
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-[-qc flags]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1985,77 +2001,6 @@ Optional arguments for regrid_data_plane
 \series default
 The 
 \series bold
--method type
-\series default
- option overrides the default regridding method.
- Default is NEAREST.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-6.
- 
-\series default
-The 
-\series bold
--width n
-\series default
- option overrides the default regridding width.
- Default is 1.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-7.
- 
-\series default
-The 
-\series bold
--sigma
-\series default
- option overrides the default regridding sigma for Gaussian interpolation.
- Default is 1.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-8.
- 
-\series default
-The 
-\series bold
--vld_thresh n
-\series default
- option overrides the default required ratio of valid data for regridding.
- Default is 0.5.
- 
-\end_layout
-
-\begin_layout Description
-
-\series medium
-9.
- 
-\series default
-The 
-\series bold
--name list
-\series default
- specifies a comma-separated list of output variable names for each field
- specified.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-10.
- 
-\series default
-The 
-\series bold
 -qc flags
 \series default
  option specifies a comma-separated list of QC flags, for example "0,1"
@@ -2075,7 +2020,92 @@ goes_imager_projection
 \begin_layout Description
 
 \series medium
+6.
+ 
+\series default
+The 
+\series bold
+-method type
+\series default
+ option overrides the default regridding method.
+ Default is NEAREST.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ 
+\series default
+The 
+\series bold
+-width n
+\series default
+ option overrides the default regridding width.
+ Default is 1.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+The 
+\series bold
+-sigma
+\series default
+ option overrides the default regridding sigma for Gaussian interpolation.
+ Default is 1.476.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+9.
+ 
+\series default
+The 
+\series bold
+-shape
+\series default
+ option overrides the default interpolation shape.
+ Default is SQUARE.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+10.
+ 
+\series default
+The 
+\series bold
+-vld_thresh n
+\series default
+ option overrides the default required ratio of valid data for regridding.
+ Default is 0.5.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
 11.
+ 
+\series default
+The 
+\series bold
+-name list
+\series default
+ specifies a comma-separated list of output variable names for each field
+ specified.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+12.
  The 
 \series bold
 -log file
@@ -2094,7 +2124,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-12.
+13.
  The 
 \series bold
 -v level
@@ -2120,7 +2150,7 @@ level
 \begin_layout Description
 
 \series medium
-13.
+14.
 
 \series default
  The 

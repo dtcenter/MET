@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -121,6 +123,10 @@ The following map projections are currently supported in MET:
 * Lat/Lon Projection
 \end_layout
 
+\begin_layout Standard
+* Rotated Lat/Lon Projection
+\end_layout
+
 \begin_layout Section
 Grids
 \begin_inset CommandInset label
@@ -162,57 +168,6 @@ http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The NCEP grids that are pre-defined in MET are listed below by projection
- type:
-\end_layout
-
-\begin_layout Standard
-* Lambert Conformal Projection
-\end_layout
-
-\begin_layout Standard
-o G145, G146, G163, G206, G209, G211, G212, G215, G218, G221
-\end_layout
-
-\begin_layout Standard
-o G222, G226, G227, G236, G237, G241, G245, G246, G247, G252
-\end_layout
-
-\begin_layout Standard
-* Polar Stereographic Projection (Northern)
-\end_layout
-
-\begin_layout Standard
-o G005, G006, G027, G028, G055, G056, G087, G088, G100, G101
-\end_layout
-
-\begin_layout Standard
-o G103, G104, G105, G106, G107, G201, G202, G203, G205, G207
-\end_layout
-
-\begin_layout Standard
-o G213, G214, G216, G217, G223, G224, G240, G242, G249
-\end_layout
-
-\begin_layout Standard
-* Lat/Lon Projection
-\end_layout
-
-\begin_layout Standard
-o G002, G003, G004, G029, G030, G033, G034, G045, G085, G086
-\end_layout
-
-\begin_layout Standard
-o G110, G175, G228, G229, G230, G231, G232, G233, G234, G243
-\end_layout
-
-\begin_layout Standard
-o G248, G250,G251
 \end_layout
 
 \begin_layout Section

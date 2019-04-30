@@ -3618,7 +3618,8 @@ Optional arguments for ascii2nc
 \series bold
 -format ASCII_format
 \series medium
- option may be set to "met_point", "little_r", "surfrad", "wwsis", "aeronet", "aeronetv2", or "aeronetv3".
+ option may be set to "met_point", "little_r", "surfrad", "wwsis", "aeronet",
+ "aeronetv2", or "aeronetv3".
  If passing in ISIS data, use the 
 \begin_inset Quotes eld
 \end_inset
@@ -4217,6 +4218,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-config file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-qc_dd list]
 \end_layout
 
@@ -4423,6 +4440,18 @@ Optional arguments for madis2nc
 4.
  The 
 \series bold
+-config file 
+\series medium
+option specifies the configuration file to generate summaries of the fields
+ in the ASCII files.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
 -qc_dd list
 \series medium
  option specifies a comma-separated list of QC flag values to be accepted
@@ -4432,7 +4461,7 @@ Optional arguments for madis2nc
 \begin_layout Description
 
 \series medium
-5.
+6.
  The 
 \series bold
 -lvl_dim list option
@@ -4443,12 +4472,12 @@ Optional arguments for madis2nc
 \begin_layout Description
 
 \series medium
-6.
+7.
  To specify the exact records to be processed, the 
 \series bold
 -rec_beg n
 \series medium
- specifies the index of the first MADIS record to process and 
+ specifies the index of the first MADIS record toprocess and 
 \series bold
 -rec_end n
 \series medium
@@ -4459,7 +4488,7 @@ Optional arguments for madis2nc
 \begin_layout Description
 
 \series medium
-7.
+8.
  The 
 \series bold
 -mask_grid string
@@ -4471,7 +4500,7 @@ Optional arguments for madis2nc
 \begin_layout Description
 
 \series medium
-8.
+9.
  The 
 \series bold
 -mask_poly file
@@ -4483,7 +4512,7 @@ Optional arguments for madis2nc
 \begin_layout Description
 
 \series medium
-9.
+10.
  The 
 \series bold
 -mask_sid file|list 
@@ -4511,7 +4540,7 @@ reference "subsec:IO_General-MET-Config-Options"
 \begin_layout Description
 
 \series medium
-10.
+11.
  The 
 \series bold
 -log file
@@ -4531,7 +4560,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-11.
+12.
  The 
 \series bold
 -v level
@@ -4557,7 +4586,7 @@ level
 \begin_layout Description
 
 \series medium
-12.
+13.
 
 \series default
  The 
@@ -4603,6 +4632,173 @@ sample_madis_obs_met.nc
 .
  Warnings and error messages will be written to the madislog file, and the
  verbosity will be level three.
+\end_layout
+
+\begin_layout Subsection
+madis2nc configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:madis2nc-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The default configuration file for the MADIS2NC tool named 
+\series bold
+Madis2NcConfig_default
+\series medium
+ can be found in the installed share/met/config directory.
+ It is recommended that users make a copy of this file prior to modifying
+ its contents.
+\end_layout
+
+\begin_layout Standard
+The MADIS2NC configuration file is optional and only necessary when defining
+ time summaries.
+
+\series medium
+ The contents of the default MADIS2NC configuration file are described below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version = "VN.N";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+time_summary = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   beg        = "000000";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   end        = "235959";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   step       = 300;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width      = 600;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   grib_code  = [ 11, 204, 211 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   obs_var    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
+ ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_freq   = 0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+time_summary
+\series medium
+ feature was implemented to allow additional processing of observations
+ with high temporal resolution.
+ This option is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pb2nc-configuration-file"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
