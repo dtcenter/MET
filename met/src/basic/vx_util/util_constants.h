@@ -70,9 +70,9 @@ static const int n_vld_msg_typ =
    sizeof(vld_msg_typ_list)/sizeof(*vld_msg_typ_list);
 
 // Message type group names
-static const char *surface_msg_typ_group_str = "SURFACE"; // Surface message type group
-static const char *landsf_msg_typ_group_str  = "LANDSF";  // Surface land message type group
-static const char *watersf_msg_typ_group_str = "WATERSF"; // Surface water message type group
+static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group
+static const char landsf_msg_typ_group_str  [] = "LANDSF";  // Surface land message type group
+static const char watersf_msg_typ_group_str [] = "WATERSF"; // Surface water message type group
 
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
