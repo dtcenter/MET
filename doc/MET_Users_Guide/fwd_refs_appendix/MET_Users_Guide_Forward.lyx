@@ -195,6 +195,10 @@ DY
  are now configurable for Grid-Stat.
 \end_layout
 
+\begin_layout Itemize
+Added percentile intensity columns to the MTD 2D output files.
+\end_layout
+
 \begin_layout Subsection*
 Enhancements to Existing Tools:
 \end_layout
@@ -495,6 +499,28 @@ dy
 \end_inset
 
 ) directions.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+MTD
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Added percentile intensity columns to the MTD 2D output files:
+\series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+INTENSITY_10, INTENSITY_25, INTENSITY_50, INTENSITY_75, INTENSITY_90
+\end_layout
+
+\begin_layout Itemize
+Corrected timestamps in the header columns.
 \end_layout
 
 \end_deeper

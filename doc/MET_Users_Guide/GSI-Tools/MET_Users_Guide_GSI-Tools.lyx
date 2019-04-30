@@ -651,7 +651,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-1-32
+1-37
 \end_layout
 
 \end_inset
@@ -687,7 +687,7 @@ reference "table_PS_format_info_MPR"
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+38
 \end_layout
 
 \end_inset
@@ -716,7 +716,7 @@ Model pressure value at the observation height (hPa)
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+39
 \end_layout
 
 \end_inset
@@ -745,7 +745,7 @@ PrepBufr inverse observation error
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+40
 \end_layout
 
 \end_inset
@@ -774,7 +774,7 @@ read_prepbufr inverse observation error
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+41
 \end_layout
 
 \end_inset
@@ -803,7 +803,7 @@ Final inverse observation error
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+42
 \end_layout
 
 \end_inset
@@ -832,7 +832,7 @@ read_prepbufr usage
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+43
 \end_layout
 
 \end_inset
@@ -861,7 +861,7 @@ Analysis usage (1 for yes, -1 for no)
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+44
 \end_layout
 
 \end_inset
@@ -890,7 +890,7 @@ Setup quality control
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+45
 \end_layout
 
 \end_inset
@@ -1025,7 +1025,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-1-32
+1-37
 \end_layout
 
 \end_inset
@@ -1061,7 +1061,7 @@ reference "table_PS_format_info_MPR"
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+38
 \end_layout
 
 \end_inset
@@ -1090,7 +1090,7 @@ Channel used (1 for yes, -1 for no)
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+39
 \end_layout
 
 \end_inset
@@ -1119,7 +1119,7 @@ Sensor scan position
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+40
 \end_layout
 
 \end_inset
@@ -1148,7 +1148,7 @@ Satellite zenith angle (degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+41
 \end_layout
 
 \end_inset
@@ -1177,7 +1177,7 @@ Satellite azimuth angle (degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+42
 \end_layout
 
 \end_inset
@@ -1206,7 +1206,7 @@ Solar zenith angle (degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+43
 \end_layout
 
 \end_inset
@@ -1235,7 +1235,7 @@ Solar azimuth angle (degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+44
 \end_layout
 
 \end_inset
@@ -1264,7 +1264,7 @@ Sun glint angle (degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+45
 \end_layout
 
 \end_inset
@@ -1293,7 +1293,7 @@ Fractional coverage by water
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+46
 \end_layout
 
 \end_inset
@@ -1322,7 +1322,7 @@ Fractional coverage by land
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+47
 \end_layout
 
 \end_inset
@@ -1363,7 +1363,7 @@ Fractional coverage by ice
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+48
 \end_layout
 
 \end_inset
@@ -1392,7 +1392,7 @@ Fractional coverage by snow
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+49
 \end_layout
 
 \end_inset
@@ -1421,7 +1421,7 @@ Surface temperature over water (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+50
 \end_layout
 
 \end_inset
@@ -1450,7 +1450,7 @@ Surface temperature over land (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+51
 \end_layout
 
 \end_inset
@@ -1479,7 +1479,7 @@ Surface temperature over ice (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+52
 \end_layout
 
 \end_inset
@@ -1508,7 +1508,7 @@ Surface temperature over snow (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+53
 \end_layout
 
 \end_inset
@@ -1537,7 +1537,7 @@ Soil temperature (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+54
 \end_layout
 
 \end_inset
@@ -1566,7 +1566,7 @@ Soil moisture
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+55
 \end_layout
 
 \end_inset
@@ -1595,7 +1595,7 @@ Surface land type
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+56
 \end_layout
 
 \end_inset
@@ -1624,7 +1624,7 @@ Vegetation fraction
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+57
 \end_layout
 
 \end_inset
@@ -1653,7 +1653,7 @@ Snow depth
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+58
 \end_layout
 
 \end_inset
@@ -1682,7 +1682,7 @@ Surface wind speed (m/s)
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+59
 \end_layout
 
 \end_inset
@@ -1719,7 +1719,7 @@ Cloud liquid water (kg/m**2) (microwave only)
 \begin_inset Text
 
 \begin_layout Plain Layout
-55
+60
 \end_layout
 
 \end_inset
@@ -1757,7 +1757,7 @@ Total column precip.
 \begin_inset Text
 
 \begin_layout Plain Layout
-56
+61
 \end_layout
 
 \end_inset
@@ -1786,7 +1786,7 @@ Foundation temperature: Tr
 \begin_inset Text
 
 \begin_layout Plain Layout
-57
+62
 \end_layout
 
 \end_inset
@@ -1815,7 +1815,7 @@ Diurnal warming: d(Tw) at depth zob
 \begin_inset Text
 
 \begin_layout Plain Layout
-58
+63
 \end_layout
 
 \end_inset
@@ -1844,7 +1844,7 @@ Sub-layer cooling: d(Tc) at depth zob
 \begin_inset Text
 
 \begin_layout Plain Layout
-59
+64
 \end_layout
 
 \end_inset
@@ -1873,7 +1873,7 @@ d(Tz)/d(Tr)
 \begin_inset Text
 
 \begin_layout Plain Layout
-60
+65
 \end_layout
 
 \end_inset
@@ -1902,7 +1902,7 @@ Inverse observation error
 \begin_inset Text
 
 \begin_layout Plain Layout
-61
+66
 \end_layout
 
 \end_inset
@@ -1931,7 +1931,7 @@ Brightness temperature with no bias correction (K)
 \begin_inset Text
 
 \begin_layout Plain Layout
-62
+67
 \end_layout
 
 \end_inset
@@ -1960,7 +1960,7 @@ Surface emissivity
 \begin_inset Text
 
 \begin_layout Plain Layout
-63
+68
 \end_layout
 
 \end_inset
@@ -1989,7 +1989,7 @@ Stability index
 \begin_inset Text
 
 \begin_layout Plain Layout
-64
+69
 \end_layout
 
 \end_inset

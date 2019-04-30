@@ -221,7 +221,17 @@ In the vertical, if forecasts and observations are at the same vertical
  Vertical interpolation for heights above ground are done linear in height
  coordinates.
  When forecasts are for the surface, no interpolation is done.
- They are matched to observations with message type ADPSFC or SFCSHP.
+ They are matched to observations with message types that are mapped to
+ 
+\series bold
+SURFACE
+\series medium
+ in the 
+\series bold
+message_type_group_map
+\series medium
+ configuration option.
+ By defualt, the surface message types include ADPSFC, SFCSHP, and MSONET.
  
 \end_layout
 
@@ -232,10 +242,12 @@ To match forecasts and observations in the horizontal plane, the user can
  select from a number of methods described below.
  Many of these methods require the user to define the width of the forecast
  grid W, around each observation point P, that should be considered.
- For example, a width of 2 defines a 2 x 2 square of grid points enclosing
+ In addition, the user can select the interpolation shape, either a SQUARE
+ or a CIRCLE.
+ For example, a square of width 2 defines the 2 x 2 set of grid points enclosing
  P, or simply the 4 grid points closest to P.
- A width of 3 defines a 3 x 3 square consisting of 9 grid points centered
- on the grid point closest to P.
+ A square of width of 3 defines a 3 x 3 square consisting of 9 grid points
+ centered on the grid point closest to P.
  Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -362,10 +374,60 @@ The forecast value at P is assigned the value at the nearest grid point.
  Here, "nearest" means spatially closest in horizontal grid coordinates.
  This method is used by default when the interpolation width, W, is set
  to 1.
-\begin_inset Newline newline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Geography Match
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The forecast value at P is assigned the value at the nearest grid point
+ in the interpolation area where the land/sea mask and topography criteria
+ are satisfied.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Gaussian
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The forecast value at P is a weighted sum of the values in the interpolation
+ area.
+ The weight given to each forecast point follows the gaussian distribution
+ with nearby points contributing more the far away points.
+ The shape of the distribution is configured using sigma.
 \end_layout
 
 \begin_layout Standard
@@ -389,11 +451,8 @@ Minimum value
 \begin_layout Standard
 
 \series medium
-The forecast value at P is the minimum of the values in the W x W square.
-\begin_inset Newline newline
-\end_inset
-
-
+The forecast value at P is the minimum of the values in the interpolation
+ area.
 \end_layout
 
 \begin_layout Standard
@@ -417,11 +476,8 @@ Maximum value
 \begin_layout Standard
 
 \series medium
-The forecast value at P is the maximum of the values in the W x W square.
-\begin_inset Newline newline
-\end_inset
-
-
+The forecast value at P is the maximum of the values in the interpolation
+ area.
 \end_layout
 
 \begin_layout Standard
@@ -445,16 +501,13 @@ Distance-weighted mean
 \begin_layout Standard
 
 \series medium
-The forecast value at P is a weighted sum of the values in the W x W square.
+The forecast value at P is a weighted sum of the values in the interpolation
+ area.
  The weight given to each forecast point is the reciprocal of the square
  of the distance (in grid coordinates) from P.
  The weighted sum of forecast values is normalized by dividing by the sum
  of the weights.
  
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -481,10 +534,6 @@ Unweighted mean
 This method is similar to the distance-weighted mean, except all the weights
  are equal to 1.
  The distance of any point from P is not considered.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -508,12 +557,8 @@ Median
 \begin_layout Standard
 
 \series medium
-The forecast value at P is the median of the forecast values in the W x
- W square.
-\begin_inset Newline newline
-\end_inset
-
-
+The forecast value at P is the median of the forecast values in the interpolatio
+n area.
 \end_layout
 
 \begin_layout Standard
@@ -621,10 +666,6 @@ x,y
 \series default
 ) of P are substituted into this expression to give z, our least squares
  interpolated data value at P.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -699,9 +740,8 @@ Best Interpolation
 \begin_layout Standard
 
 \series medium
-This method is performed using the four closest grid squares.
- The forecast values are interpolated to the grid point which most closely
- matches the observation value
+The forecast value at P is the chosen as the grid point inside the interpolation
+ area whose value most closely matches the observation value.
 \end_layout
 
 \begin_layout Subsection
@@ -2187,6 +2227,235 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+land_mask = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   file_name = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   field     = { name = "LAND"; level = "L0"; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   regrid    = { method = NEAREST; width = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   thresh = eq1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+land_mask
+\series medium
+ dictionary defines the land/sea mask field which is used when verifying
+ at the surface.
+ For point observations whose message type appears in the 
+\series bold
+LANDSF
+\series medium
+ entry of the 
+\series bold
+message_type_group_map
+\series medium
+ setting, only use forecast grid points where land = TRUE.
+ For point observations whose message type appears in the 
+\series bold
+WATERSF
+\series medium
+ entry of the 
+\series bold
+message_type_group_map
+\series medium
+ setting, only use forecast grid points where land = FALSE.
+ The 
+\series bold
+flag
+\series medium
+ entry enables/disables this logic.
+ If the 
+\series bold
+file_name
+\series medium
+ is left empty, then the land/sea is assumed to exist in the input forecast
+ file.
+ Otherwise, the specified file(s) are searched for the data specified in
+ the 
+\series bold
+field
+\series medium
+ entry.
+ The 
+\series bold
+regrid
+\series medium
+ settings specify how this field should be regridded to the verification
+ domain.
+ Lastly, the 
+\series bold
+thresh
+\series medium
+ entry is the threshold which defines land (threshold is true) and water
+ (threshold is false).
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+topo_mask = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag               = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   file_name          = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   field              = { name = "TOPO"; level = "L0"; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   regrid             = { method = BILIN; width = 2; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   use_obs_thresh     = ge-100&&le100;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   interp_fcst_thresh = ge-50&&le50;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+topo_mask
+\series medium
+ dictionary defines the model topography field which is used when verifying
+ at the surface.
+ This logic is applied to point observations whose message type appears
+ in the 
+\series bold
+SURFACE
+\series medium
+ entry of the 
+\series bold
+message_type_group_map
+\series medium
+ setting.
+ Only use point observations where the topo - station elevation difference
+ meets the 
+\series bold
+use_obs_thresh
+\series medium
+ threshold entry.
+ For the observations kept, when interpolating forecast data to the observation
+ location, only use forecast grid points where the topo - station difference
+ meets the 
+\series bold
+interp_fcst_thresh
+\series medium
+ threshold entry.
+ The 
+\series bold
+flag
+\series medium
+ entry enables/disables this logic.
+ If the 
+\series bold
+file_name
+\series medium
+ is left empty, then the topography data is assumed to exist in the input
+ forecast file.
+ Otherwise, the specified file(s) are searched for the data specified in
+ the 
+\series bold
+field
+\series medium
+ entry.
+ The 
+\series bold
+regrid
+\series medium
+ settings specify how this field should be regridded to the verification
+ domain.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
@@ -2663,10 +2932,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -2689,7 +2954,7 @@ name "table_PS_header_info_point-stat_out"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
@@ -3051,11 +3316,40 @@ Model variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
 \end_layout
 
 \end_inset
@@ -3084,7 +3378,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -3109,11 +3403,40 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -3142,7 +3465,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -3171,7 +3494,7 @@ Observation message type selected
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
@@ -3201,7 +3524,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -3230,7 +3553,7 @@ Interpolation method applied to forecasts
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -3259,7 +3582,7 @@ Number of points used in interpolation method
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -3288,7 +3611,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -3317,7 +3640,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -3346,7 +3669,7 @@ NA in Point-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -3375,7 +3698,7 @@ Error percent value used in confidence intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3535,7 +3858,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3564,7 +3887,7 @@ Forecast, Hit, Observation line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3593,7 +3916,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3622,7 +3945,7 @@ Forecast rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3651,7 +3974,7 @@ Hit rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3796,7 +4119,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3825,7 +4148,7 @@ Contingency Table Counts line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3854,7 +4177,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3883,7 +4206,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3912,7 +4235,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3941,7 +4264,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -4088,7 +4411,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4117,7 +4440,7 @@ Contingency Table Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4146,7 +4469,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-28
+26-30
 \end_layout
 
 \end_inset
@@ -4175,7 +4498,7 @@ Base rate including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-29-33
+31-35
 \end_layout
 
 \end_inset
@@ -4217,7 +4540,7 @@ Forecast mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-38
+36-40
 \end_layout
 
 \end_inset
@@ -4262,7 +4585,7 @@ Accuracy including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-39-41
+41-43
 \end_layout
 
 \end_inset
@@ -4299,7 +4622,7 @@ Frequency Bias including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-42-46
+44-48
 \end_layout
 
 \end_inset
@@ -4341,7 +4664,7 @@ Probability of detecting yes including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-47-51
+49-53
 \end_layout
 
 \end_inset
@@ -4383,7 +4706,7 @@ Probability of detecting no including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-52-56
+54-58
 \end_layout
 
 \end_inset
@@ -4425,7 +4748,7 @@ Probability of false detection including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-57-61
+59-63
 \end_layout
 
 \end_inset
@@ -4471,7 +4794,7 @@ False alarm ratio including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-62-66
+64-68
 \end_layout
 
 \end_inset
@@ -4517,7 +4840,7 @@ Critical Success Index including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-67-69
+69-71
 \end_layout
 
 \end_inset
@@ -4674,7 +4997,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-70-74
+72-76
 \end_layout
 
 \end_inset
@@ -4720,7 +5043,7 @@ Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-75-77
+77-79
 \end_layout
 
 \end_inset
@@ -4757,7 +5080,7 @@ Heidke Skill Score including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-78-82
+80-84
 \end_layout
 
 \end_inset
@@ -4802,7 +5125,7 @@ Odds Ratio including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-83-87
+85-89
 \end_layout
 
 \end_inset
@@ -4848,7 +5171,7 @@ Logarithm of the Odds Ratio including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-88-92
+90-94
 \end_layout
 
 \end_inset
@@ -4894,7 +5217,7 @@ Odds Ratio Skill Score including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-93-97
+95-99
 \end_layout
 
 \end_inset
@@ -4940,7 +5263,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-98-102
+100-104
 \end_layout
 
 \end_inset
@@ -4986,7 +5309,7 @@ Symmetric Extreme Depenency Score including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-103-107
+105-109
 \end_layout
 
 \end_inset
@@ -5032,7 +5355,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-108-112
+111-113
 \end_layout
 
 \end_inset
@@ -5078,7 +5401,7 @@ Symmetric Extremal Depenency Index including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-113-115
+115-117
 \end_layout
 
 \end_inset
@@ -5227,7 +5550,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -5256,7 +5579,7 @@ Continuous statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -5285,7 +5608,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-28
+26-30
 \end_layout
 
 \end_inset
@@ -5331,7 +5654,7 @@ Forecast mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-29-33
+31-35
 \end_layout
 
 \end_inset
@@ -5377,7 +5700,7 @@ Standard deviation of the forecasts including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-38
+36-40
 \end_layout
 
 \end_inset
@@ -5423,7 +5746,7 @@ Observation mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-39-43
+41-45
 \end_layout
 
 \end_inset
@@ -5469,7 +5792,7 @@ Standard deviation of the observations including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-44-48
+46-50
 \end_layout
 
 \end_inset
@@ -5515,7 +5838,7 @@ Pearson correlation coefficient including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+51
 \end_layout
 
 \end_inset
@@ -5544,7 +5867,7 @@ Spearman's rank correlation coefficient
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+52
 \end_layout
 
 \end_inset
@@ -5573,7 +5896,7 @@ Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+53
 \end_layout
 
 \end_inset
@@ -5602,7 +5925,7 @@ Number of ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+54
 \end_layout
 
 \end_inset
@@ -5631,7 +5954,7 @@ Number of tied forecast ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+55
 \end_layout
 
 \end_inset
@@ -5660,7 +5983,7 @@ Number of tied observation ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-54-58
+56-60
 \end_layout
 
 \end_inset
@@ -5706,7 +6029,7 @@ Mean error (F-O) including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-59-63
+61-65
 \end_layout
 
 \end_inset
@@ -5763,7 +6086,7 @@ Standard deviation of the error including normal and bootstrap upper and
 \begin_inset Float table
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -5868,7 +6191,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-64-66
+66-68
 \end_layout
 
 \end_inset
@@ -5905,7 +6228,7 @@ Multiplicative bias including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-67-69
+69-71
 \end_layout
 
 \end_inset
@@ -5942,7 +6265,7 @@ Mean absolute error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-70-72
+72-74
 \end_layout
 
 \end_inset
@@ -5979,7 +6302,7 @@ Mean squared error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-73-75
+75-77
 \end_layout
 
 \end_inset
@@ -6017,7 +6340,7 @@ Bias-corrected mean squared error including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-76-78
+78-80
 \end_layout
 
 \end_inset
@@ -6055,7 +6378,7 @@ Root mean squared error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-79-92
+81-94
 \end_layout
 
 \end_inset
@@ -6141,7 +6464,7 @@ E90_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-94-96
+96-98
 \end_layout
 
 \end_inset
@@ -6178,7 +6501,7 @@ The Interquartile Range including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-97-99
+99-101
 \end_layout
 
 \end_inset
@@ -6216,7 +6539,7 @@ The Median Absolute Deviation including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-100-104
+102-106
 \end_layout
 
 \end_inset
@@ -6262,7 +6585,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-105-107
+107-109
 \end_layout
 
 \end_inset
@@ -6300,7 +6623,7 @@ The square of the mean error (bias) including bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-108-110
+110-112
 \end_layout
 
 \end_inset
@@ -6338,7 +6661,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-111-113
+113-115
 \end_layout
 
 \end_inset
@@ -6376,7 +6699,7 @@ Root mean squared forecast anomaly (f-c) including bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-114-116
+116-118
 \end_layout
 
 \end_inset
@@ -6524,7 +6847,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -6553,7 +6876,7 @@ Multi-category Contingency Table Counts line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -6582,7 +6905,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -6611,7 +6934,7 @@ Dimension of the contingency table
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -6754,7 +7077,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -6783,7 +7106,7 @@ Multi-category Contingency Table Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -6812,7 +7135,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -6842,7 +7165,7 @@ The total number of categories in each of dimension of the contingency table.
 \begin_inset Text
 
 \begin_layout Plain Layout
-25-29
+27-31
 \end_layout
 
 \end_inset
@@ -6875,7 +7198,7 @@ Accuracy, normal confidence limits and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-30-32
+32-34
 \end_layout
 
 \end_inset
@@ -6912,7 +7235,7 @@ Hanssen and Kuipers Discriminant and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-35
+35-37
 \end_layout
 
 \end_inset
@@ -6945,7 +7268,7 @@ Heidke Skill Score and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-36-38
+38-40
 \end_layout
 
 \end_inset
@@ -7091,7 +7414,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -7120,7 +7443,7 @@ Probability contingency table count line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -7149,7 +7472,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -7178,7 +7501,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -7207,7 +7530,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -7237,7 +7560,7 @@ Number of observation yes when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -7409,7 +7732,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -7438,7 +7761,7 @@ Probabilistic statistics for dichotomous outcome line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -7467,7 +7790,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -7496,7 +7819,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-25-27
+27-29
 \end_layout
 
 \end_inset
@@ -7533,7 +7856,7 @@ The Base Rate, including normal upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -7562,7 +7885,7 @@ Reliability
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -7591,7 +7914,7 @@ Resolution
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -7620,7 +7943,7 @@ Uncertainty
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -7649,7 +7972,7 @@ Area under the receiver operating characteristic curve
 \begin_inset Text
 
 \begin_layout Plain Layout
-32-34
+34-36
 \end_layout
 
 \end_inset
@@ -7686,7 +8009,7 @@ Brier Score including normal upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-35-37
+37-39
 \end_layout
 
 \end_inset
@@ -7723,7 +8046,7 @@ Climatological Brier Score including upper and lower normal confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+40
 \end_layout
 
 \end_inset
@@ -7752,7 +8075,7 @@ Brier Skill Score relative to external climatology
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+41
 \end_layout
 
 \end_inset
@@ -7781,7 +8104,7 @@ Brier Skill Score relative to sample climatology
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+42
 \end_layout
 
 \end_inset
@@ -7923,7 +8246,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -7952,7 +8275,7 @@ Probabilistic Joint/Continuous line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -7981,7 +8304,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -8010,7 +8333,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -8039,7 +8362,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -8069,7 +8392,7 @@ Number of observation yes when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -8099,7 +8422,7 @@ Number of observation no when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -8129,7 +8452,7 @@ Calibration when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -8159,7 +8482,7 @@ Refinement when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -8189,7 +8512,7 @@ Likelihood when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -8361,7 +8684,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -8390,7 +8713,7 @@ Probability ROC points line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -8419,7 +8742,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -8448,7 +8771,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -8477,7 +8800,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -8507,7 +8830,7 @@ Probability of detecting yes when forecast is between the ith and i+1th
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -8679,7 +9002,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -8708,7 +9031,7 @@ Economic Cost/Loss Relative Value line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -8737,7 +9060,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -8766,7 +9089,7 @@ Base rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -8795,7 +9118,7 @@ Economic value of the base rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -8824,7 +9147,7 @@ Number of Cost/Loss ratios
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -8853,7 +9176,7 @@ ith Cost/Loss ratio evaluated
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -8994,7 +9317,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -9023,7 +9346,7 @@ Scalar L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -9052,7 +9375,7 @@ Total number of matched pairs of forecast (f) and observation (o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -9081,7 +9404,7 @@ Mean(f)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -9110,7 +9433,7 @@ Mean(o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -9139,7 +9462,7 @@ Mean(f*o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -9177,7 +9500,7 @@ Mean(f
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -9215,7 +9538,7 @@ Mean(o
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -9357,7 +9680,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -9386,7 +9709,7 @@ Scalar Anomaly L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -9416,7 +9739,7 @@ gical value (c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -9445,7 +9768,7 @@ Mean(f-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -9474,7 +9797,7 @@ Mean(o-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -9503,7 +9826,7 @@ Mean((f-c)*(o-c))
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -9541,7 +9864,7 @@ Mean((f-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -9579,7 +9902,7 @@ Mean((o-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -9720,7 +10043,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -9749,7 +10072,7 @@ Vector L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -9779,7 +10102,7 @@ Total number of matched pairs of forecast winds (uf, vf) and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -9808,7 +10131,7 @@ Mean(uf)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -9837,7 +10160,7 @@ Mean(vf)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -9866,7 +10189,7 @@ Mean(uo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -9895,7 +10218,7 @@ Mean(vo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -9924,7 +10247,7 @@ Mean(uf*uo+vf*vo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -9971,7 +10294,7 @@ Mean(uf
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -10018,7 +10341,7 @@ Mean(uo
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -10047,7 +10370,7 @@ Mean forecast wind speed
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -10189,7 +10512,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -10218,7 +10541,7 @@ Vector Anomaly L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -10248,7 +10571,7 @@ Total number of matched triplets of forecast winds (uf, vf), observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -10277,7 +10600,7 @@ Mean(uf-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -10306,7 +10629,7 @@ Mean(vf-vc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -10335,7 +10658,7 @@ Mean(uo-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -10364,7 +10687,7 @@ Mean(vo-vc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -10393,7 +10716,7 @@ Mean((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc))
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -10440,7 +10763,7 @@ Mean((uf-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -10528,11 +10851,11 @@ name "table_PS_format_info_VCNT"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="21" columns="3">
+<lyxtabular version="3" rows="22" columns="3">
 <features islongtable="true" longtabularalignment="center">
-<column alignment="center" valignment="top" width="2.5cm">
-<column alignment="center" valignment="top" width="4.5cm">
-<column alignment="center" valignment="middle" width="9cm">
+<column alignment="left" valignment="top" width="2.5cm">
+<column alignment="left" valignment="top" width="4.5cm">
+<column alignment="left" valignment="top" width="9cm">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -10565,7 +10888,7 @@ VCNT OUTPUT FORMAT
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10576,7 +10899,7 @@ Column Numbers
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10587,7 +10910,7 @@ VCNT Column Name
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10600,16 +10923,45 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VCNT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vector Continuous Statistics line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10618,7 +10970,7 @@ TOTAL
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10629,16 +10981,16 @@ Total number of data points
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-24–26
+26–28
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10647,7 +10999,7 @@ FBAR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10658,16 +11010,16 @@ Mean value of forecast wind speed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-27–29
+29–31
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10676,7 +11028,7 @@ OBAR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10687,16 +11039,16 @@ Mean value of observed wind speed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-30–32
+32–34
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10705,7 +11057,7 @@ FS_RMS
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10716,16 +11068,16 @@ Root mean square forecast wind speed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-33–35
+35–37
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10734,7 +11086,7 @@ OS_RMS
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10745,16 +11097,16 @@ Root mean square observed wind speed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-36–38
+38–40
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10763,7 +11115,7 @@ MSVE
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10775,16 +11127,16 @@ Mean squared length of the vector difference between the forecast and observed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-39–41
+41–43
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10793,7 +11145,7 @@ RMSVE
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10804,16 +11156,16 @@ Square root of MSVE
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-42–44
+45–46
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10822,7 +11174,7 @@ FSTDEV
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10833,16 +11185,16 @@ Standard deviation of the forecast wind speed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-45–47
+47–49
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10851,7 +11203,7 @@ OSTDEV
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10862,16 +11214,16 @@ Standard deviation of the observed wind field
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-48–50
+50–52
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10880,7 +11232,7 @@ FDIR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10891,16 +11243,16 @@ Direction of the average forecast wind vector
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-51–53
+53–55
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10909,7 +11261,7 @@ ODIR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10920,16 +11272,16 @@ Direction of the average observed wind vector
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-54–56
+56–58
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10938,7 +11290,7 @@ FBAR_SPEED
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10949,16 +11301,16 @@ Length (speed) of the average forecast wind vector
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-57–59
+59–61
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10967,7 +11319,7 @@ OBAR_SPEED
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10978,16 +11330,16 @@ Length (speed) of the average observed wind vector
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-60–62
+62–64
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -10996,7 +11348,7 @@ VDIFF_SPEED
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11008,16 +11360,16 @@ Length (speed) of the vector difference between the average forecast and
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-63–65
+65–67
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11026,7 +11378,7 @@ VDIFF_DIR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11038,16 +11390,16 @@ Direction of the vector difference between the average forecast and average
 </cell>
 </row>
 <row newpage="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-66–68
+68–70
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11056,7 +11408,7 @@ SPEED_ERR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11068,16 +11420,16 @@ Difference between the length of the average forecast wind vector and the
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-69–71
+71–73
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11086,7 +11438,7 @@ SPEED_ABSERR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11097,16 +11449,16 @@ Absolute value of SPEED_ERR
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-72–74
+74–76
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11115,7 +11467,7 @@ DIR_ERR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11129,16 +11481,16 @@ Signed angle between the directions of the average forecast and observed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-75–77
+77–79
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11147,7 +11499,7 @@ DIR_ABSERR
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -11274,7 +11626,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -11303,7 +11655,7 @@ Matched Pair line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -11332,7 +11684,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -11361,7 +11713,7 @@ Index for the current matched pair
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -11390,7 +11742,7 @@ Station Identifier of observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -11419,7 +11771,7 @@ Latitude of the observation in degrees north
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -11448,7 +11800,7 @@ Longitude of the observation in degrees east
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -11477,7 +11829,7 @@ Pressure level of the observation in hPa or accumulation interval in hours
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -11506,7 +11858,7 @@ Elevation of the observation in meters above sea level
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -11535,7 +11887,7 @@ Forecast value interpolated to the observation location
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -11564,7 +11916,7 @@ Observation value
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -11593,7 +11945,7 @@ Quality control flag for observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -11622,7 +11974,7 @@ Climatological mean value
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -11651,7 +12003,7 @@ Climatological standard deviation value
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37
 \end_layout
 
 \end_inset

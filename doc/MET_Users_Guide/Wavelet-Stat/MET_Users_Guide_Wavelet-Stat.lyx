@@ -2742,7 +2742,7 @@ name "table_WS_header_info_ws_outputs"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -3104,11 +3104,40 @@ Model variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
 \end_layout
 
 \end_inset
@@ -3137,7 +3166,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -3162,11 +3191,40 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -3195,7 +3253,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -3224,7 +3282,7 @@ User provided text string designating the observation type
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
@@ -3254,7 +3312,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -3283,7 +3341,7 @@ NA in Wavelet-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -3312,7 +3370,7 @@ NA in Wavelet-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -3341,7 +3399,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -3370,7 +3428,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -3399,7 +3457,7 @@ NA in Wavelet-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -3428,7 +3486,7 @@ NA in Wavelet-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3568,7 +3626,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3597,7 +3655,7 @@ Intensity-Scale line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3626,7 +3684,7 @@ The number of grid points (forecast locations) used
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3655,7 +3713,7 @@ The dimensions of the tile
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3684,7 +3742,7 @@ Horizontal coordinate of the lower left corner of the tile
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3713,7 +3771,7 @@ Vertical coordinate of the lower left corner of the tile
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -3742,7 +3800,7 @@ Total number of scales used in decomposition
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -3771,7 +3829,7 @@ The scale at which all information following applies
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -3800,7 +3858,7 @@ Mean squared error for this scale
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -3829,7 +3887,7 @@ The intensity scale skill score
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -3858,7 +3916,7 @@ Forecast energy squared for this scale
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -3887,7 +3945,7 @@ Observed energy squared for this scale
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -3916,7 +3974,7 @@ The base rate (not scale dependent)
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset

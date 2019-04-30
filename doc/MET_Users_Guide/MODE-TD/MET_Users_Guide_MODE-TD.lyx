@@ -3280,7 +3280,7 @@ name "table_mtd-header-columns"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="18" columns="3">
+<lyxtabular version="3" rows="20" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3729,11 +3729,64 @@ Forecast variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+Units for forecast variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
 \end_layout
 
 \end_inset
@@ -3762,7 +3815,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -3787,11 +3840,64 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -3855,7 +3961,7 @@ name "table_mtd-2D-Attributes"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="16" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3931,7 +4037,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -3960,7 +4066,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -3989,7 +4095,7 @@ Object category
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -4018,7 +4124,7 @@ Time index of slice
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -4047,7 +4153,7 @@ AREA
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -4080,7 +4186,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4113,7 +4219,7 @@ coordinate of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4142,7 +4248,7 @@ Latitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4167,16 +4273,16 @@ Longitude of centroid
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4185,11 +4291,216 @@ AXIS_ANG
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Angle that the axis makes with the grid x direction
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$10^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity in time slice
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$25^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity in time slice
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$50^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity in time slice
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_75
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$75^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity in time slice
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$90^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity in time slice
 \end_layout
 
 \end_inset
@@ -4311,7 +4622,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -4340,7 +4651,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -4369,7 +4680,7 @@ Object category
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -4402,7 +4713,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -4435,7 +4746,7 @@ coordinate of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -4468,7 +4779,7 @@ t
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4497,7 +4808,7 @@ Latitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4526,7 +4837,7 @@ Longitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4559,7 +4870,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -4592,7 +4903,7 @@ component of object velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -4621,7 +4932,7 @@ Angle that the axis plane of an object makes with the grid x direction
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -4658,7 +4969,7 @@ cells
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -4687,7 +4998,7 @@ Object start time
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -4716,7 +5027,7 @@ Object end time
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -4746,7 +5057,7 @@ Total great circle distance travelled by the 2D spatial centroid over the
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -4787,7 +5098,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -4828,7 +5139,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -4869,7 +5180,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -4910,7 +5221,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37
 \end_layout
 
 \end_inset
@@ -5062,7 +5373,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -5091,7 +5402,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -5120,7 +5431,7 @@ Object category
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -5160,7 +5471,7 @@ $(x, y)$
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -5204,7 +5515,7 @@ index of object spacetime centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -5233,7 +5544,7 @@ Difference in spatial axis plane angles
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -5262,7 +5573,7 @@ Difference in object speeds
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -5291,7 +5602,7 @@ Difference in object direction of movement
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -5320,7 +5631,7 @@ Ratio of object volumes
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -5349,7 +5660,7 @@ Difference in object starting time steps
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -5378,7 +5689,7 @@ Difference in object ending time steps
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -5414,7 +5725,7 @@ Volume
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -5443,7 +5754,7 @@ Dfference in the lifetimes of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset

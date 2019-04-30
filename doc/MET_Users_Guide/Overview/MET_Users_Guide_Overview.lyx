@@ -460,8 +460,14 @@ reference "Fig_Overview_MET_Overview_Flowchart"
  The MET-TC package functions independently of the other MET modules, as
  inducated in the Figure.
  Each of these stages is described further in later chapters.
- For example, the input and output formats are discussed in Chapter 2 as
- well as in the chapters associated with each of the statistics modules.
+ For example, the input and output formats are discussed in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:MET-Data-I/O"
+
+\end_inset
+
+ as well as in the chapters associated with each of the statistics modules.
  MET input files are represented on the far left.
  
 \end_layout
@@ -480,22 +486,20 @@ The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
  MODIS and WWMCA files are regridded and formatted into NetCDF files by
  their respective tools.
  These NetCDF files are then used in the statistical analysis step.
- The Gen-Vx-Mask and Pcp-Combine are optional.
- The Gen-Vx-Mask tool will create a bitmapped masking area in one of two
- ways.
- The first is from a user specified polygon, i.e.
- a text file containing a series of latitudes / longitudes.
- This mask can then be used to efficiently limit verification to the interior
- of a user specified region.
- Similarly, the Gen-Vx-Mask tool can create a circular masking region, frequency
- used with radar observations.
- The Pcp-Combine tool accumulates precipitation amounts into the time interval
+ The Gen-Vx-Mask and Pcp-Combine tools are optional.
+ The Gen-Vx-Mask tool will create a bitmapped masking area in a variety
+ of ways.
+ The output mask can then be used to efficiently limit verification to the
+ interior of a user specified region.
+ The Pcp-Combine tool can be used to add, subtract, or derive fields across
+ multiple timesteps.
+ Often it is run to accumulate precipitation amounts into the time interval
  selected by the user - if a user would like to verify over a different
  time interval than is included in their forecast or observational dataset.
  The Ensemble-Stat tool will combine many forecasts into an ensemble mean
  or probability forecast.
- Additionally, if observations are included, ensemble verification statistics
- are produced.
+ Additionally, if gridded or point observations are included, ensemble verificat
+ion statistics are produced.
  
 \series bold
 
@@ -509,7 +513,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename ../Flowchart/MET_flowchart_v8.1.png
+	filename /d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Flowchart/MET_flowchart_v8.0.png
 	scale 60
 
 \end_inset
@@ -952,44 +956,6 @@ met_help@ucar.edu
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Section
-Fortify
-\end_layout
-
-\begin_layout Standard
-Since the previous release of MET, requirements from various government
- agencies that use MET have resulted in our code being analyzed by Fortify,
- a proprietary static source code analyzer owned by HP Enterprise Security
- Products.
- Briefly, Fortify looks at source code and analyzes it for security risks,
- memory leaks, uninitialized variables, and other such weaknesses and bad
- coding practices.
- Fortify categorizes any issues it finds as low priority, high priority,
- or critical, and reports these issues back to the developers for them to
- address.
- A development cycle is thus established, with Fortify analyzing code and
- reporting back to the developers, who then make changes in the source code
- to address these issues, and hand the new code off to Fortify again for
- re-analysis.
- The goal is to drive the counts of both high priority and critical issues
- down to zero.
-\end_layout
-
-\begin_layout Standard
-The MET developers are pleased to report that after several months of work
- we have achieved this goal.
- Fortify now reports 
-\shape italic
-zero
-\shape default
- high priority or critical issues in the MET code.
- Users of MET tools who work in high security environments can therefore
- rest assured about the possibility of security risks when using MET, since
- the quality of the code has now been vetted by unbiased third-party experts.
- The MET developers plan to continue using Fortify regularly to ensure that
- these counts remain at zero in all future releases.
 \end_layout
 
 \end_body

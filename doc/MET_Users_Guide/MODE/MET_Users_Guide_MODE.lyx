@@ -3342,7 +3342,7 @@ name "CTS_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="41" columns="3">
+<lyxtabular version="3" rows="43" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -3859,7 +3859,7 @@ Observation convolution threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3868,7 +3868,7 @@ FCST_VAR
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3879,11 +3879,40 @@ Forecast variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
 \end_layout
 
 \end_inset
@@ -3912,12 +3941,12 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3926,7 +3955,7 @@ OBS_VAR
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3937,11 +3966,40 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -3970,7 +4028,7 @@ Observation vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -3999,7 +4057,7 @@ User provided observation type
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -4029,7 +4087,7 @@ Field type for this line:* RAW for the raw input fields * OBJECT for the
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4058,7 +4116,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4087,7 +4145,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4116,7 +4174,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -4145,7 +4203,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -4174,7 +4232,7 @@ Number of forecast no and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -4203,7 +4261,7 @@ Base rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -4232,7 +4290,7 @@ Forecast mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -4261,7 +4319,7 @@ Accuracy
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -4290,7 +4348,7 @@ Frequency Bias
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -4319,7 +4377,7 @@ Probability of detecting yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -4348,7 +4406,7 @@ Probability of detecting no
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -4377,7 +4435,7 @@ Probability of false detection
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -4406,7 +4464,7 @@ False alarm ratio
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37
 \end_layout
 
 \end_inset
@@ -4435,7 +4493,7 @@ Critical Success Index
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+38
 \end_layout
 
 \end_inset
@@ -4464,7 +4522,7 @@ Gilbert Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+39
 \end_layout
 
 \end_inset
@@ -4493,7 +4551,7 @@ Hanssen-Kuipers Discriminant
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+40
 \end_layout
 
 \end_inset
@@ -4522,7 +4580,7 @@ Heidke Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+41
 \end_layout
 
 \end_inset
@@ -5173,7 +5231,7 @@ name "MODE_object_attribute_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="36" columns="3">
+<lyxtabular version="3" rows="38" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -5690,7 +5748,7 @@ Observation convolution threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5699,7 +5757,7 @@ FCST_VAR
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5710,11 +5768,40 @@ Forecast variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for forecast variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
 \end_layout
 
 \end_inset
@@ -5743,7 +5830,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -5772,7 +5859,36 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
 \end_layout
 
 \end_inset
@@ -5801,7 +5917,7 @@ Observation vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -5830,7 +5946,7 @@ User provided observation type
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -5859,7 +5975,7 @@ Object numbered from 1 to the number of objects in each field
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -5888,7 +6004,7 @@ Object category indicating to which cluster object it belongs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23-24
+25-26
 \end_layout
 
 \end_inset
@@ -5917,7 +6033,7 @@ Location of the centroid (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25-26
+27-28
 \end_layout
 
 \end_inset
@@ -5946,7 +6062,7 @@ Location of the centroid (in lat/lon degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -5975,7 +6091,7 @@ Object axis angle (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -6004,7 +6120,7 @@ Length of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -6033,7 +6149,7 @@ Width of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -6062,7 +6178,7 @@ Object area (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -6092,7 +6208,7 @@ Area of the object containing data values in the raw field that meet the
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -6122,7 +6238,7 @@ Radius of curvature of the object defined in terms of third order moments
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-34
+35-36
 \end_layout
 
 \end_inset
@@ -6151,7 +6267,7 @@ Center of curvature (in grid coordinates)
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37
 \end_layout
 
 \end_inset
@@ -6181,7 +6297,7 @@ Ratio of the difference between the area of an object and the area of its
 \begin_inset Text
 
 \begin_layout Plain Layout
-36-40
+38-42
 \end_layout
 
 \end_inset
@@ -6211,7 +6327,7 @@ INTENSITY_10, _25, _50, _75, _90
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+43
 \end_layout
 
 \end_inset
@@ -6354,7 +6470,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+44
 \end_layout
 
 \end_inset
@@ -6383,7 +6499,7 @@ Sum of the intensities of the raw field within the object (variable units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+45
 \end_layout
 
 \end_inset
@@ -6412,7 +6528,7 @@ Distance between two objects centroids (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+46
 \end_layout
 
 \end_inset
@@ -6441,7 +6557,7 @@ Minimum distance between the boundaries of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+47
 \end_layout
 
 \end_inset
@@ -6474,7 +6590,7 @@ Minimum distance between the convex hulls of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+48
 \end_layout
 
 \end_inset
@@ -6503,7 +6619,7 @@ Difference between the axis angles of two objects (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+49
 \end_layout
 
 \end_inset
@@ -6533,7 +6649,7 @@ Absolute value of the difference between the aspect ratios of two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+50
 \end_layout
 
 \end_inset
@@ -6563,7 +6679,7 @@ Ratio of the areas of two objects defined as the lesser of the two divided
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+51
 \end_layout
 
 \end_inset
@@ -6596,7 +6712,7 @@ Intersection area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+52
 \end_layout
 
 \end_inset
@@ -6625,7 +6741,7 @@ Union area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+53
 \end_layout
 
 \end_inset
@@ -6654,7 +6770,7 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+54
 \end_layout
 
 \end_inset
@@ -6688,7 +6804,7 @@ Ratio of intersection area to the lesser of the forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+55
 \end_layout
 
 \end_inset
@@ -6722,7 +6838,7 @@ Ratio of the curvature of two objects defined as the lesser of the two divided
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+56
 \end_layout
 
 \end_inset
@@ -6756,7 +6872,7 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-55
+57
 \end_layout
 
 \end_inset
@@ -6795,7 +6911,7 @@ Ratio of the nth percentile (column 37) of intensity of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-56
+58
 \end_layout
 
 \end_inset

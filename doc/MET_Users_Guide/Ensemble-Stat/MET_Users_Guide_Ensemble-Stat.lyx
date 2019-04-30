@@ -2134,7 +2134,7 @@ name "table_ES_header_info_es_out"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -2496,11 +2496,40 @@ Model variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
 \end_layout
 
 \end_inset
@@ -2529,7 +2558,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -2554,11 +2583,40 @@ Observation variable
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_UNITS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Units for observation variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -2587,7 +2645,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -2616,7 +2674,7 @@ Type of observation selected
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
@@ -2646,7 +2704,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -2675,7 +2733,7 @@ Interpolation method applied to forecasts
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
@@ -2704,7 +2762,7 @@ Number of points used in interpolation method
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+20
 \end_layout
 
 \end_inset
@@ -2733,7 +2791,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+21
 \end_layout
 
 \end_inset
@@ -2762,7 +2820,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+22
 \end_layout
 
 \end_inset
@@ -2791,7 +2849,7 @@ The minimum fraction of valid ensemble members required to calculate statistics.
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+23
 \end_layout
 
 \end_inset
@@ -2820,7 +2878,7 @@ Error percent value used in confidence intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -2976,7 +3034,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3005,7 +3063,7 @@ Ensemble Continuous Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3034,7 +3092,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3063,7 +3121,7 @@ Number of ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3092,7 +3150,7 @@ The Continuous Ranked Probability Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3121,7 +3179,7 @@ The ContinuousRanked Probability Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -3150,7 +3208,7 @@ The Ignorance Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -3179,7 +3237,7 @@ The Mean Error of the ensemble mean (unperturbed or supplied)
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -3208,7 +3266,7 @@ The Root Mean Square Error of the ensemble mean (unperturbed or supplied)
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -3238,7 +3296,7 @@ The mean of the spread (standard deviation) of the unperturbed ensemble
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -3268,7 +3326,7 @@ The Mean Error of the PERTURBED ensemble mean (e.g.
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -3298,7 +3356,7 @@ The Root Mean Square Error of the PERTURBED ensemble mean (e.g.
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -3329,7 +3387,7 @@ The mean of the spread (standard deviation) of the PERTURBED ensemble member
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -3697,7 +3755,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3726,7 +3784,7 @@ Probability Integral Transform line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -3755,7 +3813,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -3784,7 +3842,7 @@ Probability interval width
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -3813,7 +3871,7 @@ Total number of probability intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -3954,7 +4012,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -3983,7 +4041,7 @@ Relative Position line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4012,7 +4070,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4041,7 +4099,7 @@ Number of ensemble members
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -4184,7 +4242,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4213,7 +4271,7 @@ Observation Rank line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4242,7 +4300,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4271,7 +4329,7 @@ Line number in ORANK file
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -4300,7 +4358,7 @@ Station Identifiier
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -4329,7 +4387,7 @@ Latitude of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -4358,7 +4416,7 @@ Longitude of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -4387,7 +4445,7 @@ Level of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -4416,7 +4474,7 @@ Elevation of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -4445,7 +4503,7 @@ Value of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -4474,7 +4532,7 @@ Probability Integral Transform
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -4503,7 +4561,7 @@ Rank of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -4532,7 +4590,7 @@ Number of valid ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -4561,7 +4619,7 @@ Number of ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37
 \end_layout
 
 \end_inset
@@ -4834,7 +4892,7 @@ name "table_ES_header_info_es_out_SSVAR"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="38" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -4910,7 +4968,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+24
 \end_layout
 
 \end_inset
@@ -4939,7 +4997,7 @@ Spread/Skill Variance line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+25
 \end_layout
 
 \end_inset
@@ -4968,7 +5026,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+26
 \end_layout
 
 \end_inset
@@ -4997,7 +5055,7 @@ Number of bins for current forecast run
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+27
 \end_layout
 
 \end_inset
@@ -5026,7 +5084,7 @@ Index of the current bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+28
 \end_layout
 
 \end_inset
@@ -5055,7 +5113,7 @@ Number of points in bin i
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+29
 \end_layout
 
 \end_inset
@@ -5084,7 +5142,7 @@ Minimum variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+30
 \end_layout
 
 \end_inset
@@ -5113,7 +5171,7 @@ Maximum variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+31
 \end_layout
 
 \end_inset
@@ -5142,7 +5200,7 @@ Average variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+32
 \end_layout
 
 \end_inset
@@ -5171,7 +5229,7 @@ Average forecast value
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+33
 \end_layout
 
 \end_inset
@@ -5200,7 +5258,7 @@ Average observed value
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+34
 \end_layout
 
 \end_inset
@@ -5229,7 +5287,7 @@ Average product of forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+35
 \end_layout
 
 \end_inset
@@ -5258,7 +5316,7 @@ Average of forecast squared
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+36
 \end_layout
 
 \end_inset
@@ -5287,7 +5345,7 @@ Average of observation squared
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+37-38
 \end_layout
 
 \end_inset
@@ -5296,33 +5354,8 @@ Average of observation squared
 \begin_inset Text
 
 \begin_layout Plain Layout
-FBAR_NCL
+FBAR_NCL,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound of mean forecast
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-36
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 FBAR_NCU
@@ -5334,7 +5367,7 @@ FBAR_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound of mean forecast
+Mean forecast normal upper and lower confidence limits
 \end_layout
 
 \end_inset
@@ -5345,7 +5378,7 @@ Normal confidence upper bound of mean forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+39-41
 \end_layout
 
 \end_inset
@@ -5354,62 +5387,12 @@ Normal confidence upper bound of mean forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-FSTDEV
+FSTDEV,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
-Standard deviation of the error
+FSTDEV_NCL,
 \end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-38
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-FSTDEV_NCL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound on error std dev
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-39
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 FSTDEV_NCU
@@ -5421,7 +5404,8 @@ FSTDEV_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound on error std dev
+Standard deviation of the error including normal upper and lower confidence
+ limits
 \end_layout
 
 \end_inset
@@ -5432,7 +5416,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+42-43
 \end_layout
 
 \end_inset
@@ -5441,7 +5425,11 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-OBAR_NCL
+OBAR_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+OBAR_NCU
 \end_layout
 
 \end_inset
@@ -5450,7 +5438,7 @@ OBAR_NCL
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence lower bound of mean observation
+Mean observation normal upper and lower confidence limits
 \end_layout
 
 \end_inset
@@ -5461,7 +5449,7 @@ Normal confidence lower bound of mean observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+44-46
 \end_layout
 
 \end_inset
@@ -5470,91 +5458,12 @@ Normal confidence lower bound of mean observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-BAR_NCU
+OSTDEV,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound of mean observation
+OSTDEV_NCL,
 \end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-42
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-OSTDEV
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Standard deviation of the error
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-43
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-OSTDEV_NCL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound on error std dev
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-44
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 OSTDEV_NCU
@@ -5566,7 +5475,8 @@ OSTDEV_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound on error std dev
+Standard deviation of the error including normal upper and lower confidence
+ limits
 \end_layout
 
 \end_inset
@@ -5577,7 +5487,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+47-49
 \end_layout
 
 \end_inset
@@ -5586,62 +5496,12 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-PR_CORR
+PR_CORR,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
-Pearson correlation coefficient
+PR_CORR_NCL,
 \end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-46
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-PR_CORR_NCL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound on PR_CORR
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-47
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 PR_CORR_NCU
@@ -5653,7 +5513,8 @@ PR_CORR_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound on PR_CORR
+Pearson correlation coefficient including normal upper and lower confidence
+ limits
 \end_layout
 
 \end_inset
@@ -5664,7 +5525,7 @@ Normal confidence upper bound on PR_CORR
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+50-52
 \end_layout
 
 \end_inset
@@ -5673,62 +5534,12 @@ Normal confidence upper bound on PR_CORR
 \begin_inset Text
 
 \begin_layout Plain Layout
-ME
+ME,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
-Mean error
+ME_NCL,
 \end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-49
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-ME_NCL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound on mean error
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-50
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 ME_NCU
@@ -5740,7 +5551,7 @@ ME_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound on mean error
+Mean error including normal upper and lower confidence limits
 \end_layout
 
 \end_inset
@@ -5751,7 +5562,7 @@ Normal confidence upper bound on mean error
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+53-55
 \end_layout
 
 \end_inset
@@ -5760,62 +5571,12 @@ Normal confidence upper bound on mean error
 \begin_inset Text
 
 \begin_layout Plain Layout
-ESTDEV
+ESTDEV,
 \end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
-Standard deviation of the error
+ESTDEV_NCL,
 \end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-52
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-ESTDEV_NCL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Normal confidence lower bound on error std dev
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-53
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
 
 \begin_layout Plain Layout
 ESTDEV_NCU
@@ -5827,7 +5588,8 @@ ESTDEV_NCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Normal confidence upper bound on error std dev
+Standard deviation of the error including normal upper and lower confidence
+ limits
 \end_layout
 
 \end_inset
@@ -5838,7 +5600,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+56
 \end_layout
 
 \end_inset
@@ -5867,7 +5629,7 @@ Mangitude bias
 \begin_inset Text
 
 \begin_layout Plain Layout
-55
+57
 \end_layout
 
 \end_inset
@@ -5896,7 +5658,7 @@ Mean squared error
 \begin_inset Text
 
 \begin_layout Plain Layout
-56
+58
 \end_layout
 
 \end_inset
@@ -5925,7 +5687,7 @@ Bias corrected root mean squared error
 \begin_inset Text
 
 \begin_layout Plain Layout
-57
+59
 \end_layout
 
 \end_inset
