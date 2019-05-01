@@ -6656,12 +6656,11 @@ Calculating Percentiles
 
 \begin_layout Standard
 Several of the MET tools make use of percentiles in one way or another.
- Percentiles can be used as part of the intenal computations of a tool,
- or can be written out as elements of some of the standard verificaion statistic
-s.
- There are several widely-used conventions for calculating percentiles,
- however, so in this secion we describe how percentiles are calculated in
- MET.
+ Percentiles can be used as part of the internal computations of a tool,
+ or can be written out as elements of some of the standard verification
+ statistics.
+ There are several widely-used conventions for calculating percentiles however,
+ so in this secion we describe how percentiles are calculated in MET.
 \end_layout
 
 \begin_layout Standard
