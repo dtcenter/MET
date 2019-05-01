@@ -6655,7 +6655,379 @@ Calculating Percentiles
 \end_layout
 
 \begin_layout Standard
-Hello.
+Several of the MET tools make use of percentiles in one way or another.
+ Percentiles can be used as part of the intenal computations of a tool,
+ or can be written out as elements of some of the standard verificaion statistic
+s.
+ There are several widely-used conventions for calculating percentiles,
+ however, so in this secion we describe how percentiles are calculated in
+ MET.
+\end_layout
+
+\begin_layout Standard
+The explanation makes use of the 
+\shape italic
+floor
+\shape default
+ function.
+ The floor of a real number 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x$
+\end_layout
+
+\end_inset
+
+, denoted 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor x 
+\backslash
+rfloor$
+\end_layout
+
+\end_inset
+
+, is defined to be the greatest integer 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+leq x$
+\end_layout
+
+\end_inset
+
+.
+ For example, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor 3.01 
+\backslash
+rfloor = 3$
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor 3.99 
+\backslash
+rfloor = 3$
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor -3.01 
+\backslash
+rfloor = -4$
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor -3.99 
+\backslash
+rfloor = -4$
+\end_layout
+
+\end_inset
+
+.
+ These examples show that the floor function does 
+\shape italic
+not
+\shape default
+ simply round its argument to the nearest integer.
+ Note also that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+lfloor x 
+\backslash
+rfloor = x$
+\end_layout
+
+\end_inset
+
+ if and only if 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x$
+\end_layout
+
+\end_inset
+
+ is an integer.
+\end_layout
+
+\begin_layout Standard
+Suppose now that we have a collection of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$N$
+\end_layout
+
+\end_inset
+
+ data points 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x_i$
+\end_layout
+
+\end_inset
+
+ for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$i = 0, 1, 2, 
+\backslash
+ldots, N - 1$
+\end_layout
+
+\end_inset
+
+.
+ (Note that we're using the C/C++ convention here, where array indices start
+ at zero by default.) We will assume that the data are sorted in increasing
+ (strictly speaking, 
+\shape italic
+nondecreasing
+\shape default
+) order, so that 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$i 
+\backslash
+leq j$
+\end_layout
+
+\end_inset
+
+ implies 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x_i 
+\backslash
+leq x_j$
+\end_layout
+
+\end_inset
+
+.
+ Suppose also that we wish to calculate the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$t$
+\end_layout
+
+\end_inset
+
+ percentile of the data, where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$0 
+\backslash
+leq t < 1$
+\end_layout
+
+\end_inset
+
+.
+ For example, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$t = 0.25$
+\end_layout
+
+\end_inset
+
+ for the 25th percentile of the data.
+ Define
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+I & = & 
+\backslash
+lfloor 
+\backslash
+left( N - 1
+\backslash
+right) t 
+\backslash
+rfloor 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+noalign{
+\backslash
+vskip 0.1in}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+Delta & = & 
+\backslash
+left( N - 1 
+\backslash
+right) t - I 
+\backslash
+
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then the value 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$p$
+\end_layout
+
+\end_inset
+
+ of the percentile is 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{displaymath}
+\end_layout
+
+\begin_layout Plain Layout
+
+p = 
+\backslash
+left( 1 - 
+\backslash
+Delta 
+\backslash
+right) x_I + 
+\backslash
+Delta x_{I + 1}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{displaymath}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body
