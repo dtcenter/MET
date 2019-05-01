@@ -6648,7 +6648,14 @@ The overall proportion of grid points with observed events to total grid
  points in the domain.
  The forecast rate will match the observation rate in unbiased forecasts.
  This quantity is sometimes referred to as the base rate.
- 
+\end_layout
+
+\begin_layout Section
+Calculating Percentiles
+\end_layout
+
+\begin_layout Standard
+Hello.
 \end_layout
 
 \end_body
