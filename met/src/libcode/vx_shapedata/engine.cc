@@ -2742,8 +2742,6 @@ void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
 void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at, const int row)
 
 {
-   mlog << Debug(3) << "write_header_columns().\n";
-
    int c = 0;
    ConcatString s;
 
