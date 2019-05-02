@@ -146,7 +146,7 @@ name "sec:New-for-MET"
 \series medium
 MET version 8.1 includes some major enhancements, including Fortify compliance,
  percentile thresholds, land/sea mask and topography in Point-Stat, the
- derive option in PCP-Combine, and gaussian interpolation.
+ derive option in PCP-Combine, and Gaussian interpolation.
 \end_layout
 
 \begin_layout Subsection*

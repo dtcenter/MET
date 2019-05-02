@@ -379,7 +379,7 @@ obtype = "ANALYS";
 //   - The "shape" entry defines the shape of the neighborhood.
 //     Valid values are "SQUARE" or "CIRCLE"
 //
-//   - The "sigma" entry defines the gaussian filter shape by specifying in
+//   - The "sigma" entry defines the Gaussian filter shape by specifying in
 //     grid units the radius for one standard deviation. It only applies to the
 //     GAUSSIAN interpolation method
 //      - sigma = 1;
