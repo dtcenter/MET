@@ -327,7 +327,7 @@ Version 8.1 Release Notes:
 - What's New:
    - Major Enhancements: Fortify compliance, percentile thresholds, land/sea
      mask and topography in Point-Stat, the derive option in PCP-Combine, and
-     gaussian interpolation
+     Gaussian interpolation
    - New Tools: No new tools
 
 - Changes to Output Formats:

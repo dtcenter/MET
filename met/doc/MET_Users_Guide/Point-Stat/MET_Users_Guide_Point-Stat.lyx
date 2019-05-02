@@ -425,7 +425,7 @@ Gaussian
 \series medium
 The forecast value at P is a weighted sum of the values in the interpolation
  area.
- The weight given to each forecast point follows the gaussian distribution
+ The weight given to each forecast point follows the Gaussian distribution
  with nearby points contributing more the far away points.
  The shape of the distribution is configured using sigma.
 \end_layout
