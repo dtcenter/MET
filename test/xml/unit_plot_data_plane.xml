@@ -1,0 +1,412 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!-- Depends on unit_pcp_combine.xml -->
+
+  <test name="plot_data_plane_GRIB1">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_APCP_12.ps \
+      'name = "APCP"; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_APCP_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_REC">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_REC_61_APCP_12.ps \
+      'GRIB1_rec = 61; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_REC_61_APCP_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_CODE">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_CODE_61_APCP_12.ps \
+      'GRIB1_code = 61; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_CODE_61_APCP_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_ENS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gefs/enspost_grb1.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens17.ps \
+      'name="PRMSL";level="L0";GRIB_ens="+17";' \
+      -title "GRIB1 GEFS  PRMSL ENS +17" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens17.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_ENS_HI">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gefs/enspost_grb1.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens_hi.ps \
+      'name="PRMSL";level="L0";GRIB_ens="hi_res_ctl";' \
+      -title "GRIB1 GEFS  PRMSL ENS hi_res_ctl" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens_hi.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB2_TMP_P500.ps \
+      'name = "TMP"; level = "P500";' \
+      -title "GRIB2 NAM Temperature at 500mb" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB2_TMP_P500.ps</ps>
+    </output>
+  </test>
+
+
+  <test name="plot_data_plane_GRIB2_ENS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps \
+      'name="PRMSL";level="L0";GRIB_ens="+1";' \
+      -title "GRIB1 GEFS  PRMSL ENS +1" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_ENS_LOW">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps \
+      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";' \
+      -title "GRIB1 GEFS  PRMSL ENS low_res_ctl" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NC_PINTERP">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV \
+      &OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps \
+      'name = "PSFC"; level = "(0,*,*)";' \
+      -title "NC PINTERP Pressure at the Surface" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrfout_d01_2008-08-08_12:00:00_PLEV_NC_PINTERP_PRES_SFC.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NC_MET">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F018_APCP12_NC_MET.ps \
+      'name = "APCP_12"; level = "(*,*)";' \
+      -title "NC MET 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F018_APCP12_NC_MET.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_lc_0">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_0.ps \
+      'name = "edr"; level = "(0,0,*,*)";' \
+      -title "NCCF Lambert Conformal Level 0" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_0.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_lc_25">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_25.ps \
+      'name = "edr"; level = "(0,25,*,*)";' \
+      -title "NCCF Lambert Conformal Level 25" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_25.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_lc_50">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/lc/gtg_obs_forecast.20130404.i12.f06.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_50.ps \
+      'name = "edr"; level = "(0,50,*,*)";' \
+      -title "NCCF Lambert Conformal Level 50" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130404.i12.f06.NCCF_lc_50.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_0">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_0.ps \
+      'name = "edr"; level = "(0,0,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 0" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_0.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_12">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_12.ps \
+      'name = "edr"; level = "(0,12,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 12" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_latlon_25">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_25.ps \
+      'name = "edr"; level = "(0,25,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 25" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_25.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_north_to_south">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/north_to_south_CMORPH_8KM-30MIN_2016020712.nc \
+      &OUTPUT_DIR;/plot_data_plane/north_to_south_CMORPH_8KM-30MIN_2016020712.ps \
+      'name = "CMORPH"; level = "(0,*,*)";' \
+      -title "NCCF Latitude/Longitude North to South" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/north_to_south_CMORPH_8KM-30MIN_2016020712.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_PROB">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F012.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps \
+      'name = "PROB"; level = "A12"; prob = { name = "APCP"; thresh_lo = 2.54; };' \
+      -title "GRIB2 Probability of 12-hour APCP > 2.54mm)" \
+      -color_table &MET_BASE;/colortables/NCL_colortables/WhBlGrYeRe.ctable \
+      -plot_range 0 100 \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/sref_prob_2012040821_F012_GRIB2_PROB_APCP_12_gt2.54.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_TRMM_3B42_3hourly_nc">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42.20131125.03.7.G3.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42.20131125.03.7.G3.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_3hourly_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42.20131125.03.7.G3.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_TRMM_3B42_daily_nc">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_TRMM_3B42_daily_packed">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3_packed.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_packed.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_packed.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_TRMM_3B42_daily_packed_CONVERT">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3_packed.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_inches.ps \
+      'name="precipitation"; level="(*,*)"; convert(x)=x/25.4; censor_thresh=lt0; censor_val=0;' \
+      -title "TRMM Precipitation (inches)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_inches.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_CESM_SSMI_microwave">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/cesm/ssmi.ifrac.gx3v5.2003.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_ssmi.ifrac.gx3v5.2003.ps \
+      'name="ifrac"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_ssmi.ifrac.gx3v5.2003.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_CESM_sea_ice_nc">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/cesm/b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.ps \
+      'name="aice_d"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.ps</ps>
+    </output>
+  </test>
+
+  <!--
+  <test name="plot_data_plane_EaSM_CMIP5_histroical">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.nc \
+      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps \
+      'name="pr"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps</ps>
+    </output>
+  </test>
+  -->
+
+  <test name="plot_data_plane_EaSM_CMIP5_rcp85">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
+      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.ps \
+      'name="pr"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_EaSM_CMIP5_rcp85_time_slice">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
+      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101_12_time.ps \
+      'name="pr"; level="(20060101_120000,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101_12_time.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_EaSM_CESM">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.ps \
+      'name="CLDICE"; level="(0,0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.ps</ps>
+    </output>
+  </test>
+
+</met_test>

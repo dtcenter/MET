@@ -1,0 +1,302 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!--  depends on unit_point_stat, unit_grid_stat, unit_wavelet_stat.xml, and unit_ensemble_stat.xml  -->
+
+  <!--  jobs for wavelet_stat output  -->
+
+  <test name="stat_analysis_AGG_RHIST">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate -line_type RHIST \
+      -fcst_var TMP -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_RHIST_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_RHIST.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_RHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_PHIST">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate -line_type PHIST \
+      -fcst_var TMP -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_PHIST_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_PHIST.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_PHIST_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_PHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_RELP">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate -line_type RELP -by FCST_VAR -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_RELP_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_RELP_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_RELP.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RELP_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RELP_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_RELP.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type RHIST \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_PHIST">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type PHIST \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB -out_bin_size 0.10 \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_RELP">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type RELP \
+      -fcst_var APCP_24 -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_SSVAR">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type SSVAR \
+      -fcst_var APCP_24 -vx_mask NWC -vx_mask GRB -out_bin_size 0.25 \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_ECNT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_OBS_ERROR_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type ECNT \
+      -fcst_var APCP_24 -by VX_MASK \
+      -set_hdr DESC VX_MASK \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_ECNT.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_SSVAR">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_CMD_LINE_20120410_120000V.stat \
+      -job aggregate -line_type SSVAR \
+      -fcst_var APCP_24 -obtype ANALYS -vx_mask NWC -vx_mask GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_SSVAR_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_SSVAR_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_SSVAR.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_SSVAR_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_SSVAR_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_SSVAR.out</exist>
+    </output>
+  </test>
+
+  <!--  jobs for ensemble_stat output  -->
+
+  <test name="stat_analysis_AGG_ISC">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.stat \
+      -job aggregate -line_type ISC \
+      -fcst_var APCP_12 -fcst_thresh '>0.0' -vx_mask TILE1 -vx_mask TILE2 \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_ISC_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_ISC_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_ISC.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ISC_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_ISC_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_ISC.out</exist>
+    </output>
+  </test>
+
+  <!--  jobs for grid_stat output  -->
+
+  <test name="stat_analysis_CONFIG_GRID_STAT">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/grid_stat/grid_stat_GRIB2_NAM_RTMA_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_grid_stat \
+      -out &OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_filter.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_sl1l2_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_sl1l2_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_ctc_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_ctc_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_out.stat</stat>
+    </output>
+  </test>
+
+  <!--  jobs for point_stat output  -->
+
+  <test name="stat_analysis_CONFIG_POINT_STAT">
+    <env>
+      <pair><name>CONFIG_DIR</name> <value>&CONFIG_DIR;</value></pair>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_point_stat \
+      -out &OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_filter_mpr_sid.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_RAMPS">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_MODEL;/time_series_met_6.0/*.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_ramps \
+      -out &OUTPUT_DIR;/stat_analysis/RAMPS.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/RAMPS.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_100_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_25_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_25_100_30min.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_SUMMARY">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS,FCST-OBS,ABS(FCST-OBS)' \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_POINT_STAT_SUMMARY_UNION">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS' -column_union true \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY_UNION.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY_UNION.out</exist>
+    </output>
+  </test>
+
+</met_test>

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!-- Depends on unit_pb2nc.xml -->
+
+  <test name="plot_point_obs_G218">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &OUTPUT_DIR;/plot_point_obs/ndas.20120409.t12z.prepbufr.tm00.nr_G218.ps \
+      -data_file &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      -dotsize 2.0 \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_point_obs/ndas.20120409.t12z.prepbufr.tm00.nr_G218.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_point_obs_TMP_ADPUPA">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &OUTPUT_DIR;/plot_point_obs/gdas1.20120409.t12z.prepbufr_TMP_ADPUPA.ps \
+      -obs_var TMP \
+      -msg_typ ADPUPA \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_point_obs/gdas1.20120409.t12z.prepbufr_TMP_ADPUPA.ps</ps>
+    </output>
+  </test>
+
+</met_test>

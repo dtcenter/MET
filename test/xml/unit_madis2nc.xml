@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <!-- MADIS data can be retrieved from the NOAA JET machine here:
+       /public/data/madis/point -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="madis2nc_METAR">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_METAR_time_summary">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040901_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040902_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040903_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040904_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040905_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040906_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040907_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040908_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_20120409_time_summary.nc \
+      -type metar -config &CONFIG_DIR;/Madis2NcConfig_time_summary -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_20120409_time_summary.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_METAR_mask_sid">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -mask_sid "OIKB,OIBB,OIKK,OICK,OICC,OIIP,OIIK,OIMM,OIAA,OIAH" \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_METAR_mask_grid">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_grid.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -mask_grid &TEST_DIR;/data/mnc/test_grid_valid.nc \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_grid.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_RAOB">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/raob/raob_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc \
+      -type raob -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_PROFILER_MASK_POLY">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/profiler/profiler_20120409_1200.nc \
+      &OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc \
+      -type profiler -mask_poly &MET_BASE;/poly/CONUS.poly -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_MARITIME">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/maritime/maritime_20120409_1200.nc \
+      &OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc \
+      -type maritime -qc_dd V,Q -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_MESONET_MASK_GRID">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/mesonet/mesonet_20140704_1200.nc \
+      &OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc \
+      -type mesonet -mask_grid G207 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_ACARS_PROFILES">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/acarsProfiles/acarsProfiles_20151005_1200.nc \
+      &OUTPUT_DIR;/madis2nc/acarsProfiles_20151005_1200.nc \
+      -type acarsProfiles -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/acarsProfiles_20151005_1200.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_buf_handle">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_20170118_0000.nc \
+      -type metar -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_20170118_0000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_multiple_inputs">
+    <exec>&MET_BIN;/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_20170118.nc \
+      -type metar -rec_beg 5000 -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_20170118.nc</point_nc>
+    </output>
+  </test>
+
+</met_test>

@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="pcp_combine_GRIB1_SUBTRACT">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F030.grib 30 \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib 24 \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="mode_NO_MATCH_MERGE">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>NONE</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>NONE</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>""</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>NO_MATCH_MERGE</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_hmt \
+      -outdir &OUTPUT_DIR;/mode -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_NO_MATCH_MERGE_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_NO_MATCH_MERGE_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_NO_MATCH_MERGE_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_NO_MATCH_MERGE_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+  <test name="mode_NO_MERGE">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>NONE</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>NO_MERGE</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>""</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>NO_MERGE</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_hmt \
+      -outdir &OUTPUT_DIR;/mode -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_NO_MERGE_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+  <test name="mode_MERGE_BOTH">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>BOTH</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>BOTH</value></pair>
+      <pair><name>MASK_POLY</name>      <value>""</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>MERGE_BOTH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_hmt \
+      -outdir &OUTPUT_DIR;/mode -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_MERGE_BOTH_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+  <test name="mode_MASK_POLY">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>THRESH</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>"MET_BASE/poly/NWC.poly"</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>BOTH</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>MASK_POLY</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_hmt \
+      -outdir &OUTPUT_DIR;/mode -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_MASK_POLY_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+<!-- Disabling the mode_CUT_LINE test which causes random failures in the nightly build 
+ <test name="mode_CUT_LINE">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>CUT_LINE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/mode_cut_line/latlon_test.nc \
+      &DATA_DIR_MODEL;/mode_cut_line/latlon_test.nc \
+      &CONFIG_DIR;/MODEConfig_cut_line \
+      -outdir &OUTPUT_DIR;/mode -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A.ps</ps>
+    </output>
+  </test>
+-->
+
+  <test name="mode_QUILT">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>THRESH</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>NONE</value></pair>
+      <pair><name>MASK_POLY</name>      <value>"MET_BASE/poly/NWC.poly"</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>BOTH</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>QUILT</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_quilt \
+      -outdir &OUTPUT_DIR;/mode -v 3
+    </param>
+    <output>
+
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_cts.txt</stat>
+
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.txt</stat>
+
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.nc</exist>
+
+      <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1.ps</ps>
+      <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2.ps</ps>
+      <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1.ps</ps>
+      <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2.ps</ps>
+
+    </output>
+  </test>
+
+  <test name="mode_CONFIG_MERGE">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>MERGE_FLAG</name>     <value>ENGINE</value></pair>
+      <pair><name>MATCH_FLAG</name>     <value>MERGE_BOTH</value></pair>
+      <pair><name>MASK_MISSING</name>   <value>BOTH</value></pair>
+      <pair><name>MASK_POLY</name>      <value>""</value></pair>
+      <pair><name>POLY_FLAG</name>      <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>CONFIG_MERGE</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_hmt \
+      -config_merge &CONFIG_DIR;/MODEConfig_hmt_CONFIG_MERGE \
+      -outdir &OUTPUT_DIR;/mode -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A_fcst_merge.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A_obs_merge.txt</stat>
+      <exist>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/mode/mode_CONFIG_MERGE_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+</met_test>

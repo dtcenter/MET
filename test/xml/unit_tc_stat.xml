@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/tc_data/adeck">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/tc_data/bdeck">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+
+  <test name="tc_stat_ALAL2010">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
+      -config &CONFIG_DIR;/TCStatConfig_ALAL2010 \
+      -out &OUTPUT_DIR;/tc_stat/ALAL2010_stat.out \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/ALAL2010_stat.out</exist>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_ri.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_rw.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_stat_PROBRIRW">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2015_PROBRIRW.tcst \
+      -config &CONFIG_DIR;/TCStatConfig_PROBRIRW \
+      -out &OUTPUT_DIR;/tc_stat/PROBRIRW_stat.out \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/PROBRIRW_stat.out</exist>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_filter_ee.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_summary_tk_err.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_probrirw.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_stat_LEAD_REQ">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010_LEAD_REQ.tcst \
+      -out &OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_stat.out \
+      -dump_row &OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ.tcst \
+      -job filter -lead_req 120,132 \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_stat.out</exist>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_stat_FALSE_ALARMS">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
+      -job filter -lead 24 -column_thresh BLAT ==-9999 \
+      -dump_row &OUTPUT_DIR;/tc_stat/ALAL2010_FALSE_ALARMS_24_hour.tcst \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_FALSE_ALARMS_24_hour.tcst</stat>
+    </output>
+  </test>
+
+</met_test>

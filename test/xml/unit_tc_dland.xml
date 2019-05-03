@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_dland_ONE_DEG">
+    <exec>&MET_BIN;/tc_dland</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_dland/tc_dland_one_deg.nc \
+      -grid 0.0 -180.0 1.0 1.0 61 181 \
+      -log &OUTPUT_DIR;/tc_dland/tc_dland_one_deg.log \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_dland/tc_dland_one_deg.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="tc_dland_HALF_DEG">
+    <exec>&MET_BIN;/tc_dland</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_dland/tc_dland_half_deg.nc \
+      -grid 0.0 -180.0 0.5 0.5 121 361 \
+      -log &OUTPUT_DIR;/tc_dland/tc_dland_half_deg.log \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_dland/tc_dland_half_deg.nc</grid_nc>
+    </output>
+  </test>
+  
+</met_test>

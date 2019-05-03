@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <!--                                                                  -->
+  <!-- test percentile thresholding across MET tools                    -->
+  <!--                                                                  -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+
+  <!--                                                                  -->
+  <!-- Plot-Data-Plane censor thresh                                    -->
+  <!--                                                                  -->
+
+  <test name="perc_thresh_PLOT_DATA_PLANE">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/perc_thresh/plot_data_plane_TMP_Z2_IQR.ps \
+      'name="TMP"; level="Z2"; censor_thresh=&lt;SFP25||&gt;SFP75; censor_val=-9999;'
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/perc_thresh/plot_data_plane_TMP_Z2_IQR.ps</ps>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Gen-Vx-Mask data masking                                         -->
+  <!--                                                                  -->
+
+  <test name="perc_thresh_GEN_VX_MASK">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/perc_thresh/gen_vx_mask_SFP75.nc \
+      -type data -mask_field 'name="TMP"; level="Z2";' \
+      -thresh '>SFP75' -name "TMP_Z2_gtSFP75" -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/perc_thresh/gen_vx_mask_SFP75.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- Grid-Stat                                                        -->
+  <!--                                                                  -->
+
+  <test name="perc_thresh_GRID_STAT">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>PERC_THRESH</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012_gRtma.grib2 \
+      &DATA_DIR_OBS;/rtma/rtma_2012051712_F000.grib2 \
+      &CONFIG_DIR;/GridStatConfig_rtma_perc_thresh \
+      -outdir &OUTPUT_DIR;/perc_thresh -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_nbrctc.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_nbrcts.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_nbrcnt.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- MODE                                                             -->
+  <!--                                                                  -->
+
+  <test name="perc_thresh_MODE">
+    <exec>&MET_BIN;/mode</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>PERC_THRESH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
+      &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      &CONFIG_DIR;/MODEConfig_perc_thresh \
+      -outdir &OUTPUT_DIR;/perc_thresh -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/perc_thresh/mode_PERC_THRESH_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/perc_thresh/mode_PERC_THRESH_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <exist>&OUTPUT_DIR;/perc_thresh/mode_PERC_THRESH_300000L_20120410_180000V_060000A_obj.nc</exist>
+      <ps>&OUTPUT_DIR;/perc_thresh/mode_PERC_THRESH_300000L_20120410_180000V_060000A.ps</ps>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- STAT-Analysis                                                    -->
+  <!--                                                                  -->
+
+  <test name="perc_thresh_STAT_ANALYSIS">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/perc_thresh/grid_stat_PERC_THRESH_120000L_20120409_120000V.stat \
+      -job aggregate -line_type CTC -by FCST_VAR,FCST_LEV,FCST_THRESH,OBS_THRESH \
+      -out_stat &OUTPUT_DIR;/perc_thresh/stat_analysis_agg_ctc_PERC_THRESH.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/perc_thresh/stat_analysis_agg_ctc_PERC_THRESH.stat</stat>
+    </output>
+  </test>
+
+</met_test>
