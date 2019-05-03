@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test
+[
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY EXECUTABLE     "&MET_BIN;/modis_regrid">
+  <!ENTITY DATA_DIR_OUT   "${MET_TEST_OUTPUT}/modis">
+  
+  <!ENTITY MODIS_FILE     "${MET_TEST_INPUT}/obs_data/modis/MYD06_L2.A2013032.0630.051.2013032185634.hdf">
+  <!ENTITY GRID_FILE      "&MET_DATA;/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212">
+
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+
+  <!--                                    -->
+  <!--  modis_regrid                      -->
+  <!--                                    -->
+
+  <test name="modis_regrid_SURFACE_TEMPERATURE">
+    <exec>&EXECUTABLE;</exec>
+    <param> \
+      -field Surface_Temperature  \
+      -data_file &GRID_FILE;  \
+      -out &DATA_DIR_OUT;/m_sfc_temp.nc  \
+      -units K  \
+      -scale 0.01   \
+      -offset -15000  \
+      -fill -32768  \
+      &MODIS_FILE;
+    </param>   
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/m_sfc_temp.nc</grid_nc>
+    </output>
+  </test>
+  
+
+  <test name="modis_regrid_CLOUD_FRACTION">
+    <exec>&EXECUTABLE;</exec>
+    <param> \
+      -field Cloud_Fraction  \
+      -data_file &GRID_FILE;  \
+      -out &DATA_DIR_OUT;/m_cld_frac.nc  \
+      -units percent  \
+      -scale 0.01   \
+      -offset 0  \
+      -fill 127  \
+      &MODIS_FILE;
+    </param>   
+    <output>
+      <grid_nc>&DATA_DIR_OUT;/m_cld_frac.nc</grid_nc>
+    </output>
+  </test>
+
+
+</met_test>

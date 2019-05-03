@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+
+  <test name="wavelet_stat_GRIB1_NAM_STAGE4">
+    <exec>&MET_BIN;/wavelet_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>GRIB1_NAM_STAGE4</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
+      &OUTPUT_DIR;/pcp_combine/stage4_2012040912_F012_APCP12.nc \
+      &CONFIG_DIR;/WaveletStatConfig \
+      -outdir &OUTPUT_DIR;/wavelet_stat -v 1
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V_isc.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.nc</grid_nc>
+      <ps>&OUTPUT_DIR;/wavelet_stat/wavelet_stat_GRIB1_NAM_STAGE4_120000L_20120409_120000V.ps</ps>
+    </output>
+  </test>
+
+
+</met_test>

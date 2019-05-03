@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="wwmca_regrid_G003_NO_AGE">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>G003</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_NO_AGE.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_NO_AGE.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_G003_AGE_60">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>G003</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>60</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_60.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_60.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_G003_AGE_120">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>G003</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_120.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_120.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_G003_AGE_240">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>G003</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>240</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_240.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_G003_AGE_240.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_G003_WRITE_PIXEL_AGE">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>G003</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>1200</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>TRUE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 &DATA_DIR_OBS;/wwmca/WWMCA_PIXL_TIME_MEANS_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_WRITE_PIXEL_AGE_2009083005_G003.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_WRITE_PIXEL_AGE_2009083005_G003.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_GFS_LATLON">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>latlon 720 361 -90.0 0.0 0.5 0.5</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_GFS_LATLON.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_GFS_LATLON.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_GFS_MERCATOR">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>mercator 116 44 -48.670 3.104 61.050 0.000</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_GFS_MERCATOR.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_GFS_MERCATOR.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_NAM_LAMBERT">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>lambert 614 428 12.190 -133.459 -95.0 12.191 6371.20 25.0 25.0 N</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_NAM_LAMBERT.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_NAM_LAMBERT.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="wwmca_regrid_HMT_STEREO">
+    <exec>&MET_BIN;/wwmca_regrid</exec>
+    <env>
+      <pair><name>GRID_DEF</name> <value>stereo 169 154 31.357 -129.770 -120.5 10.395 6371.20 60.0 N</value></pair>
+      <pair><name>PIXEL_AGE</name> <value>120</value></pair>
+      <pair><name>WRITE_PIXEL_AGE</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      -config &CONFIG_DIR;/WWMCARegridConfig \
+      -nh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      -sh     &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -out    &OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_HMT_STEREO.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/wwmca_regrid/WWMCA_TOTAL_CLOUD_PCT_2009083005_HMT_STEREO.nc</grid_nc>
+    </output>
+  </test>
+
+</met_test>

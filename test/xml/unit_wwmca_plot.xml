@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+  
+  <test name="wwmca_plot_NH_SH_AGE_240">
+    <exec>&MET_BIN;/wwmca_plot</exec>
+    <param> \
+      -outdir &OUTPUT_DIR;/wwmca_plot \
+      -max 240 \
+      &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005 \
+      &DATA_DIR_OBS;/wwmca/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005 \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/wwmca_plot/WWMCA_TOTAL_CLOUD_PCT_NH_2009083005.ps</ps>
+      <ps>&OUTPUT_DIR;/wwmca_plot/WWMCA_TOTAL_CLOUD_PCT_SH_2009083005.ps</ps>
+    </output>
+  </test>
+
+</met_test>
