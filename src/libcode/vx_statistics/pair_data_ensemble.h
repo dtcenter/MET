@@ -91,8 +91,8 @@ class VxPairDataEnsemble {
       //
       //////////////////////////////////////////////////////////////////
       
-      VarInfo     *fcst_info;    // Forecast field, allocated by VarInfoFactory
-      VarInfoGrib *obs_info;     // Observation field, allocated by VarInfoFactory
+      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
+      VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
 
       double interp_thresh;      // Threshold between 0 and 1 used when
                                  // interpolating the forecasts to the
@@ -132,7 +132,7 @@ class VxPairDataEnsemble {
       void clear();
 
       void set_fcst_info(VarInfo *);
-      void set_obs_info(VarInfoGrib *);
+      void set_obs_info(VarInfo *);
       void set_interp_thresh(double);
 
       void set_fcst_dpa(const DataPlaneArray &);

@@ -88,7 +88,7 @@ madis2nc: madis2nc.cc $(OBJECTS)
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
+	-lm -lnetcdf_c++ -lnetcdf -lgsl \
 	$(CXX_LIBS)
 	cp $(EXECUTABLES) $(MET_BIN_DIR)
 

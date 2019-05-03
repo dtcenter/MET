@@ -321,7 +321,7 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 void VxPairDataEnsemble::init_from_scratch() {
 
    fcst_info    = (VarInfo *) 0;
-   obs_info     = (VarInfoGrib *) 0;
+   obs_info     = (VarInfo *) 0;
    pd           = (PairDataEnsemble ***) 0;
 
    n_msg_typ    = 0;
@@ -338,8 +338,8 @@ void VxPairDataEnsemble::init_from_scratch() {
 void VxPairDataEnsemble::clear() {
    int i, j, k;
 
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *)     0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfoGrib *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
 
    interp_thresh = 0;
 
@@ -413,13 +413,14 @@ void VxPairDataEnsemble::set_fcst_info(VarInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_obs_info(VarInfoGrib *info) {
+void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
+   VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfoGrib *) 0; }
+   if(obs_info) { delete obs_info; obs_info = (VarInfo *) 0; }
 
    // Perform a deep copy
-   obs_info = new VarInfoGrib;
+   obs_info = f.new_var_info(info->file_type());
    *obs_info = *info;
 
    return;
@@ -582,10 +583,22 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt;
    double obs_v;
+   VarInfoGrib *obs_info_grib = (VarInfoGrib *) 0;
 
+   // Check the observation VarInfo file type
+   if(obs_info->file_type() != FileType_Gb1) {
+      mlog << Error << "\nVxPairDataEnsemble::add_obs() -> "
+           << "when processing point observations, the observation "
+           << "VarInfo type must be GRIB.\n\n";
+      exit(1);
+   }
+
+   // Create VarInfoGrib pointer
+   obs_info_grib = (VarInfoGrib *) obs_info;
+   
    // Check whether the GRIB code for the observation matches
    // the specified code
-   if(obs_info->code() != nint(obs_arr[1])) return;
+   if(obs_info_grib->code() != nint(obs_arr[1])) return;
 
    // Check whether the observation time falls within the valid time
    // window
@@ -612,31 +625,31 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // For pressure levels, check if the observation pressure level
    // falls in the requsted range.
-   if(obs_info->level().type() == LevelType_Pres) {
+   if(obs_info_grib->level().type() == LevelType_Pres) {
 
-      if(obs_lvl < obs_info->level().lower() ||
-         obs_lvl > obs_info->level().upper()) return;
+      if(obs_lvl < obs_info_grib->level().lower() ||
+         obs_lvl > obs_info_grib->level().upper()) return;
    }
    // For accumulations, check if the observation accumulation interval
    // matches the requested interval.
-   else if(obs_info->level().type() == LevelType_Accum) {
+   else if(obs_info_grib->level().type() == LevelType_Accum) {
 
-      if(obs_lvl < obs_info->level().lower() ||
-         obs_lvl > obs_info->level().upper()) return;
+      if(obs_lvl < obs_info_grib->level().lower() ||
+         obs_lvl > obs_info_grib->level().upper()) return;
    }
    // For vertical levels, check for a surface message type or if the
    // observation height falls within the requested range.
-   else if(obs_info->level().type() == LevelType_Vert) {
+   else if(obs_info_grib->level().type() == LevelType_Vert) {
 
       if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
-         (obs_hgt < obs_info->level().lower() ||
-          obs_hgt > obs_info->level().upper())) return;
+         (obs_hgt < obs_info_grib->level().lower() ||
+          obs_hgt > obs_info_grib->level().upper())) return;
    }
    // For all other level types (RecNumber, NoLevel), check
    // if the observation height falls within the requested range.
    else {
-      if(obs_hgt < obs_info->level().lower() ||
-         obs_hgt > obs_info->level().upper()) return;
+      if(obs_hgt < obs_info_grib->level().lower() ||
+         obs_hgt > obs_info_grib->level().upper()) return;
    }
 
    // Look through all of the PairData objects to see if the observation
