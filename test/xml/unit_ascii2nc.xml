@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+  
+  <test name="ascii2nc_TRMM_3hr">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/trmm_2012040912_3hr.mtxt \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_TRMM_12hr">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/trmm_2008080812_12hr.mtxt \
+      &OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_GAGE_24hr">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.precip24.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>
+
+</met_test>

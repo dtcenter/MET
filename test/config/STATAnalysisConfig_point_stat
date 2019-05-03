@@ -1,0 +1,90 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// STAT-Analysis configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filtering input STAT lines by the contents of each column
+//
+model = [];
+
+fcst_lead = [];
+obs_lead  = [];
+
+fcst_valid_beg  = "";
+fcst_valid_end  = "";
+fcst_valid_hour = [];
+
+obs_valid_beg   = "";
+obs_valid_end   = "";
+obs_valid_hour  = [];
+
+fcst_init_beg   = "";
+fcst_init_end   = "";
+fcst_init_hour  = [];
+
+obs_init_beg    = "";
+obs_init_end    = "";
+obs_init_hour   = [];
+
+fcst_var = [ "TMP" ];
+obs_var  = [];
+
+fcst_lev = [ "Z2" ];
+obs_lev  = [];
+
+obtype = [];
+
+vx_mask = [ "DTC165", "DTC166" ];
+
+interp_mthd = [ "UW_MEAN" ];
+
+interp_pnts = [ 1 ];
+
+fcst_thresh = [];
+obs_thresh  = [];
+cov_thresh  = [];
+
+alpha = [];
+
+line_type = [];
+
+column = [];
+
+weight = [];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Array of STAT-Analysis jobs to be performed on the filtered data
+//
+jobs = [
+   "-job aggregate_stat -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr.stat"
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+out_alpha = 0.05;
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 1000;
+   rng      = "mt19937";
+   seed     = "1";
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+rank_corr_flag = TRUE;
+vif_flag       = FALSE;
+tmp_dir        = "/tmp";
+version        = "V4.0";
+
+////////////////////////////////////////////////////////////////////////////////
