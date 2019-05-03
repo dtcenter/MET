@@ -1,0 +1,60 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// WWMCA-Regrid configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify the grid to which the data should be interpolated in one of the
+// following ways:
+//
+//    - The path to a gridded data file whose grid should be used
+//
+//    - Name ("GNNN" where NNN indicates the three digit NCEP grid number)
+//
+//    - lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_parallel_1
+//      [standard_parallel_2] N|S
+//
+//    - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
+//
+//    - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
+//
+//    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+//
+regrid = {
+   to_grid    = "${GRID_DEF}";
+   method     = UW_MEAN;
+   width      = 5;
+   vld_thresh = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// NetCDF output information
+//
+variable_name = "Cloud_Pct";
+units         = "percent";
+long_name     = "cloud cover percent";
+level         = "SFC";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Maximum pixel age in minutes
+//
+max_minutes   = ${PIXEL_AGE};
+
+//
+// Swap endianess of binary pixel age files
+//
+swap_endian = TRUE;
+
+//
+// Write the pixel age in minutes instead of cloud data
+//
+write_pixel_age = ${WRITE_PIXEL_AGE};
+
+////////////////////////////////////////////////////////////////////////////////

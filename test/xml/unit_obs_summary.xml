@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <!--  Depends on unit_ascii2nc to generate dup_test.nc obs file -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>false</exit_on_fail>
+
+  <test name="ascii2nc_obs_summary">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    &DATA_DIR_OBS;/ascii/obs_sum_test_qty.txt \
+    &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+    -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/obs_sum_test.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="point_stat_OS_NONE">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_NONE</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:None</value></pair>  
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NONE_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NONE_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_NEAREST">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>NEAREST</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_NEAREST</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Nearest_Time</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NEAREST_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_NEAREST_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_MIN">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>MIN</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_MIN</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Minimum_Value</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MIN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MIN_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_MAX">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>MAX</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_MAX</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Maximum_Value</value></pair>   
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MAX_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MAX_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_UW_MEAN">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>UW_MEAN</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_UW_MEAN</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Unweighted_Mean</value></pair>      
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UW_MEAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+  
+  <test name="point_stat_OS_DW_MEAN">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>DW_MEAN</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_DW_MEAN</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Time_Weighted_Mean</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_DW_MEAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_DW_MEAN_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_MEDIAN">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>MEDIAN</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_MEDIAN</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:Median</value></pair>      
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MEDIAN_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_MEDIAN_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_PERC">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_SUMMARY</name> <value>PERC</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_PERC</value></pair>
+      <pair><name>DESCRIPTION</name> <value>Obs_Summary:75th_Percentile</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_PERC_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_PERC_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_OS_UNIQUE_ALL">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>OS_UNIQUE_ALL</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/ascii2nc/obs_sum_test.nc \
+      &CONFIG_DIR;/PointStatConfig_obs_summary_all \
+      -outdir &OUTPUT_DIR;/point_stat -v 3
+    </param>   
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+  
+</met_test>

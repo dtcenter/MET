@@ -1,0 +1,92 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// MODE configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fuzzy engine weights
+//
+weight = {
+   centroid_dist    = 0.0;
+   boundary_dist    = 8.0;
+   convex_hull_dist = 0.0;
+   angle_diff       = 2.0;
+   aspect_diff      = 0.0;
+   area_ratio       = 0.0;
+   int_area_ratio   = 0.0;
+   curvature_ratio  = 0.0;
+   complexity_ratio = 0.0;
+   inten_perc_ratio = 0.0;
+   inten_perc_value = 50;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fuzzy engine interest functions
+//
+interest_function = {
+
+   centroid_dist = (
+      (            0.0, 1.0 )
+      (  60.0/grid_res, 1.0 )
+      ( 600.0/grid_res, 0.0 )
+   );
+
+   boundary_dist = (
+      (            0.0, 1.0 )
+      ( 400.0/grid_res, 0.0 )
+   );
+
+   convex_hull_dist = (
+      (            0.0, 1.0 )
+      ( 400.0/grid_res, 0.0 )
+   );
+
+   angle_diff = (
+      (  0.0, 1.0 )
+      ( 30.0, 1.0 )
+      ( 90.0, 0.0 )
+   );
+
+   aspect_diff = (
+      (  0.00, 1.0 )
+      (  0.10, 1.0 )
+      (  0.75, 0.0 )
+   );
+
+   corner   = 0.8;
+   ratio_if = (
+      (    0.0, 0.0 )
+      ( corner, 1.0 )
+      (    1.0, 1.0 )
+   );
+
+   area_ratio = ratio_if;
+
+   int_area_ratio = (
+      ( 0.00, 0.00 )
+      ( 0.10, 0.50 )
+      ( 0.25, 1.00 )
+      ( 1.00, 1.00 )
+   );
+
+   curvature_ratio = ratio_if;
+
+   complexity_ratio = ratio_if;
+
+   inten_perc_ratio = ratio_if;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Total interest threshold for determining matches
+//
+total_interest_thresh = 0.9;
+
+////////////////////////////////////////////////////////////////////////////////
+
