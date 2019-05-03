@@ -230,7 +230,7 @@ boot_rng = "mt19937";
 // intervals.  If left unspecified, the seed will change for each run and
 // the computed bootstrap confidence intervals will not be reproducable.
 //
-boot_seed = "";
+boot_seed = "1";
 
 //
 // Specify a comma-separated list of interpolation method(s) to be used
@@ -242,7 +242,6 @@ boot_seed = "";
 //    UW_MEAN = Unweighted mean in the neighborhood
 //    DW_MEAN = Distance-weighted mean in the neighborhood
 //    LS_FIT  = Least-squares fit in the neighborhood
-//    BILIN   = Bilinear interpolation using the 4 closest points
 //
 // In all cases, vertical interpolation is performed in the natural log
 // of pressure of the levels above and below the observation.
@@ -501,4 +500,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V3.0.1";
+version = "V3.0";

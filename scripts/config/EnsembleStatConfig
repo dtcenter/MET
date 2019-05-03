@@ -223,7 +223,6 @@ mask_sid = "";
 //    UW_MEAN = Unweighted mean in the neighborhood
 //    DW_MEAN = Distance-weighted mean in the neighborhood
 //    LS_FIT  = Least-squares fit in the neighborhood
-//    BILIN   = Bilinear interpolation using the 4 closest points
 //
 // e.g. interp_method[] = [ "UW_MEAN", "MEDIAN" ];
 //
@@ -328,7 +327,7 @@ rng_type = "mt19937";
 // If left unspecified, the random number generator seed will change for
 // each run and the assignment of ranks will not be reproducable.
 //
-rng_seed = "";
+rng_seed = "1";
 
 //
 // Specify the GRIB Table 2 parameter table version number to be used
@@ -346,4 +345,4 @@ output_prefix = "";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V3.0.1";
+version = "V3.0";
