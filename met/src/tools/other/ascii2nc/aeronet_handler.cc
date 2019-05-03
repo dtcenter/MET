@@ -161,23 +161,12 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     return false;
 
   //
-  // Get the Level number from the fourth header line
+  // Get the Level number
   //
 
   ascii_file >> data_line;
-  ConcatString dl_string(data_line[0]);
-  StringArray tokens = dl_string.split(" ");
-  string header_type = "AERONET" + string("_") + tokens[tokens.n_elements()-1];
+  string header_type = "AERONET_AOD";
   
-  if (format_version == 3 && data_line.n_items() > 1) {
-    //string tmp_str = string(data_line[1]);
-    string tmp_str = string(data_line.get_line());
-    int offset = tmp_str.find(":");
-    if (offset != (int) string::npos)
-      header_type += tmp_str.substr(0, offset);
-    mlog << Debug(5) << "_readObservations() message_type: [" << header_type << "]\n";
-  }
-
   //
   // Get the field information from the fifth header line
   //
