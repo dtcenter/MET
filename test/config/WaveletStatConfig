@@ -1,0 +1,117 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Wavelet-Stat configuration file.
+//
+// For additional information, see the MET_BASE/data/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   field = [
+      {
+        name       = "APCP";
+        level      = [ "A12" ];
+        cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
+};
+obs = {
+   field = [
+      {
+        name       = "APCP_12";
+        level      = [ "(*,*)" ];
+        cat_thresh = [ >0.0, >=5.0 ];
+      }
+   ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Handle missing data
+//
+mask_missing_flag = NONE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Decompose the field into dyadic tiles
+//
+grid_decomp_flag = AUTO;
+
+tile = {
+   width = 0;
+   location = [
+      {
+         x_ll = 0;
+         y_ll = 0;
+      }
+   ];
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Wavelet to be used for the decomposition
+//
+wavelet = {
+   type   = HAAR;
+   member = 2;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   isc = BOTH;
+};
+
+//
+// NetCDF matched pairs and PostScript output files
+//
+nc_pairs_flag = TRUE;
+ps_plot_flag  = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Plotting information
+//
+met_data_dir = "MET_BASE/data";
+
+fcst_raw_plot = {
+   color_table = "MET_BASE/data/colortables/met_default.ctable";
+   plot_min = 0.0;
+   plot_max = 0.0;
+};
+
+obs_raw_plot = {
+   color_table = "MET_BASE/data/colortables/met_default.ctable";
+   plot_min = 0.0;
+   plot_max = 0.0;
+};
+
+wvlt_plot = {
+   color_table = "MET_BASE/data/colortables/NCL_colortables/BlWhRe.ctable";
+   plot_min = -1.0;
+   plot_max =  1.0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_prefix = "${OUTPUT_PREFIX}";
+version = "V4.0";
+
+////////////////////////////////////////////////////////////////////////////////
