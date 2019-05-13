@@ -83,9 +83,9 @@ run_command() {
 # Run svn info to update contents of version.txt
 get_git_info() {
   echo "CALLING: git config, git rev-parse, and git log"
-  git config --get remote.origin.url | sed -r 's/^/Repository:\t/g' > $1/data/version.txt
-  git rev-parse --short HEAD         | sed -r 's/^/Last Changed Rev:\t/g' >> $1/data/version.txt
-  git log -1 --format=%cd met        | sed -r 's/^/Last Changed Date:\t/g' >> $1/data/version.txt
+  git config --get remote.origin.url | sed -r 's/^/Repository:\t/g'         > met/data/version.txt
+  git rev-parse --short HEAD         | sed -r 's/^/Last Changed Rev:\t/g'  >> met/data/version.txt
+  git log -1 --format=%cd met        | sed -r 's/^/Last Changed Date:\t/g' >> met/data/version.txt
 }
 
 # Clone repo into a working directory
@@ -126,7 +126,7 @@ elif [[ ${NARGS} -eq 2 && $1 == "new_branch" ]]; then
 elif [[ ${NARGS} -eq 2 && $1 == "tag" ]]; then
 
    echo "Checking out the '$2' tagged version of MET."
-   run_command "git checkout met-8.1"
+   run_command "git checkout $2"
    BUILD_ARGS="$2"
    get_git_info ${BUILD_ARGS}
 
@@ -142,6 +142,18 @@ else
    exit 1
 fi
 
+# Check that the met_build.sh script exists
+if [[ ! -e "scripts/met_build.sh" ]]; then
+
+  echo
+  echo "ERROR: scripts/met_build.sh does not exist!"
+  echo
+  exit 1
+
+fi
+
 # Call the build script to build the release
 run_command "scripts/met_build.sh ${BUILD_ARGS}"
-run_command "mv *.tar.gz ../../. ; cd ../.. ; rm -rf build"
+run_command "mv *.tar.gz ../../."
+run_command "cd ../.."
+run_command "rm -rf build"
