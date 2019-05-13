@@ -61,6 +61,8 @@ class TCRMWConfInfo {
         // Track datasets
         TrackType Track;
 
+        bool CheckDup;
+
         // Config file version
         ConcatString Version;
 

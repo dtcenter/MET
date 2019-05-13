@@ -64,6 +64,7 @@ void TCRMWConfInfo::clear() {
     LeadReq.clear();
     ValidBeg = ValidEnd = (unixtime) 0;
     Track = TrackType_None;
+    CheckDup = true;
     Version.clear();
 
     return;
@@ -146,6 +147,9 @@ void TCRMWConfInfo::process_config() {
     for(i=0; i<sa.n_elements(); i++){
         LeadReq.add(timestring_to_sec(sa[i].c_str()));
     }
+
+    // Conf: CheckDup
+    CheckDup = Conf.lookup_bool(conf_key_check_dup);
 
     // Conf: Track
     // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));

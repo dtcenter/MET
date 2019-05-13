@@ -134,6 +134,15 @@ static void process_bdecks(TrackInfoArray& bdeck_tracks) {
     // Initialize
     bdeck_tracks.clear();
 
+    // Get the list of track files
+    get_atcf_files(bdeck_source, bdeck_model_suffix,
+                   files, files_model_suffix);
+
+    mlog << Debug(2)
+         << "Processing " << files.n_elements() << " BDECK file(s).\n";
+
+    process_track_files(files, files_model_suffix, bdeck_tracks,
+                        false, false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -192,6 +201,7 @@ static void process_track_files(const StringArray& files,
                                 TrackInfoArray& tracks,
                                 bool check_keep,
                                 bool check_anly) {
+    int cur_read, cur_add, tot_read, tot_add;
 
     LineDataFile f;
     ConcatString cs;
@@ -199,6 +209,54 @@ static void process_track_files(const StringArray& files,
 
     // Initialize
     tracks.clear();
+
+    // Initialize counts
+    tot_read = tot_add = 0;
+
+    // Process each of the input ATCF files
+    for(int i = 0; i < files.n_elements(); i++) {
+
+        // Open the current file
+        if(!f.open(files[i].c_str())) {
+            mlog << Error
+                 << "\nprocess_track_files() -> "
+                 << "unable to open file \"" << files[i] << "\"\n\n";
+            exit(1);
+        }
+
+        // Initialize counts
+        cur_read = cur_add = 0;
+
+        // Read each line in the file
+        while(f >> line) {
+
+            // Increment the line counts
+            cur_read++;
+            tot_read++;
+
+            // Add model suffix, if specified
+            if(model_suffix[i].length() > 0) {
+                cs << cs_erase << line.technique() << model_suffix[i];
+                line.set_technique(cs);
+            }
+
+            // Attempt to add the current line to the TrackInfoArray
+            if(tracks.add(line, conf_info.CheckDup, check_anly)) {
+                cur_add++;
+                tot_add++;
+            }
+        }
+
+        // Dump out the current number of lines
+        mlog << Debug(4)
+             << "[File " << i + 1 << " of " << files.n_elements()
+             << "] " << cur_read
+             << " lines read from file \n\"" << files[i] << "\"\n";
+
+        // Close the current file
+        f.close();
+
+    } // end for i
 }
 
 ////////////////////////////////////////////////////////////////////////
