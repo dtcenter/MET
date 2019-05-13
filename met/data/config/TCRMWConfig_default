@@ -64,6 +64,11 @@ init_hour = [];
 lead_req = [];
 
 //
+// Specify if the code should check for duplicate ATCF lines
+//
+check_dup = FALSE;
+
+//
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
