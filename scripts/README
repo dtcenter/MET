@@ -1,0 +1,65 @@
+The scripts in this directory are described below.
+
+(1) met_checkout_and_build.sh may be run to build a release of the MET software package.
+Depending on the command line arguments, the scripts will build the latest release,
+an existing tag, or an existing branch:
+
+USAGE: met_checkout_and_build.sh <new, tag, branch> <name>
+       'met_checkout_and_build.sh new'             to build a new release with no TAG
+       'met_checkout_and_build.sh new_tag    NAME' to build a new release and tag it
+       'met_checkout_and_build.sh new_branch NAME' to build a new release and create a branch
+       'met_checkout_and_build.sh tag        NAME' to build an existing tag
+       'met_checkout_and_build.sh branch     NAME' to build an existing branch
+
+(2) met_patch_build.sh may be run to create a patch file containing all files which differ
+between two tags or branches.
+
+USAGE:
+  ./met_patch_build.sh {'tag'|'branch'}/[dist1] {'tag'|'branch'}/[dist2]
+or
+  ./met_patch_build.sh [dist]
+    where dist expands to tag/[dist] and branch/[dist]_bugfix
+
+(3) met_build.sh is called by both met_checkout_and_build.sh and met_patch_build.sh.
+This script transforms the code from the source code repository into a releasable tarball.
+
+(4) run_fortity_sca.sh runs the Fortify static code analyzer tool.
+
+USAGE: run_fortify_sca.sh [-q] trunk [rev] | branch name [rev] | tag name [rev]
+   where
+                  -q specifies no text output, exit status indicates success
+         trunk [rev] specifies the repository trunk
+      tag name [rev] specifies a named tag, e.g. met-6.0
+   branch name [rev] specifies a named branch, e.g. met-6.0_bugfix
+               [rev] optionally specifies a revision number, e.g. met-6.0_bugfix 4160
+
+(5) run_fortify_sca_nightly.sh executes the run_fortify_sca.sh script nightly on a development
+machine and it is intended to be run through cron.
+
+(6) test_unit.sh checks out the requested tag or branch, compiles the code, and executes all
+the unit tests.
+
+USAGE: test_unit.sh [-q] trunk [rev] | branch name [rev] | tag name [rev]
+   where
+                  -q specifies no text output, exit status indicates success
+         trunk [rev] specifies the repository trunk
+      tag name [rev] specifies a named tag, e.g. met-6.0
+   branch name [rev] specifies a named branch, e.g. met-6.0_bugfix
+               [rev] optionally specifies a revision number, e.g. met-6.0_bugfix 4160
+
+(7) test_regression.sh calls the test_unit.sh script for two different versions of the code
+and diffs their output.
+
+USAGE: test_regression.sh {version1} {version2}
+   where version1 and version2 each have the format
+      trunk [rev] | branch name [rev] | tag name [rev]
+   and:
+         trunk [rev] specifies the repository trunk
+      tag name [rev] specifies a named tag, e.g. met-6.0
+   branch name [rev] specifies a named branch, e.g. met-6.0_bugfix
+               [rev] optionally specifies a revision number, e.g. met-6.0_bugfix 4160
+
+(8) test_nightly.sh executes the test_regression.sh script to compare the tip of the
+development branch to a previous, reference revision.  It is intended to be run through cron.
+
+(9) regression_runtimes.ksh scrapes the nightly build log files and extracts the timing info.
