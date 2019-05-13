@@ -1,3 +1,3 @@
-Repository:	https://svn-met-dev.cgd.ucar.edu
+Repository:	https://github.com/NCAR/MET
 Revision:	development
 Change Date:	development 
