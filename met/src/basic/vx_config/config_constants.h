@@ -895,7 +895,7 @@ static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
 
 //
-// TC-Pairs and TC-Stat specific parameter key names
+// TC-Pairs, TC-RMW, and TC-Stat specific parameter key names
 //
 
 static const char conf_key_storm_id[]                 = "storm_id";
@@ -957,6 +957,14 @@ static const char conf_key_landfall_end[]             = "landfall_end";
 static const char conf_key_event_equal[]              = "event_equal";
 static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
+
+//
+// TC-RMW specific parameter key names
+//
+static const char conf_key_n_radius[]     = "n_radius";
+static const char conf_key_n_azimuth[]    = "n_azimuth";
+static const char conf_key_max_radius[]   = "max_radius";
+static const char conf_key_delta_radius[] = "delta_radius";
 
 //
 // Parameter value names common to multiple tools
