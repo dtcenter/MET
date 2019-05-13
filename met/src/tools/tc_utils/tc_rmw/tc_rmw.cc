@@ -24,7 +24,7 @@ using namespace std;
 #include "tc_rmw.h"
 
 #include "vx_grid.h"
-#include "tcrmw_grid.h"
+// #include "tcrmw_grid.h"
 
 #include "vx_tc_util.h"
 #include "vx_util.h"
@@ -91,6 +91,9 @@ void process_command_line(int argc, char **argv) {
     // Set usage function
 
     // Add function calls for arguments
+    cline.add(set_bdeck,     "-bdeck", -1);
+    cline.add(set_adeck,     "-adeck", -1);
+    cline.add(set_edeck,     "-edeck", -1);
     cline.add(set_config,    "-config", 1);
     cline.add(set_out,       "-out",    1);
     cline.add(set_logfile,   "-log",    1);
@@ -99,7 +102,7 @@ void process_command_line(int argc, char **argv) {
     // Parse command line
     cline.parse();
 
-    // Create efault config file name
+    // Create default config file name
     default_config_file = replace_path(default_config_filename);
 
     // List config files
@@ -125,19 +128,23 @@ void process_decks() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_bdecks(TrackInfoArray&) {
+static void process_bdecks(TrackInfoArray& bdeck_tracks) {
+    StringArray files, files_model_suffix;
+
+    // Initialize
+    bdeck_tracks.clear();
 
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_adecks(const TrackInfoArray&) {
+static void process_adecks(const TrackInfoArray& adeck_tracks) {
 
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_edecks(const TrackInfoArray&) {
+static void process_edecks(const TrackInfoArray& edeck_tracks) {
 
 }
 
@@ -186,6 +193,12 @@ static void process_track_files(const StringArray& files,
                                 bool check_keep,
                                 bool check_anly) {
 
+    LineDataFile f;
+    ConcatString cs;
+    ATCFTrackLine line;
+
+    // Initialize
+    tracks.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -268,5 +281,5 @@ void set_verbosity(const StringArray& a) {
 
 static void compute_grids() {
 
-    TcrmwGrid grid;
+    // TcrmwGrid grid;
 }
