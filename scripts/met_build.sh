@@ -16,9 +16,6 @@
 #
 #================================================
 
-# Constants
-SVN_BASE="https://svn-met-dev.cgd.ucar.edu"
-
 # MET_DEVELOPMENT must be set to build a release
 MET_DEVELOPMENT=true
 
@@ -28,25 +25,32 @@ NARGS=$#
 # Get the current date
 DATE=`date +%Y%m%d`
 
-# Get the current revision number
-CUR_REV=`svn info ${SVN_BASE} | grep Revision | cut -d' ' -f2`
+# Get the current revision hash
+CUR_REV=`git rev-parse --short HEAD`
+
+# Check for a met sub-directory
+if [[ ! -e "met" ]]; then
+  echo
+  echo "ERROR: no \"met\" subdirectory found!"
+  echo
+  exit 1
+fi
 
 # Check for 0 or 1 arguments
 if [[ ${NARGS} -eq 0 ]]; then
-  VERSION="met-rev${CUR_REV}"
-  mv met ${VERSION}
+  VERSION="met-${CUR_REV}"
 elif [[ ${NARGS} -eq 1 ]]; then
   VERSION=$1
 else
+  echo
   echo "USAGE: MET_build <version_number>"
-  exit
+  echo
+  exit 1
 fi
 
-# Set the top-level MET directory
-TOP=${VERSION}
-
-# Enter the top-level MET directory
-cd ${TOP}
+# Copy the current met directory
+cp -r met ${VERSION}
+cd ${VERSION}
 
 # Set the MET build version for bootstrap by stripping off leading "met-"
 export MET_BUILD_VERSION=`echo $VERSION | sed 's/met-//g'`
@@ -54,7 +58,7 @@ echo "Building MET version '${MET_BUILD_VERSION}'"
 
 # Run the bootstrap program to prepare for running configure
 echo "Running 'bootstrap' to prepare for running configure"
-bootstrap > /dev/null
+./bootstrap > /dev/null
 
 # Patch vx_config Makefile.in by removing lex/yacc
 cat src/basic/vx_config/Makefile.in | \
