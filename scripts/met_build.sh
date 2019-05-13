@@ -86,8 +86,7 @@ echo "Running configure to create the Makefiles"
             --enable-grib2 \
             --enable-mode_graphics \
             --enable-modis \
-            --enable-lidar2nc \
-            --enable-python  > /dev/null
+            --enable-lidar2nc > /dev/null
 
 # Make the distribution file.  This will automatically create
 # any needed distribution files like those created by yacc/lex
