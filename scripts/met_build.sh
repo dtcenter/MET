@@ -60,22 +60,6 @@ echo "Building MET version '${MET_BUILD_VERSION}'"
 echo "Running 'bootstrap' to prepare for running configure"
 ./bootstrap > /dev/null
 
-# Patch vx_config Makefile.in by removing lex/yacc
-cat src/basic/vx_config/Makefile.in | \
-    sed 's/config.tab.yy//g'        | \
-    sed 's/config_scanner.ll//g'    > \
-    src/basic/vx_config/Makefile.new
-mv  src/basic/vx_config/Makefile.new \
-    src/basic/vx_config/Makefile.in
-
-# Patch vx_color Makefile.in by removing lex/yacc
-cat src/libcode/vx_color/Makefile.in | \
-    sed 's/color_parser_yacc.yy//g'  | \
-    sed 's/color_scanner.ll//g'      > \
-    src/libcode/vx_color/Makefile.new
-mv  src/libcode/vx_color/Makefile.new \
-    src/libcode/vx_color/Makefile.in
-
 # Figure out where to install MET
 MET_INSTALL_DIR=`pwd`
 
