@@ -45,7 +45,7 @@ static void get_atcf_files(const StringArray&,
 static void process_track_files(const StringArray&,
                                 const StringArray&,
                                 TrackInfoArray&, bool, bool);
-static void compute_grids();
+static void compute_grids(const TrackInfoArray&);
 static void set_bdeck(const StringArray&);
 static void set_adeck(const StringArray&);
 static void set_edeck(const StringArray&);
@@ -337,7 +337,16 @@ void set_verbosity(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void compute_grids() {
+static void compute_grids(const TrackInfoArray& tracks) {
+
+    for(int j = 0; j < tracks.n_tracks(); j++) {
+
+        TrackInfo track = tracks[j];
+
+        for(int i = 0; i < track.n_points(); i++) {
+            TrackPoint point = track[i];
+        } 
+    }
 
     // TcrmwGrid grid;
 }
