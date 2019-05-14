@@ -43,8 +43,10 @@ for FILE in `find met -name Makefile_release`; do
   mv ${FILE} ${NEW}
 done
 
-# Cleanup
-rm -rf met/build
+# Copy default config files into data/config
+for FILE in `find met -name "*Config_default"`; do
+  cp ${FILE} met/data/config/.
+done
 
 # Tar up the newly built MET distribution
 mv met ${VERSION}
