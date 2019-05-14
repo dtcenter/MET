@@ -48,9 +48,6 @@ for FILE in `find met -name "*Config_default"`; do
   cp ${FILE} met/data/config/.
 done
 
-# Cleanup
-rm -rf met/build
-
 # Tar up the newly built MET distribution
 mv met ${VERSION}
 tar -czf ${VERSION}.${DATE}.tar.gz ${VERSION}
