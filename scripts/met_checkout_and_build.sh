@@ -83,7 +83,7 @@ run_command() {
 # Run svn info to update contents of version.txt
 get_git_info() {
   echo "CALLING: git config, git rev-parse, and git log"
-  git config --get remote.origin.url | sed -r 's/^/Repository:\t/g'         > met/data/version.txt
+  git config --get remote.origin.url | sed -r 's/^/Repository:\t\t/g'       > met/data/version.txt
   git rev-parse --short HEAD         | sed -r 's/^/Last Changed Rev:\t/g'  >> met/data/version.txt
   git log -1 --format=%cd met        | sed -r 's/^/Last Changed Date:\t/g' >> met/data/version.txt
 }
