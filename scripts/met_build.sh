@@ -37,25 +37,10 @@ else
    exit 1
 fi
 
-# Move over the met_data
-for DIR in `ls met_data`; do
-   mv met_data/${DIR}/* met/data/${DIR}/.
-done
-rm -rf met_data
-
-# Move over the met_doc
-mv met_doc/*.pdf met/doc/.
-rm -rf met_doc
-
 # Move Makefile_release over to Makefile
 for FILE in `find met -name Makefile_release`; do
   NEW=`echo ${FILE} | sed 's/_release//g'`
   mv ${FILE} ${NEW}
-done
-
-# Copy default config files into data/config
-for FILE in `find met -name "*Config_default"`; do
-  cp ${FILE} met/data/config/.
 done
 
 # Cleanup
