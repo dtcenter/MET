@@ -61,4 +61,5 @@ done
 rm -rf met/build
 
 # Tar up the newly built MET distribution
-tar -cvzf ${VERSION}.${DATE}.tar.gz met
+mv met ${VERSION}
+tar -cvzf ${VERSION}.${DATE}.tar.gz ${VERSION}
