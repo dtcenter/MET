@@ -26,21 +26,19 @@ DATE=`date +%Y%m%d`
 CUR_REV=`git rev-parse --short HEAD`
 
 # Check for 0 or 1 arguments
-if [[ ${NARGS} -eq 0 ]]; then
-   VERSION="MET_rev${CUR_REV}"
-   mv met ${VERSION}
-elif [[ ${NARGS} -eq 1 ]]; then
-   VERSION=$1
+if [ ${NARGS} -eq 0 ]; then
+   VERSION="met-${CUR_REV}"
+elif [ ${NARGS} -eq 1 ]; then
+   VERSION="met-${1}"
 else
+   echo
    echo "USAGE: MET_build <version_number>"
-   exit
+   echo
+   exit 1
 fi
 
-# Set the top-level MET directory
-TOP=${VERSION}
-
 # Enter the top-level MET directory
-cd ${TOP}
+cd met
 
   # Run 'make gen_sources' to generate source code
   echo "Running 'make gen_sources' to create the generated source files."
@@ -77,13 +75,8 @@ cd ${TOP}
   echo "Removing source code for test programs named 'test_*.cc'."
   rm -rf `find ./ -name "test_*.cc"`
 
-  # Remove any .git directories before building
-  echo "Removing any instances of '.git'."
-  rm -rf `find ./ -name '.git'`
-
-  # Remove the top-level build directory
-  echo "Removing top-level 'build' directory."
-  rm -rf build
+  # Cleanup
+  rm -f `find ./ -name ".gitignore"`
 
 # Go back up one level
 cd ..
@@ -91,4 +84,4 @@ cd ..
 # Tar up the newly built MET distribution
 TAR_FILE="${VERSION}.${DATE}.tar.gz"
 echo "Creating tar file '${TAR_FILE}'"
-tar -czf ${TAR_FILE} ${TOP}
+tar -czf ${TAR_FILE} ${VERSION}
