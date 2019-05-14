@@ -27,13 +27,14 @@ CUR_REV=`git rev-parse --short HEAD`
 
 # Check for 0 or 1 argument
 if [ ${NARGS} -eq 0 ]; then
-   VERSION="MET_${DATE}_rev${CUR_REV}"
-   mv met ${VERSION}
+   VERSION="met-${CUR_REV}"
 elif [ ${NARGS} -eq 1 ]; then
-   VERSION=$1
+   VERSION="met-${1}"
 else
+   echo
    echo "USAGE: MET_build <version_number>"
-   exit
+   echo
+   exit 1
 fi
 
 # Move over the met_data
