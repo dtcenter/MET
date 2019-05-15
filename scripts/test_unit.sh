@@ -27,14 +27,10 @@ function usage {
   echo "USAGE: test_unit.sh name"
   echo "   where \"name\" specifies a branch, tag, or hash."
   echo
-  echo "   e.g. test_unit.sh develop"
-  echo "        test_unit.sh met-8.1"
-  echo "        test_unit.sh 59d9194"
-  echo
 }
 
 # Check for arguments
-if [ $# -lt 1 ]; then usage; exit; fi
+if [ $# -lt 1 ]; then usage; exit 1; fi
 
 # Sub-routine for running a command and checking return status
 function run_command() {
@@ -91,4 +87,7 @@ export MET_BUILD_BASE=$(pwd)/met
 export MET_BASE=$MET_BUILD_BASE/share/met
 export MET_TEST_BASE=$(pwd)/test
 export MET_TEST_OUTPUT=$(pwd)/test_output
+export MET_TMP_DIR=$(pwd)/test/tmp
+export MET_TEST_INPUT=${MET_TEST_INPUT:-/d3/projects/MET/MET_test_data/unit_test}
+run_command "mkdir -p ${MET_TMP_DIR}"
 run_command "test/bin/unit_test.sh"
