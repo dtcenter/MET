@@ -69,7 +69,7 @@ for VERSION in `echo "${1} ${2}"`; do
   PID_LIST="${PID_LIST} $!"
 
   # Sleep for 5 minutes to stagger the unit test start times
-  sleep 30
+  sleep 300
 done
 
 # Wait for unit tests to finish
