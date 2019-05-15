@@ -94,24 +94,23 @@ today=`date +%Y%m%d`
 LOGFILE=${PWD}/NB${today}.out
 >${LOGFILE}
 
-# Check we have a script to run
-SCRIPT_DIR=`dirname $0`
-if [[ ! -r ${SCRIPT_DIR}/test_regression.sh ]]
-then
-  echo "$0: FAILURE ${SCRIPT_DIR}/test_regression.sh not found" > ${LOGFILE}
-  exit $E_NOEXECSCRIPT
-fi
-
 # make a little home - always start from scratch
 if [[ -e NB${today} ]];  then rm -rf NB${today}; fi
 mkdir NB${today}
 cd NB${today}
 
-# copy over the test scripts directory
-cp -r -p ${SCRIPT_DIR} .
+# Copy over the test scripts directory
+cp -r -p `dirname $0` .
 
-# run the regression test fail if nonZero status
-${SCRIPT_DIR}/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
+# Check that we have a script to run
+if [[ ! -r scripts/test_regression.sh ]]
+then
+  echo "$0: FAILURE scripts/test_regression.sh not found" > ${LOGFILE}
+  exit $E_NOEXECSCRIPT
+fi
+
+# Run the regression test fail if non-zero status
+scripts/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
 if [[ $? -ne 0 ]]
 then
   echo "$0: FAILURE the regression test failed." >> ${LOGFILE}
@@ -120,7 +119,7 @@ then
   exit $E_REGTEST_FAILED
 fi
 
-# Look for warnings and/or failure and report it
+# Look for errors and/or warnings
 N_ERR=`egrep "ERROR:"   ${LOGFILE} | wc -l`
 N_WRN=`egrep "WARNING:" ${LOGFILE} | wc -l`
 echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
@@ -128,7 +127,8 @@ echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 if [[ $N_ERR -gt 0 ]]      # check for errors
 then
   echo "$0: FAILURE grep found ERRORS in regtest" >> ${LOGFILE}
-  echo "Nightly Build Log: `hostname`:${LOGFILE}" | mail -s "MET Nightly Build Failed (autogen msg)" ${EMAIL_LIST}
+  echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
+  mail -s "MET Nightly Build Failed for ${1} (autogen msg)" ${EMAIL_LIST}
   exit ${E_FOUNDWARNING}
 fi
 
