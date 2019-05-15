@@ -80,6 +80,9 @@ run_command "./configure --prefix=`pwd` \
             --enable-lidar2nc \
             --enable-python"
 
+# Set the build id
+BUILD_ID="MET-${1}"
+
 # Run Fortify SCA clean
 run_command "${FORTIFY_BIN}/sourceanalyzer -b ${BUILD_ID} -clean"
 
