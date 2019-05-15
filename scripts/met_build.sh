@@ -52,6 +52,9 @@ fi
 cp -r met ${VERSION}
 cd ${VERSION}
 
+# Cleanup
+rm -f `find ./ -name ".gitignore"`
+
 # Set the MET build version for bootstrap by stripping off leading "met-"
 export MET_BUILD_VERSION=`echo $VERSION | sed 's/met-//g'`
 echo "Building MET version '${MET_BUILD_VERSION}'"
@@ -94,9 +97,6 @@ echo "Running configure to create the Makefiles"
 # and enum_to_string.
 echo "Creating the distribution file"
 make dist > /dev/null
-
-# Cleanup
-rm -f `find ./ -name ".gitignore"`
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
