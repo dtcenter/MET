@@ -37,10 +37,10 @@ if [[ ! -e "met" ]]; then
 fi
 
 # Check for 0 or 1 arguments
-if [[ ${NARGS} -eq 0 ]]; then
+if [ ${NARGS} -eq 0 ]; then
   VERSION="met-${CUR_REV}"
-elif [[ ${NARGS} -eq 1 ]]; then
-  VERSION=$1
+elif [ ${NARGS} -eq 1 ]; then
+  VERSION="met-${1}"
 else
   echo
   echo "USAGE: MET_build <version_number>"
@@ -51,6 +51,9 @@ fi
 # Copy the current met directory
 cp -r met ${VERSION}
 cd ${VERSION}
+
+# Cleanup
+rm -f `find ./ -name ".gitignore"`
 
 # Set the MET build version for bootstrap by stripping off leading "met-"
 export MET_BUILD_VERSION=`echo $VERSION | sed 's/met-//g'`
@@ -85,8 +88,7 @@ echo "Running configure to create the Makefiles"
 ./configure --prefix=$MET_INSTALL_DIR \
             --enable-grib2 \
             --enable-mode_graphics \
-            --enable-modis \
-            --enable-lidar2nc > /dev/null
+            --enable-modis > /dev/null
 
 # Make the distribution file.  This will automatically create
 # any needed distribution files like those created by yacc/lex
