@@ -1,14 +1,39 @@
 #!/bin/bash
-# This script is intended to be run from a cron job nightly to
-# verify the current trunk output compares with a known working
-# output, utilizing the regression test script found in the MET
-# software repository
-# Output should be directed to the LOGFILE per cron convention
+#
+# Run nightly regression tests
+#=======================================================================
+#
+# This test_nightly.sh script will call the test_regression.sh script to
+# to compare two different versions of MET.  It is intented to be run
+# nightly through cron.  Output should be directed to the LOGFILE, per
+# cron convention.  To run this script, use the following commands:
+#
+#    git clone https://github.com/NCAR/MET
+#    MET/scripts/test_nightly.sh name
+#
+# Usage: test_nightly.sh name
+#    where "name" specifies a branch or tag for which a corresponding
+#          "name-ref" branch or tag exists
+#
+# For example, test the develop branch:
+#    scripts/test_regression.sh develop
+#
+#=======================================================================
 
-# Configure run
-RUNDIR="/d3/projects/MET/MET_regression"
+function usage {
+  echo
+  echo "USAGE: test_nightly.sh name"
+  echo "   where \"name\" specifies a branch or tag for which a corresponding"
+  echo "         \"name-ref\" branch or tag exists"
+  echo
+}
+
+# Check for arguments
+if [ $# -lt 1 ]; then usage; exit 1; fi
+
+# Configure run for dakota
+RUNDIR="/d3/projects/MET/MET_regression/${1}"
 EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
-REF_BASE=6384
 KEEP_STUFF_DURATION=5    #This is in days
 
 # Variables required to build MET (pre-METv5.0)
@@ -58,6 +83,7 @@ E_FOUND_WARNING=63
 umask 0002
 
 # Get to the run directory
+mkdir -p ${RUNDIR}
 cd ${RUNDIR}
 
 # Clean the place up
@@ -68,31 +94,32 @@ today=`date +%Y%m%d`
 LOGFILE=${PWD}/NB${today}.out
 >${LOGFILE}
 
-# Check we have a script to run
+# make a little home - always start from scratch
+if [[ -e NB${today} ]];  then rm -rf NB${today}; fi
+mkdir NB${today}
+cd NB${today}
+
+# Copy over the test scripts directory
+cp -r -p `dirname $0` .
+
+# Check that we have a script to run
 if [[ ! -r scripts/test_regression.sh ]]
 then
   echo "$0: FAILURE scripts/test_regression.sh not found" > ${LOGFILE}
   exit $E_NOEXECSCRIPT
 fi
 
-# make a little home - always start from scratch
-if [[ -e NB${today} ]];  then rm -rf NB${today}; fi
-mkdir NB${today}
-cd NB${today}
-
-# copy over the test scripts directory
-cp -r -p ../scripts .
-
-# run the regression test fail if nonZero status
-scripts/test_regression.sh trunk ${REF_BASE} trunk >> ${LOGFILE} 2>&1
+# Run the regression test fail if non-zero status
+scripts/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
 if [[ $? -ne 0 ]]
 then
   echo "$0: FAILURE the regression test failed." >> ${LOGFILE}
-  echo -e "Nightly Build Log: `hostname`:${LOGFILE}\n\n`tail -10 ${LOGFILE}`" | mail -s "MET Nightly Build Failed (autogen msg)" ${EMAIL_LIST}
+  echo -e "Nightly Build Log: `hostname`:${LOGFILE}\n\n`tail -10 ${LOGFILE}`" | \
+  mail -s "MET Nightly Build Failed for ${1} (autogen msg)" ${EMAIL_LIST}
   exit $E_REGTEST_FAILED
 fi
 
-# Look for warnings and/or failure and report it
+# Look for errors and/or warnings
 N_ERR=`egrep "ERROR:"   ${LOGFILE} | wc -l`
 N_WRN=`egrep "WARNING:" ${LOGFILE} | wc -l`
 echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
@@ -100,7 +127,8 @@ echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 if [[ $N_ERR -gt 0 ]]      # check for errors
 then
   echo "$0: FAILURE grep found ERRORS in regtest" >> ${LOGFILE}
-  echo "Nightly Build Log: `hostname`:${LOGFILE}" | mail -s "MET Nightly Build Failed (autogen msg)" ${EMAIL_LIST}
+  echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
+  mail -s "MET Nightly Build Failed for ${1} (autogen msg)" ${EMAIL_LIST}
   exit ${E_FOUNDWARNING}
 fi
 
