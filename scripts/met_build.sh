@@ -88,7 +88,8 @@ echo "Running configure to create the Makefiles"
 ./configure --prefix=$MET_INSTALL_DIR \
             --enable-grib2 \
             --enable-mode_graphics \
-            --enable-modis > /dev/null
+            --enable-modis \
+            --enable-lidar2nc > /dev/null
 
 # Make the distribution file.  This will automatically create
 # any needed distribution files like those created by yacc/lex
