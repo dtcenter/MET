@@ -3,156 +3,91 @@
 # Run unit tests on a specified revision of MET
 #=======================================================================
 #
-# This test_unit.sh script will check out the specified revision
-# of MET and the test module, build the development instances of
-# the MET tools and run the unit tests on the built tools.  First,
-# go to the directory where you would like the unit tests performed,
-# then run:
-#    svn co https://svn-met-dev.cgd.ucar.edu/build/scripts
-#    scripts/test_unit.sh trunk [rev] | branch name [rev] | tag name [rev]
+# This test_unit.sh script will check out the specified revision of MET,
+# compile the code, and run the unit tests.
 #
-# Usage: test_unit.sh [-q] trunk [rev] | branch name [rev] | tag name [rev]
-#    Test the latest version of MET repository trunk:
-#       test_unit.sh trunk
-#    Test the specified revision of MET:
-#       test_unit.sh trunk [rev]
+#    git clone https://github.com/NCAR/MET
+#    MET/scripts/test_unit.sh name
+#
+# Usage: test_unit.sh name
 #    Test the specified branched version of MET:
-#       test_unit.sh tag branch name [rev]
+#       test_unit.sh master_v8.1
 #    Test the specified tagged version of MET:
-#       test_unit.sh tag name [rev]
+#       test_unit.sh met-8.1
 #
 #=======================================================================
 
 # Constants
-SVN_BASE="https://svn-met-dev.cgd.ucar.edu"
+GIT_REPO="https://github.com/NCAR/MET"
 CXX_COMPILER=/usr/bin/g++
 F77_COMPILER=/usr/bin/gfortran
 
-# Check for quiet flag
-QUIET=0
-if [[ $1 == "-q" ]]; then QUIET=1; shift; REDIR=">/dev/null 2>&1"; fi
-
 function usage {
-   [ $QUIET -eq 1 ] && return
-        echo
-        echo "USAGE: test_unit.sh [-q] trunk [rev] | branch name [rev] | tag name [rev]"
-        echo "   where"
-        echo "                  -q specifies no text output, exit status indicates success"
-        echo "         trunk [rev] specifies the repository trunk"
-        echo "      tag name [rev] specifies a named tag, e.g. met-6.0"
-        echo "   branch name [rev] specifies a named branch, e.g. met-6.0_bugfix"
-        echo "               [rev] optionally specifies a revision number, e.g. met-6.0_bugfix 4160"
-        echo
-}
-
-function log {
-   [ $QUIET -eq 0 ] && echo $*
+  echo
+  echo "USAGE: test_unit.sh name"
+  echo "   where \"name\" specifies a branch, tag, or hash."
+  echo
 }
 
 # Check for arguments
-if [[ $# -lt 1 ]]; then usage; exit; fi
+if [ $# -lt 1 ]; then usage; exit 1; fi
 
-# Parse the input parameters
-case $1 in
-   trunk)
-      MET_BASE_DIR="trunk/met"
-      TEST_BASE_DIR="trunk/test"
-      if [ $# -lt 2 ]; then
-         REV=$(svn info $SVN_BASE | egrep '^Rev' | awk '{print $2}')
-      else
-         REV=$2
-      fi
-      NAME="rev${REV}"
-      ;;
-   tag)
-      if [ $# -lt 2 ]; then
-         log "ERROR: tag not specified";
-         usage;
-         exit 1;
-      fi
-      MET_BASE_DIR="tags/met/$2"
-      TEST_BASE_DIR="tags/test/$2"
-      if [ $# -lt 3 ]; then
-         REV=$(svn info $SVN_BASE/tags/met/$2 | egrep 'Last Changed Rev' | awk '{print $4}')
-      else
-         REV=$3
-      fi
-      NAME="tag_$2_rev${REV}"
-      ;;
-   branch)
-      if [ $# -lt 2 ]; then
-         log "ERROR: branch not specified";
-         usage;
-         exit 1;
-      fi
-      MET_BASE_DIR="branches/met/$2"
-      TEST_BASE_DIR="branches/test/$2"
-      if [ $# -lt 3 ]; then
-         REV=$(svn info $SVN_BASE/branches/met/$2 | egrep 'Last Changed Rev' | awk '{print $4}')
-      else
-         REV=$3
-      fi
-      NAME="branch_$2_rev${REV}"
-      ;;
-   *)
-      log "ERROR: unrecognized input argument '$1'";
-      usage;
-      exit 1;
-      ;;
-esac
+# Sub-routine for running a command and checking return status
+function run_command() {
 
-# Check out the requested version of MET
-[ -e "met_$NAME" ] && eval "rm -rf met_$NAME"
-SVN_MET="svn export -q -r ${REV} ${SVN_BASE}/${MET_BASE_DIR} met_$NAME"
-log "checking out MET:  $SVN_MET"
-eval "$SVN_MET" $REDIR
-if [ $? -ne 0 ]; then log "ERROR: checkout of met_$NAME failed"; exit 1; fi
+  # Print the command being called
+  echo "CALLING: $1"
 
-# Check out the requested version of the test module
-[ -e "test_$NAME" ] && eval "rm -rf test_$NAME"
-SVN_TEST="svn export -q -r ${REV} ${SVN_BASE}/${TEST_BASE_DIR} test_$NAME"
-log "checking out test module:  $SVN_TEST"
-eval "$SVN_TEST" $REDIR
-if [ $? -ne 0 ]; then log "ERROR: checkout of test_$NAME failed"; exit 1; fi
+  # Run the command and store the return status
+  $1
+  STATUS=$?
+
+  # Check return status
+  if [[ ${STATUS} -ne 0 ]]; then
+     echo "ERROR: Command returned with non-zero status ($STATUS): $1"
+     exit ${STATUS}
+  fi
+
+  return ${STATUS}
+}
+
+# Clone repo into a sub-directory and checkout the requested version
+REPO_DIR="MET-${1}"
+if [ -e ${REPO_DIR} ]; then
+  run_command "rm -rf ${REPO_DIR}"
+fi
+run_command "git clone ${GIT_REPO} ${REPO_DIR}"
+run_command "cd ${REPO_DIR}"
+run_command "git checkout ${1}"
 
 # Build the MET instance
-cd met_$NAME
-log "building met_$NAME..."
-
-# Create log file
-LOG=../build_$NAME.log
-rm -f $LOG
+run_command "cd met"
 
 # Run bootstrap
-eval "./bootstrap" >> $LOG
-if [ $? -ne 0 ]; then log "ERROR: bootstrap of met_$NAME failed"; exit 1; fi
+run_command "./bootstrap"
 
 # Set the compilers to be used
 export CXX=${CXX_COMPILER}
 export F77=${F77_COMPILER}
 
 # Run the configure script
-eval "./configure --prefix=`pwd` \
+run_command "./configure --prefix=`pwd` \
             --enable-grib2 \
             --enable-modis \
             --enable-mode_graphics \
             --enable-lidar2nc \
-            --enable-python > /dev/null" >> $LOG
-if [ $? -ne 0 ]; then log "ERROR: configuration of met_$NAME failed"; exit 1; fi
+            --enable-python"
 
 # Compile and install the build
-eval "make install" >> $LOG
-if [ $? -ne 0 ]; then log "ERROR: build of met_$NAME failed"; exit 1; fi
-cd ..
+run_command "make install"
+run_command "cd .."
 
 # Run the unit tests
-log "running unit tests..."
-export MET_BUILD_BASE=$(pwd)/met_$NAME
+export MET_BUILD_BASE=$(pwd)/met
 export MET_BASE=$MET_BUILD_BASE/share/met
-export MET_TEST_BASE=$(pwd)/test_$NAME
-export MET_TEST_OUTPUT=$(pwd)/test_output_$NAME
-[ -e "test_output_$NAME" ] && eval "rm -rf test_output_$NAME"
-test_$NAME/bin/unit_test.sh $REDIR
-if [ $? -ne 0 ]; then log "ERROR: unit test of met_$NAME failed"; exit 1; fi
-
-exit
+export MET_TEST_BASE=$(pwd)/test
+export MET_TEST_OUTPUT=$(pwd)/test_output
+export MET_TMP_DIR=$(pwd)/test/tmp
+export MET_TEST_INPUT=${MET_TEST_INPUT:-/d3/projects/MET/MET_test_data/unit_test}
+run_command "mkdir -p ${MET_TMP_DIR}"
+run_command "test/bin/unit_test.sh"
