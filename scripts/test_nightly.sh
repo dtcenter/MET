@@ -83,6 +83,7 @@ E_FOUND_WARNING=63
 umask 0002
 
 # Get to the run directory
+mkdir -p ${RUNDIR}
 cd ${RUNDIR}
 
 # Clean the place up
