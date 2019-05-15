@@ -40,7 +40,7 @@ fi
 if [ ${NARGS} -eq 0 ]; then
   VERSION="met-${CUR_REV}"
 elif [ ${NARGS} -eq 1 ]; then
-  VERSION=$1
+  VERSION="met-${1}"
 else
   echo
   echo "USAGE: MET_build <version_number>"
@@ -94,6 +94,9 @@ echo "Running configure to create the Makefiles"
 # and enum_to_string.
 echo "Creating the distribution file"
 make dist > /dev/null
+
+# Cleanup
+rm -f `find ./ -name ".gitignore"`
 
 # Construct the desired name for the tar file.  autoconf
 # creates the tar file using it's standard naming convention.
