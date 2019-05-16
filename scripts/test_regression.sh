@@ -69,7 +69,7 @@ for VERSION in `echo "${1} ${2}"`; do
   PID_LIST="${PID_LIST} $!"
 
   # Sleep for 5 minutes to stagger the unit test start times
-  sleep 300
+  sleep 30
 done
 
 # Wait for unit tests to finish
@@ -84,6 +84,5 @@ if [ "$FAILURE" == "1" ]; then
 fi
 
 # Run the directory comparison tool on the output from the unit tests
-export MET_BASE=$(pwd)/MET-${2}/met/share/met
 export MET_TEST_BASE=$(pwd)/MET-${2}/test
 run_command "${MET_TEST_BASE}/bin/comp_dir.sh MET-${1}/test_output MET-${2}/test_output"
