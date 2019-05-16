@@ -636,20 +636,20 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 	strNcDiff  = paste(strDirTmp, "/", "ncdiff_", as.numeric(Sys.time()), ".nc", sep="");
 
 	# build and run the ncdump command for the first file
-    if (0 < comp_var) {
+	if (0 < comp_var) {
 		strCmd = paste(strNcDumpExec, " \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
-    } else {
+	} else {
 		strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
-    }
+	}
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
 	# build and run the ncdump command for the second file
-    if (0 < comp_var) {
+	if (0 < comp_var) {
 		strCmd = paste(strNcDumpExec, " \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
-    } else {
+	} else {
 		strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
-    }
+	}
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
@@ -670,31 +670,28 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 		}
 	}
 
-    skip_nc_size_checking = system("echo $MET_TEST_NO_NC_SIZE", intern=T);
-    if (skip_nc_size_checking != "" ) {
-        cat("INFO: NetCDF file size checking was disabled by environment variable MET_TEST_NO_NC_SIZE\n");
-    } else if (delta < 0 ) {
-        cat("INFO: NetCDF file size checking was disabled\n");
-    } else {
-        ncFileSize1 = file.size(nc1);
-        ncFileSize2 = file.size(nc2);
-        ncHeaderSize1 = file.size(strNcDump1);
-        ncHeaderSize2 = file.size(strNcDump2);
-        if ( (ncFileSize1 - ncFileSize2) != (ncHeaderSize1 - ncHeaderSize2) ) {
-            sizeDiff = abs((ncFileSize1 - ncFileSize2) - (ncHeaderSize1 - ncHeaderSize2));
-            if (sizeDiff > delta) {
-                if( 1 <= verb ){
-                    cat("ERROR: NetCDF file size is different more than header difference\n");
-                    cat("       header size difference: ", abs(ncHeaderSize1 - ncHeaderSize2), ", file size difference: ", abs(ncFileSize1 - ncFileSize2), "\n");
-                    cat("       ", nc1, " : ", ncFileSize1, "\n");
-                    cat("       ", nc2, " : ", ncFileSize2, "\n");
-                #    return();
-                #} else {
-                #    quit(status=1);
-                }
-            }
-        };
-    }
+	skip_nc_size_checking = system("echo $MET_TEST_NO_NC_SIZE", intern=T);
+	if (skip_nc_size_checking != "" ) {
+		cat("INFO: NetCDF file size checking was disabled by environment variable MET_TEST_NO_NC_SIZE\n");
+	} else if (delta < 0 ) {
+		cat("INFO: NetCDF file size checking was disabled\n");
+	} else {
+		ncFileSize1 = file.size(nc1);
+		ncFileSize2 = file.size(nc2);
+		ncFileSizeDiff = abs(ncFileSize1 - ncFileSize2);
+		ncHeaderSize1 = file.size(strNcDump1);
+		ncHeaderSize2 = file.size(strNcDump2);
+		ncHeaderSizeDiff = abs(ncHeaderSize1 - ncHeaderSize2);
+		if ( (ncFileSizeDiff - ncHeaderSizeDiff) > delta) {
+			if( 1 <= verb ){
+				cat("ERROR: NetCDF file size difference is larger than the header size difference\n");
+				cat("       file size difference:", ncFileSizeDiff, "\n");
+				cat("       header size difference:", ncHeaderSizeDiff, "\n");
+				cat("      ", nc1, ":", ncFileSize1, "\n");
+				cat("      ", nc2, ":", ncFileSize2, "\n");
+			}
+		}
+	}
 
 	# build and run the ncdiff command
 	strCmd = paste(strNcDiffExec, " -x -v time_bounds \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
