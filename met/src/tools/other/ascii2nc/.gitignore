@@ -1,0 +1,6 @@
+ascii2nc
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

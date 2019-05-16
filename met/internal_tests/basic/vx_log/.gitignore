@@ -1,0 +1,7 @@
+test_reg_exp
+test_logger
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

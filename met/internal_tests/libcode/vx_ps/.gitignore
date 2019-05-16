@@ -1,0 +1,6 @@
+test_ps
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

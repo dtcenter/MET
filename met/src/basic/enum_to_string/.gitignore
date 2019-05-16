@@ -1,0 +1,7 @@
+enum_to_string
+enum_parser.cc
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

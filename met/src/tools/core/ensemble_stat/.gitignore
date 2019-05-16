@@ -1,0 +1,6 @@
+ensemble_stat
+*.o
+*.a
+.deps
+Makefile
+Makefile.in
