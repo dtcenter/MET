@@ -30,13 +30,15 @@ function usage {
 if [ $# -lt 1 ]; then usage; exit 1; fi
 
 # Configure run for dakota
-SCRIPTS=`dirname $0`
-EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu mccabe@ucar.edu"
 TODAY=`date +%Y%m%d`
 RUNDIR="/d3/projects/MET/MET_regression/${1}/NB${TODAY}/fortify_sca"
 mkdir -p $RUNDIR
 cd $RUNDIR
 LOGFILE=${PWD}/run_fortify_sca_${TODAY}.log
+EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu mccabe@ucar.edu"
+
+# Store the scripts location
+SCRIPTS=`dirname $0`
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true

@@ -15,8 +15,8 @@
 # Usage: test_regression.sh version1 version2
 #    where version1 and version2 are named branches, tags, or hashes.
 #
-# For example, test the develop branch versus the 8.1 release:
-#    scripts/test_regression.sh met-8.1 develop
+# For example, test the met-8.1 release versus the develop branch:
+#    test_regression.sh met-8.1 develop
 #
 #=======================================================================
 
@@ -54,6 +54,9 @@ function run_command() {
   return ${STATUS}
 }
 
+# Store the scripts location
+SCRIPTS=`dirname $0`
+
 # Run the unit test script for each version
 PID_LIST=""
 FAILURE=0
@@ -62,7 +65,7 @@ for VERSION in `echo "${1} ${2}"`; do
   LOG="$(pwd)/test_unit_${VERSION}.log"
 
   # Run the unit tests in the background
-  UNIT_CMD="scripts/test_unit.sh ${VERSION}"
+  UNIT_CMD="${SCRIPTS}/test_unit.sh ${VERSION}"
   echo "CALLING: ${UNIT_CMD}"
   echo "LOGGING: ${LOG}"
   $UNIT_CMD > $LOG 2>&1 &

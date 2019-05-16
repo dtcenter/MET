@@ -16,7 +16,7 @@
 #          "name-ref" branch or tag exists
 #
 # For example, test the develop branch:
-#    test_regression.sh develop
+#    test_nightly.sh develop
 #
 #=======================================================================
 
@@ -32,10 +32,12 @@ function usage {
 if [ $# -lt 1 ]; then usage; exit 1; fi
 
 # Configure run for dakota
-SCRIPTS=`dirname $0`
 RUNDIR="/d3/projects/MET/MET_regression/${1}"
 EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
 KEEP_STUFF_DURATION=5    #This is in days
+
+# Store the scripts location
+SCRIPTS=`dirname $0`
 
 # Variables required to build MET (pre-METv5.0)
 export NETCDF=/d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3
