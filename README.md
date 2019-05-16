@@ -1,5 +1,4 @@
 # MET
-Model Evaluation Tools
 
 This repository contains the source code for the Model Evaluation Tools package (met), unit test code (test), and scripts used to build and test the code (scripts).
 
