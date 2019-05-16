@@ -1,0 +1,8 @@
+plot_mode_field
+*_to_string.h
+*_to_string.cc
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

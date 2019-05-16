@@ -1,0 +1,6 @@
+test_read_grib1
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

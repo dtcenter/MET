@@ -1,0 +1,8 @@
+color_scanner.cc
+color_parser_yacc.cc
+color_parser_yacc.h
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

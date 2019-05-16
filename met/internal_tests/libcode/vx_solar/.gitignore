@@ -1,0 +1,6 @@
+test_ra_dec
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

@@ -1,0 +1,6 @@
+test_read_nc_met
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

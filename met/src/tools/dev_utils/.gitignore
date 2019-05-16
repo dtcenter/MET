@@ -1,0 +1,14 @@
+swinging_door
+reformat_map_data
+reformat_county_data
+pbtime
+nceptab_to_flat
+insitu_nc_to_ascii
+gribtab_dat_to_flat
+gen_climo_bin
+chk4copyright
+*.o
+*.a
+.deps
+Makefile
+Makefile.in
