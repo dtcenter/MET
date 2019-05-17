@@ -268,7 +268,7 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 31 executables:
+  command line) will contain 33 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
@@ -297,6 +297,8 @@ sub-directory, or the MET Online Tutorial:
    - tc_dland
    - tc_pairs
    - tc_stat
+   - tc_gen
+   - tc_rmw
    - wavelet_stat
    - wwmca_plot
    - wwmca_regrid

@@ -1174,7 +1174,8 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
-                 src/tools/tc_utils/tc_stat/Makefile])
+                 src/tools/tc_utils/tc_stat/Makefile
+                 src/tools/tc_utils/tc_gen/Makefile])
 
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile
