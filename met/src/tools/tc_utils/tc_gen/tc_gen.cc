@@ -14,25 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    03/14/12  Halley Gotway   New
-//   001    05/20/14  Halley Gotway   Refine consensus to ensure the
-//                                    presence of required members at
-//                                    each lead time.
-//   002    07/15/14  Halley Gotway   Simplify Interp12 logic.
-//   003    07/15/14  Halley Gotway   Fix bug in init_beg/end logic.
-//   004    02/10/16  Halley Gotway   Prior to calling acerr_ rescale
-//                    longitudes from [-180, 180] to [0, 360] for tracks
-//                    crossing the international date line.
-//   005    02/10/16  Halley Gotway   Add support for analysis tracks.
-//   006    06/01/16  Halley Gotway   Apply interp12 logic to tracks
-//                    with ATCF id's ending in '3'.
-//   007    06/01/16  Halley Gotway   Add support for EDecks.
-//   008    09/29/16  Halley Gotway   Add DESC output column.
-//   009    03/09/17  Halley Gotway   Define BEST track time step.
-//   010    03/02/17  Win             MET-667 Add support for tracks
-//                    that contain all required lead times.
-//   011    07/27/18  Halley Gotway   Support masks defined by
-//                    the gen_vx_mask tool.
+//   000    05/17/19  Halley Gotway   New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -63,11 +45,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int mxp  = 1000;
-static const int nvtx = 10;
-
-////////////////////////////////////////////////////////////////////////
-
 static void   process_command_line (int, char **);
 static void   process_decks        ();
 static void   process_bdecks       (TrackInfoArray &);
@@ -94,9 +71,6 @@ static int    derive_lag           (TrackInfoArray &);
 static void   process_match        (const TrackInfo &, const TrackInfo &,
                                     TrackPairInfoArray &);
 static double compute_dland        (double, double);
-static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
-                                    TimeArray &, NumArray &, NumArray &,
-                                    NumArray &, NumArray &, NumArray &);
 static void   load_dland           ();
 static void   process_watch_warn   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
@@ -1302,10 +1276,6 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    // Initialize TrackPairInfo with the current tracks
    pair.initialize(adeck, bdeck);
 
-   // Compute the track errors
-   compute_track_err(adeck, bdeck, valid_err, tk_err,
-                     x_err, y_err, altk_err, crtk_err);
-
    // Loop through the ADECK TrackPoints to build a list of valid times
    for(i=0; i<adeck.n_points(); i++) {
       if(!valid_list.has(adeck[i].valid()))
@@ -1412,124 +1382,6 @@ double compute_dland(double lat, double lon) {
    else                                dist = dland_dp.get(x, y);
 
    return(dist);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
-                       TimeArray &vld_err, NumArray &tk_err,
-                       NumArray &x_err,    NumArray &y_err,
-                       NumArray &altk_err, NumArray &crtk_err) {
-   int i, i_adeck, i_bdeck, status;
-   unixtime ut, ut_min, ut_max;
-   int ut_inc, n_ut;
-   float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
-   float crtk[mxp], altk[mxp];
-   double x, y, tk, lon_min, lon_max;
-
-   // Initialize
-   vld_err.clear();
-   tk_err.clear();
-   x_err.clear();
-   y_err.clear();
-   altk_err.clear();
-   crtk_err.clear();
-
-   // Get the valid time range
-   ut_min = min(adeck.valid_min(), bdeck.valid_min());
-   ut_max = max(adeck.valid_max(), bdeck.valid_max());
-
-   // Determine the valid increment
-   // For BEST tracks, use a constant time step
-   // For non-BEST tracks, select the most common BDECK time step
-   if(bdeck.is_best_track()) ut_inc = best_track_time_step;
-   else                      ut_inc = bdeck.valid_inc();
-
-   // Round the valid times to the nearest valid increment
-   if(ut_min%ut_inc != 0) ut_min = (ut_min/ut_inc + 1)*ut_inc;
-   if(ut_max%ut_inc != 0) ut_max = (ut_max/ut_inc)*ut_inc;
-
-   // Compute the number of valid times
-   n_ut = (ut_max-ut_min)/ut_inc + 1;
-
-   mlog << Debug(3)
-        << "Computing track errors for " << n_ut << " vaild times: "
-        << unix_to_yyyymmdd_hhmmss(ut_min)
-        << " to " << unix_to_yyyymmdd_hhmmss(ut_max)
-        << " by " << sec_to_hhmmss(ut_inc) << " increment.\n";
-
-   // Check for too many track points
-   if(n_ut > mxp) {
-      mlog << Error
-           << "\ncompute_track_err() -> "
-           << "exceeded the maximum number of allowable track points ("
-           << n_ut << " > " << mxp << ")\n\n";
-      exit(1);
-   }
-
-   // Loop through the valid times
-   for(i=0, lon_min=180, lon_max=-180; i<n_ut; i++) {
-
-      // Add the current valid time
-      ut = ut_min+(i*ut_inc);
-      vld_err.add(ut);
-
-      // Initialize to bad data
-      tk_err.add(bad_data_double);
-      x_err.add(bad_data_double);
-      y_err.add(bad_data_double);
-      altk_err.add(bad_data_double);
-      crtk_err.add(bad_data_double);
-
-      // Get the indices for this time
-      i_adeck = adeck.valid_index(ut);
-      i_bdeck = bdeck.valid_index(ut);
-
-      // Populate array arguments
-      alat[i] = (i_adeck >= 0 ? adeck[i_adeck].lat() : bad_data_float);
-      alon[i] = (i_adeck >= 0 ? adeck[i_adeck].lon() : bad_data_float);
-      blat[i] = (i_bdeck >= 0 ? bdeck[i_bdeck].lat() : bad_data_float);
-      blon[i] = (i_bdeck >= 0 ? bdeck[i_bdeck].lon() : bad_data_float);
-
-      // Check for good data
-      if(is_bad_data(alat[i]) || is_bad_data(blat[i]) ||
-         is_bad_data(alon[i]) || is_bad_data(blon[i])) continue;
-
-      // Keep track of min/max longitudes
-      lon_min = (min(alon[i], blon[i]) < lon_min ? min(alon[i], blon[i]) : lon_min);
-      lon_max = (max(alon[i], blon[i]) > lon_max ? max(alon[i], blon[i]) : lon_max);
-
-      // Compute and store track errors
-      latlon_to_xytk_err(alat[i], alon[i], blat[i], blon[i], x, y, tk);
-      x_err.set(i, x);
-      y_err.set(i, y);
-      tk_err.set(i, tk);
-   }
-
-   // If the range of longitudes is large, rescale from [-180, 180] to [0, 360]
-   // prior to computing along and cross-track errors.
-   if((lon_max - lon_min) >= 180) {
-      for(i=0; i<n_ut; i++) {
-         alon[i] = rescale_deg(alon[i], 0, 360);
-         blon[i] = rescale_deg(blon[i], 0, 360);
-      }
-   }
-
-   // Store the along/cross track errors in nm
-   if(status == 0) {
-      for(i=0; i<n_ut; i++) {
-
-         // Along-track error
-         if(!is_bad_data(altk[i]))
-            altk_err.set(i, tc_nautical_miles_per_km*altk[i]);
-
-         // Cross-track error
-         if(!is_bad_data(crtk[i]))
-            crtk_err.set(i, tc_nautical_miles_per_km*crtk[i]);
-      }
-   }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

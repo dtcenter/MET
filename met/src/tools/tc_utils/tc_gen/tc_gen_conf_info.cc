@@ -25,28 +25,25 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class TCPairsConfInfo
+//  Code for class TCGenVxOpt
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCPairsConfInfo::TCPairsConfInfo() {
+TCGenVxOpt::TCGenVxOpt() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-TCPairsConfInfo::~TCPairsConfInfo() {
+TCGenVxOpt::~TCGenVxOpt() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPairsConfInfo::init_from_scratch() {
-
-   // Initialize pointers
-   Consensus = (ConsensusInfo *) 0;
+void TCGenVxOpt::init_from_scratch() {
 
    clear();
 
@@ -55,42 +52,100 @@ void TCPairsConfInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPairsConfInfo::clear() {
-
-   // Deallocate memory
-   if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) 0; }
+void TCGenVxOpt::clear() {
 
    Desc.clear();
-   Model.clear();
+   AModel.clear();
+   BModel.clear();
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
-   InitBeg = InitEnd = (unixtime) 0;
-   InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
-   InitMaskName.clear();
-   InitPolyMask.clear();
-   InitGridMask.clear();
-   InitAreaMask.clear();
-   ValidMaskName.clear();
-   ValidPolyMask.clear();
-   ValidGridMask.clear();
-   ValidAreaMask.clear();
-   LeadReq.clear();
-   CheckDup = true;
-   Interp12 = Interp12Type_Replace;
-   NConsensus = 0;
-   LagTime.clear();
+   VxMaskName.clear();
+   VxPolyMask.clear();
+   VxGridMask.clear();
+   VxAreaMask.clear();
+   DLandThresh.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenVxOpt::process_config(Dictionary &dict) {
+   int i, j;
+   ConcatString file_name;
+
+   // Conf: Desc
+   Desc = parse_conf_string(&Conf, conf_key_desc);
+
+   // Conf: AModel and BModel
+   AModel = Conf.lookup_string_array(conf_key_amodel);
+   BModel = Conf.lookup_string_array(conf_key_bmodel);
+
+   // Conf: StormId
+   StormId = Conf.lookup_string_array(conf_key_storm_id);
+
+   // Conf: Basin
+   Basin = Conf.lookup_string_array(conf_key_basin);
+
+   // Conf: Cyclone
+   Cyclone = Conf.lookup_string_array(conf_key_cyclone);
+
+   // Conf: StormName
+   StormName = Conf.lookup_string_array(conf_key_storm_name);
+
+   // Conf: ValidBeg, ValidEnd
+   ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
+   ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
+
+   // Conf: VxMask
+   if(nonempty(Conf.lookup_string(conf_key_vx_mask).c_str())) {
+      file_name = replace_path(Conf.lookup_string(conf_key_vx_mask));
+      mlog << Debug(2) << "Masking File: " << file_name << "\n";
+      parse_poly_mask(file_name, VxPolyMask, VxGridMask, VxAreaMask,
+                      VxMaskName);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class TCGenConfInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TCGenConfInfo::TCGenConfInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCGenConfInfo::~TCGenConfInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenConfInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCGenConfInfo::clear() {
+
+   for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
    BestTechnique.clear();
-   BestBaseline.clear();
-   OperTechnique.clear();
-   OperBaseline.clear();
-   AnlyTrack = TrackType_None;
-   MatchPoints = false;
-   DLandFile.clear();
-   WatchWarnFile.clear();
-   WatchWarnOffset = bad_data_int;
+   DLandGrid.clear();
+   DLandData.clear();
    Version.clear();
 
    return;
@@ -98,8 +153,8 @@ void TCPairsConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPairsConfInfo::read_config(const char *default_file_name,
-                                  const char *user_file_name) {
+void TCGenConfInfo::read_config(const char *default_file_name,
+                                const char *user_file_name) {
 
    // Read the config file constants
    Conf.read(replace_path(config_const_filename).c_str());
@@ -118,173 +173,45 @@ void TCPairsConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCPairsConfInfo::process_config() {
-   int i, j;
-   StringArray sa;
-   ConcatString poly_file;
+void TCGenConfInfo::process_config() {
    Dictionary *dict = (Dictionary *) 0;
-
-   // Conf: Version
-   Version = Conf.lookup_string(conf_key_version);
-   check_met_version(Version.c_str());
-
-   // Conf: Desc
-   Desc = parse_conf_string(&Conf, conf_key_desc);
-
-   // Conf: Model
-   Model = Conf.lookup_string_array(conf_key_model);
-
-   // Conf: StormId
-   StormId = Conf.lookup_string_array(conf_key_storm_id);
-
-   // Conf: Basin
-   Basin = Conf.lookup_string_array(conf_key_basin);
-
-   // Conf: Cyclone
-   Cyclone = Conf.lookup_string_array(conf_key_cyclone);
-
-   // Conf: StormName
-   StormName = Conf.lookup_string_array(conf_key_storm_name);
-
-   // Conf: InitBeg, InitEnd
-   InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
-   InitEnd = Conf.lookup_unixtime(conf_key_init_end);
-
-   // Conf: InitInc
-   sa = Conf.lookup_string_array(conf_key_init_inc);
-   for(i=0; i<sa.n_elements(); i++)
-      InitInc.add(timestring_to_unix(sa[i].c_str()));
-
-   // Conf: InitExc
-   sa = Conf.lookup_string_array(conf_key_init_exc);
-   for(i=0; i<sa.n_elements(); i++)
-      InitExc.add(timestring_to_unix(sa[i].c_str()));
-
-   // Conf: InitHour
-   sa = Conf.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n_elements(); i++)
-      InitHour.add(timestring_to_sec(sa[i].c_str()));
-
-   // Conf: ValidBeg, ValidEnd
-   ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
-   ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
-
-   // Conf: LeadReq
-   sa = Conf.lookup_string_array(conf_key_lead_req);
-   for(i=0; i<sa.n_elements(); i++){
-      LeadReq.add(timestring_to_sec(sa[i].c_str()));
-   }
-
-   // Conf: InitMask
-   if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
-      mlog << Debug(2)
-           << "Init Points Masking File: " << poly_file << "\n";
-      parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
-                      InitAreaMask, InitMaskName);
-   }
-
-   // Conf: ValidMask
-   if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
-      mlog << Debug(2)
-           << "Valid Point Masking File: " << poly_file << "\n";
-      parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
-                      ValidAreaMask, ValidMaskName);
-   }
-
-   // Conf: CheckDup
-   CheckDup = Conf.lookup_bool(conf_key_check_dup);
-
-   // Conf: Interp12
-   Interp12 = int_to_interp12type(Conf.lookup_int(conf_key_interp12));
-
-   // Conf: Consensus
-   dict = Conf.lookup_array(conf_key_consensus);
-
-   // Set the consensus count
-   NConsensus = dict->n_entries();
-   Consensus  = new ConsensusInfo [NConsensus];
-
-   // Loop over the consensus entries
-   for(i=0; i<NConsensus; i++) {
-
-      // Conf: Consensus: name, members, required, min_req
-      Consensus[i].Name     = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
-      Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
-      Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
-      Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
-
-      // If required is empty, default to 0
-      if(Consensus[i].Required.n_elements() == 0) {
-         for(j=0; j<Consensus[i].Members.n_elements(); j++) {
-            Consensus[i].Required.add(0);
-         }
-      }
-      else if(Consensus[i].Required.n_elements() !=
-              Consensus[i].Members.n_elements()) {
-         mlog << Error
-              << "\nTCPairsConfInfo::process_config() -> "
-              << "\"consensus.required\" must either be empty "
-              << "or the same length as \"consensus.members\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Conf: LagTime
-   sa = Conf.lookup_string_array(conf_key_lag_time);
-   for(i=0; i<sa.n_elements(); i++)
-      LagTime.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
    BestTechnique.set_ignore_case(true);
 
-   // Conf: BestBaseline
-   BestBaseline = Conf.lookup_string_array(conf_key_best_baseline);
+   // Conf: Version
+   Version = Conf.lookup_string(conf_key_version);
+   check_met_version(Version.c_str());
 
-   if(BestTechnique.n() > 1 && BestBaseline.n() > 0) {
-      mlog << Warning
-           << "\nTCPairsConfInfo::process_config() -> "
-           << "deriving \"best_baseline\" models from multiple "
-           << "\"best_technique\" models may cause the baseline "
-           << "technique names to be used multiple times.\n\n";
-   }
+   // Conf: Filter
 
-   // Conf: OperTechnique
-   OperTechnique = Conf.lookup_string_array(conf_key_oper_technique);
-   OperTechnique.set_ignore_case(true);
 
-   // Conf: OperBaseline
-   OperBaseline = Conf.lookup_string_array(conf_key_oper_baseline);
 
-   if(OperTechnique.n() > 1 && OperBaseline.n() > 0) {
-      mlog << Warning
-           << "\nTCPairsConfInfo::process_config() -> "
-           << "deriving \"oper_baseline\" models from multiple "
-           << "\"oper_technique\" models may cause the baseline "
-           << "technique names to be used multiple times.\n\n";
-   }
+   return;
+}
 
-   // Conf: AnlyTrack
-   AnlyTrack = int_to_tracktype(Conf.lookup_int(conf_key_anly_track));
+////////////////////////////////////////////////////////////////////////
 
-   // Conf: MatchPoints
-   MatchPoints = Conf.lookup_bool(conf_key_match_points);
+void TCGenConfInfo::load_dland() {
+
+   // JHG, read DLand file and store in DLandGrid and DLandData
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);
 
-   // Conf: Watch/Warning dictionary
-   dict = Conf.lookup_dictionary(conf_key_watch_warn);
-
-   // Conf: WatchWarnFile
-   WatchWarnFile = dict->lookup_string(conf_key_file_name);
-
-   // Conf: WatchWarnOffset
-   WatchWarnOffset = dict->lookup_int(conf_key_time_offset);
-
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCGenConfInfo::get_dland(double lat, double lon) {
+
+   if(DLandGrid.nxy() == 0) load_dland();
+
+   // JHG compute the distance to land and return it
+
+   return(0.0);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "mask_poly.h"
 
@@ -22,16 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-struct ConsensusInfo {
-   ConcatString Name;
-   StringArray  Members;
-   NumArray     Required;
-   int          MinReq;
-};
-
-////////////////////////////////////////////////////////////////////////
-
-class TCPairsConfInfo {
+class TcGenVxOpt {
 
    private:
 
@@ -39,84 +31,93 @@ class TCPairsConfInfo {
 
    public:
 
-      // TCPairs configuration object
-      MetConfig Conf;
+      TcGenVxOpt();
+     ~TcGenVxOpt();
 
-      // User-defined description
+      //////////////////////////////////////////////////////////////////
+
+      // Description string
       ConcatString Desc;
 
+      // Model comparisons
+      StringArray AModel;    // Forecast ATCF ID
+      StringArray BModel;    // Reference ATCF ID
+
       // Track filtering criteria
-      StringArray Model;     // List of model names
       StringArray StormId;   // List of storm ids
       StringArray Basin;     // List of basin names
       StringArray Cyclone;   // List of cyclone numbers
       StringArray StormName; // List of storm names
 
       // Timing information
-      unixtime  InitBeg, InitEnd;
-      TimeArray InitInc;
-      TimeArray InitExc;
-      NumArray  InitHour;
-      NumArray  LeadReq;
-      unixtime  ValidBeg, ValidEnd;
+      unixtime ValidBeg, ValidEnd;
 
-      // Polyline masking regions
-      ConcatString InitMaskName;
-      MaskPoly     InitPolyMask;
-      Grid         InitGridMask;
-      MaskPlane    InitAreaMask;
+      // JHG, should we also include init_hour?  Wait to hear from Kathryn.
 
-      ConcatString ValidMaskName;
-      MaskPoly     ValidPolyMask;
-      Grid         ValidGridMask;
-      MaskPlane    ValidAreaMask;
+      // Polyline masking region
+      ConcatString VxMaskName;
+      MaskPoly     VxPolyMask;
+      Grid         VxGridMask;
+      MaskPlane    VxAreaMask;
 
-      // Check for duplicate ATCFTrackLines
-      bool CheckDup;
+      // Distance to land threshold
+      SingleThresh DLandThresh;
 
-      // 12-hour track interpolation logic
-      Interp12Type Interp12;
+      //////////////////////////////////////////////////////////////////
 
-      // Consensus model definition
-      int NConsensus;           // Number of consensus models
-      ConsensusInfo *Consensus; // Consensus model definition
+      void clear();
 
-      // Time-lagged track definition
-      NumArray LagTime;
+      void process_config(Dictionary &);
+};
 
-      // CLIPER/SHIFOR baseline model definition along with BEST
-      // and operational technique names
+////////////////////////////////////////////////////////////////////////
+
+class TCGenConfInfo {
+
+   private:
+
+      void init_from_scratch();
+      void load_dland();
+
+   public:
+
+      TCGenConfInfo();
+     ~TCGenConfInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // TCPairs configuration object
+      MetConfig Conf;
+
+      // Vector of vx task filtering options [n_vx]
+      std::vector<TcGenVxOpt> VxOpt;
+
+      // BEST track ATCF ID's
       StringArray BestTechnique;
-      StringArray BestBaseline;
-      StringArray OperTechnique;
-      StringArray OperBaseline;
-
-      // Analysis track datasets
-      TrackType AnlyTrack;
-
-      // Only retain TrackPoints in both the ADECK and BDECK tracks
-      bool MatchPoints;
 
       // Gridded data file containing distances to land
-      ConcatString DLandFile;
-
-      // ASCII watch/warnings file
-      ConcatString WatchWarnFile;
-
-      // Watch/warnings time offset
-      int WatchWarnOffset;
+      Grid      DLandGrid;
+      DataPlane DLandData;
 
       // Config file version
       ConcatString Version;
 
-      TCPairsConfInfo();
-     ~TCPairsConfInfo();
+      //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void read_config(const char *, const char *);
+
       void process_config();
+
+      double get_dland(double lat, double lon);
+
+      int get_n_vx(); const
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int TcGenConfInfo::get_n_vx() const { return(VxOpt.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 
