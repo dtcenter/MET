@@ -627,7 +627,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 #      nc2: path and file name of second NetCDF file to compare
 #     verb: (optional) verbosity level, 0 for no output
 #   strict: (optional) require strict numerical equality, default no
-#    delta: (optional) the allowed file size difference, ignore the file size checking if negative
+#    delta: (optional) the allowed file size percentage difference, ignore the file size checking if negative
 # comp_var: (optional) Compare the variables, too, default: no
 compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 
@@ -679,14 +679,10 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 		ncFileSize1 = file.size(nc1);
 		ncFileSize2 = file.size(nc2);
 		ncFileSizeDiff = abs(ncFileSize1 - ncFileSize2);
-		ncHeaderSize1 = file.size(strNcDump1);
-		ncHeaderSize2 = file.size(strNcDump2);
-		ncHeaderSizeDiff = abs(ncHeaderSize1 - ncHeaderSize2);
-		if ( (ncFileSizeDiff - ncHeaderSizeDiff) > delta) {
+		if ( (ncFileSizeDiff / ncFileSize1) > delta) {
 			if( 1 <= verb ){
-				cat("ERROR: NetCDF file size difference is larger than the header size difference\n");
+				cat("ERROR: NetCDF file size difference exceeds", delta*100.0, "%\n");
 				cat("       file size difference:", ncFileSizeDiff, "\n");
-				cat("       header size difference:", ncHeaderSizeDiff, "\n");
 				cat("      ", nc1, ":", ncFileSize1, "\n");
 				cat("      ", nc2, ":", ncFileSize2, "\n");
 			}
