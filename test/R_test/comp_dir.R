@@ -11,7 +11,7 @@ source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 verb = 1;
 strict = F;
 hist = 0;		# default histogram plot production
-file_size_delta = 0;
+file_size_delta = 0.01; # 1% file size difference
 compare_nc_var = 0;
 
 usage = function(){
