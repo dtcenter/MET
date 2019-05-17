@@ -3,8 +3,8 @@
 # Run nightly regression tests
 #=======================================================================
 #
-# This test_nightly.sh script will call the test_regression.sh script to
-# to compare two different versions of MET.  It is intented to be run
+# This test_nightly.sh script calls the test_regression.sh script to
+# compare two different versions of MET.  It is intented to be run
 # nightly through cron.  Output should be directed to the LOGFILE, per
 # cron convention.  To run this script, use the following commands:
 #
@@ -16,7 +16,7 @@
 #          "name-ref" branch or tag exists
 #
 # For example, test the develop branch:
-#    scripts/test_regression.sh develop
+#    test_nightly.sh develop
 #
 #=======================================================================
 
@@ -35,6 +35,9 @@ if [ $# -lt 1 ]; then usage; exit 1; fi
 RUNDIR="/d3/projects/MET/MET_regression/${1}"
 EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu hsoh@ucar.edu mccabe@ucar.edu fillmore@ucar.edu"
 KEEP_STUFF_DURATION=5    #This is in days
+
+# Store the scripts location
+SCRIPTS=`dirname $0`
 
 # Variables required to build MET (pre-METv5.0)
 export NETCDF=/d3/projects/MET/MET_releases/external_libs/netcdf/netcdf-4.1.3
@@ -99,18 +102,15 @@ if [[ -e NB${today} ]];  then rm -rf NB${today}; fi
 mkdir NB${today}
 cd NB${today}
 
-# Copy over the test scripts directory
-cp -r -p `dirname $0` .
-
 # Check that we have a script to run
-if [[ ! -r scripts/test_regression.sh ]]
+if [[ ! -r ${SCRIPTS}/test_regression.sh ]]
 then
-  echo "$0: FAILURE scripts/test_regression.sh not found" > ${LOGFILE}
+  echo "$0: FAILURE ${SCRIPTS}/test_regression.sh not found" > ${LOGFILE}
   exit $E_NOEXECSCRIPT
 fi
 
 # Run the regression test fail if non-zero status
-scripts/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
+${SCRIPTS}/test_regression.sh ${1}-ref ${1} >> ${LOGFILE} 2>&1
 if [[ $? -ne 0 ]]
 then
   echo "$0: FAILURE the regression test failed." >> ${LOGFILE}
