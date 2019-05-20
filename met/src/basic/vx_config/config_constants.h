@@ -234,8 +234,6 @@ struct BootInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const double default_interp_sigma=1.0;
-
 //
 // Struct to store interpolation information
 //
@@ -253,6 +251,10 @@ struct InterpInfo {
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
 };
+
+// Default sigma value used for Gaussian interpolation and regridding options.
+// Chosen by Hazardous Weather Testbed.
+static const double default_interp_sigma = 1.476;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -503,6 +505,7 @@ static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
 static const char conf_key_prob[]              = "prob";
 static const char conf_key_prob_as_scalar[]    = "prob_as_scalar"; // true/false
+static const char conf_key_thresh[]            = "thresh";
 static const char conf_key_thresh_lo[]         = "thresh_lo";
 static const char conf_key_thresh_hi[]         = "thresh_hi";
 static const char conf_key_wind_thresh[]       = "wind_thresh";
@@ -595,7 +598,13 @@ static const char conf_key_time_step[]          = "time_step";
 //
 // Point-Stat specific parameter key names
 //
-static const char conf_key_hira[] = "hira";
+static const char conf_key_hira[]               = "hira";
+static const char conf_key_land_mask[]          = "land_mask";
+static const char conf_key_land_mask_flag[]     = "land_mask.flag";
+static const char conf_key_topo_mask[]          = "topo_mask";
+static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
+static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
+static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 
 //
 // Grid-Stat specific parameter key names
