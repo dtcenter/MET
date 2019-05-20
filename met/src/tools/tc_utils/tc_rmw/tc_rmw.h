@@ -38,8 +38,12 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "tc_rmw_conf_info.h"
 
+#include "vx_data2d_factory.h"
 #include "vx_tc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
@@ -67,14 +71,31 @@ static const char* default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray    bdeck_source, bdeck_model_suffix;
+static ConcatString   fcst_file;
 static StringArray    adeck_source, adeck_model_suffix;
+static StringArray    bdeck_source, bdeck_model_suffix;
 static StringArray    edeck_source, edeck_model_suffix;
 static ConcatString   config_file;
 static TCRMWConfInfo  conf_info;
 
 // Optional arguments
-static ConcatString out_base;
+static ConcatString out_dir;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Variables for Output Files
+//
+////////////////////////////////////////////////////////////////////////
+
+// Output NetCDF file
+static ConcatString out_nc_file;
+static NcFile*      nc_out = (NcFile*) 0;
+static NcDim        range_dim;
+static NcDim        azimuth_dim;
+static NcDim        track_point_dim;
+
+// List of output NetCDF variable names
+static StringArray nc_var_sa;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -83,12 +104,17 @@ static ConcatString out_base;
 ////////////////////////////////////////////////////////////////////////
 
 static StringArray  out_files;
-static DataPlane    rmw_dp;
-static Grid         rmw_grid;
+static DataPlane    dp;
+static TcrmwData    grid_data;
+static TcrmwGrid    grid;
 static ConcatString wwarn_file;
+
+// Data file factory and input files
+static Met2dDataFileFactory mtddf_factory;
+static Met2dDataFile* fcst_mtddf = (Met2dDataFile*) 0;
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   //  __TC_RMW_H__
+#endif  //  __TC_RMW_H__
 
 ////////////////////////////////////////////////////////////////////////

@@ -151,17 +151,17 @@ void TCRMWConfInfo::process_config() {
     // Conf: CheckDup
     CheckDup = Conf.lookup_bool(conf_key_check_dup);
 
-    // Conf: n_radius
-    n_radius = Conf.lookup_int(conf_key_n_radius);
+    // Conf: n_range
+    n_range = Conf.lookup_int(conf_key_n_range);
 
     // Conf: n_azimuth
     n_azimuth = Conf.lookup_int(conf_key_n_azimuth);
 
-    // Conf: max_radius
-    max_radius = Conf.lookup_double(conf_key_max_radius);
+    // Conf: max_range
+    max_range = Conf.lookup_double(conf_key_max_range);
 
-    // Conf: delta_radius
-    delta_radius = Conf.lookup_double(conf_key_delta_radius);
+    // Conf: delta_range
+    delta_range = Conf.lookup_double(conf_key_delta_range);
 
     // Conf: Track
     // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));

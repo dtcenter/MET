@@ -63,10 +63,10 @@ class TCRMWConfInfo {
 
         bool CheckDup;
 
-        int n_radius;
+        int n_range;
         int n_azimuth;
-        double max_radius;
-        double delta_radius;
+        double max_range;
+        double delta_range;
 
         // Config file version
         ConcatString Version;

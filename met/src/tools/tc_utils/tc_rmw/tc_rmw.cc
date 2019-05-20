@@ -24,9 +24,11 @@ using namespace std;
 #include "tc_rmw.h"
 
 #include "vx_grid.h"
-// #include "tcrmw_grid.h"
+#include "tcrmw_grid.h"
 
 #include "vx_tc_util.h"
+#include "vx_nc_util.h"
+#include "vx_tc_nc_util.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -34,20 +36,20 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+static void usage();
 static void process_command_line(int, char **);
 static void process_decks();
+static void process_adecks(TrackInfoArray&);
 static void process_bdecks(TrackInfoArray&);
-static void process_adecks(const TrackInfoArray&);
-static void process_edecks(const TrackInfoArray&);
+static void process_edecks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
                            const StringArray&,
                            StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
                                 const StringArray&,
                                 TrackInfoArray&, bool, bool);
-static void compute_grids(const TrackInfoArray&);
-static void set_bdeck(const StringArray&);
 static void set_adeck(const StringArray&);
+static void set_bdeck(const StringArray&);
 static void set_edeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
                             StringArray&, StringArray&);
@@ -56,24 +58,48 @@ static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 
+static void setup_grid();
+static void setup_nc_file();
+static void compute_grids(const TrackInfoArray&);
+static void write_nc(const ConcatString&, const DataPlane&, FieldType);
+
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
 
-    // Process the command line arguments
+    // Set handler for memory allocation error
+    set_new_handler(oom); // out of memory
+
+    // Process command line arguments
     process_command_line(argc, argv);
+
+    // Setup grid
+    setup_grid();
+
+    // Setup NetCDF output
+    setup_nc_file();
 
     // Process deck files
     process_decks();
 
-    // List the output files
-    for(int i =0 ; i < out_files.n_elements(); i++) {
-        mlog << Debug(1)
-             << "Output file: " << out_files[i] << "\n";
-    }
-
     return(0);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void usage() {
+
+    cout << "\n*** Model Evaluation Tools (MET" << met_version
+         << ") ***\n\n"
+         << "Usage: " << program_name << "\n"
+         << "\tfcst_file\n"
+         << "\t[-log file]\n"
+         << "\t[-v level]\n\n" << flush;
+
+    exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,17 +108,18 @@ void process_command_line(int argc, char **argv) {
     CommandLine cline;
     ConcatString default_config_file;
 
-    // Default output file
-    out_base = "./tc_rmw";
+    // Default output base
+    out_dir = "./";
 
     // Parse command line into tokens
     cline.set(argc, argv);
 
     // Set usage function
+    cline.set_usage(usage);
 
     // Add function calls for arguments
-    cline.add(set_bdeck,     "-bdeck", -1);
     cline.add(set_adeck,     "-adeck", -1);
+    cline.add(set_bdeck,     "-bdeck", -1);
     cline.add(set_edeck,     "-edeck", -1);
     cline.add(set_config,    "-config", 1);
     cline.add(set_out,       "-out",    1);
@@ -101,6 +128,11 @@ void process_command_line(int argc, char **argv) {
 
     // Parse command line
     cline.parse();
+
+    // Check number of arguments
+    if (cline.n() != 1) usage();
+
+    fcst_file = cline[0];
 
     // Create default config file name
     default_config_file = replace_path(default_config_filename);
@@ -114,16 +146,58 @@ void process_command_line(int argc, char **argv) {
     conf_info.read_config(default_config_file.c_str(),
                           config_file.c_str());
 
+
+    // Get forecast file type from config
+    GrdFileType ftype
+        = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
+        conf_key_fcst));
+
+    // Read forecast file
+    if(!(fcst_mtddf
+        = mtddf_factory.new_met_2d_data_file(
+            fcst_file.c_str(), ftype))) {
+
+        mlog << Error << "\nTrouble reading forecast file \""
+             << fcst_file << "\"\n\n";
+        exit(1);
+    }
+
     return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void process_decks() {
-    TrackInfoArray bdeck_tracks;
+    // Process ADECK files
+    TrackInfoArray adeck_tracks;
+    process_adecks(adeck_tracks);
+
+    compute_grids(adeck_tracks);
 
     // Process BDECK files
+    TrackInfoArray bdeck_tracks;
     process_bdecks(bdeck_tracks);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_adecks(TrackInfoArray& adeck_tracks) {
+    StringArray files, files_model_suffix;
+
+    // Initialize
+    adeck_tracks.clear();
+
+    // Get list of track files
+    get_atcf_files(adeck_source, adeck_model_suffix,
+                   files, files_model_suffix);
+
+    mlog << Debug(2)
+         << "Processing " << files.n_elements() << " ADECK file(s).\n";
+
+    process_track_files(files, files_model_suffix, adeck_tracks,
+                        false, false);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -134,7 +208,7 @@ static void process_bdecks(TrackInfoArray& bdeck_tracks) {
     // Initialize
     bdeck_tracks.clear();
 
-    // Get the list of track files
+    // Get list of track files
     get_atcf_files(bdeck_source, bdeck_model_suffix,
                    files, files_model_suffix);
 
@@ -143,12 +217,6 @@ static void process_bdecks(TrackInfoArray& bdeck_tracks) {
 
     process_track_files(files, files_model_suffix, bdeck_tracks,
                         false, false);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void process_adecks(const TrackInfoArray& adeck_tracks) {
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -213,10 +281,10 @@ static void process_track_files(const StringArray& files,
     // Initialize counts
     tot_read = tot_add = 0;
 
-    // Process each of the input ATCF files
+    // Process input ATCF files
     for(int i = 0; i < files.n_elements(); i++) {
 
-        // Open the current file
+        // Open current file
         if(!f.open(files[i].c_str())) {
             mlog << Error
                  << "\nprocess_track_files() -> "
@@ -227,10 +295,10 @@ static void process_track_files(const StringArray& files,
         // Initialize counts
         cur_read = cur_add = 0;
 
-        // Read each line in the file
+        // Read each line
         while(f >> line) {
 
-            // Increment the line counts
+            // Increment line counts
             cur_read++;
             tot_read++;
 
@@ -240,20 +308,20 @@ static void process_track_files(const StringArray& files,
                 line.set_technique(cs);
             }
 
-            // Attempt to add the current line to the TrackInfoArray
+            // Attempt to add current line to TrackInfoArray
             if(tracks.add(line, conf_info.CheckDup, check_anly)) {
                 cur_add++;
                 tot_add++;
             }
         }
 
-        // Dump out the current number of lines
+        // Dump out current number of lines
         mlog << Debug(4)
              << "[File " << i + 1 << " of " << files.n_elements()
              << "] " << cur_read
              << " lines read from file \n\"" << files[i] << "\"\n";
 
-        // Close the current file
+        // Close current file
         f.close();
 
     } // end for i
@@ -261,14 +329,14 @@ static void process_track_files(const StringArray& files,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_bdeck(const StringArray& b) {
-    set_atcf_source(b, bdeck_source, bdeck_model_suffix);
+void set_adeck(const StringArray& a) {
+    set_atcf_source(a, adeck_source, adeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adeck(const StringArray& a) {
-    set_atcf_source(a, adeck_source, adeck_model_suffix);
+void set_bdeck(const StringArray& b) {
+    set_atcf_source(b, bdeck_source, bdeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -302,7 +370,7 @@ void set_atcf_source(const StringArray& a,
         }
     }
 
-    // Parse the remaining sources
+    // Parse remaining sources
     for(int i = 0; i < a.n_elements(); i++) {
         if( a[i] == "suffix" ) continue;
         source.add(a[i]);
@@ -319,7 +387,7 @@ void set_config(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_out(const StringArray& a) {
-    out_base = a[0];
+    out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -337,6 +405,18 @@ void set_verbosity(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void setup_grid() {
+
+    grid_data.name = "TCRMW";
+    grid_data.range_n = conf_info.n_range;
+    grid_data.azimuth_n = conf_info.n_azimuth;
+    grid_data.range_max_km = conf_info.max_range;
+
+    grid.set_from_data(grid_data);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void compute_grids(const TrackInfoArray& tracks) {
 
     for(int j = 0; j < tracks.n_tracks(); j++) {
@@ -345,8 +425,57 @@ static void compute_grids(const TrackInfoArray& tracks) {
 
         for(int i = 0; i < track.n_points(); i++) {
             TrackPoint point = track[i];
-        } 
+            mlog << Debug(4)
+                 << "(" << point.lat() << ", " << point.lon() << ")\n";
+            grid_data.lat_center = point.lat();
+            grid_data.lon_center = - point.lon(); // internal sign change
+            grid.clear();
+            grid.set_from_data(grid_data);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void setup_nc_file() {
+
+    out_nc_file.add(fcst_file);
+    out_nc_file.chomp(".nc");
+    out_nc_file.chomp(".nc4");
+    out_nc_file.add(".tc_rmw.nc");
+
+    mlog << Debug(1) << out_nc_file << "\n";
+
+    // Create NetCDF file
+    nc_out = open_ncfile(out_nc_file.c_str(), true);
+
+    if (IS_INVALID_NC_P(nc_out)) {
+        mlog << Error << "\nsetup_nc_file() -> "
+             << "trouble opening output NetCDF file "
+             << out_nc_file << "\n\n";
+        exit(1);
     }
 
-    // TcrmwGrid grid;
+    mlog << Debug(4) << grid.range_n() << "\n";
+    mlog << Debug(4) << grid.azimuth_n() << "\n";
+
+    // Define dimensions
+    range_dim = add_dim(nc_out, "range", (long) grid.range_n());
+    azimuth_dim = add_dim(nc_out, "azimuth", (long) grid.azimuth_n());
+    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+
+    write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
+
+    nc_out->close();
 }
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_nc(const ConcatString& field_name,
+    const DataPlane& dp, FieldType field_type) {
+    ConcatString var_name, var_str;
+    NcVar nc_var;
+
+}
+
+////////////////////////////////////////////////////////////////////////
