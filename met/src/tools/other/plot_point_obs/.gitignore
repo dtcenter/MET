@@ -1,0 +1,6 @@
+plot_point_obs
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

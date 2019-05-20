@@ -1,0 +1,6 @@
+pcp_combine
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

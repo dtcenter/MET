@@ -10,7 +10,7 @@ source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 
 verb = 1;
 strict = F;
-file_size_delta = 0;
+file_size_delta = 0.01;
 
 usage = function(){
 	cat("usage: Rscript comp_nc.R [-v {lev}] [-strict] {nc_file_1} {nc_file_2}\n",

@@ -1,0 +1,10 @@
+test_table_float
+test_data_plane
+test_command_line
+test_ascii_header
+test_add_rows
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

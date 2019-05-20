@@ -1,15 +1,44 @@
 #!/bin/bash
-# This script is intended to be run from a cron job nightly to
-# check out the MET code tree and do a Fortify scan
+#
+# Run nightly Fortify scan
+#=======================================================================
+#
+# This run_fortify_sca_nightly.sh script calls the run_fortify_sca.sh
+# script.  It is intented to be run nightly through cron.  Output
+# should be directed to the LOGFILE, per cron convention.  To run this
+# script, use the following commands:
+#
+#    git clone https://github.com/NCAR/MET
+#    MET/scripts/run_fortify_sca_nightly.sh name
+#
+# Usage: run_fortify_sca_nightly.sh name
+#    where "name" specifies a branch, tag, or hash
+#
+# For example, scan the develop branch:
+#    run_fortify_sca_nightyl.sh develop
+#
+#=======================================================================
 
-# Configure run
-SCRIPTS=`dirname $0`
-EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu mccabe@ucar.edu"
+function usage {
+  echo
+  echo "USAGE: run_fortify_sca_nightly.sh name"
+  echo "   where \"name\" specifies a branch, tag, or hash."
+  echo
+}
+
+# Check for arguments
+if [ $# -lt 1 ]; then usage; exit 1; fi
+
+# Configure run for dakota
 TODAY=`date +%Y%m%d`
-RUNDIR="/d3/projects/MET/MET_regression/NB${TODAY}/fortify_sca"
+RUNDIR="/d3/projects/MET/MET_regression/${1}/NB${TODAY}/fortify_sca"
 mkdir -p $RUNDIR
 cd $RUNDIR
 LOGFILE=${PWD}/run_fortify_sca_${TODAY}.log
+EMAIL_LIST="johnhg@ucar.edu bullock@ucar.edu mccabe@ucar.edu"
+
+# Store the scripts location
+SCRIPTS=`dirname $0`
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
@@ -39,12 +68,10 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
 export LD_LIBRARY_PATH=${MET_NETCDF}/lib:${MET_HDF5}/lib:/usr/local/lib:/usr/lib
 
 # Run scan and check for bad return status
-${SCRIPTS}/run_fortify_sca.sh trunk > ${LOGFILE}
+${SCRIPTS}/run_fortify_sca.sh develop > ${LOGFILE}
 if [[ $? -ne 0 ]]
 then
   echo "$0: The nightly Fortify scan FAILED on ${TODAY}." >> ${LOGFILE}
-  cat ${LOGFILE} | mail -s "MET Fortify Scan Failed (autogen msg)" ${EMAIL_LIST}
+  cat ${LOGFILE} | mail -s "MET Fortify Scan Failed for ${1} (autogen msg)" ${EMAIL_LIST}
   exit 1
 fi
-
-exit 0
