@@ -464,7 +464,7 @@ static void setup_nc_file() {
 
     write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
 
-    nc_out->close();
+    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
