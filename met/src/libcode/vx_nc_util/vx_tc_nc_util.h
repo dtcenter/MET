@@ -16,9 +16,15 @@
 #include <netcdf>
 using namespace netCDF;
 
-using namespace std;
-
+#include "vx_log.h"
+#include "vx_nc_util.h"
+#include "vx_tc_util.h"
 #include "tcrmw_grid.h"
+
+////////////////////////////////////////////////////////////////////////
+
+extern void write_nc_tracks(const ConcatString&,
+    const TrackInfoArray&);
 
 extern void write_nc_range_azimuth(NcFile*,
     const NcDim&, const NcDim&, const TcrmwGrid&);

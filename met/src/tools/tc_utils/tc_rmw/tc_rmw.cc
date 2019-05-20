@@ -173,11 +173,6 @@ void process_decks() {
     process_adecks(adeck_tracks);
 
     compute_grids(adeck_tracks);
-
-    // Process BDECK files
-    TrackInfoArray bdeck_tracks;
-    process_bdecks(bdeck_tracks);
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -198,6 +193,9 @@ static void process_adecks(TrackInfoArray& adeck_tracks) {
     process_track_files(files, files_model_suffix, adeck_tracks,
                         false, false);
 
+    ConcatString adeck_track_file("adeck.nc");
+
+    write_nc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,7 +322,7 @@ static void process_track_files(const StringArray& files,
         // Close current file
         f.close();
 
-    } // end for i
+    } // end loop over files
 }
 
 ////////////////////////////////////////////////////////////////////////

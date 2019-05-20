@@ -8,8 +8,28 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "vx_nc_util.h"
 #include "vx_tc_nc_util.h"
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_tracks(const ConcatString& track_nc_file,
+    const TrackInfoArray& tracks) {
+
+    mlog << Debug(2) << "Writing " << track_nc_file << "\n";
+
+    NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
+
+    NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+
+    if (IS_INVALID_NC_P(nc_out)) {
+        mlog << Error << "\nwrite_nc_tracks() -> "
+             << "unable to open NetCDF file " 
+             << track_nc_file << "\n\n";
+        exit(1);
+    }
+
+    nc_out->close();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
