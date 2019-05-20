@@ -234,6 +234,8 @@ struct BootInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
+static const double default_interp_sigma=1.0;
+
 //
 // Struct to store interpolation information
 //
@@ -1053,6 +1055,7 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
+
 
 ////////////////////////////////////////////////////////////////////////
 
