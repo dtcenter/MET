@@ -320,7 +320,7 @@ static void process_track_files(const StringArray& files,
              << " lines read from file \n\"" << files[i] << "\"\n";
 
         // Close current file
-        f.close();
+        // f.close();
 
     } // end loop over files
 }

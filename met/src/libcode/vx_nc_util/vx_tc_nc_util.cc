@@ -28,7 +28,7 @@ void write_nc_tracks(const ConcatString& track_nc_file,
         exit(1);
     }
 
-    nc_out->close();
+    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
