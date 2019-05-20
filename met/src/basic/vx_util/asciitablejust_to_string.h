@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -9,36 +7,49 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Warning:
+   //
+   //     This file is machine generated.
+   //
+   //     Do not edit by hand.
+   //
+   //
+   //     Created by enum_to_string from file "ascii_table.h"
+   //
+   //     on May 13, 2019   12:27 pm MDT
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_GRID_H__
-#define  __VX_GRID_H__
+#ifndef  __ASCIITABLEJUST_TO_STRING_H__
+#define  __ASCIITABLEJUST_TO_STRING_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-// #include "grid_base.h"
-
-#include "st_grid.h"
-#include "lc_grid.h"
-#include "latlon_grid.h"
-#include "merc_grid.h"
-#include "tcrmw_grid.h"
-
-#include "find_grid_by_name.h"
+#include "concat_string.h"
+#include "ascii_table.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __VX_GRID_H__
+extern ConcatString asciitablejust_to_string(const AsciiTableJust);
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+#endif   /*  __ASCIITABLEJUST_TO_STRING_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
 
 
