@@ -1,0 +1,8 @@
+gis_dump_shx
+gis_dump_shp
+gis_dump_dbf
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

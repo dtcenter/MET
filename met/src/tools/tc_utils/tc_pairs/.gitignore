@@ -1,0 +1,6 @@
+tc_pairs
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

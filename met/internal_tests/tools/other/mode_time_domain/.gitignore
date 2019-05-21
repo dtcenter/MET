@@ -1,0 +1,6 @@
+test_velocity
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

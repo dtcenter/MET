@@ -1,0 +1,7 @@
+test_read_prob
+test_read
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

@@ -1,0 +1,14 @@
+test_user_func
+test_thresh
+test_string_then_config
+test_string
+test_met_478
+test_lookup3
+test_lookup2
+test_lookup
+test_config
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

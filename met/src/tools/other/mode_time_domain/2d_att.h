@@ -66,6 +66,8 @@ class SingleAtt2D {
 
       bool IsFcst;
 
+      bool Is_Cluster;   //  as opposed to simple
+
       unixtime ValidTime;
 
       int Lead_Time;
@@ -100,6 +102,9 @@ class SingleAtt2D {
       void set_fcst (bool = true);
       void set_obs  (bool = true);
 
+      void set_is_cluster (bool = true);
+      void set_is_simple  (bool = true);
+
       void set_valid_time(const unixtime);
 
       void set_lead_time(const int);
@@ -133,6 +138,9 @@ class SingleAtt2D {
 
       bool is_fcst () const;
       bool is_obs  () const;
+
+      bool is_cluster () const;
+      bool is_simple  () const;
 
       unixtime valid_time() const;
 
@@ -182,6 +190,9 @@ inline double SingleAtt2D::ptile_90() const { return ( Ptile_90 ); }
 
 inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
 inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
+
+inline bool   SingleAtt2D::is_cluster () const { return (   Is_Cluster ); }
+inline bool   SingleAtt2D::is_simple  () const { return ( ! Is_Cluster ); }
 
 inline unixtime SingleAtt2D::valid_time () const { return ( ValidTime ); }
 
