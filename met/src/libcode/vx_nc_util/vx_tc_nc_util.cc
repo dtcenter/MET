@@ -28,7 +28,20 @@ void write_nc_tracks(const ConcatString& track_nc_file,
         exit(1);
     }
 
-    // nc_out->close();
+    NcVar track_lat_var = nc_out->addVar(
+        "track_lat", ncFloat, track_point_dim);
+    NcVar track_lon_var = nc_out->addVar(
+        "track_lon", ncFloat, track_point_dim);
+
+    for(int j = 0; j < tracks.n_tracks(); j++) {
+
+        TrackInfo track = tracks[j];
+
+        for(int i = 0; i < track.n_points(); i++) {
+        }
+    }
+
+    nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////

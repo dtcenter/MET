@@ -320,7 +320,7 @@ static void process_track_files(const StringArray& files,
              << " lines read from file \n\"" << files[i] << "\"\n";
 
         // Close current file
-        // f.close();
+        f.close();
 
     } // end loop over files
 }
@@ -464,7 +464,7 @@ static void setup_nc_file() {
 
     write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
 
-    // nc_out->close();
+    nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
