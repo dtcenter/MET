@@ -48,9 +48,10 @@ static const char * atcf_suffix = ".dat";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/config/TCPairsConfig_default";
+   "MET_BASE/config/TCGenConfig_default";
 
 // BEST track time step (6 hours)
+// JHG do I need this?
 static const int best_track_time_step = 21600;
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,11 +61,9 @@ static const int best_track_time_step = 21600;
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray     adeck_source, adeck_model_suffix;
-static StringArray     edeck_source, edeck_model_suffix;
-static StringArray     bdeck_source, bdeck_model_suffix;
-static ConcatString    config_file;
-static TCPairsConfInfo conf_info;
+static StringArray   atcf_source, atcf_model_suffix;
+static ConcatString  config_file;
+static TCGenConfInfo conf_info;
 
 // Optional arguments
 static ConcatString out_base;
@@ -75,10 +74,7 @@ static ConcatString out_base;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static StringArray  out_files;
-static DataPlane    dland_dp;
-static Grid         dland_grid;
-static ConcatString wwarn_file;
+static StringArray out_files;
 
 ////////////////////////////////////////////////////////////////////////
 

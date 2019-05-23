@@ -23,7 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TcGenVxOpt {
+class TCGenVxOpt {
 
    private:
 
@@ -31,8 +31,8 @@ class TcGenVxOpt {
 
    public:
 
-      TcGenVxOpt();
-     ~TcGenVxOpt();
+      TCGenVxOpt();
+     ~TCGenVxOpt();
 
       //////////////////////////////////////////////////////////////////
 
@@ -90,7 +90,7 @@ class TCGenConfInfo {
       MetConfig Conf;
 
       // Vector of vx task filtering options [n_vx]
-      std::vector<TcGenVxOpt> VxOpt;
+      std::vector<TCGenVxOpt> VxOpt;
 
       // BEST track ATCF ID's
       StringArray BestTechnique;
@@ -110,14 +110,14 @@ class TCGenConfInfo {
 
       void process_config();
 
-      double get_dland(double lat, double lon);
+      double compute_dland(double lat, double lon);
 
-      int get_n_vx(); const
+      int get_n_vx() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TcGenConfInfo::get_n_vx() const { return(VxOpt.size()); }
+inline int TCGenConfInfo::get_n_vx() const { return(VxOpt.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 

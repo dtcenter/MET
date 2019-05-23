@@ -46,42 +46,26 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
-static void   process_decks        ();
-static void   process_bdecks       (TrackInfoArray &);
-static void   process_adecks       (const TrackInfoArray &);
-static void   process_edecks       (const TrackInfoArray &);
+static void   process_tracks       ();
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     StringArray &, StringArray &);
 static void   process_track_files  (const StringArray &,
-                                    const StringArray &,
-                                    TrackInfoArray &, bool, bool);
-static void   process_prob_files   (const StringArray &,
-                                    const StringArray &,
-                                    ProbInfoArray &);
+                                    const StringArray &);
 static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
                                     double lat, double lon);
-static void   derive_interp12      (TrackInfoArray &);
-static int    derive_consensus     (TrackInfoArray &);
-static int    derive_lag           (TrackInfoArray &);
 static void   process_match        (const TrackInfo &, const TrackInfo &,
                                     TrackPairInfoArray &);
-static double compute_dland        (double, double);
-static void   load_dland           ();
 static void   process_watch_warn   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
 static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
 static void   setup_table          (AsciiTable &);
 static void   usage                ();
-static void   set_adeck            (const StringArray &);
-static void   set_edeck            (const StringArray &);
-static void   set_bdeck            (const StringArray &);
-static void   set_atcf_source      (const StringArray &,
-                                    StringArray &, StringArray &);
+static void   set_lookin           (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
 static void   set_logfile          (const StringArray &);
@@ -98,7 +82,7 @@ int main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    // Process the ATCF deck files and write output
-   process_decks();
+   process_tracks();
 
    // List the output files
    for(int i=0; i<out_files.n_elements(); i++) {
@@ -126,53 +110,31 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add function calls for the arguments
-   cline.add(set_adeck,     "-adeck", -1);
-   cline.add(set_edeck,     "-edeck", -1);
-   cline.add(set_bdeck,     "-bdeck", -1);
-   cline.add(set_config,    "-config", 1);
-   cline.add(set_out,       "-out",    1);
-   cline.add(set_logfile,   "-log",    1);
-   cline.add(set_verbosity, "-v",      1);
+   cline.add(set_lookin,    "-lookin", -1);
+   cline.add(set_config,    "-config",  1);
+   cline.add(set_out,       "-out",     1);
+   cline.add(set_logfile,   "-log",     1);
+   cline.add(set_verbosity, "-v",       1);
 
    // Parse the command line
    cline.parse();
 
    // Check for the minimum number of arguments
-   if((adeck_source.n_elements() == 0 &&
-       edeck_source.n_elements() == 0) ||
-      bdeck_source.n_elements()  == 0  ||
-      config_file.length()       == 0) {
+   if(atcf_source.n_elements() == 0 ||
+      config_file.length()     == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
-           << "You must specify at least one source of ADECK or EDECK "
-           << "data, BDECK data, and the config file using the "
-           << "\"-adeck\", \"-edeck\", \"-bdeck\", and \"-config\" "
-           << "command line options.\n\n";
+           << "missing \"-lookin\" or \"-config\" command line "
+           << "option\n\n";
       usage();
    }
 
-   // List the input ADECK track files
-   for(i=0; i<adeck_source.n_elements(); i++) {
+   // List the input track files
+   for(i=0; i<atcf_source.n_elements(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << adeck_source.n_elements()
-           << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
-           << adeck_model_suffix[i] << "\n";
-   }
-
-   // List the input EDECK track files
-   for(i=0; i<edeck_source.n_elements(); i++) {
-      mlog << Debug(1)
-           << "[Source " << i+1 << " of " << edeck_source.n_elements()
-           << "] EDECK Source: " << edeck_source[i] << ", Model Suffix: "
-           << edeck_model_suffix[i] << "\n";
-   }
-
-   // List the input BDECK track files
-   for(i=0; i<bdeck_source.n_elements(); i++) {
-      mlog << Debug(1)
-           << "[Source " << i+1 << " of " << bdeck_source.n_elements()
-           << "] BDECK Source: " << bdeck_source[i] << ", Model Suffix: "
-           << bdeck_model_suffix[i] << "\n";
+           << "[Source " << i+1 << " of " << atcf_source.n_elements()
+           << "] ATCF Source: " << atcf_source[i] << ", Model Suffix: "
+           << atcf_model_suffix[i] << "\n";
    }
 
    // Create the default config file name
@@ -184,233 +146,28 @@ void process_command_line(int argc, char **argv) {
         << "Config File User: " << config_file << "\n";
 
    // Read the config files
-   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-
-   // Load the distance to land data file
-   if(dland_dp.nx() == 0 || dland_dp.ny() == 0) load_dland();
+   conf_info.read_config(default_config_file.c_str(),
+                         config_file.c_str());
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_decks() {
-   TrackInfoArray bdeck_tracks;
-
-   // Process BDECK files
-   process_bdecks(bdeck_tracks);
-
-   // Process ADECK files
-   if(adeck_source.n_elements() > 0) {
-      process_adecks(bdeck_tracks);
-   }
-
-   // Process EDECK files
-   if(edeck_source.n_elements() > 0) {
-      process_edecks(bdeck_tracks);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_bdecks(TrackInfoArray &bdeck_tracks) {
-   StringArray files, files_model_suffix;
+void process_tracks() {
+   TrackInfoArray tracks;
+   StringArray atcf_files, atcf_files_model_suffix;
 
    // Initialize
-   bdeck_tracks.clear();
+   tracks.clear();
 
    // Get the list of track files
-   get_atcf_files(bdeck_source, bdeck_model_suffix,
-                  files, files_model_suffix);
+   get_atcf_files(atcf_source, atcf_model_suffix,
+                  atcf_files,  atcf_files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << files.n_elements() << " BDECK file(s).\n";
-   process_track_files(files, files_model_suffix, bdeck_tracks, false,
-                       (conf_info.AnlyTrack == TrackType_BDeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
-   mlog << Debug(2)
-        << "Found " << bdeck_tracks.n_tracks() << " BDECK track(s).\n";
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_adecks(const TrackInfoArray &bdeck_tracks) {
-   StringArray files, files_model_suffix;
-   TrackInfoArray adeck_tracks;
-   TrackPairInfoArray pairs;
-   int i, j, n_match;
-
-   // Get the list of track files
-   get_atcf_files(adeck_source, adeck_model_suffix,
-                  files, files_model_suffix);
-
-   mlog << Debug(2)
-        << "Processing " << files.n_elements() << " ADECK file(s).\n";
-   process_track_files(files, files_model_suffix, adeck_tracks, true,
-                       (conf_info.AnlyTrack == TrackType_ADeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
-
-   //
-   // Derive new track types
-   //
-
-   // Handle 12-hourly interpolated models
-   if(conf_info.Interp12) {
-      mlog << Debug(2)
-           << "Deriving 12-hour interpolated ADECK tracks.\n";
-      derive_interp12(adeck_tracks);
-   }
-
-   // Derive consensus forecasts from the ADECK tracks
-   mlog << Debug(2)
-        << "Deriving " << conf_info.NConsensus
-        << " ADECK consensus model(s).\n";
-   i = derive_consensus(adeck_tracks);
-   mlog << Debug(2)
-        << "Added " << i << " ADECK consensus tracks(s).\n";
-
-   // Derive lag forecasts from the ADECK tracks
-   mlog << Debug(2)
-        << "Deriving " << conf_info.LagTime.n_elements()
-        << " ADECK lag model(s).\n";
-   i = derive_lag(adeck_tracks);
-   mlog << Debug(2)
-        << "Added " << i << " ADECK lag tracks(s).\n";
-
-   // Filter the ADECK tracks using the config file information
-   mlog << Debug(2)
-        << "Filtering " << adeck_tracks.n_tracks()
-        << " ADECK tracks based on config file settings.\n";
-   filter_tracks(adeck_tracks);
-
-   //
-   // Loop through the ADECK tracks and find a matching BDECK track
-   //
-
-   mlog << Debug(2)
-        << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
-        << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
-
-   for(i=0; i<adeck_tracks.n_tracks(); i++) {
-
-      for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
-
-         // Check if the BDECK track matches the current ADECK track
-         if(adeck_tracks[i].is_match(bdeck_tracks[j])) {
-            n_match++;
-            mlog << Debug(4)
-                 << "[Track " << i+1 << "] ADECK track " << i+1
-                 << " matches BDECK track " << j+1 << ":\n"
-                 << "    ADeck: " << adeck_tracks[i].serialize() << "\n"
-                 << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
-
-            // Process the matching tracks
-            process_match(adeck_tracks[i], bdeck_tracks[j], pairs);
-         }
-      } // end for j
-
-      // Dump the number of matching tracks
-      mlog << Debug(3)
-           << "[Track " << i+1 << "] ADECK track " << i+1 << " matches "
-           << n_match << " BDECK track(s).\n";
-
-   } // end for i
-
-   // Add the watch/warning information to the matched track pairs
-   process_watch_warn(pairs);
-
-   // Dump out very verbose output
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5)
-           << pairs.serialize_r() << "\n";
-   }
-
-   // Write out the track pairs
-   write_tracks(pairs);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_edecks(const TrackInfoArray &bdeck_tracks) {
-   StringArray files, files_model_suffix;
-   ProbInfoArray edeck_probs;
-   ProbRIRWPairInfo cur_ri;
-   ProbRIRWPairInfoArray prob_rirw_pairs;
-   int n_match, i, j;
-
-   // Get the list of ATCF files
-   get_atcf_files(edeck_source, edeck_model_suffix,
-                  files, files_model_suffix);
-
-   mlog << Debug(2)
-        << "Processing " << files.n_elements()
-        << " EDECK file(s).\n";
-   process_prob_files(files, files_model_suffix, edeck_probs);
-
-   // Filter the EDECK tracks using the config file information
-   mlog << Debug(2)
-        << "Filtering " << edeck_probs.n_probs()
-        << " probabilities based on config file settings.\n";
-   filter_probs(edeck_probs);
-
-   //
-   // Match BDECK tracks to EDECK probabilities
-   //
-
-   mlog << Debug(2)
-        << "Matching " << edeck_probs.n_probs()
-        << " EDECK probabilities to "
-        << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
-
-   for(i=0; i<edeck_probs.n_probs(); i++) {
-
-      for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
-
-         // Check if the BDECK track matches the current EDECK
-         if(edeck_probs[i]->is_match(bdeck_tracks[j])) {
-
-            // Attempt to store the pair
-            if(!cur_ri.set(edeck_probs.prob_rirw(i), bdeck_tracks[j])) continue;
-
-            mlog << Debug(4)
-                 << "[Prob " << i+1 << "] EDECK probability " << i+1
-                 << " matches BDECK track " << j+1 << ":\n"
-                 << "    EDeck: " << edeck_probs[i]->serialize() << "\n"
-                 << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
-
-            // Compute the distances to land
-            cur_ri.set_adland(compute_dland(cur_ri.prob_rirw().lat(), -1.0*cur_ri.prob_rirw().lon()));
-            cur_ri.set_bdland(compute_dland(cur_ri.blat(),            -1.0*cur_ri.blon()));
-
-            // Store the current pair
-            prob_rirw_pairs.add(cur_ri);
-
-            // Increment the match counter
-            n_match++;
-         }
-      } // end for j
-
-      // Dump the number of matching tracks
-      mlog << Debug(3)
-           << "[Prob " << i+1 << "] EDECK probability " << i+1
-           << " matches " << n_match << " BDECK track(s).\n";
-
-   } // end for i
-
-   // Dump out very verbose output
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5)
-           << prob_rirw_pairs.serialize_r() << "\n";
-   }
-
-   // Write out the ProbRIRW pairs
-   if(prob_rirw_pairs.n_pairs() > 0) write_prob_rirw(prob_rirw_pairs);
+        << "Processing " << atcf_files.n() << " ATCF file(s).\n";
+   process_track_files(atcf_files, atcf_files_model_suffix);
 
    return;
 }
@@ -423,13 +180,6 @@ void get_atcf_files(const StringArray &source,
                     StringArray &files_model_suffix) {
    StringArray cur_source, cur_files;
    int i, j;
-
-   if(source.n_elements() != model_suffix.n_elements()) {
-      mlog << Error
-           << "\nget_atcf_files() -> "
-           << "the source and suffix arrays must be equal length!\n\n";
-      exit(1);
-   }
 
    // Initialize
    files.clear();
@@ -453,9 +203,8 @@ void get_atcf_files(const StringArray &source,
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_files(const StringArray &files,
-                         const StringArray &model_suffix,
-                         TrackInfoArray &tracks, bool check_keep,
-                         bool check_anly) {
+                         const StringArray &model_suffix) {
+/*
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
    ConcatString cs;
@@ -547,97 +296,7 @@ void process_track_files(const StringArray &files,
               << "] " << tracks[i].serialize() << "\n";
       }
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_prob_files(const StringArray &files,
-                        const StringArray &model_suffix,
-                        ProbInfoArray &probs) {
-   int i, cur_read, cur_add, tot_read, tot_add;
-   LineDataFile f;
-   ConcatString cs;
-   ATCFProbLine line;
-
-   // Initialize
-   probs.clear();
-
-   // Initialize counts
-   tot_read = tot_add = 0;
-
-   // Process each of the input ATCF files
-   for(i=0; i<files.n_elements(); i++) {
-
-      // Open the current file
-      if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_prob_files() -> "
-              << "unable to open file \"" << files[i] << "\"\n\n";
-         exit(1);
-      }
-
-      // Initialize counts
-      cur_read = cur_add = 0;
-
-      // Read each line in the file
-      while(f >> line) {
-
-         // Increment the line counts
-         cur_read++;
-         tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
-
-         // Check the keep status
-         if(!is_keeper(&line)) continue;
-
-         // Attempt to add the current line to ProbInfoArray
-         if(probs.add(line, conf_info.CheckDup)) {
-            cur_add++;
-            tot_add++;
-         }
-      }
-
-      // Dump out the current number of lines
-      mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n_elements()
-           << "] Used " << cur_add << " of " << cur_read
-           << " lines read from file \"" << files[i] << "\"\n";
-
-      // Close the current file
-      f.close();
-
-   } // end for i
-
-   // Dump out the total number of lines
-   mlog << Debug(3)
-        << "Used " << tot_add << " of " << tot_read
-        << " lines read from " << files.n_elements() << " file(s).\n";
-
-   // Dump out the track information
-   mlog << Debug(3)
-        << "Identified " << probs.n_probs() << " probabilities.\n";
-
-   // Dump out very verbose output
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5)
-           << probs.serialize_r() << "\n";
-   }
-   // Dump out track info
-   else {
-      for(i=0; i<probs.n_probs(); i++) {
-         mlog << Debug(4)
-              << "[Prob " << i+1 << " of " << probs.n_probs()
-              << "] " << probs[i]->serialize() << "\n";
-      }
-   }
-
+*/
    return;
 }
 
@@ -651,6 +310,7 @@ void process_prob_files(const StringArray &files,
 
 bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
+/*
    int m, d, y, h, mm, s;
 
    // Decompose warning time
@@ -692,7 +352,7 @@ bool is_keeper(const ATCFLineBase * line) {
    else if(conf_info.InitHour.n_elements() > 0 &&
            !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
       keep = false;
-
+*/
    // Return the keep status
    return(keep);
 }
@@ -700,6 +360,7 @@ bool is_keeper(const ATCFLineBase * line) {
 ////////////////////////////////////////////////////////////////////////
 
 void filter_tracks(TrackInfoArray &tracks) {
+/*
    int i, j;
    int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead;
    bool status;
@@ -817,13 +478,14 @@ void filter_tracks(TrackInfoArray &tracks) {
         << "Rejected for required lead times = " << n_req_lead        << "\n"
         << "Rejected for init mask           = " << n_mask_init       << "\n"
         << "Rejected for valid mask          = " << n_mask_vld        << "\n";
-
+*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void filter_probs(ProbInfoArray &probs) {
+/*
    int i;
    int n_vld, n_mask_init, n_mask_vld;
    ProbInfoArray p = probs;
@@ -889,7 +551,7 @@ void filter_probs(ProbInfoArray &probs) {
         << "Rejected for valid time  = " << n_vld           << "\n"
         << "Rejected for init mask   = " << n_mask_init     << "\n"
         << "Rejected for valid mask  = " << n_mask_vld      << "\n";
-
+*/
    return;
 }
 
@@ -932,337 +594,10 @@ bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Apply the following logic to derive 12-hour interpolated tracks:
-//
-// - The interp12 parameter is set to NONE, FILL, or REPLACE.
-// - Loop through the TrackInfoArray looking for models ending in '2'
-//   or '3'.
-// - For each track ending in '2', search for a corresponding one
-//   ending in 'I'.
-// - If not found, copy the '2' track, rename it 'I', and add it to
-//   the track list.
-// - If found and interp12 is set to REPLACE, copy the '2' track,
-//   rename it 'I', and replace the existing 'I' track.
-// - For each track ending in '3', search for a corresponding one ending
-//   in '2'.
-// - If not found, apply the same logic listed above.
-//
-////////////////////////////////////////////////////////////////////////
-
-void derive_interp12(TrackInfoArray &tracks) {
-   int i, j, n_add, n_replace;
-   ConcatString track_case, amodel;
-   StringArray track_case_list;
-   TrackInfo interp_track;
-   const char *sep = ":";
-   char c;
-
-   // If Interp12 logic set to NONE, Nothing to do.
-   if(conf_info.Interp12 == Interp12Type_None) return;
-
-   // Loop through the track array and store case information
-   for(i=0; i<tracks.n_tracks(); i++) {
-
-      // Build track case information as AMODEL:STORMID:INIT
-      track_case << cs_erase
-                 << tracks[i].technique() << sep
-                 << tracks[i].storm_id() << sep
-                 << (tracks[i].init() > 0 ?
-                     unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
-      track_case_list.add(track_case);
-   }
-
-   // Loop through the track array and apply the interp12 logic
-   for(i=0, n_add=0, n_replace=0; i<tracks.n_tracks(); i++) {
-
-      // Skip AMODEL names not ending in '2' or '3'
-     c = tracks[i].technique()[tracks[i].technique().length() - 1];
-      if(c != '2' && c != '3') continue;
-
-      // Search for corresponding track with AMODEL name ending in '2'
-      if(c == '3') {
-         amodel = tracks[i].technique();
-         amodel.chomp('3');
-         amodel << '2';
-         track_case << cs_erase
-                    << amodel << sep
-                    << tracks[i].storm_id() << sep
-                    << (tracks[i].init() > 0 ?
-                       unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
-         if(track_case_list.has(track_case)) continue;
-      }
-
-      // Swap the '2' or '3' for an 'I' in the AMODEL
-      amodel = tracks[i].technique();
-      amodel.chomp(c);
-      amodel << 'I';
-
-      // Create a copy the '2' or '3' track and rename it to 'I'.
-      interp_track = tracks[i];
-      interp_track.set_technique(amodel.c_str());
-
-      // Search for corresponding track with AMODEL name ending in 'I'
-      track_case << cs_erase
-                 << amodel << sep
-                 << tracks[i].storm_id() << sep
-                 << (tracks[i].init() > 0 ?
-                    unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
-
-      // If the 'I' track doesn't exist, add the new interp track.
-      if(!track_case_list.has(track_case, j)) {
-
-         mlog << Debug(3)
-              << "Adding new track for Interp12 case \"" << track_case
-              << "\" by renaming the " << tracks[i].technique() << " track.\n";
-
-         tracks.add(interp_track);
-         n_add++;
-      }
-      // If the 'I' track does exist, check logic, and replace it.
-      else {
-
-         // Check logic before replacing existing 'I' track with new one.
-         if(conf_info.Interp12 == Interp12Type_Replace) {
-
-            mlog << Debug(3)
-                 << "Replacing existing track for Interp12 case \"" << track_case
-                 << "\" with the " << tracks[i].technique() << " track.\n";
-
-            tracks.set(j, interp_track);
-            n_replace++;
-         }
-      }
-   }
-
-   mlog << Debug(2)
-        << "Finished adding " << n_add << " and replacing " << n_replace
-        << " Interp12 track(s).\n";
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int derive_consensus(TrackInfoArray &tracks) {
-   int i, j, k, l;
-   ConcatString cur_case;
-   StringArray case_list, case_cmp, req_list;
-   TrackInfoArray con_tracks;
-   TrackInfo new_track;
-   bool found, skip;
-   const char *sep = " ";
-   int n_add = 0;
-
-   // If no consensus models are defined, nothing to do
-   if(conf_info.NConsensus == 0) return(0);
-
-   // Loop through the tracks to build a list of cases
-   for(i=0; i<tracks.n_tracks(); i++) {
-
-      // Case defined as: Basin, Cyclone, InitTime
-      cur_case.erase();
-      cur_case << tracks[i].basin() << sep
-               << tracks[i].cyclone() << sep
-               << unix_to_yyyymmdd_hhmmss(tracks[i].init());
-
-      // Add this case
-      if(!case_list.has(cur_case)) case_list.add(cur_case);
-
-   } // end for i
-
-   mlog << Debug(3)
-        << "Building consensus track(s) for " << case_list.n_elements()
-        << " cases.\n";
-
-   // Loop through the cases and process each consensus model
-   for(i=0; i<case_list.n_elements(); i++) {
-
-      // Break the case back out into Basin, Cyclone, InitTime
-      cur_case = case_list[i];
-      case_cmp = cur_case.split(sep);
-
-      // Loop through the consensus models
-      for(j=0; j<conf_info.NConsensus; j++) {
-
-         // Initialize
-         con_tracks.clear();
-         new_track.clear();
-         req_list.clear();
-
-         // Loop through the consensus members
-         for(k=0, skip=false;
-             k<conf_info.Consensus[j].Members.n_elements(); k++) {
-
-            // Add required members to the list
-            if(conf_info.Consensus[j].Required[k]) {
-               req_list.add(conf_info.Consensus[j].Members[k]);
-            }
-
-            // Loop through the tracks looking for a match
-            for(l=0, found=false; l<tracks.n_tracks(); l++) {
-
-               // If the consenus member was found for this case,
-               // add it to the TrackInfoArray object
-               if(tracks[l].basin()     == case_cmp[0]                       &&
-                  tracks[l].cyclone()   == case_cmp[1]                       &&
-                  tracks[l].technique() == conf_info.Consensus[j].Members[k] &&
-                  tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2].c_str())) {
-                  con_tracks.add(tracks[l]);
-                  found = true;
-                  mlog << Debug(5)
-                       << "[Case " << i+1 << "] For case \""
-                       << case_list[i] << "\" member \""
-                       << conf_info.Consensus[j].Members[k]
-                       <<  "\" was found.\n";
-                  break;
-               }
-            } // end for l
-
-            // Check if the model was not found
-            if(!found) {
-               mlog << Debug(5)
-                    << "[Case " << i+1 << "] For case \""
-                    << case_list[i] << "\" member \""
-                    << conf_info.Consensus[j].Members[k]
-                    <<  "\" was not found.\n";
-
-               // Check if it was a required model
-               if(conf_info.Consensus[j].Required[k]) {
-                  mlog << Debug(4)
-                       << "[Case " << i+1 << "] For case \"" << case_list[i]
-                       << "\" skipping consensus model \""
-                       << conf_info.Consensus[j].Name
-                       << "\" since required member \""
-                       << conf_info.Consensus[j].Members[k]
-                       <<  "\" was not found.\n";
-                     skip = true;
-                     break;
-               }
-            }
-         } // end for k
-
-         // If a required member was missing, continue to the next case
-         if(skip) continue;
-
-         // Check that the required number of tracks were found
-         if(con_tracks.n_tracks() < conf_info.Consensus[j].MinReq) {
-            mlog << Debug(4)
-                 << "[Case " << i+1 << "] For case \"" << case_list[i]
-                 << "\" skipping consensus model \"" << conf_info.Consensus[j].Name
-                 << "\" since the minimum number of required members were not found ("
-                 << con_tracks.n_tracks() << " < "
-                 << conf_info.Consensus[j].MinReq << ").\n";
-            continue;
-         }
-
-         // Derive the consensus model from the TrackInfoArray
-         new_track = consensus(con_tracks, conf_info.Consensus[j].Name,
-                               conf_info.Consensus[j].MinReq, req_list);
-
-         if(mlog.verbosity_level() >= 5) {
-            mlog << Debug(5)
-                 << "Adding consensus track:\n"
-                 << new_track.serialize_r(1) << "\n";
-         }
-         else {
-            mlog << Debug(4)
-                 << "Adding consensus track:\n"
-                 << new_track.serialize() << "\n";
-         }
-
-         // Add the consensus model
-         tracks.add(new_track);
-         n_add++;
-
-      } // end for j
-
-   } // end for i
-
-   return(n_add);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int derive_lag(TrackInfoArray &tracks) {
-   int i, j, k, s, n_tracks;
-   TrackInfo new_track;
-   TrackPoint new_point;
-   ConcatString lag_model;
-   int n_add = 0;
-
-   // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n_elements() == 0) return(0);
-
-   // Store the input number of tracks to process
-   n_tracks = tracks.n_tracks();
-
-   // Loop through the time lags to be applied
-   for(i=0; i<conf_info.LagTime.n_elements(); i++) {
-
-      mlog << Debug(3)
-           << "Building time-lagged track(s) for lag time \""
-           << sec_to_hhmmss(nint(conf_info.LagTime[i])) << "\"\n";
-
-      // Store current lag time
-      s = nint(conf_info.LagTime[i]);
-
-      // Loop through the tracks
-      for(j=0; j<n_tracks; j++) {
-
-         // Make a copy of the current track
-         new_track = tracks[j];
-
-         // Adjust the TrackInfo model name
-         lag_model << cs_erase << new_track.technique()
-                   << "_LAG_" << sec_to_timestring(s);
-         new_track.set_technique(lag_model.c_str());
-
-         // Adjust the TrackInfo times
-         new_track.set_init(new_track.init() + s);
-         new_track.set_valid_min(new_track.valid_min() + s);
-         new_track.set_valid_max(new_track.valid_max() + s);
-
-         // Loop over the track points
-         for(k=0; k<new_track.n_points(); k++) {
-
-            // Make a copy of the current track point
-            new_point = new_track[k];
-
-            // Adjust the TrackPoint times
-            new_point.set_valid(new_point.valid() + s);
-
-            // Store the current time-lagged track point
-            new_track.set_point(k, new_point);
-
-         } // end for k
-
-         if(mlog.verbosity_level() >= 5) {
-            mlog << Debug(5)
-                 << "Adding time-lagged track:\n"
-                 << new_track.serialize_r(1) << "\n";
-         }
-         else {
-            mlog << Debug(4)
-                 << "Adding time-lagged track:\n"
-                 << new_track.serialize() << "\n";
-         }
-
-         // Store the current time-lagged track
-         tracks.add(new_track);
-         n_add++;
-
-      } // end for j
-
-   } // end for i
-
-   return(n_add);
-}
-
-////////////////////////////////////////////////////////////////////////
 
 void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
                    TrackPairInfoArray &p) {
+/*
    int i, i_adeck, i_bdeck, i_err;
    TimeArray valid_list, valid_err;
    NumArray tk_err, x_err, y_err, altk_err, crtk_err;
@@ -1355,97 +690,14 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
 
    // Add the current TrackPairInfo object
    p.add(pair);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double compute_dland(double lat, double lon) {
-   double x_dbl, y_dbl, dist;
-   int x, y;
-
-   // Check for empty grid
-   if(dland_grid.nx() == 0 || dland_grid.ny() == 0)
-      return(bad_data_double);
-
-   // Convert lat,lon to x,y
-   dland_grid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
-
-   // Round to nearest int
-   x = nint(x_dbl);
-   y = nint(y_dbl);
-
-   // Check range
-   if(x < 0 || x >= dland_grid.nx() ||
-      y < 0 || y >= dland_grid.ny())   dist = bad_data_double;
-   else                                dist = dland_dp.get(x, y);
-
-   return(dist);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void load_dland() {
-   ConcatString file_name;
-   LongArray dim;
-   int i;
-
-   // Get the path for the distance to land file
-   file_name = replace_path(conf_info.DLandFile);
-
-   mlog << Debug(1)
-        << "Distance to land file: " << file_name << "\n";
-
-   // Check for no file provided
-   if(file_name.empty()) return;
-   // Open the NetCDF output of the tc_dland tool
-   MetNcFile MetNc;
-   if(!MetNc.open(file_name.c_str())) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "problem reading file \"" << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Find the first non-lat/lon variable
-   for(i=0; i<MetNc.Nvars; i++) {
-      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_var_name) != 0 &&
-         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_var_name) != 0)
-         break;
-   }
-
-   // Check range
-   if(i == MetNc.Nvars) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't find non-lat/lon variable in file \""
-           << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the grid
-   dland_grid = MetNc.grid;
-
-   // Set the dimension to (*,*)
-   dim.add(vx_data2d_star);
-   dim.add(vx_data2d_star);
-
-   // Read the data
-   if(!MetNc.data(MetNc.Var[i].var, dim, dland_dp)) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't read data from file \""
-           << file_name << "\"\n\n";
-      exit(1);
-   }
-
+*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void process_watch_warn(TrackPairInfoArray &p) {
+/*
    ConcatString file_name;
    LineDataFile f_in;
    DataLine dl;
@@ -1505,13 +757,14 @@ void process_watch_warn(TrackPairInfoArray &p) {
 
    // Close the input file
    f_in.close();
-
+*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_tracks(const TrackPairInfoArray &p) {
+/*
    int i_row, i;
    TcHdrColumns tchc;
    ConcatString out_file;
@@ -1566,13 +819,14 @@ void write_tracks(const TrackPairInfoArray &p) {
       delete out;
       out = (ofstream *) 0;
    }
-
+*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
+/*
    int i_row, i, n, n_row, max_n;
    TcHdrColumns tchc;
    ConcatString out_file;
@@ -1644,7 +898,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       delete out;
       out = (ofstream *) 0;
    }
-
+*/
    return;
 }
 
@@ -1678,30 +932,18 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-adeck source and/or -edeck source\n"
-        << "\t-bdeck source\n"
+        << "\t-lookin path\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-adeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "model output \"" << atcf_suffix
-        << "\" data to process (required if no -edeck).\n"
-
-        << "\t\t\"-edeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "ensemble model output \"" << atcf_suffix
-        << "\" data to process (required if no -adeck).\n"
-
-        << "\t\t\"-bdeck source\" is used one or more times to "
-        << "specify a file or top-level directory containing ATCF "
-        << "best track \"" << atcf_suffix
-        << "\" data to process (required).\n"
+        << "\twhere\t\"-lookin path\" specifies an ATCF file or "
+        << "top-level directory containing ATCF files ending in \""
+        << atcf_suffix << "\" to process (required).\n"
 
         << "\t\t\"-config file\" is used once to specify the "
-        << "TCPairsConfig file containing the desired configuration "
+        << "TCGenConfig file containing the desired configuration "
         << "settings (required).\n"
 
         << "\t\t\"-out base\" overrides the default output file base "
@@ -1711,64 +953,49 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
-
-        << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
-        << "may include \"suffix=string\" to modify the model names "
-        << "from that source.\n\n";
+        << mlog.verbosity_level() << ") (optional).\n\n";
 
    exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adeck(const StringArray & a) {
-   set_atcf_source(a, adeck_source, adeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_edeck(const StringArray & a) {
-   set_atcf_source(a, edeck_source, edeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_bdeck(const StringArray & a) {
-   set_atcf_source(a, bdeck_source, bdeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_atcf_source(const StringArray & a,
-                     StringArray &source, StringArray &model_suffix) {
+void set_lookin(const StringArray & a) {
    int i;
    StringArray sa;
-   ConcatString cs, suffix;
+   ConcatString cs;
 
    // Check for optional suffix sub-argument
-   for(i=0; i<a.n_elements(); i++) {
-      if( a[i] == "suffix" ) {
+   for(int i=0; i<a.n(); i++) {
+      if(a[i] == "suffix") {
          cs = a[i];
          sa = cs.split("=");
          if(sa.n_elements() != 2) {
-            mlog << Error
-                 << "\nset_atcf_source() -> "
+            mlog << Error << "\nset_lookin() -> "
                  << "the model suffix must be specified as "
                  << "\"suffix=string\".\n\n";
-            usage();
          }
          else {
-            suffix = sa[1];
+            atcf_model_suffix.add(sa[1]);
          }
+      }
+      else {
+         atcf_source.add(a[i]);
       }
    }
 
-   // Parse the remaining sources
-   for(i=0; i<a.n_elements(); i++) {
-     if( a[i] == "suffix" ) continue;
-     source.add(a[i]);
-     model_suffix.add(suffix);
+   // Check for consistent usage
+   if(atcf_model_suffix.n() > 0 &&
+      atcf_model_suffix.n() != atcf_source.n()) {
+      mlog << Error << "\nset_lookin() -> "
+           << "the number of \"suffix=string\" options must match the "
+           << "number of -lookin options.\n\n";
+      exit(1);
+   }
+
+   // Add empty suffix strings
+   for(i=atcf_model_suffix.n(); i<atcf_source.n(); i++) {
+      atcf_model_suffix.add("");
    }
 
    return;
