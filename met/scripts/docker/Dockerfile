@@ -140,6 +140,8 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && cd /met/MET-${MET_GIT_NAME}/met \
  && git checkout ${MET_GIT_NAME} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/configure.log \
+ && echo "Running bootstrap" \
+ && ./bootstrap \
  && echo "Configuring MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && ./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python \
     MET_HDF=/met/external_libs/HDF4.2r3 \
