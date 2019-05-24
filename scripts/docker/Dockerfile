@@ -4,8 +4,9 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 #
 # This Dockerfile compiles MET from source during "docker build" step
 #
-ENV MET_GIT_NAME feature_1127_tcgen
-ENV MET_GIT_URL  https://github.com/NCAR/MET
+ENV MET_GIT_NAME    feature_1127_tcgen
+ENV MET_GIT_URL     https://github.com/NCAR/MET
+ENV MET_DEVELOPMENT true
 
 #
 # Compilers
@@ -49,9 +50,7 @@ WORKDIR /met
 #
 # Environment for interactive bash and csh container shells
 #
-RUN echo export MET_DEVELOPMENT=true >> /etc/bashrc \
- && echo setenv MET_DEVELOPMENT true >> /etc/csh.cshrc \
- && echo export MET_BASE=/usr/local/share/met >> /etc/bashrc \
+RUN echo export MET_BASE=/usr/local/share/met >> /etc/bashrc \
  && echo setenv MET_BASE /usr/local/share/met >> /etc/csh.cshrc \
  && echo export MET_FONT_DIR=/met/external_libs/fonts >> /etc/bashrc \
  && echo setenv MET_FONT_DIR /met/external_libs/fonts >> /etc/csh.cshrc \
