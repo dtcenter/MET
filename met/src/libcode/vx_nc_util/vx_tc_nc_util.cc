@@ -33,12 +33,31 @@ void write_nc_tracks(const ConcatString& track_nc_file,
     NcVar track_lon_var = nc_out->addVar(
         "track_lon", ncFloat, track_point_dim);
 
+    int offset = 0;
+
     for(int j = 0; j < tracks.n_tracks(); j++) {
 
         TrackInfo track = tracks[j];
 
+        mlog << Debug(2) << "Writing track " << j << "\n";
+
+        float* track_lat_data = new float[track.n_points()];
+        float* track_lon_data = new float[track.n_points()];
+
         for(int i = 0; i < track.n_points(); i++) {
+            track_lat_data[i] = track[i].lat();
+            track_lon_data[i] = track[i].lon();
         }
+
+        put_nc_data(&track_lat_var, track_lat_data,
+            track.n_points(), offset);
+        put_nc_data(&track_lon_var, track_lon_data,
+            track.n_points(), offset);
+
+        delete[] track_lat_data;
+        delete[] track_lon_data;
+
+        offset += track.n_points();
     }
 
     nc_out->close();
