@@ -437,10 +437,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
 
 static void setup_nc_file() {
 
-    out_nc_file.add(fcst_file);
-    out_nc_file.chomp(".nc");
-    out_nc_file.chomp(".nc4");
-    out_nc_file.add(".tc_rmw.nc");
+    out_nc_file.add("tc_rmw_grids.nc");
 
     mlog << Debug(1) << out_nc_file << "\n";
 
@@ -463,6 +460,14 @@ static void setup_nc_file() {
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
+
+    vector<NcDim> dims;
+    dims.push_back(range_dim);
+    dims.push_back(azimuth_dim);
+    dims.push_back(track_point_dim);
+
+    add_var(nc_out, "lat", ncFloat, dims);
+    add_var(nc_out, "lon", ncFloat, dims);
 
     nc_out->close();
 }
