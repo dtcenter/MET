@@ -417,9 +417,9 @@ static void setup_grid() {
 
 static void compute_grids(const TrackInfoArray& tracks) {
 
-    lat_grid = new float[
+    lat_grid = new double[
         grid.range_n() * grid.azimuth_n()];
-    lon_grid = new float[
+    lon_grid = new double[
         grid.range_n() * grid.azimuth_n()];
 
     for(int j = 0; j < tracks.n_tracks(); j++) {
@@ -434,6 +434,19 @@ static void compute_grids(const TrackInfoArray& tracks) {
             grid_data.lon_center = - point.lon(); // internal sign change
             grid.clear();
             grid.set_from_data(grid_data);
+
+            // compute lat and lon coordinate arrays
+            for(int ir = 0; ir < grid.range_n(); ir++) {
+                for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+                    double lat, lon;
+                    grid.range_azi_to_latlon(
+                        ir * grid.range_delta_km(),
+                        ia * grid.azimuth_delta_deg(),
+                        lat, lon);
+                    lat_grid[ir * grid.azimuth_n() + ia] = lat;
+                    lon_grid[ir * grid.azimuth_n() + ia] = lon;
+                }
+            }
         }
     }
 
