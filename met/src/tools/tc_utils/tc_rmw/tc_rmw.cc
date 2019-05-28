@@ -417,6 +417,11 @@ static void setup_grid() {
 
 static void compute_grids(const TrackInfoArray& tracks) {
 
+    lat_grid = new float[
+        grid.range_n() * grid.azimuth_n()];
+    lon_grid = new float[
+        grid.range_n() * grid.azimuth_n()];
+
     for(int j = 0; j < tracks.n_tracks(); j++) {
 
         TrackInfo track = tracks[j];
@@ -431,6 +436,9 @@ static void compute_grids(const TrackInfoArray& tracks) {
             grid.set_from_data(grid_data);
         }
     }
+
+    delete[] lat_grid;
+    delete[] lon_grid;
 }
 
 ////////////////////////////////////////////////////////////////////////

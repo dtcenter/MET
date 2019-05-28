@@ -113,6 +113,10 @@ static ConcatString wwarn_file;
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile* fcst_mtddf = (Met2dDataFile*) 0;
 
+// Grid coordinate arrays
+static float* lat_grid;
+static float* lon_grid;
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif  //  __TC_RMW_H__
