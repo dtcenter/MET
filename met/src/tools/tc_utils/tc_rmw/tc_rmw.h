@@ -93,6 +93,8 @@ static NcFile*      nc_out = (NcFile*) 0;
 static NcDim        range_dim;
 static NcDim        azimuth_dim;
 static NcDim        track_point_dim;
+static NcVar        lat_grid_var;
+static NcVar        lon_grid_var;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;

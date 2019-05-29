@@ -173,6 +173,8 @@ void process_decks() {
     process_adecks(adeck_tracks);
 
     compute_grids(adeck_tracks);
+
+    nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -444,9 +446,22 @@ static void compute_grids(const TrackInfoArray& tracks) {
                         ia * grid.azimuth_delta_deg(),
                         lat, lon);
                     lat_grid[ir * grid.azimuth_n() + ia] = lat;
-                    lon_grid[ir * grid.azimuth_n() + ia] = lon;
+                    lon_grid[ir * grid.azimuth_n() + ia] = - lon;
                 }
             }
+            // write coordinate arrays
+            // move this to nc_utils
+            vector<size_t> offsets, counts;
+            offsets.clear();
+            offsets.push_back(0);
+            offsets.push_back(0);
+            offsets.push_back(i);
+            counts.clear();
+            counts.push_back(grid.range_n());
+            counts.push_back(grid.azimuth_n());
+            counts.push_back(1);
+            lat_grid_var.putVar(offsets, counts, lat_grid);
+            lon_grid_var.putVar(offsets, counts, lon_grid);
         }
     }
 
@@ -487,10 +502,8 @@ static void setup_nc_file() {
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
 
-    add_var(nc_out, "lat", ncFloat, dims);
-    add_var(nc_out, "lon", ncFloat, dims);
-
-    nc_out->close();
+    lat_grid_var = add_var(nc_out, "lat", ncDouble, dims);
+    lon_grid_var = add_var(nc_out, "lon", ncDouble, dims);
 }
 
 ////////////////////////////////////////////////////////////////////////
