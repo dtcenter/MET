@@ -142,6 +142,8 @@ TimeIndex = -1;
 
 IsFcst = true;
 
+Is_Cluster = false;
+
 ValidTime = (unixtime) 0;
 
 Lead_Time = 0;
@@ -183,6 +185,8 @@ CentroidLat = a.CentroidLat;
 CentroidLon = a.CentroidLon;
 
 IsFcst = a.IsFcst;
+
+Is_Cluster = a.Is_Cluster;
 
 ValidTime = a.ValidTime;
 
@@ -298,6 +302,34 @@ void SingleAtt2D::set_obs(bool tf)
 {
 
 IsFcst = !tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_is_cluster(bool tf)
+
+{
+
+Is_Cluster = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_is_simple(bool tf)
+
+{
+
+Is_Cluster = !tf;
 
 return;
 
@@ -452,7 +484,10 @@ ConcatString s;
 
 s.erase();
 
-k = max<int>(ObjectNumber, 0);
+if ( is_cluster() )  k = max<int>(ClusterNumber, 0);
+else                 k = max<int>(ObjectNumber,  0);
+
+if ( is_cluster() )  s << 'C';
 
 if ( IsFcst )  s << 'F';
 else           s << 'O';

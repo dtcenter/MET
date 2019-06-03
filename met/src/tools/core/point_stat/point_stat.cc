@@ -1005,7 +1005,7 @@ void process_scores() {
                     << ", for interpolation method "
                     << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_obs << " pairs.\n";
+                    << "), using " << pd_ptr->n_obs << " matched pairs.\n";
 
                // Dump out detailed information about why observations were rejected
                mlog << Debug(3)
@@ -1796,7 +1796,7 @@ void do_hira_ens(int i_vx, PairDataPoint *pd_ptr) {
            << ", over region " << pd_ptr->mask_name
            << ", for interpolation method HiRA Ensemble NBRHD("
            << shc.get_interp_pnts_str()
-           << "), using " << hira_pd.n_obs << " pairs.\n";
+           << "), using " << hira_pd.n_obs << " matched pairs.\n";
 
       // Check for zero matched pairs
       if(hira_pd.o_na.n_elements() == 0) {
@@ -1917,7 +1917,7 @@ void do_hira_prob(int i_vx, PairDataPoint *pd_ptr) {
               << ", over region " << pd_ptr->mask_name
               << ", for interpolation method HiRA Probability NBRHD("
               << shc.get_interp_pnts_str()
-              << "), using " << hira_pd.n_obs << " pairs.\n";
+              << "), using " << hira_pd.n_obs << " matched pairs.\n";
 
          // Check for zero matched pairs
          if(hira_pd.f_na.n_elements() == 0 ||
