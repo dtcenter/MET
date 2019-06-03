@@ -95,6 +95,7 @@ static NcDim        azimuth_dim;
 static NcDim        track_point_dim;
 static NcVar        lat_grid_var;
 static NcVar        lon_grid_var;
+static NcVar        valid_time_var;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;

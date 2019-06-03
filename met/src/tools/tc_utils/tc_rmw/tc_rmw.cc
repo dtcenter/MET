@@ -430,6 +430,14 @@ static void compute_grids(const TrackInfoArray& tracks) {
 
         for(int i = 0; i < track.n_points(); i++) {
             TrackPoint point = track[i];
+            unixtime valid_time = point.valid();
+            int year, month, day, hour, minute, second;
+            unix_to_mdyhms(
+                valid_time,
+                month, day, year,
+                hour, minute, second);
+            long valid_yyyymmddhh = 1000000 * year
+                + 10000 * month + 100 * day + hour;
             mlog << Debug(4)
                  << "(" << point.lat() << ", " << point.lon() << ")\n";
             grid_data.lat_center = point.lat();
@@ -452,16 +460,24 @@ static void compute_grids(const TrackInfoArray& tracks) {
             // write coordinate arrays
             // move this to nc_utils
             vector<size_t> offsets, counts;
+            vector<size_t> record_offsets, record_counts;
             offsets.clear();
+            record_offsets.clear();
             offsets.push_back(0);
             offsets.push_back(0);
             offsets.push_back(i);
+            record_offsets.push_back(i);
             counts.clear();
+            record_counts.clear();
             counts.push_back(grid.range_n());
             counts.push_back(grid.azimuth_n());
             counts.push_back(1);
+            record_counts.push_back(1);
             lat_grid_var.putVar(offsets, counts, lat_grid);
             lon_grid_var.putVar(offsets, counts, lon_grid);
+            valid_time_var.putVar(
+                record_offsets, record_counts,
+                &valid_yyyymmddhh);
         }
     }
 
@@ -504,6 +520,8 @@ static void setup_nc_file() {
 
     lat_grid_var = add_var(nc_out, "lat", ncDouble, dims);
     lon_grid_var = add_var(nc_out, "lon", ncDouble, dims);
+    valid_time_var = add_var(
+        nc_out, "valid_time", ncUint64, track_point_dim);
 }
 
 ////////////////////////////////////////////////////////////////////////
