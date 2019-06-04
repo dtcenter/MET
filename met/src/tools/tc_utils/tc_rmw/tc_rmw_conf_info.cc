@@ -95,7 +95,7 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 void TCRMWConfInfo::process_config() {
     int i, j;
     StringArray sa;
-    Dictionary *dict = (Dictionary *) 0;
+    Dictionary *fdict = (Dictionary *) 0;
 
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);
@@ -165,6 +165,14 @@ void TCRMWConfInfo::process_config() {
 
     // Conf: Track
     // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));
+
+    // Conf: fcst.field
+    fdict = Conf.lookup_array(conf_key_fcst_field);
+
+    // Determine number of field (name/level)
+    int n_fvx = parse_conf_n_vx(fdict);
+
+    mlog << Debug(2) << "n_fvx:" << n_fvx << "\n";
 
     return;
 }
