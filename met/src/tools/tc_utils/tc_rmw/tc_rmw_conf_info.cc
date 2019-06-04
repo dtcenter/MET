@@ -174,6 +174,10 @@ void TCRMWConfInfo::process_config() {
 
     mlog << Debug(2) << "n_fvx:" << n_fvx << "\n";
 
+    for (int i = 0; i < n_fvx; i++) {
+        Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
+    }
+
     return;
 }
 
