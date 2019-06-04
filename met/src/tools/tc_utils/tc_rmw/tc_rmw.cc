@@ -533,3 +533,21 @@ static void write_nc(const ConcatString& field_name,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool read_data_plane(VarInfo* info, DataPlane& dp,
+    Met2dDataFile* mtddf, const ConcatString& filename) {
+
+    bool status = mtddf->data_plane(*info, dp);
+
+    if (!status) {
+        mlog << Warning << "\nread_data_plane() -> "
+             << info->magic_str()
+             << "not found in file: " << filename
+             << "\n\n";
+        return false;
+    }
+
+    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
