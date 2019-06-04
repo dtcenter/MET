@@ -25,6 +25,7 @@ using namespace std;
 
 #include "vx_grid.h"
 #include "tcrmw_grid.h"
+#include "vx_regrid.h"
 
 #include "vx_tc_util.h"
 #include "vx_nc_util.h"
@@ -424,61 +425,59 @@ static void compute_grids(const TrackInfoArray& tracks) {
     lon_grid = new double[
         grid.range_n() * grid.azimuth_n()];
 
-    for(int j = 0; j < tracks.n_tracks(); j++) {
+    // assume single track for now
+    TrackInfo track = tracks[0];
 
-        TrackInfo track = tracks[j];
+    for(int i = 0; i < track.n_points(); i++) {
+        TrackPoint point = track[i];
+        unixtime valid_time = point.valid();
+        int year, month, day, hour, minute, second;
+        unix_to_mdyhms(
+            valid_time,
+            month, day, year,
+            hour, minute, second);
+        long valid_yyyymmddhh = 1000000 * year
+            + 10000 * month + 100 * day + hour;
+        mlog << Debug(4)
+             << "(" << point.lat() << ", " << point.lon() << ")\n";
+        grid_data.lat_center = point.lat();
+        grid_data.lon_center = - point.lon(); // internal sign change
+        grid.clear();
+        grid.set_from_data(grid_data);
 
-        for(int i = 0; i < track.n_points(); i++) {
-            TrackPoint point = track[i];
-            unixtime valid_time = point.valid();
-            int year, month, day, hour, minute, second;
-            unix_to_mdyhms(
-                valid_time,
-                month, day, year,
-                hour, minute, second);
-            long valid_yyyymmddhh = 1000000 * year
-                + 10000 * month + 100 * day + hour;
-            mlog << Debug(4)
-                 << "(" << point.lat() << ", " << point.lon() << ")\n";
-            grid_data.lat_center = point.lat();
-            grid_data.lon_center = - point.lon(); // internal sign change
-            grid.clear();
-            grid.set_from_data(grid_data);
-
-            // compute lat and lon coordinate arrays
-            for(int ir = 0; ir < grid.range_n(); ir++) {
-                for(int ia = 0; ia < grid.azimuth_n(); ia++) {
-                    double lat, lon;
-                    grid.range_azi_to_latlon(
-                        ir * grid.range_delta_km(),
-                        ia * grid.azimuth_delta_deg(),
-                        lat, lon);
-                    lat_grid[ir * grid.azimuth_n() + ia] = lat;
-                    lon_grid[ir * grid.azimuth_n() + ia] = - lon;
-                }
+        // compute lat and lon coordinate arrays
+        for(int ir = 0; ir < grid.range_n(); ir++) {
+            for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+                double lat, lon;
+                grid.range_azi_to_latlon(
+                    ir * grid.range_delta_km(),
+                    ia * grid.azimuth_delta_deg(),
+                    lat, lon);
+                lat_grid[ir * grid.azimuth_n() + ia] = lat;
+                lon_grid[ir * grid.azimuth_n() + ia] = - lon;
             }
-            // write coordinate arrays
-            // move this to nc_utils
-            vector<size_t> offsets, counts;
-            vector<size_t> record_offsets, record_counts;
-            offsets.clear();
-            record_offsets.clear();
-            offsets.push_back(0);
-            offsets.push_back(0);
-            offsets.push_back(i);
-            record_offsets.push_back(i);
-            counts.clear();
-            record_counts.clear();
-            counts.push_back(grid.range_n());
-            counts.push_back(grid.azimuth_n());
-            counts.push_back(1);
-            record_counts.push_back(1);
-            lat_grid_var.putVar(offsets, counts, lat_grid);
-            lon_grid_var.putVar(offsets, counts, lon_grid);
-            valid_time_var.putVar(
-                record_offsets, record_counts,
-                &valid_yyyymmddhh);
         }
+        // write coordinate arrays
+        // move this to nc_utils
+        vector<size_t> offsets, counts;
+        vector<size_t> record_offsets, record_counts;
+        offsets.clear();
+        record_offsets.clear();
+        offsets.push_back(0);
+        offsets.push_back(0);
+        offsets.push_back(i);
+        record_offsets.push_back(i);
+        counts.clear();
+        record_counts.clear();
+        counts.push_back(grid.range_n());
+        counts.push_back(grid.azimuth_n());
+        counts.push_back(1);
+        record_counts.push_back(1);
+        lat_grid_var.putVar(offsets, counts, lat_grid);
+        lon_grid_var.putVar(offsets, counts, lon_grid);
+        valid_time_var.putVar(
+            record_offsets, record_counts,
+            &valid_yyyymmddhh);
     }
 
     delete[] lat_grid;
