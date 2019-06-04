@@ -44,25 +44,25 @@ static void process_adecks(TrackInfoArray&);
 static void process_bdecks(TrackInfoArray&);
 static void process_edecks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
-                           const StringArray&,
-                           StringArray&, StringArray&);
+    const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
-                                const StringArray&,
-                                TrackInfoArray&, bool, bool);
+    const StringArray&, TrackInfoArray&, bool, bool);
 static void set_adeck(const StringArray&);
 static void set_bdeck(const StringArray&);
 static void set_edeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
-                            StringArray&, StringArray&);
+    StringArray&, StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
-
 static void setup_grid();
 static void setup_nc_file();
 static void compute_grids(const TrackInfoArray&);
-static void write_nc(const ConcatString&, const DataPlane&, FieldType);
+static void write_nc(const ConcatString&,
+    const DataPlane&, FieldType);
+static bool read_data_plane(VarInfo*, DataPlane&, Met2dDataFile*,
+    const ConcatString&);
 
 ////////////////////////////////////////////////////////////////////////
 
