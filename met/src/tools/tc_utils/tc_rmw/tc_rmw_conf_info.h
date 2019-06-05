@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "vx_config.h"
+#include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_util.h"
 
@@ -84,7 +85,7 @@ class TCRMWConfInfo {
         void clear();
 
         void read_config(const char *, const char *);
-        void process_config();
+        void process_config(GrdFileType);
 
         int get_n_fcst() const;
 };

@@ -137,7 +137,7 @@ void process_command_line(int argc, char **argv) {
     cline.parse();
 
     // Check number of arguments
-    if (cline.n() != 1) usage();
+    if(cline.n() != 1) usage();
 
     fcst_file = cline[0];
 
@@ -158,6 +158,9 @@ void process_command_line(int argc, char **argv) {
     GrdFileType ftype
         = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
         conf_key_fcst));
+
+    // Process the configuration
+    conf_info.process_config(ftype);
 
     // Read forecast file
     if(!(fcst_mtddf
@@ -260,7 +263,7 @@ void get_atcf_files(const StringArray& source,
         cur_source.add(source[i]);
         cur_files = get_filenames(cur_source, NULL, atcf_suffix);
 
-        for (int j = 0; j < cur_files.n_elements(); j++) {
+        for(int j = 0; j < cur_files.n_elements(); j++) {
             files.add(cur_files[j]);
             files_model_suffix.add(model_suffix[i]);
         }
@@ -362,7 +365,7 @@ void set_atcf_source(const StringArray& a,
 
     // Check for optional suffix sub-argument
     for(int i = 0; i < a.n_elements(); i++) {
-        if( a[i] == "suffix" ) {
+        if(a[i] == "suffix") {
             cs = a[i];
             sa = cs.split("=");
             if(sa.n_elements() != 2) {
@@ -529,7 +532,7 @@ static void setup_nc_file() {
     // Create NetCDF file
     nc_out = open_ncfile(out_nc_file.c_str(), true);
 
-    if (IS_INVALID_NC_P(nc_out)) {
+    if(IS_INVALID_NC_P(nc_out)) {
         mlog << Error << "\nsetup_nc_file() -> "
              << "trouble opening output NetCDF file "
              << out_nc_file << "\n\n";
@@ -573,7 +576,7 @@ bool read_data_plane(VarInfo* info, DataPlane& dp,
 
     bool status = mtddf->data_plane(*info, dp);
 
-    if (!status) {
+    if(!status) {
         mlog << Warning << "\nread_data_plane() -> "
              << info->magic_str()
              << "not found in file: " << filename

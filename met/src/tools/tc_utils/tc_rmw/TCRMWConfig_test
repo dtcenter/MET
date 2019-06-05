@@ -18,6 +18,7 @@ model = [];
 // Forecast fields
 //
 fcst = {
+    file_type = NETCDF_NCCF;
     field = [
         {
           name = "T";

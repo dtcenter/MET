@@ -73,8 +73,16 @@ void TCRMWConfInfo::clear() {
     // Clear fcst_info
     if (fcst_info) {
         for (int i = 0; i < n_fcst; i++) {
+            if (fcst_info[i]) {
+                fcst_info[i] = (VarInfo*) 0;
+            }
         }
+        delete fcst_info;
+        fcst_info = (VarInfo**) 0;
     }
+
+    // Reset field count
+    n_fcst = 0;
 
     return;
 }
@@ -93,17 +101,15 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
     // Read user-specified config file
     Conf.read(user_file_name);
 
-    // Process configuration file
-    process_config();
-
     return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::process_config() {
+void TCRMWConfInfo::process_config(GrdFileType ftype) {
     int i, j;
     StringArray sa;
+    VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;
 
     // Conf: Version
@@ -178,12 +184,34 @@ void TCRMWConfInfo::process_config() {
     // Conf: fcst.field
     fdict = Conf.lookup_array(conf_key_fcst_field);
 
-    // Determine number of field (name/level)
-    int n_fvx = parse_conf_n_vx(fdict);
+    // Determine number of fields (name/level)
+    int n_fcst = parse_conf_n_vx(fdict);
 
-    mlog << Debug(2) << "n_fvx:" << n_fvx << "\n";
+    mlog << Debug(2) << "n_fcst:" << n_fcst << "\n";
 
-    for (int i = 0; i < n_fvx; i++) {
+    // Check for empty fcst settings
+    if (n_fcst == 0) {
+        mlog << Error << "\nTCRMWConfInfo::process_config() -> "
+             << "fcst may not be empty.\n\n";
+        exit(1);
+    }
+
+    // Allocate space based on number of fields
+    fcst_info = new VarInfo*[n_fcst];
+
+    // Initialize pointers
+    for (int i = 0; i < n_fcst; i++) {
+        fcst_info[i] = (VarInfo*) 0;
+    }
+
+    // Parse fcst field information
+    for (int i = 0; i < n_fcst; i++) {
+
+        // Allocate new VarInfo objects
+        fcst_info[i] = info_factory.new_var_info(ftype);
+    }
+
+    for (int i = 0; i < n_fcst; i++) {
         Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
     }
 
