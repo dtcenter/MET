@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "vx_config.h"
+#include "vx_data2d.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,9 @@ class TCRMWConfInfo {
     private:
 
         void init_from_scratch();
+
+        // Number of forecast fields
+        int n_fcst;
 
     public:
 
@@ -68,6 +72,9 @@ class TCRMWConfInfo {
         double max_range;
         double delta_range;
 
+        // Variable information
+        VarInfo** fcst_info;
+
         // Config file version
         ConcatString Version;
 
@@ -78,7 +85,15 @@ class TCRMWConfInfo {
 
         void read_config(const char *, const char *);
         void process_config();
+
+        int get_n_fcst() const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int TCRMWConfInfo::get_n_fcst() const {
+    return n_fcst;
+}
 
 ////////////////////////////////////////////////////////////////////////
 

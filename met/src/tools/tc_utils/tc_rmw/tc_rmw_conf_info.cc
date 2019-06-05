@@ -44,6 +44,9 @@ TCRMWConfInfo::~TCRMWConfInfo() {
 
 void TCRMWConfInfo::init_from_scratch() {
 
+    // Initialize pointers
+    fcst_info = (VarInfo**) 0;
+
     clear();
 
     return;
@@ -66,6 +69,12 @@ void TCRMWConfInfo::clear() {
     Track = TrackType_None;
     CheckDup = true;
     Version.clear();
+
+    // Clear fcst_info
+    if (fcst_info) {
+        for (int i = 0; i < n_fcst; i++) {
+        }
+    }
 
     return;
 }

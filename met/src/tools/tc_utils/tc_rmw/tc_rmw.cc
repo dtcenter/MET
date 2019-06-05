@@ -431,6 +431,7 @@ static void get_series_entry(int i_series,
 static bool read_single_entry(VarInfo*, const ConcatString&,
     const GrdFileType, DataPlane&, Grid&) {
 
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -449,6 +450,7 @@ static void setup_grid() {
 
 static void compute_grids(const TrackInfoArray& tracks) {
 
+    // these should be DataPlanes
     lat_grid = new double[
         grid.range_n() * grid.azimuth_n()];
     lon_grid = new double[
@@ -474,7 +476,10 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.clear();
         grid.set_from_data(grid_data);
 
+        // Get VarInfo
+
         // compute lat and lon coordinate arrays
+        // move this to TcrmwGrid class
         for(int ir = 0; ir < grid.range_n(); ir++) {
             for(int ia = 0; ia < grid.azimuth_n(); ia++) {
                 double lat, lon;
