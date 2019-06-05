@@ -895,7 +895,7 @@ static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
 
 //
-// TC-Pairs and TC-Stat specific parameter key names
+// MET-TC specific parameter key names
 //
 
 static const char conf_key_storm_id[]                 = "storm_id";
@@ -957,6 +957,7 @@ static const char conf_key_landfall_end[]             = "landfall_end";
 static const char conf_key_event_equal[]              = "event_equal";
 static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
+static const char conf_key_filter[]                   = "filter";
 
 //
 // Parameter value names common to multiple tools

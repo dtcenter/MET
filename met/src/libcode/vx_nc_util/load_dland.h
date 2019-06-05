@@ -6,34 +6,24 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
 
+#ifndef  __LOAD_DLAND_H__
+#define  __LOAD_DLAND_H__
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 
-#ifndef  __VX_NC_UTIL_H__
-#define  __VX_NC_UTIL_H__
+#include "vx_log.h"
+#include "vx_grid.h"
+#include "vx_data2d.h"
+////////////////////////////////////////////////////////////////////////
 
+extern void load_dland(const ConcatString &, Grid &, DataPlane &);
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#include "grid_output.h"
-#include "nc_constants.h"
-#include "nc_utils.h"
-#include "nc_var_info.h"
-#include "write_netcdf.h"
-#include "load_dland.h"
-
+#endif   /*  __LOAD_DLAND_H__  */
 
 ////////////////////////////////////////////////////////////////////////
-
-
-#endif   //  __VX_NC_UTIL_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-

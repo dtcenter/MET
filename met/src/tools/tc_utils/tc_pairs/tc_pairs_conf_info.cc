@@ -67,6 +67,8 @@ void TCPairsConfInfo::clear() {
    Cyclone.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitMaskName.clear();

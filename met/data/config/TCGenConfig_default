@@ -61,10 +61,18 @@ cyclone = [];
 storm_name = [];
 
 //
-// Track timing information
+// Model initialization time windows to include or exclude
 //
-time_beg = "";
-time_end = "";
+init_beg = "";
+init_end = "";
+init_inc = [];
+init_exc = [];
+
+//
+// Valid model time window
+//
+valid_beg = "";
+valid_end = "";
 
 //
 // Spatial masking region

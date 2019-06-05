@@ -20,6 +20,7 @@ using namespace std;
 
 #include "tc_gen_conf_info.h"
 
+#include "vx_nc_util.h"
 #include "apply_mask.h"
 #include "vx_log.h"
 
@@ -61,6 +62,10 @@ void TCGenVxOpt::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+   InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
+   InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    VxMaskName.clear();
    VxPolyMask.clear();
@@ -76,6 +81,7 @@ void TCGenVxOpt::clear() {
 void TCGenVxOpt::process_config(Dictionary &dict) {
    int i, j;
    ConcatString file_name;
+   StringArray sa;
 
    // Conf: Desc
    Desc = parse_conf_string(&dict, conf_key_desc);
@@ -95,6 +101,26 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
    // Conf: StormName
    StormName = dict.lookup_string_array(conf_key_storm_name);
+
+   // Conf: InitBeg, InitEnd
+   InitBeg = dict.lookup_unixtime(conf_key_init_beg);
+   InitEnd = dict.lookup_unixtime(conf_key_init_end);
+
+   // Conf: InitInc
+   sa = dict.lookup_string_array(conf_key_init_inc);
+   for(i=0; i<sa.n_elements(); i++)
+      InitInc.add(timestring_to_unix(sa[i].c_str()));
+
+   // Conf: InitExc
+   sa = dict.lookup_string_array(conf_key_init_exc);
+   for(i=0; i<sa.n_elements(); i++)
+      InitExc.add(timestring_to_unix(sa[i].c_str()));
+
+   // Conf: InitHour
+   sa = dict.lookup_string_array(conf_key_init_hour);
+   for(i=0; i<sa.n_elements(); i++) {
+      InitHour.add(timestring_to_sec(sa[i].c_str()));
+   }
 
    // Conf: ValidBeg, ValidEnd
    ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
@@ -144,6 +170,7 @@ void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
    BestTechnique.clear();
+   DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
    Version.clear();
@@ -174,31 +201,37 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenConfInfo::process_config() {
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *filter_dict = (Dictionary *) 0;
+   TCGenVxOpt vx_opt;
+   int i;
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
    BestTechnique.set_ignore_case(true);
+
+   // Conf: DLandFile
+   DLandFile = Conf.lookup_string(conf_key_dland_file);
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version.c_str());
 
    // Conf: Filter
+   filter_dict = Conf.lookup_array(conf_key_filter, false);
 
-
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCGenConfInfo::load_dland() {
-
-   // JHG, read DLand file and store in DLandGrid and DLandData
-
-   // Conf: DLandFile
-   //DLandFile = Conf.lookup_string(conf_key_dland_file);
+   // If no filters are specified, use the top-level settings
+   if(filter_dict->n_entries() == 0) {
+      vx_opt.process_config(Conf);
+      VxOpt.push_back(vx_opt);
+   }
+   // Loop through the array entries
+   else {
+      for(i=0; i<filter_dict->n_entries(); i++) {
+         vx_opt.clear();
+         vx_opt.process_config(*((*filter_dict)[i]->dict_value()));
+         VxOpt.push_back(vx_opt);
+      }
+   }
 
    return;
 }
@@ -206,95 +239,27 @@ void TCGenConfInfo::load_dland() {
 ////////////////////////////////////////////////////////////////////////
 
 double TCGenConfInfo::compute_dland(double lat, double lon) {
-
-//   if(DLandGrid.nxy() == 0) load_dland();
-
-   // JHG compute the distance to land and return it
-/*
-void load_dland() {
-   ConcatString file_name;
-   LongArray dim;
-   int i;
-
-   // Get the path for the distance to land file
-   file_name = replace_path(conf_info.DLandFile);
-
-   mlog << Debug(1)
-        << "Distance to land file: " << file_name << "\n";
-
-   // Check for no file provided
-   if(file_name.empty()) return;
-   // Open the NetCDF output of the tc_dland tool
-   MetNcFile MetNc;
-   if(!MetNc.open(file_name.c_str())) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "problem reading file \"" << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Find the first non-lat/lon variable
-   for(i=0; i<MetNc.Nvars; i++) {
-      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_var_name) != 0 &&
-         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_var_name) != 0)
-         break;
-   }
-
-   // Check range
-   if(i == MetNc.Nvars) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't find non-lat/lon variable in file \""
-           << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the grid
-   dland_grid = MetNc.grid;
-
-   // Set the dimension to (*,*)
-   dim.add(vx_data2d_star);
-   dim.add(vx_data2d_star);
-
-   // Read the data
-   if(!MetNc.data(MetNc.Var[i].var, dim, dland_dp)) {
-      mlog << Error
-           << "\nload_dland() -> "
-           << "can't read data from file \""
-           << file_name << "\"\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double compute_dland(double lat, double lon) {
    double x_dbl, y_dbl, dist;
    int x, y;
 
-   // Check for empty grid
-   if(dland_grid.nx() == 0 || dland_grid.ny() == 0)
-      return(bad_data_double);
+   // Load the distance to land data, if needed.
+   if(DLandData.is_empty()) {
+      load_dland(DLandFile, DLandGrid, DLandData);
+   }
 
    // Convert lat,lon to x,y
-   dland_grid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
+   DLandGrid.latlon_to_xy(lat, lon, x_dbl, y_dbl);
 
    // Round to nearest int
    x = nint(x_dbl);
    y = nint(y_dbl);
 
    // Check range
-   if(x < 0 || x >= dland_grid.nx() ||
-      y < 0 || y >= dland_grid.ny())   dist = bad_data_double;
-   else                                dist = dland_dp.get(x, y);
+   if(x < 0 || x >= DLandGrid.nx() ||
+      y < 0 || y >= DLandGrid.ny())   dist = bad_data_double;
+   else                               dist = DLandData.get(x, y);
 
    return(dist);
-}*/
-
-
-   return(0.0);
 }
 
 ////////////////////////////////////////////////////////////////////////

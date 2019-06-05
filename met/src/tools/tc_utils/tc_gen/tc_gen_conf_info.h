@@ -50,9 +50,11 @@ class TCGenVxOpt {
       StringArray StormName; // List of storm names
 
       // Timing information
-      unixtime ValidBeg, ValidEnd;
-
-      // JHG, should we also include init_hour?  Wait to hear from Kathryn.
+      unixtime  InitBeg, InitEnd;
+      TimeArray InitInc;
+      TimeArray InitExc;
+      NumArray  InitHour;
+      unixtime  ValidBeg, ValidEnd;
 
       // Polyline masking region
       ConcatString VxMaskName;
@@ -77,7 +79,6 @@ class TCGenConfInfo {
    private:
 
       void init_from_scratch();
-      void load_dland();
 
    public:
 
@@ -96,8 +97,9 @@ class TCGenConfInfo {
       StringArray BestTechnique;
 
       // Gridded data file containing distances to land
-      Grid      DLandGrid;
-      DataPlane DLandData;
+      ConcatString DLandFile;
+      Grid         DLandGrid;
+      DataPlane    DLandData;
 
       // Config file version
       ConcatString Version;

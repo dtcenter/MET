@@ -124,8 +124,8 @@ void process_command_line(int argc, char **argv) {
       config_file.length()     == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
-           << "missing \"-lookin\" or \"-config\" command line "
-           << "option\n\n";
+           << "the \"-lookin\" and \"-config\" command line options are "
+           << "required\n\n";
       usage();
    }
 
