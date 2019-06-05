@@ -71,9 +71,9 @@ void TCRMWConfInfo::clear() {
     Version.clear();
 
     // Clear fcst_info
-    if (fcst_info) {
-        for (int i = 0; i < n_fcst; i++) {
-            if (fcst_info[i]) {
+    if(fcst_info) {
+        for(int i = 0; i < n_fcst; i++) {
+            if(fcst_info[i]) {
                 fcst_info[i] = (VarInfo*) 0;
             }
         }
@@ -190,7 +190,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     mlog << Debug(2) << "n_fcst:" << n_fcst << "\n";
 
     // Check for empty fcst settings
-    if (n_fcst == 0) {
+    if(n_fcst == 0) {
         mlog << Error << "\nTCRMWConfInfo::process_config() -> "
              << "fcst may not be empty.\n\n";
         exit(1);
@@ -200,19 +200,28 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     fcst_info = new VarInfo*[n_fcst];
 
     // Initialize pointers
-    for (int i = 0; i < n_fcst; i++) {
+    for(int i = 0; i < n_fcst; i++) {
         fcst_info[i] = (VarInfo*) 0;
     }
 
     // Parse fcst field information
-    for (int i = 0; i < n_fcst; i++) {
+    for(int i = 0; i < n_fcst; i++) {
 
         // Allocate new VarInfo objects
         fcst_info[i] = info_factory.new_var_info(ftype);
-    }
 
-    for (int i = 0; i < n_fcst; i++) {
+        // Get current dictionary
         Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
+
+        // Set current dictionary
+        fcst_info[i]->set_dict(i_fdict);
+
+        // Dump contents of current VarInfo
+        if(mlog.verbosity_level() >=2) {
+            mlog << Debug(2) << "Parsed forecast field "
+            << i + 1 << ":\n";
+            fcst_info[i]->dump(cout);
+        }
     }
 
     return;
