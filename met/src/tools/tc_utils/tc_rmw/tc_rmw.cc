@@ -453,6 +453,9 @@ static void setup_grid() {
 
 static void compute_grids(const TrackInfoArray& tracks) {
 
+    VarInfo *fcst_info = (VarInfo *) 0;
+    DataPlane fcst_dp;
+
     // these should be DataPlanes
     lat_grid = new double[
         grid.range_n() * grid.azimuth_n()];
@@ -462,8 +465,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
     // assume single track for now
     TrackInfo track = tracks[0];
 
-    for(int i = 0; i < track.n_points(); i++) {
-        TrackPoint point = track[i];
+    for(int i_point = 0; i_point < track.n_points(); i_point++) {
+        TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
         int year, month, day, hour, minute, second;
         unix_to_mdyhms(
@@ -479,7 +482,12 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.clear();
         grid.set_from_data(grid_data);
 
-        // Get VarInfo
+        for(int i_var = 0; i_var < conf_info.get_n_fcst(); i_var++) {
+            // Get VarInfo
+            fcst_info = conf_info.fcst_info[i_var];
+            // Get data
+            get_series_data(i_point, fcst_info, fcst_dp);
+        }
 
         // compute lat and lon coordinate arrays
         // move this to TcrmwGrid class
@@ -502,8 +510,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
         record_offsets.clear();
         offsets.push_back(0);
         offsets.push_back(0);
-        offsets.push_back(i);
-        record_offsets.push_back(i);
+        offsets.push_back(i_point);
+        record_offsets.push_back(i_point);
         counts.clear();
         record_counts.clear();
         counts.push_back(grid.range_n());

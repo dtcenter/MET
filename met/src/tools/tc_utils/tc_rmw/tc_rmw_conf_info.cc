@@ -216,6 +216,8 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
         // Set current dictionary
         fcst_info[i]->set_dict(i_fdict);
 
+        mlog << Debug(2) << fcst_info[i]->magic_str() << "\n";
+
         // Dump contents of current VarInfo
         if(mlog.verbosity_level() >=2) {
             mlog << Debug(2) << "Parsed forecast field "
