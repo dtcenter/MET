@@ -102,8 +102,13 @@ void usage() {
     cout << "\n*** Model Evaluation Tools (MET" << met_version
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
-         << "\tfcst_file\n"
+         << "\t-fcst file_1 ... file_n | fcst_file_list\n"
+         << "\t-adeck file\n"
+         << "\t-config file\n"
+         << "\t[-bdeck file]\n"
+         << "\t[-ddeck file]\n"
          << "\t[-log file]\n"
+         << "\t[-out file]\n"
          << "\t[-v level]\n\n" << flush;
 
     exit(1);
@@ -128,21 +133,22 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     // Add function calls for arguments
-    cline.add(set_adeck,     "-adeck", -1);
-    cline.add(set_bdeck,     "-bdeck", -1);
-    cline.add(set_edeck,     "-edeck", -1);
-    cline.add(set_config,    "-config", 1);
-    cline.add(set_out,       "-out",    1);
-    cline.add(set_logfile,   "-log",    1);
-    cline.add(set_verbosity, "-v",      1);
+    cline.add(set_fcst_files, "-fcst",  -1);
+    cline.add(set_adeck,      "-adeck", -1);
+    cline.add(set_bdeck,      "-bdeck", -1);
+    cline.add(set_edeck,      "-edeck", -1);
+    cline.add(set_config,     "-config", 1);
+    cline.add(set_out,        "-out",    1);
+    cline.add(set_logfile,    "-log",    1);
+    cline.add(set_verbosity,  "-v",      1);
 
     // Parse command line
     cline.parse();
 
     // Check number of arguments
-    if(cline.n() != 1) usage();
+    // if(cline.n() != 1) usage();
 
-    fcst_file = cline[0];
+    // fcst_file = cline[0];
 
     // Create default config file name
     default_config_file = replace_path(default_config_filename);
@@ -166,14 +172,14 @@ void process_command_line(int argc, char **argv) {
     conf_info.process_config(ftype);
 
     // Read forecast file
-    if(!(fcst_mtddf
-        = mtddf_factory.new_met_2d_data_file(
-            fcst_file.c_str(), ftype))) {
+    // if(!(fcst_mtddf
+    //     = mtddf_factory.new_met_2d_data_file(
+    //         fcst_file.c_str(), ftype))) {
 
-        mlog << Error << "\nTrouble reading forecast file \""
-             << fcst_file << "\"\n\n";
-        exit(1);
-    }
+    //     mlog << Error << "\nTrouble reading forecast file \""
+    //          << fcst_file << "\"\n\n";
+    //     exit(1);
+    // }
 
     return;
 }
