@@ -56,6 +56,8 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
+static StringArray parse_file_list(const StringArray&,
+    const GrdFileType);
 static void get_series_data(int, VarInfo*, DataPlane&);
 static void get_series_entry(int, VarInfo*,
     const StringArray&, const GrdFileType,
@@ -411,6 +413,17 @@ void set_logfile(const StringArray& a) {
 
 void set_verbosity(const StringArray& a) {
     mlog.set_verbosity_level(atoi(a[0].c_str()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray parse_file_list(const StringArray& a,
+    const GrdFileType type) {
+
+    Met2dDataFile *mtddf = (Met2dDataFile*) 0;
+    StringArray list;
+
+    return list;
 }
 
 ////////////////////////////////////////////////////////////////////////
