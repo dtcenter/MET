@@ -184,7 +184,7 @@ void process_decks() {
 
     compute_grids(adeck_tracks);
 
-    nc_out->close();
+    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
