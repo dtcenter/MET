@@ -38,7 +38,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void usage();
-static void process_command_line(int, char **);
+static void process_command_line(int, char**);
 static void process_decks();
 static void process_adecks(TrackInfoArray&);
 static void process_bdecks(TrackInfoArray&);
@@ -52,6 +52,7 @@ static void set_bdeck(const StringArray&);
 static void set_edeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
+static void set_fcst_files(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
@@ -392,6 +393,12 @@ void set_atcf_source(const StringArray& a,
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_fcst_files(const StringArray& a) {
+    fcst_files = a;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void set_config(const StringArray& a) {
     config_file = a[0];
 }
@@ -423,6 +430,22 @@ StringArray parse_file_list(const StringArray& a,
     Met2dDataFile *mtddf = (Met2dDataFile*) 0;
     StringArray list;
 
+    // Check for empty list
+    if(a.n_elements() == 0) {
+        mlog << Error << "\nparse_file_list() -> "
+             << "empty list!\n\n";
+        exit(1);
+    }
+
+    // Attempt read of first file
+    mtddf = mtddf_factory.new_met_2d_data_file(a[0].c_str(), type);
+
+    // If successful store list
+    if(mtddf) {
+        list.add(a);
+        delete mtddf;
+        mtddf = (Met2dDataFile*) 0;
+    }
 
     return list;
 }

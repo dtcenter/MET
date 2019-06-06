@@ -72,6 +72,7 @@ static const char* default_config_filename =
 
 // Input files
 static ConcatString   fcst_file;
+static StringArray    fcst_files, found_fcst_files;
 static StringArray    adeck_source, adeck_model_suffix;
 static StringArray    bdeck_source, bdeck_model_suffix;
 static StringArray    edeck_source, edeck_model_suffix;
