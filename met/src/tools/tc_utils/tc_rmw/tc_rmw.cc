@@ -445,6 +445,8 @@ StringArray parse_file_list(const StringArray& a,
         list.add(a);
         delete mtddf;
         mtddf = (Met2dDataFile*) 0;
+    } else { // Otherwise read a list of files 
+        list = parse_ascii_file_list(a[0].c_str());
     }
 
     return list;
