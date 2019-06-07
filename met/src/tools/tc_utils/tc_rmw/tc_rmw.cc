@@ -23,14 +23,14 @@ using namespace std;
 
 #include "tc_rmw.h"
 
-#include "vx_grid.h"
 #include "tcrmw_grid.h"
-#include "vx_regrid.h"
+#include "series_data.h"
 
+#include "vx_grid.h"
+#include "vx_regrid.h"
 #include "vx_tc_util.h"
 #include "vx_nc_util.h"
 #include "vx_tc_nc_util.h"
-#include "vx_series_data.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
