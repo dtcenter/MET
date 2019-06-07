@@ -30,6 +30,7 @@ using namespace std;
 #include "vx_tc_util.h"
 #include "vx_nc_util.h"
 #include "vx_tc_nc_util.h"
+#include "vx_series_data.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
