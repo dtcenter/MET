@@ -60,7 +60,7 @@ void write_nc_tracks(const ConcatString& track_nc_file,
         offset += track.n_points();
     }
 
-    nc_out->close();
+    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
