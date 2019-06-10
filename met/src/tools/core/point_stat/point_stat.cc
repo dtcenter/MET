@@ -239,7 +239,7 @@ void process_command_line(int argc, char **argv) {
 
    // Store the input forecast and observation file names
    fcst_file = cline[0];
-   obs_file.insert(0, cline[1]);
+   obs_file.insert(0, cline[1].c_str());
    config_file = cline[2];
 
    // Create the default config file names

@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
     usage();
 
   ncfile_arg = cline[0];
-  error_arg = atof(cline[1]);
-  grib_code_arg = atoi(cline[2]);
+  error_arg = atof(cline[1].c_str());
+  grib_code_arg = atoi(cline[2].c_str());
   message_type_arg = cline[3];
   station_id_arg = cline[4];
 

@@ -362,32 +362,32 @@ void process_sum_args(const CommandLine & cline) {
    //
    // Init time
    //
-   if(strcmp(cline[0], zero_time_str) == 0) {
+   if(cline[0].compare(zero_time_str) == 0) {
       init_time = (unixtime) 0;
    }
    else {
-      init_time = timestring_to_unix(cline[0]);
+      init_time = timestring_to_unix(cline[0].c_str());
    }
 
    //
    // Input accumulation
    //
-   in_accum = timestring_to_sec(cline[1]);
+   in_accum = timestring_to_sec(cline[1].c_str());
 
    //
    // Valid time
    //
-   if(strcmp(cline[2], zero_time_str) == 0) {
+   if(cline[2].compare(zero_time_str) == 0) {
       valid_time = (unixtime) 0;
    }
    else {
-      valid_time = timestring_to_unix(cline[2]);
+      valid_time = timestring_to_unix(cline[2].c_str());
    }
 
    //
    // Output accumulation
    //
-   out_accum = timestring_to_sec(cline[3]);
+   out_accum = timestring_to_sec(cline[3].c_str());
 
    //
    // Out file
@@ -453,7 +453,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
          // If the read was successful, store the file name.
          // Otherwise, process as an ascii file list.
          //
-         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0],
+         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0].c_str(),
                                                         type))) {
             file_list.add(cline[0]);
          }
@@ -461,7 +461,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
             mlog << Debug(1)
                  << "Parsing input file names from ASCII file list: "
                  << cline[0] << "\n";
-            file_list = parse_ascii_file_list(cline[0]);
+            file_list = parse_ascii_file_list(cline[0].c_str());
          }
 
          //
@@ -495,7 +495,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
          //
          // Check if this is actually a file name
          //
-         if(file_exists(cline[i+1])) {
+         if(file_exists(cline[i+1].c_str())) {
             mlog << Error << "\nprocess_add_sub_derive_args() -> "
                  << "file name used when config string expected ("
                  << cline[i+1]

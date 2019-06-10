@@ -101,9 +101,9 @@ ConcatString function_name;
 
 for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here, not zero
 
-   if ( strcmp(cline[j], ":") == 0 )  break;
+   if ( cline[j].compare(":") == 0 )  break;
 
-   status = config.read(cline[j]);
+   status = config.read(cline[j].c_str());
 
    if ( ! status )  {
 
@@ -121,7 +121,7 @@ function_name = cline[j++];
 
 // int n_args = argc - j;
 
-x = atof(cline[j]);
+x = atof(cline[j].c_str());
 
    //
    //
