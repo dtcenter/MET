@@ -72,11 +72,6 @@ void get_series_entry(int i_series, VarInfo* data_info,
     const StringArray& search_files, const GrdFileType type,
     StringArray& found_files, DataPlane& dp) {
 
-    Grid grid;
-
-    // Intialize
-    dp.clear();
-
 }
 
 ////////////////////////////////////////////////////////////////////////
