@@ -162,7 +162,7 @@ void process_command_line(int argc, char **argv) {
                           config_file.c_str());
 
 
-    // Get forecast file type from config
+    // Get data file type from config
     GrdFileType ftype
         = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
         conf_key_data));
@@ -170,15 +170,9 @@ void process_command_line(int argc, char **argv) {
     // Process the configuration
     conf_info.process_config(ftype);
 
-    // Read forecast file
-    // if(!(data_mtddf
-    //     = mtddf_factory.new_met_2d_data_file(
-    //         data_file.c_str(), ftype))) {
-
-    //     mlog << Error << "\nTrouble reading forecast file \""
-    //          << data_file << "\"\n\n";
-    //     exit(1);
-    // }
+    // Search for files
+    found_data_files
+        = parse_file_list(data_files, ftype);
 
     return;
 }

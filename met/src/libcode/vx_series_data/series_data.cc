@@ -43,12 +43,21 @@ StringArray parse_file_list(const StringArray& a,
         list.add(a);
         delete mtddf;
         mtddf = (Met2dDataFile*) 0;
-    } else { // Otherwise read a list of files 
+    } else { // Otherwise read a list of files
+        if(a.n_elements() != 1) {
+            mlog << Error << "\nparse_file_list() -> "
+                 << "more than one file list!\n\n";
+            exit(1);
+        }
         list = parse_ascii_file_list(a[0].c_str());
     }
 
+    if(mlog.verbosity_level() >= 3) {
+        for(int i = 0; i < list.n_elements(); i++) {
+            mlog << Debug(3) << list[i] << "\n";
+        }
+    }
     return list;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
