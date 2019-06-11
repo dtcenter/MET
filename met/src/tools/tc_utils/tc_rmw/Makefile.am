@@ -18,6 +18,7 @@ tc_rmw_LDFLAGS = ${MET_LDFLAGS}
 tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_analysis_util \
+	-lvx_series_data \
 	-lvx_tc_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
