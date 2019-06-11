@@ -38,7 +38,7 @@ class TCRMWConfInfo {
         void init_from_scratch();
 
         // Number of forecast fields
-        int n_fcst;
+        int n_data;
 
     public:
 
@@ -74,7 +74,7 @@ class TCRMWConfInfo {
         double delta_range;
 
         // Variable information
-        VarInfo** fcst_info;
+        VarInfo** data_info;
 
         // Config file version
         ConcatString Version;
@@ -87,13 +87,13 @@ class TCRMWConfInfo {
         void read_config(const char *, const char *);
         void process_config(GrdFileType);
 
-        int get_n_fcst() const;
+        int get_n_data() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCRMWConfInfo::get_n_fcst() const {
-    return n_fcst;
+inline int TCRMWConfInfo::get_n_data() const {
+    return n_data;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -45,7 +45,7 @@ TCRMWConfInfo::~TCRMWConfInfo() {
 void TCRMWConfInfo::init_from_scratch() {
 
     // Initialize pointers
-    fcst_info = (VarInfo**) 0;
+    data_info = (VarInfo**) 0;
 
     clear();
 
@@ -70,19 +70,19 @@ void TCRMWConfInfo::clear() {
     CheckDup = true;
     Version.clear();
 
-    // Clear fcst_info
-    if(fcst_info) {
-        for(int i = 0; i < n_fcst; i++) {
-            if(fcst_info[i]) {
-                fcst_info[i] = (VarInfo*) 0;
+    // Clear data_info
+    if(data_info) {
+        for(int i = 0; i < n_data; i++) {
+            if(data_info[i]) {
+                data_info[i] = (VarInfo*) 0;
             }
         }
-        delete fcst_info;
-        fcst_info = (VarInfo**) 0;
+        delete data_info;
+        data_info = (VarInfo**) 0;
     }
 
     // Reset field count
-    n_fcst = 0;
+    n_data = 0;
 
     return;
 }
@@ -181,48 +181,48 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: Track
     // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));
 
-    // Conf: fcst.field
-    fdict = Conf.lookup_array(conf_key_fcst_field);
+    // Conf: data.field
+    fdict = Conf.lookup_array(conf_key_data_field);
 
     // Determine number of fields (name/level)
-    int n_fcst = parse_conf_n_vx(fdict);
+    int n_data = parse_conf_n_vx(fdict);
 
-    mlog << Debug(2) << "n_fcst:" << n_fcst << "\n";
+    mlog << Debug(2) << "n_data:" << n_data << "\n";
 
-    // Check for empty fcst settings
-    if(n_fcst == 0) {
+    // Check for empty data settings
+    if(n_data == 0) {
         mlog << Error << "\nTCRMWConfInfo::process_config() -> "
-             << "fcst may not be empty.\n\n";
+             << "data may not be empty.\n\n";
         exit(1);
     }
 
     // Allocate space based on number of fields
-    fcst_info = new VarInfo*[n_fcst];
+    data_info = new VarInfo*[n_data];
 
     // Initialize pointers
-    for(int i = 0; i < n_fcst; i++) {
-        fcst_info[i] = (VarInfo*) 0;
+    for(int i = 0; i < n_data; i++) {
+        data_info[i] = (VarInfo*) 0;
     }
 
-    // Parse fcst field information
-    for(int i = 0; i < n_fcst; i++) {
+    // Parse data field information
+    for(int i = 0; i < n_data; i++) {
 
         // Allocate new VarInfo objects
-        fcst_info[i] = info_factory.new_var_info(ftype);
+        data_info[i] = info_factory.new_var_info(ftype);
 
         // Get current dictionary
         Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
 
         // Set current dictionary
-        fcst_info[i]->set_dict(i_fdict);
+        data_info[i]->set_dict(i_fdict);
 
-        mlog << Debug(2) << fcst_info[i]->magic_str() << "\n";
+        mlog << Debug(2) << data_info[i]->magic_str() << "\n";
 
         // Dump contents of current VarInfo
         if(mlog.verbosity_level() >=2) {
             mlog << Debug(2) << "Parsed forecast field "
             << i + 1 << ":\n";
-            fcst_info[i]->dump(cout);
+            data_info[i]->dump(cout);
         }
     }
 

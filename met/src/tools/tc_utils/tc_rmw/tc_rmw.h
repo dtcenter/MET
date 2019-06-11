@@ -71,8 +71,8 @@ static const char* default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static ConcatString   fcst_file;
-static StringArray    fcst_files, found_fcst_files;
+static ConcatString   data_file;
+static StringArray    data_files, found_data_files;
 static StringArray    adeck_source, adeck_model_suffix;
 static StringArray    bdeck_source, bdeck_model_suffix;
 static StringArray    edeck_source, edeck_model_suffix;
@@ -115,7 +115,7 @@ static ConcatString wwarn_file;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile* fcst_mtddf = (Met2dDataFile*) 0;
+static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
 
 // Grid coordinate arrays
 static double* lat_grid;

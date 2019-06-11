@@ -53,7 +53,7 @@ static void set_bdeck(const StringArray&);
 static void set_edeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
-static void set_fcst_files(const StringArray&);
+static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
@@ -101,7 +101,7 @@ void usage() {
     cout << "\n*** Model Evaluation Tools (MET" << met_version
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
-         << "\t-fcst file_1 ... file_n | fcst_file_list\n"
+         << "\t-data file_1 ... file_n | data_file_list\n"
          << "\t-adeck file\n"
          << "\t-config file\n"
          << "\t[-bdeck file]\n"
@@ -132,7 +132,7 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     // Add function calls for arguments
-    cline.add(set_fcst_files, "-fcst",  -1);
+    cline.add(set_data_files, "-data",  -1);
     cline.add(set_adeck,      "-adeck", -1);
     cline.add(set_bdeck,      "-bdeck", -1);
     cline.add(set_edeck,      "-edeck", -1);
@@ -147,7 +147,7 @@ void process_command_line(int argc, char **argv) {
     // Check number of arguments
     // if(cline.n() != 1) usage();
 
-    // fcst_file = cline[0];
+    // data_file = cline[0];
 
     // Create default config file name
     default_config_file = replace_path(default_config_filename);
@@ -165,18 +165,18 @@ void process_command_line(int argc, char **argv) {
     // Get forecast file type from config
     GrdFileType ftype
         = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
-        conf_key_fcst));
+        conf_key_data));
 
     // Process the configuration
     conf_info.process_config(ftype);
 
     // Read forecast file
-    // if(!(fcst_mtddf
+    // if(!(data_mtddf
     //     = mtddf_factory.new_met_2d_data_file(
-    //         fcst_file.c_str(), ftype))) {
+    //         data_file.c_str(), ftype))) {
 
     //     mlog << Error << "\nTrouble reading forecast file \""
-    //          << fcst_file << "\"\n\n";
+    //          << data_file << "\"\n\n";
     //     exit(1);
     // }
 
@@ -398,8 +398,8 @@ void set_atcf_source(const StringArray& a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_fcst_files(const StringArray& a) {
-    fcst_files = a;
+void set_data_files(const StringArray& a) {
+    data_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ void set_verbosity(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 static void get_series_data(int i_series,
-    VarInfo* fcst_info, DataPlane& fcst_dp) {
+    VarInfo* data_info, DataPlane& data_dp) {
 
 }
 
@@ -467,8 +467,8 @@ static void setup_grid() {
 
 static void compute_grids(const TrackInfoArray& tracks) {
 
-    VarInfo *fcst_info = (VarInfo *) 0;
-    DataPlane fcst_dp;
+    VarInfo *data_info = (VarInfo *) 0;
+    DataPlane data_dp;
 
     // these should be DataPlanes
     lat_grid = new double[
@@ -496,11 +496,11 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.clear();
         grid.set_from_data(grid_data);
 
-        for(int i_var = 0; i_var < conf_info.get_n_fcst(); i_var++) {
+        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
             // Get VarInfo
-            fcst_info = conf_info.fcst_info[i_var];
+            data_info = conf_info.data_info[i_var];
             // Get data
-            get_series_data(i_point, fcst_info, fcst_dp);
+            get_series_data(i_point, data_info, data_dp);
         }
 
         // compute lat and lon coordinate arrays
