@@ -1786,7 +1786,7 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 
 StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -1796,7 +1796,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -1805,13 +1805,13 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
-                                                     add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
-      else                                         {                                       b.add(a[i]);        }
+           if(c.compare("-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
+                                                 add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(c.compare("-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(c.compare("-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));           a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
+      else if(c.compare("-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
+      else                                     {                                               b.add(a[i]);        }
    }
 
    return(b);
@@ -2462,7 +2462,7 @@ TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
    else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
    else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
-   else                                                   t = NoTCStatJobType;
+   else                                                           t = NoTCStatJobType;
 
    return(t);
 }
@@ -2633,7 +2633,7 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
 
 void parse_thresh_option(const char *col_name, const char *col_val,
                          map<ConcatString,ThreshArray> &m) {
-  ConcatString cs = to_upper((string)col_name);
+   ConcatString cs = to_upper((string)col_name);
    ThreshArray ta;
    ta.add_css(col_val);
 
@@ -2648,7 +2648,7 @@ void parse_thresh_option(const char *col_name, const char *col_val,
 
 void parse_string_option(const char *col_name, const char *col_val,
                          map<ConcatString,StringArray> &m) {
-  ConcatString cs = to_upper((string)col_name);
+   ConcatString cs = to_upper((string)col_name);
    StringArray sa;
    sa.set_ignore_case(1);
    sa.add_css(col_val);
@@ -2760,7 +2760,7 @@ void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
 
 StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -2773,7 +2773,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -2782,10 +2782,10 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
-      else                                           {                                        b.add(a[i]);        }
+           if(c.compare("-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));            a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
+      else                                       {                                                b.add(a[i]);        }
    }
 
    return(b);
@@ -3505,7 +3505,7 @@ void TCStatJobProbRIRW::assign(const TCStatJobProbRIRW & j) {
 
 StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -3519,7 +3519,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -3528,13 +3528,13 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1].c_str())); a.shift_down(i, 1); }
-      else                                                   {                                                        b.add(a[i]);        }
+           if(c.compare("-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                            a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
+      else if(c.compare("-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                         a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1].c_str())); a.shift_down(i, 1); }
+      else                                               {                                                                b.add(a[i]);        }
    }
 
    return(b);
