@@ -17,7 +17,7 @@ model = [];
 //
 // Forecast fields
 //
-fcst = {
+data = {
     file_type = GRIB2;
     field = [
         {
