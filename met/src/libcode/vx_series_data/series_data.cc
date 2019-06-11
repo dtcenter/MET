@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -19,6 +17,8 @@ using namespace std;
 #include <string.h>
 
 #include "series_data.h"
+
+////////////////////////////////////////////////////////////////////////
 
 StringArray parse_file_list(const StringArray& a,
     const GrdFileType type) {
@@ -32,7 +32,7 @@ StringArray parse_file_list(const StringArray& a,
         mlog << Error << "\nparse_file_list() -> "
              << "empty list!\n\n";
         exit(1);
-    }   
+    }
 
     // Attempt read of first file
     mtddf = mtddf_factory.new_met_2d_data_file(
@@ -58,6 +58,54 @@ StringArray parse_file_list(const StringArray& a,
         }
     }
     return list;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_series_data(int i_series, VarInfo* data_info, DataPlane& dp) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_series_entry(int i_series, VarInfo* data_info,
+    const StringArray& search_files, const GrdFileType type,
+    StringArray& found_files, DataPlane& dp) {
+
+    Grid grid;
+
+    // Intialize
+    dp.clear();
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool read_single_entry(VarInfo* info, const ConcatString& filename,
+    const GrdFileType type, DataPlane& dp, Grid& grid) {
+
+    Met2dDataFileFactory mtddf_factory;
+    Met2dDataFile* mtddf = (Met2dDataFile*) 0;
+
+    // Check that file exists
+    if(!file_exists(filename.c_str())) {
+        mlog << Warning << "\nseries_data:read_single_entry() - >"
+             << "File does not exist: " << filename << "\n\n";
+        return(false);
+    }
+
+    // Open data file
+    mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
+
+    // Attempt to read gridded data
+    bool found = mtddf->data_plane(*info, dp);
+
+    // Store grid
+    if(found) {
+        grid = mtddf->grid();
+    }
+
+    return found;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -58,12 +56,6 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
-static void get_series_data(int, VarInfo*, DataPlane&);
-static void get_series_entry(int, VarInfo*,
-    const StringArray&, const GrdFileType,
-    StringArray&, DataPlane&);
-static bool read_single_entry(VarInfo*, const ConcatString&,
-    const GrdFileType, DataPlane&, Grid&);
 static void setup_grid();
 static void setup_nc_file();
 static void compute_grids(const TrackInfoArray&);
@@ -419,30 +411,6 @@ void set_logfile(const StringArray& a) {
 
 void set_verbosity(const StringArray& a) {
     mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void get_series_data(int i_series,
-    VarInfo* data_info, DataPlane& data_dp) {
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void get_series_entry(int i_series,
-    VarInfo* info, const StringArray& search_files,
-    const GrdFileType type, StringArray& found_files,
-    DataPlane& dp) {
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static bool read_single_entry(VarInfo*, const ConcatString&,
-    const GrdFileType, DataPlane&, Grid&) {
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
