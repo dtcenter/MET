@@ -835,7 +835,7 @@ void process_scores() {
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
                  << "), over region " << shc.get_mask()
-                 << ", using " << f_na.n_elements() << " pairs.\n";
+                 << ", using " << f_na.n_elements() << " matched pairs.\n";
 
             // Continue if no pairs were found
             if(f_na.n_elements() == 0) continue;
@@ -1266,7 +1266,7 @@ void process_scores() {
 
                   mlog << Debug(2) << "Computing Gradient DX(" << dx << ")/DY("
                        << dy << ") Statistics " << "over region " << shc.get_mask()
-                       << ", using " << fgx_na.n_elements() << " pairs.\n";
+                       << ", using " << fgx_na.n_elements() << " matched pairs.\n";
 
                   // Continue if no pairs were found
                   if(fgx_na.n_elements() == 0) continue;
@@ -1469,7 +1469,7 @@ void process_scores() {
                        << conf_info.vx_opt[i].ocat_ta[k].get_str()
                        << ", over region " << shc.get_mask()
                        << ", using " << f_na.n_elements()
-                       << " pairs.\n";
+                       << " matched pairs.\n";
 
                   // Continue if no pairs were found
                   if(f_na.n_elements() == 0) continue;
@@ -1635,7 +1635,7 @@ void process_scores() {
                  << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
                  << ", for Fourier wave number " << shc.get_interp_mthd()
                  << ", over region " << shc.get_mask()
-                 << ", using " << f_na.n_elements() << " pairs.\n";
+                 << ", using " << f_na.n_elements() << " matched pairs.\n";
 
             // Continue if no pairs were found
             if(f_na.n_elements() == 0) continue;

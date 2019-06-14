@@ -1197,7 +1197,7 @@ void process_point_scores() {
                     << ", for interpolation method "
                     << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_obs << " pairs.\n";
+                    << "), using " << pd_ptr->n_obs << " matched pairs.\n";
 
                // Continue if there are no points
                if(pd_ptr->n_obs == 0) continue;
@@ -1635,7 +1635,7 @@ void process_grid_vx() {
                  << ", for interpolation method "
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
-                 << "), using " << pd_all.n_obs << " pairs.\n";
+                 << "), using " << pd_all.n_obs << " matched pairs.\n";
 
             // Continue if there are no points
             if(pd_all.n_obs == 0) continue;
