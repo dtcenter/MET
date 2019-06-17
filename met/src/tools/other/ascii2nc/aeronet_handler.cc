@@ -21,6 +21,7 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <assert.h> 
 
 #include "vx_log.h"
 #include "vx_math.h"
@@ -68,6 +69,8 @@ const string WAVELENGTHS_INPUT_AOD_NAME = "Exact_Wavelengths_for_Input_AOD";    
 static int format_version;
 
 const float AERONET_MISSING_VALUE = -999.;
+
+double angstrom_power_interplation(double value_1, double value_2, double level_1, double level_2, double target_level);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -152,6 +155,7 @@ void AeronetHandler::setFormatVersion(int version) {
 bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 {
   DataLine data_line;
+  string method_name = "AeronetHandler::_readObservations() ";
 
   //
   // Read and save the station name, latitude, longitude, and elevation.
@@ -191,6 +195,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   }
 
   int flag;
+  int aod_var_id = bad_data_int;
   int var_idx, sid_idx, elv_idx, lat_idx, lon_idx;
   double height_from_header;
   string aot = "AOT";
@@ -200,6 +205,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   NumArray header_heights;
   IntArray header_var_index;
   StringArray header_var_names;
+  bool has_aod_column_at_550 = false;
   
   sid_idx = elv_idx = lat_idx = lon_idx = -1;
 
@@ -250,13 +256,16 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         if (flag) {
           var_idx = var_names.n_elements();
           var_names.add(var_name.c_str());
+          if (strcmp(var_name.c_str(), AOD_NAME.c_str()) == 0) aod_var_id = var_idx;
         }
       }
       height_from_header = extract_height(hdr_field);
       header_var_index.add(var_idx);
       header_var_names.add(var_name.c_str());
       header_heights.add(height_from_header);
-      mlog << Debug(5) << "AeronetHandler::_readObservations() header_idx: " << j
+      if (0 == strcmp(var_name.c_str(), AOD_NAME.c_str())
+          && is_eq(height_from_header, 550)) has_aod_column_at_550 = true;
+      mlog << Debug(5) << method_name << "header_idx: " << j
            << ", var_idx: " << var_idx << ", var: " << var_name << " from " << hdr_field
            << ", flag: " << flag << ", height: " << height_from_header << "\n";
     }
@@ -283,7 +292,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     {
       bad_line_count++;
       if (format_version != 3) {
-        mlog << Error << "\nAeronetHandler::_readObservations() -> "
+        mlog << Error << "\nAeronetHandler" << method_name << "-> "
              << "line number " << data_line.line_number()
              << " does not have the correct number of columns " << data_line.n_items()
              << " (" << column_cnt << "). Stop processing \""
@@ -364,7 +373,13 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     if (valid_time == 0)
       return false;
 
+    bool has_aod_at_550;
+    double aod_at_440, aod_at_675;
     int var_id = AOT_GRIB_CODE;
+    
+    has_aod_at_550 = false;
+    aod_at_440 = aod_at_675 = bad_data_float;
+    
     var_name = AOT_NAME;
     //
     // Save the desired observations from the line
@@ -404,6 +419,11 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         var_name = header_var_names[k];
         dheight  = header_heights[k];
         //if (is_eq(atof(data_line[k]), AERONET_MISSING_VALUE)) continue;
+        if (strcmp(var_name.c_str(), AOD_NAME.c_str()) == 0) {
+          if (is_eq(dheight, 550)) has_aod_at_550 = true;
+          else if (is_eq(dheight, 440)) aod_at_440 = atof(data_line[k]);
+          else if (is_eq(dheight, 675)) aod_at_675 = atof(data_line[k]);
+        }
       }
       
       _addObservations(Observation(header_type, _stationId,
@@ -416,6 +436,22 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
                                    atof(data_line[k]),
                                    var_name));
     }
+    if (format_version == 3) {
+      if (!has_aod_at_550 && !is_eq(aod_at_440, bad_data_float) && !is_eq(aod_at_675, bad_data_float)) {
+        var_id   = aod_var_id;
+        var_name = AOD_NAME;
+        double dheight  = 550;
+        double aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,dheight);
+        _addObservations(Observation(header_type, _stationId, valid_time,
+                                     _stationLat, _stationLon, _stationAlt,
+                                     na_str, var_id, bad_data_double, dheight,
+                                     aod_at_550,
+                                     var_name));
+        mlog << Debug(7) << "AeronetHandler::_readObservations() AOD at 550: "
+             << aod_at_550 << "\t440: " << aod_at_440
+             << "\t675: " << aod_at_675 << "\n";
+      }
+    }
   } // end while
   if (bad_line_count > 0) {
     mlog << Warning << "\nAeronetHandler::_readObservations() -> "
@@ -424,6 +460,47 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
          << ascii_file.filename() << "\".\n\n";
   }
   
+  if (format_version == 3) {
+    double aod_at_675, aod_at_440;
+    double aod_at_550_expected, angstrom_675_440_expected;
+    double angstrom_675_440, aod_at_550;
+    
+    aod_at_675 = 0.645283;
+    aod_at_440 = 0.794593;
+    aod_at_550_expected = 0.71286864;
+    //angstrom_675_440_expected = 0.486381371;
+    aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,550);
+    if (! is_eq(aod_at_550, aod_at_550_expected))
+      mlog << Warning << "AeronetHandler::_readObservations() Check AOD at 550: "
+           << aod_at_550 << " (" << aod_at_550_expected << ")"
+           << "\t440: " << aod_at_440
+           << "\t675: " << aod_at_675 
+           << "\n";
+    else
+      mlog << Debug(3) << "AeronetHandler::_readObservations() Confirmed AOD interpolation at 550: "
+           << aod_at_550 << " (" << aod_at_550_expected << ")"
+           << "\t440: " << aod_at_440
+           << "\t675: " << aod_at_675 
+           << "\n";
+
+    aod_at_675 = 0.669274;
+    aod_at_440 = 0.83858;
+    aod_at_550_expected = 0.745546058;
+    //angstrom_675_440_expected = 0.526983959;
+    aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,550);
+    if (! is_eq(aod_at_550, aod_at_550_expected))
+      mlog << Warning << "AeronetHandler::_readObservations() Check AOD at 550: "
+           << aod_at_550 << " (" << aod_at_550_expected << ")"
+           << "\t440: " << aod_at_440
+           << "\t675: " << aod_at_675 
+           << "\n";
+    else
+      mlog << Debug(3) << "AeronetHandler::_readObservations() Confirmed AOD interpolation at 550: "
+           << aod_at_550 << " (" << aod_at_550_expected << ")"
+           << "\t440: " << aod_at_440
+           << "\t675: " << aod_at_675 
+           << "\n";
+  }
   return true;
 }
 
@@ -693,4 +770,11 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
     }
   }
   return var_name;
+}
+
+double angstrom_power_interplation(double value_1, double value_2,
+    double level_1, double level_2, double target_level) {
+  double angstrom_log = -log10(value_1/value_2)/log10(level_1/level_2);
+  double angstrom_value = value_2 * pow((target_level/level_2),-angstrom_log);
+  return angstrom_value;
 }
