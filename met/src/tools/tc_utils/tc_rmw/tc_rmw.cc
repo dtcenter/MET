@@ -478,18 +478,14 @@ static void compute_grids(const TrackInfoArray& tracks) {
                 lon_grid[ir * grid.azimuth_n() + ia] = - lon;
             }
         }
+
         // write coordinate arrays
-        // move this to nc_utils
-        vector<size_t> record_offsets, record_counts;
-        record_offsets.clear();
-        record_offsets.push_back(i_point);
-        record_counts.clear();
-        record_counts.push_back(1);
         write_tc_data(nc_out, grid, i_point, lat_grid_var, lat_grid);
         write_tc_data(nc_out, grid, i_point, lon_grid_var, lon_grid);
-        valid_time_var.putVar(
-            record_offsets, record_counts,
-            &valid_yyyymmddhh);
+
+        // write valid time
+        write_tc_valid_time(nc_out, i_point,
+            valid_time_var, valid_yyyymmddhh);
     }
 
     delete[] lat_grid;

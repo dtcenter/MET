@@ -36,6 +36,9 @@ extern void def_tc_lat_lon_time(NcFile*,
 extern void write_tc_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, double*);
 
+extern void write_tc_valid_time(NcFile*,
+    const int&, const NcVar&, const long&);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif  //  __VX_TC_NC_UTIL_H__

@@ -151,3 +151,21 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void write_tc_valid_time(NcFile* nc_out,
+    const int& i_point, const NcVar& var,
+    const long& valid_time) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    offsets.clear();
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(1);
+
+    var.putVar(offsets, counts, &valid_time);
+}
+
+////////////////////////////////////////////////////////////////////////
