@@ -97,5 +97,19 @@ return ( s );
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+long unix_to_long_yyyymmddhh(unixtime u) {
+
+int mon, day, yr, hr, min, sec;
+long yyyymmddhh;
+
+unix_to_mdyhms(u, mon, day, yr, hr, min, sec);
+
+yyyymmddhh = 1000000 * yr + 10000 * mon + 100 * day + hr;
+
+return ( yyyymmddhh );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
