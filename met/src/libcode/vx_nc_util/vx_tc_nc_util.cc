@@ -131,4 +131,23 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&valid_time_var, "standard_name", "valid_time");
 }
 
+void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
+    const int& i_point, const NcVar& var, double* data) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    offsets.clear();
+    offsets.push_back(0);
+    offsets.push_back(0);
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(grid.range_n());
+    counts.push_back(grid.azimuth_n());
+    counts.push_back(1);
+
+    var.putVar(offsets, counts, data);
+}
+
 ////////////////////////////////////////////////////////////////////////

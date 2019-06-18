@@ -480,22 +480,13 @@ static void compute_grids(const TrackInfoArray& tracks) {
         }
         // write coordinate arrays
         // move this to nc_utils
-        vector<size_t> offsets, counts;
         vector<size_t> record_offsets, record_counts;
-        offsets.clear();
         record_offsets.clear();
-        offsets.push_back(0);
-        offsets.push_back(0);
-        offsets.push_back(i_point);
         record_offsets.push_back(i_point);
-        counts.clear();
         record_counts.clear();
-        counts.push_back(grid.range_n());
-        counts.push_back(grid.azimuth_n());
-        counts.push_back(1);
         record_counts.push_back(1);
-        lat_grid_var.putVar(offsets, counts, lat_grid);
-        lon_grid_var.putVar(offsets, counts, lon_grid);
+        write_tc_data(nc_out, grid, i_point, lat_grid_var, lat_grid);
+        write_tc_data(nc_out, grid, i_point, lon_grid_var, lon_grid);
         valid_time_var.putVar(
             record_offsets, record_counts,
             &valid_yyyymmddhh);
