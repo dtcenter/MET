@@ -533,15 +533,8 @@ static void setup_nc_file() {
 
     write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
 
-    vector<NcDim> dims;
-    dims.push_back(range_dim);
-    dims.push_back(azimuth_dim);
-    dims.push_back(track_point_dim);
-
-    lat_grid_var = add_var(nc_out, "lat", ncDouble, dims);
-    lon_grid_var = add_var(nc_out, "lon", ncDouble, dims);
-    valid_time_var = add_var(
-        nc_out, "valid_time", ncUint64, track_point_dim);
+    def_nc_lat_lon_time(nc_out, range_dim, azimuth_dim,
+        track_point_dim, lat_grid_var, lon_grid_var, valid_time_var);
 }
 
 ////////////////////////////////////////////////////////////////////////
