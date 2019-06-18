@@ -12,7 +12,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_tracks(const ConcatString& track_nc_file,
+void write_tc_tracks(const ConcatString& track_nc_file,
     const TrackInfoArray& tracks) {
 
     mlog << Debug(2) << "Writing " << track_nc_file << "\n";
@@ -65,7 +65,7 @@ void write_nc_tracks(const ConcatString& track_nc_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_range_azimuth(NcFile* nc_out,
+void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const TcrmwGrid& grid) {
 
@@ -78,6 +78,14 @@ void write_nc_range_azimuth(NcFile* nc_out,
     // Define variables
     range_var = nc_out->addVar("range", ncFloat, range_dim);
     azimuth_var = nc_out->addVar("azimuth", ncFloat, azimuth_dim);
+
+    // Set attributes
+    add_att(&range_var, "long_name", "range");
+    add_att(&range_var, "units", "kilometers");
+    add_att(&range_var, "standard_name", "range");
+    add_att(&azimuth_var, "long_name", "azimuth");
+    add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
+    add_att(&azimuth_var, "standard_name", "azimuth");
 
     // Compute grid coordinates
     for (int i = 0; i < grid.range_n(); i++) {
@@ -96,7 +104,7 @@ void write_nc_range_azimuth(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void def_nc_lat_lon_time(NcFile* nc_out,
+void def_tc_lat_lon_time(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const NcDim& track_point_dim,
     NcVar& lat_var, NcVar& lon_var, NcVar& valid_time_var) {
@@ -110,6 +118,14 @@ void def_nc_lat_lon_time(NcFile* nc_out,
     lon_var = nc_out->addVar("lon", ncDouble, dims);
     valid_time_var = nc_out->addVar("valid_time", ncUint64,
         track_point_dim);
+
+    // Set attributes
+    add_att(&lat_var, "long_name", "latitude");
+    add_att(&lat_var, "units", "degrees_north");
+    add_att(&lat_var, "standard_name", "latitude");
+    add_att(&lon_var, "long_name", "longitude");
+    add_att(&lon_var, "units", "degrees_east");
+    add_att(&lon_var, "standard_name", "longitude");
 }
 
 ////////////////////////////////////////////////////////////////////////

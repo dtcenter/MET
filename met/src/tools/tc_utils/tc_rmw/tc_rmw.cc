@@ -201,7 +201,7 @@ static void process_adecks(TrackInfoArray& adeck_tracks) {
 
     ConcatString adeck_track_file("adeck.nc");
 
-    write_nc_tracks(adeck_track_file, adeck_tracks);
+    write_tc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -531,9 +531,9 @@ static void setup_nc_file() {
     azimuth_dim = add_dim(nc_out, "azimuth", (long) grid.azimuth_n());
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
-    write_nc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
 
-    def_nc_lat_lon_time(nc_out, range_dim, azimuth_dim,
+    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
         track_point_dim, lat_grid_var, lon_grid_var, valid_time_var);
 }
 

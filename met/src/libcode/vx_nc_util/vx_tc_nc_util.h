@@ -23,13 +23,13 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_nc_tracks(const ConcatString&,
+extern void write_tc_tracks(const ConcatString&,
     const TrackInfoArray&);
 
-extern void write_nc_range_azimuth(NcFile*,
+extern void def_tc_range_azimuth(NcFile*,
     const NcDim&, const NcDim&, const TcrmwGrid&);
 
-extern void def_nc_lat_lon_time(NcFile*,
+extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, NcVar&, NcVar&);
 
