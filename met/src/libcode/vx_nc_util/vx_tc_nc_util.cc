@@ -93,3 +93,23 @@ void write_nc_range_azimuth(NcFile* nc_out,
 
     return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void def_nc_lat_lon_time(NcFile* nc_out,
+    const NcDim& range_dim, const NcDim& azimuth_dim,
+    const NcDim& track_point_dim,
+    NcVar& lat_var, NcVar& lon_var, NcVar& valid_time_var) {
+
+    vector<NcDim> dims;
+    dims.push_back(range_dim);
+    dims.push_back(azimuth_dim);
+    dims.push_back(track_point_dim);
+
+    lat_var = nc_out->addVar("lat", ncDouble, dims);
+    lon_var = nc_out->addVar("lon", ncDouble, dims);
+    valid_time_var = nc_out->addVar("valid_time", ncUint64,
+        track_point_dim);
+}
+
+////////////////////////////////////////////////////////////////////////
