@@ -59,8 +59,6 @@ static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
 static void compute_grids(const TrackInfoArray&);
-static void write_nc(const ConcatString&,
-    const DataPlane&, FieldType);
 static bool read_data_plane(VarInfo*, DataPlane&, Met2dDataFile*,
     const ConcatString&);
 
@@ -516,15 +514,6 @@ static void setup_nc_file() {
 
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
         track_point_dim, lat_grid_var, lon_grid_var, valid_time_var);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void write_nc(const ConcatString& field_name,
-    const DataPlane& dp, FieldType field_type) {
-    ConcatString var_name, var_str;
-    NcVar nc_var;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
