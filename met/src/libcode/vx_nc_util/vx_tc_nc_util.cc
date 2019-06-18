@@ -126,6 +126,9 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&lon_var, "long_name", "longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude");
+    add_att(&valid_time_var, "long_name", "valid_time");
+    add_att(&valid_time_var, "units", "yyyymmddhh");
+    add_att(&valid_time_var, "standard_name", "valid_time");
 }
 
 ////////////////////////////////////////////////////////////////////////
