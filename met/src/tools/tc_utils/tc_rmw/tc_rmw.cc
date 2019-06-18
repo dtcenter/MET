@@ -444,13 +444,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
     for(int i_point = 0; i_point < track.n_points(); i_point++) {
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
-        int year, month, day, hour, minute, second;
-        unix_to_mdyhms(
-            valid_time,
-            month, day, year,
-            hour, minute, second);
-        long valid_yyyymmddhh = 1000000 * year
-            + 10000 * month + 100 * day + hour;
+        long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
         mlog << Debug(4)
              << "(" << point.lat() << ", " << point.lon() << ")\n";
         grid_data.lat_center = point.lat();
