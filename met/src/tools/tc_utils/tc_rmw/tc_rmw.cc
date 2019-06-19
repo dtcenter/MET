@@ -153,12 +153,13 @@ void process_command_line(int argc, char **argv) {
 
 
     // Get data file type from config
-    GrdFileType ftype
-        = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
+    ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
         conf_key_data));
 
     // Process the configuration
     conf_info.process_config(ftype);
+
+    mlog << Debug(2) << "n_data:" << conf_info.get_n_data() << "\n";
 
     // Search for files
     data_files
@@ -454,7 +455,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
             // Get VarInfo
             data_info = conf_info.data_info[i_var];
             // Get data
-            get_series_data(i_point, data_info, data_dp);
+            get_series_entry(i_point, data_info,
+                data_files, ftype, found_data_files, data_dp);
         }
 
         // compute lat and lon coordinate arrays

@@ -72,6 +72,9 @@ void get_series_entry(int i_series, VarInfo* data_info,
     const StringArray& search_files, const GrdFileType type,
     StringArray& found_files, DataPlane& dp) {
 
+    mlog << Debug(2)
+         << "Processing series entry " << i_series + 1 << ": "
+         << data_info->magic_str() << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

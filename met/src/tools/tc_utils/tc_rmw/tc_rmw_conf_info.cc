@@ -217,8 +217,8 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
         mlog << Debug(2) << data_info[i]->magic_str() << "\n";
 
         // Dump contents of current VarInfo
-        if(mlog.verbosity_level() >=2) {
-            mlog << Debug(2) << "Parsed forecast field "
+        if(mlog.verbosity_level() >=5) {
+            mlog << Debug(5) << "Parsed forecast field "
             << i + 1 << ":\n";
             data_info[i]->dump(cout);
         }

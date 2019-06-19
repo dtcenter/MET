@@ -77,6 +77,7 @@ static StringArray    bdeck_source, bdeck_model_suffix;
 static StringArray    edeck_source, edeck_model_suffix;
 static ConcatString   config_file;
 static TCRMWConfInfo  conf_info;
+static GrdFileType    ftype;
 
 // Optional arguments
 static ConcatString out_dir;
