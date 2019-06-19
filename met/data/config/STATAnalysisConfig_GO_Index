@@ -148,6 +148,6 @@ boot = {
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V8.1";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////
