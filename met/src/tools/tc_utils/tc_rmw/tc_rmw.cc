@@ -159,8 +159,6 @@ void process_command_line(int argc, char **argv) {
     // Process the configuration
     conf_info.process_config(ftype);
 
-    mlog << Debug(2) << "n_data:" << conf_info.get_n_data() << "\n";
-
     // Search for files
     data_files
         = parse_file_list(data_files, ftype);

@@ -37,6 +37,9 @@ class TCRMWConfInfo {
 
         void init_from_scratch();
 
+        // Number of forecast fields
+        int n_data;
+
     public:
 
         // TCRMW configuration object
@@ -64,9 +67,6 @@ class TCRMWConfInfo {
         TrackType Track;
 
         bool CheckDup;
-
-        // Number of forecast fields
-        int n_data;
 
         int n_range;
         int n_azimuth;

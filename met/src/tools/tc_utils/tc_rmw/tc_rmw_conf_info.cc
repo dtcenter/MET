@@ -183,7 +183,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     fdict = Conf.lookup_array(conf_key_data_field);
 
     // Determine number of fields (name/level)
-    int n_data = parse_conf_n_vx(fdict);
+    n_data = parse_conf_n_vx(fdict);
 
     mlog << Debug(2) << "n_data:" << n_data << "\n";
 
@@ -223,8 +223,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
             data_info[i]->dump(cout);
         }
     }
-
-    mlog << Debug(2) << "n_data:" << n_data << "\n";
 
     return;
 }
