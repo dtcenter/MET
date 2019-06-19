@@ -1133,11 +1133,11 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    static const char *method_name = "save_geostationary_data() ";
 
    NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
-   NcDim xdim = add_dim(nc_file, dim_name_lat, grid_data.nx);
-   NcDim ydim = add_dim(nc_file, dim_name_lon, grid_data.ny);
+   NcDim xdim = add_dim(nc_file, dim_name_lon, grid_data.nx);
+   NcDim ydim = add_dim(nc_file, dim_name_lat, grid_data.ny);
 
-   NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, xdim, ydim, deflate_level);
-   NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, xdim, ydim, deflate_level);
+   NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, ydim, xdim, deflate_level);
+   NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, ydim, xdim, deflate_level);
 
    if (!IS_INVALID_NC(lat_var)) {
       if (grid_data.dy_rad >= 0) {
