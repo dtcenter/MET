@@ -618,6 +618,47 @@ class GRADInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Class to store distance map statistics
+//
+////////////////////////////////////////////////////////////////////////
+
+class DMAPInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const DMAPInfo &);
+
+   public:
+
+      DMAPInfo();
+      ~DMAPInfo();
+      DMAPInfo(const DMAPInfo &);
+      DMAPInfo & operator=(const DMAPInfo &);
+
+      // Thresholds
+      SingleThresh fthresh;
+      SingleThresh othresh;
+
+      // Counts
+      int total, fy, oy;
+
+      // Distance metrics
+      double baddeley, hausdorff;
+
+      // Mean error distance
+      double med_fo, med_of, med_min, med_max, med_mean;
+
+      // Pratt's Figure of Merit
+      double fom_fo, fom_of, fom_min, fom_max, fom_mean;
+
+      // Compute statistics
+      double fbias()      const; // fbias = fy / oy
+
+      void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Utility functions for parsing data from configuration files
 //
 ////////////////////////////////////////////////////////////////////////

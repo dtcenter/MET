@@ -2961,6 +2961,107 @@ void GRADInfo::set(int grad_dx, int grad_dy,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for class DMAPInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+DMAPInfo::DMAPInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DMAPInfo::~DMAPInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DMAPInfo::DMAPInfo(const DMAPInfo &c) {
+
+   init_from_scratch();
+
+   assign(c);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DMAPInfo & DMAPInfo::operator=(const DMAPInfo &c) {
+
+   if(this == &c) return(*this);
+
+   assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DMAPInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DMAPInfo::clear() {
+
+   fthresh.clear();
+   othresh.clear();
+   total    = fy = oy = 0;
+   baddeley = hausdorff = bad_data_double;
+   med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
+   fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DMAPInfo::assign(const DMAPInfo &c) {
+
+   clear();
+
+   fthresh = c.fthresh;
+   othresh = c.othresh;
+
+   total = c.total;
+   fy    = c.fy;
+   oy    = c.oy;
+
+   baddeley  = c.baddeley;
+   hausdorff = c.hausdorff;
+
+   med_fo   = c.med_fo;
+   med_of   = c.med_of;
+   med_min  = c.med_min;
+   med_max  = c.med_max;
+   med_mean = c.med_mean;
+
+   fom_fo   = c.fom_fo;
+   fom_of   = c.fom_of;
+   fom_min  = c.fom_min;
+   fom_max  = c.fom_max;
+   fom_mean = c.fom_mean;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double DMAPInfo::fbias() const {
+   double v;
+
+   if(oy == 0) v = bad_data_double;
+   else        v = (double) fy / oy;
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Begin code for misc functions
 //
 ////////////////////////////////////////////////////////////////////////

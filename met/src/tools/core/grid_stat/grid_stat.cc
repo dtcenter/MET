@@ -644,6 +644,7 @@ void process_scores() {
    NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
    PCTInfo    *pct_info    = (PCTInfo *) 0;
    GRADInfo    grad_info;
+   DMAPInfo    dmap_info;
 
    // Store the maximum number of each threshold type
    n_cnt  = conf_info.get_max_n_cnt_thresh();

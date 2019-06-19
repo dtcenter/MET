@@ -1240,13 +1240,13 @@ gradient = {
 //
 // The "distance_map" entry is a dictionary containing options related to the
 // distance map statistics in the DMAP output line type. The "baddeley_p" entry
-// is an integer specifying the exponent used in the lp-norm when computing the
+// is an integer specifying the exponent used in the Lp-norm when computing the
 // Baddeley Delta metric.  The "baddeley_max_dist" entry is a floating point
-// number specifying the maximum allowable distance. Any distances larger than
-// this number will be reset to this constant. A value of NA indicates that no
-// maximum distance value should be used. The "fom_alpha" entry is a floating
-// point number specifying the alpha value to be used when computing Pratt's
-// Figure of Merit.
+// number specifying the maximum allowable distance for each distance map. Any
+// distances larger than this number will be reset to this constant. A value of
+// NA indicates that no maximum distance value should be used. The "fom_alpha"
+// entry is a floating point number specifying the scaling constant to be used
+// when computing Pratt's Figure of Merit.
 //
 // This configuration option may be set separately in each "obs.field" entry.
 //

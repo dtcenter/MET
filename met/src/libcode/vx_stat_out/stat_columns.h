@@ -266,6 +266,13 @@ static const char * grad_columns [] = {
    "FGOG_RATIO",  "DX",          "DY"
 };
 
+static const char * dmap_columns [] = {
+   "TOTAL",       "FY",          "OY",
+   "FBIAS",       "BADDELEY",    "HAUSDORFF",
+   "MED_FO",      "MED_OF",      "MED_MIN",     "MED_MAX",     "MED_MEAN",
+   "FOM_FO",      "FOM_OF",      "FOM_MIN",     "FOM_MAX",     "FOM_MEAN"
+};
+
 static const char * isc_columns [] = {
    "TOTAL",
    "TILE_DIM",    "TILE_XLL",    "TILE_YLL",
@@ -391,6 +398,7 @@ static const int n_nbrctc_columns       = sizeof(nbrctc_columns)/sizeof(*nbrctc_
 static const int n_nbrcts_columns       = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
 static const int n_nbrcnt_columns       = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
 static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
+static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_columns);
 
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
@@ -497,6 +505,8 @@ extern void write_nbrcnt_row(StatHdrColumns &, const NBRCNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_grad_row  (StatHdrColumns &, const GRADInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_dmap_row  (StatHdrColumns &, const DMAPInfo &, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, bool,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
@@ -542,6 +552,7 @@ extern void write_nbrcts_cols(const NBRCTSInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_grad_cols  (const GRADInfo &,         AsciiTable &, int, int);
+extern void write_dmap_cols  (const DMAPInfo &,         AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *,    int, AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
 extern void write_ecnt_cols  (const PairDataEnsemble *,      AsciiTable &, int, int);

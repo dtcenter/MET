@@ -741,9 +741,30 @@ void GridStatVxOpt::process_config(
 
    // Conf: distance_map
    d = odict.lookup_dictionary(conf_key_distance_map);
+
    baddeley_p = d->lookup_int(conf_key_baddeley_p);
+   if(baddeley_p < 1) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_baddeley_p << "\" option ("
+           << baddeley_p << ") must be set >= 1.\n\n";
+      exit(1);
+   }
+
    baddeley_max_dist = d->lookup_double(conf_key_baddeley_max_dist, false);
+   if(!is_bad_data(baddeley_max_dist) && baddeley_max_dist < 0) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_baddeley_max_dist << "\" option ("
+           << baddeley_max_dist << ") must be set >= 0.\n\n";
+      exit(1);
+   }
+
    fom_alpha = d->lookup_double(conf_key_fom_alpha);
+   if(fom_alpha <=0 || fom_alpha > 1) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_fom_alpha << "\" option ("
+           << fom_alpha << ") must be set > 0 and <= 1.\n\n";
+      exit(1);
+   }
 
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);

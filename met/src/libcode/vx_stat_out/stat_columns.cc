@@ -1388,6 +1388,45 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
+                    bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+
+   // DMAP line type
+   shc.set_line_type(stat_dmap_str);
+
+   // Thresholds
+   shc.set_fcst_thresh(dmap_info.fthresh);
+   shc.set_obs_thresh(dmap_info.othresh);
+
+   // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_alpha(bad_data_double);
+   shc.set_cov_thresh(na_str);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_dmap_cols(dmap_info, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
@@ -3268,6 +3307,69 @@ void write_grad_cols(const GRADInfo &grad_info,
 
    at.set_entry(r, c+9,  // DY
       grad_info.dy);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_dmap_cols(const DMAPInfo &dmap_info,
+                     AsciiTable &at, int r, int c) {
+
+   //
+   // Distance Map Line Type (DMAP)
+   //    TOTAL,       FY,          OY,
+   //    FBIAS,       BADDELEY,    HAUSDORFF,
+   //    MED_FO,      MED_OF,      MED_MIN,      MED_MAX,      MED_MEAN,
+   //    FOM_FO,      FOM_OF,      FOM_MIN,      FOM_MAX,      FOM_MEAN
+   //
+   at.set_entry(r, c+0,  // TOTAL
+      dmap_info.total);
+
+   at.set_entry(r, c+1,  // FY
+      dmap_info.fy);
+
+   at.set_entry(r, c+2,  // OY
+      dmap_info.oy);
+
+   at.set_entry(r, c+3,  // FBIAS
+      dmap_info.fbias());
+
+   at.set_entry(r, c+4,  // BADDELEY
+      dmap_info.baddeley);
+
+   at.set_entry(r, c+5,  // HAUSDORFF
+      dmap_info.hausdorff);
+
+   at.set_entry(r, c+6,  // MED_FO
+      dmap_info.med_fo);
+
+   at.set_entry(r, c+7,  // MED_OF
+      dmap_info.med_of);
+
+   at.set_entry(r, c+8,  // MED_MIN
+      dmap_info.med_min);
+
+   at.set_entry(r, c+9,  // MED_MAX
+      dmap_info.med_max);
+
+   at.set_entry(r, c+10, // MED_MEAN
+      dmap_info.med_mean);
+
+   at.set_entry(r, c+11, // FOM_FO
+      dmap_info.med_fo);
+
+   at.set_entry(r, c+12, // FOM_OF
+      dmap_info.med_of);
+
+   at.set_entry(r, c+13, // FOM_MIN
+      dmap_info.med_min);
+
+   at.set_entry(r, c+14, // FOM_MAX
+      dmap_info.med_max);
+
+   at.set_entry(r, c+15, // FOM_MEAN
+      dmap_info.med_mean);
 
    return;
 }
