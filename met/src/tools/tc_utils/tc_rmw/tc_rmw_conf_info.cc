@@ -224,6 +224,8 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
         }
     }
 
+    mlog << Debug(2) << "n_data:" << n_data << "\n";
+
     return;
 }
 
