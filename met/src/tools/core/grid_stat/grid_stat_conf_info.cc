@@ -250,15 +250,16 @@ void GridStatConfInfo::process_flags() {
       }
 
       // Summary of nc_info flag settings
-      if(vx_opt[i].nc_info.do_latlon)     nc_info.do_latlon     = true;
-      if(vx_opt[i].nc_info.do_raw)        nc_info.do_raw        = true;
-      if(vx_opt[i].nc_info.do_diff)       nc_info.do_diff       = true;
-      if(vx_opt[i].nc_info.do_climo)      nc_info.do_climo      = true;
-      if(vx_opt[i].nc_info.do_weight)     nc_info.do_weight     = true;
-      if(vx_opt[i].nc_info.do_nbrhd)      nc_info.do_nbrhd      = true;
-      if(vx_opt[i].nc_info.do_fourier)    nc_info.do_fourier    = true;
-      if(vx_opt[i].nc_info.do_gradient)   nc_info.do_gradient   = true;
-      if(vx_opt[i].nc_info.do_apply_mask) nc_info.do_apply_mask = true;
+      if(vx_opt[i].nc_info.do_latlon)       nc_info.do_latlon       = true;
+      if(vx_opt[i].nc_info.do_raw)          nc_info.do_raw          = true;
+      if(vx_opt[i].nc_info.do_diff)         nc_info.do_diff         = true;
+      if(vx_opt[i].nc_info.do_climo)        nc_info.do_climo        = true;
+      if(vx_opt[i].nc_info.do_weight)       nc_info.do_weight       = true;
+      if(vx_opt[i].nc_info.do_nbrhd)        nc_info.do_nbrhd        = true;
+      if(vx_opt[i].nc_info.do_fourier)      nc_info.do_fourier      = true;
+      if(vx_opt[i].nc_info.do_gradient)     nc_info.do_gradient     = true;
+      if(vx_opt[i].nc_info.do_distance_map) nc_info.do_distance_map = true;
+      if(vx_opt[i].nc_info.do_apply_mask)   nc_info.do_apply_mask   = true;
    }
 
    // Check output_ascii_flag
@@ -738,6 +739,12 @@ void GridStatVxOpt::process_config(
       exit(1);
    }
 
+   // Conf: distance_map
+   d = odict.lookup_dictionary(conf_key_distance_map);
+   baddeley_p = d->lookup_int(conf_key_baddeley_p);
+   baddeley_max_dist = d->lookup_double(conf_key_baddeley_max_dist, false);
+   fom_alpha = d->lookup_double(conf_key_fom_alpha);
+
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
@@ -784,15 +791,16 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
    // Parse the various entries
    Dictionary * d = e->dict_value();
 
-   nc_info.do_latlon      = d->lookup_bool(conf_key_latlon_flag);
-   nc_info.do_raw         = d->lookup_bool(conf_key_raw_flag);
-   nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
-   nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
-   nc_info.do_weight      = d->lookup_bool(conf_key_weight);
-   nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
-   nc_info.do_fourier     = d->lookup_bool(conf_key_fourier);
-   nc_info.do_gradient    = d->lookup_bool(conf_key_gradient);
-   nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
+   nc_info.do_latlon       = d->lookup_bool(conf_key_latlon_flag);
+   nc_info.do_raw          = d->lookup_bool(conf_key_raw_flag);
+   nc_info.do_diff         = d->lookup_bool(conf_key_diff_flag);
+   nc_info.do_climo        = d->lookup_bool(conf_key_climo_flag);
+   nc_info.do_weight       = d->lookup_bool(conf_key_weight);
+   nc_info.do_nbrhd        = d->lookup_bool(conf_key_nbrhd);
+   nc_info.do_fourier      = d->lookup_bool(conf_key_fourier);
+   nc_info.do_gradient     = d->lookup_bool(conf_key_gradient);
+   nc_info.do_distance_map = d->lookup_bool(conf_key_distance_map);
+   nc_info.do_apply_mask   = d->lookup_bool(conf_key_apply_mask_flag);
 
    return;
 }
@@ -1008,6 +1016,13 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_mask() * get_n_interp() * get_n_grad());
          break;
 
+      case(i_dmap):
+         // Number of DMAP lines =
+         //    Masks * Smoothing Methods * Thresholds
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_interp() * get_n_cat_thresh());
+         break;
+
       default:
          mlog << Error << "\nGridStatVxOpt::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row
@@ -1079,8 +1094,10 @@ void GridStatNcOutInfo::clear() {
 
 bool GridStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_raw   || do_diff    || do_climo ||
-                 do_weight || do_nbrhd || do_fourier || do_apply_mask;
+   bool status = do_latlon      || do_raw     || do_diff         ||
+                 do_climo       || do_weight  || do_nbrhd        ||
+                 do_fourier     || do_gradient|| do_distance_map ||
+                 do_apply_mask;
 
    return(!status);
 }
@@ -1089,15 +1106,16 @@ bool GridStatNcOutInfo::all_false() const {
 
 void GridStatNcOutInfo::set_all_false() {
 
-   do_latlon     = false;
-   do_raw        = false;
-   do_diff       = false;
-   do_climo      = false;
-   do_weight     = false;
-   do_nbrhd      = false;
-   do_fourier    = false;
-   do_gradient   = false;
-   do_apply_mask = false;
+   do_latlon       = false;
+   do_raw          = false;
+   do_diff         = false;
+   do_climo        = false;
+   do_weight       = false;
+   do_nbrhd        = false;
+   do_fourier      = false;
+   do_gradient     = false;
+   do_distance_map = false;
+   do_apply_mask   = false;
 
    return;
 }
@@ -1106,15 +1124,16 @@ void GridStatNcOutInfo::set_all_false() {
 
 void GridStatNcOutInfo::set_all_true() {
 
-   do_latlon     = true;
-   do_raw        = true;
-   do_diff       = true;
-   do_climo      = true;
-   do_weight     = true;
-   do_nbrhd      = true;
-   do_fourier    = true;
-   do_gradient   = true;
-   do_apply_mask = true;
+   do_latlon       = true;
+   do_raw          = true;
+   do_diff         = true;
+   do_climo        = true;
+   do_weight       = true;
+   do_nbrhd        = true;
+   do_fourier      = true;
+   do_gradient     = true;
+   do_distance_map = true;
+   do_apply_mask   = true;
 
    return;
 }
