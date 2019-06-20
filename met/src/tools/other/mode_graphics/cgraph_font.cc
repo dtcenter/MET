@@ -112,19 +112,16 @@ afm = (Afm *) 0;
 
 face = 0;
 
-const char * c = get_env (cg_font_env);
-
-if ( !c )  {
+if ( !get_env(cg_font_env, gs_font_dir) )  {
 
    mlog << Error
-        << "\n\n  CgFont::init_from_scratch() -> unable to get environment variable \""
+        << "\n\n  CgFont::init_from_scratch() -> "
+        << "unable to get environment variable \""
         << cg_font_env << "\"\n\n";
 
    exit ( 1 );
 
 }
-
-gs_font_dir = c;
 
 clear();
 

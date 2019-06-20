@@ -552,26 +552,21 @@ TableFlatFile::TableFlatFile(int) {
 void TableFlatFile::readUserGribTables(const char * table_type) {
    ConcatString path;
    StringArray filtered_file_names;
-   char * ptr;
 
    //
-   //  search for MET_GRIB_TABLES environment variable
-   //  if not defined, try the older USER_GRIB_TABLES ones
+   // search for MET_GRIB_TABLES environment variable
+   // if not defined, try the older USER_GRIB_TABLES ones
    //
-   ptr = get_env(met_grib_tables);
+   if(!get_env(met_grib_tables, path)) get_env(user_grib_tables, path);
 
-   if(ptr == NULL) ptr = get_env(user_grib_tables);
-
-   if(ptr != NULL) {
-
-      path = ptr;
+   if(!path.empty()) {
 
       filtered_file_names = get_filenames(path, table_type, ".txt", true);
 
       for (int i = 0; i < filtered_file_names.n_elements(); i++) {
 
          //
-         //  write to cout since mlog may not have been constructed yet
+         // write to cout since mlog may not have been constructed yet
          //
          cout << "DEBUG 1: Reading user-defined " << table_type << " "
               << met_grib_tables << " file: " << filtered_file_names[i]

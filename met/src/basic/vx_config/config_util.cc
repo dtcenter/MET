@@ -1674,41 +1674,30 @@ int parse_conf_percentile(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_conf_tmp_dir(Dictionary *dict) {
-   char *ptr = NULL;
-   DIR* tmp_dir = NULL;
-   ConcatString s;
+   DIR* odir = NULL;
+   ConcatString tmp_dir_path;
 
-   if((ptr = get_env("MET_TMP_DIR")) != NULL && ((tmp_dir = met_opendir(ptr)) != NULL )) {
-      s = ptr;
-   }
-   else {
+   if(!get_env("MET_TMP_DIR", tmp_dir_path)) {
       if(!dict) {
          mlog << Error << "\nparse_conf_tmp_dir() -> "
               << "empty dictionary!\n\n";
-         if(tmp_dir != NULL) met_closedir(tmp_dir);
-         if(ptr != NULL) delete ptr;
          exit(1);
       }
       // Read the temporary directory
-      s = dict->lookup_string(conf_key_tmp_dir);
+      tmp_dir_path = dict->lookup_string(conf_key_tmp_dir);
    }
 
    // Make sure that it exists
-   DIR* odir;
-   if((odir = met_opendir(s.c_str())) == NULL ) {
+   if((odir = met_opendir(tmp_dir_path.c_str())) == NULL) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
            << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
-           << s << "\n\n";
-      if(tmp_dir != NULL) met_closedir(tmp_dir);
-      if(odir != NULL) met_closedir(odir);
+           << tmp_dir_path << "\n\n";
       exit(1);
    }
 
-   if(tmp_dir != NULL) met_closedir(tmp_dir);
+   if(odir != NULL) met_closedir(odir);
 
-   if(odir != NULL)  met_closedir(odir);
-
-   return(s);
+   return(tmp_dir_path);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
