@@ -73,6 +73,9 @@ if ( PyErr_Occurred() )  {
    //  read the PYTHONPATH environment variable
    //
 
+ConcatString python_path;
+get_env("PYTHONPATH", python_path);
+
    //
    //  set the arguments
    //
@@ -102,7 +105,7 @@ if ( do_reload )  {
 if ( PyErr_Occurred() )  {
 
    mlog << Warning << "\npython_dataplane() -> "
-        << "an error occurred importing module \"" << get_env("PYTHONPATH")
+        << "an error occurred importing module \"" << python_path
         << "/" << script_name << ".py\"\n\n";
 
    return ( false );
@@ -112,7 +115,7 @@ if ( PyErr_Occurred() )  {
 if ( ! module )  {
 
    mlog << Warning << "\npython_dataplane() -> "
-        << "error running python script \"" << get_env("PYTHONPATH")
+        << "error running python script \"" << python_path
         << "/" << script_name << ".py\"\n\n";
 
    return ( false );
@@ -142,7 +145,7 @@ if ( use_xarray )  {
    if ( !data_array )  {
 
       mlog << Warning << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << get_env("PYTHONPATH")
+           << "trouble reading data from \"" << python_path
            << "/" << script_name << ".py\"\n\n";
 
       return ( false );
@@ -165,7 +168,7 @@ if ( use_xarray )  {
    if ( !numpy_array || !attrs_dict )  {
 
       mlog << Warning << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << get_env("PYTHONPATH")
+           << "trouble reading data from \"" << python_path
            << "/" << script_name << ".py\"\n\n";
 
       return ( false );

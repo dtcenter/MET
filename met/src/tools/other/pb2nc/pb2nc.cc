@@ -2426,27 +2426,26 @@ void write_netcdf_hdr_data() {
    for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
       int var_index;
       std::string var_name;
-      const char *unit_str;
-      const char *desc_str;
+      ConcatString unit_str, desc_str;
 
       unit_str = "";
       var_name = bufr_obs_name_arr[i];
       if (var_names.has(var_name, var_index)) {
-         unit_str = var_units[var_index].c_str();
-         if (0 == strcmp("DEG C", unit_str)) {
+         unit_str = var_units[var_index];
+         if (0 == strcmp("DEG C", unit_str.c_str())) {
             unit_str = "KELVIN";
          }
-         else if (0 == strcmp("MB", unit_str)) {
+         else if (0 == strcmp("MB", unit_str.c_str())) {
             unit_str = "PASCALS";
          }
-         else if (0 == strcmp("MG/KG", unit_str)) {
+         else if (0 == strcmp("MG/KG", unit_str.c_str())) {
             unit_str = "KG/KG";
          }
       }
       nc_var_unit_arr.add(unit_str);
 
       desc_str = (tableB_vars.has(var_name, var_index))
-            ? tableB_descs[var_index].c_str()
+            ? tableB_descs[var_index]
             : "";
       nc_var_desc_arr.add(desc_str);
 

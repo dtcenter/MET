@@ -148,7 +148,7 @@ static NcFile *ncf = open_ncfile(output_filename.text(), true);
 
 mlog << Debug(1) << "Processing Lidar File: " << cline[0] << "\n";
 
-process_calipso_file(ncf, cline[0]);
+process_calipso_file(ncf, cline[0].c_str());
 
 
    //

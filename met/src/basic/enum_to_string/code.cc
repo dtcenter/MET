@@ -1123,7 +1123,7 @@ char c;
 
 n = strlen(len_name);
 
-new_name = new char [n];
+new_name = new char [n + 1];
 
 pos = 0;
 

@@ -68,11 +68,9 @@ bool get_att_value(const NcAtt *att, int &att_val) {
          status = true;
       }
       else if (NC_CHAR == nc_type_id) {
-         int att_size = att->getAttLength();
-         char *att_value = new char[att_size+1];
+         string att_value;
          att->getValues(att_value);
-         att_val = atoi(att_value);
-         delete [] att_value;
+         att_val = atoi(att_value.c_str());
          status = true; 
       }
    }
@@ -90,11 +88,9 @@ bool get_att_value(const NcAtt *att, float &att_val) {
          status = true;
       }
       else if (NC_CHAR == nc_type_id) {
-         int att_size = att->getAttLength();
-         char *att_value = new char[att_size+1];
+         string att_value;
          att->getValues(att_value);
-         att_val = atof(att_value);
-         delete [] att_value;
+         att_val = atof(att_value.c_str());
          status = true; 
       }
    }
@@ -112,11 +108,9 @@ bool get_att_value(const NcAtt *att, double &att_val) {
          status = true;
       }
       else if (NC_CHAR == nc_type_id) {
-         int att_size = att->getAttLength();
-         char *att_value = new char[att_size+1];
+         string att_value;
          att->getValues(att_value);
-         att_val = (double)atof(att_value);
-         delete [] att_value;
+         att_val = (double)atof(att_value.c_str());
          status = true; 
       }
    }
@@ -185,14 +179,11 @@ char get_att_value_char(const NcAtt *att) {
 bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    bool status = false;
    if (!IS_INVALID_NC_P(att)) {
-      int att_size = att->getAttLength();
       nc_type attType = GET_NC_TYPE_ID_P(att);
       if (attType == NC_CHAR) {
-         char *att_value = new char[att_size+1];
+         string att_value;
          att->getValues(att_value);
-         att_value[att_size] = '\0';
          value = att_value;
-         delete [] att_value;
       }
       else { // MET-788: to handle a custom modified NetCDF
          mlog << Error << "\nget_att_value_chars(NcAtt) -> "
@@ -2913,7 +2904,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
 NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
-   for(unsigned int idx; idx<dims.size(); idx++) {
+   for(unsigned int idx=0; idx<dims.size(); idx++) {
       NcDim dim = dims[idx];
       if (!has_dim(to_nc, GET_NC_NAME(dim).c_str())) {
          add_dim(to_nc, GET_NC_NAME(dim), dim.getSize());

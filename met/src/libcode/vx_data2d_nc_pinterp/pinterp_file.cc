@@ -37,7 +37,7 @@ using namespace std;
 
 static const char x_dim_name           [] = "west_east";
 static const char y_dim_name           [] = "south_north";
-static const char t_dim_name           [] = "Time";
+static const char t_dim_name           [] = "time";
 static const char z_dim_p_interp_name  [] = "num_metgrid_levels";
 static const char z_dim_wrf_interp_name[] = "vlevs";
 static const string strl_dim_name         = "DateStrLen";
@@ -185,7 +185,7 @@ bool PinterpFile::open(const char * filename)
 int j, k;
 int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
-const char * c = (const char *) 0;
+string c;
 NcVar v;
 
 
@@ -211,18 +211,18 @@ Dim = new NcDim*[Ndims];
 
 StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
-   
+
 for (j=0; j<Ndims; ++j)  {
-   c = gDimNames[j].c_str();
+   c = to_lower(gDimNames[j]);
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
-   if ( strcasecmp(c, t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
+   if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
 
-   if ( strcasecmp(c, x_dim_name) == 0 )            Xdim = &dim;
-   if ( strcasecmp(c, y_dim_name) == 0 )            Ydim = &dim;
-   if ( strcasecmp(c, z_dim_p_interp_name  ) == 0 ||
-        strcasecmp(c, z_dim_wrf_interp_name) == 0)  Zdim = &dim;
-   if ( strcasecmp(c, t_dim_name) == 0 )            Tdim = &dim;
+   if ( c.compare(x_dim_name) == 0 )            Xdim = &dim;
+   if ( c.compare(y_dim_name) == 0 )            Ydim = &dim;
+   if ( c.compare(z_dim_p_interp_name  ) == 0 ||
+        c.compare(z_dim_wrf_interp_name) == 0)  Zdim = &dim;
+   if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
 
 }
 
@@ -239,7 +239,7 @@ Time = new unixtime [Ntimes];
    // format = YYYY-MM-DD_hh:mm:ss
    //
 
-   
+
 if ( has_var(Nc, times_var_name) ) {
    v = get_var(Nc, times_var_name);
 
@@ -304,22 +304,22 @@ InitTime = parse_init_time(att_value.c_str());
 
    for (j=0; j<Nvars; ++j)  {
       v = get_var(Nc, varNames[j].c_str());
-  
+
       Var[j].var = new NcVar(v);
-  
+
       Var[j].name = GET_NC_NAME(v).c_str();
-  
+
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
-  
+
       Var[j].Dims = new NcDim * [dim_count];
-  
+
       //
       //  parse the variable attributes
       //
       get_att_str( Var[j], description_att_name, Var[j].long_name_att );
       get_att_str( Var[j], units_att_name,       Var[j].units_att     );
-      
+
       //
       //  get the pressure variable and store the hPa conversion factor
       //
@@ -330,37 +330,37 @@ InitTime = parse_init_time(att_value.c_str());
               if ( strcasecmp(Var[j].units_att.c_str(), pa_units_str ) == 0 ) hPaCF = 0.01;
          else if ( strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0 ) hPaCF = 1.0;
       }
-     
-  
+
+
       dimNames.clear();
       get_dim_names(&v, &dimNames);
-  
+
       for (k=0; k<(dim_count); ++k)  {
-        c = dimNames[k].c_str();
+        c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
-  
+
         if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
         if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
         if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
         if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
-        if ( strcasecmp(c, x_dim_name) == 0 ) {
+        if ( c.compare(x_dim_name) == 0 ) {
            Var[j].x_slot = k;
         }
-        if ( strcasecmp(c, y_dim_name) == 0 ) {
+        if ( c.compare(y_dim_name) == 0 ) {
            Var[j].y_slot = k;
         }
-        if ( strcasecmp(c, z_dim_p_interp_name  ) == 0 ||
-             strcasecmp(c, z_dim_wrf_interp_name) == 0) {
+        if ( c.compare(z_dim_p_interp_name  ) == 0 ||
+             c.compare(z_dim_wrf_interp_name) == 0) {
            Var[j].z_slot = k;
         }
-        if ( strcasecmp(c, t_dim_name) == 0 ) {
+        if ( c.compare(t_dim_name) == 0 ) {
            Var[j].t_slot = k;
         }
       }   //  for k
    }   //  for j
 
-  
+
    //
    //  done
    //
@@ -815,38 +815,38 @@ int type_id = GET_NC_TYPE_ID_P(v);
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;
    switch ( type_id )  {
-   
+
       case NcType::nc_INT:
          get_nc_data(v, (int *)&i, lengths, offsets);
          for (y=0; y<Ny; ++y)  {
             d[y] = (double)i[y];
          }
          break;
-     
+
       case NcType::nc_SHORT:
          get_nc_data(v, (short *)&s, lengths, offsets);
          for (y=0; y<Ny; ++y)  {
             d[y] = (double)s[y];
          }
          break;
-     
+
       case NcType::nc_FLOAT:
          get_nc_data(v, (float *)&f, lengths, offsets);
          for (y=0; y<Ny; ++y)  {
             d[y] = (double)f[y];
          }
          break;
-   
+
       case NcType::nc_DOUBLE:
          get_nc_data(v, (double *)&d, lengths, offsets);
          break;
-         
+
       default:
          mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
               << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
          exit ( 1 );
          break;
-   
+
    }   //  switch
 
 

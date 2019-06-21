@@ -829,7 +829,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 StringArray TCStatJob::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Parse the jobstring into a StringArray
@@ -838,10 +838,10 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
    // Loop over the StringArray elements
    for(i=0; i<a.n_elements(); i++) {
 
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Skip newline characters
-      if(strcasecmp(c, "\n") == 0) continue;
+      if(c.compare("\n") == 0) continue;
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -850,75 +850,79 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-desc"              ) == 0) { Desc.add_css(a[i+1]);                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_inc"          ) == 0) { InitInc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1].c_str());              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1].c_str());                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-lead_req"          ) == 0) { LeadReq.add_css_sec(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1].c_str());             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-init_mask"         ) == 0) { InitMask.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1].c_str());                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-line_type"         ) == 0) { LineType.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1].c_str());            a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_thresh"     ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), ColumnThreshMap);
-                                                                                                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrMap);
-                                                                                                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitThreshMap);
-                                                                                                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrMap);
-                                                                                                      a.shift_down(i, 2); }
-      else if(strcasecmp(c, "-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time"         ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str());
-                                                           RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time_adeck"   ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_time_bdeck"   ) == 0) { RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact"        ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());
-                                                           RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact_adeck"  ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_exact_bdeck"  ) == 0) { RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh"       ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());
-                                                           RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_window"       ) == 0) {
-         if(i+2 < a.n_elements() && is_number(a[i+2].c_str()))   { RIRWWindowBeg = timestring_to_sec(a[i+1].c_str());
-                                                           RIRWWindowEnd = timestring_to_sec(a[i+2].c_str()); a.shift_down(i, 2); }
-         else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1].c_str());
-                                                           RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
+           if(c.compare("-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]);         a.shift_down(i, 1); }
+      else if(c.compare("-amodel"            ) == 0) { AModel.add_css(a[i+1]);                            a.shift_down(i, 1); }
+      else if(c.compare("-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                            a.shift_down(i, 1); }
+      else if(c.compare("-desc"              ) == 0) { Desc.add_css(a[i+1]);                              a.shift_down(i, 1); }
+      else if(c.compare("-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                           a.shift_down(i, 1); }
+      else if(c.compare("-basin"             ) == 0) { Basin.add_css(a[i+1]);                             a.shift_down(i, 1); }
+      else if(c.compare("-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                           a.shift_down(i, 1); }
+      else if(c.compare("-storm_name"        ) == 0) { StormName.add_css(a[i+1]);                         a.shift_down(i, 1); }
+      else if(c.compare("-init_beg"          ) == 0) { InitBeg = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(c.compare("-init_end"          ) == 0) { InitEnd = timestring_to_unix(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(c.compare("-init_inc"          ) == 0) { InitInc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(c.compare("-init_exc"          ) == 0) { InitExc.add_css(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(c.compare("-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1].c_str());              a.shift_down(i, 1); }
+      else if(c.compare("-lead"              ) == 0) { Lead.add_css_sec(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(c.compare("-lead_req"          ) == 0) { LeadReq.add_css_sec(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
+      else if(c.compare("-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1].c_str());     a.shift_down(i, 1); }
+      else if(c.compare("-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(c.compare("-valid_exc"         ) == 0) { ValidExc.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(c.compare("-valid_hour"        ) == 0) { ValidHour.add_css_sec(a[i+1].c_str());             a.shift_down(i, 1); }
+      else if(c.compare("-init_mask"         ) == 0) { InitMask.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(c.compare("-valid_mask"        ) == 0) { ValidMask.add_css(a[i+1].c_str());                 a.shift_down(i, 1); }
+      else if(c.compare("-line_type"         ) == 0) { LineType.add_css(a[i+1].c_str());                  a.shift_down(i, 1); }
+      else if(c.compare("-track_watch_warn"  ) == 0) { TrackWatchWarn.add_css(a[i+1].c_str());            a.shift_down(i, 1); }
+      else if(c.compare("-column_thresh"     ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), ColumnThreshMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-column_str"        ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), ColumnStrMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-init_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitThreshMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
+      else if(c.compare("-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(c.compare("-rirw_time"         ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str());
+                                                       RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(c.compare("-rirw_time_adeck"   ) == 0) { RIRWTimeADeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(c.compare("-rirw_time_bdeck"   ) == 0) { RIRWTimeBDeck = timestring_to_sec(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(c.compare("-rirw_exact"        ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());
+                                                       RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(c.compare("-rirw_exact_adeck"  ) == 0) { RIRWExactADeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(c.compare("-rirw_exact_bdeck"  ) == 0) { RIRWExactBDeck = string_to_bool(a[i+1].c_str());   a.shift_down(i, 1); }
+      else if(c.compare("-rirw_thresh"       ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());
+                                                       RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-rirw_window"       ) == 0) {
+         if(i+2 < a.n_elements() && is_number(a[i+2].c_str())) {
+                                                       RIRWWindowBeg = timestring_to_sec(a[i+1].c_str());
+                                                       RIRWWindowEnd = timestring_to_sec(a[i+2].c_str()); a.shift_down(i, 2); }
+         else {
+                                                       RIRWWindowEnd = timestring_to_sec(a[i+1].c_str());
+                                                       RIRWWindowBeg = -1 * RIRWWindowEnd;                a.shift_down(i, 1); }
       }
-      else if(strcasecmp(c, "-probrirw_thresh"   ) == 0) { ProbRIRWThresh = atof(a[i+1].c_str());             a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1].c_str());         a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-landfall_window")    == 0) {
-                                                           Landfall = true; // For -landfall_window, set -landfall true
-         if(i+2 < a.n_elements() && is_number(a[i+2].c_str()))   { LandfallBeg = timestring_to_sec(a[i+1].c_str());
-                                                           LandfallEnd = timestring_to_sec(a[i+2].c_str());   a.shift_down(i, 2); }
-         else                                            { LandfallEnd = timestring_to_sec(a[i+1].c_str());
-                                                           LandfallBeg = -1 * LandfallEnd;            a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_thresh"   ) == 0) { ProbRIRWThresh = atof(a[i+1].c_str());             a.shift_down(i, 1); }
+      else if(c.compare("-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1].c_str());         a.shift_down(i, 1); }
+      else if(c.compare("-landfall_window")    == 0) {
+                                                       Landfall = true; // For -landfall_window, set -landfall true
+         if(i+2 < a.n_elements() && is_number(a[i+2].c_str())) {
+                                                       LandfallBeg = timestring_to_sec(a[i+1].c_str());
+                                                       LandfallEnd = timestring_to_sec(a[i+2].c_str());   a.shift_down(i, 2); }
+         else {
+                                                       LandfallEnd = timestring_to_sec(a[i+1].c_str());
+                                                       LandfallBeg = -1 * LandfallEnd;                    a.shift_down(i, 1); }
       }
-      else if(strcasecmp(c, "-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1].c_str());      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1].c_str());       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1].c_str());        a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1].c_str());                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1].c_str());                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();       a.shift_down(i, 1); }
-      else                                               {                                            b.add(a[i]);        }
+      else if(c.compare("-match_points"      ) == 0) { MatchPoints = string_to_bool(a[i+1].c_str());      a.shift_down(i, 1); }
+      else if(c.compare("-event_equal"       ) == 0) { EventEqual = string_to_bool(a[i+1].c_str());       a.shift_down(i, 1); }
+      else if(c.compare("-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1].c_str());        a.shift_down(i, 1); }
+      else if(c.compare("-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1].c_str());                 a.shift_down(i, 1); }
+      else if(c.compare("-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1].c_str());                a.shift_down(i, 1); }
+      else if(c.compare("-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();               a.shift_down(i, 1); }
+      else if(c.compare("-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();               a.shift_down(i, 1); }
+      else                                           {                                                    b.add(a[i]);        }
    }
 
    return(b);
@@ -1782,7 +1786,7 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
 
 StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -1792,7 +1796,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -1801,13 +1805,13 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
-                                                     add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));   a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
-      else                                         {                                       b.add(a[i]);        }
+           if(c.compare("-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
+                                                 add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
+      else if(c.compare("-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
+      else if(c.compare("-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));           a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
+      else if(c.compare("-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
+      else                                     {                                               b.add(a[i]);        }
    }
 
    return(b);
@@ -2458,7 +2462,7 @@ TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
    else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
    else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
-   else                                                   t = NoTCStatJobType;
+   else                                                           t = NoTCStatJobType;
 
    return(t);
 }
@@ -2629,7 +2633,7 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
 
 void parse_thresh_option(const char *col_name, const char *col_val,
                          map<ConcatString,ThreshArray> &m) {
-  ConcatString cs = to_upper((string)col_name);
+   ConcatString cs = to_upper((string)col_name);
    ThreshArray ta;
    ta.add_css(col_val);
 
@@ -2644,7 +2648,7 @@ void parse_thresh_option(const char *col_name, const char *col_val,
 
 void parse_string_option(const char *col_name, const char *col_val,
                          map<ConcatString,StringArray> &m) {
-  ConcatString cs = to_upper((string)col_name);
+   ConcatString cs = to_upper((string)col_name);
    StringArray sa;
    sa.set_ignore_case(1);
    sa.add_css(col_val);
@@ -2756,7 +2760,7 @@ void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
 
 StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -2769,7 +2773,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -2778,10 +2782,10 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));  a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
-      else                                           {                                        b.add(a[i]);        }
+           if(c.compare("-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));            a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
+      else if(c.compare("-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
+      else                                       {                                                b.add(a[i]);        }
    }
 
    return(b);
@@ -3501,7 +3505,7 @@ void TCStatJobProbRIRW::assign(const TCStatJobProbRIRW & j) {
 
 StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    StringArray a, b;
-   const char * c = (const char *) 0;
+   string c;
    int i;
 
    // Call the parent and store any unused options
@@ -3515,7 +3519,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
    for(i=0; i<a.n_elements(); i++) {
 
       // Point at the current entry
-      c = a[i].c_str();
+      c = to_lower(a[i]);
 
       // Check for a job command option
       if(c[0] != '-') {
@@ -3524,13 +3528,13 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(strcasecmp(c, "-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                    a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                 a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1].c_str())); a.shift_down(i, 1); }
-      else                                                   {                                                        b.add(a[i]);        }
+           if(c.compare("-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                            a.shift_down(i, 1); }
+      else if(c.compare("-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
+      else if(c.compare("-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                         a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
+      else if(c.compare("-probrirw_prob_thresh"  ) == 0) { ProbRIRWProbThresh.add(string_to_prob_thresh(a[i+1].c_str())); a.shift_down(i, 1); }
+      else                                               {                                                                b.add(a[i]);        }
    }
 
    return(b);
