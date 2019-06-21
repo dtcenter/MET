@@ -449,14 +449,11 @@ void ObsErrorTable::initialize() {
    ConcatString path;
    ConcatString desc;
    StringArray file_names;
-   char *ptr;
 
    //
    // Use MET_OBS_ERROR_TABLE, if set
    //
-   ptr = get_env(met_obs_error_table);
-   if((ptr = get_env(met_obs_error_table)) != NULL) {
-      path = ptr;
+   if(get_env(met_obs_error_table, path)) {
       desc << "user-defined " << met_obs_error_table;
    }
    //

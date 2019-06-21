@@ -33,7 +33,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char x_dim_name []           = "lon";
+static const char x_dim_name []          = "lon";
 static const char y_dim_name []          = "lat";
 
 static const string valid_time_att_name  = "valid_time_ut";
@@ -141,7 +141,7 @@ bool MetNcFile::open(const char * filename)
 {
 
 int j, k;
-const char * c = (const char *) 0;
+string c;
 long long ill, vll;
 NcVar v;
 
@@ -168,13 +168,13 @@ get_dim_names(Nc, &gDimNames);
 Ndims = gDimNames.n_elements();
 
 for (j=0; j<Ndims; ++j)  {
-   c = gDimNames[j].c_str();
+   c = to_lower(gDimNames[j]);
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
-   if ( strcmp(c, x_dim_name) == 0 ) {
+   if ( c.compare(x_dim_name) == 0 ) {
       Xdim = &dim;
    }
-   if ( strcmp(c, y_dim_name) == 0 ) {
+   if ( c.compare(y_dim_name) == 0 ) {
       Ydim = &dim;
    }
 
@@ -222,12 +222,12 @@ for (j=0; j<Ndims; ++j)  {
       get_dim_names(&v, &dimNames);
 
       for (k=0; k<(dim_count); ++k)  {
-         c = dimNames[k].c_str();
+         c = to_lower(dimNames[k]);
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
 
-         if ( strcmp(c, x_dim_name) == 0 ) Var[j].x_slot = k;
-         if ( strcmp(c, y_dim_name) == 0 ) Var[j].y_slot = k;
+         if ( c.compare(x_dim_name) == 0 ) Var[j].x_slot = k;
+         if ( c.compare(y_dim_name) == 0 ) Var[j].y_slot = k;
 
       }   //  for k
 

@@ -345,7 +345,7 @@ void process_data_file() {
    ConcatString geostationary_file(tmp_dir);
    ConcatString grid_map_file(tmp_dir);
    if (is_geostationary) {
-      char *env_coord_name = get_env(key_geostationary_data);
+      ConcatString env_coord_name;
       grid_map_file.add("/");
       grid_map_file.add(make_geostationary_filename(fr_grid, to_grid));
       geostationary_file.add("/");
@@ -353,8 +353,9 @@ void process_data_file() {
       if (file_exists(grid_map_file.c_str())) {
          run_cs << " with " << grid_map_file;
       }
-      else if ((env_coord_name != NULL) && (strlen(env_coord_name) > 0)
-                && file_exists(env_coord_name)) {
+      else if (get_env(key_geostationary_data, env_coord_name) &&
+               env_coord_name.nonempty() &&
+               file_exists(env_coord_name.c_str())) {
          run_cs << " with " << env_coord_name;
       }
       else if (file_exists(geostationary_file.c_str())) {
@@ -668,10 +669,11 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    int from_lon_count = fr_grid.nx();
 
    bool has_coord_input;
-   char *tmp_coord_name = get_env(key_geostationary_data);
+   ConcatString tmp_coord_name;
 
-   if ((tmp_coord_name != NULL) && strlen(tmp_coord_name)
-        && file_exists(tmp_coord_name)) {
+   if (get_env(key_geostationary_data, tmp_coord_name) &&
+       tmp_coord_name.nonempty() &&
+       file_exists(tmp_coord_name.c_str())) {
       has_coord_input = true;
       cur_coord_name = tmp_coord_name;
    }
@@ -1133,11 +1135,11 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    static const char *method_name = "save_geostationary_data() ";
 
    NcFile *nc_file = open_ncfile(geostationary_file.text(), true);
-   NcDim xdim = add_dim(nc_file, dim_name_lat, grid_data.nx);
-   NcDim ydim = add_dim(nc_file, dim_name_lon, grid_data.ny);
+   NcDim xdim = add_dim(nc_file, dim_name_lon, grid_data.nx);
+   NcDim ydim = add_dim(nc_file, dim_name_lat, grid_data.ny);
 
-   NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, xdim, ydim, deflate_level);
-   NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, xdim, ydim, deflate_level);
+   NcVar lat_var = add_var(nc_file, var_name_lat, ncFloat, ydim, xdim, deflate_level);
+   NcVar lon_var = add_var(nc_file, var_name_lon, ncFloat, ydim, xdim, deflate_level);
 
    if (!IS_INVALID_NC(lat_var)) {
       if (grid_data.dy_rad >= 0) {
