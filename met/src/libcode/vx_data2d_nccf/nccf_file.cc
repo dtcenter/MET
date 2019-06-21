@@ -394,13 +394,13 @@ bool NcCfFile::open(const char * filepath)
     for (int k=0; k<(dim_count); ++k)  {
       const ConcatString c = dimNames[k];
       NcDim *dim = Var[j].Dims[k];
-      if ((dim == _xDim) || c  == x_dim_var_name) {
+      if ((dim && dim == _xDim) || c  == x_dim_var_name) {
          Var[j].x_slot = k;
       }
-      else if ((dim == _yDim) || c == y_dim_var_name) {
+      else if ((dim && dim == _yDim) || c == y_dim_var_name) {
          Var[j].y_slot = k;
       }
-      else if ((dim == _tDim) || c == t_dim_name) {
+      else if ((dim && dim == _tDim) || c == t_dim_name) {
          Var[j].t_slot = k;
       }
     }
