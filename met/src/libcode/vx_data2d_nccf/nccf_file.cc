@@ -91,7 +91,7 @@ void NcCfFile::init_from_scratch()
   _dims = (NcDim **) 0;
   Var = (NcVarInfo *) 0;
   _time_var_info = (NcVarInfo *)NULL;
-  
+
   // Close any existing file
 
   close();
@@ -198,7 +198,7 @@ bool NcCfFile::open(const char * filepath)
   NcVar *valid_time_var = (NcVar *)0;
   ConcatString att_value;
 
-    
+
   StringArray varNames;
   Nvars = get_var_names(_ncFile, &varNames);
   Var = new NcVarInfo [Nvars];
@@ -394,7 +394,7 @@ bool NcCfFile::open(const char * filepath)
     for (int k=0; k<(dim_count); ++k)  {
       const ConcatString c = dimNames[k];
       NcDim *dim = Var[j].Dims[k];
-      if ((dim && dim == _xDim) || c  == x_dim_var_name) {
+      if      ((dim && dim == _xDim) || c == x_dim_var_name) {
          Var[j].x_slot = k;
       }
       else if ((dim && dim == _yDim) || c == y_dim_var_name) {
@@ -802,7 +802,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   }
   if (att_add_offset) delete att_add_offset;
   if (att_scale_factor) delete att_scale_factor;
-  
+
   double missing_value = get_var_missing_value(var);
   double fill_value    = get_var_fill_value(var);
 
@@ -1289,7 +1289,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
   ConcatString grid_mapping_name;
   status = get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
   if (grid_mapping_name_att) delete grid_mapping_name_att;
-  
+
   // Handle each mapping type defined in the standard
 
   if (grid_mapping_name == "albers_conical_equal_area")
@@ -1451,7 +1451,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
     const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
     if (IS_INVALID_NC(coord_var)) continue;
-    
+
     const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
     if (IS_INVALID_NC_P(std_name_att)) {
       if (std_name_att) delete std_name_att;
@@ -1468,7 +1468,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
        delete std_name_att;
        std_name_att = (NcVarAtt *)0;
     }
-  
+
     // See if this is an X or Y dimension
 
     if ( dim_std_name == x_dim_key_name )
@@ -1737,14 +1737,14 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
       if (units_att) delete units_att;
       continue;
     }
- 
+
     //const char *dim_units = units_att->getValues(att->as_string(0);
     ConcatString dim_units;
     if (!get_att_value_chars(units_att, dim_units)) {
       if (units_att) delete units_att;
       continue;
     }
- 
+
     if (units_att) delete units_att;
 
     // See if this is a lat or lon dimension
@@ -2012,16 +2012,16 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
     const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
     if (IS_INVALID_NC_P(std_name_att)) {
-      if (std_name_att) delete std_name_att;  
+      if (std_name_att) delete std_name_att;
       continue;
     }
     ConcatString dim_std_name;
     if (!get_att_value_chars(std_name_att, dim_std_name)) {
-      if (std_name_att) delete std_name_att;  
+      if (std_name_att) delete std_name_att;
       continue;
     }
-    if (std_name_att) delete std_name_att;  
-  
+    if (std_name_att) delete std_name_att;
+
     // See if this is an X or Y dimension
 
     if ( dim_std_name == x_dim_key_name)
@@ -2367,7 +2367,7 @@ void NcCfFile::get_grid_mapping_geostationary(
     }
     if (std_name_att) delete std_name_att;
 
-  
+
     // See if this is an X or Y dimension
 
     if ( dim_std_name == x_dim_key_name )
@@ -2442,7 +2442,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   }
 
   if (do_exit) exit(1);
-  
+
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
@@ -2474,7 +2474,7 @@ void NcCfFile::get_grid_mapping_geostationary(
     if ( Var[j].name == "x_image_bounds" ) var_x_bound = Var[j].var;
     if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var;
   }
-  
+
 
   // Fill in the data structure.  Remember to negate the longitude
   // values since MET uses the mathematical coordinate system centered on
@@ -2484,7 +2484,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   double double_data;
   NumArray double_datas;
   data.reset();
-  
+
   //data.name = grid_mapping_var->getName().c_str();
   data.name = grid_mapping_name_geostationary;
   data.perspective_point_height = get_att_value_double(perspective_point_height_att);
@@ -2512,7 +2512,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.H = data.perspective_point_height + data.semi_major_axis;
   //data._xSubSatIdx;
   //data._ySubSatIdx;
-  
+
   data.x_values = new double[x_counts];
   data.y_values = new double[y_counts];
 
@@ -2538,12 +2538,12 @@ void NcCfFile::get_grid_mapping_geostationary(
     scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
   }
-  
+
   // Note: Computing lat/lon was deferred because it took 1 minutes
-  
+
   grid.set(data);
   //data.dump();
-  
+
   if (perspective_point_height_att) delete perspective_point_height_att;
   if (semi_major_axis_att) delete semi_major_axis_att;
   if (semi_minor_axis_att) delete semi_minor_axis_att;
