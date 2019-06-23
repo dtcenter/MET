@@ -456,7 +456,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
             data_info = conf_info.data_info[i_var];
             // Get data
             get_series_entry(i_point, data_info,
-                data_files, ftype, found_data_files, data_dp);
+                data_files, ftype, found_data_files,
+                data_dp, latlon_grid);
         }
 
         // compute lat and lon coordinate arrays

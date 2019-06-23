@@ -109,6 +109,7 @@ static StringArray nc_var_sa;
 
 static StringArray  out_files;
 static DataPlane    dp;
+static Grid         latlon_grid;
 static TcrmwData    grid_data;
 static TcrmwGrid    grid;
 static ConcatString wwarn_file;
