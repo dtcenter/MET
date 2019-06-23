@@ -428,6 +428,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
     DataPlane data_dp;
+    DataPlane u_dp;
+    DataPlane v_dp;
 
     // these should be DataPlanes
     lat_grid = new double[
@@ -470,6 +472,9 @@ static void compute_grids(const TrackInfoArray& tracks) {
                 lon_grid[ir * grid.azimuth_n() + ia] = - lon;
             }
         }
+
+        // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
+        // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
 
         // write coordinate arrays
         write_tc_data(nc_out, grid, i_point, lat_grid_var, lat_grid);
