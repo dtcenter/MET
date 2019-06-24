@@ -22,15 +22,15 @@ data = {
     field = [
         {
           name = "T";
-          level = ["L0"];
+          level = ["(0,41,*,*)"];
         },
         {
           name = "U";
-          level = ["L0"];
+          level = ["(0,41,*,*)"];
         },
         {
           name = "V";
-          level = ["L0"];
+          level = ["(0,41,*,*)"];
         }
     ];
 }
