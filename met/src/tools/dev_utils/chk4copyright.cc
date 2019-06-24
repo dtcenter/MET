@@ -133,11 +133,13 @@ int main(int argc, char *argv[])
       //
    if (copyright_notice_filename.length() == 0)
    {
-      copyright_notice_filename = get_env("COPYRIGHT_NOTICE");
+      get_env("COPYRIGHT_NOTICE", copyright_notice_filename);
 
-      if (copyright_notice_filename.length() == 0)
+      if(copyright_notice_filename.empty())
       {
-         mlog << Error << "\nno copyright notice filename given on command line or set in the environment variable COPYRIGHT_NOTICE!\n\n";
+         mlog << Error << "\nno copyright notice filename given on "
+              << "command line or set in the environment variable "
+              << "COPYRIGHT_NOTICE!\n\n";
          usage();
       }
    }
@@ -213,7 +215,6 @@ void process_directory(const char * dir_name)
    int fd;
    int pid;
    bool notice_found = false;
-   char *ptr;
 
       //
       // set the temporary directory and temporary filename
@@ -221,14 +222,8 @@ void process_directory(const char * dir_name)
 
    pid = getpid();
    
-   if((ptr = get_env("TMPDIR")) != NULL)
-   {
-       tmp_directory = ptr;
-   }
-   else if((ptr = get_env("MET_TMP_DIR")) != NULL)
-   {
-      tmp_directory = ptr;
-   }
+        if(get_env("TMPDIR",      tmp_directory)) {}
+   else if(get_env("MET_TMP_DIR", tmp_directory)) {}
    else
    {
       tmp_directory = "/tmp";

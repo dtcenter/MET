@@ -5933,7 +5933,7 @@ hbox{AUC}=
 \backslash
 frac{1}{2}
 \backslash
-sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}+POFD_i)$$
+sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}-POFD_i)$$
 \end_layout
 
 \end_inset

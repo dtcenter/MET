@@ -199,7 +199,7 @@ for (j=0; j<N_items; ++j)  {
    //snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
    sstream << "Item[" << j << "]       = \"";
-   out << prefix << sstream << Line.substr(j) << "\"\n";
+   out << prefix << sstream.str() << Line.substr(j) << "\"\n";
 
    if ( (j%5) == 4 )  out << prefix << "\n";
 
@@ -215,7 +215,7 @@ for (j=0; j<N_items; ++j)  {
 
    //snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
    sstream << "Offset[" << j << "]     = ";
-   out << prefix << sstream << Offset[j] << "\n";
+   out << prefix << sstream.str() << Offset[j] << "\n";
 
    if ( (j%5) == 4 )  out << prefix << "\n";
 

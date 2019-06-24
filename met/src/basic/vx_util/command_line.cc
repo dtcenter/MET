@@ -304,7 +304,8 @@ u = new CLOptionInfo [n];
 
 if ( !u )  {
 
-   mlog << Error << "\nCLOptionInfoArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nCLOptionInfoArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -368,7 +369,8 @@ void CLOptionInfoArray::set_alloc_inc(int n)
 
 if ( n < 0 )  {
 
-   mlog << Error << "\nCLOptionInfoArray::set_alloc_int(int) -> bad value ... " << n << "\n\n";
+   mlog << Error << "\nCLOptionInfoArray::set_alloc_int(int) -> "
+        << "bad value ... " << n << "\n\n";
 
    exit ( 1 );
 
@@ -429,7 +431,8 @@ CLOptionInfo & CLOptionInfoArray::operator[](int n) const
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\nCLOptionInfoArray::operator[](int) -> range check error ... " << n << "\n\n";
+   mlog << Error << "\nCLOptionInfoArray::operator[](int) -> "
+        << "range check error ... " << n << "\n\n";
 
    exit ( 1 );
 }
@@ -442,15 +445,16 @@ return ( e[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int CLOptionInfoArray::lookup(const char * name) const
+int CLOptionInfoArray::lookup(const string & name) const
 
 {
 
 int j;
+ConcatString cs = name;
 
 for (j=0; j<Nelements; ++j)  {
 
-  if ( strcmp(name, e[j].option_text.c_str()) == 0 )  return ( j );
+  if ( e[j].option_text == cs )  return ( j );
 
 }
 
@@ -668,7 +672,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * CommandLine::operator[](int k) const
+const string CommandLine::operator[](int k) const
 
 {
 
@@ -678,11 +682,7 @@ const char * CommandLine::operator[](int k) const
    //    StringArray::operator[](int)
    //
 
-const char * c = (const char *) 0;
-
- c = args[k].c_str();
-
-return ( c );
+return ( args[k] );
 
 }
 
@@ -690,7 +690,7 @@ return ( c );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool CommandLine::has_option(const char *text) const
+bool CommandLine::has_option(const string & text) const
 
 {
 
@@ -711,22 +711,19 @@ int CommandLine::next_option(int & option_index) const
 {
 
 int j, N;
-const char * name = (const char *) 0;
 
 
 N = args.n_elements();
 
 for (j=0; j<N; ++j)  {
 
-  name = args[j].c_str();
+   if ( is_switch(args[j]) )  {
 
-   if ( is_switch(name) )  {
+      if ( (args[j].compare("-help") == 0) || (args[j].compare("--help") == 0) )  do_help();   //  doesn't return
 
-      if ( (strcmp(name, "-help") == 0) || (strcmp(name, "--help") == 0) )  do_help();   //  doesn't return
+      if ( (args[j].compare("-version") == 0) || (args[j].compare("--version") == 0) )  show_version();   //  doesn't return
 
-      if ( (strcmp(name, "-version") == 0) || (strcmp(name, "--version") == 0) )  show_version();   //  doesn't return
-
-      option_index = options.lookup(args[j].c_str());
+      option_index = options.lookup(args[j]);
 
       if ( option_index >= 0 )  return ( j );
 
@@ -737,7 +734,8 @@ for (j=0; j<N; ++j)  {
       if ( AllowUnrecognizedSwitches )  continue;
       else {
 
-         mlog << Error << "\nCommandLine::next_option() -> unrecognized command-line switch \"" << args[j] << "\"\n\n";
+         mlog << Error << "\nCommandLine::next_option() -> "
+              << "unrecognized command-line switch \"" << args[j] << "\"\n\n";
 
          exit ( 1 );
 
@@ -761,7 +759,7 @@ return ( -1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void CommandLine::add(CLSetFunction func, const char * text, int n_args)
+void CommandLine::add(CLSetFunction func, const string & text, int n_args)
 
 {
 
@@ -791,7 +789,8 @@ void CommandLine::do_help() const
 if ( Usage )  Usage();
 else {
 
-   mlog << Error << "\n" << ProgramName << ": no usage message available ... sorry.\n\n";
+   mlog << Error << "\n" << ProgramName
+        << ": no usage message available ... sorry.\n\n";
 
 }
 
@@ -868,16 +867,13 @@ void CommandLine::parse()
 int j, index;
 int N, M;
 StringArray a;
-const char * switch_name = (const char *) 0;
 
 
 while ( (j = next_option(index)) >= 0 )  {
 
-  switch_name = args[j].c_str();
-
    if ( index < 0 )  {
 
-      mlog << Error << "\n" << ProgramName << ": unrecognized command-line switch: \"" << switch_name << "\"\n\n";
+      mlog << Error << "\n" << ProgramName << ": unrecognized command-line switch: \"" << args[j] << "\"\n\n";
 
       if ( Usage )  Usage();
 
@@ -899,7 +895,7 @@ while ( (j = next_option(index)) >= 0 )  {
 
       M = N;
 
-      get_n_args(a, N, switch_name, j + 1);
+      get_n_args(a, N, args[j], j + 1);
 
    }
 
@@ -925,7 +921,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CommandLine::get_n_args(StringArray & a, const int Nargs, const char * switch_name, const int pos)
+void CommandLine::get_n_args(StringArray & a, const int Nargs,
+                             const string & switch_name, const int pos)
 
 {
 
@@ -934,7 +931,6 @@ a.clear();
 if ( Nargs == 0 )  return;
 
 int j, k;
-const char * c = (const char *) 0;
 
 
 for (j=0; j<Nargs; ++j)  {
@@ -943,23 +939,25 @@ for (j=0; j<Nargs; ++j)  {
 
    if ( k >= args.n_elements() )  {
 
-      mlog << Error << "\nCommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+      mlog << Error << "\nCommandLine::get_n_args() -> "
+           << "too few arguments to command-line switch \""
+           << switch_name << "\"\n\n";
 
       exit ( 1 );
 
    }
 
-   c = args[k].c_str();
+   if ( is_switch(args[k]) )  {
 
-   if ( is_switch(c) )  {
-
-      mlog << Error << "\nCommandLine::get_n_args() -> too few arguments to command-line switch \"" << switch_name << "\"\n\n";
+      mlog << Error << "\nCommandLine::get_n_args() -> "
+           << "too few arguments to command-line switch \""
+           << switch_name << "\"\n\n";
 
       exit ( 1 );
 
    }
 
-   a.add(c);
+   a.add(args[k]);
 
 }   //  for j
 
@@ -980,7 +978,6 @@ int CommandLine::get_unlimited_args(StringArray & a, const int pos)
 {
 
 int k, count;
-const char * c = (const char *) 0;
 
 
 a.clear();
@@ -993,11 +990,9 @@ while ( 1 )  {
 
    if ( k >= args.n_elements() )  break;
 
-   c = args[k].c_str();
+   if ( is_switch(args[k]) )  break;
 
-   if ( is_switch(c) )  break;
-
-   a.add(c);
+   a.add(args[k]);
 
    ++count;
 
@@ -1016,13 +1011,14 @@ return ( count );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool CommandLine::is_switch(const char * text) const
+bool CommandLine::is_switch(const string & text) const
 
 {
 
-if ( !text || !(*text) )  {
+if ( text.empty() )  {
 
-   mlog << Error << "\nCommandLine::is_switch(const char *) const -> empty string!\n\n";
+   mlog << Error << "\nCommandLine::is_switch(const string &) const -> "
+        << "empty string!\n\n";
 
    exit ( 1 );
 
@@ -1030,7 +1026,7 @@ if ( !text || !(*text) )  {
 
 if ( text[0] != '-' )  return ( false );
 
-if ( AllowNumbers && is_number(text) )  return ( false );
+if ( AllowNumbers && is_number(text.c_str()) )  return ( false );
 
 return ( true );
 

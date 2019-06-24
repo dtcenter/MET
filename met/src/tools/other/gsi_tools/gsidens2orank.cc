@@ -113,12 +113,12 @@ int main(int argc, char * argv []) {
    }
    // Process one remaining argument as a filename
    else if(cline.n() == 1) {
-      ens_file_list = parse_ascii_file_list(cline[0]);
+      ens_file_list = parse_ascii_file_list(cline[0].c_str());
    }
    // Process multiple remaining arguments as a list of filenames
    else {
       for(int i=0; i<(cline.n()); i++) {
-         ens_file_list.add(cline[i]);
+         ens_file_list.add(cline[i].c_str());
       }
    }
 
@@ -143,12 +143,12 @@ int main(int argc, char * argv []) {
       // Setup first pass
       if(i==0) {
          setup_header(shc, hdr_name, hdr_value, "ORANK");
-         conv_flag  = is_conv(cline[0]);
-         retr_flag  = (!conv_flag) && is_retr(cline[0]);
+         conv_flag  = is_conv(cline[0].c_str());
+         retr_flag  = (!conv_flag) && is_retr(cline[0].c_str());
       }
 
       // Check for consistent ensemble member file types
-      if(is_conv(cline[i]) != conv_flag) {
+      if(is_conv(cline[i].c_str()) != conv_flag) {
          mlog << Error
               << "\nThe ensemble binary GSI diagnostic files must all "
               << "be of the same type (conventional or radiance).\n\n.";
@@ -156,8 +156,8 @@ int main(int argc, char * argv []) {
       }
 
       // Process by file type
-      if(conv_flag) process_conv(cline[i], i);
-      else          process_rad (cline[i], i);
+      if(conv_flag) process_conv(cline[i].c_str(), i);
+      else          process_rad (cline[i].c_str(), i);
    }
 
    // Process ensemble mean file
