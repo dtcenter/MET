@@ -28,6 +28,12 @@ extern bool match_met_version(const char *);
 
 extern void check_met_version(const char *);
 
+extern ConcatString parse_version(const char *, const int);
+
+extern ConcatString parse_version_major(const char *);
+
+extern ConcatString parse_version_major_minor(const char *);
+
 extern const char * get_short_name(const char * path);
 
 extern void append_char(char *, const char);
