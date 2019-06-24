@@ -74,7 +74,7 @@ ConcatString parse_version(const char * version, const int ndots) {
    int i, n;
 
    //
-   // Find the major and minor version number (Vx.y) substring.
+   // Parse the version string to the requested depth.
    //
    for(i=n=0; i<s.length(); i++) {
       if(s[i] == '.') n++;
