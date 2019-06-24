@@ -1,4 +1,4 @@
-Model Evaluation Tools version 8.1 (May 3, 2019)
+Model Evaluation Tools version 8.1.1 (June 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -320,6 +320,21 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+- When applicable, release notes are followed by the GitHub issue number which
+  describes the bugfix, enhancement, or new feature:
+  https://github.com/NCAR/MET/issues
+
+Version 8.1.1 Bugfix Release Notes:
+----------------------------------
+
+- Fix MET to correctly handle the updated "V8.1.1" version number (#1153).
+- Fix compilation problems for GNU 6.3.0 and later versions (#1139).
+- Bugfix for header array index when computing time summaries in PB2NC (#1137).
+- Bugfix for segfault in Grid-Stat when reading climo_mean data (#1146).
+- Bugfix to ALPHA=NA in the GRAD output line type from Grid-Stat (#1131).
+- Bugfix for the OBJECT_ID column in the 2D ASCII output files from MTD (#1128).
+- Minor corrections in the user's guide (#1150).
 
 Version 8.1 Release Notes:
 -------------------------
