@@ -177,6 +177,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
       // If dimensions are specified, clear the default value
       if (strchr(ptr, ',') != NULL) Dimension.clear();
 
+      bool as_offset = true;
       // Parse the dimensions
       while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
       {
@@ -186,7 +187,6 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
          }
          else
          {
-            bool as_offset = true;
             // Check for a range of levels
             if ((ptr3 = strchr(ptr2, '-')) != NULL)
             {
@@ -270,13 +270,14 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                }
                Dimension.add(level);
             }
-            Level.set_as_offset(as_offset);
          }
 
          // Set ptr to NULL for next call to strtok
          ptr = NULL;
 
       } // end while
+      Level.set_time_as_offset(as_offset);
+
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
