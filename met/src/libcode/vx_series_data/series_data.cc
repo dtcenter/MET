@@ -74,7 +74,7 @@ void get_series_entry(int i_series, VarInfo* data_info,
 
     mlog << Debug(2)
          << "Processing series entry " << i_series + 1 << ": "
-         << data_info->magic_str() << "\n";
+         << data_info->name() << ": " << data_info->magic_str() << "\n";
 
     ConcatString filename;
     filename = search_files[i_series];
