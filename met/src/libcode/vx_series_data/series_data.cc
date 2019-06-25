@@ -79,6 +79,8 @@ void get_series_entry(int i_series, VarInfo* data_info,
     ConcatString filename;
     filename = search_files[i_series];
 
+    dp.clear();
+
     read_single_entry(data_info, filename, type, dp, grid);
 }
 
