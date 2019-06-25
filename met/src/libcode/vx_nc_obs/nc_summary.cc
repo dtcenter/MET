@@ -114,7 +114,9 @@ bool write_observations(NcFile *nc_file, NetcdfObsVars &obs_vars,
   bool do_header = (nc_out_data.processed_hdr_cnt == 0);
 
   mlog << Debug(5) << method_name << "do_header: " << (do_header ? "true" : "false")
-       << ", do_summary: " << (do_summary ? "true" : "false") << "\n";
+       << ", do_summary: " << (do_summary ? "true" : "false")
+       << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
+       << "\n";
   
   if (!do_summary || (do_summary && do_save_raw_data)) {
     mlog << Debug(5) << method_name << "writing " 

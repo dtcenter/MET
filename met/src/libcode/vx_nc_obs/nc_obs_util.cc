@@ -139,6 +139,7 @@ void clear_header_data(NcHeaderData *my_hdr_data) {
    my_hdr_data->typ_array.clear();
    my_hdr_data->sid_array.clear();
    my_hdr_data->vld_array.clear();
+   my_hdr_data->vld_num_array.clear();
    my_hdr_data->typ_idx_array.clear();
    my_hdr_data->sid_idx_array.clear();
    my_hdr_data->vld_idx_array.clear();
@@ -993,6 +994,7 @@ void reset_header_buffer(int buf_size, bool reset_all) {
       hdr_data.typ_array.clear();
       hdr_data.sid_array.clear();
       hdr_data.vld_array.clear();
+      hdr_data.vld_num_array.clear();
       hdr_data.typ_idx_array.clear();
       hdr_data.sid_idx_array.clear();
       hdr_data.vld_idx_array.clear();

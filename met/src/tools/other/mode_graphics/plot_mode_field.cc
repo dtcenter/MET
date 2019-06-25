@@ -258,7 +258,7 @@ for (j=0; j<(cline.n()); ++j)  {
    mlog << Debug(2)
         << "Making plot " << (j + 1) << " of " << cline.n() << '\n';
 
-   do_plot(cline[j]);
+   do_plot(cline[j].c_str());
 
 }
 

@@ -202,6 +202,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void ConcatString::add(const char c)
 {
     (*s) += c;
@@ -440,19 +441,19 @@ void ConcatString::replace(const char * target, const char * replacement,
     if (empty())
         return;
 
-    if (::is_empty(target) || ::is_empty(replacement) )  {
+    if (::is_empty(target) || ::is_empty(replacement) ) {
        mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> target and/or replacement string is empty\n\n";
        exit ( 1 );
     }
 
-    const char * c = (const char *) 0;
-    if (check_env && (c = get_env(replacement)) != NULL)
-        replacement = c;
-
+    ConcatString repl_env;
+    if (check_env && get_env(replacement, repl_env)) {
+       replacement = repl_env.c_str();
+    }
 
     size_t pos;
     while ((pos = s->find(target)) != string::npos) {
-        s->replace(pos, strlen(target), replacement);
+       s->replace(pos, strlen(target), replacement);
     }
 }
 
@@ -532,6 +533,7 @@ return ( uc );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -546,6 +548,7 @@ lc.set_lower();
 return ( lc );
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1058,74 +1061,87 @@ return ( (text == NULL) || (*text == 0) || (strlen(text) == 0));
 
 ////////////////////////////////////////////////////////////////////////
 
-char *get_env(const char* env_name)
+
+bool get_env(const char *env_name, ConcatString &env_value)
+
 {
-   char *env_value = NULL;
-   string env_val = env_name;
-   static const char *method_name = "get_env() ";
 
-   if (env_val.find('/') != string::npos) return env_value;
+const char *ptr;
+string str = env_name;
+static const char *method_name = "get_env() ";
 
-   if((env_value = getenv(env_name)) != NULL) {
-      env_val = env_value;
-      mlog << Debug(10) << method_name << " " << env_name
-           << " to " << env_value << "\n";
+// Initialize
+env_value.clear();
 
-      int count_replaced = 0;
-      const char *nested_value;
-      size_t pos, pos_end, pos_env, pos_env_end;
-      pos = 0;
-      while ((pos = env_val.find('$', pos)) != string::npos) {
-         string nested_name;
-         pos_env = pos + 1;
-         if ('{' == env_val.at(pos_env)) {
-            pos_env++;
-            pos_end = env_val.find('}', pos);
-            if (string::npos == pos_end) {
-               mlog << Error << "\n" << method_name << "\""
-                    << env_val << "\" The right curly bracket is missing.\n\n";
-               exit (1);
-            }
-            else {
-               pos_env_end = pos_end;
-               pos_end++;
-            }
-         }
-         else {
-            pos_end = env_val.find('/', pos);
-            pos_env_end = pos_end - 1;
-            if (string::npos == pos_end) {
-               pos_end = env_val.length();
-               pos_env_end = pos_end;
-            }
-         }
-         nested_name = env_val.substr(pos_env, (pos_env_end-pos_env));
-         nested_value = getenv(nested_name.c_str());
-         if ( nested_value == NULL )  {
-            mlog << Error << "\n" << method_name
-                 << "can't get value of nested environment variable \""
-                 << nested_name << "\" from " << env_name << "\n\n";
-            exit ( 1 );
-         }
-         env_val.replace(pos, (pos_end - pos), nested_value);
-         mlog << Debug(7) << method_name << " " << nested_name
-              << " to " << nested_value << "\n";
-         count_replaced++;
+if (str.find('/') != string::npos ||
+    (ptr = getenv(env_name)) == NULL) {
+   return(false);
+}
+
+env_value = ptr;
+str = env_value;
+
+mlog << Debug(10) << method_name
+     << " " << env_name << " to " << env_value << "\n";
+
+int count_replaced = 0;
+string nested_value;
+size_t pos, pos_end, pos_env, pos_env_end;
+pos = 0;
+while ((pos = str.find('$', pos)) != string::npos) {
+   string nested_name;
+   pos_env = pos + 1;
+   if ('{' == str.at(pos_env)) {
+      pos_env++;
+      pos_end = str.find('}', pos);
+      if (string::npos == pos_end) {
+         mlog << Error << "\n" << method_name << "\""
+              << str << "\" The right curly bracket is missing.\n\n";
+         exit (1);
       }
-      if (count_replaced > 0) {
-         env_value = (char *)env_val.c_str();
-         mlog << Debug(5) << method_name << env_name << " to \""
-              << env_val.c_str() << "\"\n";
+      else {
+         pos_env_end = pos_end;
+         pos_end++;
       }
    }
+   else {
+      pos_end = str.find('/', pos);
+      pos_env_end = pos_end - 1;
+      if (string::npos == pos_end) {
+         pos_end = str.length();
+         pos_env_end = pos_end;
+      }
+   }
+   nested_name = str.substr(pos_env, (pos_env_end-pos_env));
+   if((ptr = getenv(nested_name.c_str())) == NULL) {
+      mlog << Error << "\n" << method_name
+           << "can't get value of nested environment variable \""
+           << nested_name << "\" from " << env_name << "\n\n";
+      exit ( 1 );
+   }
+   nested_value = ptr;
+   str.replace(pos, (pos_end - pos), nested_value);
+   mlog << Debug(7) << method_name << " " << nested_name
+        << " to " << nested_value << "\n";
+   count_replaced++;
+}
 
-   return env_value;
+if (count_replaced > 0) {
+   env_value = str;
+   mlog << Debug(5) << method_name
+        << env_name << " to \"" << env_value << "\"\n";
+}
+
+return(true);
+
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
 int ConcatString::find(int c)
+
 {
   std::string::size_type position = s->rfind(c);
   if ( position != std::string::npos) {
@@ -1136,12 +1152,22 @@ int ConcatString::find(int c)
   }
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
 int ConcatString::compare(size_t pos, size_t len, std::string str)
+
 {
   return s->compare(pos, len, str);
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
 int ConcatString::comparecase(size_t pos, size_t len, std::string str)
+
 {
   std::string lower_s = *s;
   transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
@@ -1151,3 +1177,4 @@ int ConcatString::comparecase(size_t pos, size_t len, std::string str)
 }
 
 
+////////////////////////////////////////////////////////////////////////

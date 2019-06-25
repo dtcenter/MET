@@ -32,21 +32,22 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString replace_path(const ConcatString path) {
-  ConcatString s, met_base_val;
-   char *ptr;
+   ConcatString s, met_base_env, met_base_val;
 
    // initialize
    s = path;
    
    // Use the MET_BASE environment variable, if set.
    // Otherwise, use the compile-time value.
-   if((ptr = get_env(met_base_str)) != NULL) met_base_val = ptr;
-   else                                      met_base_val = MET_BASE;
+   if(get_env(met_base_str, met_base_env)) met_base_val = met_base_env;
+   else                                    met_base_val = MET_BASE;
 
    s.replace(met_base_str, met_base_val.c_str());
 
    return(s);
 }
+
+////////////////////////////////////////////////////////////////////////
 
 ConcatString replace_path(const char * path) {
   return replace_path((string)path);

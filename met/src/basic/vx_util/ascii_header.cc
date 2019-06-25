@@ -324,7 +324,8 @@ ConcatString AsciiHeaderLine::col_name(const int offset, int const dim) const {
 
 AsciiHeader::AsciiHeader() {
    init_from_scratch();
-   read(met_version);
+   ConcatString version_mm(parse_version_major_minor(met_version));
+   read(version_mm.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -402,7 +403,7 @@ void AsciiHeader::read(const char *version) {
    if(!Versions.has(version)) {
 
       // Substitute in the current version and handle MET_BASE
-     file_name = replace_path(str_replace(header_file_tmpl, "VERSION", version).c_str());
+      file_name = replace_path(str_replace(header_file_tmpl, "VERSION", version));
 
       mlog << Debug(4)
            << "Reading MET header columns:\n" << file_name << "\n";
@@ -453,17 +454,19 @@ const AsciiHeaderLine * AsciiHeader::header(const char *version,
                                             const char *data_type,
                                             const char *line_type) {
 
+   ConcatString version_mm(parse_version_major_minor(version));
+
    // Check if the version needs to be loaded
-   if(!Versions.has(version)) read(version);
+   if(!Versions.has(version_mm)) read(version_mm.c_str());
 
    // Find matching header line
    // Allow NA for line_type to match any line type
    vector<AsciiHeaderLine>::const_iterator it;
    for(it = Headers.begin(); it != Headers.end(); ++it) {
-      if(strcmp(it->version(),    version)   == 0 &&
-         strcmp(it->data_type(),  data_type) == 0 &&
-         (strcmp(it->line_type(), line_type) == 0 ||
-          strcmp(na_str,          line_type) == 0)) break;
+      if(strcmp(it->version(),    version_mm.c_str()) == 0 &&
+         strcmp(it->data_type(),  data_type)          == 0 &&
+         (strcmp(it->line_type(), line_type)          == 0 ||
+          strcmp(na_str,          line_type)          == 0)) break;
    }
 
    // Check for no match

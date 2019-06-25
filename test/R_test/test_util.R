@@ -244,13 +244,19 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 #   that the MET version number is the first token on the second line of the file.  If
 #   successful, the version number is returned in the format V_v[_vv[..]], e.g. 2_0 or
 #   3_0_1.
+# 
+# Since met-8.1, the MET team has been creating bugfix release versions of the form x.y.z
+# where x, y, and z specify the major, minor, and patch levels.  The header columns are
+# defined for each major and minor version number but not the patch level.  This function
+# has been modified to return the major and minor version number but not the patch level. 
 #
 # INPUTS:
 #      stat: path and filename of a MET stat file to read data from
 getStatMetVer = function(stat){
 	if( isStatEmpty(stat) ){ return (NA); }
 	strCmdStatVer = paste("cat ", stat, " | head -2 | tail -1 | awk '{print $1}'", sep="");
-	return ( gsub( "\\.", "_", sub("^V", "", system(strCmdStatVer, intern=T)) ) );
+        strVrs = unlist ( strsplit( sub("^V", "", system(strCmdStatVer, intern=TRUE)), "[.]" ) );
+	return ( paste ( strVrs[1], strVrs[2], sep='_' ) );
 }
 
 # getStatLty() assumes that the input string contains the path and file name of a MET

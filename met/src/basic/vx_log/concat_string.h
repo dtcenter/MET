@@ -270,7 +270,7 @@ extern bool operator >  (const char *, const ConcatString &);
 
 extern ConcatString write_css(const StringArray &);
 
-extern char *get_env(const char*);
+extern bool get_env(const char *, ConcatString &);
 
 
 ////////////////////////////////////////////////////////////////////////
