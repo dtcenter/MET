@@ -91,7 +91,7 @@ cout << "GRIB1\n";
 
 for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
 
-   process(cline[j]);
+   process(cline[j].c_str());
 
 }
 

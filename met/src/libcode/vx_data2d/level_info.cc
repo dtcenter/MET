@@ -88,7 +88,7 @@ void LevelInfo::assign(const LevelInfo &l) {
    Upper   = l.upper();
    Lower   = l.lower();
    Increment = l.increment();
-   as_offset = l.is_as_offset();
+   time_as_offset = l.is_time_as_offset();
 
    return;
 }
@@ -106,7 +106,7 @@ void LevelInfo::clear() {
    Upper  = 0.0;
    Lower  = 0.0;
    Increment = 0.0;
-   as_offset = true;
+   time_as_offset = true;
 
    return;
 }
@@ -194,8 +194,8 @@ void LevelInfo::set_increment(double i) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void LevelInfo::set_as_offset(bool b) {
-   as_offset = b;
+void LevelInfo::set_time_as_offset(bool b) {
+   time_as_offset = b;
    return;
 }
 

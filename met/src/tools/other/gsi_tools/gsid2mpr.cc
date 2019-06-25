@@ -103,7 +103,7 @@ int main(int argc, char * argv []) {
       // Construct output file name
       output_filename << cs_erase
                       << output_directory << '/'
-                      << get_short_name(cline[i]) << suffix;
+                      << get_short_name(cline[i].c_str()) << suffix;
 
       // Initialize output StatHdrColumns
       setup_header(shc, hdr_name, hdr_value, "MPR");
@@ -113,8 +113,8 @@ int main(int argc, char * argv []) {
       obs_key_map.clear();
 
       // Process by file type
-      if(is_conv(cline[i])) process_conv(cline[i], output_filename.c_str());
-      else                  process_rad (cline[i], output_filename.c_str());
+      if(is_conv(cline[i].c_str())) process_conv(cline[i].c_str(), output_filename.c_str());
+      else                          process_rad (cline[i].c_str(), output_filename.c_str());
    }
 
    return(0);

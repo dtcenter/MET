@@ -251,13 +251,10 @@ ConcatString MetConfig::get_tmp_dir()
    ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.
-   if((ptr = get_env("MET_TMP_DIR")) != NULL) {
-      tmp_dir = ptr;
-   }
-   else {
+   if(!get_env("MET_TMP_DIR", tmp_dir)) { 
       const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
-      if ( LastLookupStatus )  tmp_dir = *(_e->string_value());
-      else                     tmp_dir = default_tmp_dir;
+      if ( LastLookupStatus ) tmp_dir = *(_e->string_value());
+      else                    tmp_dir = default_tmp_dir;
    }
 
    return ( tmp_dir );
@@ -268,12 +265,12 @@ ConcatString MetConfig::get_tmp_dir()
 
 int MetConfig::nc_compression()
 {
-   char *ptr;
+   ConcatString cs;
    int n = 0;
 
    // Use the MET_NC_COMPRESS environment variable, if set.
-   if((ptr = get_env("MET_NC_COMPRESS")) != NULL) {
-      n = atoi(ptr);
+   if(get_env("MET_NC_COMPRESS", cs)) {
+      n = atoi(cs.c_str());
    }
    else {
       n = lookup_int(conf_key_nc_compression, false);

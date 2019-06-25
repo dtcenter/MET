@@ -187,7 +187,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
     if (0 <= time_dim_slot) {
       org_time_offset = dimension[time_dim_slot];
       long time_offset = org_time_offset;
-      bool time_as_value = !vinfo_nc->level().is_as_offset();
+      bool time_as_value = !vinfo_nc->level().is_time_as_offset();
       if (time_as_value || (time_offset == range_flag) || (time_offset == vx_data2d_star)) {
         if (0 <= _time_dim_offset) time_offset = _time_dim_offset;
         if (time_as_value && time_offset > time_threshold_cnt)   // convert the unixtime to offset
@@ -382,8 +382,8 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    LevelInfo level = vinfo.level();
    LongArray dimension = vinfo_nc->dimension();
    bool is_time_range = (level.type() == LevelType_Time);
-   bool time_as_value = !level.is_as_offset();
-
+   bool time_as_value = !level.is_time_as_offset();
+   
    long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
    long time_value = (time_as_value ? dim_offset : -1);
    bool include_all_times = (dim_offset == vx_data2d_star);

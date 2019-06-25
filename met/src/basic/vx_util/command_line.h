@@ -104,7 +104,7 @@ class CLOptionInfoArray {
 
       CLOptionInfo & operator[](int) const;
 
-      int lookup(const char *) const;
+      int lookup(const string &) const;
 
 };
 
@@ -131,7 +131,8 @@ class CommandLine {
 
       void show_version() const;
 
-      void get_n_args(StringArray &, const int Nargs, const char * switch_name, const int pos);
+      void get_n_args(StringArray &, const int Nargs,
+                      const string & switch_name, const int pos);
 
       int  get_unlimited_args(StringArray &, const int pos);
 
@@ -147,7 +148,7 @@ class CommandLine {
 
       bool AllowUnrecognizedSwitches;   //  default: false
 
-      bool is_switch(const char *) const;
+      bool is_switch(const string &) const;
 
    public:
 
@@ -182,7 +183,7 @@ class CommandLine {
 
       int length(int) const;   //  length of jth arg
 
-      bool has_option(const char *) const;
+      bool has_option(const string &) const;
 
       int next_option(int & index) const;   //  -1 if no option found
 
@@ -192,11 +193,11 @@ class CommandLine {
 
       void shift_down(int pos, int k);
 
-      const char * operator[](int) const;
+      const string operator[](int) const;
 
       void parse();
 
-      void add(CLSetFunction, const char * text, int n_args);   //  n_args not including switch
+      void add(CLSetFunction, const string & text, int n_args);   //  n_args not including switch
 
 };
 
