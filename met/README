@@ -332,7 +332,7 @@ Version 8.1.1 Bugfix Release Notes:
 - Fix compilation problems for GNU 6.3.0 and later versions (#1139).
 - Bugfix for header array index when computing time summaries in PB2NC (#1137).
 - Bugfix for segfault in Grid-Stat when reading climo_mean data (#1146).
-- Bugfix to ALPHA=NA in the GRAD output line type from Grid-Stat (#1131).
+- Bugfix for ALPHA=NA in the GRAD output line type from Grid-Stat (#1131).
 - Bugfix for the OBJECT_ID column in the 2D ASCII output files from MTD (#1128).
 - Minor corrections in the user's guide (#1150).
 
