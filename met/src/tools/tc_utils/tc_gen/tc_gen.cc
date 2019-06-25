@@ -51,7 +51,8 @@ static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     StringArray &, StringArray &);
 static void   process_track_files  (const StringArray &,
-                                    const StringArray &);
+                                    const StringArray &,
+                                    GenesisInfoArray &);
 static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
@@ -157,6 +158,7 @@ void process_command_line(int argc, char **argv) {
 void process_tracks() {
    TrackInfoArray tracks;
    StringArray atcf_files, atcf_files_model_suffix;
+   GenesisInfoArray genesis;
 
    // Initialize
    tracks.clear();
@@ -167,7 +169,7 @@ void process_tracks() {
 
    mlog << Debug(2)
         << "Processing " << atcf_files.n() << " ATCF file(s).\n";
-   process_track_files(atcf_files, atcf_files_model_suffix);
+   process_track_files(atcf_files, atcf_files_model_suffix, genesis);
 
    return;
 }
@@ -203,7 +205,107 @@ void get_atcf_files(const StringArray &source,
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_files(const StringArray &files,
-                         const StringArray &model_suffix) {
+                         const StringArray &model_suffix,
+                         GenesisInfoArray &genesis) {
+
+   int i, n_lines, n_tracks, tot_lines, tot_tracks;
+   LineDataFile f;
+   ConcatString cs;
+   ATCFTrackLine line;
+   TrackInfo cur_track;
+
+   // Initialize counts
+   tot_lines = tot_tracks = 0;
+
+   // Process each of the input ATCF files
+   for(i=0; i<files.n_elements(); i++) {
+
+      // Open the current file
+      if(!f.open(files[i].c_str())) {
+         mlog << Error
+              << "\nprocess_track_files() -> "
+              << "unable to open file \"" << files[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Initialize counts
+      n_lines = n_tracks = 0;
+
+      // Read each line in the file
+      while(f >> line) {
+
+         // Increment the line counts
+         n_lines++;
+
+         // Add model suffix, if specified
+         if(model_suffix[i].length() > 0) {
+            cs << cs_erase << line.technique() << model_suffix[i];
+            line.set_technique(cs);
+         }
+
+         // Check for BEST track technqiue
+         if(conf_info.BestTechnique.has(line.technique())) {
+            line.set_best_track(true);
+         }
+
+         // Attempt to add the current line to the current track
+         if(!cur_track.add(line)) {
+
+            // This track is complete, add it to GenInfoArray.
+            genesis.add(cur_track);
+            n_tracks++;
+
+            // Clear the current track and start a new one.
+            cur_track.clear();
+            cur_track.add(line);
+         }
+      }
+
+      // Add the last track
+      if(cur_track.n_points() > 0) {
+         genesis.add(cur_track);
+         n_tracks++;
+      }
+
+      // Dump out the current number of lines
+      mlog << Debug(4)
+           << "[File " << i+1 << " of " << files.n_elements()
+           << "] Parsed " << n_tracks << " tracks from " << n_lines
+           << " lines read from file \"" << files[i] << "\"\n";
+
+      // Close the current file
+      f.close();
+
+      // Increment counts
+      tot_lines  += n_lines;
+      tot_tracks += n_tracks;
+
+   } // end for i
+
+   // Dump out the total number of lines
+   mlog << Debug(3)
+        << "Parsed " << tot_tracks << " track from " << tot_lines
+        << " lines read from " << files.n_elements() << " file(s).\n";
+
+   // Dump out the track information
+   mlog << Debug(3)
+        << "Identified " << genesis.n() << " genesis event(s).\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << genesis.serialize_r() << "\n";
+   }
+   // Dump out track info
+   else {
+      for(i=0; i<genesis.n(); i++) {
+         mlog << Debug(4)
+              << "[Genesis " << i+1 << " of " << genesis.n()
+              << "] " << genesis[i].serialize() << "\n";
+      }
+   }
+
+
 /*
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
