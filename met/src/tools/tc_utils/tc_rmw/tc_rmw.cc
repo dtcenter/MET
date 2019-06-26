@@ -451,7 +451,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.clear();
         grid.set_from_data(grid_data);
 
-        // compute lat and lon coordinate arrays
+        // Compute lat and lon coordinate arrays
         // move this to TcrmwGrid class
         for(int ir = 0; ir < grid.range_n(); ir++) {
             for(int ia = 0; ia < grid.azimuth_n(); ia++) {
@@ -468,11 +468,11 @@ static void compute_grids(const TrackInfoArray& tracks) {
         // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
         // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
 
-        // write coordinate arrays
+        // Write coordinate arrays
         write_tc_grid(nc_out, grid, i_point, lat_grid_var, lat_grid);
         write_tc_grid(nc_out, grid, i_point, lon_grid_var, lon_grid);
 
-        // write valid time
+        // Write valid time
         write_tc_valid_time(nc_out, i_point,
             valid_time_var, valid_yyyymmddhh);
 
@@ -485,7 +485,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
                 data_dp, latlon_grid);
             // Regrid data
             // data_dp = met_regrid(data_dp,
-            //     latlon_grid, grid, info->regrid());
+            //     latlon_grid, grid, data_info->regrid());
         }
     }
 
