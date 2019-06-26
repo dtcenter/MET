@@ -493,6 +493,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_nc_file() {
+    VarInfo *data_info = (VarInfo *) 0;
 
     out_nc_file.add("tc_rmw_grids.nc");
 
@@ -516,10 +517,20 @@ static void setup_nc_file() {
     azimuth_dim = add_dim(nc_out, "azimuth", (long) grid.azimuth_n());
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
+    // Define range and azimuth dimensions
     def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
 
+    // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
         track_point_dim, lat_grid_var, lon_grid_var, valid_time_var);
+
+    // Define variables
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        // Get VarInfo
+        data_info = conf_info.data_info[i_var];
+        def_tc_data(nc_out, range_dim, azimuth_dim,
+            track_point_dim, data_var, data_info);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

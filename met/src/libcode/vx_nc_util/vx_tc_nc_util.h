@@ -17,6 +17,7 @@
 using namespace netCDF;
 
 #include "vx_log.h"
+#include "vx_data2d.h"
 #include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "tcrmw_grid.h"
@@ -41,7 +42,10 @@ extern void write_tc_valid_time(NcFile*,
 
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
-    NcVar&);
+    NcVar&, VarInfo*);
+
+extern void write_tc_data(NcFile*,
+    const int&, const NcVar&, double*);
 
 ////////////////////////////////////////////////////////////////////////
 
