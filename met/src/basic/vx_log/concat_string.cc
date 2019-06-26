@@ -1178,3 +1178,17 @@ int ConcatString::comparecase(size_t pos, size_t len, std::string str)
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+int ConcatString::comparecase(const char * str)
+
+{
+  std::string lower_s = *s;
+  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+  std::string lower_str = str;
+  transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
+  return lower_s.compare(lower_str);
+}
+
+
+////////////////////////////////////////////////////////////////////////

@@ -181,6 +181,7 @@ class ConcatString {
       int find(int c);
       int compare(size_t pos, size_t len, std::string str);
       int comparecase(size_t pos, size_t len, std::string str);
+      int comparecase(const char *);
 };
 
 
