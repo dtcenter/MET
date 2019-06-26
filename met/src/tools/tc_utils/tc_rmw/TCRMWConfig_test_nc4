@@ -23,14 +23,32 @@ data = {
         {
           name = "T";
           level = ["(0,41,*,*)"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         },
         {
           name = "U";
           level = ["(0,41,*,*)"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         },
         {
           name = "V";
           level = ["(0,41,*,*)"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         }
     ];
 }
