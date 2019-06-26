@@ -451,15 +451,6 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.clear();
         grid.set_from_data(grid_data);
 
-        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-            // Get VarInfo
-            data_info = conf_info.data_info[i_var];
-            // Get data
-            get_series_entry(i_point, data_info,
-                data_files, ftype, found_data_files,
-                data_dp, latlon_grid);
-        }
-
         // compute lat and lon coordinate arrays
         // move this to TcrmwGrid class
         for(int ir = 0; ir < grid.range_n(); ir++) {
@@ -478,12 +469,21 @@ static void compute_grids(const TrackInfoArray& tracks) {
         // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
 
         // write coordinate arrays
-        write_tc_data(nc_out, grid, i_point, lat_grid_var, lat_grid);
-        write_tc_data(nc_out, grid, i_point, lon_grid_var, lon_grid);
+        write_tc_grid(nc_out, grid, i_point, lat_grid_var, lat_grid);
+        write_tc_grid(nc_out, grid, i_point, lon_grid_var, lon_grid);
 
         // write valid time
         write_tc_valid_time(nc_out, i_point,
             valid_time_var, valid_yyyymmddhh);
+
+        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+            // Get VarInfo
+            data_info = conf_info.data_info[i_var];
+            // Get data
+            get_series_entry(i_point, data_info,
+                data_files, ftype, found_data_files,
+                data_dp, latlon_grid);
+        }
     }
 
     delete[] lat_grid;

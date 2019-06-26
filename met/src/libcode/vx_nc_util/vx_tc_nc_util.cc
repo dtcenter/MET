@@ -131,7 +131,7 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&valid_time_var, "standard_name", "valid_time");
 }
 
-void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
+void write_tc_grid(NcFile* nc_out, const TcrmwGrid& grid,
     const int& i_point, const NcVar& var, double* data) {
 
     vector<size_t> offsets;
