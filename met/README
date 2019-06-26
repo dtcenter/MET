@@ -329,12 +329,16 @@ Version 8.1.1 Bugfix Release Notes:
 ----------------------------------
 
 - Fix MET to correctly handle the updated "V8.1.1" version number (#1153).
-- Fix compilation problems for GNU 6.3.0 and later versions (#1139).
-- Bugfix for header array index when computing time summaries in PB2NC (#1137).
+- Interpret the NetCDF COARDS convention as being CF-compliant (#1155).
+- Bugfix for swapped lat/lon dimensions in regrid_data_plane GOES-16 output
+  (#1152).
+- Bugfix for time slicing of NetCDF files (#1147).
 - Bugfix for segfault in Grid-Stat when reading climo_mean data (#1146).
+- Bugfix for header array index when computing time summaries in PB2NC (#1137).
 - Bugfix for ALPHA=NA in the GRAD output line type from Grid-Stat (#1131).
 - Bugfix for the OBJECT_ID column in the 2D ASCII output files from MTD (#1128).
-- Minor corrections in the user's guide (#1150).
+- Fix compilation problems for GNU 6.3.0 and later versions (#1139).
+- Minor corrections to the user's guide (#1150).
 
 Version 8.1 Release Notes:
 -------------------------
