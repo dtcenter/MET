@@ -113,6 +113,7 @@ static DataPlane    dp;
 static Grid         latlon_grid;
 static TcrmwData    grid_data;
 static TcrmwGrid    tcrmw_grid;
+static Grid         grid;
 static ConcatString wwarn_file;
 
 // Data file factory and input files

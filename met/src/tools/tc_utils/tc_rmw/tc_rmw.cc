@@ -420,6 +420,7 @@ static void setup_grid() {
     grid_data.range_max_km = conf_info.max_range;
 
     tcrmw_grid.set_from_data(grid_data);
+    grid.set(grid_data);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,6 +451,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid_data.lon_center = - point.lon(); // internal sign change
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
+        grid.clear();
+        grid.set(grid_data);
 
         // Compute lat and lon coordinate arrays
         // move this to TcrmwGrid class
@@ -484,8 +487,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
                 data_files, ftype, found_data_files,
                 data_dp, latlon_grid);
             // Regrid data
-            // data_dp = met_regrid(data_dp,
-            //     latlon_grid, tcrmw_grid, data_info->regrid());
+            data_dp = met_regrid(data_dp,
+                latlon_grid, grid, data_info->regrid());
         }
     }
 
