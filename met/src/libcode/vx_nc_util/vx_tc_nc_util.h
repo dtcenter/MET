@@ -42,7 +42,7 @@ extern void write_tc_valid_time(NcFile*,
     const int&, const NcVar&, const long&);
 
 extern void write_tc_data(NcFile*, const TcrmwGrid&,
-    const int&, const NcVar&, double*);
+    const int&, const NcVar&, const double*);
 
 ////////////////////////////////////////////////////////////////////////
 
