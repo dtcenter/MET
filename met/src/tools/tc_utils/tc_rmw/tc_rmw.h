@@ -112,7 +112,7 @@ static StringArray  out_files;
 static DataPlane    dp;
 static Grid         latlon_grid;
 static TcrmwData    grid_data;
-static TcrmwGrid    grid;
+static TcrmwGrid    tcrmw_grid;
 static ConcatString wwarn_file;
 
 // Data file factory and input files

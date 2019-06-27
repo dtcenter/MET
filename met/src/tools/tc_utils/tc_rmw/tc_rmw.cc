@@ -419,7 +419,7 @@ static void setup_grid() {
     grid_data.azimuth_n = conf_info.n_azimuth;
     grid_data.range_max_km = conf_info.max_range;
 
-    grid.set_from_data(grid_data);
+    tcrmw_grid.set_from_data(grid_data);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -433,9 +433,9 @@ static void compute_grids(const TrackInfoArray& tracks) {
 
     // these should be DataPlanes
     lat_grid = new double[
-        grid.range_n() * grid.azimuth_n()];
+        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
     lon_grid = new double[
-        grid.range_n() * grid.azimuth_n()];
+        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
     // assume single track for now
     TrackInfo track = tracks[0];
@@ -448,20 +448,20 @@ static void compute_grids(const TrackInfoArray& tracks) {
              << "(" << point.lat() << ", " << point.lon() << ")\n";
         grid_data.lat_center = point.lat();
         grid_data.lon_center = - point.lon(); // internal sign change
-        grid.clear();
-        grid.set_from_data(grid_data);
+        tcrmw_grid.clear();
+        tcrmw_grid.set_from_data(grid_data);
 
         // Compute lat and lon coordinate arrays
         // move this to TcrmwGrid class
-        for(int ir = 0; ir < grid.range_n(); ir++) {
-            for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+        for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+            for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
                 double lat, lon;
-                grid.range_azi_to_latlon(
-                    ir * grid.range_delta_km(),
-                    ia * grid.azimuth_delta_deg(),
+                tcrmw_grid.range_azi_to_latlon(
+                    ir * tcrmw_grid.range_delta_km(),
+                    ia * tcrmw_grid.azimuth_delta_deg(),
                     lat, lon);
-                lat_grid[ir * grid.azimuth_n() + ia] = lat;
-                lon_grid[ir * grid.azimuth_n() + ia] = - lon;
+                lat_grid[ir * tcrmw_grid.azimuth_n() + ia] = lat;
+                lon_grid[ir * tcrmw_grid.azimuth_n() + ia] = - lon;
             }
         }
 
@@ -469,8 +469,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
         // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
 
         // Write coordinate arrays
-        write_tc_grid(nc_out, grid, i_point, lat_grid_var, lat_grid);
-        write_tc_grid(nc_out, grid, i_point, lon_grid_var, lon_grid);
+        write_tc_grid(nc_out, tcrmw_grid, i_point, lat_grid_var, lat_grid);
+        write_tc_grid(nc_out, tcrmw_grid, i_point, lon_grid_var, lon_grid);
 
         // Write valid time
         write_tc_valid_time(nc_out, i_point,
@@ -485,7 +485,7 @@ static void compute_grids(const TrackInfoArray& tracks) {
                 data_dp, latlon_grid);
             // Regrid data
             // data_dp = met_regrid(data_dp,
-            //     latlon_grid, grid, data_info->regrid());
+            //     latlon_grid, tcrmw_grid, data_info->regrid());
         }
     }
 
@@ -512,16 +512,16 @@ static void setup_nc_file() {
         exit(1);
     }
 
-    mlog << Debug(4) << grid.range_n() << "\n";
-    mlog << Debug(4) << grid.azimuth_n() << "\n";
+    mlog << Debug(4) << tcrmw_grid.range_n() << "\n";
+    mlog << Debug(4) << tcrmw_grid.azimuth_n() << "\n";
 
     // Define dimensions
-    range_dim = add_dim(nc_out, "range", (long) grid.range_n());
-    azimuth_dim = add_dim(nc_out, "azimuth", (long) grid.azimuth_n());
+    range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
+    azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, grid);
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
