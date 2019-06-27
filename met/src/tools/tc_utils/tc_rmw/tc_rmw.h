@@ -94,8 +94,8 @@ static NcFile*      nc_out = (NcFile*) 0;
 static NcDim        range_dim;
 static NcDim        azimuth_dim;
 static NcDim        track_point_dim;
-static NcVar        lat_grid_var;
-static NcVar        lon_grid_var;
+static NcVar        lat_arr_var;
+static NcVar        lon_arr_var;
 static NcVar        valid_time_var;
 static NcVar        data_var;
 
@@ -112,7 +112,7 @@ static StringArray nc_var_sa;
 
 static StringArray  out_files;
 static DataPlane    dp;
-static Grid         latlon_grid;
+static Grid         latlon_arr;
 static TcrmwData    grid_data;
 static TcrmwGrid    tcrmw_grid;
 static Grid         grid;
@@ -123,8 +123,8 @@ static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
 
 // Grid coordinate arrays
-static double* lat_grid;
-static double* lon_grid;
+static double* lat_arr;
+static double* lon_arr;
 
 ////////////////////////////////////////////////////////////////////////
 

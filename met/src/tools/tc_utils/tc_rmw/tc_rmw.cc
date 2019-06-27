@@ -58,7 +58,7 @@ static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
-static void compute_grids(const TrackInfoArray&);
+static void process_fields(const TrackInfoArray&);
 static bool read_data_plane(VarInfo*, DataPlane&, Met2dDataFile*,
     const ConcatString&);
 
@@ -173,7 +173,7 @@ void process_decks() {
     TrackInfoArray adeck_tracks;
     process_adecks(adeck_tracks);
 
-    compute_grids(adeck_tracks);
+    process_fields(adeck_tracks);
 
     // nc_out->close();
 }
@@ -425,28 +425,32 @@ static void setup_grid() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void compute_grids(const TrackInfoArray& tracks) {
+static void process_fields(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
     DataPlane data_dp;
     DataPlane u_dp;
     DataPlane v_dp;
 
-    // these should be DataPlanes
-    lat_grid = new double[
+    // Define latitude and longitude arrays
+    lat_arr = new double[
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
-    lon_grid = new double[
+    lon_arr = new double[
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
-    // assume single track for now
+    // Assume single track for now
     TrackInfo track = tracks[0];
 
+    // Loop over track points
     for(int i_point = 0; i_point < track.n_points(); i_point++) {
+
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
         long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
         mlog << Debug(4)
              << "(" << point.lat() << ", " << point.lon() << ")\n";
+
+        // Set grid center
         grid_data.lat_center = point.lat();
         grid_data.lon_center = - point.lon(); // internal sign change
         tcrmw_grid.clear();
@@ -455,7 +459,6 @@ static void compute_grids(const TrackInfoArray& tracks) {
         grid.set(grid_data);
 
         // Compute lat and lon coordinate arrays
-        // move this to TcrmwGrid class
         for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
             for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
                 double lat, lon;
@@ -463,17 +466,14 @@ static void compute_grids(const TrackInfoArray& tracks) {
                     ir * tcrmw_grid.range_delta_km(),
                     ia * tcrmw_grid.azimuth_delta_deg(),
                     lat, lon);
-                lat_grid[ir * tcrmw_grid.azimuth_n() + ia] = lat;
-                lon_grid[ir * tcrmw_grid.azimuth_n() + ia] = - lon;
+                lat_arr[ir * tcrmw_grid.azimuth_n() + ia] = lat;
+                lon_arr[ir * tcrmw_grid.azimuth_n() + ia] = - lon;
             }
         }
 
-        // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
-        // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
-
         // Write coordinate arrays
-        write_tc_data(nc_out, tcrmw_grid, i_point, lat_grid_var, lat_grid);
-        write_tc_data(nc_out, tcrmw_grid, i_point, lon_grid_var, lon_grid);
+        write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
+        write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
 
         // Write valid time
         write_tc_valid_time(nc_out, i_point,
@@ -485,18 +485,21 @@ static void compute_grids(const TrackInfoArray& tracks) {
             // Get data
             get_series_entry(i_point, data_info,
                 data_files, ftype, found_data_files,
-                data_dp, latlon_grid);
+                data_dp, latlon_arr);
             // Regrid data
             data_dp = met_regrid(data_dp,
-                latlon_grid, grid, data_info->regrid());
+                latlon_arr, grid, data_info->regrid());
             // Write data
             write_tc_data(nc_out, tcrmw_grid, i_point,
                 data_vars[i_var], data_dp.data());
         }
+
+        // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
+        // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
     }
 
-    delete[] lat_grid;
-    delete[] lon_grid;
+    delete[] lat_arr;
+    delete[] lon_arr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -531,7 +534,7 @@ static void setup_nc_file() {
 
     // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
-        track_point_dim, lat_grid_var, lon_grid_var, valid_time_var);
+        track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
 
     // Define variables
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
