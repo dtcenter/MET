@@ -489,6 +489,9 @@ static void compute_grids(const TrackInfoArray& tracks) {
             // Regrid data
             data_dp = met_regrid(data_dp,
                 latlon_grid, grid, data_info->regrid());
+            // Write data
+            write_tc_data(nc_out, tcrmw_grid, i_point,
+                data_vars[i_var], data_dp.data());
         }
     }
 
@@ -536,6 +539,7 @@ static void setup_nc_file() {
         data_info = conf_info.data_info[i_var];
         def_tc_data(nc_out, range_dim, azimuth_dim,
             track_point_dim, data_var, data_info);
+        data_vars.push_back(data_var);
     }
 }
 

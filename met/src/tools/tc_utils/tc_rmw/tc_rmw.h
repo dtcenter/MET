@@ -99,6 +99,8 @@ static NcVar        lon_grid_var;
 static NcVar        valid_time_var;
 static NcVar        data_var;
 
+static vector<NcVar> data_vars;
+
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
 
