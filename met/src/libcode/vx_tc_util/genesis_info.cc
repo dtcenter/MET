@@ -41,22 +41,41 @@ GenesisInfo::~GenesisInfo() {
 
 ////////////////////////////////////////////////////////////////////////
 
-GenesisInfo::GenesisInfo(const GenesisInfo & t) {
+GenesisInfo::GenesisInfo(const GenesisInfo &g) {
 
    clear();
 
-   assign(t);
+   assign(g);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-GenesisInfo & GenesisInfo::operator=(const GenesisInfo & t) {
+GenesisInfo & GenesisInfo::operator=(const GenesisInfo &g) {
 
-   if(this == &t) return(*this);
+   if(this == &g) return(*this);
 
-   assign(t);
+   assign(g);
 
    return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check for matching stormid, technique name/number, timing
+// information, and location information.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfo::operator==(const GenesisInfo & g) const {
+
+   return(StormId         == g.StormId         &&
+          Technique       == g.Technique       &&
+          TechniqueNumber == g.TechniqueNumber &&
+          GenesisTime     == g.GenesisTime     &&
+          InitTime        == g.InitTime        &&
+          LeadTime        == g.LeadTime        &&
+          is_eq(Lat, g.Lat)                    &&
+          is_eq(Lon, g.Lon));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,11 +88,12 @@ void GenesisInfo::clear() {
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
+   StormName.clear();
    TechniqueNumber = bad_data_int;
    Technique.clear();
    Initials.clear();
 
-   GenTime         = (unixtime) 0;
+   GenesisTime     = (unixtime) 0;
    InitTime        = (unixtime) 0;
    LeadTime        = bad_data_int;
 
@@ -92,34 +112,35 @@ void GenesisInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfo::assign(const GenesisInfo &t) {
+void GenesisInfo::assign(const GenesisInfo &g) {
    int i;
 
    clear();
 
    IsSet           = true;
-   IsBestTrack     = t.IsBestTrack;
+   IsBestTrack     = g.IsBestTrack;
 
-   StormId         = t.StormId;
-   Basin           = t.Basin;
-   Cyclone         = t.Cyclone;
-   TechniqueNumber = t.TechniqueNumber;
-   Technique       = t.Technique;
-   Initials        = t.Initials;
+   StormId         = g.StormId;
+   Basin           = g.Basin;
+   Cyclone         = g.Cyclone;
+   StormName       = g.StormName;
+   TechniqueNumber = g.TechniqueNumber;
+   Technique       = g.Technique;
+   Initials        = g.Initials;
 
-   GenTime         = t.GenTime;
-   InitTime        = t.InitTime;
-   LeadTime        = t.LeadTime;
+   GenesisTime     = g.GenesisTime;
+   InitTime        = g.InitTime;
+   LeadTime        = g.LeadTime;
 
-   Lat             = t.Lat;
-   Lon             = t.Lon;
-   DLand           = t.DLand;
+   Lat             = g.Lat;
+   Lon             = g.Lon;
+   DLand           = g.DLand;
 
-   NPoints         = t.NPoints;
-   MinValidTime    = t.MinValidTime;
-   MaxValidTime    = t.MaxValidTime;
-   MinWarmCoreTime = t.MinWarmCoreTime;
-   MaxWarmCoreTime = t.MaxWarmCoreTime;
+   NPoints         = g.NPoints;
+   MinValidTime    = g.MinValidTime;
+   MaxValidTime    = g.MaxValidTime;
+   MinWarmCoreTime = g.MinWarmCoreTime;
+   MaxWarmCoreTime = g.MaxWarmCoreTime;
 
    return;
 }
@@ -134,12 +155,13 @@ void GenesisInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
    out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
    out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
+   out << prefix << "StormName       = \"" << StormName.contents() << "\"\n";
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << Technique.contents() << "\"\n";
    out << prefix << "Initials        = \"" << Initials.contents() << "\"\n";
-   out << prefix << "GenTime         = \""
-                 << (GenTime > 0 ?
-                     unix_to_yyyymmdd_hhmmss(GenTime).text() :
+   out << prefix << "GenesisTime         = \""
+                 << (GenesisTime > 0 ?
+                     unix_to_yyyymmdd_hhmmss(GenesisTime).text() :
                      na_str) << "\"\n";
    out << prefix << "InitTime        = \""
                  << (InitTime > 0 ?
@@ -185,11 +207,12 @@ ConcatString GenesisInfo::serialize() const {
      << ", StormId = \"" << StormId.contents() << "\""
      << ", Basin = \"" << Basin.contents() << "\""
      << ", Cyclone = \"" << Cyclone.contents() << "\""
+     << ", StormName = \"" << StormName.contents() << "\""
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << Technique.contents() << "\""
      << ", Initials = \"" << Initials.contents() << "\""
-     << ", GenTime = \"" << (GenTime > 0 ?
-           unix_to_yyyymmdd_hhmmss(GenTime).text() : na_str) << "\""
+     << ", GenesisTime = \"" << (GenesisTime > 0 ?
+           unix_to_yyyymmdd_hhmmss(GenesisTime).text() : na_str) << "\""
      << ", InitTime = \"" << (InitTime > 0 ?
            unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\""
      << ", LeadTime = \"" << sec_to_hhmmss(LeadTime).text() << "\""
@@ -225,38 +248,6 @@ ConcatString GenesisInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfo::initialize(const ATCFTrackLine &l) {
-
-   IsSet           = true;
-   IsBestTrack     = l.is_best_track();
-
-   Basin           = l.basin();
-   Cyclone         = l.cyclone_number();
-   TechniqueNumber = l.technique_number();
-   Technique       = l.technique();
-   Initials        = l.initials();
-
-   // For BEST tracks, keep InitTime = LeadTime = 0.
-   if(IsBestTrack) {
-      InitTime = (unixtime) 0;
-      LeadTime = 0;
-   }
-   else {
-      // JHG start working here!
-      set_init(l.warning_time());
-   }
-
-   // Set the valid time range
-   MinValidTime = MaxValidTime = l.valid();
-
-   // Create the storm id
-   set_storm_id();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void GenesisInfo::set_storm_id() {
 
    StormId = define_storm_id(InitTime, MinValidTime, MaxValidTime,
@@ -267,92 +258,76 @@ void GenesisInfo::set_storm_id() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::add(const ATCFTrackLine &l) {
-// JHG
-   bool found = false;
-   bool status = false;
-   int i;
-
-   // Initialize GenesisInfo with ATCFTrackLine, if necessary
-   if(!IsSet) initialize(l);
-
-   // Otherwise, check if TrackPoint doesn't match this GenesisInfo
-   else if(!is_match(l)) return(false);
-
-   // Update min/max valid times
-   if(MinValidTime == 0 || l.valid() < MinValidTime) {
-      MinValidTime = l.valid();
-   }
-   if(MaxValidTime == 0 || l.valid() > MaxValidTime) {
-      MaxValidTime = l.valid();
-   }
-/* JHG
-   // Update min/max warm core times
-   if(l.is_warm_core()) {
-      if(MinWarmCoreTime == 0 || l.valid() < MinWarmCoreTime) {
-         MinWarmCoreTime = l.valid();
-      }
-      if(MaxWarmCoreTime == 0 || l.valid() < MaxWarmCoreTime) {
-         MaxWarmCoreTime = l.valid();
-      }
-   }
-*/
-   return(true);
+void GenesisInfo::set_dland(double d) {
+   DLand = d;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::is_match(const ATCFTrackLine &l) {
-   bool match = true;
-   int diff;
-/* JHG
-   // Make sure the technique is defined.
-   if(Technique.empty()) return(false);
+bool GenesisInfo::set(const TrackInfo &t, int min_fhr) {
+   int i;
 
-   // Make sure the basin, cyclone, and technique stay constant.
-   if(Basin     != l.basin() ||
-      Cyclone   != l.cyclone_number() ||
-      Technique != l.technique()) return(false);
+   // Initialize
+   clear();
 
-   // Check for an analysis track where the technique number matches,
-   // the lead time remains zero, and the valid time changes.
-   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && NPoints > 0) {
+   // Check for a best track
+   IsBestTrack = t.is_best_track();
 
-      if(TechniqueNumber          == l.technique_number() &&
-         Point[NPoints-1].lead()  == 0 &&
-         l.lead()                 == 0 &&
-         Point[NPoints-1].valid() != l.valid()) {
-
-         // Set analysis track flag and reset InitTime to 0.
-         IsAnlyTrack = true;
-         InitTime    = (unixtime) 0;
-      }
+   // Skip empty tracks and pre-existing forecast tracks
+   if(t.n_points() == 0 ||
+      (!IsBestTrack && t[0].lead() < (min_fhr*sec_per_hour))) {
+      return(false);
    }
 
-   // Apply matching logic for BEST and analysis tracks
-   if(IsBestTrack || IsAnlyTrack) {
+   // Initialize
+   IsSet           = true;
+   Basin           = t.basin();
+   Cyclone         = t.cyclone();
+   StormName       = t.storm_name();
+   TechniqueNumber = t.technique_number();
+   Technique       = t.technique();
+   Initials        = t.initials();
 
-      // Subsequent track point times cannot differ by too much
-      if(NPoints > 0) {
-         diff = (int) (l.warning_time() - Point[NPoints-1].valid());
-         if(abs(diff) > MaxBestTrackTimeInc) match = false;
-      }
+   // Store genesis time and location.
+   GenesisTime = t[0].valid();
+   Lat         = t[0].lat();
+   Lon         = t[0].lon();
 
-      // Analysis tracks technique numbers must stay constant.
-      if(IsAnlyTrack && !IsBestTrack &&
-         TechniqueNumber != l.technique_number()) match = false;
+   // For BEST tracks, keep InitTime = LeadTime = 0.
+   if(IsBestTrack) {
+      InitTime = (unixtime) 0;
+      LeadTime = 0;
    }
-
-   // Apply matching logic for non-BEST, non-analysis tracks
    else {
-
-      // Check that the technique number and init time stay constant.
-      if(TechniqueNumber != l.technique_number() ||
-         InitTime        != l.warning_time())
-         match = false;
+      InitTime = t.init();
+      LeadTime = t[0].lead();
    }
-*/
-   return(match);
+
+   // Compute the track time ranges
+   MinValidTime    = MaxValidTime    = t[0].valid();
+   MinWarmCoreTime = MaxWarmCoreTime = 0;
+   NPoints         = t.n_points();
+
+   for(i=0; i<NPoints; i++) {
+
+      if(t[i].valid() < MinValidTime) MinValidTime = t[i].valid();
+      if(t[i].valid() > MaxValidTime) MaxValidTime = t[i].valid();
+
+      if(t[i].warm_core()) {
+         if(MinWarmCoreTime == 0 || t[i].valid() < MinWarmCoreTime) {
+            MinWarmCoreTime = t[i].valid();
+         }
+         if(MaxWarmCoreTime == 0 || t[i].valid() > MaxWarmCoreTime) {
+            MaxWarmCoreTime = t[i].valid();
+         }
+      }
+   }
+
+   // Create the storm id
+   set_storm_id();
+
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -461,14 +436,14 @@ ConcatString GenesisInfoArray::serialize_r(int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfoArray::assign(const GenesisInfoArray &t) {
+void GenesisInfoArray::assign(const GenesisInfoArray &ga) {
    int i;
 
    clear();
 
-   if(t.Genesis.size() == 0) return;
+   if(ga.Genesis.size() == 0) return;
 
-   for(i=0; i<t.Genesis.size(); i++) Genesis.push_back(Genesis[i]);
+   for(i=0; i<ga.Genesis.size(); i++) add(ga[i]);
 
    return;
 }
@@ -490,55 +465,56 @@ const GenesisInfo & GenesisInfoArray::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenesisInfoArray::add(const GenesisInfo &t) {
+void GenesisInfoArray::add(const GenesisInfo &g) {
 
-   Genesis.push_back(t);
+   Genesis.push_back(g);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::add(const TrackInfo &t) {
+bool GenesisInfoArray::add(const TrackInfo &t, int min_fhr) {
+   GenesisInfo g;
 
-   // JHG work here
-   // Check if this genesis event already exists
-   // If not, add it and return true.
-   // If yes, return false.
-   /*
-   bool found  = false;
-   bool status = false;
-   int i;
+   // Attempt to create a genesis object
+   if(!g.set(t, min_fhr)) return(false);
 
-   // Check if this ATCFTrackLine already exists in the GenesisInfoArray
-   if(check_dup) {
-      if(has(l)) {
-         mlog << Warning
-              << "\nGenesisInfoArray::add(const ATCFTrackLine &) -> "
-              << "skipping duplicate ATCFTrackLine:\n"
-              << l.get_line() << "\n\n";
-         return(false);
-      }
-   }
+   // Check for duplicates
+   if(has(g)) return(false);
 
-   // Add ATCFTrackLine to an existing track if possible
-   for(i=NTracks-1; i>=0; i--) {
-      if(Track[i].is_match(l)) {
-         found = true;
-         status = Track[i].add(l, check_dup, check_anly);
-         break;
-      }
-   }
+   // Store the genesis object
+   add(g);
 
-   // Otherwise, create a new track
-   if(!found) {
-      extend(NTracks + 1);
-      status = Track[NTracks++].add(l, check_dup, check_anly);
-   }
-
-   return(status);
-   */
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfoArray::has(const GenesisInfo &g) {
+
+   for(int i=0; i<Genesis.size(); i++) {
+      if(g == Genesis[i]) return(true);
+   }
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenesisInfoArray::set_dland(int n, double d) {
+
+   // Check range
+   if((n < 0) || (n >= Genesis.size())) {
+      mlog << Error
+           << "\nGenesisInfoArray::set_dland() -> "
+           << "range check error for index value " << n << "\n\n";
+      exit(1);
+   }
+
+   Genesis[n].set_dland(d);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

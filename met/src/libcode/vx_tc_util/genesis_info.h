@@ -41,12 +41,13 @@ class GenesisInfo {
       ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
+      ConcatString StormName;
       int          TechniqueNumber;
       ConcatString Technique;
       ConcatString Initials;
 
       // Genesis Timing
-      unixtime GenTime;
+      unixtime GenesisTime;
       unixtime InitTime;
       int      LeadTime;
 
@@ -62,14 +63,13 @@ class GenesisInfo {
       unixtime MinWarmCoreTime;
       unixtime MaxWarmCoreTime;
 
-      void initialize(const ATCFTrackLine &);
-
    public:
 
       GenesisInfo();
      ~GenesisInfo();
       GenesisInfo(const GenesisInfo &);
       GenesisInfo & operator=(const GenesisInfo &);
+      bool          operator==(const GenesisInfo &) const;
 
       void         clear();
       void         dump(ostream &, int = 0)  const;
@@ -82,14 +82,8 @@ class GenesisInfo {
          //
 
       void set_storm_id();
-      void set_storm_id(const ConcatString &);
-      void set_basin(const ConcatString &);
-      void set_cyclone(const ConcatString &);
-      void set_storm_name(const ConcatString &);
-      void set_technique_number(int);
-      void set_technique(const ConcatString &);
-      void set_initials(const ConcatString &);
-      void set_init(const unixtime);
+      void set_dland(double);
+      bool set(const TrackInfo &, int min_fhr);
 
          //
          //  get stuff
@@ -103,45 +97,40 @@ class GenesisInfo {
       int                  technique_number() const;
       const ConcatString & technique()        const;
       const ConcatString & initials()         const;
+      double               lat()              const;
+      double               lon()              const;
+      double               dland()            const;
+      unixtime             genesis()          const;
       unixtime             init()             const;
       int                  init_hour()        const;
+      int                  lead_time()        const;
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
       int                  valid_dur()        const;
+      int                  n_points()         const;
       unixtime             warm_core_min()    const;
       unixtime             warm_core_max()    const;
       int                  warm_core_dur()    const;
-      int                  n_points()         const;
-
-         //
-         //  do stuff
-         //
-
-      bool add(const ATCFTrackLine &);
-
-      bool is_match(const ATCFTrackLine &);
-
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool GenesisInfo::is_best_track()                  const { return(IsBestTrack); }
-inline void GenesisInfo::set_storm_id(const ConcatString &cs)   { StormId = cs;        }
-inline void GenesisInfo::set_basin(const ConcatString &cs)      { Basin = cs;          }
-inline void GenesisInfo::set_cyclone(const ConcatString &cs)    { Cyclone = cs;        }
-inline void GenesisInfo::set_technique_number(int i)            { TechniqueNumber = i; }
-inline void GenesisInfo::set_technique(const ConcatString &cs)  { Technique = cs;      }
-inline void GenesisInfo::set_initials(const ConcatString &cs)   { Initials = cs;       }
-inline void GenesisInfo::set_init(const unixtime u)             { InitTime = u;        }
-
+inline bool                 GenesisInfo::is_best_track()    const { return(IsBestTrack);             }
 inline const ConcatString & GenesisInfo::storm_id()         const { return(StormId);                 }
 inline const ConcatString & GenesisInfo::basin()            const { return(Basin);                   }
 inline const ConcatString & GenesisInfo::cyclone()          const { return(Cyclone);                 }
+inline const ConcatString & GenesisInfo::storm_name()       const { return(StormName);               }
 inline int                  GenesisInfo::technique_number() const { return(TechniqueNumber);         }
 inline const ConcatString & GenesisInfo::technique()        const { return(Technique);               }
 inline const ConcatString & GenesisInfo::initials()         const { return(Initials);                }
+inline double               GenesisInfo::lat()              const { return(Lat);                     }
+inline double               GenesisInfo::lon()              const { return(Lon);                     }
+inline double               GenesisInfo::dland()            const { return(DLand);                   }
+inline unixtime             GenesisInfo::genesis()          const { return(GenesisTime);             }
 inline unixtime             GenesisInfo::init()             const { return(InitTime);                }
 inline int                  GenesisInfo::init_hour()        const { return(InitTime % sec_per_hour); }
+inline int                  GenesisInfo::lead_time()        const { return(LeadTime);                }
+inline int                  GenesisInfo::n_points()         const { return(NPoints);                 }
 inline unixtime             GenesisInfo::valid_min()        const { return(MinValidTime);            }
 inline unixtime             GenesisInfo::valid_max()        const { return(MaxValidTime);            }
 inline int                  GenesisInfo::valid_dur()        const { return((MinValidTime == 0 ||
@@ -154,7 +143,6 @@ inline int                  GenesisInfo::warm_core_dur()    const { return((MinW
                                                                             MaxWarmCoreTime == 0 ?
                                                                             bad_data_int :
                                                                             MaxWarmCoreTime - MinWarmCoreTime)); }
-inline int                  GenesisInfo::n_points()         const { return(NPoints);                 }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -189,7 +177,9 @@ class GenesisInfoArray {
          //
 
       void add(const GenesisInfo &);
-      bool add(const TrackInfo &);
+      bool add(const TrackInfo &, int min_fhr);
+      bool has(const GenesisInfo &);
+      void set_dland(int, double);
 
          //
          //  get stuff

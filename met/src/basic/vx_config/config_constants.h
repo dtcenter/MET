@@ -958,6 +958,7 @@ static const char conf_key_event_equal[]              = "event_equal";
 static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 static const char conf_key_filter[]                   = "filter";
+static const char conf_key_fcst_hour_start[]          = "fcst_hour_star";
 
 //
 // Parameter value names common to multiple tools

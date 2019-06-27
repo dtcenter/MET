@@ -53,9 +53,6 @@ static void   get_atcf_files       (const StringArray &,
 static void   process_track_files  (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &);
-static bool   is_keeper            (const ATCFLineBase *);
-static void   filter_tracks        (TrackInfoArray &);
-static void   filter_probs         (ProbInfoArray &);
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
                                     double lat, double lon);
@@ -158,7 +155,8 @@ void process_command_line(int argc, char **argv) {
 void process_tracks() {
    TrackInfoArray tracks;
    StringArray atcf_files, atcf_files_model_suffix;
-   GenesisInfoArray genesis;
+   GenesisInfoArray ga, amodel_ga, bmodel_ga;
+   map<ConcatString,GenesisInfoArray> amodel_ga_map;
 
    // Initialize
    tracks.clear();
@@ -168,8 +166,48 @@ void process_tracks() {
                   atcf_files,  atcf_files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << atcf_files.n() << " ATCF file(s).\n";
-   process_track_files(atcf_files, atcf_files_model_suffix, genesis);
+        << "Processing " << atcf_files.n() << " ATCF files.\n";
+   process_track_files(atcf_files, atcf_files_model_suffix, ga);
+
+   // Loop through the filters and subset the genesis events
+   for(int i=0; i<conf_info.n_vx(); i++) {
+
+      // Initialize
+      bmodel_ga.clear();
+      amodel_ga_map.clear();
+
+      // Loop through and subset the genesis events
+      for(int j=0; j<ga.n(); j++) {
+
+         // Check filters
+         if(conf_info.VxOpt[i].is_keeper(ga[j])) {
+
+            // Store the current model name
+            ConcatString cs = ga[j].technique();
+
+            // Check requested bmodel
+            if(cs == conf_info.VxOpt[i].BModel) {
+               bmodel_ga.add(ga[i]);
+            }
+            // Check requested amodels
+            else if(conf_info.VxOpt[i].AModel.n() == 0 ||
+                    conf_info.VxOpt[i].AModel.has(cs)) {
+
+               // Add a new map entry, if necessary
+               if(amodel_ga_map.count(cs) == 0) {
+                  amodel_ga.clear();
+                  amodel_ga_map[cs] = amodel_ga;
+               }
+
+               // Store the current object
+               amodel_ga_map[cs].add(ga[j]);
+            }
+         }
+      } // end j
+
+      // JHG, do more work here and process the pairs!
+
+   }
 
    return;
 }
@@ -207,7 +245,6 @@ void get_atcf_files(const StringArray &source,
 void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray &genesis) {
-
    int i, n_lines, n_tracks, tot_lines, tot_tracks;
    LineDataFile f;
    ConcatString cs;
@@ -252,7 +289,7 @@ void process_track_files(const StringArray &files,
          if(!cur_track.add(line)) {
 
             // This track is complete, add it to GenInfoArray.
-            genesis.add(cur_track);
+            genesis.add(cur_track, conf_info.FHrStart);
             n_tracks++;
 
             // Clear the current track and start a new one.
@@ -263,7 +300,7 @@ void process_track_files(const StringArray &files,
 
       // Add the last track
       if(cur_track.n_points() > 0) {
-         genesis.add(cur_track);
+         genesis.add(cur_track, conf_info.FHrStart);
          n_tracks++;
       }
 
@@ -284,12 +321,18 @@ void process_track_files(const StringArray &files,
 
    // Dump out the total number of lines
    mlog << Debug(3)
-        << "Parsed " << tot_tracks << " track from " << tot_lines
-        << " lines read from " << files.n_elements() << " file(s).\n";
+        << "Parsed " << tot_tracks << " tracks from " << tot_lines
+        << " lines read from " << files.n_elements() << " files.\n";
+
+   // Compute the distance to land
+   for(i=0; i<genesis.n(); i++) {
+      genesis.set_dland(i, conf_info.compute_dland(
+                              genesis[i].lat(), genesis[i].lon()));
+   }
 
    // Dump out the track information
    mlog << Debug(3)
-        << "Identified " << genesis.n() << " genesis event(s).\n";
+        << "Identified " << genesis.n() << " genesis events.\n";
 
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
@@ -305,355 +348,6 @@ void process_track_files(const StringArray &files,
       }
    }
 
-
-/*
-   int i, cur_read, cur_add, tot_read, tot_add;
-   LineDataFile f;
-   ConcatString cs;
-   ATCFTrackLine line;
-
-   // Initialize
-   tracks.clear();
-
-   // Initialize counts
-   tot_read = tot_add = 0;
-
-   // Process each of the input ATCF files
-   for(i=0; i<files.n_elements(); i++) {
-
-      // Open the current file
-      if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_track_files() -> "
-              << "unable to open file \"" << files[i] << "\"\n\n";
-         exit(1);
-      }
-
-      // Initialize counts
-      cur_read = cur_add = 0;
-
-      // Read each line in the file
-      while(f >> line) {
-
-         // Increment the line counts
-         cur_read++;
-         tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
-
-         // Check for BEST track technqiue
-         if(conf_info.BestTechnique.has(line.technique())) {
-            line.set_best_track(true);
-         }
-
-         // Check for operational track technqiue
-         if(conf_info.OperTechnique.has(line.technique())) {
-            line.set_oper_track(true);
-         }
-
-         // Check the keep status if requested
-         if(check_keep && !is_keeper(&line)) continue;
-
-         // Attempt to add the current line to the TrackInfoArray
-         if(tracks.add(line, conf_info.CheckDup, check_anly)) {
-            cur_add++;
-            tot_add++;
-         }
-      }
-
-      // Dump out the current number of lines
-      mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n_elements()
-           << "] Used " << cur_add << " of " << cur_read
-           << " lines read from file \"" << files[i] << "\"\n";
-
-      // Close the current file
-      f.close();
-
-   } // end for i
-
-   // Dump out the total number of lines
-   mlog << Debug(3)
-        << "Used " << tot_add << " of " << tot_read
-        << " lines read from " << files.n_elements() << " file(s).\n";
-
-   // Dump out the track information
-   mlog << Debug(3)
-        << "Identified " << tracks.n_tracks() << " track(s).\n";
-
-   // Dump out very verbose output
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5)
-           << tracks.serialize_r() << "\n";
-   }
-   // Dump out track info
-   else {
-      for(i=0; i<tracks.n_tracks(); i++) {
-         mlog << Debug(4)
-              << "[Track " << i+1 << " of " << tracks.n_tracks()
-              << "] " << tracks[i].serialize() << "\n";
-      }
-   }
-*/
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Check if the ATCFLineBase should be kept.  Only check those columns
-// that remain constant across the entire track:
-//    model, storm id, basin, cyclone, and init time
-//
-////////////////////////////////////////////////////////////////////////
-
-bool is_keeper(const ATCFLineBase * line) {
-   bool keep = true;
-/*
-   int m, d, y, h, mm, s;
-
-   // Decompose warning time
-   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
-
-   // Check model
-   if(conf_info.Model.n_elements() > 0 &&
-      !conf_info.Model.has(line->technique()))
-      keep = false;
-
-   // Check storm id
-   else if(conf_info.StormId.n_elements() > 0 &&
-           !has_storm_id(conf_info.StormId, line->basin(),
-                         line->cyclone_number(), line->warning_time()))
-      keep = false;
-
-   // Check basin
-   else if(conf_info.Basin.n_elements() > 0 &&
-           !conf_info.Basin.has(line->basin()))
-      keep = false;
-
-   // Check cyclone
-   else if(conf_info.Cyclone.n_elements() > 0 &&
-           !conf_info.Cyclone.has(line->cyclone_number()))
-      keep = false;
-
-   // Initialization time window
-   else if((conf_info.InitBeg > 0 &&
-            conf_info.InitBeg > line->warning_time()) ||
-           (conf_info.InitEnd > 0 &&
-            conf_info.InitEnd < line->warning_time()) ||
-           (conf_info.InitInc.n_elements() > 0 &&
-            !conf_info.InitInc.has(line->warning_time())) ||
-           (conf_info.InitExc.n_elements() > 0 &&
-            conf_info.InitExc.has(line->warning_time())))
-      keep = false;
-
-   // Initialization hour
-   else if(conf_info.InitHour.n_elements() > 0 &&
-           !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
-      keep = false;
-*/
-   // Return the keep status
-   return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void filter_tracks(TrackInfoArray &tracks) {
-/*
-   int i, j;
-   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead;
-   bool status;
-   TrackInfoArray t = tracks;
-
-   // Initialize
-   tracks.clear();
-   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = 0;
-
-   // Loop through the tracks and determine which should be retained
-   // The is_keeper() function has already filtered by model, storm id,
-   // basin, cyclone, initialization time, and initialization hour.
-   for(i=0; i<t.n_tracks(); i++) {
-
-      // Check storm name
-      if(conf_info.StormName.n_elements() > 0 &&
-         !conf_info.StormName.has(t[i].storm_name())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for storm name mismatch: "
-              << t[i].storm_name() << "\n";
-         n_name++;
-         continue;
-      }
-
-      // Valid time window
-      if((conf_info.ValidBeg > 0 &&
-          conf_info.ValidBeg > t[i].valid_min()) ||
-         (conf_info.ValidEnd > 0 &&
-          conf_info.ValidEnd < t[i].valid_max())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for falling outside the "
-              << "valid time window: "
-              <<  unix_to_yyyymmdd_hhmmss(t[i].valid_min()) << " to "
-              <<  unix_to_yyyymmdd_hhmmss(t[i].valid_max()) << "\n";
-         n_vld++;
-         continue;
-      }
-
-      // MET-667 Incorporate support for required lead times.
-      // These are used in determining whether to keep or discard a track; keep a track
-      // if all the required lead times are present.  If no required lead times are
-      // specified in the config file, then ignore checking and proceed as usual.
-      if(conf_info.LeadReq.n_elements() > 0) {
-
-         // Loop over the required lead times
-         for(j=0, status=true; j<conf_info.LeadReq.n_elements(); j++) {
-
-            // If required lead time is missing, break out
-            if(t[i].lead_index(conf_info.LeadReq[j]) == -1) {
-               status = false;
-               break;
-            }
-         }
-
-         // For bad status, discard this track and increment counter
-         if(!status) {
-            mlog << Debug(4)
-                 << "Discarding track " << i+1
-                 << " for not containing all required lead times. \n";
-            n_req_lead++;
-            continue;
-         }
-      }
-
-      // Initialization location mask
-      if(conf_info.InitMaskName.nonempty() &&
-         !check_masks(conf_info.InitPolyMask,
-                      conf_info.InitGridMask,
-                      conf_info.InitAreaMask,
-                      t[i][0].lat(), t[i][0].lon())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for falling outside the "
-              << "initialization masking region: ("
-              << t[i][0].lat() << ", " << t[i][0].lon() << ")\n";
-         n_mask_init++;
-         continue;
-      }
-
-      // Valid location mask
-      if(conf_info.ValidMaskName.nonempty()) {
-
-         // Loop over all the points in the current track
-         for(j=0, status=true; j<t[i].n_points(); j++) {
-
-            // If the TrackPoint falls outside of the polyline break out
-            if(!check_masks(conf_info.ValidPolyMask,
-                            conf_info.ValidGridMask,
-                            conf_info.ValidAreaMask,
-                            t[i][j].lat(), t[i][j].lon())) {
-               status = false;
-               break;
-            }
-         } // end for j
-
-         if(!status) {
-            mlog << Debug(4)
-                 << "Discarding track " << i+1 << " for falling outside the "
-                 << "valid masking region: "
-                 << t[i][j].lat() << ", " << t[i][j].lon() << ")\n";
-            n_mask_vld++;
-            continue;
-         }
-      }
-
-      // If we've made it here, retain this track
-      tracks.add(t[i]);
-   }
-
-   // Print summary filtering info
-   mlog << Debug(3)
-        << "Total tracks read                = " << t.n_tracks()      << "\n"
-        << "Total tracks kept                = " << tracks.n_tracks() << "\n"
-        << "Rejected for storm name          = " << n_name            << "\n"
-        << "Rejected for valid time          = " << n_vld             << "\n"
-        << "Rejected for required lead times = " << n_req_lead        << "\n"
-        << "Rejected for init mask           = " << n_mask_init       << "\n"
-        << "Rejected for valid mask          = " << n_mask_vld        << "\n";
-*/
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void filter_probs(ProbInfoArray &probs) {
-/*
-   int i;
-   int n_vld, n_mask_init, n_mask_vld;
-   ProbInfoArray p = probs;
-
-   // Initialize
-   probs.clear();
-   n_vld = n_mask_init = n_mask_vld = 0;
-
-   // Loop through the pairs and determine which should be retained
-   // The is_keeper() function has already filtered by model, storm id,
-   // basin, cyclone, initialization time, and initialization hour.
-   for(i=0; i<p.n_probs(); i++) {
-
-      // Valid time window
-      if((conf_info.ValidBeg > 0 &&
-          conf_info.ValidBeg > p[i]->valid()) ||
-         (conf_info.ValidEnd > 0 &&
-          conf_info.ValidEnd < p[i]->valid())) {
-         mlog << Debug(4)
-              << "Discarding probability " << i+1 << " for falling "
-              << "outside the valid time window: "
-              <<  unix_to_yyyymmdd_hhmmss(p[i]->valid()) << "\n";
-         n_vld++;
-         continue;
-      }
-
-      // Initialization location mask
-      if(conf_info.InitMaskName.nonempty()&&
-         !check_masks(conf_info.InitPolyMask,
-                      conf_info.InitGridMask,
-                      conf_info.InitAreaMask,
-                      p[i]->lat(), p[i]->lon())) {
-         mlog << Debug(4)
-              << "Discarding probability " << i+1 << " for falling "
-              << "outside the initialization masking region: ("
-              << p[i]->lat() << ", " << p[i]->lon() << ")\n";
-         n_mask_init++;
-         continue;
-      }
-
-      // Valid location mask
-      if(conf_info.ValidMaskName.nonempty() &&
-         !check_masks(conf_info.ValidPolyMask,
-                      conf_info.ValidGridMask,
-                      conf_info.ValidAreaMask,
-                      p[i]->lat(), p[i]->lon())) {
-         mlog << Debug(4)
-              << "Discarding probability " << i+1 << " for falling "
-              << "outside the valid polyline: ("
-              << p[i]->lat() << ", " << p[i]->lon() << ")\n";
-         n_mask_vld++;
-         continue;
-      }
-
-      // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRIRW) probs.add(p.prob_rirw(i));
-   }
-
-   // Print summary filtering info
-   mlog << Debug(3)
-        << "Total probabilities read = " << p.n_probs()     << "\n"
-        << "Total probabilities kept = " << probs.n_probs() << "\n"
-        << "Rejected for valid time  = " << n_vld           << "\n"
-        << "Rejected for init mask   = " << n_mask_init     << "\n"
-        << "Rejected for valid mask  = " << n_mask_vld      << "\n";
-*/
    return;
 }
 

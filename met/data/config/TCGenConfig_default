@@ -31,14 +31,14 @@ desc = "NA";
 //
 // Forecast ATCF ID's
 // If empty, all non-BEST track ATCF ID's found will be processed.
+// Statistics will be generated separately for each amodel entry.
 //
 amodel = [];
 
 //
-// Reference ATCF ID's
-// If more than one, the number of amodel and bmodel entries must match.
+// Analysis ATCF ID (e.g. BEST track)
 //
-bmodel = [ "BEST" ];
+bmodel = "BEST";
 
 //
 // Storm identifiers
@@ -85,6 +85,15 @@ vx_mask = "";
 dland_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
+//
+// Top-level options applied globally.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Starting forecast hour for genesis forecasts.
+//
+fcst_hour_start = 24;
 
 //
 // ATCF BEST track technique name(s).

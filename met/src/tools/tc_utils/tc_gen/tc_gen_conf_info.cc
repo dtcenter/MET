@@ -88,7 +88,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
    // Conf: AModel and BModel
    AModel = dict.lookup_string_array(conf_key_amodel);
-   BModel = dict.lookup_string_array(conf_key_bmodel);
+   BModel = dict.lookup_string(conf_key_bmodel);
 
    // Conf: StormId
    StormId = dict.lookup_string_array(conf_key_storm_id);
@@ -138,6 +138,79 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
+   bool keep = true;
+   int m, d, y, h, mm, s;
+
+   // AModel and BModel names are checked elsewhere
+
+   // Parse init time into components
+   unix_to_mdyhms(g.init(), m, d, y, h, mm, s);
+
+   // Check storm id
+   if(StormId.n() > 0 &&
+      !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
+      keep = false;
+
+   // Check basin
+   else if(Basin.n() > 0 && !Basin.has(g.basin()))
+      keep = false;
+
+   // Check cyclone
+   else if(Cyclone.n() > 0 &&
+           !Cyclone.has(g.cyclone()))
+      keep = false;
+
+   // Check storm name
+   else if(StormName.n() > 0 &&
+           !StormName.has(g.storm_name()))
+      keep = false;
+
+   // Initialization time window
+   else if((InitBeg     > 0 &&  InitBeg > g.init())    ||
+           (InitEnd     > 0 &&  InitEnd < g.init())    ||
+           (InitInc.n() > 0 && !InitInc.has(g.init())) ||
+           (InitExc.n() > 0 &&  InitExc.has(g.init())))
+      keep = false;
+
+   // Initialization hour
+   else if(InitHour.n() > 0 && !InitHour.has(hms_to_sec(h, mm, s)))
+      keep = false;
+
+   // Valid time window
+   else if((ValidBeg     > 0 &&  ValidBeg > g.valid_min()) ||
+           (ValidEnd     > 0 &&  ValidEnd < g.valid_max()))
+      keep = false;
+
+   // Distance to land
+   else if((DLandThresh.get_type() != no_thresh_type) &&
+           (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+      keep = false;
+
+   // Poly masking
+   else if(VxPolyMask.n_points() > 0 &&
+           !VxPolyMask.latlon_is_inside(g.lat(), g.lon()))
+      keep = false;
+
+   // Area masking
+   else if(!VxAreaMask.is_empty() ) {
+      double x, y;
+      VxGridMask.latlon_to_xy(g.lat(), g.lon(), x, y);
+      if(x < 0 || x >= VxGridMask.nx() ||
+         y < 0 || y >= VxGridMask.ny()) {
+         keep = false;
+      }
+      else {
+         keep = VxAreaMask(nint(x), nint(y));
+      }
+   }
+
+   // Return the keep status
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TCGenConfInfo
 //
@@ -169,6 +242,7 @@ void TCGenConfInfo::init_from_scratch() {
 void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
+   FHrStart = bad_data_int;
    BestTechnique.clear();
    DLandFile.clear();
    DLandGrid.clear();
@@ -204,6 +278,9 @@ void TCGenConfInfo::process_config() {
    Dictionary *filter_dict = (Dictionary *) 0;
    TCGenVxOpt vx_opt;
    int i;
+
+   // Conf: FHrStart
+   FHrStart = Conf.lookup_int(conf_key_fcst_hour_start);
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);

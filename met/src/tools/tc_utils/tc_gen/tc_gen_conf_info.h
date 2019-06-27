@@ -18,6 +18,7 @@
 
 #include "mask_poly.h"
 
+#include "vx_tc_util.h"
 #include "vx_config.h"
 #include "vx_util.h"
 
@@ -40,8 +41,8 @@ class TCGenVxOpt {
       ConcatString Desc;
 
       // Model comparisons
-      StringArray AModel;    // Forecast ATCF ID
-      StringArray BModel;    // Reference ATCF ID
+      StringArray  AModel;    // Forecast ATCF ID
+      ConcatString BModel;    // Reference ATCF ID
 
       // Track filtering criteria
       StringArray StormId;   // List of storm ids
@@ -70,6 +71,8 @@ class TCGenVxOpt {
       void clear();
 
       void process_config(Dictionary &);
+
+      bool is_keeper(const GenesisInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,6 +96,9 @@ class TCGenConfInfo {
       // Vector of vx task filtering options [n_vx]
       std::vector<TCGenVxOpt> VxOpt;
 
+      // Starting genesis forecast hour
+      int FHrStart;
+
       // BEST track ATCF ID's
       StringArray BestTechnique;
 
@@ -114,12 +120,12 @@ class TCGenConfInfo {
 
       double compute_dland(double lat, double lon);
 
-      int get_n_vx() const;
+      int n_vx() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCGenConfInfo::get_n_vx() const { return(VxOpt.size()); }
+inline int TCGenConfInfo::n_vx() const { return(VxOpt.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 
