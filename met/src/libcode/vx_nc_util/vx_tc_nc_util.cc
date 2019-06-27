@@ -172,7 +172,7 @@ void def_tc_data(NcFile* nc_out,
 ////////////////////////////////////////////////////////////////////////
 
 void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
-    const int& i_point, const NcVar& var, double* data) {
+    const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
     vector<size_t> counts;
