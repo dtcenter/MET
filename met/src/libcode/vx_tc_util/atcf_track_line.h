@@ -189,6 +189,8 @@ class ATCFTrackLine : public ATCFLineBase {
       int           seas_radius2    () const;
       int           seas_radius3    () const;
       int           seas_radius4    () const;
+
+      bool          warm_core       () const;
 };
 
 ////////////////////////////////////////////////////////////////////////

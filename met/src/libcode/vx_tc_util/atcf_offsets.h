@@ -65,6 +65,11 @@ static const int SeasRadius2Offset     = 32;
 static const int SeasRadius3Offset     = 33;
 static const int SeasRadius4Offset     = 34;
 
+static const int UserDefinedOffset     = 35;
+static const int WarmCoreOffset        = 39;
+
+static const char ThermoParams_Str[]   = "THERMO PARARMS";
+
 //
 // Offsets specific to the EDECK probability lines
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
