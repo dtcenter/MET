@@ -34,17 +34,14 @@ extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, NcVar&, NcVar&);
 
-extern void write_tc_grid(NcFile*, const TcrmwGrid&,
-    const int&, const NcVar&, double*);
-
-extern void write_tc_valid_time(NcFile*,
-    const int&, const NcVar&, const long&);
-
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, VarInfo*);
 
-extern void write_tc_data(NcFile*,
+extern void write_tc_valid_time(NcFile*,
+    const int&, const NcVar&, const long&);
+
+extern void write_tc_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, double*);
 
 ////////////////////////////////////////////////////////////////////////

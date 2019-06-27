@@ -472,8 +472,8 @@ static void compute_grids(const TrackInfoArray& tracks) {
         // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
 
         // Write coordinate arrays
-        write_tc_grid(nc_out, tcrmw_grid, i_point, lat_grid_var, lat_grid);
-        write_tc_grid(nc_out, tcrmw_grid, i_point, lon_grid_var, lon_grid);
+        write_tc_data(nc_out, tcrmw_grid, i_point, lat_grid_var, lat_grid);
+        write_tc_data(nc_out, tcrmw_grid, i_point, lon_grid_var, lon_grid);
 
         // Write valid time
         write_tc_valid_time(nc_out, i_point,
