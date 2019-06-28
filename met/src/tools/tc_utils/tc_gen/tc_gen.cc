@@ -279,13 +279,8 @@ void process_track_files(const StringArray &files,
             line.set_technique(cs);
          }
 
-         // Check for BEST track technqiue
-         if(conf_info.BestTechnique.has(line.technique())) {
-            line.set_best_track(true);
-         }
-
-         // Add the current line
-         tracks.add(line);
+         // Add the current line checking for analysis tracks
+         tracks.add(line, false, true);
       }
 
       // Increment counts
@@ -297,6 +292,9 @@ void process_track_files(const StringArray &files,
 
       // Add these tracks to the GenInfoArray
       for(j=0, n_genesis=0; j<tracks.n(); j++) {
+
+         // JHG, have apply lots more filtering criteria here!
+
          if(genesis.add(tracks[j], conf_info.FHrStart)) n_genesis++;
       }
 

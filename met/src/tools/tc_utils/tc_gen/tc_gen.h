@@ -50,10 +50,6 @@ static const char * atcf_suffix = ".dat";
 static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
 
-// BEST track time step (6 hours)
-// JHG do I need this?
-static const int best_track_time_step = 21600;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
