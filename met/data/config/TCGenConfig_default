@@ -75,6 +75,11 @@ valid_beg = "";
 valid_end = "";
 
 //
+// Model initialization hours
+//
+init_hour = [];
+
+//
 // Spatial masking region
 //
 vx_mask = "";
@@ -83,6 +88,14 @@ vx_mask = "";
 // Distance to land threshold
 //
 dland_thresh = NA;
+
+//
+// Genesis matching time window, defined relative to each forecast genesis event
+//
+genesis_window = {
+   beg = "000000";
+   end = "000000";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
