@@ -223,6 +223,7 @@ class TrackInfoArray {
 
       const TrackInfo & operator[](int) const;
       int n_tracks() const;
+      int n() const;
 
          //
          //  do stuff
@@ -238,6 +239,7 @@ class TrackInfoArray {
 ////////////////////////////////////////////////////////////////////////
 
 inline int TrackInfoArray::n_tracks() const { return(NTracks); }
+inline int TrackInfoArray::n()        const { return(NTracks); }
 
 ////////////////////////////////////////////////////////////////////////
 
