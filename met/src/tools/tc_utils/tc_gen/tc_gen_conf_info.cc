@@ -134,6 +134,9 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
                       VxMaskName);
    }
 
+   // Conf: DLandThresh
+   DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
+
    return;
 }
 
@@ -243,7 +246,9 @@ void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
    FHrStart = bad_data_int;
-   BestTechnique.clear();
+   MinDurHr = bad_data_int;
+   EventCategory = NoCycloneLevel;
+   EventVMaxThresh.clear();
    DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
@@ -282,9 +287,15 @@ void TCGenConfInfo::process_config() {
    // Conf: FHrStart
    FHrStart = Conf.lookup_int(conf_key_fcst_hour_start);
 
-   // Conf: BestTechnique
-   BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
-   BestTechnique.set_ignore_case(true);
+   // Conf: MinDurHr
+   MinDurHr = Conf.lookup_int(conf_key_min_duration_hours);
+
+   // Conf: EventCategory
+   EventCategory = string_to_cyclonelevel(
+                      Conf.lookup_string(conf_key_event_category).c_str());
+
+   // Conf: EventVMaxThresh
+   EventVMaxThresh = Conf.lookup_thresh(conf_key_event_vmax_thresh);
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);

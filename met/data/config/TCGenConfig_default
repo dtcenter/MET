@@ -109,9 +109,16 @@ genesis_window = {
 fcst_hour_start = 24;
 
 //
-// ATCF BEST track technique name(s).
+// Minimum track duration for genesis event.
 //
-best_technique = [ "BEST" ];
+min_duration_hours = 12;
+
+//
+// Define a genesis event as being category = TD or greater,
+// Or define a genesis event by thresholding the maximum wind speed.
+//
+event_category    = "TD"; // Set to NA to skip
+event_vmax_thresh = NA;   // Set to NA to skip
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded

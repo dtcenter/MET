@@ -99,8 +99,12 @@ class TCGenConfInfo {
       // Starting genesis forecast hour
       int FHrStart;
 
-      // BEST track ATCF ID's
-      StringArray BestTechnique;
+      // Minimum track duration
+      int MinDurHr;
+
+      // Genesis event criteria
+      CycloneLevel EventCategory;
+      SingleThresh EventVMaxThresh;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;
