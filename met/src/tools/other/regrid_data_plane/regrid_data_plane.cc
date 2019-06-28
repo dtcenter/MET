@@ -668,8 +668,13 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    int from_lat_count = fr_grid.ny();;
    int from_lon_count = fr_grid.nx();
 
+<<<<<<< HEAD
    bool has_coord_input;
    ConcatString tmp_coord_name;
+=======
+   bool has_coord_input = false;
+   char *tmp_coord_name = get_env(key_geostationary_data);
+>>>>>>> origin/bugfix_1156_uninitialized
 
    if (get_env(key_geostationary_data, tmp_coord_name) &&
        tmp_coord_name.nonempty() &&
