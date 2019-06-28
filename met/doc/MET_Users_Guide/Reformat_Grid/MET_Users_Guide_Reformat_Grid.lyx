@@ -2325,7 +2325,7 @@ regrid_data_plane_GOES-16_AOD_TO_G212.nc
 \end_layout
 
 \begin_layout LyX-Code
--qc 1,2,3
+-qc 0,1,2
 \end_layout
 
 \begin_layout LyX-Code

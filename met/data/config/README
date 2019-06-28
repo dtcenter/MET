@@ -612,6 +612,12 @@ regrid = {
 //         (Table 4.7).
 //       - The "GRIB2_stat_type" entry specifies the statistical processing type
 //         (Table 4.10).
+//       - The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
+//         that specify product description template values to be used.  The
+//         indices are 0-based.  For example, use the following to request a
+//         GRIB2 record whose 9-th and 27-th product description template values
+//         are 1 and 2, respectively:
+//            GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
 //
 //    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
 //       - The "name" entry specifies the NetCDF variable name.

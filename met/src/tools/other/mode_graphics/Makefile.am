@@ -8,27 +8,21 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-# The vx_cgraph library
+# The programs
 
-noinst_LIBRARIES = libvx_cgraph.a
-libvx_cgraph_a_SOURCES = \
-	cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h \
+bin_PROGRAMS    = plot_mode_field
+
+plot_mode_field_SOURCES = cgraphbase_plottype_to_string.cc cgraphbase_plottype_to_string.h \
 	color_stack.cc color_stack.h \
 	cgraph_font.cc cgraph_font.h \
 	cgraph_main.cc cgraph_main.h \
-	gs_ps_map.h
-libvx_cgraph_a_CPPFLAGS = ${MET_CPPFLAGS}
-
-# The plot_mode_field tool
-
-bin_PROGRAMS    = plot_mode_field
-plot_mode_field_SOURCES = plot_mode_field.cc \
+	gs_ps_map.h \
+	plot_mode_field.cc \
 	mode_nc_output_file.cc mode_nc_output_file.h \
 	cgraph.h
 plot_mode_field_CPPFLAGS = ${MET_CPPFLAGS}
 plot_mode_field_LDFLAGS = -L. ${MET_LDFLAGS}
-plot_mode_field_LDADD = -lvx_cgraph \
-	-lvx_config \
+plot_mode_field_LDADD = -lvx_config \
 	-lvx_plot_util \
 	-lvx_data2d_nc_met \
 	$(PYTHON_LIBS) \
@@ -47,7 +41,7 @@ plot_mode_field_LDADD = -lvx_cgraph \
 	-lnetcdf \
 	-lcairo \
 	-lfreetype \
-	-lm  \
+	-lm \
 	-lz
 
 # If we are in development mode, generate the "to_string" files and

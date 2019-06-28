@@ -1,4 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -697,14 +698,15 @@ void MetGrib2DataFile::read_grib2_record_list() {
               2 != gfld->ipdtnum &&     //  ensemble mean
               5 != gfld->ipdtnum &&     //  probability forecast
               8 != gfld->ipdtnum &&     //  accumulation forecast
-              9 != gfld->ipdtnum &&     //  probabilistic accumultion forecast
+              9 != gfld->ipdtnum &&     //  probabilistic accumulation forecast
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
              48 != gfld->ipdtnum ){     //  aerosol data
-            mlog << Warning << "\nMetGrib2DataFile::data_plane() -> "
-                 << "unexpected PDS template number ("
-                 << gfld->ipdtnum << ") may cause unexpected results. "
+            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+                 << "PDS template number ("
+                 << gfld->ipdtnum << ") is not supported. "
                  << "Please email met_help@ucar.edu.\n\n";
+            exit(1);
          }
 
          //  store the record information

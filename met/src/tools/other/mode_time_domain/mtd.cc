@@ -464,6 +464,8 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_time_index(t);
 
+      att_2.set_is_simple();
+
       fcst_simple_att_2d.add(att_2);
 
    }   //  for k
@@ -495,6 +497,8 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
       att_2.set_object_number(j + 1);   //  1-based
 
       att_2.set_time_index(t);
+
+      att_2.set_is_simple();
 
       obs_simple_att_2d.add(att_2);
 
@@ -709,6 +713,8 @@ if ( have_pairs )  {
 
          att_2.set_time_index(t);
 
+         att_2.set_is_cluster();
+
          fcst_cluster_att_2d.add(att_2);
 
       }   //  for t
@@ -747,6 +753,8 @@ if ( have_pairs )  {
          att_2.set_cluster_number (j + 1);   //  1-based
 
          att_2.set_time_index(t);
+
+         att_2.set_is_cluster();
 
          obs_cluster_att_2d.add(att_2);
 

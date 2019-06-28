@@ -1928,16 +1928,16 @@ DocumentMedia default_media()
 
 {
 
-const char * c = get_env(papersize_env);
+ConcatString cs;
 
-if ( c == NULL )  return ( MediaLetter );
+if ( !get_env(papersize_env, cs) )  return ( MediaLetter );
 
-if ( strcmp(c, "Letter") == 0 )  return ( MediaLetter );
+if ( cs == "Letter" )  return ( MediaLetter );
 
-if ( strcmp(c, "A4") == 0 )  return ( MediaA4 );
+if ( cs == "A4" )  return ( MediaA4 );
 
 mlog << Error << "\ndefault_media() -> "
-     << "bad value \"" << c << "\" for environment variable "
+     << "bad value \"" << cs << "\" for environment variable "
      << papersize_env << "\n\n";
 
 exit ( 1 );

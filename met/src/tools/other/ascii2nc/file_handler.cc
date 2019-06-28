@@ -374,8 +374,8 @@ bool FileHandler::_addObservations(const Observation &obs)
    _observations.push_back(obs);
    if (do_summary) summary_obs.addObservationObj(obs);
    else {
-      const char *var_name = obs.getVarName().c_str();
-      if (0 < strlen(var_name) && !obs_names.has(var_name)) {
+      ConcatString var_name = obs.getVarName();
+      if (var_name.nonempty() && !obs_names.has(var_name)) {
          obs_names.add(var_name);
       }
    }

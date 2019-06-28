@@ -36,13 +36,11 @@ bool match_met_version(const char * check_version) {
    bool match = false;
 
    //
-   // Check if the check version matches the first significant digit
-   // of the MET version.
+   // Check if the major version numbers match.
    //
-   if(strncasecmp(check_version, met_version, strlen("Vn.") ) == 0)
-      match = true;
-
-   return(match);
+   ConcatString check_major(parse_version_major(check_version));
+   ConcatString met_major(parse_version_major(met_version));
+   return(check_major == met_major);
 }
 
 
@@ -64,6 +62,44 @@ void check_met_version(const char * check_version) {
    }
 
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString parse_version(const char * version, const int ndots) {
+   ConcatString cs;
+   string s = version;
+   int i, n;
+
+   //
+   // Parse the version string to the requested depth.
+   //
+   for(i=n=0; i<s.length(); i++) {
+      if(s[i] == '.') n++;
+      if(n == ndots) break;
+   }
+
+   cs = s.substr(0, i);
+
+   return(cs);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString parse_version_major(const char * version) {
+   return(parse_version(version, 1));
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString parse_version_major_minor(const char * version) {
+   return(parse_version(version, 2));
 }
 
 
@@ -266,7 +302,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
       mat = NULL;
    }
 
-   regfree(re);  
+   regfree(re);
    if ( re )  { delete re;  re = 0; }
    re = 0;
    return num_act;

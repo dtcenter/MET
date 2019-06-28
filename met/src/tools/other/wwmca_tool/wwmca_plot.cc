@@ -163,7 +163,7 @@ for (j=0; j<(cline.n()); ++j)  {
 
    if ( (j%5) == 4 )  mlog << Debug(1) << '\n';
 
-   process(cline[j]);
+   process(cline[j].c_str());
 
 }
 

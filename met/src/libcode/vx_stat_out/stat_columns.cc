@@ -1364,6 +1364,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
    shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);

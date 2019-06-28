@@ -232,8 +232,8 @@ void process_command_line(int argc, char **argv) {
       //
       // It should be a filename and then a config filename
       //
-      if(is_integer(cline[0]) == 0) {
-         ens_file_list = parse_ascii_file_list(cline[0]);
+      if(is_integer(cline[0].c_str()) == 0) {
+         ens_file_list = parse_ascii_file_list(cline[0].c_str());
          n_ens = ens_file_list.n_elements();
       }
       else {
@@ -247,9 +247,9 @@ void process_command_line(int argc, char **argv) {
       // More than two arguments. Check that the first is an integer
       // followed by that number of filenames and a config filename.
       //
-      if(is_integer(cline[0]) == 1) {
+      if(is_integer(cline[0].c_str()) == 1) {
 
-         n_ens = atoi(cline[0]);
+         n_ens = atoi(cline[0].c_str());
 
          if(n_ens <= 0) {
             mlog << Error << "\nprocess_command_line() -> "
@@ -1197,7 +1197,7 @@ void process_point_scores() {
                     << ", for interpolation method "
                     << shc.get_interp_mthd() << "("
                     << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_obs << " pairs.\n";
+                    << "), using " << pd_ptr->n_obs << " matched pairs.\n";
 
                // Continue if there are no points
                if(pd_ptr->n_obs == 0) continue;
@@ -1635,7 +1635,7 @@ void process_grid_vx() {
                  << ", for interpolation method "
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
-                 << "), using " << pd_all.n_obs << " pairs.\n";
+                 << "), using " << pd_all.n_obs << " matched pairs.\n";
 
             // Continue if there are no points
             if(pd_all.n_obs == 0) continue;
