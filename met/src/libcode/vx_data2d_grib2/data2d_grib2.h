@@ -101,13 +101,8 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void read_grib2_grid(gribfield *gfld);
 
-      long read_grib2_record( long offset,
-                              g2int unpack,
-                              g2int ifld,
-                              gribfield* &gfld,
-                              unsigned char* &cgrib,
-                              g2int &numfields
-                            );
+      long read_grib2_record(long offset, g2int unpack, g2int ifld,
+                             gribfield* &gfld, g2int &numfields);
 
       void read_grib2_record_list();
 
