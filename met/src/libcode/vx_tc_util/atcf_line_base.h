@@ -81,7 +81,7 @@ class ATCFLineBase : public DataLine {
          // set values
          //
 
-      void set_technique(const ConcatString &);
+      void set_technique (const ConcatString &);
       void set_best_track(const bool);
       void set_oper_track(const bool);
 

@@ -111,8 +111,8 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
    out << prefix << "Valid           = " << unix_to_yyyymmdd_hhmmss(valid()) << "\n";
    cs = technique();
    out << prefix << "Technique       = \"" << cs.contents() << "\"\n";
-   out << prefix << "IsBestTrack     = \"" << (IsBestTrack ? "TRUE" : "FALSE") << "\"\n";
-   out << prefix << "IsOperTrack     = \"" << (IsOperTrack ? "TRUE" : "FALSE") << "\"\n";
+   out << prefix << "IsBestTrack     = \"" << bool_to_string(IsBestTrack) << "\"\n";
+   out << prefix << "IsOperTrack     = \"" << bool_to_string(IsOperTrack) << "\"\n";
    out << prefix << "Lat             = " << lat() << "\n";
    out << prefix << "Lon             = " << lon() << "\n";
 
