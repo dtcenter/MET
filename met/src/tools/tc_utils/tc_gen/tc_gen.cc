@@ -153,13 +153,9 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_tracks() {
-   TrackInfoArray tracks;
    StringArray atcf_files, atcf_files_model_suffix;
    GenesisInfoArray ga, amodel_ga, bmodel_ga;
    map<ConcatString,GenesisInfoArray> amodel_ga_map;
-
-   // Initialize
-   tracks.clear();
 
    // Get the list of track files
    get_atcf_files(atcf_source, atcf_model_suffix,
@@ -245,11 +241,11 @@ void get_atcf_files(const StringArray &source,
 void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray &genesis) {
-   int i, n_lines, n_tracks, tot_lines, tot_tracks;
+   int i, j, n_lines, n_genesis, tot_lines, tot_tracks;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
-   TrackInfo cur_track;
+   TrackInfoArray tracks;
 
    // Initialize counts
    tot_lines = tot_tracks = 0;
@@ -265,10 +261,13 @@ void process_track_files(const StringArray &files,
          exit(1);
       }
 
-      // Initialize counts
-      n_lines = n_tracks = 0;
+      // Initialize
+      tracks.clear();
+      n_lines = 0;
 
-      // Read each line in the file
+      // Read each line in the file.
+      // Track lines may be interleaved within a file but cannot
+      // span multiple files.
       while(f >> line) {
 
          // Increment the line counts
@@ -285,44 +284,37 @@ void process_track_files(const StringArray &files,
             line.set_best_track(true);
          }
 
-         // Attempt to add the current line to the current track
-         if(!cur_track.add(line)) {
-
-            // This track is complete, add it to GenInfoArray.
-            genesis.add(cur_track, conf_info.FHrStart);
-            n_tracks++;
-
-            // Clear the current track and start a new one.
-            cur_track.clear();
-            cur_track.add(line);
-         }
+         // Add the current line
+         tracks.add(line);
       }
 
-      // Add the last track
-      if(cur_track.n_points() > 0) {
-         genesis.add(cur_track, conf_info.FHrStart);
-         n_tracks++;
+      // Increment counts
+      tot_lines  += n_lines;
+      tot_tracks += tracks.n();
+
+      // Close the current file
+      f.close();
+
+      // Add these tracks to the GenInfoArray
+      for(j=0, n_genesis=0; j<tracks.n(); j++) {
+         if(genesis.add(tracks[j], conf_info.FHrStart)) n_genesis++;
       }
 
       // Dump out the current number of lines
       mlog << Debug(4)
            << "[File " << i+1 << " of " << files.n_elements()
-           << "] Parsed " << n_tracks << " tracks from " << n_lines
-           << " lines read from file \"" << files[i] << "\"\n";
-
-      // Close the current file
-      f.close();
-
-      // Increment counts
-      tot_lines  += n_lines;
-      tot_tracks += n_tracks;
+           << "] Found " << n_genesis << " genesis events, from "
+           << tracks.n() << " tracks, from " << n_lines
+           << " input lines, from file \"" << files[i] << "\".\n";
 
    } // end for i
 
    // Dump out the total number of lines
    mlog << Debug(3)
-        << "Parsed " << tot_tracks << " tracks from " << tot_lines
-        << " lines read from " << files.n_elements() << " files.\n";
+        << "Found a total of " << genesis.n() << " genesis events, from "
+        << tot_tracks << " tracks, from " << tot_lines
+        << " input lines, from " << files.n_elements()
+        << " input files.\n";
 
    // Compute the distance to land
    for(i=0; i<genesis.n(); i++) {
@@ -331,7 +323,7 @@ void process_track_files(const StringArray &files,
    }
 
    // Dump out the track information
-   mlog << Debug(3)
+   mlog << Debug(2)
         << "Identified " << genesis.n() << " genesis events.\n";
 
    // Dump out very verbose output
