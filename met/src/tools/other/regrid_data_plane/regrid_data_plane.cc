@@ -667,7 +667,7 @@ void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
    int from_lat_count = fr_grid.ny();;
    int from_lon_count = fr_grid.nx();
 
-   bool has_coord_input;
+   bool has_coord_input = false;
    char *tmp_coord_name = get_env(key_geostationary_data);
 
    if ((tmp_coord_name != NULL) && strlen(tmp_coord_name)

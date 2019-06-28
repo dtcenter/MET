@@ -2537,16 +2537,14 @@ void clean_up() {
 int get_event_index(int flag, int i_var, int i_lvl) {
    int ev, i;
 
+   ev = 0;
    // Check the event_stack_flag to determine if the top or bottom
    // of the event stack is to be used
    //   Top of the stack:    ev = 0
    //   Bottom of the stack: ev > 0
-   if(flag) {
-      ev = 0;
-   }
-   // If the bottom of the event stack is to be used, find the
-   // correct event index
-   else {
+   if(!flag) {
+      // If the bottom of the event stack is to be used, find the
+      // correct event index
 
       // Index through the events
       for(i=0; i<mxr8vn; i++) {
