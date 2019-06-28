@@ -678,13 +678,12 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
 
 void MetGrib2DataFile::read_grib2_record_list() {
    gribfield  *gfld;
-   unsigned char *cgrib;
    long offset = 0, offset_next;
    g2int numfields;
    int idx = 0, rec_num = 1;
 
    //  read all the records into the record list, pulling grid information from the first
-   while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, cgrib, numfields)) ){
+   while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
 
       //  read the grid information, if necessary
       if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
@@ -900,7 +899,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          g2_free(gfld);
 
          //  if there are more fields in the current record, read the next one
-         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, cgrib, numfields);
+         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
 
       }  //  END:  for(int i=1; i <= numfields; i++)
 
@@ -1259,7 +1258,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    float v, v_miss[2];
    int n_miss, i;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
-                               cgrib, numfields) ){
+                               numfields) ){
       mlog << Error
            << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
            << "failed to read record at offset " << rec->ByteOffset
@@ -1357,13 +1356,9 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetGrib2DataFile::read_grib2_record( long offset,
-                                          g2int unpack,
-                                          g2int ifld,
-                                          gribfield* &gfld,
-                                          unsigned char* &cgrib,
-                                          g2int &numfields
-                                        ) {
+long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
+                                         g2int ifld, gribfield* &gfld,
+                                         g2int &numfields) {
 
    //  the following code was lifted and modified from:
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
@@ -1373,17 +1368,23 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
-   if (lgrib == 0) return -1;
-   cgrib   = new unsigned char[lgrib];
+   if(lgrib == 0) return -1;
+
+   //  allocate memory to store the record
+   unsigned char * cgrib = new unsigned char[lgrib];
    fseek(FileGrib2, lskip, SEEK_SET);
    fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
-   if( g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal) )
+
+   if(g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal)) {
+      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
       return -1;
+   }
 
    //  read the specified field in the record
    g2_getfld(cgrib, ifld, unpack, 1, &gfld);
 
-   delete[] cgrib;
+   //  cleanup
+   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
 
    //  return the offset of the next record
    return lskip + lgrib;
