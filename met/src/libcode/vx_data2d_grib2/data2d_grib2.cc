@@ -1381,6 +1381,8 @@ long MetGrib2DataFile::read_grib2_record( long offset,
    //  read the specified field in the record
    g2_getfld(cgrib, ifld, unpack, 1, &gfld);
 
+   delete[] cgrib;
+
    //  return the offset of the next record
    return lskip + lgrib;
 }
