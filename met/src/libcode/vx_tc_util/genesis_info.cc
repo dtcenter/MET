@@ -83,7 +83,7 @@ bool GenesisInfo::operator==(const GenesisInfo & g) const {
 void GenesisInfo::clear() {
 
    IsSet       = false;
-   IsBestTrack = false;
+   IsAnlyTrack = false;
 
    StormId.clear();
    Basin.clear();
@@ -118,7 +118,7 @@ void GenesisInfo::assign(const GenesisInfo &g) {
    clear();
 
    IsSet           = true;
-   IsBestTrack     = g.IsBestTrack;
+   IsAnlyTrack     = g.IsAnlyTrack;
 
    StormId         = g.StormId;
    Basin           = g.Basin;
@@ -151,7 +151,7 @@ void GenesisInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    out << prefix << "IsSet           = " << bool_to_string(IsSet) << "\n";
-   out << prefix << "IsBestTrack     = " << bool_to_string(IsBestTrack) << "\n";
+   out << prefix << "IsAnlyTrack     = " << bool_to_string(IsAnlyTrack) << "\n";
    out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
    out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
    out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
@@ -203,7 +203,7 @@ ConcatString GenesisInfo::serialize() const {
 
    s << "GenesisInfo: "
      << "IsSet = " << bool_to_string(IsSet)
-     << ", IsBestTrack = " << bool_to_string(IsBestTrack)
+     << ", IsAnlyTrack = " << bool_to_string(IsAnlyTrack)
      << ", StormId = \"" << StormId.contents() << "\""
      << ", Basin = \"" << Basin.contents() << "\""
      << ", Cyclone = \"" << Cyclone.contents() << "\""
@@ -272,13 +272,17 @@ bool GenesisInfo::set(const TrackInfo &t, int min_fhr) {
    clear();
 
    // Check for a best track
-   IsBestTrack = t.is_best_track();
+   IsAnlyTrack = t.is_anly_track();
 
    // Skip empty tracks and pre-existing forecast tracks
    if(t.n_points() == 0 ||
-      (!IsBestTrack && t[0].lead() < (min_fhr*sec_per_hour))) {
+      (!IsAnlyTrack && t[0].lead() < (min_fhr*sec_per_hour))) {
       return(false);
    }
+
+   // Search track for genesis event
+   // JHG, find the first track point that's TD or greater.
+
 
    // Initialize
    IsSet           = true;
@@ -294,8 +298,8 @@ bool GenesisInfo::set(const TrackInfo &t, int min_fhr) {
    Lat         = t[0].lat();
    Lon         = t[0].lon();
 
-   // For BEST tracks, keep InitTime = LeadTime = 0.
-   if(IsBestTrack) {
+   // For analysis tracks, keep InitTime = LeadTime = 0.
+   if(IsAnlyTrack) {
       InitTime = (unixtime) 0;
       LeadTime = 0;
    }

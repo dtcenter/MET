@@ -37,7 +37,7 @@ class GenesisInfo {
 
       // Storm and model identification
       bool         IsSet;
-      bool         IsBestTrack;
+      bool         IsAnlyTrack;
       ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
@@ -89,7 +89,7 @@ class GenesisInfo {
          //  get stuff
          //
 
-      bool  is_best_track()                   const;
+      bool  is_anly_track()                   const;
       const ConcatString & storm_id()         const;
       const ConcatString & basin()            const;
       const ConcatString & cyclone()          const;
@@ -115,7 +115,6 @@ class GenesisInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool                 GenesisInfo::is_best_track()    const { return(IsBestTrack);             }
 inline const ConcatString & GenesisInfo::storm_id()         const { return(StormId);                 }
 inline const ConcatString & GenesisInfo::basin()            const { return(Basin);                   }
 inline const ConcatString & GenesisInfo::cyclone()          const { return(Cyclone);                 }
