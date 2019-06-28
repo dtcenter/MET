@@ -23,14 +23,32 @@ data = {
         {
           name = "TMP";
           level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         },
         {
           name = "UGRD";
           level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         },
         {
           name = "VGRD";
           level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
         }
     ];
 }
