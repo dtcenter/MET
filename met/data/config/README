@@ -40,8 +40,18 @@ The configuration file language supports the following data types:
         (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
         and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
    - Percentile Thresholds:
-      - Thresholds may be defined as a percentile of the data being processed in
-        several places.  The following percentile threshold types are supported:
+      - Thresholds may be defined as percentiles of the data being processed in
+        several places:
+         - In Point-Stat and Grid-Stat when setting "cat_thresh" and
+           "cnt_thresh".
+         - In Wavelet-Stat when setting "cat_thresh".
+         - In MODE when setting "conv_thresh" and "merge_thresh".
+         - In Ensemble-Stat when setting "obs_thresh".
+         - When using the "censor_thresh" config option.
+         - In the Stat-Analysis "-out_fcst_thresh" and "-out_obs_thresh" job
+           command options.
+         - In the Gen-Vx-Mask "-thresh" command line option.
+      - The following percentile threshold types are supported:
          - "SFP" for a percentile of the sample forecast values.
            e.g. ">SFP50" means greater than the 50-th forecast percentile.
          - "SOP" for a percentile of the sample observation values.
