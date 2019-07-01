@@ -25,8 +25,8 @@ sub usage(){
 }
 
 my @fld_hdrs  = qw(VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG
-                   OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD
-                   INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
+                   OBS_VALID_END FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE VX_MASK
+                   INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
 
 my @fld_sings = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON
                    AXIS_ANG LENGTH WIDTH AREA AREA_THRESH CURVATURE CURVATURE_X
@@ -51,8 +51,10 @@ my $fmt_hdr =
       "%-16s" . # OBS_VALID_BEG
       "%-16s" . # OBS_VALID_END
       "%-12s" . # FCST_VAR
+      "%-12s" . # FCST_UNITS
       "%-9s"  . # FCST_LEV
       "%-12s" . # OBS_VAR
+      "%-12s" . # OBS_UNITS
       "%-9s"  . # OBS_LEV
       "%-10s" . # OBTYPE
       "%-8s"  . # VX_MASK
@@ -180,10 +182,12 @@ while(<$fh_mode_in>){
     $vals[9],  # OBS_VALID_END
     $vals[9],  # OBS_VALID_END
     $vals[15], # FCST_VAR
-    $vals[16], # FCST_LEV
-    $vals[17], # OBS_VAR
-    $vals[18], # OBS_LEV
-    $vals[19], # OBTYPE
+    $vals[16], # FCST_UNITS
+    $vals[17], # FCST_LEV
+    $vals[18], # OBS_VAR
+    $vals[19], # OBS_UNITS
+    $vals[20], # OBS_LEV
+    $vals[21], # OBTYPE
     "FULL",    # VX_MASK
     "UW_MEAN", # INTERP_MTHD
     "0",       # INTERP_PNTS
@@ -196,21 +200,21 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, (" MODE_CTS ", @vals[2,3,20 .. 38]);
+    push @outs, (" MODE_CTS ", @vals[2,3,22 .. 40]);
     $fmt_val = $fmt_cts;
   }
 
   # write a single object attribute line
   elsif( $vals[20] !~ /_/ ){
     next if( $type eq "p");
-    push @outs, (" MODE_SOA ", @vals[2,3,20 .. 41]);
+    push @outs, (" MODE_SOA ", @vals[2,3,22 .. 43]);
     $fmt_val = $fmt_sing;
   }
 
   # write a pair object attribute line
   else {
     next if ($type eq "s");
-    push @outs, (" MODE_POA ", @vals[2,3,20,21,42 .. 53]);
+    push @outs, (" MODE_POA ", @vals[2,3,22,23,44 .. 57]);
     $fmt_val = $fmt_pair;
   }
 
@@ -236,64 +240,68 @@ close($fh_mode_in);
 # 13 - OBS_RAD
 # 14 - OBS_THR
 # 15 - FCST_VAR
-# 16 - FCST_LEV
-# 17 - OBS_VAR
-# 18 - OBS_LEV
-# 19 - OBTYPE
+# 16 - FCST_UNITS
+# 17 - FCST_LEV
+# 18 - OBS_VAR
+# 19 - OBS_UNITS
+# 20 - OBS_LEV
+# 21 - OBTYPE
 
-# 20 - OBJECT_ID
-# 21 - OBJECT_CAT
+# 22 - OBJECT_ID
+# 23 - OBJECT_CAT
 
-# 22 - CENTROID_X
-# 23 - CENTROID_Y
-# 24 - CENTROID_LAT
-# 25 - CENTROID_LON
-# 26 - AXIS_ANG
-# 27 - LENGTH
-# 28 - WIDTH
-# 29 - AREA
-# 30 - AREA_THRESH
-# 31 - CURVATURE
-# 32 - CURVATURE_X
-# 33 - CURVATURE_Y
-# 34 - COMPLEXITY
-# 35 - INTENSITY_10
-# 36 - INTENSITY_25
-# 37 - INTENSITY_50
-# 38 - INTENSITY_75
-# 39 - INTENSITY_90
-# 40 - INTENSITY_50
-# 41 - INTENSITY_SUM
+# 24 - CENTROID_X
+# 25 - CENTROID_Y
+# 26 - CENTROID_LAT
+# 27 - CENTROID_LON
+# 28 - AXIS_ANG
+# 29 - LENGTH
+# 30 - WIDTH
+# 31 - AREA
+# 32 - AREA_THRESH
+# 33 - CURVATURE
+# 34 - CURVATURE_X
+# 35 - CURVATURE_Y
+# 36 - COMPLEXITY
+# 37 - INTENSITY_10
+# 38 - INTENSITY_25
+# 39 - INTENSITY_50
+# 40 - INTENSITY_75
+# 41 - INTENSITY_90
+# 42 - INTENSITY_50
+# 43 - INTENSITY_SUM
 
-# 42 - CENTROID_DIST
-# 43 - BOUNDARY_DIST
-# 44 - CONVEX_HULL_DIST
-# 45 - ANGLE_DIFF
-# 46 - AREA_RATIO
-# 47 - INTERSECTION_AREA
-# 48 - UNION_AREA
-# 49 - SYMMETRIC_DIFF
-# 50 - INTERSECTION_OVER_AREA
-# 51 - COMPLEXITY_RATIO
-# 52 - PERCENTILE_INTENSITY_RATIO
-# 53 - INTEREST
+# 44 - CENTROID_DIST
+# 45 - BOUNDARY_DIST
+# 46 - CONVEX_HULL_DIST
+# 47 - ANGLE_DIFF
+# 48 - ASPECT_DIFF
+# 49 - AREA_RATIO
+# 50 - INTERSECTION_AREA
+# 51 - UNION_AREA
+# 52 - SYMMETRIC_DIFF
+# 53 - INTERSECTION_OVER_AREA
+# 54 - CURVATURE_RATIO
+# 55 - COMPLEXITY_RATIO
+# 56 - PERCENTILE_INTENSITY_RATIO
+# 57 - INTEREST
 
-# 20 - FIELD
-# 21 - TOTAL
-# 22 - FY_OY
-# 23 - FY_ON
-# 24 - FN_OY
-# 25 - FN_ON
-# 26 - BASER
-# 27 - FMEAN
-# 28 - ACC
-# 29 - FBIAS
-# 30 - PODY
-# 31 - PODN
-# 32 - POFD
-# 33 - FAR
-# 34 - CSI
-# 35 - GSS
-# 36 - HK
-# 37 - HSS
-# 38 - ODDS
+# 22 - FIELD
+# 23 - TOTAL
+# 24 - FY_OY
+# 25 - FY_ON
+# 26 - FN_OY
+# 27 - FN_ON
+# 28 - BASER
+# 29 - FMEAN
+# 30 - ACC
+# 31 - FBIAS
+# 32 - PODY
+# 33 - PODN
+# 34 - POFD
+# 35 - FAR
+# 36 - CSI
+# 37 - GSS
+# 38 - HK
+# 39 - HSS
+# 40 - ODDS
