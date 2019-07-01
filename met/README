@@ -1,4 +1,4 @@
-Model Evaluation Tools version 8.1.1 (June 2019)
+Model Evaluation Tools version 8.1.1 (July 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -330,6 +330,8 @@ Version 8.1.1 Bugfix Release Notes:
 
 - Fix MET to correctly handle the updated "V8.1.1" version number (#1153).
 - Interpret the NetCDF COARDS convention as being CF-compliant (#1155).
+- Bugfix for memory leak in vx_data2d_grib2 library (#1157).
+- Bugfix for uninitialized variables in pb2nc and regrid_data_plane (#1156).
 - Bugfix for swapped lat/lon dimensions in regrid_data_plane GOES-16 output
   (#1152).
 - Bugfix for time slicing of NetCDF files (#1147).
