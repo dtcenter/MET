@@ -182,6 +182,10 @@ Update list of GRIB2 vertical level types (#1159).
 \end_layout
 
 \begin_layout Itemize
+Fix to handle GRIB2 PDS Template number 46 (#1160).
+\end_layout
+
+\begin_layout Itemize
 Bugfix for memory leak in vx_data2d_grib2 library (#1157).
 \end_layout
 

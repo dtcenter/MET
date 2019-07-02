@@ -1,5 +1,4 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -700,7 +699,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
               9 != gfld->ipdtnum &&     //  probabilistic accumulation forecast
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
-             48 != gfld->ipdtnum ){     //  aerosol data
+             46 != gfld->ipdtnum &&     //  average, accumulation, and/or extreme values or other statistically processed values at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval for aerosol.
+             48 != gfld->ipdtnum ){     //  analysis or forecast at a horizontal level or in a horizontal layer at a point in time for aerosol.
             mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
@@ -720,14 +720,25 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-         rec->LvlTyp       = gfld->ipdtmpl[9];
+
+         //  get the level type
+         if( gfld->ipdtnum == 46 ) {
+            rec->LvlTyp    = gfld->ipdtmpl[15];
+         } else {
+            rec->LvlTyp    = gfld->ipdtmpl[9];
+         }
 
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
 
+         //  check for template number 46
+         if( gfld->ipdtnum == 46 ) {
+            rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
+            rec->LvlVal2 = rec->LvlVal1;
+
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-         //  Reference: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
-         if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
+         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+         } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
@@ -813,13 +824,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
             }
             rec->LeadTime = rec->ValidTime - rec->InitTime;
 
+         //  https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp4-46.shtml
+         } else if ( 46 == gfld->ipdtnum ) {
+
+            // ValidTime is the end of the overall time interval
+            rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[22], gfld->ipdtmpl[23], gfld->ipdtmpl[21],
+                                            gfld->ipdtmpl[24], gfld->ipdtmpl[25], gfld->ipdtmpl[26]);
+
+            //  set the forecast time information
+            if ( -1 == rec->LeadTime )   rec->LeadTime = rec->ValidTime - rec->InitTime;
+
          } else {
 
             //  determine the index for the time unit and forecast time
             int i_time_unit, i_fcst_time;
             switch(gfld->ipdtnum){
 
-               //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_temp4-48.shtml
+               //  https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp4-48.shtml
                case 48:
                   i_time_unit = 18;
                   i_fcst_time = 19;
