@@ -498,6 +498,10 @@ LevelType VarInfoGrib2::g2_lty_to_level_type(int lt) {
       case 101: // Mean Sea Level
       case 102: // Specific Altitude Above Mean Sea Level
       case 103: // Specified Height Level Above Ground
+      case 106: // Depth Below Land Surface
+      case 117: // Mixed Layer Depth
+      case 160: // Depth Below Sea Level
+      case 161: // Depth Below Water Surface
          t = LevelType_Vert;
          break;
 

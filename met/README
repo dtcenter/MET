@@ -330,6 +330,7 @@ Version 8.1.1 Bugfix Release Notes:
 
 - Fix MET to correctly handle the updated "V8.1.1" version number (#1153).
 - Interpret the NetCDF COARDS convention as being CF-compliant (#1155).
+- Update list of GRIB2 vertical level types (#1159).
 - Bugfix for memory leak in vx_data2d_grib2 library (#1157).
 - Bugfix for uninitialized variables in pb2nc and regrid_data_plane (#1156).
 - Bugfix for swapped lat/lon dimensions in regrid_data_plane GOES-16 output

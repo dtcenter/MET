@@ -178,6 +178,10 @@ Interpret the NetCDF COARDS convention as being CF-compliant (#1155).
 \end_layout
 
 \begin_layout Itemize
+Update list of GRIB2 vertical level types (#1159).
+\end_layout
+
+\begin_layout Itemize
 Bugfix for memory leak in vx_data2d_grib2 library (#1157).
 \end_layout
 
