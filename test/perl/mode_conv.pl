@@ -60,8 +60,8 @@ my $fmt_hdr =
       "%-8s"  . # VX_MASK
       "%-12s" . # INTERP_MTHD
       "%-12s" . # INTERP_PNTS
-      "%-12s" . # FCST_THRESH
-      "%-11s" . # OBS_THRESH
+      "%-20s" . # FCST_THRESH
+      "%-20s" . # OBS_THRESH
       "%-11s" . # COV_THRESH
       "%-6s"  . # ALPHA
       "%-10s";  # LINE_TYPE
@@ -119,19 +119,19 @@ my $fmt_cts =
       "%8s"   . # FY_ON
       "%8s"   . # FN_OY
       "%8s"   . # FN_ON
-      "%10s"  . # BASER
-      "%10s"  . # FMEAN
-      "%10s"  . # ACC
-      "%10s"  . # FBIAS
-      "%10s"  . # PODY
-      "%10s"  . # PODN
-      "%10s"  . # POFD
-      "%10s"  . # FAR
-      "%10s"  . # CSI
-      "%10s"  . # GSS
-      "%10s"  . # HK
-      "%10s"  . # HSS
-      "%10s";   # ODDS
+      "%12s"  . # BASER
+      "%12s"  . # FMEAN
+      "%12s"  . # ACC
+      "%12s"  . # FBIAS
+      "%12s"  . # PODY
+      "%12s"  . # PODN
+      "%12s"  . # POFD
+      "%12s"  . # FAR
+      "%12s"  . # CSI
+      "%12s"  . # GSS
+      "%12s"  . # HK
+      "%12s"  . # HSS
+      "%12s";   # ODDS
 
 
 if( 1 > @ARGV && 2 < @ARGV ){ die "ERROR: unexpected number of arguments\n\n" . usage() }
