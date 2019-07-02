@@ -486,9 +486,17 @@ static void process_fields(const TrackInfoArray& tracks) {
             get_series_entry(i_point, data_info,
                 data_files, ftype, found_data_files,
                 data_dp, latlon_arr);
+            // Check data range
+            double data_min, data_max;
+            data_dp.data_range(data_min, data_max);
+            mlog << Debug(2) << "data_min:" << data_min << "\n";
+            mlog << Debug(2) << "data_max:" << data_max << "\n";
             // Regrid data
             data_dp = met_regrid(data_dp,
                 latlon_arr, grid, data_info->regrid());
+            data_dp.data_range(data_min, data_max);
+            mlog << Debug(2) << "data_min:" << data_min << "\n";
+            mlog << Debug(2) << "data_max:" << data_max << "\n";
             // Write data
             write_tc_data(nc_out, tcrmw_grid, i_point,
                 data_vars[i_var], data_dp.data());
