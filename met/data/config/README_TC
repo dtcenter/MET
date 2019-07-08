@@ -133,6 +133,13 @@ version = "V6.0";
 model  = [];
 
 //
+// The "desc" entry specifies a user-specified description for each verification
+// task.  This string is written to the DESC column of the ASCII output
+// generated.
+//
+desc = "NA";
+
+//
 // Specify whether the code should check for duplicate ATCF lines when
 // building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 //
@@ -253,6 +260,11 @@ watch_warn = {
 //
 amodel = [];
 bmodel = [];
+
+//
+// Stratify by the DESC column.
+//
+desc = [];
 
 //
 // Stratify by the VALID times.
@@ -493,18 +505,6 @@ out_valid_mask = "";
 //          "-init_thresh        name thresh"
 //          "-init_str           name string"
 //
-//          Additional filtering options that may be used only when -line_type
-//          has been listed only once. These options take two arguments: the name
-//          of the data column to be used and the min, max, or exact value for
-//          that column. If multiple column eq/min/max/str options are listed,
-//          the job will be performed on their intersection:
-//
-//          "-column_min col_name value"  e.g. -column_min TK_ERR 100.00
-//          "-column_max col_name value"
-//          "-column_eq  col_name value"
-//          "-column_str col_name string" separate multiple filtering strings
-//                                        with commas
-//
 //          Required Args: -dump_row
 //
 //       "summary"
@@ -589,7 +589,7 @@ out_valid_mask = "";
 //       e.g.
 //       jobs = [
 //          "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
-//          "-job filter -column_min TK_ERR 100.000 \
+//          "-job filter -column_thresh TK_ERR gt100.000 \
 //           -dumprow ./tc_filter_job.tcst",
 //          "-job summary -line_type TCMPR -column AC \
 //           -dumprow  ./tc_summary_job.tcst",
