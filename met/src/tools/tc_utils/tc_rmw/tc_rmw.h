@@ -98,6 +98,8 @@ static NcVar        lat_arr_var;
 static NcVar        lon_arr_var;
 static NcVar        valid_time_var;
 static NcVar        data_var;
+static NcVar        wind_r_var;
+static NcVar        wind_a_var;
 
 static vector<NcVar> data_vars;
 
@@ -125,6 +127,10 @@ static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
 // Grid coordinate arrays
 static double* lat_arr;
 static double* lon_arr;
+
+// Wind arrays
+static double* wind_r_arr;
+static double* wind_a_arr;
 
 ////////////////////////////////////////////////////////////////////////
 

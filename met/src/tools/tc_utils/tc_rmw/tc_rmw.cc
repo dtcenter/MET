@@ -438,6 +438,12 @@ static void process_fields(const TrackInfoArray& tracks) {
     lon_arr = new double[
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
+    // Define radial and azimuthal wind arrays
+    wind_r_arr = new double[
+        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+    wind_a_arr = new double[
+        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+
     // Assume single track for now
     TrackInfo track = tracks[0];
 
@@ -551,14 +557,27 @@ static void process_fields(const TrackInfoArray& tracks) {
                 double lon = - lon_arr[ir * tcrmw_grid.azimuth_n() + ia];
                 double u = u_dp.data()[ir, ia];
                 double v = v_dp.data()[ir, ia];
+                double wind_r;
+                double wind_a;
+                tcrmw_grid.wind_ne_to_ra(
+                    lat, lon, u, v, wind_r, wind_a);
+                // tcrmw_grid.wind_ne_to_ra_conventional(
+                //     lat, lon, u, v, wind_r, wind_a);
+                wind_r_arr[ir * tcrmw_grid.azimuth_n() + ia] = wind_r;
+                wind_a_arr[ir * tcrmw_grid.azimuth_n() + ia] = wind_a;
             }
         }
-        // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
-        // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
+        // Write data
+        // write_tc_data(nc_out, tcrmw_grid, i_point,
+        //     wind_r_var, wind_r_arr);
+        // write_tc_data(nc_out, tcrmw_grid, i_point,
+        //     wind_a_var, wind_a_arr);
     }
 
     delete[] lat_arr;
     delete[] lon_arr;
+    delete[] wind_r_arr;
+    delete[] wind_a_arr;
 }
 
 ////////////////////////////////////////////////////////////////////////
