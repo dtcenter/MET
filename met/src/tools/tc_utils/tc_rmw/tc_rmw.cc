@@ -482,26 +482,77 @@ static void process_fields(const TrackInfoArray& tracks) {
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
             // Get variable info
             data_info = conf_info.data_info[i_var];
-            // Get data
-            get_series_entry(i_point, data_info,
-                data_files, ftype, found_data_files,
-                data_dp, latlon_arr);
-            // Check data range
-            double data_min, data_max;
-            data_dp.data_range(data_min, data_max);
-            mlog << Debug(2) << "data_min:" << data_min << "\n";
-            mlog << Debug(2) << "data_max:" << data_max << "\n";
-            // Regrid data
-            data_dp = met_regrid(data_dp,
-                latlon_arr, grid, data_info->regrid());
-            data_dp.data_range(data_min, data_max);
-            mlog << Debug(2) << "data_min:" << data_min << "\n";
-            mlog << Debug(2) << "data_max:" << data_max << "\n";
-            // Write data
-            write_tc_data(nc_out, tcrmw_grid, i_point,
-                data_vars[i_var], data_dp.data());
+            if (data_info->name() == "U"
+                || data_info->name() == "UGRD") {
+                // Get data
+                get_series_entry(i_point, data_info,
+                    data_files, ftype, found_data_files,
+                    u_dp, latlon_arr);
+                // Check data range
+                double data_min, data_max;
+                u_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Regrid data
+                u_dp = met_regrid(u_dp,
+                    latlon_arr, grid, data_info->regrid());
+                u_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Write data
+                write_tc_data(nc_out, tcrmw_grid, i_point,
+                    data_vars[i_var], u_dp.data());
+            } else if (data_info->name() == "V"
+                || data_info->name() == "VGRD") {
+                // Get data
+                get_series_entry(i_point, data_info,
+                    data_files, ftype, found_data_files,
+                    v_dp, latlon_arr);
+                // Check data range
+                double data_min, data_max;
+                v_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Regrid data
+                v_dp = met_regrid(v_dp,
+                    latlon_arr, grid, data_info->regrid());
+                v_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Write data
+                write_tc_data(nc_out, tcrmw_grid, i_point,
+                    data_vars[i_var], v_dp.data());
+            } else {
+                // Get data
+                get_series_entry(i_point, data_info,
+                    data_files, ftype, found_data_files,
+                    data_dp, latlon_arr);
+                // Check data range
+                double data_min, data_max;
+                data_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Regrid data
+                data_dp = met_regrid(data_dp,
+                    latlon_arr, grid, data_info->regrid());
+                data_dp.data_range(data_min, data_max);
+                mlog << Debug(2) << "data_min:" << data_min << "\n";
+                mlog << Debug(2) << "data_max:" << data_max << "\n";
+                // Write data
+                write_tc_data(nc_out, tcrmw_grid, i_point,
+                    data_vars[i_var], data_dp.data());
+            }
         }
 
+        // Transform (u, v) to (radial, azimuthal)
+        for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+            for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+                double lat = lat_arr[ir * tcrmw_grid.azimuth_n() + ia];
+                double lon = - lon_arr[ir * tcrmw_grid.azimuth_n() + ia];
+                double u = u_dp.data()[ir, ia];
+                double v = v_dp.data()[ir, ia];
+            }
+        }
         // wind_ne_to_ra(lat, lon, u, v, radial, azimuthal)
         // wind_ne_to_ra_conventional(lat, lon, u, v, radial, azimuthal)
     }
