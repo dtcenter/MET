@@ -29,6 +29,7 @@
 #include "vx_tc_util.h"
 #include "vx_nc_util.h"
 #include "vx_tc_nc_util.h"
+#include "vx_data2d_nc_met.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -555,8 +556,8 @@ static void process_fields(const TrackInfoArray& tracks) {
             for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
                 double lat = lat_arr[ir * tcrmw_grid.azimuth_n() + ia];
                 double lon = - lon_arr[ir * tcrmw_grid.azimuth_n() + ia];
-                double u = u_dp.data()[ir, ia];
-                double v = v_dp.data()[ir, ia];
+                double u = u_dp.data()[ir * tcrmw_grid.azimuth_n() + ia];
+                double v = v_dp.data()[ir * tcrmw_grid.azimuth_n() + ia];
                 double wind_r;
                 double wind_a;
                 tcrmw_grid.wind_ne_to_ra(
@@ -568,11 +569,11 @@ static void process_fields(const TrackInfoArray& tracks) {
             }
         }
         // Write data
-        // write_tc_data(nc_out, tcrmw_grid, i_point,
-        //     wind_r_var, wind_r_arr);
-        // write_tc_data(nc_out, tcrmw_grid, i_point,
-        //     wind_a_var, wind_a_arr);
-    }
+        write_tc_data(nc_out, tcrmw_grid, i_point,
+            wind_r_var, wind_r_arr);
+        write_tc_data(nc_out, tcrmw_grid, i_point,
+            wind_a_var, wind_a_arr);
+    } // Close loop over track points
 
     delete[] lat_arr;
     delete[] lon_arr;
@@ -583,7 +584,7 @@ static void process_fields(const TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_nc_file() {
-    VarInfo *data_info = (VarInfo *) 0;
+    VarInfo* data_info = (VarInfo*) 0;
 
     out_nc_file.add("tc_rmw_grids.nc");
 
@@ -622,6 +623,20 @@ static void setup_nc_file() {
             track_point_dim, data_var, data_info);
         data_vars.push_back(data_var);
     }
+
+    // Define derived variables
+    VarInfoNcMet wind_r_info;
+    VarInfoNcMet wind_a_info;
+    wind_r_info.set_name("VRAD");
+    wind_a_info.set_name("VAZI");
+    wind_r_info.set_long_name("Radial Component of Wind");
+    wind_a_info.set_long_name("Azimuthal Component of Wind");
+    wind_r_info.set_units("m/s");
+    wind_a_info.set_units("m/s");
+    def_tc_data(nc_out, range_dim, azimuth_dim,
+        track_point_dim, wind_r_var, &wind_r_info);
+    def_tc_data(nc_out, range_dim, azimuth_dim,
+        track_point_dim, wind_a_var, &wind_a_info);
 }
 
 ////////////////////////////////////////////////////////////////////////
