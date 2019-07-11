@@ -469,12 +469,13 @@ static void process_fields(const TrackInfoArray& tracks) {
         for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
             for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
                 double lat, lon;
+                int i = ir * tcrmw_grid.azimuth_n() + ia;
                 tcrmw_grid.range_azi_to_latlon(
                     ir * tcrmw_grid.range_delta_km(),
                     ia * tcrmw_grid.azimuth_delta_deg(),
                     lat, lon);
-                lat_arr[ir * tcrmw_grid.azimuth_n() + ia] = lat;
-                lon_arr[ir * tcrmw_grid.azimuth_n() + ia] = - lon;
+                lat_arr[i] = lat;
+                lon_arr[i] = - lon;
             }
         }
 
@@ -554,18 +555,19 @@ static void process_fields(const TrackInfoArray& tracks) {
         // Transform (u, v) to (radial, azimuthal)
         for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
             for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-                double lat = lat_arr[ir * tcrmw_grid.azimuth_n() + ia];
-                double lon = - lon_arr[ir * tcrmw_grid.azimuth_n() + ia];
-                double u = u_dp.data()[ir * tcrmw_grid.azimuth_n() + ia];
-                double v = v_dp.data()[ir * tcrmw_grid.azimuth_n() + ia];
+                int i = ir * tcrmw_grid.azimuth_n() + ia;
+                double lat = lat_arr[i];
+                double lon = - lon_arr[i];
+                double u = u_dp.data()[i];
+                double v = v_dp.data()[i];
                 double wind_r;
                 double wind_a;
                 tcrmw_grid.wind_ne_to_ra(
                     lat, lon, u, v, wind_r, wind_a);
                 // tcrmw_grid.wind_ne_to_ra_conventional(
                 //     lat, lon, u, v, wind_r, wind_a);
-                wind_r_arr[ir * tcrmw_grid.azimuth_n() + ia] = wind_r;
-                wind_a_arr[ir * tcrmw_grid.azimuth_n() + ia] = wind_a;
+                wind_r_arr[i] = wind_r;
+                wind_a_arr[i] = wind_a;
             }
         }
         // Write data
