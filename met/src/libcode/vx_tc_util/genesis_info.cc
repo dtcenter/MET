@@ -265,7 +265,7 @@ void GenesisInfo::set_dland(double d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::set(const TrackInfo &t, int min_fhr) {
+bool GenesisInfo::set(const TrackInfo &t) {
    int i;
 
    // Initialize
@@ -273,16 +273,6 @@ bool GenesisInfo::set(const TrackInfo &t, int min_fhr) {
 
    // Check for a best track
    IsAnlyTrack = t.is_anly_track();
-
-   // Skip empty tracks and pre-existing forecast tracks
-   if(t.n_points() == 0 ||
-      (!IsAnlyTrack && t[0].lead() < (min_fhr*sec_per_hour))) {
-      return(false);
-   }
-
-   // Search track for genesis event
-   // JHG, find the first track point that's TD or greater.
-
 
    // Initialize
    IsSet           = true;
@@ -478,11 +468,11 @@ void GenesisInfoArray::add(const GenesisInfo &g) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::add(const TrackInfo &t, int min_fhr) {
+bool GenesisInfoArray::add(const TrackInfo &t) {
    GenesisInfo g;
 
    // Attempt to create a genesis object
-   if(!g.set(t, min_fhr)) return(false);
+   if(!g.set(t)) return(false);
 
    // Check for duplicates
    if(has(g)) return(false);
