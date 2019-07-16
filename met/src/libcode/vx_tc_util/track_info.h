@@ -130,6 +130,7 @@ class TrackInfo {
       int                  init_hour()        const;
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
+      int                  duration()         const;
       int                  valid_inc()        const;
       int                  n_points()         const;
 

@@ -368,6 +368,13 @@ void TrackInfo::set_storm_id() {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackInfo::duration() const {
+   return(MaxValidTime == 0 || MinValidTime == 0 ? bad_data_int :
+          MaxValidTime - MinValidTime);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
