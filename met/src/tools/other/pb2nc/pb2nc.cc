@@ -1243,8 +1243,9 @@ void process_pbfile(int i_pb) {
       // Get the next PrepBufr message
       readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
 
-      // Special handling for "AIRNOW"
-      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
+      // Special handling for "AIRNOW" and "ANOWPM"
+      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
+                        0 == strcmp("ANOWPM", hdr_typ));
 
       if (0 < message_type_map.count((string)hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
@@ -1461,7 +1462,7 @@ void process_pbfile(int i_pb) {
                else if(grib_code == tmp_grib_code) {
                   obs_arr[4] += c_to_k;
                }
-               
+
                if (cal_cape) {
                   if(grib_code == pres_grib_code) {
                      is_cape_input = true;
@@ -1586,7 +1587,7 @@ void process_pbfile(int i_pb) {
       if (cal_cape && (cape_level > 1)) {
          bool reverse_levels;
          float cape_val, cin_val, PLCL,PEQL;
-         
+
          float cape_val2, cin_val2,cape_val3, cin_val3, cape_val4, cin_val4;    // delete me
          cape_val = bad_data_double;
          cin_val  = bad_data_double;
@@ -1601,11 +1602,11 @@ void process_pbfile(int i_pb) {
                swap_value = cape_data_pres[idx];
                cape_data_pres[idx] = cape_data_pres[buf_idx];
                cape_data_pres[buf_idx] = swap_value;
-               
+
                swap_value = cape_data_temp[idx];
                cape_data_temp[idx] = cape_data_temp[buf_idx];
                cape_data_temp[buf_idx] = swap_value;
-               
+
                swap_value = cape_data_spfh[idx];
                cape_data_spfh[idx] = cape_data_spfh[buf_idx];
                cape_data_spfh[buf_idx] = swap_value;
@@ -1616,7 +1617,7 @@ void process_pbfile(int i_pb) {
             cape_data_temp[idx] = r8bfms * 10;
             cape_data_spfh[idx] = r8bfms * 10;
          }
-         
+
          calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
                   &p1d,&t1d,&q1d, static_dummy_201,
                   &cape_level, &IMM,&JMM, &cape_level,
@@ -1637,7 +1638,7 @@ void process_pbfile(int i_pb) {
                  << " " << hdr_typ << " " << hdr_sid
                  << "\n\n" ;
          }
-         
+
          if (cape_val > 0) {
             obs_arr[1] = cape_code;
             obs_arr[2] = cape_p;
@@ -1792,7 +1793,7 @@ void process_pbfile(int i_pb) {
          strncpy(prev_hdr_typ, hdr_typ, strlen(not_assigned));
          strncpy(prev_hdr_sid, hdr_sid.c_str(), strlen(not_assigned));
       }
-      
+
       // If the number of observations for this header is non-zero,
       // store the header data and increment the PrepBufr record
       // counter
@@ -1809,7 +1810,7 @@ void process_pbfile(int i_pb) {
          rej_nobs++;
       }
    } // end for i_read
-   
+
    if (cal_pbl) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       obs_arr[1] = pbl_code;
@@ -1822,7 +1823,7 @@ void process_pbfile(int i_pb) {
            << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
            << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
       if (obs_arr[4] > MAX_PBL) obs_arr[4] = MAX_PBL;
-      
+
       addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                      hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
       //insert_pbl();
@@ -1836,7 +1837,7 @@ void process_pbfile(int i_pb) {
       pqtzuv_map_tq.clear();
       pqtzuv_map_uv.clear();
    }
-   
+
    if(showed_progress) {
       log_message = "100% ";
       if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -2536,16 +2537,14 @@ void clean_up() {
 int get_event_index(int flag, int i_var, int i_lvl) {
    int ev, i;
 
+   ev = 0;
    // Check the event_stack_flag to determine if the top or bottom
    // of the event stack is to be used
    //   Top of the stack:    ev = 0
    //   Bottom of the stack: ev > 0
-   if(flag) {
-      ev = 0;
-   }
-   // If the bottom of the event stack is to be used, find the
-   // correct event index
-   else {
+   if(!flag) {
+      // If the bottom of the event stack is to be used, find the
+      // correct event index
 
       // Index through the events
       for(i=0; i<mxr8vn; i++) {
@@ -2837,7 +2836,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    int uv_count = 0;
    int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
-   
+
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
@@ -2846,7 +2845,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       float *pqtzuv_tq, *pqtzuv_uv;
       float *cur_pqtzuv, *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;
-      
+
       first_pres = bad_data_float;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
@@ -2914,7 +2913,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          prev_pres = cur_pres;
          prev_pqtzuv = cur_pqtzuv;
       }
-      
+
       prev_pres = first_pres;
       prev_pqtzuv = first_pqtzuv;
       it_tq = pqtzuv_map_tq.begin();
@@ -2940,7 +2939,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          prev_pqtzuv = cur_pqtzuv;
       }
    }
-   
+
    if(mlog.verbosity_level() >= 7) {
       for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
             it!=pqtzuv_map_merged.end(); ++it) {
@@ -2954,10 +2953,10 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          cout << "\n";
       }
    }
-   
+
    return pqtzuv_map_merged.size();
 }
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 float compute_pbl(map<float, float*> pqtzuv_map_tq,
@@ -2971,14 +2970,14 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int uv_count = 0;
    int pbl_diff_count = 0;
    static const char *method_name = "compute_pbl() ";
-   
+
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    mlog << Debug(7) << method_name << "is called: TQZ: "
         << tq_count << "  UV: " << uv_count << "\n";
    if (tq_count > 0 || uv_count > 0) {
       int hgt_cnt, spfh_cnt;
-      
+
       map<float, float*> pqtzuv_map_merged;
       pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged);
       mlog << Debug(7) << method_name << "pbl_level= " << pbl_level << "\n";
@@ -3003,7 +3002,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          pbl_data_vgrd[index] = pqtzuv[5];
          if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
          if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
-   
+
          index--;
       }
 
@@ -3015,13 +3014,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
          mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
       }
-      
+
       if ((spfh_cnt>0) && (pbl_level>0)) {
          mzbl = pbl_level;
          mlog << Debug(7) << method_name << "mzbl: " << mzbl
               << "  missing count: Q: " << (pbl_level - spfh_cnt)
               << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
-         
+
          //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
          calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
                  pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
@@ -3037,7 +3036,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
    int count_interpolated;
    bool skip_missing;
    static const char *method_name = "interpolate_by_pressure() ";
-   
+
    idx_start = -1;
    idx_end = length;
    skip_missing = false;
@@ -3050,7 +3049,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
          if (skip_missing) {
             idx_end = idx;
             if (idx_start >= 0) {
-               mlog << Debug(7) << method_name << "between pres[" 
+               mlog << Debug(7) << method_name << "between pres["
                     << idx_start <<"] and pres[" << idx_end <<"] ("
                     << var_data[idx_start] << " and " << var_data[idx_end] << ")\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
@@ -3059,7 +3058,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
                         / (pres_data[idx_end] - pres_data[idx_start]);
                   var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
                   mlog << Debug(7) << method_name << " interpolated value["
-                       << idx2 << "] = " << var_data[idx2] << "\n"; 
+                       << idx2 << "] = " << var_data[idx2] << "\n";
                   count_interpolated++;
                }
                idx_start = idx;
@@ -3071,9 +3070,9 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
          }
       }
    }
-   mlog << Debug(5) << method_name << "interpolated count: " 
+   mlog << Debug(5) << method_name << "interpolated count: "
         << count_interpolated << "\n";
-   
+
    return count_interpolated;
 }
 

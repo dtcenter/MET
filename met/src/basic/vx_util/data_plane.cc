@@ -430,7 +430,9 @@ MaskPlane DataPlane::mask_plane() const {
 
    mp.set_size(Nx, Ny);
 
-   for(int i=0; i<Nxy; i++) mp.buf()[i] = !is_eq(Data[i], 0.0);
+   for(int i=0; i<Nxy; i++) {
+      mp.buf()[i] = (is_bad_data(Data[i]) ? false : !is_eq(Data[i], 0.0));
+   }
 
    return(mp);
 }

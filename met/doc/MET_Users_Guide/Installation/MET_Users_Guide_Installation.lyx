@@ -389,14 +389,13 @@ Two additional utilities are strongly recommended for use with MET:
 1.
  The Unified Post-Processor is recommended for post-processing the raw WRF
  model output prior to verifying the model forecasts with MET.
- The Unified Post-Processor is freely available for download from the "downloads
-" section of the WRF-NMM user's website at 
+ The Unified Post-Processor is freely available for download 
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
-http://www.dtcenter.org/wrf-nmm/users
+https://dtcenter.org/community-code/unified-post-processor-upp
 \end_layout
 
 \end_inset
@@ -762,18 +761,15 @@ As described in the introduction to this chapter, two additional utilities
 1.
  The Unified Post-Processor is recommended for post-processing the raw WRF
  model output prior to verifying the data with MET.
- The Unified Post-Processor may be used on output from both the ARW and
- NMM cores.
- Please refer to online documentation for instructions on how to install
- and use the Unified Post-Processor.
- Installation instructions for the Unified Post-Processor can be found in
- Chapter 7 of the WRF-NMM User's Guide or online at 
+ The Unified Post-Processor may be used on WRF output from both the ARW
+ and NMM cores.
+ 
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
-http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm_chap7.pdf
+https://dtcenter.org/community-code/unified-post-processor-upp
 \end_layout
 
 \end_inset

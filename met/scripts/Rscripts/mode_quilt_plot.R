@@ -52,17 +52,22 @@ if(length(args) < 2) {
    cat("         mode_obj_file_list is a space-separated list of MODE object statistic files.\n")
    quit()
 }
-
-# Load libraries.
-library(fields)
-library(gdata)
-
 # Constants
 i_start<-2
 
 # Store the prefix to be used
 prefix<-args[1]
 
+# run interactively
+prefix<-"BIO"
+flist <- as.character(read.table("filelist", header=FALSE, sep=" ")$V1)
+
+# Load libraries.
+library(fields)
+library(gdata)
+library(gtools)
+library(RColorBrewer)
+cols <- brewer.pal(9, "YlGnBu")
 ########################################################################
 #
 # Read the input MODE files.
@@ -70,14 +75,18 @@ prefix<-args[1]
 ########################################################################
 
 # Read each of the MODE files and combine them into one big data frame
-for(i in i_start:length(args)) {
+#for(i in i_start:length(args)) {
+i_start <- 1
+
+for(i in 1:length(flist)) { # for interactive running
 
    # Store the current MODE file
-   mode_file<-args[i]
+   mode_file<-flist[i] # for interactive running
+#   mode_file<-args[i]
 
    # Read the MODE file passed as an argument
-   mode_tmp<-read.table(mode_file, header=TRUE)
-
+    mode_tmp<-read.table(mode_file, header=TRUE)
+   
    cat(paste("Read", dim(mode_tmp)[1], "lines from MODE file:", mode_file, "\n"))
 
    # Check for an empty file containing only the header row
@@ -93,7 +102,16 @@ for(i in i_start:length(args)) {
 } # end for loop
 
 # Dump out the total number of MODE lines read
-cat(paste("Read", dim(mode)[1] , "lines from", length(args)-i_start+1, "MODE files.\n"))
+cat(paste("Read", dim(mode_data)[1] , "lines from", length(args)-i_start+1, "MODE files.\n"))
+
+# replace the strings with numerics
+mode_data[,13] <- as.numeric(as.vector(gsub("=|<|>", "", mode_data[,13])))
+mode_data[,15] <- as.numeric(as.vector(gsub("=|<|>", "", mode_data[,15])))
+
+#test <- mode_data[order(as.numeric(gsub("=|<|>", "", mode_data[,13])), mode_data[,12], decreasing=FALSE),]
+test <- mode_data[order(mode_data[,13], mode_data[,12], decreasing=FALSE),]
+
+mode_data <- test
 
 ########################################################################
 #
@@ -126,8 +144,16 @@ if(length(unique(mode_data$FCST_LEAD)) > 1) {
 #
 ########################################################################
 
+#radius<-sort(unique(c(mode_data$FCST_RAD, mode_data$OBS_RAD)))
 radius<-unique(c(mode_data$FCST_RAD, mode_data$OBS_RAD))
+
 thresh<-unique(c(as.character(mode_data$FCST_THR), as.character(mode_data$OBS_THR)))
+#thresh<-mixedsort(unique(c(as.character(mode_data$FCST_THR), as.character(mode_data$OBS_THR))))
+print(thresh)
+thresh0 <- as.numeric(as.vector(gsub("=|<|>", "", thresh)))
+print(thresh0)
+len <- length(thresh0)
+
 
 cat(paste(length(radius), "Convolution Radii Found:\n"), radius, "\n")
 cat(paste(length(thresh), "Convolution Thresholds Found:\n"), thresh, "\n")
@@ -157,48 +183,57 @@ ind_unmatch   <-regexpr("^C[F,O]000$", mode_data$OBJECT_CAT) == 1
 ########################################################################
 
 # All simple objects
+ind <- c()
 ind<-ind_simp_fcst+ind_simp_obs > 0
-n_simp        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
+n_simp  <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
+
 med_area_simp <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # All matched simple objects
+ind <- c()
 ind<-(ind_simp_fcst+ind_simp_obs)*ind_match > 0
 n_simp_match        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Simple forecast objects
+ind <- c()
 ind<-ind_simp_fcst
 n_simp_fcst        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_fcst <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_fcst <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Matched simple forecast objects
+ind <- c()
 ind<-ind_simp_fcst*ind_match > 0
 n_simp_fcst_match        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_fcst_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_fcst_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Unmatched simple forecast objects
+ind <- c()
 ind<-ind_simp_fcst*ind_unmatch > 0
 n_simp_fcst_unmatch        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_fcst_unmatch <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_fcst_unmatch <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Simple observation objects
+ind <- c()
 ind<-ind_simp_obs
 n_simp_obs        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_obs <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_obs <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Matched simple observation objects
+ind <- c()
 ind<-ind_simp_obs*ind_match > 0
 n_simp_obs_match        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_obs_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
 tot_area_simp_obs_match <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=sum)
 
 # Unmatched simple observation objects
+ind <- c()
 ind<-ind_simp_obs*ind_unmatch > 0
 n_simp_obs_unmatch        <-aggregate(mode_data$OBJECT_ID[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=length)
 med_area_simp_obs_unmatch <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data$FCST_RAD[ind], thresh=mode_data$FCST_THR[ind]), FUN=median)
@@ -210,7 +245,7 @@ tot_area_simp_obs_unmatch <-aggregate(mode_data$AREA[ind], by=list(rad=mode_data
 # lines.
 #
 ########################################################################
-
+ind <- c()
 # Use only the simple pair lines.
 ind<-ind_simp_pair
 
@@ -251,108 +286,141 @@ for(i in 1:length(thresh)) {
    if(length(T) > 1) T<-c(T, rep(thresh[i], length(radius)))
    else              T<-rep(thresh[i], length(radius))
 }
+#T <- rep(thresh, length(radius))
 
 # Construct a data frame with 3 columns
 mode_summary<-data.frame(cbind(rad=R, thresh=T, case=paste(R, T, sep="")))
+print(mode_summary)
+ind <- c()
 
 # All simple objects
 ind<-mode_summary$case%in%paste(n_simp$rad, n_simp$thresh, sep="")
 mode_summary$n_simp[ind]<-n_simp$x
+print(mode_summary)
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp$rad, med_area_simp$thresh, sep="")
 mode_summary$med_area_simp[ind]<-med_area_simp$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp$rad, tot_area_simp$thresh, sep="")
 mode_summary$tot_area_simp[ind]<-tot_area_simp$x
+ind <- c()
 
 # All matched simple objects
 ind<-mode_summary$case%in%paste(n_simp_match$rad, n_simp_match$thresh, sep="")
 mode_summary$n_simp_match[ind]<-n_simp_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_match$rad, med_area_simp_match$thresh, sep="")
 mode_summary$med_area_simp_match[ind]<-med_area_simp_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_match$rad, tot_area_simp_match$thresh, sep="")
 mode_summary$tot_area_simp_match[ind]<-tot_area_simp_match$x
+ind <- c()
 
 # Simple forecast objects
 ind<-mode_summary$case%in%paste(n_simp_fcst$rad, n_simp_fcst$thresh, sep="")
 mode_summary$n_simp_fcst[ind]<-n_simp_fcst$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_fcst$rad, med_area_simp_fcst$thresh, sep="")
 mode_summary$med_area_simp_fcst[ind]<-med_area_simp_fcst$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_fcst$rad, tot_area_simp_fcst$thresh, sep="")
 mode_summary$tot_area_simp_fcst[ind]<-tot_area_simp_fcst$x
+ind <- c()
 
 # Matched simple forecast objects
 ind<-mode_summary$case%in%paste(n_simp_fcst_match$rad, n_simp_fcst_match$thresh, sep="")
 mode_summary$n_simp_fcst_match[ind]<-n_simp_fcst_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_fcst_match$rad, med_area_simp_fcst_match$thresh, sep="")
 mode_summary$med_area_simp_fcst_match[ind]<-med_area_simp_fcst_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_fcst_match$rad, tot_area_simp_fcst_match$thresh, sep="")
 mode_summary$tot_area_simp_fcst_match[ind]<-tot_area_simp_fcst_match$x
+ind <- c()
 
 # Unmatched simple forecast objects
 ind<-mode_summary$case%in%paste(n_simp_fcst_unmatch$rad, n_simp_fcst_unmatch$thresh, sep="")
 mode_summary$n_simp_fcst_unmatch[ind]<-n_simp_fcst_unmatch$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_fcst_unmatch$rad, med_area_simp_fcst_unmatch$thresh, sep="")
 mode_summary$med_area_simp_fcst_unmatch[ind]<-med_area_simp_fcst_unmatch$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_fcst_unmatch$rad, tot_area_simp_fcst_unmatch$thresh, sep="")
 mode_summary$tot_area_simp_fcst_unmatch[ind]<-tot_area_simp_fcst_unmatch$x
+ind <- c()
 
 # Simple observation objects
 ind<-mode_summary$case%in%paste(n_simp_obs$rad, n_simp_obs$thresh, sep="")
 mode_summary$n_simp_obs[ind]<-n_simp_obs$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_obs$rad, med_area_simp_obs$thresh, sep="")
 mode_summary$med_area_simp_obs[ind]<-med_area_simp_obs$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_obs$rad, tot_area_simp_obs$thresh, sep="")
 mode_summary$tot_area_simp_obs[ind]<-tot_area_simp_obs$x
+ind <- c()
 
 # Matched simple observation objects
 ind<-mode_summary$case%in%paste(n_simp_obs_match$rad, n_simp_obs_match$thresh, sep="")
 mode_summary$n_simp_obs_match[ind]<-n_simp_obs_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_obs_match$rad, med_area_simp_obs_match$thresh, sep="")
 mode_summary$med_area_simp_obs_match[ind]<-med_area_simp_obs_match$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_obs_match$rad, tot_area_simp_obs_match$thresh, sep="")
 mode_summary$tot_area_simp_obs_match[ind]<-tot_area_simp_obs_match$x
+ind <- c()
 
 # Unmatch simple observation objects
 ind<-mode_summary$case%in%paste(n_simp_obs_unmatch$rad, n_simp_obs_unmatch$thresh, sep="")
 mode_summary$n_simp_obs_unmatch[ind]<-n_simp_obs_unmatch$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_area_simp_obs_unmatch$rad, med_area_simp_obs_unmatch$thresh, sep="")
 mode_summary$med_area_simp_obs_unmatch[ind]<-med_area_simp_obs_unmatch$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(tot_area_simp_obs_unmatch$rad, tot_area_simp_obs_unmatch$thresh, sep="")
 mode_summary$tot_area_simp_obs_unmatch[ind]<-tot_area_simp_obs_unmatch$x
+ind <- c()
 
 # Interest value measures
 ind<-mode_summary$case%in%paste(max_interest$rad, max_interest$thresh, sep="")
 mode_summary$max_interest[ind]<-max_interest$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_interest$rad, med_interest$thresh, sep="")
 mode_summary$med_interest[ind]<-med_interest$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_of_max_interest_fcst$rad, med_of_max_interest_fcst$thresh, sep="")
 mode_summary$med_of_max_interest_fcst[ind]<-med_of_max_interest_fcst$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_of_max_interest_obs$rad, med_of_max_interest_obs$thresh, sep="")
 mode_summary$med_of_max_interest_obs[ind]<-med_of_max_interest_obs$x
+ind <- c()
 
 ind<-mode_summary$case%in%paste(med_of_max_interest_fcst_obs$rad, med_of_max_interest_fcst_obs$thresh, sep="")
 mode_summary$med_of_max_interest_fcst_obs[ind]<-med_of_max_interest_fcst_obs$x
+ind <- c()
 
 # Replace any instances of NA with zero
-mode_summary[is.na(mode_summary)]=0
+#mode_summary[is.na(mode_summary)]=0
 
 # Save all of the data in the current directory for use later
 save.image()
@@ -383,51 +451,68 @@ pdf(pdf_file, height = 8.5, width = 11)
 ###############################################################################
 
 # Total object counts
+print(mode_summary$n_simp)
+
+yy <- rep(1, length(radius))
+for (rr in 2:length(thresh))
+  yy <- c(yy, rep(rr, length(radius)))
+          
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+#           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n", #col=cols, nlevel=9,
            z=mode_summary$n_simp,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nTotal Simple Object Counts\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",#col=cols, nlevel=9,
            z=mode_summary$med_area_simp,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Total object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",#col=cols, nlevel=9,
            z=mode_summary$tot_area_simp,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nTotal Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of objects matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",#col=cols, 
            z=mode_summary$n_simp_match/mode_summary$n_simp,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Simple Objects Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of area matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$tot_area_simp_match/mode_summary$tot_area_simp,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Area Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 ###############################################################################
 #
@@ -442,50 +527,60 @@ quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
 
 # Forecast object counts
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$n_simp_fcst,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nForecast Simple Object Counts\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median forecast object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_area_simp_fcst,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian Forecast Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Total forecast object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$tot_area_simp_fcst,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nTotal Forecast Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of forecast objects matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$n_simp_fcst_match/mode_summary$n_simp_fcst,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Simple Forecast Objects Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of forecast area matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$tot_area_simp_fcst_match/mode_summary$tot_area_simp_fcst,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Forecast Area Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 ###############################################################################
 #
@@ -500,50 +595,60 @@ quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
 
 # Observation object counts
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$n_simp_obs,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nObservation Simple Object Counts\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median observation object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_area_simp_obs,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian Observation Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Total observation object areas
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$tot_area_simp_obs,
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nTotal Observation Object Area\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of observation objects matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$n_simp_obs_match/mode_summary$n_simp_obs,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Simple Observation Objects Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Percentage of observation area matched
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$tot_area_simp_obs_match/mode_summary$tot_area_simp_obs,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nPercentage of Observation Area Matched\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 ###############################################################################
 #
@@ -558,47 +663,55 @@ quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
 
 # Object pair max interest
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$max_interest,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMaximum Interest for All Pairs\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Object pair median interest
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_interest,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian Interest for All Pairs\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median of maximum interest by fcst
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_of_max_interest_fcst,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian of Maximum Interests for Forecast Objects\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median of maximum interest by obs
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_of_max_interest_obs,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),
            main=paste(prefix, "\nMedian of Maximum Interests for Observation Objects\n", "Valid:", mode_data$FCST_VALID[1]),
            xlab="Convolution Radius",
            ylab="Convolution Threshold")
+axis(2, at=1:len, labels=thresh0)
+box()
 
 # Median of maximum interest by fcst and obs
 quilt.plot(x=as.numeric(as.vector(mode_summary$rad)),
-           y=as.numeric(as.vector(gsub("=|<|>", "", mode_summary$thresh))),
+           y=yy, yaxt="n",
            z=mode_summary$med_of_max_interest_fcst_obs,
            zlim=c(0,1),
            nrow=length(radius), ncol=length(thresh),

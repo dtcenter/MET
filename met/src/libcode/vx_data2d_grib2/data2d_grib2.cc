@@ -1,5 +1,4 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -678,13 +677,12 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
 
 void MetGrib2DataFile::read_grib2_record_list() {
    gribfield  *gfld;
-   unsigned char *cgrib;
    long offset = 0, offset_next;
    g2int numfields;
    int idx = 0, rec_num = 1;
 
    //  read all the records into the record list, pulling grid information from the first
-   while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, cgrib, numfields)) ){
+   while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
 
       //  read the grid information, if necessary
       if( !Raw_Grid || 1 > Raw_Grid->nx() || 1 > Raw_Grid->ny() ) read_grib2_grid(gfld);
@@ -701,7 +699,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
               9 != gfld->ipdtnum &&     //  probabilistic accumulation forecast
              11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
-             48 != gfld->ipdtnum ){     //  aerosol data
+             46 != gfld->ipdtnum &&     //  average, accumulation, and/or extreme values or other statistically processed values at a horizontal level or in a horizontal layer in a continuous or non-continuous time interval for aerosol.
+             48 != gfld->ipdtnum ){     //  analysis or forecast at a horizontal level or in a horizontal layer at a point in time for aerosol.
             mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
                  << "PDS template number ("
                  << gfld->ipdtnum << ") is not supported. "
@@ -721,14 +720,25 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-         rec->LvlTyp       = gfld->ipdtmpl[9];
+
+         //  get the level type
+         if( gfld->ipdtnum == 46 ) {
+            rec->LvlTyp    = gfld->ipdtmpl[15];
+         } else {
+            rec->LvlTyp    = gfld->ipdtmpl[9];
+         }
 
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++){ rec->IPDTmpl.add((int) gfld->ipdtmpl[j]); }
 
+         //  check for template number 46
+         if( gfld->ipdtnum == 46 ) {
+            rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
+            rec->LvlVal2 = rec->LvlVal1;
+
          //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-         //  Reference: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
-         if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
+         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+         } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
@@ -814,13 +824,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
             }
             rec->LeadTime = rec->ValidTime - rec->InitTime;
 
+         //  https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp4-46.shtml
+         } else if ( 46 == gfld->ipdtnum ) {
+
+            // ValidTime is the end of the overall time interval
+            rec->ValidTime = mdyhms_to_unix(gfld->ipdtmpl[22], gfld->ipdtmpl[23], gfld->ipdtmpl[21],
+                                            gfld->ipdtmpl[24], gfld->ipdtmpl[25], gfld->ipdtmpl[26]);
+
+            //  set the forecast time information
+            if ( -1 == rec->LeadTime )   rec->LeadTime = rec->ValidTime - rec->InitTime;
+
          } else {
 
             //  determine the index for the time unit and forecast time
             int i_time_unit, i_fcst_time;
             switch(gfld->ipdtnum){
 
-               //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_temp4-48.shtml
+               //  https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp4-48.shtml
                case 48:
                   i_time_unit = 18;
                   i_fcst_time = 19;
@@ -900,7 +920,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          g2_free(gfld);
 
          //  if there are more fields in the current record, read the next one
-         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, cgrib, numfields);
+         if( i < numfields ) read_grib2_record(offset, 0, i+1, gfld, numfields);
 
       }  //  END:  for(int i=1; i <= numfields; i++)
 
@@ -1259,7 +1279,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    float v, v_miss[2];
    int n_miss, i;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
-                               cgrib, numfields) ){
+                               numfields) ){
       mlog << Error
            << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
            << "failed to read record at offset " << rec->ByteOffset
@@ -1357,13 +1377,9 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetGrib2DataFile::read_grib2_record( long offset,
-                                          g2int unpack,
-                                          g2int ifld,
-                                          gribfield* &gfld,
-                                          unsigned char* &cgrib,
-                                          g2int &numfields
-                                        ) {
+long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
+                                         g2int ifld, gribfield* &gfld,
+                                         g2int &numfields) {
 
    //  the following code was lifted and modified from:
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
@@ -1373,15 +1389,23 @@ long MetGrib2DataFile::read_grib2_record( long offset,
 
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
-   if (lgrib == 0) return -1;
-   cgrib   = new unsigned char[lgrib];
+   if(lgrib == 0) return -1;
+
+   //  allocate memory to store the record
+   unsigned char * cgrib = new unsigned char[lgrib];
    fseek(FileGrib2, lskip, SEEK_SET);
    fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
-   if( g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal) )
+
+   if(g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal)) {
+      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
       return -1;
+   }
 
    //  read the specified field in the record
    g2_getfld(cgrib, ifld, unpack, 1, &gfld);
+
+   //  cleanup
+   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
 
    //  return the offset of the next record
    return lskip + lgrib;
