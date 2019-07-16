@@ -241,11 +241,13 @@ void get_atcf_files(const StringArray &source,
 void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray &genesis) {
-   int i, j, n_lines, n_genesis, tot_lines, tot_tracks;
+   int i, j, k;
+   int n_lines, n_genesis, tot_lines, tot_tracks;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
    TrackInfoArray tracks;
+   bool keep;
 
    // Initialize counts
    tot_lines = tot_tracks = 0;
@@ -265,9 +267,8 @@ void process_track_files(const StringArray &files,
       tracks.clear();
       n_lines = 0;
 
-      // Read each line in the file.
-      // Track lines may be interleaved within a file but cannot
-      // span multiple files.
+      // Read each input line. Track lines may be interleaved
+      // within a file but cannot span multiple files.
       while(f >> line) {
 
          // Increment the line counts
@@ -290,13 +291,56 @@ void process_track_files(const StringArray &files,
       // Close the current file
       f.close();
 
-      // Add these tracks to the GenInfoArray
+      // Search the tracks for genesis events
       for(j=0, n_genesis=0; j<tracks.n(); j++) {
 
-         // JHG, have apply lots more filtering criteria here!
+         // Check for empty tracks
+         if(tracks[j].n_points() == 0) {
+            continue;
+         }
 
-         if(genesis.add(tracks[j], conf_info.FHrStart)) n_genesis++;
-      }
+         // Check the minimum forecast hour
+         if(!tracks[j].is_anly_track() &&
+            tracks[j][0].lead() < conf_info.FHrStart*sec_per_hour) {
+            continue;
+         }
+
+         // Check the minimum duration
+         if(tracks[j].duration() < conf_info.MinDurHr*sec_per_hour) {
+            continue;
+         }
+
+         // Check the genesis event criteria for each track point
+         keep = false;
+         for(k=0; k<tracks[j].n_points(); k++) {
+
+            // Check event event category
+            if(conf_info.EventCategory.size() > 0 &&
+               conf_info.EventCategory[tracks[j][k].level()] > 0) {
+               keep = true;
+               break;
+            }
+
+            // Check VMax threshold
+            if(conf_info.EventVMaxThresh.check(tracks[j][k].v_max())) {
+               keep = true;
+               break;
+            }
+
+            // Check MSLP threshold
+            if(conf_info.EventMSLPThresh.check(tracks[j][k].mslp())) {
+               keep = true;
+               break;
+            }
+
+         } // end for k
+
+         if(!keep) continue;
+
+         // Store the genesis event
+         if(genesis.add(tracks[j])) n_genesis++;
+
+      } // end for j
 
       // Dump out the current number of lines
       mlog << Debug(4)
