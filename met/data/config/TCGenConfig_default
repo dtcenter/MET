@@ -9,12 +9,30 @@
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
 //
 
+////////////////////////////////////////////////////////////////////////////////
 //
-// Filter is an array of dictionaries containing the track filtering options
-// listed below.  If empty, a single filter is defined using the top-level
-// settings.
+// Genesis definition criteria.
 //
-filter = [];
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Starting forecast hour for genesis forecasts.
+//
+fcst_hour_start = 24;
+
+//
+// Minimum track duration for genesis event.
+//
+min_duration_hours = 12;
+
+//
+// Define a genesis event as being category = TD or greater,
+// Or by thresholding the maximum wind speed,
+// Or by thresholding the minimum sea-level pressure.
+//
+event_category    = [ "TD", "TS", "TY", "ST", "TC", "HU" ]; // Empty to skip
+event_vmax_thresh = NA;   // Set to NA to skip
+event_mslp_thresh = NA;   // Set to NA to skip
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -22,6 +40,13 @@ filter = [];
 // array entry.
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filter is an array of dictionaries containing the track filtering options
+// listed below.  If empty, a single filter is defined using the top-level
+// settings.
+//
+filter = [];
 
 //
 // Description written to output DESC column
@@ -99,26 +124,9 @@ genesis_window = {
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Top-level options applied globally.
+// Global settings.
 //
 ////////////////////////////////////////////////////////////////////////////////
-
-//
-// Starting forecast hour for genesis forecasts.
-//
-fcst_hour_start = 24;
-
-//
-// Minimum track duration for genesis event.
-//
-min_duration_hours = 12;
-
-//
-// Define a genesis event as being category = TD or greater,
-// Or define a genesis event by thresholding the maximum wind speed.
-//
-event_category    = "TD"; // Set to NA to skip
-event_vmax_thresh = NA;   // Set to NA to skip
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded

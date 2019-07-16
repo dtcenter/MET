@@ -103,8 +103,9 @@ class TCGenConfInfo {
       int MinDurHr;
 
       // Genesis event criteria
-      CycloneLevel EventCategory;
-      SingleThresh EventVMaxThresh;
+      vector<CycloneLevel> EventCategory;
+      SingleThresh         EventVMaxThresh;
+      SingleThresh         EventMSLPThresh;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;

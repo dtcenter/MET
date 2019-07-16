@@ -963,6 +963,7 @@ static const char conf_key_fcst_hour_start[]          = "fcst_hour_start";
 static const char conf_key_min_duration_hours[]       = "min_duration_hours";
 static const char conf_key_event_category[]           = "event_category";
 static const char conf_key_event_vmax_thresh[]        = "event_vmax_thresh";
+static const char conf_key_event_mslp_thresh[]        = "event_mslp_thresh";
 
 //
 // Parameter value names common to multiple tools
