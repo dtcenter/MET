@@ -56,8 +56,9 @@ void TCGenVxOpt::init_from_scratch() {
 void TCGenVxOpt::clear() {
 
    Desc.clear();
-   AModel.clear();
-   BModel.clear();
+   Model.clear();
+   BestTechnique.clear();
+   OperTechnique.clear();
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -65,8 +66,9 @@ void TCGenVxOpt::clear() {
    InitBeg = InitEnd = (unixtime) 0;
    InitInc.clear();
    InitExc.clear();
-   InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
+   InitHour.clear();
+   Lead.clear();
    VxMaskName.clear();
    VxPolyMask.clear();
    VxGridMask.clear();
@@ -80,15 +82,19 @@ void TCGenVxOpt::clear() {
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
    int i, j;
+   Dictionary *dict2 = (Dictionary *) 0;
    ConcatString file_name;
    StringArray sa;
 
    // Conf: Desc
    Desc = parse_conf_string(&dict, conf_key_desc);
 
-   // Conf: AModel and BModel
-   AModel = dict.lookup_string_array(conf_key_amodel);
-   BModel = dict.lookup_string(conf_key_bmodel);
+   // Conf: Model
+   Model = dict.lookup_string_array(conf_key_model);
+
+   // Conf: BestTechnique and OperTechnique
+   BestTechnique = dict.lookup_string(conf_key_best_technique);
+   OperTechnique = dict.lookup_string(conf_key_oper_technique);
 
    // Conf: StormId
    StormId = dict.lookup_string_array(conf_key_storm_id);
@@ -116,15 +122,21 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    for(i=0; i<sa.n_elements(); i++)
       InitExc.add(timestring_to_unix(sa[i].c_str()));
 
+   // Conf: ValidBeg, ValidEnd
+   ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
+   ValidEnd = dict.lookup_unixtime(conf_key_valid_end);
+
    // Conf: InitHour
    sa = dict.lookup_string_array(conf_key_init_hour);
    for(i=0; i<sa.n_elements(); i++) {
       InitHour.add(timestring_to_sec(sa[i].c_str()));
    }
 
-   // Conf: ValidBeg, ValidEnd
-   ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
-   ValidEnd = dict.lookup_unixtime(conf_key_valid_end);
+   // Conf: Lead
+   sa = dict.lookup_string_array(conf_key_lead);
+   for(i=0; i<sa.n_elements(); i++) {
+      Lead.add(timestring_to_sec(sa[i].c_str()));
+   }
 
    // Conf: VxMask
    if(nonempty(dict.lookup_string(conf_key_vx_mask).c_str())) {
@@ -137,6 +149,16 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: DLandThresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
+   // Conf: GenesisBeg and GenesisEnd
+   int beg, end;
+   dict2 = dict.lookup_dictionary(conf_key_genesis_window);
+   parse_conf_range_int(dict2, beg, end);
+   GenesisBeg = beg*sec_per_hour;
+   GenesisEnd = end*sec_per_hour;
+
+   // Conf: GenesisRadius
+   GenesisRadius = dict.lookup_double(conf_key_genesis_radius);
+
    return;
 }
 
@@ -146,7 +168,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    bool keep = true;
    int m, d, y, h, mm, s;
 
-   // AModel and BModel names are checked elsewhere
+   // Model, BestTechnique, and OperTechnique are checked elsewhere
 
    // Parse init time into components
    unix_to_mdyhms(g.init(), m, d, y, h, mm, s);
@@ -177,18 +199,17 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
            (InitExc.n() > 0 &&  InitExc.has(g.init())))
       keep = false;
 
-   // Initialization hour
+   // Valid time window
+   else if((ValidBeg > 0 && ValidBeg > g.valid_min()) ||
+           (ValidEnd > 0 && ValidEnd < g.valid_max()))
+      keep = false;
+
+   // Initialization hours
    else if(InitHour.n() > 0 && !InitHour.has(hms_to_sec(h, mm, s)))
       keep = false;
 
-   // Valid time window
-   else if((ValidBeg     > 0 &&  ValidBeg > g.valid_min()) ||
-           (ValidEnd     > 0 &&  ValidEnd < g.valid_max()))
-      keep = false;
-
-   // Distance to land
-   else if((DLandThresh.get_type() != no_thresh_type) &&
-           (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+   // Lead times
+   else if(Lead.n() > 0 && !Lead.has(g.lead_time()))
       keep = false;
 
    // Poly masking
@@ -208,6 +229,11 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
          keep = VxAreaMask(nint(x), nint(y));
       }
    }
+
+   // Distance to land
+   else if((DLandThresh.get_type() != no_thresh_type) &&
+           (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+      keep = false;
 
    // Return the keep status
    return(keep);
@@ -245,8 +271,10 @@ void TCGenConfInfo::init_from_scratch() {
 void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
-   FHrStart = bad_data_int;
-   MinDurHr = bad_data_int;
+   InitFreq = bad_data_int;
+   LeadBeg = bad_data_int;
+   LeadEnd = bad_data_int;
+   MinDur = bad_data_int;
    EventCategory.clear();
    EventVMaxThresh.clear();
    EventMSLPThresh.clear();
@@ -281,16 +309,22 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenConfInfo::process_config() {
-   Dictionary *filter_dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) 0;
    TCGenVxOpt vx_opt;
    StringArray sa;
-   int i;
+   int i, beg, end;
 
-   // Conf: FHrStart
-   FHrStart = Conf.lookup_int(conf_key_fcst_hour_start);
+   // Conf: init_freq
+   InitFreq = Conf.lookup_int(conf_key_init_freq);
 
-   // Conf: MinDurHr
-   MinDurHr = Conf.lookup_int(conf_key_min_duration_hours);
+   // Conf: lead_window
+   dict = Conf.lookup_dictionary(conf_key_lead_window);
+   parse_conf_range_int(dict, beg, end);
+   LeadBeg = beg*sec_per_hour;
+   LeadEnd = end*sec_per_hour;
+
+   // Conf: min_duration
+   MinDur = Conf.lookup_int(conf_key_min_duration);
 
    // Conf: EventCategory
    sa = Conf.lookup_string_array(conf_key_event_category);
@@ -312,18 +346,18 @@ void TCGenConfInfo::process_config() {
    check_met_version(Version.c_str());
 
    // Conf: Filter
-   filter_dict = Conf.lookup_array(conf_key_filter, false);
+   dict = Conf.lookup_array(conf_key_filter, false);
 
    // If no filters are specified, use the top-level settings
-   if(filter_dict->n_entries() == 0) {
+   if(dict->n_entries() == 0) {
       vx_opt.process_config(Conf);
       VxOpt.push_back(vx_opt);
    }
    // Loop through the array entries
    else {
-      for(i=0; i<filter_dict->n_entries(); i++) {
+      for(i=0; i<dict->n_entries(); i++) {
          vx_opt.clear();
-         vx_opt.process_config(*((*filter_dict)[i]->dict_value()));
+         vx_opt.process_config(*((*dict)[i]->dict_value()));
          VxOpt.push_back(vx_opt);
       }
    }

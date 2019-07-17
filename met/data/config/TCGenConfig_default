@@ -16,14 +16,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Starting forecast hour for genesis forecasts.
+// Model initialization frequency in hours, starting at 0.
 //
-fcst_hour_start = 24;
+init_freq = 6;
 
 //
-// Minimum track duration for genesis event.
+// Lead times in hours to be searched for genesis events
 //
-min_duration_hours = 12;
+lead_window = {
+   beg = 24;
+   end = 120;
+}
+
+//
+// Minimum track duration for genesis event in hours.
+//
+min_duration = 12;
 
 //
 // Define a genesis event as being category = TD or greater,
@@ -58,7 +66,20 @@ desc = "NA";
 // If empty, all non-BEST track ATCF ID's found will be processed.
 // Statistics will be generated separately for each amodel entry.
 //
-amodel = [];
+model = [];
+
+//
+// Analysis and operational ATCF ID's (e.g. BEST and CARQ tracks)
+//
+best_technique = "BEST";
+oper_technique = "CARQ";
+
+//
+// Forecast ATCF ID's
+// If empty, all non-BEST track ATCF ID's found will be processed.
+// Statistics will be generated separately for each amodel entry.
+//
+model = [];
 
 //
 // Analysis ATCF ID (e.g. BEST track)
@@ -105,7 +126,12 @@ valid_end = "";
 init_hour = [];
 
 //
-// Spatial masking region
+// Model lead times in hours
+//
+lead = [];
+
+//
+// Spatial masking region (polyline, named grid, or path to gridded data file)
 //
 vx_mask = "";
 
@@ -115,12 +141,17 @@ vx_mask = "";
 dland_thresh = NA;
 
 //
-// Genesis matching time window, defined relative to each forecast genesis event
+// Genesis matching time window, in hours relative to the model genesis time
 //
 genesis_window = {
-   beg = "000000";
-   end = "000000";
+   beg = 0;
+   end = 120;
 }
+
+//
+// Genesis matching search radius in km.
+//
+genesis_radius = 300;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

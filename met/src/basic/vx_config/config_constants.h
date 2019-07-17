@@ -959,11 +959,14 @@ static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
-static const char conf_key_fcst_hour_start[]          = "fcst_hour_start";
-static const char conf_key_min_duration_hours[]       = "min_duration_hours";
+static const char conf_key_init_freq[]                = "init_freq";
+static const char conf_key_lead_window[]              = "lead_window";
+static const char conf_key_min_duration[]             = "min_duration";
 static const char conf_key_event_category[]           = "event_category";
 static const char conf_key_event_vmax_thresh[]        = "event_vmax_thresh";
 static const char conf_key_event_mslp_thresh[]        = "event_mslp_thresh";
+static const char conf_key_genesis_window[]           = "genesis_window";
+static const char conf_key_genesis_radius[]           = "genesis_radius";
 
 //
 // Parameter value names common to multiple tools

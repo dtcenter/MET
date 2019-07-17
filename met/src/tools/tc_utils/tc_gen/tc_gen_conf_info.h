@@ -41,8 +41,9 @@ class TCGenVxOpt {
       ConcatString Desc;
 
       // Model comparisons
-      StringArray  AModel;    // Forecast ATCF ID
-      ConcatString BModel;    // Reference ATCF ID
+      StringArray  Model;         // Forecast ATCF ID's
+      ConcatString BestTechnique; // Best track ATCF ID
+      ConcatString OperTechnique; // Operational ATCF ID
 
       // Track filtering criteria
       StringArray StormId;   // List of storm ids
@@ -54,8 +55,9 @@ class TCGenVxOpt {
       unixtime  InitBeg, InitEnd;
       TimeArray InitInc;
       TimeArray InitExc;
-      NumArray  InitHour;
       unixtime  ValidBeg, ValidEnd;
+      NumArray  InitHour;
+      NumArray  Lead;
 
       // Polyline masking region
       ConcatString VxMaskName;
@@ -65,6 +67,10 @@ class TCGenVxOpt {
 
       // Distance to land threshold
       SingleThresh DLandThresh;
+
+      // Temporal and spatial matching criteria
+      int GenesisBeg, GenesisEnd;
+      double GenesisRadius;
 
       //////////////////////////////////////////////////////////////////
 
@@ -96,11 +102,14 @@ class TCGenConfInfo {
       // Vector of vx task filtering options [n_vx]
       std::vector<TCGenVxOpt> VxOpt;
 
-      // Starting genesis forecast hour
-      int FHrStart;
+      // Model initialization frequency in hours
+      int InitFreq;
+
+      // Begin and end forecast hours for genesis
+      int LeadBeg, LeadEnd;
 
       // Minimum track duration
-      int MinDurHr;
+      int MinDur;
 
       // Genesis event criteria
       vector<CycloneLevel> EventCategory;
