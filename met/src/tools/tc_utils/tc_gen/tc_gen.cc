@@ -46,13 +46,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
-static void   process_tracks       ();
+static void   process_genesis      ();
 static void   get_atcf_files       (const StringArray &,
                                     const StringArray &,
                                     StringArray &, StringArray &);
 static void   process_track_files  (const StringArray &,
                                     const StringArray &,
                                     GenesisInfoArray &);
+static void   process_genesis_pair (const GenesisInfoArray &,
+                                    const GenesisInfoArray &,
+                                    const GenesisInfoArray &);
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
                                     double lat, double lon);
@@ -79,8 +82,8 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the ATCF deck files and write output
-   process_tracks();
+   // Identify and process genesis events and write output
+   process_genesis();
 
    // List the output files
    for(int i=0; i<out_files.n_elements(); i++) {
@@ -152,10 +155,12 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_tracks() {
+void process_genesis() {
+   int i;
    StringArray atcf_files, atcf_files_model_suffix;
-   GenesisInfoArray ga, amodel_ga, bmodel_ga;
-   map<ConcatString,GenesisInfoArray> amodel_ga_map;
+   GenesisInfoArray ga, fcst_ga, best_ga, oper_ga;
+   map<ConcatString,GenesisInfoArray> fcst_ga_map;
+   map<ConcatString,GenesisInfoArray>::iterator it;
 
    // Get the list of track files
    get_atcf_files(atcf_source, atcf_model_suffix,
@@ -166,11 +171,12 @@ void process_tracks() {
    process_track_files(atcf_files, atcf_files_model_suffix, ga);
 
    // Loop through the filters and subset the genesis events
-   for(int i=0; i<conf_info.n_vx(); i++) {
+   for(i=0; i<conf_info.n_vx(); i++) {
 
       // Initialize
-      bmodel_ga.clear();
-      amodel_ga_map.clear();
+      fcst_ga_map.clear();
+      best_ga.clear();
+      oper_ga.clear();
 
       // Loop through and subset the genesis events
       for(int j=0; j<ga.n(); j++) {
@@ -179,31 +185,57 @@ void process_tracks() {
          if(conf_info.VxOpt[i].is_keeper(ga[j])) {
 
             // Store the current model name
-            ConcatString cs = ga[j].technique();
+            ConcatString atcf_id = ga[j].technique();
 
-            // Check requested bmodel
-            if(cs == conf_info.VxOpt[i].BModel) {
-               bmodel_ga.add(ga[i]);
+            // Check specified BEST model
+            if(atcf_id == conf_info.VxOpt[i].BestTechnique) {
+               best_ga.add(ga[i]);
             }
-            // Check requested amodels
-            else if(conf_info.VxOpt[i].AModel.n() == 0 ||
-                    conf_info.VxOpt[i].AModel.has(cs)) {
+
+            // Check specified OPER model
+            else if(atcf_id == conf_info.VxOpt[i].OperTechnique) {
+               oper_ga.add(ga[i]);
+            }
+
+            // Check specified forecast models
+            else if(conf_info.VxOpt[i].Model.n() == 0 ||
+                    conf_info.VxOpt[i].Model.has(atcf_id)) {
 
                // Add a new map entry, if necessary
-               if(amodel_ga_map.count(cs) == 0) {
-                  amodel_ga.clear();
-                  amodel_ga_map[cs] = amodel_ga;
+               if(fcst_ga_map.count(atcf_id) == 0) {
+                  fcst_ga.clear();
+                  fcst_ga_map[atcf_id] = fcst_ga;
                }
 
                // Store the current object
-               amodel_ga_map[cs].add(ga[j]);
+               fcst_ga_map[atcf_id].add(ga[j]);
             }
          }
       } // end j
 
-      // JHG, do more work here and process the pairs!
-
+      // Loop through and process the genesis event pairs
+      for(it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++) {
+         mlog << Debug(2)
+              << "For filter " << i+1 << " of " << conf_info.n_vx()
+              << ", comparing " << it->second.n() << " " << it->first
+              << " forecast genesis events to " << best_ga.n() << " "
+              << conf_info.VxOpt[i].BestTechnique << " and "
+              << oper_ga.n() << " " << conf_info.VxOpt[i].OperTechnique
+              << " genesis events.\n";
+         process_genesis_pair(it->second, best_ga, oper_ga);
+      }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_genesis_pair(const GenesisInfoArray &aga,
+                          const GenesisInfoArray &bga,
+                          const GenesisInfoArray &oga) {
+
+   // JHG work here
 
    return;
 }
@@ -291,6 +323,9 @@ void process_track_files(const StringArray &files,
       // Close the current file
       f.close();
 
+// JHG, when reading the ATCF data, keep track of the min/max init time encountered for each model.
+// Use these in the processing logic for each filter unless the filtering logic overrides them.
+
       // Search the tracks for genesis events
       for(j=0, n_genesis=0; j<tracks.n(); j++) {
 
@@ -299,14 +334,15 @@ void process_track_files(const StringArray &files,
             continue;
          }
 
-         // Check the minimum forecast hour
+         // Check the lead time window
          if(!tracks[j].is_anly_track() &&
-            tracks[j][0].lead() < conf_info.FHrStart*sec_per_hour) {
+            tracks[j][0].lead() < conf_info.LeadBeg ||
+            tracks[j][0].lead() > conf_info.LeadEnd) {
             continue;
          }
 
          // Check the minimum duration
-         if(tracks[j].duration() < conf_info.MinDurHr*sec_per_hour) {
+         if(tracks[j].duration() < conf_info.MinDur) {
             continue;
          }
 
@@ -797,8 +833,9 @@ void set_lookin(const StringArray & a) {
 
    // Check for optional suffix sub-argument
    for(int i=0; i<a.n(); i++) {
-      if(a[i] == "suffix") {
-         cs = a[i];
+
+      cs = a[i];
+      if(cs.startswith("suffix")) {
          sa = cs.split("=");
          if(sa.n_elements() != 2) {
             mlog << Error << "\nset_lookin() -> "
