@@ -2230,8 +2230,8 @@ void set_atcf_source(const StringArray & a,
 
    // Check for optional suffix sub-argument
    for(i=0; i<a.n_elements(); i++) {
-      if( a[i] == "suffix" ) {
-         cs = a[i];
+      cs = a[i];
+      if(cs.startswith("suffix")) {
          sa = cs.split("=");
          if(sa.n_elements() != 2) {
             mlog << Error
@@ -2248,9 +2248,10 @@ void set_atcf_source(const StringArray & a,
 
    // Parse the remaining sources
    for(i=0; i<a.n_elements(); i++) {
-     if( a[i] == "suffix" ) continue;
-     source.add(a[i]);
-     model_suffix.add(suffix);
+      cs = a[i];
+      if(cs.startswith("suffix")) continue;
+      source.add(a[i]);
+      model_suffix.add(suffix);
    }
 
    return;
