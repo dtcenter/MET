@@ -74,7 +74,6 @@ static const char* default_config_filename =
 static StringArray    data_files, found_data_files;
 static StringArray    adeck_source, adeck_model_suffix;
 static StringArray    bdeck_source, bdeck_model_suffix;
-static StringArray    edeck_source, edeck_model_suffix;
 static ConcatString   config_file;
 static TCRMWConfInfo  conf_info;
 static GrdFileType    ftype;

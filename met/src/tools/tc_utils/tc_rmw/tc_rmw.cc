@@ -42,14 +42,12 @@ static void process_command_line(int, char**);
 static void process_decks();
 static void process_adecks(TrackInfoArray&);
 static void process_bdecks(TrackInfoArray&);
-static void process_edecks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
     const StringArray&, TrackInfoArray&, bool, bool);
 static void set_adeck(const StringArray&);
 static void set_bdeck(const StringArray&);
-static void set_edeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
@@ -126,7 +124,6 @@ void process_command_line(int argc, char **argv) {
     cline.add(set_data_files, "-data",  -1);
     cline.add(set_adeck,      "-adeck", -1);
     cline.add(set_bdeck,      "-bdeck", -1);
-    cline.add(set_edeck,      "-edeck", -1);
     cline.add(set_config,     "-config", 1);
     cline.add(set_out,        "-out",    1);
     cline.add(set_logfile,    "-log",    1);
@@ -219,12 +216,6 @@ static void process_bdecks(TrackInfoArray& bdeck_tracks) {
 
     process_track_files(files, files_model_suffix, bdeck_tracks,
                         false, false);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void process_edecks(const TrackInfoArray& edeck_tracks) {
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -339,12 +330,6 @@ void set_adeck(const StringArray& a) {
 
 void set_bdeck(const StringArray& b) {
     set_atcf_source(b, bdeck_source, bdeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_edeck(const StringArray& e) {
-    set_atcf_source(e, edeck_source, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
