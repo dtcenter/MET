@@ -57,6 +57,8 @@ static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
+static void compute_lat_lon(TcrmwGrid&,
+    double*, double*);
 static void wind_ne_to_ra(TcrmwGrid&,
     DataPlane&, DataPlane&,
     double*, double*, double*, double*);
@@ -470,6 +472,25 @@ static void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void compute_lat_lon(TcrmwGrid& tcrmw_grid,
+    double* lat_arr, double* lon_arr) {
+
+    // Compute lat and lon coordinate arrays
+    for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+        for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+            double lat, lon;
+            int i = ir * tcrmw_grid.azimuth_n() + ia;
+            tcrmw_grid.range_azi_to_latlon(
+                ir * tcrmw_grid.range_delta_km(),
+                ia * tcrmw_grid.azimuth_delta_deg(),
+                    lat, lon);
+            lat_arr[i] = lat;
+            lon_arr[i] = - lon;
+        }
+    }
+}
+////////////////////////////////////////////////////////////////////////
+
 static void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
     DataPlane& u_dp, DataPlane& v_dp,
     double* lat_arr, double* lon_arr,
@@ -537,18 +558,19 @@ static void process_fields(const TrackInfoArray& tracks) {
         grid.set(grid_data);
 
         // Compute lat and lon coordinate arrays
-        for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-            for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-                double lat, lon;
-                int i = ir * tcrmw_grid.azimuth_n() + ia;
-                tcrmw_grid.range_azi_to_latlon(
-                    ir * tcrmw_grid.range_delta_km(),
-                    ia * tcrmw_grid.azimuth_delta_deg(),
-                    lat, lon);
-                lat_arr[i] = lat;
-                lon_arr[i] = - lon;
-            }
-        }
+        compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
+        // for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+        //     for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+        //         double lat, lon;
+        //         int i = ir * tcrmw_grid.azimuth_n() + ia;
+        //         tcrmw_grid.range_azi_to_latlon(
+        //             ir * tcrmw_grid.range_delta_km(),
+        //             ia * tcrmw_grid.azimuth_delta_deg(),
+        //             lat, lon);
+        //         lat_arr[i] = lat;
+        //         lon_arr[i] = - lon;
+        //     }
+        // }
 
         // Write coordinate arrays
         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
@@ -625,24 +647,6 @@ static void process_fields(const TrackInfoArray& tracks) {
 
         wind_ne_to_ra(tcrmw_grid, u_dp, v_dp,
             lat_arr, lon_arr, wind_r_arr, wind_a_arr);
-        // Transform (u, v) to (radial, azimuthal)
-        // for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-        //     for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-        //         int i = ir * tcrmw_grid.azimuth_n() + ia;
-        //         double lat = lat_arr[i];
-        //         double lon = - lon_arr[i];
-        //         double u = u_dp.data()[i];
-        //         double v = v_dp.data()[i];
-        //         double wind_r;
-        //         double wind_a;
-        //         tcrmw_grid.wind_ne_to_ra(
-        //             lat, lon, u, v, wind_r, wind_a);
-                // tcrmw_grid.wind_ne_to_ra_conventional(
-                //     lat, lon, u, v, wind_r, wind_a);
-        //         wind_r_arr[i] = wind_r;
-        //         wind_a_arr[i] = wind_a;
-        //     }
-        // }
 
         // Write data
         write_tc_data(nc_out, tcrmw_grid, i_point,
