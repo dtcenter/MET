@@ -57,9 +57,10 @@ static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
+static void wind_ne_to_ra(TcrmwGrid&,
+    DataPlane&, DataPlane&,
+    double*, double*, double*, double*);
 static void process_fields(const TrackInfoArray&);
-static bool read_data_plane(VarInfo*, DataPlane&, Met2dDataFile*,
-    const ConcatString&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -411,6 +412,73 @@ static void setup_grid() {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void setup_nc_file() {
+    VarInfo* data_info = (VarInfo*) 0;
+
+    out_nc_file.add("tc_rmw_grids.nc");
+
+    mlog << Debug(1) << out_nc_file << "\n";
+
+    // Create NetCDF file
+    nc_out = open_ncfile(out_nc_file.c_str(), true);
+
+    if(IS_INVALID_NC_P(nc_out)) {
+        mlog << Error << "\nsetup_nc_file() -> "
+             << "trouble opening output NetCDF file "
+             << out_nc_file << "\n\n";
+        exit(1);
+    }
+
+    mlog << Debug(4) << tcrmw_grid.range_n() << "\n";
+    mlog << Debug(4) << tcrmw_grid.azimuth_n() << "\n";
+
+    // Define dimensions
+    range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
+    azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
+    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+
+    // Define range and azimuth dimensions
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
+
+    // Define latitude and longitude arrays
+    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
+        track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
+
+    // Define variables
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        // Get VarInfo
+        data_info = conf_info.data_info[i_var];
+        def_tc_data(nc_out, range_dim, azimuth_dim,
+            track_point_dim, data_var, data_info);
+        data_vars.push_back(data_var);
+    }
+
+    // Define derived variables
+    VarInfoNcMet wind_r_info;
+    VarInfoNcMet wind_a_info;
+    wind_r_info.set_name("VRAD");
+    wind_a_info.set_name("VAZI");
+    wind_r_info.set_long_name("Radial Component of Wind");
+    wind_a_info.set_long_name("Azimuthal Component of Wind");
+    wind_r_info.set_units("m/s");
+    wind_a_info.set_units("m/s");
+    def_tc_data(nc_out, range_dim, azimuth_dim,
+        track_point_dim, wind_r_var, &wind_r_info);
+    def_tc_data(nc_out, range_dim, azimuth_dim,
+        track_point_dim, wind_a_var, &wind_a_info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
+    DataPlane& u_dp, DataPlane& v_dp,
+    double* lat_arr, double* lon_arr,
+    double* wind_r_arr, double* wind_a_arr) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void process_fields(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
@@ -566,82 +634,6 @@ static void process_fields(const TrackInfoArray& tracks) {
     delete[] lon_arr;
     delete[] wind_r_arr;
     delete[] wind_a_arr;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void setup_nc_file() {
-    VarInfo* data_info = (VarInfo*) 0;
-
-    out_nc_file.add("tc_rmw_grids.nc");
-
-    mlog << Debug(1) << out_nc_file << "\n";
-
-    // Create NetCDF file
-    nc_out = open_ncfile(out_nc_file.c_str(), true);
-
-    if(IS_INVALID_NC_P(nc_out)) {
-        mlog << Error << "\nsetup_nc_file() -> "
-             << "trouble opening output NetCDF file "
-             << out_nc_file << "\n\n";
-        exit(1);
-    }
-
-    mlog << Debug(4) << tcrmw_grid.range_n() << "\n";
-    mlog << Debug(4) << tcrmw_grid.azimuth_n() << "\n";
-
-    // Define dimensions
-    range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
-    azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
-    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-
-    // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
-
-    // Define latitude and longitude arrays
-    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
-        track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
-
-    // Define variables
-    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-        // Get VarInfo
-        data_info = conf_info.data_info[i_var];
-        def_tc_data(nc_out, range_dim, azimuth_dim,
-            track_point_dim, data_var, data_info);
-        data_vars.push_back(data_var);
-    }
-
-    // Define derived variables
-    VarInfoNcMet wind_r_info;
-    VarInfoNcMet wind_a_info;
-    wind_r_info.set_name("VRAD");
-    wind_a_info.set_name("VAZI");
-    wind_r_info.set_long_name("Radial Component of Wind");
-    wind_a_info.set_long_name("Azimuthal Component of Wind");
-    wind_r_info.set_units("m/s");
-    wind_a_info.set_units("m/s");
-    def_tc_data(nc_out, range_dim, azimuth_dim,
-        track_point_dim, wind_r_var, &wind_r_info);
-    def_tc_data(nc_out, range_dim, azimuth_dim,
-        track_point_dim, wind_a_var, &wind_a_info);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool read_data_plane(VarInfo* info, DataPlane& dp,
-    Met2dDataFile* mtddf, const ConcatString& filename) {
-
-    bool status = mtddf->data_plane(*info, dp);
-
-    if(!status) {
-        mlog << Warning << "\nread_data_plane() -> "
-             << info->magic_str()
-             << "not found in file: " << filename
-             << "\n\n";
-        return false;
-    }
-
-    return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
