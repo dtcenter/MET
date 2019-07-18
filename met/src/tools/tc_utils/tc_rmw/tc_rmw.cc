@@ -475,6 +475,24 @@ static void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
     double* lat_arr, double* lon_arr,
     double* wind_r_arr, double* wind_a_arr) {
 
+    // Transform (u, v) to (radial, azimuthal)
+    for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+        for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+            int i = ir * tcrmw_grid.azimuth_n() + ia;
+            double lat = lat_arr[i];
+            double lon = - lon_arr[i];
+            double u = u_dp.data()[i];
+            double v = v_dp.data()[i];
+            double wind_r;
+            double wind_a;
+            tcrmw_grid.wind_ne_to_ra(
+                lat, lon, u, v, wind_r, wind_a);
+            // tcrmw_grid.wind_ne_to_ra_conventional(
+            //     lat, lon, u, v, wind_r, wind_a);
+            wind_r_arr[i] = wind_r;
+            wind_a_arr[i] = wind_a;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -605,24 +623,27 @@ static void process_fields(const TrackInfoArray& tracks) {
             }
         }
 
+        wind_ne_to_ra(tcrmw_grid, u_dp, v_dp,
+            lat_arr, lon_arr, wind_r_arr, wind_a_arr);
         // Transform (u, v) to (radial, azimuthal)
-        for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-            for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-                int i = ir * tcrmw_grid.azimuth_n() + ia;
-                double lat = lat_arr[i];
-                double lon = - lon_arr[i];
-                double u = u_dp.data()[i];
-                double v = v_dp.data()[i];
-                double wind_r;
-                double wind_a;
-                tcrmw_grid.wind_ne_to_ra(
-                    lat, lon, u, v, wind_r, wind_a);
+        // for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
+        //     for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+        //         int i = ir * tcrmw_grid.azimuth_n() + ia;
+        //         double lat = lat_arr[i];
+        //         double lon = - lon_arr[i];
+        //         double u = u_dp.data()[i];
+        //         double v = v_dp.data()[i];
+        //         double wind_r;
+        //         double wind_a;
+        //         tcrmw_grid.wind_ne_to_ra(
+        //             lat, lon, u, v, wind_r, wind_a);
                 // tcrmw_grid.wind_ne_to_ra_conventional(
                 //     lat, lon, u, v, wind_r, wind_a);
-                wind_r_arr[i] = wind_r;
-                wind_a_arr[i] = wind_a;
-            }
-        }
+        //         wind_r_arr[i] = wind_r;
+        //         wind_a_arr[i] = wind_a;
+        //     }
+        // }
+
         // Write data
         write_tc_data(nc_out, tcrmw_grid, i_point,
             wind_r_var, wind_r_arr);
