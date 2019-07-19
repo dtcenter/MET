@@ -1166,11 +1166,12 @@ bool operator==(const GridInfo & i1, const GridInfo & i2)
 
 {
 
-     if ( i1.lc && i2.lc )  return ( is_eq(i1.lc, i2.lc) );
-else if ( i1.st && i2.st )  return ( is_eq(i1.st, i2.st) );
-else if ( i1.ll && i2.ll )  return ( is_eq(i1.ll, i2.ll) );
-else if ( i1.m  && i2.m  )  return ( is_eq(i1.m,  i2.m ) );
-else if ( i1.gi && i2.gi )  return ( is_eq(i1.gi, i2.gi) );
+     if ( i1.lc  && i2.lc  )  return ( is_eq(i1.lc,  i2.lc ) );
+else if ( i1.st  && i2.st  )  return ( is_eq(i1.st,  i2.st ) );
+else if ( i1.ll  && i2.ll  )  return ( is_eq(i1.ll,  i2.ll ) );
+else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
+else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
+else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 
 return ( false );
 
@@ -1256,6 +1257,39 @@ if ( ll1->Nlat            == ll2->Nlat                  &&
              rescale_lon(ll2->lon_ll),       loose_tol) &&
      is_eq  (ll1->delta_lat, ll2->delta_lat, loose_tol) &&
      is_eq  (ll1->delta_lon, ll2->delta_lon, loose_tol) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const RotatedLatLonData * ll1, const RotatedLatLonData * ll2)
+
+{
+
+if ( !ll1 || !ll2 )  return ( false );
+
+bool status = false;
+
+if ( ll1->Nlat == ll2->Nlat &&
+     ll1->Nlon == ll2->Nlon &&
+     is_eq  (ll1->rot_lat_ll,
+             ll2->rot_lat_ll, loose_tol) &&
+     is_eq  (rescale_lon(ll1->rot_lon_ll),
+             rescale_lon(ll2->rot_lon_ll), loose_tol) &&
+     is_eq  (ll1->delta_rot_lat,
+             ll2->delta_rot_lat, loose_tol) &&
+     is_eq  (ll1->delta_rot_lon,
+             ll2->delta_rot_lon, loose_tol) &&
+     is_eq  (ll1->true_lat_south_pole,
+             ll2->true_lat_south_pole, loose_tol) &&
+     is_eq  (rescale_lon(ll1->true_lon_south_pole),
+             rescale_lon(ll2->true_lon_south_pole), loose_tol) &&
+     is_eq  (ll1->aux_rotation,
+             ll2->aux_rotation, loose_tol) )  status = true;
 
 return ( status );
 
