@@ -5,10 +5,10 @@ C*
        PARAMETER ( MXR8PM = 10 )
 C*                                   Maximum number of BUFR parameters
 C*
-       PARAMETER ( MXR8LV_T = 32 )
-       PARAMETER ( MXR8LV_S = 256 )
-       PARAMETER ( MXR8LV_M = 512 )
-       PARAMETER ( MXR8LV = 1024 )
+       PARAMETER ( MXR8LV_T = 31 )
+       PARAMETER ( MXR8LV_S = 255 )
+       PARAMETER ( MXR8LV_M = 511 )
+       PARAMETER ( MXR8LV = 1023 )
 C*                                   Maximum number of BUFR levels
 C*
        PARAMETER ( MXR8VN = 10 )
