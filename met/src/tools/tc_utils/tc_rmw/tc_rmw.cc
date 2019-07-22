@@ -57,6 +57,8 @@ static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
+static void build_outfile_name(const char*,
+    ConcatString&);
 static void compute_lat_lon(TcrmwGrid&,
     double*, double*);
 static void wind_ne_to_ra(TcrmwGrid&,
@@ -181,7 +183,7 @@ void process_decks() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_adecks(TrackInfoArray& adeck_tracks) {
+void process_adecks(TrackInfoArray& adeck_tracks) {
     StringArray files, files_model_suffix;
 
     // Initialize
@@ -204,7 +206,7 @@ static void process_adecks(TrackInfoArray& adeck_tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_bdecks(TrackInfoArray& bdeck_tracks) {
+void process_bdecks(TrackInfoArray& bdeck_tracks) {
     StringArray files, files_model_suffix;
 
     // Initialize
@@ -260,7 +262,7 @@ void get_atcf_files(const StringArray& source,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_track_files(const StringArray& files,
+void process_track_files(const StringArray& files,
                                 const StringArray& model_suffix,
                                 TrackInfoArray& tracks,
                                 bool check_keep,
@@ -401,7 +403,7 @@ void set_verbosity(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void setup_grid() {
+void setup_grid() {
 
     grid_data.name = "TCRMW";
     grid_data.range_n = conf_info.n_range;
@@ -414,10 +416,10 @@ static void setup_grid() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void setup_nc_file() {
+void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
 
-    out_nc_file.add("tc_rmw_grids.nc");
+    out_nc_file.add("tc_rmw_out.nc");
 
     mlog << Debug(1) << out_nc_file << "\n";
 
@@ -472,7 +474,18 @@ static void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void compute_lat_lon(TcrmwGrid& tcrmw_grid,
+void build_outfile_name(const char* suffix, ConcatString& str) {
+
+    // Append output directory and program name
+    str << cs_erase << out_dir << "/" << program_name;
+
+    // Append suffix
+    str << suffix;
+
+    return;
+}
+
+void compute_lat_lon(TcrmwGrid& tcrmw_grid,
     double* lat_arr, double* lon_arr) {
 
     // Compute lat and lon coordinate arrays
@@ -491,7 +504,7 @@ static void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 }
 ////////////////////////////////////////////////////////////////////////
 
-static void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
+void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
     DataPlane& u_dp, DataPlane& v_dp,
     double* lat_arr, double* lon_arr,
     double* wind_r_arr, double* wind_a_arr) {
@@ -518,7 +531,7 @@ static void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_fields(const TrackInfoArray& tracks) {
+void process_fields(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
     DataPlane data_dp;
