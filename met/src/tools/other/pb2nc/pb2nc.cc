@@ -953,8 +953,8 @@ void process_pbfile(int i_pb) {
    int cape_code = -1;
    float p1d,t1d,q1d;
    int cape_level, prev_cape_level, IMM, JMM;
-   int cape_count=0, cape_cnt_too_big=0;
-   int cape_cnt_no_levels=0, cape_cnt_missing_values=0;
+   int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
+   int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
 
    // To compute PBL
    int pbl_level;
@@ -1585,77 +1585,86 @@ void process_pbfile(int i_pb) {
          }
       } // end for lv
 
-      if (cal_cape && (cape_level > 1)) {
-         bool reverse_levels;
-         float cape_val, cin_val, PLCL,PEQL;
-
-         cape_val = bad_data_double;
-         cin_val  = bad_data_double;
-
-         if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
-         reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
-         if (reverse_levels) {
-            int buf_idx;
-            float swap_value;
-            mlog << Debug(5) << method_name << " Reverse levels\n";
-            mlog << Debug(7) << method_name << "  pres[0]: " << cape_data_pres[0]
-                 << ", pres[" << (cape_level-1) << "]: "
-                 << cape_data_pres[cape_level-1] << "\n";
-            for (int idx=0; idx<(cape_level+1)/2; idx++) {
-               buf_idx = cape_level - idx - 1;
-               swap_value = cape_data_pres[idx];
-               cape_data_pres[idx] = cape_data_pres[buf_idx];
-               cape_data_pres[buf_idx] = swap_value;
-
-               swap_value = cape_data_temp[idx];
-               cape_data_temp[idx] = cape_data_temp[buf_idx];
-               cape_data_temp[buf_idx] = swap_value;
-
-               swap_value = cape_data_spfh[idx];
-               cape_data_spfh[idx] = cape_data_spfh[buf_idx];
-               cape_data_spfh[buf_idx] = swap_value;
+      if (cal_cape) {
+         if (1 < cape_level) {
+            bool reverse_levels;
+            float cape_val, cin_val, PLCL,PEQL;
+         
+            cape_val = bad_data_double;
+            cin_val  = bad_data_double;
+         
+            if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
+            reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
+            if (reverse_levels) {
+               int buf_idx;
+               float swap_value;
+               mlog << Debug(5) << method_name << " Reverse levels\n";
+               mlog << Debug(7) << method_name << "  pres[0]: " << cape_data_pres[0]
+                    << ", pres[" << (cape_level-1) << "]: "
+                    << cape_data_pres[cape_level-1] << "\n";
+               for (int idx=0; idx<(cape_level+1)/2; idx++) {
+                  buf_idx = cape_level - idx - 1;
+                  swap_value = cape_data_pres[idx];
+                  cape_data_pres[idx] = cape_data_pres[buf_idx];
+                  cape_data_pres[buf_idx] = swap_value;
+         
+                  swap_value = cape_data_temp[idx];
+                  cape_data_temp[idx] = cape_data_temp[buf_idx];
+                  cape_data_temp[buf_idx] = swap_value;
+         
+                  swap_value = cape_data_spfh[idx];
+                  cape_data_spfh[idx] = cape_data_spfh[buf_idx];
+                  cape_data_spfh[buf_idx] = swap_value;
+               }
             }
-         }
-         for (int idx=cape_level; idx<MAX_CAPE_LEVEL; idx++) {
-            cape_data_pres[idx] = r8bfms * 10;
-            cape_data_temp[idx] = r8bfms * 10;
-            cape_data_spfh[idx] = r8bfms * 10;
-         }
-
-         calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
-                  &p1d,&t1d,&q1d, static_dummy_201,
-                  &cape_level, &IMM,&JMM, &cape_level,
-                  &cape_val, &cin_val, &PLCL,&PEQL, static_dummy_200);
-
-         if(mlog.verbosity_level() >= 7) {
-            mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE\n" ;
-            for (int idx=0; idx<cape_level; idx++) {
-               mlog << Debug(7) << idx << ", " << cape_data_pres[idx] << ", "
-                    << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+            for (int idx=cape_level; idx<MAX_CAPE_LEVEL; idx++) {
+               cape_data_pres[idx] = r8bfms * 10;
+               cape_data_temp[idx] = r8bfms * 10;
+               cape_data_spfh[idx] = r8bfms * 10;
             }
-            mlog << Debug(7) << method_name << " calcape_(" << ivirt << "," << itype << ") cape_val: "
-                 << cape_val << ", cin_val: " << cin_val
-                 << "   lat: " << hdr_lat << ", lon: " << hdr_lon
-                 << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
-                 << " " << hdr_typ << " " << hdr_sid
-                 << "\n\n" ;
+         
+            p1d = cape_p;
+            t1d = cape_data_temp[cape_level-1];
+            q1d = cape_data_spfh[cape_level-1];
+            calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
+                     &p1d,&t1d,&q1d, static_dummy_201,
+                     &cape_level, &IMM,&JMM, &cape_level,
+                     &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+         
+            if(mlog.verbosity_level() >= 7) {
+               mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE\n" ;
+               for (int idx=0; idx<cape_level; idx++) {
+                  mlog << Debug(7) << idx << ", " << cape_data_pres[idx] << ", "
+                       << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+               }
+               mlog << Debug(7) << method_name 
+                    << " calcape_(" << ivirt << "," << itype << ") cape_val: "
+                    << cape_val << " cape_level: " << cape_level
+                    << ", cin_val: " << cin_val
+                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL
+                    << "   lat: " << hdr_lat << ", lon: " << hdr_lon
+                    << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                    << " " << hdr_typ << " " << hdr_sid
+                    << "\n\n" ;
+            }
+         
+            if (cape_val > MAX_CAPE_VALUE) cape_cnt_too_big++;
+            else if (cape_val > 0) {
+               obs_arr[1] = cape_code;
+               obs_arr[2] = cape_p;
+               obs_arr[3] = cape_h;
+               obs_arr[4] = cape_val; // observation value
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                              hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                              OBS_BUFFER_SIZE);
+               cape_count++;
+            }
+            else if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
+            else cape_cnt_missing_values++;
          }
-
-         if (cape_val > MAX_CAPE_VALUE) cape_cnt_too_big++;
-         else if (cape_val > 0) {
-            obs_arr[1] = cape_code;
-            obs_arr[2] = cape_p;
-            obs_arr[3] = cape_h;
-            obs_arr[4] = cape_val; // observation value
-            addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                           hdr_lat, hdr_lon, hdr_elv, cape_qm,
-                           OBS_BUFFER_SIZE);
-            cape_count++;
-         }
-         else cape_cnt_missing_values++;
+         else if (1 < buf_nlev) cape_cnt_no_levels++;
+         else cape_cnt_surface_msgs++;
       }
-      else if (cal_cape && (1 < buf_nlev)) cape_cnt_no_levels++;
-
 
       //if (do_all_vars) {
       {
@@ -1901,8 +1910,9 @@ void process_pbfile(int i_pb) {
         << n_file_obs << "\n";
    if (cal_cape) {
       mlog << Debug(3) << "  Drived CAPE\t\t= " << cape_count
-           << "\tNo cape inputs = " << cape_cnt_no_levels
+           << "\tNo cape inputs = " << (cape_cnt_no_levels + cape_cnt_surface_msgs)
            << "\tInvalid values = " << (cape_cnt_missing_values + cape_cnt_too_big)
+           //<< "\tsurface data = " << cape_cnt_surface_msgs
            //<< "\n\tToo big values\t= " << cape_cnt_too_big
            << "\n";
    }
