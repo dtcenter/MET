@@ -109,8 +109,6 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-
 void process_command_line(int argc, char **argv) {
 
     CommandLine cline;
@@ -419,7 +417,9 @@ void setup_grid() {
 void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
 
-    out_nc_file.add("tc_rmw_out.nc");
+    // Create output NetCDF file name
+    // out_nc_file.add("tc_rmw_out.nc");
+    build_outfile_name("_out.nc", out_nc_file);
 
     mlog << Debug(1) << out_nc_file << "\n";
 
