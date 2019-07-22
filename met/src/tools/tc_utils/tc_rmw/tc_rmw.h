@@ -64,6 +64,9 @@ static const char* atcf_suffix = ".dat";
 static const char* default_config_filename =
     "MET_BASE/config/TCRMWConfig_default";
 
+// Default output directory
+static const char* default_out_dir = ".";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments

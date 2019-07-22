@@ -114,8 +114,8 @@ void process_command_line(int argc, char **argv) {
     CommandLine cline;
     ConcatString default_config_file;
 
-    // Default output base
-    out_dir = "./";
+    // Default output directory
+    out_dir = replace_path(default_out_dir);
 
     // Parse command line into tokens
     cline.set(argc, argv);
@@ -199,7 +199,7 @@ static void process_adecks(TrackInfoArray& adeck_tracks) {
 
     ConcatString adeck_track_file("adeck.nc");
 
-    write_tc_tracks(adeck_track_file, adeck_tracks);
+    // write_tc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -559,18 +559,6 @@ static void process_fields(const TrackInfoArray& tracks) {
 
         // Compute lat and lon coordinate arrays
         compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
-        // for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-        //     for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-        //         double lat, lon;
-        //         int i = ir * tcrmw_grid.azimuth_n() + ia;
-        //         tcrmw_grid.range_azi_to_latlon(
-        //             ir * tcrmw_grid.range_delta_km(),
-        //             ia * tcrmw_grid.azimuth_delta_deg(),
-        //             lat, lon);
-        //         lat_arr[i] = lat;
-        //         lon_arr[i] = - lon;
-        //     }
-        // }
 
         // Write coordinate arrays
         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
