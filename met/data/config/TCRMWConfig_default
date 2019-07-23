@@ -15,6 +15,67 @@
 model = [];
 
 //
+// Forecast fields
+//
+data = {
+    file_type = GRIB2;
+    field = [
+        {
+          name = "PRMSL";
+          level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        },
+        {
+          name = "TMP";
+          level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        },
+        {
+          name = "UGRD";
+          level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        },
+        {
+          name = "VGRD";
+          level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        }
+    ];
+}
+
+//
+// Range-Azimuth grid parameters 
+//
+
+n_range = 100;
+
+n_azimuth = 180;
+
+max_range = 1000.0; // kilometers
+
+delta_range = 10.0; // kilometers
+
+//
 // Storm identifiers
 // make a string
 storm_id = [];
