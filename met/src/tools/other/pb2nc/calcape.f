@@ -774,6 +774,8 @@ C
  600  K1=K1+1
       IF(K1.LE.NNEW) GO TO 300
 C-----------------------------------------------------------------------
+C     2 YOLD(NOLD-1),YNEW(NNEW-1)
+C     2 YOLD(NOLD),YNEW(NNEW)
       RETURN
       END
 
