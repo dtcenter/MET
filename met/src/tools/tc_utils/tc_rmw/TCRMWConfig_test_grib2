@@ -21,6 +21,16 @@ data = {
     file_type = GRIB2;
     field = [
         {
+          name = "PRMSL";
+          level = ["L0"];
+          regrid = {
+            method     = NEAREST;
+            width      = 1;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        },
+        {
           name = "TMP";
           level = ["L0"];
           regrid = {
