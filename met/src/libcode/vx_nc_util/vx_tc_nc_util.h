@@ -44,6 +44,9 @@ extern void write_tc_valid_time(NcFile*,
 extern void write_tc_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, const double*);
 
+extern void write_tc_data_rev_range(NcFile*, const TcrmwGrid&,
+    const int&, const NcVar&, const double*);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif  //  __VX_TC_NC_UTIL_H__

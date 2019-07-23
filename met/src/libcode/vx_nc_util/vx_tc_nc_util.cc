@@ -191,3 +191,39 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void write_tc_data_rev_range(NcFile* nc_out, const TcrmwGrid& grid,
+    const int& i_point, const NcVar& var, const double* data) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    double* data_rev;
+
+    offsets.clear();
+    offsets.push_back(0);
+    offsets.push_back(0);
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(grid.range_n());
+    counts.push_back(grid.azimuth_n());
+    counts.push_back(1);
+
+    data_rev = new double[
+        grid.range_n() * grid.azimuth_n()];
+
+    for(int ir = 0; ir < grid.range_n(); ir++) {
+        for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+            int i = ir * grid.azimuth_n() + ia;
+            int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;
+            data_rev[i_rev] = data[i];
+        }
+    }
+
+    var.putVar(offsets, counts, data_rev);
+
+    delete[] data_rev;
+}
+
+////////////////////////////////////////////////////////////////////////
