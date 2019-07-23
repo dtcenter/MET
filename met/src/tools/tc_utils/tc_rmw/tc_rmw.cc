@@ -485,6 +485,8 @@ void build_outfile_name(const char* suffix, ConcatString& str) {
     return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void compute_lat_lon(TcrmwGrid& tcrmw_grid,
     double* lat_arr, double* lon_arr) {
 
@@ -502,6 +504,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
         }
     }
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
