@@ -45,9 +45,6 @@ class TCRMWConfInfo {
         // TCRMW configuration object
         MetConfig Conf;
 
-        // User-defined description
-        ConcatString Desc;
-
         // Track filtering criteria
         StringArray Model;     // List of model names
         StringArray StormId;   // List of storm ids

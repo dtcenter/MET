@@ -54,7 +54,6 @@ void TCRMWConfInfo::init_from_scratch() {
 
 void TCRMWConfInfo::clear() {
 
-    Desc.clear();
     Model.clear();
     StormId.clear();
     Basin.clear();
@@ -113,9 +112,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);
     check_met_version(Version.c_str());
-
-    // Conf: Desc
-    Desc = parse_conf_string(&Conf, conf_key_desc);
 
     // Conf: Model
     Model = Conf.lookup_string_array(conf_key_model);
