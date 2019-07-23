@@ -605,7 +605,7 @@ void process_fields(const TrackInfoArray& tracks) {
                 mlog << Debug(2) << "data_min:" << data_min << "\n";
                 mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Write data
-                write_tc_data(nc_out, tcrmw_grid, i_point,
+                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], u_dp.data());
             } else if (data_info->name() == "V"
                 || data_info->name() == "VGRD") {
@@ -625,7 +625,7 @@ void process_fields(const TrackInfoArray& tracks) {
                 mlog << Debug(2) << "data_min:" << data_min << "\n";
                 mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Write data
-                write_tc_data(nc_out, tcrmw_grid, i_point,
+                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], v_dp.data());
             } else {
                 // Get data
@@ -644,7 +644,7 @@ void process_fields(const TrackInfoArray& tracks) {
                 mlog << Debug(2) << "data_min:" << data_min << "\n";
                 mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Write data
-                write_tc_data(nc_out, tcrmw_grid, i_point,
+                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], data_dp.data());
             }
         }
@@ -653,9 +653,9 @@ void process_fields(const TrackInfoArray& tracks) {
             lat_arr, lon_arr, wind_r_arr, wind_a_arr);
 
         // Write data
-        write_tc_data(nc_out, tcrmw_grid, i_point,
+        write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
             wind_r_var, wind_r_arr);
-        write_tc_data(nc_out, tcrmw_grid, i_point,
+        write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
             wind_a_var, wind_a_arr);
     } // Close loop over track points
 
