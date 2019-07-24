@@ -622,6 +622,7 @@ static const char conf_key_distance_map[]      = "distance_map";
 static const char conf_key_baddeley_p[]        = "baddeley_p";
 static const char conf_key_baddeley_max_dist[] = "baddeley_max_dist";
 static const char conf_key_fom_alpha[]         = "fom_alpha";
+static const char conf_key_zhu_weight[]        = "zhu_weight";
 
 //
 // Wavelet-Stat specific parameter key names

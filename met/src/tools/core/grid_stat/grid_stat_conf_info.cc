@@ -766,6 +766,14 @@ void GridStatVxOpt::process_config(
       exit(1);
    }
 
+   zhu_weight = d->lookup_double(conf_key_zhu_weight);
+   if(zhu_weight <=0 || zhu_weight > 1) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The \"" << conf_key_zhu_weight << "\" option ("
+           << zhu_weight << ") must be set > 0 and <= 1.\n\n";
+      exit(1);
+   }
+
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
