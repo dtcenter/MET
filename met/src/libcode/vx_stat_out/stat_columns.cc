@@ -3321,7 +3321,8 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
    //    TOTAL,       FY,          OY,
    //    FBIAS,       BADDELEY,    HAUSDORFF,
    //    MED_FO,      MED_OF,      MED_MIN,      MED_MAX,      MED_MEAN,
-   //    FOM_FO,      FOM_OF,      FOM_MIN,      FOM_MAX,      FOM_MEAN
+   //    FOM_FO,      FOM_OF,      FOM_MIN,      FOM_MAX,      FOM_MEAN,
+   //    ZHU_FO,      ZHU_OF,      ZHU_MIN,      ZHU_MAX,      ZHU_MEAN
    //
    at.set_entry(r, c+0,  // TOTAL
       dmap_info.total);
@@ -3357,19 +3358,34 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
       dmap_info.med_mean);
 
    at.set_entry(r, c+11, // FOM_FO
-      dmap_info.med_fo);
+      dmap_info.fom_fo);
 
    at.set_entry(r, c+12, // FOM_OF
-      dmap_info.med_of);
+      dmap_info.fom_of);
 
    at.set_entry(r, c+13, // FOM_MIN
-      dmap_info.med_min);
+      dmap_info.fom_min);
 
    at.set_entry(r, c+14, // FOM_MAX
-      dmap_info.med_max);
+      dmap_info.fom_max);
 
    at.set_entry(r, c+15, // FOM_MEAN
-      dmap_info.med_mean);
+      dmap_info.fom_mean);
+
+   at.set_entry(r, c+11, // ZHU_FO
+      dmap_info.zhu_fo);
+
+   at.set_entry(r, c+12, // ZHU_OF
+      dmap_info.zhu_of);
+
+   at.set_entry(r, c+13, // ZHU_MIN
+      dmap_info.zhu_min);
+
+   at.set_entry(r, c+14, // ZHU_MAX
+      dmap_info.zhu_max);
+
+   at.set_entry(r, c+15, // ZHU_MEAN
+      dmap_info.zhu_mean);
 
    return;
 }

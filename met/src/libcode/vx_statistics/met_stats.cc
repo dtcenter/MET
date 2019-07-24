@@ -3014,6 +3014,7 @@ void DMAPInfo::clear() {
    baddeley = hausdorff = bad_data_double;
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
+   zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
 
    return;
 }
@@ -3045,6 +3046,12 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    fom_min  = c.fom_min;
    fom_max  = c.fom_max;
    fom_mean = c.fom_mean;
+
+   zhu_fo   = c.zhu_fo;
+   zhu_of   = c.zhu_of;
+   zhu_min  = c.zhu_min;
+   zhu_max  = c.zhu_max;
+   zhu_mean = c.zhu_mean;
 
    return;
 }

@@ -270,7 +270,8 @@ static const char * dmap_columns [] = {
    "TOTAL",       "FY",          "OY",
    "FBIAS",       "BADDELEY",    "HAUSDORFF",
    "MED_FO",      "MED_OF",      "MED_MIN",     "MED_MAX",     "MED_MEAN",
-   "FOM_FO",      "FOM_OF",      "FOM_MIN",     "FOM_MAX",     "FOM_MEAN"
+   "FOM_FO",      "FOM_OF",      "FOM_MIN",     "FOM_MAX",     "FOM_MEAN",
+   "ZHU_FO",      "ZHU_OF",      "ZHU_MIN",     "ZHU_MAX",     "ZHU_MEAN"
 };
 
 static const char * isc_columns [] = {

@@ -1358,9 +1358,7 @@ void process_scores() {
                      fdmap_dp = fcst_dp;
                      fcst_dp_thresh = fcst_dp;
                      fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
-
-                     // TODO: COMPUTE FCST DISTANCE MAP (just copy for now)
-                     fdmap_dp = fcst_dp_thresh;
+                     fdmap_dp = distance_map(fcst_dp_thresh);
 
                      // Write out the distance map if requested in the config file
                      if(conf_info.vx_opt[i].nc_info.do_distance_map) {
@@ -1379,9 +1377,7 @@ void process_scores() {
                      odmap_dp = obs_dp;
                      obs_dp_thresh = obs_dp;
                      obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
-
-                     // TODO: COMPUTE OBS DISTANCE MAP (just copy for now)
-                     odmap_dp = obs_dp_thresh;
+                     odmap_dp = distance_map(obs_dp_thresh);
 
                      // Write out the distance map if requested in the config file
                      if(conf_info.vx_opt[i].nc_info.do_distance_map) {
