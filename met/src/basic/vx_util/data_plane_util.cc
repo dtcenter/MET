@@ -689,3 +689,14 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+DataPlane distance_map(const DataPlane &dp) {
+   DataPlane dm;
+
+   // TODO: actually compute the distance map here
+
+   return(dm);
+}
+
+////////////////////////////////////////////////////////////////////////
+
