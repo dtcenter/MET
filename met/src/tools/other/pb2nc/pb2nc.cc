@@ -1599,7 +1599,7 @@ void process_pbfile(int i_pb) {
                int buf_idx;
                float swap_value;
                mlog << Debug(5) << method_name << " Reverse levels\n";
-               mlog << Debug(7) << method_name << "  pres[0]: " << cape_data_pres[0]
+               mlog << Debug(7) << method_name << "   pres[0]: " << cape_data_pres[0]
                     << ", pres[" << (cape_level-1) << "]: "
                     << cape_data_pres[cape_level-1] << "\n";
                for (int idx=0; idx<(cape_level+1)/2; idx++) {
@@ -1617,22 +1617,28 @@ void process_pbfile(int i_pb) {
                   cape_data_spfh[buf_idx] = swap_value;
                }
             }
-            for (int idx=cape_level; idx<MAX_CAPE_LEVEL; idx++) {
-               cape_data_pres[idx] = r8bfms * 10;
-               cape_data_temp[idx] = r8bfms * 10;
-               cape_data_spfh[idx] = r8bfms * 10;
+            if (cape_level < MAX_CAPE_LEVEL) {
+               cape_data_pres[cape_level] = cape_data_pres[cape_level-1];
+               cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
+               cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
+               for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
+                  cape_data_pres[idx] = r8bfms * 10;
+                  cape_data_temp[idx] = r8bfms * 10;
+                  cape_data_spfh[idx] = r8bfms * 10;
+               }
             }
          
-            p1d = cape_p;
-            t1d = cape_data_temp[cape_level-1];
-            q1d = cape_data_spfh[cape_level-1];
+            //p1d = cape_p;
+            //t1d = cape_data_temp[cape_level-1];
+            //q1d = cape_data_spfh[cape_level-1];
             calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
                      &p1d,&t1d,&q1d, static_dummy_201,
                      &cape_level, &IMM,&JMM, &cape_level,
                      &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
          
             if(mlog.verbosity_level() >= 7) {
-               mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE\n" ;
+               mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE from "
+                    << i_read << "-th message\n" ;
                for (int idx=0; idx<cape_level; idx++) {
                   mlog << Debug(7) << idx << ", " << cape_data_pres[idx] << ", "
                        << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
@@ -1648,7 +1654,13 @@ void process_pbfile(int i_pb) {
                     << "\n\n" ;
             }
          
-            if (cape_val > MAX_CAPE_VALUE) cape_cnt_too_big++;
+            if (cape_val > MAX_CAPE_VALUE) {
+               cape_cnt_too_big++;
+               mlog << Debug(5) << method_name 
+                    << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
+                    << ", cin_val: " << cin_val
+                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+            }
             else if (cape_val > 0) {
                obs_arr[1] = cape_code;
                obs_arr[2] = cape_p;
@@ -1908,12 +1920,14 @@ void process_pbfile(int i_pb) {
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
+
    if (cal_cape) {
-      mlog << Debug(3) << "  Drived CAPE\t\t= " << cape_count
-           << "\tNo cape inputs = " << (cape_cnt_no_levels + cape_cnt_surface_msgs)
-           << "\tInvalid values = " << (cape_cnt_missing_values + cape_cnt_too_big)
-           //<< "\tsurface data = " << cape_cnt_surface_msgs
-           //<< "\n\tToo big values\t= " << cape_cnt_too_big
+      mlog << Debug(3) << "\nDerived CAPE\t\t= " << cape_count
+           << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
+           << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
+           << "\n\tfiltered: zero = " << cape_cnt_zero_values
+           << "\tothers = " << cape_cnt_missing_values << ", "
+           << cape_cnt_too_big
            << "\n";
    }
 
