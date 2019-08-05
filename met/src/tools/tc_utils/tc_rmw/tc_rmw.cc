@@ -455,6 +455,9 @@ void setup_nc_file() {
         def_tc_data(nc_out, range_dim, azimuth_dim,
             track_point_dim, data_var, data_info);
         data_vars.push_back(data_var);
+        def_tc_azi_mean_data(nc_out, range_dim,
+            track_point_dim, data_var, data_info);
+        azi_mean_data_vars.push_back(data_var);
     }
 
     // Define derived variables
@@ -607,6 +610,8 @@ void process_fields(const TrackInfoArray& tracks) {
                 // Write data
                 write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], u_dp.data());
+                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+                    azi_mean_data_vars[i_var], u_dp.data());
             } else if (data_info->name() == "V"
                 || data_info->name() == "VGRD") {
                 // Get data
@@ -627,6 +632,8 @@ void process_fields(const TrackInfoArray& tracks) {
                 // Write data
                 write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], v_dp.data());
+                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+                    azi_mean_data_vars[i_var], v_dp.data());
             } else {
                 // Get data
                 get_series_entry(i_point, data_info,
@@ -646,6 +653,8 @@ void process_fields(const TrackInfoArray& tracks) {
                 // Write data
                 write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                     data_vars[i_var], data_dp.data());
+                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+                    azi_mean_data_vars[i_var], data_dp.data());
             }
         }
 
