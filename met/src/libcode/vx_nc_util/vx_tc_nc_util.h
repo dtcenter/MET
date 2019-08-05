@@ -38,6 +38,10 @@ extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, VarInfo*);
 
+extern void def_tc_azi_mean_data(NcFile*,
+    const NcDim&, const NcDim&,
+    NcVar&, VarInfo*);
+
 extern void write_tc_valid_time(NcFile*,
     const int&, const NcVar&, const long&);
 

@@ -171,6 +171,25 @@ void def_tc_data(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+void def_tc_azi_mean_data(NcFile* nc_out,
+    const NcDim& range_dim,
+    const NcDim& track_point_dim,
+    NcVar& data_var, VarInfo* data_info) {
+
+    vector<NcDim> dims;
+    dims.push_back(range_dim);
+    dims.push_back(track_point_dim);
+
+    data_var = nc_out->addVar(
+        data_info->name(), ncDouble, dims);
+
+    // Set attributes
+    add_att(&data_var, "long_name", data_info->long_name());
+    add_att(&data_var, "units", data_info->units());
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
@@ -224,6 +243,48 @@ void write_tc_data_rev_range(NcFile* nc_out, const TcrmwGrid& grid,
     var.putVar(offsets, counts, data_rev);
 
     delete[] data_rev;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
+    const int& i_point, const NcVar& var, const double* data) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    double* data_rev;
+    double* data_azi_mean;
+
+    offsets.clear();
+    offsets.push_back(0);
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(grid.range_n());
+    counts.push_back(1);
+
+    data_rev = new double[
+        grid.range_n() * grid.azimuth_n()];
+    data_azi_mean = new double[grid.range_n()];
+
+    for(int ir = 0; ir < grid.range_n(); ir++) {
+        for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+            int i = ir * grid.azimuth_n() + ia;
+            int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;
+            data_rev[i_rev] = data[i];
+            data_azi_mean[ir] += data_rev[i];
+        }
+    }
+
+    for(int ir = 0; ir < grid.range_n(); ir++) {
+        data_azi_mean[ir] /= grid.azimuth_n();
+    }
+
+    var.putVar(offsets, counts, data_azi_mean);
+
+    delete[] data_rev;
+    delete[] data_azi_mean;
 }
 
 ////////////////////////////////////////////////////////////////////////
