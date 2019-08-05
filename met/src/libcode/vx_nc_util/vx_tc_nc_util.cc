@@ -180,8 +180,10 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     dims.push_back(range_dim);
     dims.push_back(track_point_dim);
 
-    data_var = nc_out->addVar(
-        data_info->name(), ncDouble, dims);
+    ConcatString name = data_info->name();
+    name.add("_azi_mean");
+
+    data_var = nc_out->addVar(name, ncDouble, dims);
 
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
