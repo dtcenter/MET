@@ -650,12 +650,16 @@ class DMAPInfo {
 
       // Pratt's Figure of Merit
       double fom_fo, fom_of, fom_min, fom_max, fom_mean;
-      
+
       // Zhu Metric
       double zhu_fo, zhu_of, zhu_min, zhu_max, zhu_mean;
 
       // Compute statistics
       double fbias() const; // fbias = fy / oy
+
+      // Compute statistics
+      void set(const NumArray &fdmap_na, const NumArray &odmap_na,
+               const NumArray &fthr_na,  const NumArray &othr_na);
 
       void clear();
 };

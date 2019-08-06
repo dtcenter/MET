@@ -3068,6 +3068,40 @@ double DMAPInfo::fbias() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void DMAPInfo::set(const NumArray &fdmap_na, const NumArray &odmap_na,
+                   const NumArray &fthr_na,  const NumArray &othr_na) {
+
+   // Check for mismatch
+   if(fdmap_na.n_elements() != odmap_na.n_elements() ||
+      fdmap_na.n_elements() != fthr_na.n_elements()  ||
+      fdmap_na.n_elements() != othr_na.n_elements()) {
+      mlog << Error << "\nDMAPInfo::set() -> "
+           << "count mismatch ("
+           << fdmap_na.n() << ", " << odmap_na.n() << ", "
+           << fthr_na.n()  << ", " << othr_na.n() << ")\n\n";
+      exit(1);
+   }
+
+   // Initialize
+   clear();
+
+   // TODO:
+   // Compute actual DMAP statistics here.
+   // For now, just set the total count to the length of the input
+   // arrays for testing.
+   total = fdmap_na.n();
+
+   if(total == 0) {
+      mlog << Error << "\nDMAPInfo::set() -> "
+           << "count is zero!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Begin code for misc functions
 //
