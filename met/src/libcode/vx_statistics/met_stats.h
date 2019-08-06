@@ -658,7 +658,8 @@ class DMAPInfo {
       double fbias() const; // fbias = fy / oy
 
       // Compute statistics
-      void set(const NumArray &fdmap_na, const NumArray &odmap_na,
+      void set(const SingleThresh &fthr, const SingleThresh &othr,
+               const NumArray &fdmap_na, const NumArray &odmap_na,
                const NumArray &fthr_na,  const NumArray &othr_na);
 
       void clear();

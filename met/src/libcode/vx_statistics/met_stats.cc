@@ -3069,7 +3069,8 @@ double DMAPInfo::fbias() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DMAPInfo::set(const NumArray &fdmap_na, const NumArray &odmap_na,
+void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
+                   const NumArray &fdmap_na, const NumArray &odmap_na,
                    const NumArray &fthr_na,  const NumArray &othr_na) {
 
    // Check for mismatch
@@ -3085,6 +3086,10 @@ void DMAPInfo::set(const NumArray &fdmap_na, const NumArray &odmap_na,
 
    // Initialize
    clear();
+
+   // Store the thresholds
+   fthresh = fthr;
+   othresh = othr;
 
    // TODO:
    // Compute actual DMAP statistics here.

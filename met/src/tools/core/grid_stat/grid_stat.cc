@@ -1313,7 +1313,7 @@ void process_scores() {
              conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None) {
 
             // Allocate memory in one big chunk based on grid size
-            DataPlane fdmap_dp, odmap_dp;
+            DataPlane fcst_dp_dmap, obs_dp_dmap;
             f_na.extend(grid.nx()*grid.ny());
             o_na.extend(grid.nx()*grid.ny());
 
@@ -1322,8 +1322,8 @@ void process_scores() {
 
                // Initialize
                dmap_info.clear();
-               fdmap_dp.clear();
-               odmap_dp.clear();
+               fcst_dp_dmap.clear();
+               obs_dp_dmap.clear();
 
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
@@ -1352,39 +1352,39 @@ void process_scores() {
                   dmap_info.othresh = conf_info.vx_opt[i].ocat_ta[k];
 
                   // Compute forecast distance map, if necessary.
-                  if(fdmap_dp.is_empty() ||
+                  if(fcst_dp_dmap.is_empty() ||
+                     fcst_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
 
-                     fdmap_dp = fcst_dp;
                      fcst_dp_thresh = fcst_dp;
                      fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
-                     fdmap_dp = distance_map(fcst_dp_thresh);
+                     fcst_dp_dmap = distance_map(fcst_dp_thresh);
 
                      // Write out the distance map if requested in the config file
                      if(conf_info.vx_opt[i].nc_info.do_distance_map) {
                         ConcatString cs;
                         cs << cs_erase << "FCST_DMAP_"
                            << conf_info.vx_opt[i].fcat_ta[k].get_abbr_str();
-                        write_nc(cs, fdmap_dp, i, mthd, pnts,
+                        write_nc(cs, fcst_dp_dmap, i, mthd, pnts,
                                  conf_info.vx_opt[i].interp_info.field);
                      }
                   }
 
                   // Compute observation distance map, if necessary.
-                  if(odmap_dp.is_empty() ||
+                  if(obs_dp_dmap.is_empty() ||
+                     obs_dp_thresh.is_empty() ||
                      conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
 
-                     odmap_dp = obs_dp;
                      obs_dp_thresh = obs_dp;
                      obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
-                     odmap_dp = distance_map(obs_dp_thresh);
+                     obs_dp_dmap = distance_map(obs_dp_thresh);
 
                      // Write out the distance map if requested in the config file
                      if(conf_info.vx_opt[i].nc_info.do_distance_map) {
                         ConcatString cs;
                         cs << cs_erase << "OBS_DMAP_"
                            << conf_info.vx_opt[i].ocat_ta[k].get_abbr_str();
-                        write_nc(cs, odmap_dp, i, mthd, pnts,
+                        write_nc(cs, obs_dp_dmap, i, mthd, pnts,
                                  conf_info.vx_opt[i].interp_info.field);
                      }
                   }
@@ -1392,8 +1392,17 @@ void process_scores() {
                   mlog << Debug(2) << "Computing Distance Map Statistics over region "
                        << shc.get_mask() << ".\n";
 
-                  // TODO: COMPUTE STATS IN dmap_info USING fdmap_dp and odmap_dp
-                  dmap_info.total = 1;
+                  // Apply the current mask to the distance map and
+                  // thresholded fields
+                  apply_mask(fcst_dp_dmap,   mask_mp, f_na);
+                  apply_mask(fcst_dp_thresh, mask_mp, fthr_na);
+                  apply_mask(obs_dp_dmap,    mask_mp, o_na);
+                  apply_mask(obs_dp_thresh,  mask_mp, othr_na);
+
+                  // Compute DMAP statistics
+                  dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
+                                conf_info.vx_opt[i].ocat_ta[k],
+                                f_na, o_na, fthr_na, othr_na);
 
                   // Write out DMAP
                   if(conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None &&
@@ -1430,7 +1439,7 @@ void process_scores() {
 
             shc.set_interp_mthd(InterpMthd_Nbrhd, nbrhd->shape);
             shc.set_interp_wdth(nbrhd->width[j]);
-// JHG look here
+
             // Loop through and apply each of the raw threshold values
             for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
 
