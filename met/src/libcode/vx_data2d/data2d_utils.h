@@ -19,6 +19,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+extern bool compute_distance_map(DataPlane &in_data, DataPlane &distance_map);
+
 extern bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
                         DataPlane &wdir);
 
