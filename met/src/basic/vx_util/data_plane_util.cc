@@ -694,6 +694,7 @@ DataPlane distance_map(const DataPlane &dp) {
    DataPlane dm;
 
    // TODO: actually compute the distance map here
+   dm = dp;
 
    return(dm);
 }
