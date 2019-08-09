@@ -127,12 +127,12 @@ data.scale_lat_1 = dict_lookup_double(dict, "scale_lat_1");
 data.scale_lat_2 = dict_lookup_double(dict, "scale_lat_2");
 
 data.lat_pin = dict_lookup_double(dict, "lat_pin");
-data.lon_pin = dict_lookup_double(dict, "lon_pin");
+data.lon_pin = rescale_lon(dict_lookup_double(dict, "lon_pin"));
 
 data.x_pin = dict_lookup_double(dict, "x_pin");
 data.y_pin = dict_lookup_double(dict, "y_pin");
 
-data.lon_orient = dict_lookup_double(dict, "lon_orient");
+data.lon_orient = rescale_lon(dict_lookup_double(dict, "lon_orient"));
 
 data.d_km = dict_lookup_double(dict, "d_km");
 data.r_km = dict_lookup_double(dict, "r_km");
@@ -201,12 +201,12 @@ data.hemisphere = s[0];
 data.scale_lat = dict_lookup_double(dict, "scale_lat");
 
 data.lat_pin = dict_lookup_double(dict, "lat_pin");
-data.lon_pin = dict_lookup_double(dict, "lon_pin");
+data.lon_pin = rescale_lon(dict_lookup_double(dict, "lon_pin"));
 
 data.x_pin = dict_lookup_double(dict, "x_pin");
 data.y_pin = dict_lookup_double(dict, "y_pin");
 
-data.lon_orient = dict_lookup_double(dict, "lon_orient");
+data.lon_orient = rescale_lon(dict_lookup_double(dict, "lon_orient"));
 
 data.d_km = dict_lookup_double(dict, "d_km");
 data.r_km = dict_lookup_double(dict, "r_km");
@@ -265,10 +265,10 @@ s = dict_lookup_string(dict, "name");
 set_string(data.name, s);
 
 data.lat_ll = dict_lookup_double(dict, "lat_ll");
-data.lon_ll = dict_lookup_double(dict, "lon_ll");
+data.lon_ll = rescale_lon(dict_lookup_double(dict, "lon_ll"));
 
 data.lat_ur = dict_lookup_double(dict, "lat_ur");
-data.lon_ur = dict_lookup_double(dict, "lon_ur");
+data.lon_ur = rescale_lon(dict_lookup_double(dict, "lon_ur"));
 
    ////////////////
 
@@ -319,7 +319,7 @@ s = dict_lookup_string(dict, "name");
 set_string(data.name, s);
 
 data.lat_ll = dict_lookup_double(dict, "lat_ll");
-data.lon_ll = dict_lookup_double(dict, "lon_ll");
+data.lon_ll = rescale_lon(dict_lookup_double(dict, "lon_ll"));
 
 data.delta_lat = dict_lookup_double(dict, "delta_lat");
 data.delta_lon = dict_lookup_double(dict, "delta_lon");
@@ -374,7 +374,7 @@ s = dict_lookup_string(dict, "name");
 set_string(data.name, s);
 
 data.rot_lat_ll = dict_lookup_double(dict, "rot_lat_ll");
-data.rot_lon_ll = dict_lookup_double(dict, "rot_lon_ll");
+data.rot_lon_ll = rescale_lon(dict_lookup_double(dict, "rot_lon_ll"));
 
 data.delta_rot_lat = dict_lookup_double(dict, "delta_rot_lat");
 data.delta_rot_lon = dict_lookup_double(dict, "delta_rot_lon");
@@ -383,7 +383,7 @@ data.Nlat = dict_lookup_int(dict, "Nlat");
 data.Nlon = dict_lookup_int(dict, "Nlon");
 
 data.true_lat_south_pole = dict_lookup_double(dict, "true_lat_south_pole");
-data.true_lon_south_pole = dict_lookup_double(dict, "true_lon_south_pole");
+data.true_lon_south_pole = rescale_lon(dict_lookup_double(dict, "true_lon_south_pole"));
 
 data.aux_rotation = dict_lookup_double(dict, "aux_rotation");
 
