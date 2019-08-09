@@ -680,7 +680,7 @@ void reduce(double & angle)
 
 {
 
-angle = rescale_deg( angle, -180.0, 180.0 );
+angle -= 360.0*floor( (angle/360.0) + 0.5 );
 
 return;
 
