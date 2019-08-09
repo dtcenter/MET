@@ -773,7 +773,11 @@ void reduce(double & angle)
 
 {
 
+angle += 180.0;
+
 angle -= 360.0*floor( (angle/360.0) + 0.5 );
+
+angle -= 180.0;
 
 return;
 
