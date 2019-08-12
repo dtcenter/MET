@@ -965,8 +965,9 @@ static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 //
 static const char conf_key_n_range[]     = "n_range";
 static const char conf_key_n_azimuth[]   = "n_azimuth";
-static const char conf_key_max_range[]   = "max_range";
-static const char conf_key_delta_range[] = "delta_range";
+static const char conf_key_max_range[]   = "max_range_km";
+static const char conf_key_delta_range[] = "delta_range_km";
+static const char conf_key_rmw_scale[]   = "rmw_scale";
 
 //
 // Parameter value names common to multiple tools
