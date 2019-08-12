@@ -199,7 +199,7 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
 
     ConcatString adeck_track_file("adeck.nc");
 
-    // write_tc_tracks(adeck_track_file, adeck_tracks);
+    write_tc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -571,6 +571,9 @@ void process_fields(const TrackInfoArray& tracks) {
         // Set grid center
         grid_data.lat_center = point.lat();
         grid_data.lon_center = - point.lon(); // internal sign change
+        // RMW is same as mrd()
+        grid_data.range_max_km = conf_info.rmw_scale *
+            point.mrd() * conf_info.n_range;
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();
