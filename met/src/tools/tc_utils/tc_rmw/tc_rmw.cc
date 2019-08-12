@@ -406,7 +406,7 @@ void setup_grid() {
     grid_data.name = "TCRMW";
     grid_data.range_n = conf_info.n_range;
     grid_data.azimuth_n = conf_info.n_azimuth;
-    grid_data.range_max_km = conf_info.max_range;
+    grid_data.range_max_km = conf_info.max_range_km;
 
     tcrmw_grid.set_from_data(grid_data);
     grid.set(grid_data);

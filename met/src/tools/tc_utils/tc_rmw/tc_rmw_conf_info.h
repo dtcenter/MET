@@ -67,8 +67,9 @@ class TCRMWConfInfo {
 
         int n_range;
         int n_azimuth;
-        double max_range;
-        double delta_range;
+        double max_range_km;
+        double delta_range_km;
+        double rmw_scale;
 
         // Variable information
         VarInfo** data_info;

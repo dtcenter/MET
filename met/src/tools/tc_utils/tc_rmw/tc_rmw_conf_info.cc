@@ -167,10 +167,13 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     n_azimuth = Conf.lookup_int(conf_key_n_azimuth);
 
     // Conf: max_range
-    max_range = Conf.lookup_double(conf_key_max_range);
+    max_range_km = Conf.lookup_double(conf_key_max_range);
 
     // Conf: delta_range
-    delta_range = Conf.lookup_double(conf_key_delta_range);
+    delta_range_km = Conf.lookup_double(conf_key_delta_range);
+
+    // Conf: rmw_scale
+    rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
 
     // Conf: Track
     // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));
