@@ -29,9 +29,11 @@ void write_tc_tracks(const ConcatString& track_nc_file,
     }
 
     NcVar track_lat_var = nc_out->addVar(
-        "track_lat", ncFloat, track_point_dim);
+        "Lat", ncDouble, track_point_dim);
     NcVar track_lon_var = nc_out->addVar(
-        "track_lon", ncFloat, track_point_dim);
+        "Lon", ncDouble, track_point_dim);
+    NcVar track_mrd_var = nc_out->addVar(
+        "MRD", ncDouble, track_point_dim);
 
     int offset = 0;
 
@@ -41,21 +43,26 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
         mlog << Debug(2) << "Writing track " << j << "\n";
 
-        float* track_lat_data = new float[track.n_points()];
-        float* track_lon_data = new float[track.n_points()];
+        double* track_lat_data = new double[track.n_points()];
+        double* track_lon_data = new double[track.n_points()];
+        double* track_mrd_data = new double[track.n_points()];
 
         for(int i = 0; i < track.n_points(); i++) {
             track_lat_data[i] = track[i].lat();
             track_lon_data[i] = track[i].lon();
+            track_mrd_data[i] = track[i].mrd();
         }
 
         put_nc_data(&track_lat_var, track_lat_data,
             track.n_points(), offset);
         put_nc_data(&track_lon_var, track_lon_data,
             track.n_points(), offset);
+        put_nc_data(&track_mrd_var, track_mrd_data,
+            track.n_points(), offset);
 
         delete[] track_lat_data;
         delete[] track_lon_data;
+        delete[] track_mrd_data;
 
         offset += track.n_points();
     }
