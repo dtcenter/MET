@@ -29,43 +29,43 @@ void write_tc_tracks(const ConcatString& track_nc_file,
     }
 
     NcVar track_lat_var = nc_out->addVar(
-        "Lat", ncDouble, track_point_dim);
+        "Lat", ncFloat, track_point_dim);
     NcVar track_lon_var = nc_out->addVar(
-        "Lon", ncDouble, track_point_dim);
+        "Lon", ncFloat, track_point_dim);
     NcVar track_mrd_var = nc_out->addVar(
-        "MRD", ncDouble, track_point_dim);
+        "MRD", ncFloat, track_point_dim);
 
-    int offset = 0;
+    TrackInfo track = tracks[0];
 
-    for(int j = 0; j < tracks.n_tracks(); j++) {
+    mlog << Debug(2) << "write_tc_tracks:n_points:"
+         << track.n_points() << "\n";
 
-        TrackInfo track = tracks[j];
+    float* track_lat_data = new float[track.n_points()];
+    float* track_lon_data = new float[track.n_points()];
+    float* track_mrd_data = new float[track.n_points()];
 
-        mlog << Debug(2) << "Writing track " << j << "\n";
-
-        double* track_lat_data = new double[track.n_points()];
-        double* track_lon_data = new double[track.n_points()];
-        double* track_mrd_data = new double[track.n_points()];
-
-        for(int i = 0; i < track.n_points(); i++) {
-            track_lat_data[i] = track[i].lat();
-            track_lon_data[i] = track[i].lon();
-            track_mrd_data[i] = track[i].mrd();
-        }
-
-        put_nc_data(&track_lat_var, track_lat_data,
-            track.n_points(), offset);
-        put_nc_data(&track_lon_var, track_lon_data,
-            track.n_points(), offset);
-        put_nc_data(&track_mrd_var, track_mrd_data,
-            track.n_points(), offset);
-
-        delete[] track_lat_data;
-        delete[] track_lon_data;
-        delete[] track_mrd_data;
-
-        offset += track.n_points();
+    for(int i = 0; i < track.n_points(); i++) {
+        track_lat_data[i] = track[i].lat();
+        track_lon_data[i] = track[i].lon();
+        track_mrd_data[i] = track[i].mrd();
     }
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    offsets.clear();
+    offsets.push_back(0);
+
+    counts.clear();
+    counts.push_back(track.n_points());
+
+    track_lat_var.putVar(offsets, counts, track_lat_data);
+    track_lon_var.putVar(offsets, counts, track_lon_data);
+    track_mrd_var.putVar(offsets, counts, track_mrd_data);
+
+    delete[] track_lat_data;
+    delete[] track_lon_data;
+    delete[] track_mrd_data;
 
     // nc_out->close();
 }
