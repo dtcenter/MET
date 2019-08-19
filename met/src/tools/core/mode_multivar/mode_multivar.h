@@ -59,7 +59,7 @@ static const char* program_name = "mode_multivar";
 
 // Default configuration file name
 static const char* default_config_filename =
-    "MET_BASE/config/ModeMultiVarConfig_default";
+    "MET_BASE/config/MODEMultivarConfig_default";
 
 // Default output directory
 static const char* default_out_dir = ".";
@@ -72,7 +72,7 @@ static const char* default_out_dir = ".";
 
 // Input files
 static ConcatString         config_file;
-static ModeMultiVarConfInfo conf_info;
+static ModeMultivarConfInfo conf_info;
 
 // Optional arguments
 static ConcatString out_dir;
