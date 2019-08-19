@@ -28,6 +28,7 @@ endif
 
 if ENABLE_MODE
   SUBDIRS += mode
+  SUBDIRS += mode_multivar
 endif
 
 if ENABLE_MODE_ANALYSIS
