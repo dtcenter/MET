@@ -10,9 +10,9 @@ mode_multivar_LDFLAGS = ${MET_LDFLAGS}
 mode_multivar_LDADD = \
 	-lvx_config \
 	-lvx_log \
+	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
-	-lvx_util \
 	-lvx_nc_util \
         -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
