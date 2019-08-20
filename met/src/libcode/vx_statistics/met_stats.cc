@@ -3000,6 +3000,7 @@ DMAPInfo & DMAPInfo::operator=(const DMAPInfo &c) {
 void DMAPInfo::init_from_scratch() {
 
    clear();
+   reset_options();
 
    return;
 }
@@ -3015,6 +3016,15 @@ void DMAPInfo::clear() {
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
+   
+   return;
+}
+
+void DMAPInfo::reset_options() {
+   baddeley_p = 2;          // Exponent for lp-norm
+   baddeley_max_dist = 5;   // Maximum distance constant
+   fom_alpha = 0.1;         // FOM Alpha
+   zhu_weight = 0.5;        // Zhu Weight 
 
    return;
 }
@@ -3052,6 +3062,11 @@ void DMAPInfo::assign(const DMAPInfo &c) {
    zhu_min  = c.zhu_min;
    zhu_max  = c.zhu_max;
    zhu_mean = c.zhu_mean;
+
+   baddeley_p = c.baddeley_p;
+   baddeley_max_dist = c.baddeley_max_dist;
+   fom_alpha  = c.fom_alpha;
+   zhu_weight = c.zhu_weight;
 
    return;
 }
@@ -3091,20 +3106,119 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    fthresh = fthr;
    othresh = othr;
 
-   // TODO:
-   // Compute actual DMAP statistics here.
-   // For now, just set the total count to the length of the input
-   // arrays for testing.
    total = fdmap_na.n();
-
    if(total == 0) {
       mlog << Error << "\nDMAPInfo::set() -> "
            << "count is zero!\n\n";
       exit(1);
    }
+   
+   // Compute actual DMAP statistics here.
+   int max_events;
+   double f_distance, o_distance, zhu_common;
+   double abs_diff_distance = 0.0; 
+   double sum_binary_diff = 0.0;
+   double fom_fo_sum = 0.0;
+   double fom_of_sum = 0.0;
+   double med_fo_sum = 0.0;
+   double med_of_sum = 0.0;
+   double baddeley_delta_sum = 0.0;
 
+   //NumArray fwdmap_na;
+   //NumArray owdmap_na;
+   //NumArray diff_dmap_na;
+
+   cout << " DMAP.Options: baddeley_p=" << baddeley_p
+        << ", baddeley_max_dist=" << baddeley_max_dist
+        << ", fom_alpha=" << fom_alpha
+        << ", zhu_weight=" << zhu_weight << "\n";
+   mlog << Debug(3) << " DMAP.Options: baddeley_p=" << baddeley_p
+        << ", baddeley_max_dist=" << baddeley_max_dist
+        << ", fom_alpha=" << fom_alpha
+        << ", zhu_weight=" << zhu_weight << "\n";
+   for (int i=0; i<total; i++) {
+      if (fthr_na[i] > 0) {
+         fy++;
+         med_of_sum += odmap_na[i];
+         fom_of_sum += (1 + odmap_na[i] * odmap_na[i] * fom_alpha);
+      }
+      if (othr_na[i] > 0) {
+         oy++;
+         med_fo_sum += fdmap_na[i];
+         fom_fo_sum += (1 + fdmap_na[i] * fdmap_na[i] * fom_alpha);
+      }
+      
+      sum_binary_diff += (fthr_na[i] - othr_na[i]) * (fthr_na[i] - othr_na[i]);
+      
+      f_distance = (fdmap_na[i] > baddeley_max_dist) ? baddeley_max_dist : fdmap_na[i];
+      o_distance = (odmap_na[i] > baddeley_max_dist) ? baddeley_max_dist : odmap_na[i];
+      abs_diff_distance = abs(f_distance - o_distance);
+      if (abs_diff_distance != 0) {
+         baddeley_delta_sum += pow(abs_diff_distance, baddeley_p);
+      }
+      
+      // Distance metrics
+      if (hausdorff < abs_diff_distance) hausdorff = abs_diff_distance;
+   }
+   
+   max_events = max(fy, oy);
+
+   // Mean error distance
+   med_fo = med_fo_sum / oy;
+   med_of = med_of_sum / fy;
+   med_max = max(med_fo, med_of);
+   med_min = min(med_fo, med_of);
+   med_mean = (med_fo + med_of) / 2;
+   
+   // Distance metrics
+   baddeley = pow(baddeley_delta_sum/(double)total, 1.0/baddeley_p);
+   
+   // Pratt's Figure of Merit
+   fom_fo = fom_fo_sum / max_events;
+   fom_of = fom_of_sum / max_events;
+   fom_max = max(fom_fo, fom_of);
+   fom_min = min(fom_fo, fom_of);
+   fom_mean = (fom_fo, fom_of) / 2;
+   
+   // Zhu Metric
+   zhu_common = zhu_weight * sqrt(sum_binary_diff / total);
+   zhu_fo = zhu_common + (1-zhu_weight) * med_fo;
+   zhu_of = zhu_common + (1-zhu_weight) * med_of;
+   zhu_max = max(zhu_fo, zhu_of);
+   zhu_min = min(zhu_fo, zhu_of);
+   zhu_mean = (zhu_fo, zhu_of) / 2;
+
+   mlog << Debug(3) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
+        << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
+        << "\n\tmed_fo=" << med_fo << ", med_of=" << med_of
+        << ", med_min=" << med_min << ", med_max=" << med_max << ", med_mean=" << med_mean
+        << "\n\tfom_fo=" << fom_fo << ", fom_of=" << fom_of
+        << ", fom_min=" << fom_min << ", fom_max=" << fom_max << ", fom_mean=" << fom_mean
+        << "\n\tzhu_fo=" << zhu_fo << ", zhu_of=" << zhu_of
+        << ", zhu_min=" << zhu_min << ", zhu_max=" << zhu_max << ", zhu_mean=" << zhu_mean
+        << "\n";
+   cout << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
+        << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
+        << "\n\tmed_fo=" << med_fo << ", med_of=" << med_of
+        << ", med_min=" << med_min << ", med_max=" << med_max << ", med_mean=" << med_mean
+        << "\n\tfom_fo=" << fom_fo << ", fom_of=" << fom_of
+        << ", fom_min=" << fom_min << ", fom_max=" << fom_max << ", fom_mean=" << fom_mean
+        << "\n\tzhu_fo=" << zhu_fo << ", zhu_of=" << zhu_of
+        << ", zhu_min=" << zhu_min << ", zhu_max=" << zhu_max << ", zhu_mean=" << zhu_mean
+        << "\n";
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dist,
+                           const double _fom_alpha, const double _zhu_weight) {
+   baddeley_p = _baddeley_p;
+   baddeley_max_dist = _baddeley_max_dist;
+   fom_alpha = _fom_alpha;
+   zhu_weight = _zhu_weight;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 //

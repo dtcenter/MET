@@ -45,6 +45,7 @@ class CIInfo {
       // Variance inflation factor for time series
       double vif;
 
+
       // Confidence interval computed using a normal approximation
       double *v_ncl;
       double *v_ncu;
@@ -616,6 +617,7 @@ class GRADInfo {
       void clear();
 };
 
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Class to store distance map statistics
@@ -627,6 +629,12 @@ class DMAPInfo {
    private:
       void init_from_scratch();
       void assign(const DMAPInfo &);
+
+      // Distance Map Options
+      int    baddeley_p;           // Exponent for lp-norm
+      double baddeley_max_dist;    // Maximum distance constant
+      double fom_alpha;            // FOM Alpha
+      double zhu_weight;           // Zhu Weight 
 
    public:
 
@@ -662,7 +670,11 @@ class DMAPInfo {
                const NumArray &fdmap_na, const NumArray &odmap_na,
                const NumArray &fthr_na,  const NumArray &othr_na);
 
+      void set_options(const int _baddeley_p, const double _baddeley_max_dist,
+                       const double _fom_alpha, const double _zhu_weight);
+
       void clear();
+      void reset_options();
 };
 
 ////////////////////////////////////////////////////////////////////////

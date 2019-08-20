@@ -690,11 +690,137 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int meijster_sep(int u_index, int i_index, double u_distance, double i_distance) {
+   return ((u_index*u_index - i_index*i_index + u_distance*u_distance - i_distance*i_distance)
+         / (2 * (u_index-i_index)));
+}
+
+double euclide_distance(int x, int y) {
+   return sqrt(x*x + y*y);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 DataPlane distance_map(const DataPlane &dp) {
    DataPlane dm;
 
    // TODO: actually compute the distance map here
-   dm = dp;
+   DataPlane g_distance;
+
+   bool debug_g_distance = false;
+   double distance_value;
+   int ix, iy;
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int max_distance = nx + ny;
+   
+   //debug_g_distance = !debug_g_distance;
+   g_distance.set_size(nx, ny);
+   g_distance.set_constant(max_distance);
+   dm.set_size(nx, ny);
+   dm.set_constant(max_distance);
+   
+   int event_count = 0;
+   // Meijster first phase
+   for (ix=0; ix<nx; ix++) {
+      // Meijster scan 1
+      iy = 0;
+      if (0 < dp.get(ix, iy)) {
+         g_distance.set(0.0, ix, iy);
+         event_count++;
+      }
+      
+      for (iy = 1; iy<ny; iy++) {
+         if (0 < dp.get(ix, iy)) {
+            distance_value = 0.0;
+            event_count++;
+         }
+         else
+            distance_value = (1.0 + g_distance.get(ix, (iy-1)));
+         g_distance.set(distance_value, ix, iy);
+      }
+      
+      // Meijster scan 2
+      for (iy = ny-2; iy>=0; iy--) {
+         distance_value = g_distance.get(ix, (iy+1));
+         if (distance_value < g_distance.get(ix, iy))
+            g_distance.set((1.0 + distance_value), ix, iy);
+      }
+   }
+   
+   // Meijster second phase
+   if (0 < event_count) {
+      int iq, iw;
+      int s[nx], t[nx];
+      
+      // Initialize s and t array
+      for (ix=0; ix<nx; ix++) {
+         s[ix] = t[ix] = 0;
+      }
+      
+      for (iy = 0; iy<ny; iy++) {
+         iq = 0;
+         s[iq] = t[iq] = 0;
+      
+         // Meijster Scan 3
+         for (ix=1; ix<nx; ix++) {
+            while ((0 <= iq)
+                 && euclide_distance((t[iq]-s[iq]), g_distance.get(s[iq], iy))
+                    > euclide_distance((t[iq]-ix), g_distance.get(ix, iy)))
+               iq--;
+                
+            if (0 > iq) {
+               iq = 0;
+               s[0] = ix;
+            }
+            else {
+               iw = 1 + meijster_sep(ix, s[iq],
+                     g_distance.get(ix, iy), g_distance.get(s[iq], iy));
+               if (iw < nx) {
+                  iq++;
+                  s[iq] = ix;
+                  t[iq] = iw;
+               }
+            }
+         }
+         
+         //if (debug_scan) {
+         //   cout << " DEBUG: iy: " << iy << "  s:";
+         //   for (ix=0; ix<nx; ix++) cout << " " << s[ix];
+         //   cout << "  t:";
+         //   for (ix=0; ix<nx; ix++) cout << " " << t[ix];
+         //   cout << "\n";
+         //}
+         // Meijster Scan 4
+         for (ix=nx-1; ix>=0; ix--) {
+            distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
+            dm.set(distance_value,ix,iy);
+            if (ix == t[iq]) iq--;
+         }
+      }
+   }
+   
+   int debug_level = 7;
+   if(mlog.verbosity_level() >= debug_level) {
+      if (debug_g_distance) {
+         for (ix=0; ix<nx; ix++) {
+            ostringstream message;
+            message << " g_distance: " ;
+            for (iy = 0; iy<ny; iy++) {
+               message << "  " << g_distance.get(ix, iy);
+            }
+            mlog << Debug(debug_level) << message.str() << "\n";
+         }
+      }
+      for (ix=0; ix<nx; ix++) {
+         ostringstream message;
+         message << " distance: " ;
+         for (iy = 0; iy<ny; iy++) {
+            message << "  " << dm.get(ix, iy);
+         }
+         mlog << Debug(debug_level) << message.str() << "\n";
+      }
+   }
 
    return(dm);
 }
