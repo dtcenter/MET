@@ -12,25 +12,25 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ModeMultiVarConfInfo
+//  Code for class ModeMultivarConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ModeMultiVarConfInfo::ModeMultiVarConfInfo() {
+ModeMultivarConfInfo::ModeMultivarConfInfo() {
 
     init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ModeMultiVarConfInfo::~ModeMultiVarConfInfo() {
+ModeMultivarConfInfo::~ModeMultivarConfInfo() {
 
     clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeMultiVarConfInfo::init_from_scratch() {
+void ModeMultivarConfInfo::init_from_scratch() {
 
     clear();
 
@@ -39,7 +39,7 @@ void ModeMultiVarConfInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeMultiVarConfInfo::clear() {
+void ModeMultivarConfInfo::clear() {
 
     Version.clear();
 
@@ -48,7 +48,7 @@ void ModeMultiVarConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeMultiVarConfInfo::read_config(const char* default_file_name,
+void ModeMultivarConfInfo::read_config(const char* default_file_name,
                                        const char* user_file_name) {
 
     // Read config file constants
@@ -65,7 +65,7 @@ void ModeMultiVarConfInfo::read_config(const char* default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeMultiVarConfInfo::process_config() {
+void ModeMultivarConfInfo::process_config() {
 
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);

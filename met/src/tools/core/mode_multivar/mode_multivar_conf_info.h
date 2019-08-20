@@ -12,7 +12,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-class ModeMultiVarConfInfo {
+class ModeMultivarConfInfo {
 
     private:
 
@@ -20,14 +20,14 @@ class ModeMultiVarConfInfo {
 
     public:
 
-        // ModeMultiVar configuration object
+        // ModeMultivar configuration object
         MetConfig Conf;
 
         // Config file version
         ConcatString Version;
 
-        ModeMultiVarConfInfo();
-        ~ModeMultiVarConfInfo();
+        ModeMultivarConfInfo();
+        ~ModeMultivarConfInfo();
 
         void clear();
 
