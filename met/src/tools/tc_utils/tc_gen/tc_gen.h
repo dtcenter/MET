@@ -22,6 +22,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>

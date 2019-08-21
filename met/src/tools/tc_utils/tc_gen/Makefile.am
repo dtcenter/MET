@@ -10,7 +10,7 @@ include ${top_srcdir}/Make-include
 
 # The program
 
-bin_PROGRAMS    = tc_gen
+bin_PROGRAMS   = tc_gen
 tc_gen_SOURCES = tc_gen.cc \
 	tc_gen_conf_info.cc
 tc_gen_CPPFLAGS = ${MET_CPPFLAGS}
@@ -38,7 +38,7 @@ tc_gen_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf \
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
 	$(FLIBS)
 
 EXTRA_DIST = tc_gen_conf_info.h \
