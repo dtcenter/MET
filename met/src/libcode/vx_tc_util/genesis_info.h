@@ -100,7 +100,7 @@ class GenesisInfo {
       double               lat()              const;
       double               lon()              const;
       double               dland()            const;
-      unixtime             genesis()          const;
+      unixtime             genesis_time()     const;
       unixtime             init()             const;
       int                  init_hour()        const;
       int                  lead_time()        const;
@@ -125,7 +125,7 @@ inline const ConcatString & GenesisInfo::initials()         const { return(Initi
 inline double               GenesisInfo::lat()              const { return(Lat);                     }
 inline double               GenesisInfo::lon()              const { return(Lon);                     }
 inline double               GenesisInfo::dland()            const { return(DLand);                   }
-inline unixtime             GenesisInfo::genesis()          const { return(GenesisTime);             }
+inline unixtime             GenesisInfo::genesis_time()     const { return(GenesisTime);             }
 inline unixtime             GenesisInfo::init()             const { return(InitTime);                }
 inline int                  GenesisInfo::init_hour()        const { return(InitTime % sec_per_hour); }
 inline int                  GenesisInfo::lead_time()        const { return(LeadTime);                }
