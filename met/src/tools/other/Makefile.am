@@ -78,4 +78,6 @@ if ENABLE_SHIFT_DATA_PLANE
   SUBDIRS += shift_data_plane
 endif
 
+SUBDIRS += grid_diag
+
 MAINTAINERCLEANFILES 	= Makefile.in
