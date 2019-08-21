@@ -26,6 +26,45 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for struct GenesisInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+void GenesisEventInfo::clear() {
+   Technique.clear();
+   Category.clear();
+   VMaxThresh.clear();
+   MSLPThresh.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisEventInfo::is_keeper(const TrackPoint &p) {
+   bool keep = true;
+
+   // Check event category
+   if(Category.size() > 0 &&
+      Category[p.level()] == 0) {
+      keep = false;
+   }
+
+   // Check VMax threshold
+   if(VMaxThresh.get_type() != thresh_na &&
+      !VMaxThresh.check(p.v_max())) {
+      keep = false;
+   }
+
+   // Check MSLP threshold
+   if(MSLPThresh.get_type() != thresh_na &&
+      !MSLPThresh.check(p.mslp())) {
+      keep = false;
+   }
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for class TCGenVxOpt
 //
 ////////////////////////////////////////////////////////////////////////
@@ -57,8 +96,6 @@ void TCGenVxOpt::clear() {
 
    Desc.clear();
    Model.clear();
-   BestTechnique.clear();
-   OperTechnique.clear();
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -74,6 +111,8 @@ void TCGenVxOpt::clear() {
    VxGridMask.clear();
    VxAreaMask.clear();
    DLandThresh.clear();
+   GenesisSecBeg = GenesisSecEnd = bad_data_int;
+   GenesisRadius = bad_data_double;
 
    return;
 }
@@ -86,59 +125,55 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    ConcatString file_name;
    StringArray sa;
 
-   // Conf: Desc
+   // Conf: desc
    Desc = parse_conf_string(&dict, conf_key_desc);
 
-   // Conf: Model
+   // Conf: model
    Model = dict.lookup_string_array(conf_key_model);
 
-   // Conf: BestTechnique and OperTechnique
-   BestTechnique = dict.lookup_string(conf_key_best_technique);
-   OperTechnique = dict.lookup_string(conf_key_oper_technique);
-
-   // Conf: StormId
+   // Conf: storm_id
    StormId = dict.lookup_string_array(conf_key_storm_id);
 
-   // Conf: Basin
+   // Conf: basin
    Basin = dict.lookup_string_array(conf_key_basin);
 
-   // Conf: Cyclone
+   // Conf: cyclone
    Cyclone = dict.lookup_string_array(conf_key_cyclone);
 
-   // Conf: StormName
+   // Conf: storm_name
    StormName = dict.lookup_string_array(conf_key_storm_name);
 
-   // Conf: InitBeg, InitEnd
+   // Conf: init_beg, init_end
    InitBeg = dict.lookup_unixtime(conf_key_init_beg);
    InitEnd = dict.lookup_unixtime(conf_key_init_end);
 
-   // Conf: InitInc
+   // Conf: init_inc
    sa = dict.lookup_string_array(conf_key_init_inc);
    for(i=0; i<sa.n_elements(); i++)
       InitInc.add(timestring_to_unix(sa[i].c_str()));
 
-   // Conf: InitExc
+   // Conf: init_exc
    sa = dict.lookup_string_array(conf_key_init_exc);
    for(i=0; i<sa.n_elements(); i++)
       InitExc.add(timestring_to_unix(sa[i].c_str()));
 
-   // Conf: ValidBeg, ValidEnd
+   // Conf: valid_beg, valid_end
    ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = dict.lookup_unixtime(conf_key_valid_end);
 
-   // Conf: InitHour
+   // Conf: init_hour
    sa = dict.lookup_string_array(conf_key_init_hour);
    for(i=0; i<sa.n_elements(); i++) {
       InitHour.add(timestring_to_sec(sa[i].c_str()));
    }
 
-   // Conf: Lead
+   // Conf: lead
    sa = dict.lookup_string_array(conf_key_lead);
    for(i=0; i<sa.n_elements(); i++) {
       Lead.add(timestring_to_sec(sa[i].c_str()));
    }
 
-   // Conf: VxMask
+   // Conf: vx_mask
    if(nonempty(dict.lookup_string(conf_key_vx_mask).c_str())) {
       file_name = replace_path(dict.lookup_string(conf_key_vx_mask));
       mlog << Debug(2) << "Masking File: " << file_name << "\n";
@@ -146,17 +181,17 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
                       VxMaskName);
    }
 
-   // Conf: DLandThresh
+   // Conf: dland_thresh
    DLandThresh = dict.lookup_thresh(conf_key_dland_thresh);
 
-   // Conf: GenesisBeg and GenesisEnd
+   // Conf: genesis_window
    int beg, end;
    dict2 = dict.lookup_dictionary(conf_key_genesis_window);
    parse_conf_range_int(dict2, beg, end);
-   GenesisBeg = beg*sec_per_hour;
-   GenesisEnd = end*sec_per_hour;
+   GenesisSecBeg = beg*sec_per_hour;
+   GenesisSecEnd = end*sec_per_hour;
 
-   // Conf: GenesisRadius
+   // Conf: genesis_radius
    GenesisRadius = dict.lookup_double(conf_key_genesis_radius);
 
    return;
@@ -168,7 +203,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    bool keep = true;
    int m, d, y, h, mm, s;
 
-   // Model, BestTechnique, and OperTechnique are checked elsewhere
+   // ATCF ID processed elsewhere
 
    // Parse init time into components
    unix_to_mdyhms(g.init(), m, d, y, h, mm, s);
@@ -272,12 +307,12 @@ void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
    InitFreq = bad_data_int;
-   LeadBeg = bad_data_int;
-   LeadEnd = bad_data_int;
+   LeadSecBeg = bad_data_int;
+   LeadSecEnd = bad_data_int;
    MinDur = bad_data_int;
-   EventCategory.clear();
-   EventVMaxThresh.clear();
-   EventMSLPThresh.clear();
+   ModelEventInfo.clear();
+   BestEventInfo.clear();
+   OperEventInfo.clear();
    DLandFile.clear();
    DLandGrid.clear();
    DLandData.clear();
@@ -320,23 +355,23 @@ void TCGenConfInfo::process_config() {
    // Conf: lead_window
    dict = Conf.lookup_dictionary(conf_key_lead_window);
    parse_conf_range_int(dict, beg, end);
-   LeadBeg = beg*sec_per_hour;
-   LeadEnd = end*sec_per_hour;
+   LeadSecBeg = beg*sec_per_hour;
+   LeadSecEnd = end*sec_per_hour;
 
    // Conf: min_duration
    MinDur = Conf.lookup_int(conf_key_min_duration);
 
-   // Conf: EventCategory
-   sa = Conf.lookup_string_array(conf_key_event_category);
-   for(i=0; i<sa.n(); i++) {
-      EventCategory.push_back(string_to_cyclonelevel(sa[i].c_str()));
-   }
+   // Conf: model_genesis
+   dict = Conf.lookup_dictionary(conf_key_model_genesis);
+   ModelEventInfo = parse_conf_genesis_event_info(dict);
 
-   // Conf: EventVMaxThresh
-   EventVMaxThresh = Conf.lookup_thresh(conf_key_event_vmax_thresh);
+   // Conf: best_genesis
+   dict = Conf.lookup_dictionary(conf_key_best_genesis);
+   BestEventInfo = parse_conf_genesis_event_info(dict);
 
-   // Conf: EventMSLPThresh
-   EventMSLPThresh = Conf.lookup_thresh(conf_key_event_mslp_thresh);
+   // Conf: oper_genesis
+   dict = Conf.lookup_dictionary(conf_key_oper_genesis);
+   OperEventInfo = parse_conf_genesis_event_info(dict);
 
    // Conf: DLandFile
    DLandFile = Conf.lookup_string(conf_key_dland_file);
@@ -389,6 +424,41 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
    else                               dist = DLandData.get(x, y);
 
    return(dist);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Miscellaneous utility functions.
+//
+////////////////////////////////////////////////////////////////////////
+
+GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
+   GenesisEventInfo info;
+   StringArray sa;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_genesis_event_info() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: technique (optional)
+   info.Technique = dict->lookup_string(conf_key_technique, false);
+
+   // Conf: category
+   sa = dict->lookup_string_array(conf_key_category);
+   for(i=0; i<sa.n(); i++) {
+      info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
+   }
+
+   // Conf: vmax_thresh
+   info.VMaxThresh = dict->lookup_thresh(conf_key_vmax_thresh);
+
+   // Conf: mslp_thresh
+   info.MSLPThresh = dict->lookup_thresh(conf_key_mslp_thresh);
+
+   return(info);
 }
 
 ////////////////////////////////////////////////////////////////////////

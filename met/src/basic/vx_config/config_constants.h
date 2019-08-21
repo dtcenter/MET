@@ -959,12 +959,18 @@ static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
 static const char conf_key_filter[]                   = "filter";
 static const char conf_key_dland_thresh[]             = "dland_thresh";
+
+// TC-Gen config options
 static const char conf_key_init_freq[]                = "init_freq";
 static const char conf_key_lead_window[]              = "lead_window";
 static const char conf_key_min_duration[]             = "min_duration";
-static const char conf_key_event_category[]           = "event_category";
-static const char conf_key_event_vmax_thresh[]        = "event_vmax_thresh";
-static const char conf_key_event_mslp_thresh[]        = "event_mslp_thresh";
+static const char conf_key_model_genesis[]            = "model_genesis";
+static const char conf_key_best_genesis[]             = "best_genesis";
+static const char conf_key_oper_genesis[]             = "oper_genesis";
+static const char conf_key_technique[]                = "technique";
+static const char conf_key_category[]                 = "category";
+static const char conf_key_vmax_thresh[]              = "vmax_thresh";
+static const char conf_key_mslp_thresh[]              = "mslp_thresh";
 static const char conf_key_genesis_window[]           = "genesis_window";
 static const char conf_key_genesis_radius[]           = "genesis_radius";
 

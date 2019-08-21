@@ -24,6 +24,24 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+//
+// Struct to store genesis event defintion criteria
+//
+
+struct GenesisEventInfo {
+   ConcatString         Technique;
+   vector<CycloneLevel> Category;
+   SingleThresh         VMaxThresh;
+   SingleThresh         MSLPThresh;
+
+   bool                 is_keeper(const TrackPoint &);
+   void                 clear();
+};
+
+extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
+
+////////////////////////////////////////////////////////////////////////
+
 class TCGenVxOpt {
 
    private:
@@ -41,9 +59,7 @@ class TCGenVxOpt {
       ConcatString Desc;
 
       // Model comparisons
-      StringArray  Model;         // Forecast ATCF ID's
-      ConcatString BestTechnique; // Best track ATCF ID
-      ConcatString OperTechnique; // Operational ATCF ID
+      StringArray  Model;    // Forecast ATCF ID's
 
       // Track filtering criteria
       StringArray StormId;   // List of storm ids
@@ -69,7 +85,7 @@ class TCGenVxOpt {
       SingleThresh DLandThresh;
 
       // Temporal and spatial matching criteria
-      int GenesisBeg, GenesisEnd;
+      int GenesisSecBeg, GenesisSecEnd;
       double GenesisRadius;
 
       //////////////////////////////////////////////////////////////////
@@ -106,15 +122,15 @@ class TCGenConfInfo {
       int InitFreq;
 
       // Begin and end forecast hours for genesis
-      int LeadBeg, LeadEnd;
+      int LeadSecBeg, LeadSecEnd;
 
       // Minimum track duration
       int MinDur;
 
       // Genesis event criteria
-      vector<CycloneLevel> EventCategory;
-      SingleThresh         EventVMaxThresh;
-      SingleThresh         EventMSLPThresh;
+      GenesisEventInfo ModelEventInfo;
+      GenesisEventInfo  BestEventInfo;
+      GenesisEventInfo  OperEventInfo;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;
