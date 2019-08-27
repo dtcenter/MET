@@ -36,6 +36,16 @@ data = {
           }
         },
         {
+          name = "VTMP";
+          level = [ "P1000", "P800", "P500" ];
+          regrid = {
+            method     = BILIN;
+            width      = 2;
+            vld_thresh = 0.5;
+            shape      = SQUARE;
+          }
+        },
+        {
           name = "UGRD";
           level = [ "L0" ];
           regrid = {
