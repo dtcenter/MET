@@ -109,6 +109,8 @@ static vector<NcVar> azi_mean_data_vars;
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
 
+static map<string, vector<string> > variable_levels;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables
