@@ -21,7 +21,7 @@ data = {
     file_type = NETCDF_NCCF;
     field = [
         {
-          name = "T";
+          name = "PS";
           level = ["(0,41,*,*)"];
           regrid = {
             method     = NEAREST;
