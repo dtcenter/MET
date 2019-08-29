@@ -456,7 +456,7 @@ void setup_nc_file() {
         mlog << Debug(3) << "data_info->name():"
              << data_info->name().c_str() << "\n";
         // insert variable name key and empty levels if new
-        variable_levels.emplace(data_info->name(), levels);
+        // variable_levels.emplace(data_info->name(), levels);
         mlog << Debug(3) << "data_info->level_name():"
              << data_info->level_name().c_str() << "\n";
         variable_levels[data_info->name()].push_back(
