@@ -40,8 +40,18 @@ The configuration file language supports the following data types:
         (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
         and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
    - Percentile Thresholds:
-      - Thresholds may be defined as a percentile of the data being processed in
-        several places.  The following percentile threshold types are supported:
+      - Thresholds may be defined as percentiles of the data being processed in
+        several places:
+         - In Point-Stat and Grid-Stat when setting "cat_thresh" and
+           "cnt_thresh".
+         - In Wavelet-Stat when setting "cat_thresh".
+         - In MODE when setting "conv_thresh" and "merge_thresh".
+         - In Ensemble-Stat when setting "obs_thresh".
+         - When using the "censor_thresh" config option.
+         - In the Stat-Analysis "-out_fcst_thresh" and "-out_obs_thresh" job
+           command options.
+         - In the Gen-Vx-Mask "-thresh" command line option.
+      - The following percentile threshold types are supported:
          - "SFP" for a percentile of the sample forecast values.
            e.g. ">SFP50" means greater than the 50-th forecast percentile.
          - "SOP" for a percentile of the sample observation values.
@@ -175,9 +185,9 @@ GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB1".
 The following lines consist of 4 integers followed by 3 strings:
 Column 1: GRIB code (e.g. 11 for temperature)
-Column 2: center id (e.g. 07 for US Weather Service- National Met. Center)
-Column 3: subcenter id
-Column 4: parameter table version number
+Column 2: parameter table version number
+Column 3: center id (e.g. 07 for US Weather Service- National Met. Center)
+Column 4: subcenter id
 Column 5: variable name
 Column 6: variable description
 Column 7: units
@@ -357,7 +367,7 @@ obtype = "ANALYS";
 //         - DW_MEAN     for the distance-weighted average value (weight =
 //                       distance^-2)
 //         - AW_MEAN     for an area-weighted mean when regridding from
-//                       high to low resolution grids
+//                       high to low resolution grids (width = 1)
 //         - LS_FIT      for a least-squares fit
 //         - BILIN       for bilinear interpolation (width = 2)
 //         - NEAREST     for the nearest grid point (width = 1)
@@ -2523,6 +2533,8 @@ level_category = [];
 //    D_RH    for Relative Humidity in %
 //    D_MIXR  for Humidity Mixing Ratio in kg/kg
 //    D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
+//    D_PBL   for Planetary Boundary Layer
+//    D_CAPE  for Convective Available Potential Energy 
 //
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
@@ -2553,7 +2565,9 @@ obs_prefbufr_map = [
    { key = "D_WIND";  val = "WIND";  },
    { key = "D_RH";    val = "RH";    },
    { key = "D_MIXR";  val = "MIXR";  },
-   { key = "D_PRMSL"; val = "PRMSL"; }
+   { key = "D_PRMSL"; val = "PRMSL"; },
+   { key = "D_PBL";   val = "PBL";   },
+   { key = "D_CAPE";  val = "CAPE";  }
 ];
 
 //

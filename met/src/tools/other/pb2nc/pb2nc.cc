@@ -157,6 +157,7 @@ static int bufr_var_code[mxr8vt];
 static int bufr_derive_code[n_derive_gc];
 
 // The fortran code is hard-coded with 200 levels
+#define MAX_CAPE_VALUE 10000
 #define MAX_CAPE_LEVEL 200
 #define CAPE_INPUT_VARS 3
 static float cape_data_pres[MAX_CAPE_LEVEL];
@@ -212,7 +213,6 @@ static ConcatString dump_dir = (string)".";
 
 static bool obs_to_vector    = true;
 static bool do_all_vars      = false;
-static bool use_small_buffer = false;
 static bool override_vars    = false;
 static bool collect_metadata = false;
 static StringArray bufr_target_variables;
@@ -918,7 +918,7 @@ void process_pbfile(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      cout << " PERF: " << method_name << " "
+      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name << " "
            << (end_t-start_t)/double(CLOCKS_PER_SEC)
            << " seconds for preparing\n";
       start_t = clock();
@@ -946,11 +946,15 @@ void process_pbfile(int i_pb) {
    bufr_hdr_names = bufr_hdrs.text();
 
    // To compute CAPE
-   int ivirt = 1;
-   int itype = 2;
+   int ivirt = 1;   // 0: regular thetap and thetaa
+                    // 1: virtual thetap and thetaa
+   int itype = 1;   // itype 1: where a parcel is lifted from the ground
+                    // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
    float p1d,t1d,q1d;
    int cape_level, prev_cape_level, IMM, JMM;
+   int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
+   int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
 
    // To compute PBL
    int pbl_level;
@@ -1243,8 +1247,9 @@ void process_pbfile(int i_pb) {
       // Get the next PrepBufr message
       readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
 
-      // Special handling for "AIRNOW"
-      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
+      // Special handling for "AIRNOW" and "ANOWPM"
+      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
+                        0 == strcmp("ANOWPM", hdr_typ));
 
       if (0 < message_type_map.count((string)hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
@@ -1461,7 +1466,7 @@ void process_pbfile(int i_pb) {
                else if(grib_code == tmp_grib_code) {
                   obs_arr[4] += c_to_k;
                }
-               
+
                if (cal_cape) {
                   if(grib_code == pres_grib_code) {
                      is_cape_input = true;
@@ -1485,7 +1490,7 @@ void process_pbfile(int i_pb) {
                   }
                }
 
-               if (cal_cape && (pbl_level == 0)) {
+               if (cal_pbl && (pbl_level == 0)) {
                   pbl_p = obs_arr[2];
                   pbl_h = obs_arr[3];
                   pbl_qm = quality_mark;
@@ -1564,12 +1569,9 @@ void process_pbfile(int i_pb) {
          }
          if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
             float *tmp_pqtzuv = new float[mxr8vt];
-            //cout << "  DEBUG pqtzuv: ";
             for(kk=0; kk<mxr8vt; kk++) {
                tmp_pqtzuv[kk] = pqtzuv[kk];
-               //cout << "   " << pqtzuv[kk];
             }
-            //cout << "\n";
 
             if (!is_eq(tmp_pqtzuv[4],bad_data_float)
                   && !is_eq(tmp_pqtzuv[5],bad_data_float)) {
@@ -1583,70 +1585,97 @@ void process_pbfile(int i_pb) {
          }
       } // end for lv
 
-      if (cal_cape && (cape_level > 1)) {
-         bool reverse_levels;
-         float cape_val, cin_val, PLCL,PEQL;
+      if (cal_cape) {
+         if (1 < cape_level) {
+            bool reverse_levels;
+            float cape_val, cin_val, PLCL,PEQL;
          
-         float cape_val2, cin_val2,cape_val3, cin_val3, cape_val4, cin_val4;    // delete me
-         cape_val = bad_data_double;
-         cin_val  = bad_data_double;
-
-         if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
-         reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
-         if (reverse_levels) {
-            int buf_idx;
-            float swap_value;
-            for (int idx=0; idx<(cape_level+1/2); idx++) {
-               buf_idx = cape_level - idx - 1;
-               swap_value = cape_data_pres[idx];
-               cape_data_pres[idx] = cape_data_pres[buf_idx];
-               cape_data_pres[buf_idx] = swap_value;
-               
-               swap_value = cape_data_temp[idx];
-               cape_data_temp[idx] = cape_data_temp[buf_idx];
-               cape_data_temp[buf_idx] = swap_value;
-               
-               swap_value = cape_data_spfh[idx];
-               cape_data_spfh[idx] = cape_data_spfh[buf_idx];
-               cape_data_spfh[buf_idx] = swap_value;
+            cape_val = bad_data_double;
+            cin_val  = bad_data_double;
+         
+            if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
+            reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
+            if (reverse_levels) {
+               int buf_idx;
+               float swap_value;
+               mlog << Debug(5) << method_name << " Reverse levels\n";
+               mlog << Debug(7) << method_name << "   pres[0]: " << cape_data_pres[0]
+                    << ", pres[" << (cape_level-1) << "]: "
+                    << cape_data_pres[cape_level-1] << "\n";
+               for (int idx=0; idx<(cape_level+1)/2; idx++) {
+                  buf_idx = cape_level - idx - 1;
+                  swap_value = cape_data_pres[idx];
+                  cape_data_pres[idx] = cape_data_pres[buf_idx];
+                  cape_data_pres[buf_idx] = swap_value;
+         
+                  swap_value = cape_data_temp[idx];
+                  cape_data_temp[idx] = cape_data_temp[buf_idx];
+                  cape_data_temp[buf_idx] = swap_value;
+         
+                  swap_value = cape_data_spfh[idx];
+                  cape_data_spfh[idx] = cape_data_spfh[buf_idx];
+                  cape_data_spfh[buf_idx] = swap_value;
+               }
             }
-         }
-         for (int idx=cape_level; idx<MAX_CAPE_LEVEL; idx++) {
-            cape_data_pres[idx] = r8bfms * 10;
-            cape_data_temp[idx] = r8bfms * 10;
-            cape_data_spfh[idx] = r8bfms * 10;
-         }
-         
-         calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
-                  &p1d,&t1d,&q1d, static_dummy_201,
-                  &cape_level, &IMM,&JMM, &cape_level,
-                  &cape_val4, &cin_val4, &PLCL,&PEQL, static_dummy_200);
-
-         if(mlog.verbosity_level() >= 7) {
-            cout << "DEBUG 7: AFTER calcape_ cape_val: " << cape_val
-                 << ", cin_val: " << cin_val << "\n";
-            cout << "DEBUG 7:  index,P,T,Q\n" ;
-            for (int idx=0; idx<cape_level; idx++) {
-               cout << "DEBUG 7: " << idx << ", " << cape_data_pres[idx] << ", "
-                    << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+            if (cape_level < MAX_CAPE_LEVEL) {
+               cape_data_pres[cape_level] = cape_data_pres[cape_level-1];
+               cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
+               cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
+               for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
+                  cape_data_pres[idx] = r8bfms * 10;
+                  cape_data_temp[idx] = r8bfms * 10;
+                  cape_data_spfh[idx] = r8bfms * 10;
+               }
             }
-            cout << "DEBUG 7: cape: calcape(1,1): " << cape_val << ",  calcape(0,1): " << cape_val2
-                 << ",  calcape(0,2): " << cape_val3 << ",  calcape(1,2): " << cape_val4
-                 << "   lat: " << hdr_lat << ", lon: " << hdr_lon
-                 << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
-                 << " " << hdr_typ << " " << hdr_sid
-                 << "\n\n" ;
-         }
          
-         if (cape_val > 0) {
-            obs_arr[1] = cape_code;
-            obs_arr[2] = cape_p;
-            obs_arr[3] = cape_h;
-            obs_arr[4] = cape_val; // observation value
-            addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                           hdr_lat, hdr_lon, hdr_elv, cape_qm,
-                           OBS_BUFFER_SIZE);
+            //p1d = cape_p;
+            //t1d = cape_data_temp[cape_level-1];
+            //q1d = cape_data_spfh[cape_level-1];
+            calcape_(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
+                     &p1d,&t1d,&q1d, static_dummy_201,
+                     &cape_level, &IMM,&JMM, &cape_level,
+                     &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+         
+            if(mlog.verbosity_level() >= 7) {
+               mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE from "
+                    << i_read << "-th message\n" ;
+               for (int idx=0; idx<cape_level; idx++) {
+                  mlog << Debug(7) << idx << ", " << cape_data_pres[idx] << ", "
+                       << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+               }
+               mlog << Debug(7) << method_name 
+                    << " calcape_(" << ivirt << "," << itype << ") cape_val: "
+                    << cape_val << " cape_level: " << cape_level
+                    << ", cin_val: " << cin_val
+                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL
+                    << "   lat: " << hdr_lat << ", lon: " << hdr_lon
+                    << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                    << " " << hdr_typ << " " << hdr_sid
+                    << "\n\n" ;
+            }
+         
+            if (cape_val > MAX_CAPE_VALUE) {
+               cape_cnt_too_big++;
+               mlog << Debug(5) << method_name 
+                    << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
+                    << ", cin_val: " << cin_val
+                    << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+            }
+            else if (cape_val > 0) {
+               obs_arr[1] = cape_code;
+               obs_arr[2] = cape_p;
+               obs_arr[3] = cape_h;
+               obs_arr[4] = cape_val; // observation value
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                              hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                              OBS_BUFFER_SIZE);
+               cape_count++;
+            }
+            else if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
+            else cape_cnt_missing_values++;
          }
+         else if (1 < buf_nlev) cape_cnt_no_levels++;
+         else cape_cnt_surface_msgs++;
       }
 
       //if (do_all_vars) {
@@ -1792,7 +1821,7 @@ void process_pbfile(int i_pb) {
          strncpy(prev_hdr_typ, hdr_typ, strlen(not_assigned));
          strncpy(prev_hdr_sid, hdr_sid.c_str(), strlen(not_assigned));
       }
-      
+
       // If the number of observations for this header is non-zero,
       // store the header data and increment the PrepBufr record
       // counter
@@ -1809,7 +1838,7 @@ void process_pbfile(int i_pb) {
          rej_nobs++;
       }
    } // end for i_read
-   
+
    if (cal_pbl) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       obs_arr[1] = pbl_code;
@@ -1822,7 +1851,7 @@ void process_pbfile(int i_pb) {
            << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
            << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
       if (obs_arr[4] > MAX_PBL) obs_arr[4] = MAX_PBL;
-      
+
       addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                      hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
       //insert_pbl();
@@ -1836,7 +1865,7 @@ void process_pbfile(int i_pb) {
       pqtzuv_map_tq.clear();
       pqtzuv_map_uv.clear();
    }
-   
+
    if(showed_progress) {
       log_message = "100% ";
       if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -1892,6 +1921,17 @@ void process_pbfile(int i_pb) {
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
 
+   if (cal_cape) {
+      mlog << Debug(3) << "\nDerived CAPE\t\t= " << cape_count
+           << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
+           << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
+           << "\n\tfiltered: zero = " << cape_cnt_zero_values
+           << "\tothers = " << cape_cnt_missing_values << ", "
+           << cape_cnt_too_big
+           << "\n";
+   }
+
+
    if (npbmsg == rej_vld && 0 < rej_vld) {
       mlog << Warning << "\n" << method_name << " -> "
            << "All messages were filtered out by valid time.\n"
@@ -1946,7 +1986,6 @@ void process_pbfile_metadata(int i_pb) {
    int lv, var_index;
    int debug_threshold = 10;
 
-   bool tmp_use_small_buffer = false;
    int tmp_nlev_max_req = (mxr8lv_small / 64);
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
@@ -2057,7 +2096,6 @@ void process_pbfile_metadata(int i_pb) {
    int length;
    bool is_prepbufr_hdr = false;
    bool showed_progress = false;
-   use_small_buffer = true;
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
@@ -2082,7 +2120,6 @@ void process_pbfile_metadata(int i_pb) {
          strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str));
          length = strlen(tmp_str);
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
-         //if (mxr8lv_small < nlev) use_small_buffer = false;
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
             for (index=0; index<4; index++) {
@@ -2235,9 +2272,6 @@ void process_pbfile_metadata(int i_pb) {
                if (!tmp_bufr_obs_name_arr.has(bufr_var_name)) {
                   tmp_bufr_obs_name_arr.add(bufr_var_name);
                }
-               if (!prepbufr_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
-                  use_small_buffer = false;
-               }
             }
             break;
          }
@@ -2258,7 +2292,6 @@ void process_pbfile_metadata(int i_pb) {
 
          // Search through the vertical levels
          buf_nlev = nlev2;
-         if (mxr8lv_small < nlev) use_small_buffer = false;
          if (nlev2 > mxr8lv) buf_nlev = mxr8lv;
          for(lv=0; lv<buf_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
@@ -2835,7 +2868,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    int uv_count = 0;
    int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
-   
+
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
@@ -2844,7 +2877,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       float *pqtzuv_tq, *pqtzuv_uv;
       float *cur_pqtzuv, *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;
-      
+
       first_pres = bad_data_float;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
@@ -2912,7 +2945,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          prev_pres = cur_pres;
          prev_pqtzuv = cur_pqtzuv;
       }
-      
+
       prev_pres = first_pres;
       prev_pqtzuv = first_pqtzuv;
       it_tq = pqtzuv_map_tq.begin();
@@ -2938,7 +2971,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          prev_pqtzuv = cur_pqtzuv;
       }
    }
-   
+
    if(mlog.verbosity_level() >= 7) {
       for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
             it!=pqtzuv_map_merged.end(); ++it) {
@@ -2952,10 +2985,10 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          cout << "\n";
       }
    }
-   
+
    return pqtzuv_map_merged.size();
 }
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 float compute_pbl(map<float, float*> pqtzuv_map_tq,
@@ -2969,14 +3002,14 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int uv_count = 0;
    int pbl_diff_count = 0;
    static const char *method_name = "compute_pbl() ";
-   
+
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    mlog << Debug(7) << method_name << "is called: TQZ: "
         << tq_count << "  UV: " << uv_count << "\n";
    if (tq_count > 0 || uv_count > 0) {
       int hgt_cnt, spfh_cnt;
-      
+
       map<float, float*> pqtzuv_map_merged;
       pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged);
       mlog << Debug(7) << method_name << "pbl_level= " << pbl_level << "\n";
@@ -3001,7 +3034,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          pbl_data_vgrd[index] = pqtzuv[5];
          if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
          if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
-   
+
          index--;
       }
 
@@ -3013,13 +3046,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
          spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
          mlog << Debug(4) << method_name << "interpolate Q (SPFH)\n";
       }
-      
+
       if ((spfh_cnt>0) && (pbl_level>0)) {
          mzbl = pbl_level;
          mlog << Debug(7) << method_name << "mzbl: " << mzbl
               << "  missing count: Q: " << (pbl_level - spfh_cnt)
               << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
-         
+
          //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
          calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
                  pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
@@ -3035,7 +3068,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
    int count_interpolated;
    bool skip_missing;
    static const char *method_name = "interpolate_by_pressure() ";
-   
+
    idx_start = -1;
    idx_end = length;
    skip_missing = false;
@@ -3048,7 +3081,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
          if (skip_missing) {
             idx_end = idx;
             if (idx_start >= 0) {
-               mlog << Debug(7) << method_name << "between pres[" 
+               mlog << Debug(7) << method_name << "between pres["
                     << idx_start <<"] and pres[" << idx_end <<"] ("
                     << var_data[idx_start] << " and " << var_data[idx_end] << ")\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
@@ -3057,7 +3090,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
                         / (pres_data[idx_end] - pres_data[idx_start]);
                   var_data[idx2] = var_data[idx_start] + (data_diff * pres_ratio);
                   mlog << Debug(7) << method_name << " interpolated value["
-                       << idx2 << "] = " << var_data[idx2] << "\n"; 
+                       << idx2 << "] = " << var_data[idx2] << "\n";
                   count_interpolated++;
                }
                idx_start = idx;
@@ -3069,9 +3102,9 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
          }
       }
    }
-   mlog << Debug(5) << method_name << "interpolated count: " 
+   mlog << Debug(5) << method_name << "interpolated count: "
         << count_interpolated << "\n";
-   
+
    return count_interpolated;
 }
 

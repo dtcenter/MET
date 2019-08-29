@@ -251,7 +251,7 @@ ConcatString MetConfig::get_tmp_dir()
    ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.
-   if(!get_env("MET_TMP_DIR", tmp_dir)) { 
+   if(!get_env("MET_TMP_DIR", tmp_dir)) {
       const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
       if ( LastLookupStatus ) tmp_dir = *(_e->string_value());
       else                    tmp_dir = default_tmp_dir;
@@ -312,9 +312,9 @@ if ( empty(name) )  {
 }
 
 DictionaryStack DS(*this);
-ConcatString temp_filename;
+ConcatString temp_filename = get_tmp_dir();
 
-temp_filename = make_temp_file_name("met_config", 0);
+temp_filename << "/" << make_temp_file_name("met_config", 0);
 
 recursive_envs(name, temp_filename.c_str());
 
