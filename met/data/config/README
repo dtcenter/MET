@@ -185,9 +185,9 @@ GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
 The first line of the file must contain "GRIB1".
 The following lines consist of 4 integers followed by 3 strings:
 Column 1: GRIB code (e.g. 11 for temperature)
-Column 2: center id (e.g. 07 for US Weather Service- National Met. Center)
-Column 3: subcenter id
-Column 4: parameter table version number
+Column 2: parameter table version number
+Column 3: center id (e.g. 07 for US Weather Service- National Met. Center)
+Column 4: subcenter id
 Column 5: variable name
 Column 6: variable description
 Column 7: units
@@ -367,7 +367,7 @@ obtype = "ANALYS";
 //         - DW_MEAN     for the distance-weighted average value (weight =
 //                       distance^-2)
 //         - AW_MEAN     for an area-weighted mean when regridding from
-//                       high to low resolution grids
+//                       high to low resolution grids (width = 1)
 //         - LS_FIT      for a least-squares fit
 //         - BILIN       for bilinear interpolation (width = 2)
 //         - NEAREST     for the nearest grid point (width = 1)

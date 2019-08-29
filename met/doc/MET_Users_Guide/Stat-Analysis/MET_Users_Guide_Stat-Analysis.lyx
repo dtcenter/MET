@@ -396,7 +396,18 @@ name "subsec:StA_Aggregate-STAT-lines"
 The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
  same type together and produce relevant statistics from the aggregated
  line.
- This may be done in the same manner listed above in 8.2.3.
+ This may be done in the same manner listed above in 
+\series default
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:StA_Aggregated-values-from"
+
+\end_inset
+
+
+\series medium
+.
  However, rather than writing out the aggregated STAT line itself, the relevant
  statistics generated from that aggregated line are provided in the output.
  Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or
@@ -2268,8 +2279,7 @@ obs_units  = [];
 \series medium
 The user may specify a comma-separated list of forecast and observation
  units to be used for any analyses to be performed.
- If multiple units are listed, the analyses will be performed on
- their union.
+ If multiple units are listed, the analyses will be performed on their union.
  These selections may be further refined by using the "
 \series bold
 -fcst_units

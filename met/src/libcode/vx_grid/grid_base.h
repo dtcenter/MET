@@ -52,7 +52,7 @@ class GridInfo {
       void init_from_scratch();
 
       void assign(const GridInfo &);
-      
+
    public:
 
       GridInfo();
@@ -190,7 +190,7 @@ class Grid : public GridInterface {
 
       GridRep * rep;
       bool swap_to_north;       // The raw latitude data is north to south
-      
+
    public:
 
       Grid();
@@ -266,6 +266,7 @@ extern bool operator==(const GridInfo &, const GridInfo &);
 extern bool is_eq(const LambertData *,       const LambertData *);
 extern bool is_eq(const StereographicData *, const StereographicData *);
 extern bool is_eq(const LatLonData *,        const LatLonData *);
+extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 
