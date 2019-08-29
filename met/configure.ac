@@ -877,6 +877,26 @@ else
     AC_MSG_NOTICE([mode_time_domain will not be compiled])
 fi
 
+# mode_multivar
+
+AC_ARG_ENABLE(mode_multivar,
+          [AS_HELP_STRING([--disable-mode_multivar], [Disable compilation of mode_multivar])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_MODE_MULTIVAR="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-mode_multivar) ;;
+   esac],
+  [ENABLE_MODE_MULTIVAR="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_MODE_MULTIVAR], [test "x$ENABLE_MODE_MULTIVAR" = "xyes"])
+
+if test "x$ENABLE_MODE_MULTIVAR" = "xyes"; then
+    AC_DEFINE([ENABLE_MODE_MULTIVAR], [], ["build mode_multivar"])
+    AC_MSG_NOTICE([mode_multivar will be compiled])
+else
+    AC_MSG_NOTICE([mode_multivar will not be compiled])
+fi
+
 # tc_utils
 
 AC_ARG_ENABLE(tc_utils,
@@ -1149,7 +1169,6 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/ensemble_stat/Makefile
                  src/tools/core/grid_stat/Makefile
                  src/tools/core/mode/Makefile
-                 src/tools/core/mode_multivar/Makefile
                  src/tools/core/mode_analysis/Makefile
                  src/tools/core/pcp_combine/Makefile
                  src/tools/core/point_stat/Makefile
@@ -1172,6 +1191,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/regrid_data_plane/Makefile
                  src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
+                 src/tools/other/mode_multivar/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
