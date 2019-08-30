@@ -449,14 +449,11 @@ void setup_nc_file() {
         track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
 
     // Define variables
-    vector<string> levels;
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(3) << "data_info->name():"
              << data_info->name().c_str() << "\n";
-        // insert variable name key and empty levels if new
-        // variable_levels.emplace(data_info->name(), levels);
         mlog << Debug(3) << "data_info->level_name():"
              << data_info->level_name().c_str() << "\n";
         variable_levels[data_info->name()].push_back(
