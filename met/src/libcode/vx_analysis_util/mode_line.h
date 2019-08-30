@@ -52,9 +52,9 @@ class ModeLine : public DataLine {
 
       int read_line(LineDataFile *);   //  virtual from base class
 
-      int is_ok() const;               //  virtual from base class
+      bool is_ok() const;              //  virtual from base class
 
-      int is_header() const;           //  virtual from base class
+      bool is_header() const;          //  virtual from base class
 
          //
          //  retrieve stuff

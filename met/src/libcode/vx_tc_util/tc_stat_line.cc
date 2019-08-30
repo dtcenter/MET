@@ -152,13 +152,13 @@ int TCStatLine::read_line(LineDataFile * ldf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int TCStatLine::is_ok() const {
+bool TCStatLine::is_ok() const {
    return(DataLine::is_ok());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int TCStatLine::is_header() const {
+bool TCStatLine::is_header() const {
    return(Type == TCStatLineType_Header);
 }
 

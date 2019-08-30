@@ -552,13 +552,13 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int DataLine::is_ok() const
+bool DataLine::is_ok() const
 
 {
 
-if ( N_items == 0 )  return ( 0 );
+if ( N_items == 0 )  return ( false );
 
-return ( 1 );
+return ( true );
 
 }
 
@@ -566,11 +566,11 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int DataLine::is_header() const
+bool DataLine::is_header() const
 
 {
 
-return ( 0 );
+return ( false );
 
 }
 

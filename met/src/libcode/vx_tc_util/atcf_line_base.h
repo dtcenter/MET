@@ -75,7 +75,7 @@ class ATCFLineBase : public DataLine {
 
       int read_line(LineDataFile *);   //  virtual from base class
 
-      int is_header() const;           //  virtual from base class
+      bool is_header() const;          //  virtual from base class
 
          //
          // set values

@@ -299,7 +299,7 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int STATLine::is_ok() const
+bool STATLine::is_ok() const
 
 {
 
@@ -311,7 +311,7 @@ return ( DataLine::is_ok() );
 ////////////////////////////////////////////////////////////////////////
 
 
-int STATLine::is_header() const
+bool STATLine::is_header() const
 
 {
 

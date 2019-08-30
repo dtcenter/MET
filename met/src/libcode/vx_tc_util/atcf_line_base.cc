@@ -156,9 +156,9 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLineBase::is_header() const {
-    if(basin().comparecase(0, 5, "BASIN") == 0) return(1);
-    else                                        return(0);
+bool ATCFLineBase::is_header() const {
+    if(basin().comparecase(0, 5, "BASIN") == 0) return(true);
+    else                                        return(false);
 }
 
 ////////////////////////////////////////////////////////////////////////
