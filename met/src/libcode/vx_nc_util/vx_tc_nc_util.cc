@@ -140,6 +140,25 @@ void def_tc_lat_lon_time(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+vector<float> pressure_levels(
+    map<string, vector<string> > variable_levels) {
+
+    vector<float> pressure_levels;
+
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
+        i != variable_levels.end(); ++i) {
+        mlog << Debug(3) << i->first << " ";
+        vector<string> levels = variable_levels[i->first];
+        for (vector<string>::iterator j = levels.begin();
+            j != levels.end(); ++j) {
+        }
+    }
+
+    return pressure_levels;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_tc_valid_time(NcFile* nc_out,
     const int& i_point, const NcVar& var,
     const long& valid_time) {
