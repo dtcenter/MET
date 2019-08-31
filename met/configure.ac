@@ -1197,6 +1197,7 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal_tests/libcode/vx_plot_util/Makefile
                     internal_tests/libcode/vx_ps/Makefile
                     internal_tests/libcode/vx_tc_util/Makefile
+                    internal_tests/libcode/vx_nc_util/Makefile
                     internal_tests/libcode/vx_solar/Makefile
                     internal_tests/tools/Makefile
                     internal_tests/tools/other/Makefile
