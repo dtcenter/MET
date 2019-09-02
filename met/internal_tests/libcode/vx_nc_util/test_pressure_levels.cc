@@ -53,6 +53,8 @@ int main(int argc, char *argv[]) {
         cout << endl;
     }
 
+    pressure_levels(variable_levels);
+
     return 0;
 }
 

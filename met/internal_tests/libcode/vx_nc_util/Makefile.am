@@ -16,8 +16,13 @@ test_pressure_levels_SOURCES = test_pressure_levels.cc
 test_pressure_levels_CPPFLAGS = ${MET_CPPFLAGS}
 test_pressure_levels_LDFLAGS = -L. ${MET_LDFLAGS}
 test_pressure_levels_LDADD = -lvx_nc_util \
+	-lvx_tc_util \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_log
+	-lvx_log \
+	-lhdf5 \
+	-lsz \
+	-lz \
+	-lnetcdf_c++4
