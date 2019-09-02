@@ -149,8 +149,7 @@ vector<float> pressure_levels(
         i != variable_levels.end(); ++i) {
         mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
-        for (vector<string>::iterator j = levels.begin();
-            j != levels.end(); ++j) {
+        for (int j = 0; j < levels.size(); j++) {
         }
     }
 

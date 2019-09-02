@@ -28,6 +28,31 @@ int main(int argc, char *argv[]) {
 
     program_name = get_short_name(argv[0]);
 
+    map<string, vector<string> > variable_levels;
+
+    vector<string> u_levels;
+    u_levels.push_back("P1000");
+    u_levels.push_back("P800");
+    u_levels.push_back("P500");
+    variable_levels["U"] = u_levels;
+
+    vector<string> v_levels;
+    v_levels.push_back("P1000");
+    v_levels.push_back("P900");
+    v_levels.push_back("P700");
+    v_levels.push_back("P500");
+    variable_levels["V"] = v_levels;
+
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
+        i != variable_levels.end(); ++i) {
+        cout << i->first << ": ";
+        vector<string> levels = variable_levels[i->first];
+        for (int j = 0; j < levels.size(); j++) {
+            cout << levels[j] << " ";
+        }
+        cout << endl;
+    }
+
     return 0;
 }
 
