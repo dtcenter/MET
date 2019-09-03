@@ -143,6 +143,7 @@ void def_tc_lat_lon_time(NcFile* nc_out,
 vector<float> pressure_levels(
     map<string, vector<string> > variable_levels) {
 
+    set<float> pressure_levels_set;
     vector<float> pressure_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
@@ -150,6 +151,8 @@ vector<float> pressure_levels(
         mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
+            string level = levels[j].substr(1);
+            // pressure_levels_set.
         }
     }
 
