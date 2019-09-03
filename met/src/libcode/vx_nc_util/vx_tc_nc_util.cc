@@ -150,7 +150,7 @@ set<double> pressure_levels(
         mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
-            double level = stod(levels[j].substr(1));
+            double level = atof(levels[j].substr(1).c_str());
             pressure_levels.insert(level);
         }
     }
