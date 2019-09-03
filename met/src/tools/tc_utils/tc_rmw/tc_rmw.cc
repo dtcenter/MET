@@ -448,7 +448,7 @@ void setup_nc_file() {
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
         track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
 
-    // Define variables
+    // Find all variable levels
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
@@ -458,6 +458,15 @@ void setup_nc_file() {
              << data_info->level_name().c_str() << "\n";
         variable_levels[data_info->name()].push_back(
             data_info->level_name());
+    }
+
+    // Define pressure levels
+    set<float> all_pressure_levels = pressure_levels(variable_levels);
+
+    // Define variables
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        // Get VarInfo
+        data_info = conf_info.data_info[i_var];
         def_tc_data(nc_out, range_dim, azimuth_dim,
             track_point_dim, data_var, data_info);
         data_vars.push_back(data_var);
