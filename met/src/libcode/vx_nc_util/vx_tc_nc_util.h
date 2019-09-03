@@ -27,19 +27,18 @@ using namespace netCDF;
 extern void write_tc_tracks(const ConcatString&,
     const TrackInfoArray&);
 
+extern set<double> pressure_levels(
+    map<string, vector<string> >);
+
+extern void def_tc_pressure(NcFile*,
+    const NcDim&, set<double>);
+
 extern void def_tc_range_azimuth(NcFile*,
     const NcDim&, const NcDim&, const TcrmwGrid&);
 
 extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, NcVar&, NcVar&);
-
-extern set<double> pressure_levels(
-    map<string, vector<string> >);
-
-extern void def_tc_lat_lon_p_time(NcFile*,
-    const NcDim&, const NcDim&, const NcDim&, const NcDim&,
-    NcVar&, NcVar&, NcVar&, NcVar&);
 
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,

@@ -72,6 +72,33 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
 ////////////////////////////////////////////////////////////////////////
 
+set<double> pressure_levels(
+    map<string, vector<string> > variable_levels) {
+
+    set<double> pressure_levels;
+
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
+        i != variable_levels.end(); ++i) {
+        mlog << Debug(3) << i->first << " ";
+        vector<string> levels = variable_levels[i->first];
+        for (int j = 0; j < levels.size(); j++) {
+            double level = atof(levels[j].substr(1).c_str());
+            pressure_levels.insert(level);
+        }
+    }
+
+    return pressure_levels;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void def_tc_pressure(NcFile* nc_out,
+    const NcDim& pressure_dim, set<double> pressure_levels) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const TcrmwGrid& grid) {
@@ -136,26 +163,6 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&valid_time_var, "long_name", "valid_time");
     add_att(&valid_time_var, "units", "yyyymmddhh");
     add_att(&valid_time_var, "standard_name", "valid_time");
-}
-
-////////////////////////////////////////////////////////////////////////
-
-set<double> pressure_levels(
-    map<string, vector<string> > variable_levels) {
-
-    set<double> pressure_levels;
-
-    for (map<string, vector<string> >::iterator i = variable_levels.begin();
-        i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
-        vector<string> levels = variable_levels[i->first];
-        for (int j = 0; j < levels.size(); j++) {
-            double level = atof(levels[j].substr(1).c_str());
-            pressure_levels.insert(level);
-        }
-    }
-
-    return pressure_levels;
 }
 
 ////////////////////////////////////////////////////////////////////////
