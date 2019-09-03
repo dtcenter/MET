@@ -72,17 +72,17 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-set<double> pressure_levels(
+set<float> pressure_levels(
     map<string, vector<string> > variable_levels) {
 
-    set<double> pressure_levels;
+    set<float> pressure_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
         mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
-            double level = atof(levels[j].substr(1).c_str());
+            float level = atof(levels[j].substr(1).c_str());
             pressure_levels.insert(level);
         }
     }
@@ -93,8 +93,31 @@ set<double> pressure_levels(
 ////////////////////////////////////////////////////////////////////////
 
 void def_tc_pressure(NcFile* nc_out,
-    const NcDim& pressure_dim, set<double> pressure_levels) {
+    const NcDim& pressure_dim, set<float> pressure_levels) {
 
+    NcVar pressure_var;
+
+    float* pressure_data = new float[pressure_levels.size()];
+
+    // Define variable
+    pressure_var = nc_out->addVar("p", ncFloat, pressure_dim);
+
+    // Set attributes
+    add_att(&pressure_var, "long_name", "pressure");
+    add_att(&pressure_var, "units", "millibars");
+    add_att(&pressure_var, "standard_name", "pressure");
+
+    // Extract pressure coordinates
+    int k = pressure_levels.size() - 1;
+    for (set<float>::iterator i = pressure_levels.begin();
+        i != pressure_levels.end(); ++i) {
+        pressure_data[k] = *i;
+        k--;
+    }
+
+    put_nc_data(&pressure_var, &pressure_data[0]);
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////

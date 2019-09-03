@@ -27,11 +27,11 @@ using namespace netCDF;
 extern void write_tc_tracks(const ConcatString&,
     const TrackInfoArray&);
 
-extern set<double> pressure_levels(
+extern set<float> pressure_levels(
     map<string, vector<string> >);
 
 extern void def_tc_pressure(NcFile*,
-    const NcDim&, set<double>);
+    const NcDim&, set<float>);
 
 extern void def_tc_range_azimuth(NcFile*,
     const NcDim&, const NcDim&, const TcrmwGrid&);
