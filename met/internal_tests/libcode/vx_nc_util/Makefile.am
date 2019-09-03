@@ -22,7 +22,4 @@ test_pressure_levels_LDADD = -lvx_nc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lhdf5 \
-	-lsz \
-	-lz \
 	-lnetcdf_c++4
