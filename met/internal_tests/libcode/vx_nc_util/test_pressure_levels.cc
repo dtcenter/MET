@@ -53,7 +53,14 @@ int main(int argc, char *argv[]) {
         cout << endl;
     }
 
-    pressure_levels(variable_levels);
+    set<double> all_levels
+        = pressure_levels(variable_levels);
+
+    for (set<double>::iterator i = all_levels.begin();
+        i != all_levels.end(); ++i) {
+            cout << *i << " ";
+    }
+    cout << endl;
 
     return 0;
 }

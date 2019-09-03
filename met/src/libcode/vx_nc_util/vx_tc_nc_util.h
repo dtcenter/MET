@@ -34,7 +34,7 @@ extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, NcVar&, NcVar&);
 
-extern vector<float> pressure_levels(
+extern set<double> pressure_levels(
     map<string, vector<string> >);
 
 extern void def_tc_lat_lon_p_time(NcFile*,
