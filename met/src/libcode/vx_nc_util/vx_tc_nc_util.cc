@@ -218,8 +218,12 @@ void def_tc_data(NcFile* nc_out,
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
 
+    ConcatString var_name = data_info->name();
+    var_name.add("_");
+    var_name.add(data_info->level().name());
+
     data_var = nc_out->addVar(
-        data_info->name(), ncDouble, dims);
+        var_name, ncDouble, dims);
 
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
@@ -258,10 +262,12 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     dims.push_back(range_dim);
     dims.push_back(track_point_dim);
 
-    ConcatString name = data_info->name();
-    name.add("_azi_mean");
+    ConcatString var_name = data_info->name();
+    var_name.add("_");
+    var_name.add(data_info->level().name());
+    var_name.add("_azi_mean");
 
-    data_var = nc_out->addVar(name, ncDouble, dims);
+    data_var = nc_out->addVar(var_name, ncDouble, dims);
 
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
