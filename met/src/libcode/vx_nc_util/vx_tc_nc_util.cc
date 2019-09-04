@@ -228,6 +228,27 @@ void def_tc_data(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+void def_tc_data_3d(NcFile* nc_out,
+    const NcDim& range_dim, const NcDim& azimuth_dim,
+    const NcDim& pressure_dim, const NcDim& track_point_dim,
+    NcVar& data_var, VarInfo* data_info) {
+
+    vector<NcDim> dims;
+    dims.push_back(range_dim);
+    dims.push_back(azimuth_dim);
+    dims.push_back(pressure_dim);
+    dims.push_back(track_point_dim);
+
+    data_var = nc_out->addVar(
+        data_info->name(), ncDouble, dims);
+
+    // Set attributes
+    add_att(&data_var, "long_name", data_info->long_name());
+    add_att(&data_var, "units", data_info->units());
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void def_tc_azi_mean_data(NcFile* nc_out,
     const NcDim& range_dim,
     const NcDim& track_point_dim,

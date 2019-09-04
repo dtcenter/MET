@@ -462,6 +462,8 @@ void setup_nc_file() {
 
     // Define pressure levels
     set<float> all_pressure_levels = pressure_levels(variable_levels);
+    pressure_dim = add_dim(nc_out, "p", all_pressure_levels.size());
+    def_tc_pressure(nc_out, pressure_dim, all_pressure_levels);
 
     // Define variables
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
