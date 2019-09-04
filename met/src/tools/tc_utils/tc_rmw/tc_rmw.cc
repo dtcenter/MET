@@ -462,8 +462,8 @@ void setup_nc_file() {
 
     // Define pressure levels
     set<float> all_pressure_levels = pressure_levels(variable_levels);
-    pressure_dim = add_dim(nc_out, "p", all_pressure_levels.size());
-    def_tc_pressure(nc_out, pressure_dim, all_pressure_levels);
+    // pressure_dim = add_dim(nc_out, "p", all_pressure_levels.size());
+    // def_tc_pressure(nc_out, pressure_dim, all_pressure_levels);
 
     // Define variables
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
@@ -478,18 +478,18 @@ void setup_nc_file() {
     }
 
     // Define derived variables
-    VarInfoNcMet wind_r_info;
-    VarInfoNcMet wind_a_info;
-    wind_r_info.set_name("VRAD");
-    wind_a_info.set_name("VAZI");
-    wind_r_info.set_long_name("Radial Component of Wind");
-    wind_a_info.set_long_name("Azimuthal Component of Wind");
-    wind_r_info.set_units("m/s");
-    wind_a_info.set_units("m/s");
-    def_tc_data(nc_out, range_dim, azimuth_dim,
-        track_point_dim, wind_r_var, &wind_r_info);
-    def_tc_data(nc_out, range_dim, azimuth_dim,
-        track_point_dim, wind_a_var, &wind_a_info);
+    // VarInfoNcMet wind_r_info;
+    // VarInfoNcMet wind_a_info;
+    // wind_r_info.set_name("VRAD");
+    // wind_a_info.set_name("VAZI");
+    // wind_r_info.set_long_name("Radial Component of Wind");
+    // wind_a_info.set_long_name("Azimuthal Component of Wind");
+    // wind_r_info.set_units("m/s");
+    // wind_a_info.set_units("m/s");
+    // def_tc_data(nc_out, range_dim, azimuth_dim,
+    //     track_point_dim, wind_r_var, &wind_r_info);
+    // def_tc_data(nc_out, range_dim, azimuth_dim,
+    //     track_point_dim, wind_a_var, &wind_a_info);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -558,8 +558,8 @@ void process_fields(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
     DataPlane data_dp;
-    DataPlane u_dp;
-    DataPlane v_dp;
+    // DataPlane u_dp;
+    // DataPlane v_dp;
 
     // Define latitude and longitude arrays
     lat_arr = new double[
@@ -568,10 +568,10 @@ void process_fields(const TrackInfoArray& tracks) {
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
     // Define radial and azimuthal wind arrays
-    wind_r_arr = new double[
-        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
-    wind_a_arr = new double[
-        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+    // wind_r_arr = new double[
+    //     tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+    // wind_a_arr = new double[
+    //     tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
     // Assume single track for now
     TrackInfo track = tracks[0];
@@ -610,88 +610,88 @@ void process_fields(const TrackInfoArray& tracks) {
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
             // Get variable info
             data_info = conf_info.data_info[i_var];
-            if (data_info->name() == "U"
-                || data_info->name() == "UGRD") {
+            // if (data_info->name() == "U"
+            //     || data_info->name() == "UGRD") {
                 // Get data
-                get_series_entry(i_point, data_info,
-                    data_files, ftype, found_data_files,
-                    u_dp, latlon_arr);
+            //     get_series_entry(i_point, data_info,
+            //         data_files, ftype, found_data_files,
+            //         u_dp, latlon_arr);
                 // Check data range
-                double data_min, data_max;
-                u_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
+            //     double data_min, data_max;
+            //     u_dp.data_range(data_min, data_max);
+            //     mlog << Debug(2) << "data_min:" << data_min << "\n";
+            //     mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Regrid data
-                u_dp = met_regrid(u_dp,
-                    latlon_arr, grid, data_info->regrid());
-                u_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
+            //     u_dp = met_regrid(u_dp,
+            //         latlon_arr, grid, data_info->regrid());
+            //     u_dp.data_range(data_min, data_max);
+            //     mlog << Debug(2) << "data_min:" << data_min << "\n";
+            //     mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Write data
-                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
-                    data_vars[i_var], u_dp.data());
-                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-                    azi_mean_data_vars[i_var], u_dp.data());
-            } else if (data_info->name() == "V"
-                || data_info->name() == "VGRD") {
+            //     write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
+            //         data_vars[i_var], u_dp.data());
+            //     write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+            //         azi_mean_data_vars[i_var], u_dp.data());
+            // } else if (data_info->name() == "V"
+            //     || data_info->name() == "VGRD") {
                 // Get data
-                get_series_entry(i_point, data_info,
-                    data_files, ftype, found_data_files,
-                    v_dp, latlon_arr);
+            //     get_series_entry(i_point, data_info,
+            //         data_files, ftype, found_data_files,
+            //         v_dp, latlon_arr);
                 // Check data range
-                double data_min, data_max;
-                v_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
+            //     double data_min, data_max;
+            //     v_dp.data_range(data_min, data_max);
+            //     mlog << Debug(2) << "data_min:" << data_min << "\n";
+            //     mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Regrid data
-                v_dp = met_regrid(v_dp,
-                    latlon_arr, grid, data_info->regrid());
-                v_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
+            //     v_dp = met_regrid(v_dp,
+            //         latlon_arr, grid, data_info->regrid());
+            //     v_dp.data_range(data_min, data_max);
+            //     mlog << Debug(2) << "data_min:" << data_min << "\n";
+            //     mlog << Debug(2) << "data_max:" << data_max << "\n";
                 // Write data
-                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
-                    data_vars[i_var], v_dp.data());
-                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-                    azi_mean_data_vars[i_var], v_dp.data());
-            } else {
+            //     write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
+            //         data_vars[i_var], v_dp.data());
+            //    write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+            //         azi_mean_data_vars[i_var], v_dp.data());
+            // } else {
                 // Get data
-                get_series_entry(i_point, data_info,
-                    data_files, ftype, found_data_files,
-                    data_dp, latlon_arr);
-                // Check data range
-                double data_min, data_max;
-                data_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
-                // Regrid data
-                data_dp = met_regrid(data_dp,
-                    latlon_arr, grid, data_info->regrid());
-                data_dp.data_range(data_min, data_max);
-                mlog << Debug(2) << "data_min:" << data_min << "\n";
-                mlog << Debug(2) << "data_max:" << data_max << "\n";
-                // Write data
-                write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
-                    data_vars[i_var], data_dp.data());
-                write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-                    azi_mean_data_vars[i_var], data_dp.data());
-            }
+            // }
+            get_series_entry(i_point, data_info,
+                data_files, ftype, found_data_files,
+                data_dp, latlon_arr);
+            // Check data range
+            double data_min, data_max;
+            data_dp.data_range(data_min, data_max);
+            mlog << Debug(2) << "data_min:" << data_min << "\n";
+            mlog << Debug(2) << "data_max:" << data_max << "\n";
+            // Regrid data
+            data_dp = met_regrid(data_dp,
+                latlon_arr, grid, data_info->regrid());
+            data_dp.data_range(data_min, data_max);
+            mlog << Debug(2) << "data_min:" << data_min << "\n";
+            mlog << Debug(2) << "data_max:" << data_max << "\n";
+            // Write data
+            write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
+                data_vars[i_var], data_dp.data());
+            write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+                azi_mean_data_vars[i_var], data_dp.data());
         }
 
-        wind_ne_to_ra(tcrmw_grid, u_dp, v_dp,
-            lat_arr, lon_arr, wind_r_arr, wind_a_arr);
+        // wind_ne_to_ra(tcrmw_grid, u_dp, v_dp,
+        //     lat_arr, lon_arr, wind_r_arr, wind_a_arr);
 
         // Write data
-        write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
-            wind_r_var, wind_r_arr);
-        write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
-            wind_a_var, wind_a_arr);
+        // write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
+        //     wind_r_var, wind_r_arr);
+        // write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
+        //     wind_a_var, wind_a_arr);
     } // Close loop over track points
 
     delete[] lat_arr;
     delete[] lon_arr;
-    delete[] wind_r_arr;
-    delete[] wind_a_arr;
+    // delete[] wind_r_arr;
+    // delete[] wind_a_arr;
 }
 
 ////////////////////////////////////////////////////////////////////////
