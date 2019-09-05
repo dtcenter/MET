@@ -421,7 +421,7 @@ ConcatString GenesisInfoArray::serialize_r(int indent_depth) const {
    s << prefix << serialize() << ", Genesis:\n";
 
    for(i=0; i<Genesis.size(); i++) {
-      s << Genesis[i].serialize_r(i+1, indent_depth+1);
+      s << Genesis[i].serialize_r(i+1, indent_depth+1) << "\n";
    }
 
    return(s);

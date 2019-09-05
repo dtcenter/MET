@@ -503,7 +503,7 @@ ConcatString TrackPoint::serialize_r(int n, int indent_depth) const {
    s << prefix << "[" << n << "] " << serialize() << ", Winds:\n";
 
    for(i=0; i<NWinds; i++)
-      s << Wind[i].serialize_r(i+1, indent_depth+1);
+      s << Wind[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return(s);
 }

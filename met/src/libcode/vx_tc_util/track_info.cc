@@ -682,7 +682,7 @@ ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
    s << prefix << serialize() << ", Tracks:\n";
 
    for(i=0; i<NTracks; i++)
-      s << Track[i].serialize_r(i+1, indent_depth+1);
+      s << Track[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return(s);
 
