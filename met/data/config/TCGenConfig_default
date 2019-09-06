@@ -35,16 +35,16 @@ min_duration = 12;
 
 //
 // Define a genesis event as being category = TD or greater,
-// Or by thresholding the maximum wind speed,
-// Or by thresholding the minimum sea-level pressure.
+// and/or by thresholding the maximum wind speed,
+// and/or by thresholding the minimum sea-level pressure.
 
 //
-// Model genesis event criteria.  Defined as tracks reaching the specified
+// Forecast genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
-// pressure threshold.  The model genesis time is the valid time of the first
-// point of tracks which meet this criteria.
+// pressure threshold.  The forecast genesis time is the valid time of the first
+// track point where all of these criteria are met.
 //
-model_genesis = {
+fcst_genesis = {
    category    = [ "TD", "TS", "TY", "ST", "TC", "HU" ];
    vmax_thresh = NA;
    mslp_thresh = NA;
@@ -53,8 +53,8 @@ model_genesis = {
 //
 // BEST track genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
-// pressure threshold.  The BEST track genesis time is the time of the track
-// point where all of these criteria are met.
+// pressure threshold.  The BEST track genesis time is the valid time of the
+// first track point where all of these criteria are met.
 //
 best_genesis = {
    technique   = "BEST";
@@ -66,8 +66,8 @@ best_genesis = {
 //
 // Operational track genesis event criteria.  Defined as tracks reaching the
 // specified intensity category, maximum wind speed threshold, and minimum
-// sea-level pressure threshold.  The operational track genesis time is the time
-// of the track point where all of these criteria are met.
+// sea-level pressure threshold.  The operational track genesis time is valid
+// time of the first track point where all of these criteria are met.
 //
 oper_genesis = {
    technique   = "CARQ";
@@ -97,8 +97,8 @@ desc = "NA";
 
 //
 // Forecast ATCF ID's
-// If empty, all non-BEST track ATCF ID's found will be processed.
-// Statistics will be generated separately for each amodel entry.
+// If empty, all ATCF ID's found will be processed.
+// Statistics will be generated separately for each ATCF ID.
 //
 model = [];
 
@@ -123,7 +123,7 @@ cyclone = [];
 storm_name = [];
 
 //
-// Model initialization time windows to include or exclude
+// Forecast initialization time windows to include or exclude
 //
 init_beg = "";
 init_end = "";
@@ -131,18 +131,18 @@ init_inc = [];
 init_exc = [];
 
 //
-// Valid model time window
+// Valid time window
 //
 valid_beg = "";
 valid_end = "";
 
 //
-// Model initialization hours
+// Forecast initialization hours
 //
 init_hour = [];
 
 //
-// Model lead times in hours
+// Forecast lead times in hours
 //
 lead = [];
 
@@ -157,7 +157,7 @@ vx_mask = "";
 dland_thresh = NA;
 
 //
-// Genesis matching time window, in hours relative to the model genesis time
+// Genesis matching time window, in hours relative to the forecast genesis time
 //
 genesis_window = {
    beg = 0;

@@ -44,7 +44,7 @@ bool GenesisEventInfo::is_keeper(const TrackPoint &p) {
 
    // Check event category
    if(Category.size() > 0 &&
-      Category[p.level()] == 0) {
+      std::count(Category.begin(), Category.end(), p.level()) == 0) {
       keep = false;
    }
 
@@ -310,7 +310,7 @@ void TCGenConfInfo::clear() {
    LeadSecBeg = bad_data_int;
    LeadSecEnd = bad_data_int;
    MinDur = bad_data_int;
-   ModelEventInfo.clear();
+   FcstEventInfo.clear();
    BestEventInfo.clear();
    OperEventInfo.clear();
    DLandFile.clear();
@@ -361,9 +361,9 @@ void TCGenConfInfo::process_config() {
    // Conf: min_duration
    MinDur = Conf.lookup_int(conf_key_min_duration);
 
-   // Conf: model_genesis
-   dict = Conf.lookup_dictionary(conf_key_model_genesis);
-   ModelEventInfo = parse_conf_genesis_event_info(dict);
+   // Conf: fcst_genesis
+   dict = Conf.lookup_dictionary(conf_key_fcst_genesis);
+   FcstEventInfo = parse_conf_genesis_event_info(dict);
 
    // Conf: best_genesis
    dict = Conf.lookup_dictionary(conf_key_best_genesis);

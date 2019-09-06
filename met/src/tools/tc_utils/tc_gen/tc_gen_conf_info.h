@@ -55,10 +55,7 @@ class TCGenVxOpt {
 
       //////////////////////////////////////////////////////////////////
 
-      // Description string
-      ConcatString Desc;
-
-      // Model comparisons
+      ConcatString Desc;     // Description string
       StringArray  Model;    // Forecast ATCF ID's
 
       // Track filtering criteria
@@ -118,7 +115,7 @@ class TCGenConfInfo {
       // Vector of vx task filtering options [n_vx]
       std::vector<TCGenVxOpt> VxOpt;
 
-      // Model initialization frequency in hours
+      // Forecast initialization frequency in hours
       int InitFreq;
 
       // Begin and end forecast hours for genesis
@@ -128,9 +125,9 @@ class TCGenConfInfo {
       int MinDur;
 
       // Genesis event criteria
-      GenesisEventInfo ModelEventInfo;
-      GenesisEventInfo  BestEventInfo;
-      GenesisEventInfo  OperEventInfo;
+      GenesisEventInfo FcstEventInfo;
+      GenesisEventInfo BestEventInfo;
+      GenesisEventInfo OperEventInfo;
 
       // Gridded data file containing distances to land
       ConcatString DLandFile;
