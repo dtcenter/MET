@@ -955,6 +955,7 @@ void process_pbfile(int i_pb) {
    int cape_level, prev_cape_level, IMM, JMM;
    int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
+   float cape_p, cape_h, cape_qm;
 
    // To compute PBL
    int pbl_level;
@@ -984,6 +985,8 @@ void process_pbfile(int i_pb) {
    IMM = JMM =1;
    prev_cape_level = -1;
    p1d = t1d = q1d = r8bfms * 10;
+   cape_h = pbl_h = 0;
+   cape_p = pbl_p = bad_data_float;
 
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
@@ -1287,7 +1290,6 @@ void process_pbfile(int i_pb) {
          }
       }
 
-      float cape_p, cape_h, cape_qm;
       if (cal_cape) {
          cape_level = 0;
       }
@@ -1484,15 +1486,11 @@ void process_pbfile(int i_pb) {
                      cape_member_cnt++;
                   }
                   if (is_cape_input && (cape_level == 0)) {
-                     cape_p = obs_arr[2];
-                     cape_h = obs_arr[3];
                      cape_qm = quality_mark;
                   }
                }
 
                if (cal_pbl && (pbl_level == 0)) {
-                  pbl_p = obs_arr[2];
-                  pbl_h = obs_arr[3];
                   pbl_qm = quality_mark;
                }
             }
