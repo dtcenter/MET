@@ -165,8 +165,15 @@ bool ATCFLineBase::is_header() const {
 
 ConcatString ATCFLineBase::get_item(int i) const {
    ConcatString cs;
-
-   cs = DataLine::get_item(i);
+   int i_col = i;
+   
+   // For ATCFLineType_GenTrack:
+   //    Columns 1 and 2 are consistent, use offsets 0 and 1
+   //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track
+   // Shift those column indices by 1.
+   if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
+   
+   cs = DataLine::get_item(i_col);
 
    // Strip off any whitespace
    cs.ws_strip();
@@ -290,10 +297,16 @@ int ATCFLineBase::lead() const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::storm_id() const {
+   ConcatString cs;
 
-   unixtime ut = valid();
-   ConcatString cs = define_storm_id(warning_time(), ut, ut,
-                                     basin(), cyclone_number());
+   if(Type == ATCFLineType_GenTrack) {
+       cs = get_item(GenStormIdOffset);
+   }
+   else {
+      unixtime ut = valid();
+      cs = define_storm_id(warning_time(), ut, ut, basin(),
+                           cyclone_number());
+   }
 
    return(cs);
 }
@@ -371,25 +384,26 @@ double parse_lon(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_int(const char *s) {
+int parse_int(const char *s, const int bad_data) {
    int v;
 
    if(strlen(s) > 0) v = atoi(s);
    else              v = bad_data_int;
 
+   // Check bad data value
+   if(v == bad_data) v = bad_data_int;
+
    return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Interpret values of 0 as bad data
+//
+////////////////////////////////////////////////////////////////////////
 
 int parse_int_check_zero(const char *s) {
-
-   int v = parse_int(s);
-
-   // Interpret values of 0 as bad data
-   if(v == 0) v = bad_data_int;
-
-   return(v);
+   return(parse_int(s, 0));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -398,6 +412,8 @@ ATCFLineType string_to_atcflinetype(const char *s) {
    ATCFLineType t;
 
         if(!s)                       t = NoATCFLineType;
+   // YYYYMMDDHH in the 4th column for Genesis Tracks
+   else if(is_yyyymmddhh(s))         t = ATCFLineType_GenTrack;
    else if(is_number(s))             t = ATCFLineType_Track;  // ADECK
    else if(strlen(s) == 0)           t = ATCFLineType_Track;  // BDECK
    else if(strcasecmp(s, "TR") == 0) t = ATCFLineType_ProbTR;
@@ -419,6 +435,7 @@ ConcatString atcflinetype_to_string(const ATCFLineType t) {
 
    switch(t) {
       case ATCFLineType_Track:    s = "Track";    break;
+      case ATCFLineType_GenTrack: s = "GenTrack"; break;
       case ATCFLineType_ProbTR:   s = "ProbTR";   break;
       case ATCFLineType_ProbIN:   s = "ProbIN";   break;
       case ATCFLineType_ProbRIRW: s = "ProbRIRW"; break;

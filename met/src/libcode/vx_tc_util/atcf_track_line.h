@@ -171,14 +171,21 @@ class ATCFTrackLine : public ATCFLineBase {
       int           isobar_pressure () const;
       int           isobar_radius   () const;
       int           max_wind_radius () const;
+
+      int           storm_direction () const;
+      int           storm_speed     () const;
+      bool          warm_core       () const;      
+
+         //
+         // specific to ATCFLineType_Track
+         //
+
       int           gusts           () const;
       int           eye_diameter    () const;
 
       SubregionCode subregion       () const;
       int           max_seas        () const;
       ConcatString  initials        () const;
-      int           storm_direction () const;
-      int           storm_speed     () const;
 
       ConcatString  storm_name      () const;
       SystemsDepth  depth           () const;
@@ -190,7 +197,18 @@ class ATCFTrackLine : public ATCFLineBase {
       int           seas_radius3    () const;
       int           seas_radius4    () const;
 
-      bool          warm_core       () const;
+         //
+         // specific to ATCFLineType_GenTrack
+         //
+
+      double        parameter_b     () const;
+      double        therm_wind_lower() const;
+      double        therm_wind_upper() const;
+
+      int           mean_850_vort()    const;
+      int           max_850_vort()     const;
+      int           mean_700_vort()    const;
+      int           max_700_vort()     const;
 };
 
 ////////////////////////////////////////////////////////////////////////
