@@ -44,8 +44,11 @@ using namespace std;
 // Program name
 static const char * program_name = "tc_gen";
 
-// ATCF file suffix
-static const char * atcf_suffix = ".dat";
+// ATCF genesis file name regular expression 
+static const char * atcf_gen_reg_exp = "atcf_gen";
+
+// ATCF file name regular expression 
+static const char * atcf_reg_exp = ".dat$";
 
 // Default configuration file name
 static const char * default_config_filename =
@@ -58,7 +61,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray   atcf_source, atcf_model_suffix;
+static StringArray   genesis_source, genesis_model_suffix;
+static StringArray   track_source, track_model_suffix;
 static ConcatString  config_file;
 static TCGenConfInfo conf_info;
 
