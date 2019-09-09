@@ -37,12 +37,12 @@ cyclone = -1;
 //
 // Model initialization time
 //
-init_time = "";
+// init_time = "";
 
 //
 // Lead times in hours
 //
-lead_time = [];
+// lead_time = [];
 
 //
 // Data fields
