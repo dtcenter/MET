@@ -55,16 +55,11 @@ void TCRMWConfInfo::init_from_scratch() {
 void TCRMWConfInfo::clear() {
 
     Model.clear();
-    StormId.clear();
     Basin.clear();
-    Cyclone.clear();
     StormName.clear();
-    InitBeg = InitEnd = (unixtime) 0;
-    InitHour.clear();
-    LeadReq.clear();
-    ValidBeg = ValidEnd = (unixtime) 0;
-    Track = TrackType_None;
-    CheckDup = true;
+    StormId.clear();
+    // InitTime = (unixtime) 0;
+    // LeadTimes.clear();
     Version.clear();
 
     // Clear data_info
@@ -114,51 +109,28 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     check_met_version(Version.c_str());
 
     // Conf: Model
-    Model = Conf.lookup_string_array(conf_key_model);
-
-    // Conf: StormId
-    StormId = Conf.lookup_string_array(conf_key_storm_id);
+    Model = Conf.lookup_string(conf_key_model);
 
     // Conf: Basin
-    Basin = Conf.lookup_string_array(conf_key_basin);
-
-    // Conf: Cyclone
-    Cyclone = Conf.lookup_string_array(conf_key_cyclone);
+    Basin = Conf.lookup_string(conf_key_basin);
 
     // Conf: StormName
-    StormName = Conf.lookup_string_array(conf_key_storm_name);
+    StormName = Conf.lookup_string(conf_key_storm_name);
 
-    // Conf: InitBeg, InitEnd
-    InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
-    InitEnd = Conf.lookup_unixtime(conf_key_init_end);
+    // Conf: StormId
+    StormId = Conf.lookup_string(conf_key_storm_id);
 
-    // Conf: InitInc
-    sa = Conf.lookup_string_array(conf_key_init_inc);
-    for(i=0; i<sa.n_elements(); i++)
-        InitInc.add(timestring_to_unix(sa[i].c_str()));
+    // Conf: Cyclone
+    Cyclone = Conf.lookup_int(conf_key_cyclone);
 
-    // Conf: InitExc
-    sa = Conf.lookup_string_array(conf_key_init_exc);
-    for(i=0; i<sa.n_elements(); i++)
-        InitExc.add(timestring_to_unix(sa[i].c_str()));
+    // Conf: InitTime
+    // InitTime = Conf.lookup_unixtime(conf_key_init_time);
 
-    // Conf: InitHour
-    sa = Conf.lookup_string_array(conf_key_init_hour);
-    for(i=0; i<sa.n_elements(); i++)
-        InitHour.add(timestring_to_sec(sa[i].c_str()));
-
-    // Conf: ValidBeg, ValidEnd
-    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
-    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
-
-    // Conf: LeadReq
-    sa = Conf.lookup_string_array(conf_key_lead_req);
-    for(i=0; i<sa.n_elements(); i++){
-        LeadReq.add(timestring_to_sec(sa[i].c_str()));
-    }
-
-    // Conf: CheckDup
-    CheckDup = Conf.lookup_bool(conf_key_check_dup);
+    // Conf: LeadTimes
+    // sa = Conf.lookup_string_array(conf_key_lead_time);
+    // for(i=0; i<sa.n_elements(); i++){
+    //     LeadTimes.add(timestring_to_sec(sa[i].c_str()));
+    // }
 
     // Conf: n_range
     n_range = Conf.lookup_int(conf_key_n_range);
@@ -174,9 +146,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: rmw_scale
     rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
-
-    // Conf: Track
-    // Track = int_to_tracktype(Conf.lookup_int(conf_key_track));
 
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);
@@ -217,7 +186,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
         // Dump contents of current VarInfo
         if(mlog.verbosity_level() >=5) {
-            mlog << Debug(5) << "Parsed forecast field "
+            mlog << Debug(5) << "Parsed data field "
             << i + 1 << ":\n";
             data_info[i]->dump(cout);
         }

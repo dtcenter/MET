@@ -22,22 +22,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-struct ConsensusInfo {
-    ConcatString Name;
-    StringArray  Members;
-    NumArray     Required;
-    int          MinReq;
-};
-
-////////////////////////////////////////////////////////////////////////
-
 class TCRMWConfInfo {
 
     private:
 
         void init_from_scratch();
 
-        // Number of forecast fields
+        // Number of data fields
         int n_data;
 
     public:
@@ -46,24 +37,16 @@ class TCRMWConfInfo {
         MetConfig Conf;
 
         // Track filtering criteria
-        StringArray Model;     // List of model names
-        StringArray StormId;   // List of storm ids
-        StringArray Basin;     // List of basin names
-        StringArray Cyclone;   // List of cyclone numbers
-        StringArray StormName; // List of storm names
+        ConcatString Model;     // Model name
+        ConcatString Basin;     // Basin name
+        ConcatString StormName; // Storm name
+        ConcatString StormId;   // Storm id
+
+        int Cyclone;  // Cyclone number
 
         // Timing information
-        unixtime  InitBeg, InitEnd;
-        TimeArray InitInc;
-        TimeArray InitExc;
-        NumArray  InitHour;
-        NumArray  LeadReq;
-        unixtime  ValidBeg, ValidEnd;
-
-        // Track datasets
-        TrackType Track;
-
-        bool CheckDup;
+        unixtime  InitTime;
+        NumArray  LeadTimes;
 
         int n_range;
         int n_azimuth;
