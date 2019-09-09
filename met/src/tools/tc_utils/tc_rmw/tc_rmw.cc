@@ -305,7 +305,7 @@ void process_track_files(const StringArray& files,
             }
 
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, conf_info.CheckDup, check_anly)) {
+            if(tracks.add(line, false, check_anly)) {
                 cur_add++;
                 tot_add++;
             }
