@@ -52,13 +52,14 @@ static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
-static void set_out(const StringArray&);
+static void set_out_dir(const StringArray&);
+static void set_out_prefix(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
-static void build_outfile_name(const char*,
-    ConcatString&);
+static void build_outfile_name(const ConcatString&,
+    const char*, ConcatString&);
 static void compute_lat_lon(TcrmwGrid&,
     double*, double*);
 static void wind_ne_to_ra(TcrmwGrid&,
@@ -117,6 +118,9 @@ void process_command_line(int argc, char **argv) {
     // Default output directory
     out_dir = replace_path(default_out_dir);
 
+    // Default output prefix
+    out_prefix = replace_path(default_out_prefix);
+
     // Parse command line into tokens
     cline.set(argc, argv);
 
@@ -128,7 +132,8 @@ void process_command_line(int argc, char **argv) {
     cline.add(set_adeck,      "-adeck", -1);
     cline.add(set_bdeck,      "-bdeck", -1);
     cline.add(set_config,     "-config", 1);
-    cline.add(set_out,        "-out",    1);
+    cline.add(set_out_dir,    "-out",    1);
+    cline.add(set_out_prefix, "-prefix", -1);
     cline.add(set_logfile,    "-log",    1);
     cline.add(set_verbosity,  "-v",      1);
 
@@ -197,9 +202,8 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
     process_track_files(files, files_model_suffix, adeck_tracks,
                         false, false);
 
-    ConcatString adeck_track_file("adeck.nc");
-
-    write_tc_tracks(adeck_track_file, adeck_tracks);
+    // ConcatString adeck_track_file("adeck.nc");
+    // write_tc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -382,8 +386,14 @@ void set_config(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray& a) {
+void set_out_dir(const StringArray& a) {
     out_dir = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_out_prefix(const StringArray& a) {
+    out_prefix = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -419,7 +429,7 @@ void setup_nc_file() {
 
     // Create output NetCDF file name
     // out_nc_file.add("tc_rmw_out.nc");
-    build_outfile_name("_out.nc", out_nc_file);
+    build_outfile_name(out_prefix, "out.nc", out_nc_file);
 
     mlog << Debug(1) << out_nc_file << "\n";
 
@@ -494,10 +504,14 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(const char* suffix, ConcatString& str) {
+void build_outfile_name(
+    const ConcatString& prefix, const char* suffix, ConcatString& str) {
 
     // Append output directory and program name
     str << cs_erase << out_dir << "/" << program_name;
+
+    // Append prefix
+    str << prefix << "_";
 
     // Append suffix
     str << suffix;

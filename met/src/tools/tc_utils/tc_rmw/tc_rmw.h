@@ -67,6 +67,9 @@ static const char* default_config_filename =
 // Default output directory
 static const char* default_out_dir = ".";
 
+// Default output prefix
+static const char* default_out_prefix = "";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -83,6 +86,7 @@ static GrdFileType    ftype;
 
 // Optional arguments
 static ConcatString out_dir;
+static ConcatString out_prefix;
 
 ////////////////////////////////////////////////////////////////////////
 //
