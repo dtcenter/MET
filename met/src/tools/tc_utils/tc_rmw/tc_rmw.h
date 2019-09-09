@@ -122,13 +122,11 @@ static map<string, vector<string> > variable_levels;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static StringArray  out_files;
 static DataPlane    dp;
 static Grid         latlon_arr;
 static TcrmwData    grid_data;
 static TcrmwGrid    tcrmw_grid;
 static Grid         grid;
-static ConcatString wwarn_file;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
