@@ -1944,14 +1944,12 @@ obs = fcst;
 \end_layout
 
 \begin_layout Standard
-While other MET tools can process multiple fields in a single run, MODE
- processes exactly one.
- The 
+The 
 \series bold
 field 
 \series default
 entries in the forecast and observation dictionaries specify the model and
- observation variable and level to be compared.
+ observation variables and level to be compared.
  See a more complete description of them in Section
 \series medium
  

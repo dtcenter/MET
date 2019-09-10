@@ -2533,8 +2533,6 @@ level_category = [];
 //    D_RH    for Relative Humidity in %
 //    D_MIXR  for Humidity Mixing Ratio in kg/kg
 //    D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
-//    D_PBL   for Planetary Boundary Layer
-//    D_CAPE  for Convective Available Potential Energy 
 //
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
@@ -2565,9 +2563,7 @@ obs_prefbufr_map = [
    { key = "D_WIND";  val = "WIND";  },
    { key = "D_RH";    val = "RH";    },
    { key = "D_MIXR";  val = "MIXR";  },
-   { key = "D_PRMSL"; val = "PRMSL"; },
-   { key = "D_PBL";   val = "PBL";   },
-   { key = "D_CAPE";  val = "CAPE";  }
+   { key = "D_PRMSL"; val = "PRMSL"; }
 ];
 
 //
