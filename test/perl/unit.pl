@@ -285,9 +285,9 @@ sub repl_env {
   my @ret;
   while( @_ ){
     local $_ = shift;
-    while( /\$\{(\w+)\}/ ){
+    while( /\${(\w+)}/ ){
       my $val = $ENV{$1} or die "ERROR: environment variable $1 not found\n";
-      s/\$\{$1\}/$val/g;
+      s/\${$1}/$val/g;
     }
     push @ret, $_;
   }

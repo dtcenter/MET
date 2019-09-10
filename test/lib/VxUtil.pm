@@ -222,7 +222,7 @@ sub vx_const_interp {
   my $strConstInt = $_[0];
 
   # check the item for embedded constants to evaluate and replace 
-  while( $strConstInt =~ /\$\{(\w+)\}/ ){
+  while( $strConstInt =~ /\${(\w+)}/ ){
     my $strVarName = $1;
     vx_const_def($strVarName) or die "ERROR: vx_const_interp() could not replace variable $strVarName\n\n";
     my $strRef = ref($mapConst{$strVarName});
