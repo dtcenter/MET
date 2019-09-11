@@ -604,7 +604,7 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lon_center = - point.lon(); // internal sign change
         // RMW is same as mrd()
         grid_data.range_max_km = conf_info.rmw_scale *
-            point.mrd() * conf_info.n_range;
+            point.mrd() * nm_to_km * conf_info.n_range;
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();

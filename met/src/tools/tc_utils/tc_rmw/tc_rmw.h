@@ -70,6 +70,9 @@ static const char* default_out_dir = ".";
 // Default output prefix
 static const char* default_out_prefix = "";
 
+// Nautical mile to kilometer conversion
+static const float nm_to_km = 1.852;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
