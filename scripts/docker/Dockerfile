@@ -41,6 +41,7 @@ RUN yum -y update \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
  && yum -y install python2 python2-pip python2-devel \
+ && pip install --upgrade pip \
  && pip install xarray numpy
 
 #
