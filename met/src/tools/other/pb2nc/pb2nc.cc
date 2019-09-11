@@ -2974,13 +2974,18 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
             it!=pqtzuv_map_merged.end(); ++it) {
          float *pqtzuv = it->second;
-         cout << method_name << "DEBUG 7: TQZ and UV merged  ";
+         ostringstream buf;
+         buf << method_name << "TQZ and UV merged ";
          for (int idx=0; idx<mxr8vt; idx++) {
-           cout << " " << pqtzuv[idx];
+           buf << "  " << pqtzuv[idx];
          }
-         if (0 < pqtzuv_map_tq.count(it->first)) cout << " qtz";
-         if (0 < pqtzuv_map_uv.count(it->first)) cout << " uv";
-         cout << "\n";
+         if (0 < (pqtzuv_map_tq.count(it->first) + pqtzuv_map_tq.count(it->first))) {
+            buf << "   (";
+            if (0 < pqtzuv_map_tq.count(it->first)) buf << " tqz";
+            if (0 < pqtzuv_map_uv.count(it->first)) buf << " uv";
+            buf << " )";
+         }
+         mlog << Debug(7) << buf.str() << "\n";
       }
    }
 
