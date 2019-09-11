@@ -4,7 +4,8 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 #
 # This Dockerfile compiles MET from source during "docker build" step
 #
-ENV MET_GIT_NAME    feature_1127_tcgen
+ARG SOURCE_BRANCH
+ENV MET_GIT_NAME    ${SOURCE_BRANCH}
 ENV MET_GIT_URL     https://github.com/NCAR/MET
 ENV MET_DEVELOPMENT true
 
