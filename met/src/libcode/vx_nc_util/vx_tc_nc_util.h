@@ -27,7 +27,7 @@ using namespace netCDF;
 extern void write_tc_tracks(const ConcatString&,
     const TrackInfoArray&);
 
-extern set<float> pressure_levels(
+extern set<float> get_pressure_levels(
     map<string, vector<string> >);
 
 extern void def_tc_pressure(NcFile*,

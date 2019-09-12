@@ -72,7 +72,7 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-set<float> pressure_levels(
+set<float> get_pressure_levels(
     map<string, vector<string> > variable_levels) {
 
     set<float> pressure_levels;
@@ -82,8 +82,11 @@ set<float> pressure_levels(
         mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
+            string label = levels[j].substr(0, 1);
             float level = atof(levels[j].substr(1).c_str());
-            pressure_levels.insert(level);
+            if (label == "P") {
+                pressure_levels.insert(level);
+            }
         }
     }
 
@@ -100,7 +103,7 @@ void def_tc_pressure(NcFile* nc_out,
     float* pressure_data = new float[pressure_levels.size()];
 
     // Define variable
-    pressure_var = nc_out->addVar("p", ncFloat, pressure_dim);
+    pressure_var = nc_out->addVar("pressure", ncFloat, pressure_dim);
 
     // Set attributes
     add_att(&pressure_var, "long_name", "pressure");
