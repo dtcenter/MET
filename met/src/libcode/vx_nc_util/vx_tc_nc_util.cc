@@ -211,6 +211,19 @@ void write_tc_valid_time(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+void def_tc_variables(NcFile* nc_out,
+    map<string, vector<string> > variable_levels,
+    const NcDim& range_dim, const NcDim& azimuth_dim,
+    const NcDim& pressure_dim, const NcDim& track_point_dim,
+    vector<NcVar>& data_vars) {
+
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
+        i != variable_levels.end(); ++i) {
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void def_tc_data(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const NcDim& track_point_dim,

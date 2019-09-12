@@ -40,6 +40,11 @@ extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, NcVar&, NcVar&);
 
+extern void def_tc_variables(NcFile*,
+    map<string, vector<string> >,
+    const NcDim&, const NcDim&, const NcDim&, const NcDim&,
+    vector<NcVar>&);
+
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,
     NcVar&, VarInfo*);
