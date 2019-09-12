@@ -3006,6 +3006,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int pbl_diff_count = 0;
    static const char *method_name = "compute_pbl() ";
 
+   hpbl = bad_data_float;
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    mlog << Debug(7) << method_name << "is called: TQZ: "
