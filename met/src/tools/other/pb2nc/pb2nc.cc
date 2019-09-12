@@ -1659,7 +1659,7 @@ void process_pbfile(int i_pb) {
                     << ", cin_val: " << cin_val
                     << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
             }
-            else if (cape_val > 0) {
+            else if (cape_val >= 0) {
                obs_arr[1] = cape_code;
                obs_arr[2] = cape_p;
                obs_arr[3] = cape_h;
@@ -1668,8 +1668,8 @@ void process_pbfile(int i_pb) {
                               hdr_lat, hdr_lon, hdr_elv, cape_qm,
                               OBS_BUFFER_SIZE);
                cape_count++;
+               if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
             }
-            else if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
             else cape_cnt_missing_values++;
          }
          else if (1 < buf_nlev) cape_cnt_no_levels++;
@@ -1920,11 +1920,11 @@ void process_pbfile(int i_pb) {
         << n_file_obs << "\n";
 
    if (cal_cape) {
-      mlog << Debug(3) << "\nDerived CAPE\t\t= " << cape_count
+      mlog << Debug(3) << "\nDerived CAPE = " << cape_count
+           << "\tZero = " << cape_cnt_zero_values
            << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
            << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
-           << "\n\tfiltered: zero = " << cape_cnt_zero_values
-           << "\tothers = " << cape_cnt_missing_values << ", "
+           << "\n\tfiltered: " << cape_cnt_missing_values << ", "
            << cape_cnt_too_big
            << "\n";
    }
