@@ -272,7 +272,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    n_vx = parse_conf_n_vx(fdict);
 
    // Check for a valid number of verification tasks
-   if(n_vx == 0 || parse_conf_n_vx(odict) != n_vx) {
+   if(parse_conf_n_vx(odict) != n_vx) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
            << conf_key_obs_field
