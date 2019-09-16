@@ -76,6 +76,9 @@ extern void write_tc_valid_time(NcFile*,
 extern void write_tc_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, const double*);
 
+extern void write_tc_data_rev(NcFile*, const TcrmwGrid&,
+    const int&, const NcVar&, const double*);
+
 extern void write_tc_azi_mean_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, const double*);
 

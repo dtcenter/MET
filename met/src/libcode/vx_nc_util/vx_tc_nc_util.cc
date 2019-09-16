@@ -411,6 +411,27 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
     vector<size_t> offsets;
     vector<size_t> counts;
 
+    offsets.clear();
+    offsets.push_back(0);
+    offsets.push_back(0);
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(grid.range_n());
+    counts.push_back(grid.azimuth_n());
+    counts.push_back(1);
+
+    var.putVar(offsets, counts, data);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
+    const int& i_point, const NcVar& var, const double* data) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
     double* data_rev;
 
     offsets.clear();
@@ -434,8 +455,7 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
         }
     }
 
-    // var.putVar(offsets, counts, data_rev);
-    var.putVar(offsets, counts, data);
+    var.putVar(offsets, counts, data_rev);
 
     delete[] data_rev;
 }
@@ -538,8 +558,7 @@ extern void write_tc_pressure_level_data(
     // } else {
     //     var.putVar(offsets, counts, data_rev);
     // }
-    // var.putVar(offsets_3d, counts_3d, data_rev);
-    var.putVar(offsets_3d, counts_3d, data);
+    var.putVar(offsets_3d, counts_3d, data_rev);
 
     delete[] data_rev;
 }

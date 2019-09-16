@@ -634,9 +634,11 @@ void process_fields(const TrackInfoArray& tracks) {
                     pressure_level_indices, data_info->level().name(),
                     i_point, data_3d_vars[data_info->name()], data_dp.data());
             } else {
-                write_tc_data(nc_out, tcrmw_grid, i_point,
+                write_tc_data_rev(nc_out, tcrmw_grid, i_point,
                     data_3d_vars[data_info->name()], data_dp.data());
             }
+            // write_tc_data_rev(nc_out, tcrmw_grid, i_point,
+            //     data_vars[i_var], data_dp.data());
             // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
             //     azi_mean_data_vars[i_var], data_dp.data());
         }
