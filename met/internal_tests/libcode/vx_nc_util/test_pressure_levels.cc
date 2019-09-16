@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
 
     set<float> all_levels
-        = pressure_levels(variable_levels);
+        = get_pressure_levels(variable_levels);
 
     for (set<float>::iterator i = all_levels.begin();
         i != all_levels.end(); ++i) {
