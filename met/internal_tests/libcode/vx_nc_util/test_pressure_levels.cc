@@ -55,12 +55,38 @@ int main(int argc, char *argv[]) {
         cout << endl;
     }
 
-    set<float> all_levels
+    set<float> pressure_levels
         = get_pressure_levels(variable_levels);
 
-    for (set<float>::iterator i = all_levels.begin();
-        i != all_levels.end(); ++i) {
+    for (set<float>::iterator i = pressure_levels.begin();
+        i != pressure_levels.end(); ++i) {
             cout << *i << " ";
+    }
+    cout << endl;
+
+    set<string> pressure_level_strings
+        = get_pressure_level_strings(variable_levels);
+
+    for (set<string>::iterator i = pressure_level_strings.begin();
+        i != pressure_level_strings.end(); ++i) {
+            cout << *i << " ";
+    }
+    cout << endl;
+
+    pressure_levels = get_pressure_levels(pressure_level_strings);
+
+    for (set<float>::iterator i = pressure_levels.begin();
+        i != pressure_levels.end(); ++i) {
+            cout << *i << " ";
+    }
+    cout << endl;
+
+    map<float, int> pressure_level_indices
+        = get_pressure_level_indices(pressure_levels);
+
+    for (set<float>::iterator i = pressure_levels.begin();
+        i != pressure_levels.end(); ++i) {
+            cout << *i << " : " << pressure_level_indices[*i] << endl;
     }
     cout << endl;
 
