@@ -112,8 +112,9 @@ static NcVar        wind_r_var;
 static NcVar        wind_a_var;
 
 static vector<NcVar> data_vars;
-static vector<NcVar> data_3d_vars;
 static vector<NcVar> azi_mean_data_vars;
+
+static map<string, NcVar> data_3d_vars;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
