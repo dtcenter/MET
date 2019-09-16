@@ -56,7 +56,7 @@ extern void def_tc_variables(NcFile*,
     map<string, vector<string> >,
     map<string, string>, map<string, string>,
     const NcDim&, const NcDim&, const NcDim&, const NcDim&,
-    vector<NcVar>&);
+    map<string, NcVar>&);
 
 extern void def_tc_data(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,

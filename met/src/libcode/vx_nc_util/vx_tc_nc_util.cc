@@ -298,7 +298,7 @@ void def_tc_variables(NcFile* nc_out,
     map<string, string> variable_units,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const NcDim& pressure_dim, const NcDim& track_point_dim,
-    vector<NcVar>& data_vars) {
+    map<string, NcVar>& data_vars) {
 
     vector<NcDim> dims;
     dims.push_back(range_dim);
@@ -331,6 +331,7 @@ void def_tc_variables(NcFile* nc_out,
             add_att(&data_var, "long_name", long_name);
             add_att(&data_var, "units", units);
         }
+        data_vars[var_name] = data_var;
     }
 }
 

@@ -475,7 +475,10 @@ void setup_nc_file() {
     }
 
     // Define pressure levels
-    pressure_levels = get_pressure_levels(variable_levels);
+    pressure_level_strings = get_pressure_level_strings(variable_levels);
+    pressure_levels = get_pressure_levels(pressure_level_strings);
+    pressure_level_indices
+        = get_pressure_level_indices(pressure_level_strings, pressure_levels);
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
@@ -630,6 +633,9 @@ void process_fields(const TrackInfoArray& tracks) {
                 data_vars[i_var], data_dp.data());
             // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
             //     azi_mean_data_vars[i_var], data_dp.data());
+            write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                pressure_level_indices, data_info->level().name(),
+                i_point, data_3d_vars[data_info->name()], data_dp.data());
         }
     } // Close loop over track points
 
