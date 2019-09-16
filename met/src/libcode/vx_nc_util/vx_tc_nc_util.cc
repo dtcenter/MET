@@ -434,7 +434,8 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
         }
     }
 
-    var.putVar(offsets, counts, data_rev);
+    // var.putVar(offsets, counts, data_rev);
+    var.putVar(offsets, counts, data);
 
     delete[] data_rev;
 }
@@ -537,7 +538,8 @@ extern void write_tc_pressure_level_data(
     // } else {
     //     var.putVar(offsets, counts, data_rev);
     // }
-    var.putVar(offsets_3d, counts_3d, data_rev);
+    // var.putVar(offsets_3d, counts_3d, data_rev);
+    var.putVar(offsets_3d, counts_3d, data);
 
     delete[] data_rev;
 }
