@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
     v_levels.push_back("P500");
     v_levels.push_back("P300");
     v_levels.push_back("P100");
+    v_levels.push_back("P50");
+    v_levels.push_back("P10");
     variable_levels["V"] = v_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
@@ -54,15 +56,16 @@ int main(int argc, char *argv[]) {
         }
         cout << endl;
     }
-
-    set<float> pressure_levels
-        = get_pressure_levels(variable_levels);
-
-    for (set<float>::iterator i = pressure_levels.begin();
-        i != pressure_levels.end(); ++i) {
-            cout << *i << " ";
-    }
     cout << endl;
+
+    // set<float> pressure_levels
+    //     = get_pressure_levels(variable_levels);
+
+    // for (set<float>::iterator i = pressure_levels.begin();
+    //     i != pressure_levels.end(); ++i) {
+    //         cout << *i << " ";
+    // }
+    // cout << endl;
 
     set<string> pressure_level_strings
         = get_pressure_level_strings(variable_levels);
@@ -71,15 +74,16 @@ int main(int argc, char *argv[]) {
         i != pressure_level_strings.end(); ++i) {
             cout << *i << " ";
     }
-    cout << endl;
+    cout << endl << endl;
 
-    pressure_levels = get_pressure_levels(pressure_level_strings);
+    set<float> pressure_levels
+        = get_pressure_levels(pressure_level_strings);
 
     for (set<float>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
             cout << *i << " ";
     }
-    cout << endl;
+    cout << endl << endl;
 
     map<float, int> pressure_level_indices
         = get_pressure_level_indices(pressure_levels);
@@ -87,6 +91,15 @@ int main(int argc, char *argv[]) {
     for (set<float>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
             cout << *i << " : " << pressure_level_indices[*i] << endl;
+    }
+    cout << endl;
+
+    map<string, int> pressure_level_indices_string_key
+        = get_pressure_level_indices(pressure_level_strings, pressure_levels);
+
+    for (set<string>::iterator i = pressure_level_strings.begin();
+        i != pressure_level_strings.end(); ++i) {
+            cout << *i << " : " << pressure_level_indices_string_key[*i] << endl;
     }
     cout << endl;
 

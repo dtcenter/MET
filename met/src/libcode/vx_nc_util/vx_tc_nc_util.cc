@@ -160,10 +160,15 @@ map<string, int> get_pressure_level_indices(
 
     map<string, int> pressure_level_indices;
 
+    map<float, int> indices_from_levels
+        = get_pressure_level_indices(pressure_levels);
+
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
         string level_str = *i;
+        float level = atof(level_str.substr(1).c_str());
+        pressure_level_indices[level_str] = indices_from_levels[level];
     }
 
     return pressure_level_indices;
