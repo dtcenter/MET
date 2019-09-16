@@ -118,6 +118,8 @@ static vector<NcVar> azi_mean_data_vars;
 static StringArray nc_var_sa;
 
 static map<string, vector<string> > variable_levels;
+static map<string, string> variable_long_names;
+static map<string, string> variable_units;
 
 ////////////////////////////////////////////////////////////////////////
 //

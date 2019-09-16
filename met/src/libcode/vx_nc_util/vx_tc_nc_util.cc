@@ -213,6 +213,8 @@ void write_tc_valid_time(NcFile* nc_out,
 
 void def_tc_variables(NcFile* nc_out,
     map<string, vector<string> > variable_levels,
+    map<string, string> variable_long_names,
+    map<string, string> variable_units,
     const NcDim& range_dim, const NcDim& azimuth_dim,
     const NcDim& pressure_dim, const NcDim& track_point_dim,
     vector<NcVar>& data_vars) {
@@ -232,8 +234,17 @@ void def_tc_variables(NcFile* nc_out,
         i != variable_levels.end(); ++i) {
 
         NcVar data_var;
-        string name = i->first;
-        mlog << Debug(3) << i->first << " ";
+        string var_name = i->first;
+        mlog << Debug(3) << var_name << "\n";
+        vector<string> levels = variable_levels[i->first];
+
+        if (levels.size() > 1) {
+            data_var = nc_out->addVar(
+                var_name, ncDouble, dims_3d);
+        } else {
+            data_var = nc_out->addVar(
+                var_name, ncDouble, dims);
+        }
     }
 }
 
