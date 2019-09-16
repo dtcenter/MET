@@ -77,6 +77,18 @@ set<string> get_pressure_level_strings(
 
     set<string> pressure_level_strings;
 
+    for (map<string, vector<string> >::iterator i = variable_levels.begin();
+        i != variable_levels.end(); ++i) {
+        mlog << Debug(3) << i->first << " ";
+        vector<string> levels = variable_levels[i->first];
+        for (int j = 0; j < levels.size(); j++) {
+            string label = levels[j].substr(0, 1);
+            if (label == "P") {
+                pressure_level_strings.insert(levels[j]);
+            }
+        }
+    }
+
     return pressure_level_strings;
 }
 
@@ -109,6 +121,14 @@ set<float> get_pressure_levels(
     set<string> pressure_level_strings) {
 
     set<float> pressure_levels;
+
+    for (set<string>::iterator i = pressure_level_strings.begin();
+        i != pressure_level_strings.end(); ++i) {
+
+        string level_str = *i;
+        float level = atof(level_str.substr(1).c_str());
+        pressure_levels.insert(level);
+    }
 
     return pressure_levels;
 }
