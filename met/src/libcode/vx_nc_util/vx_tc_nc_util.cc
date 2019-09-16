@@ -491,6 +491,9 @@ extern void write_tc_pressure_level_data(
     vector<size_t> offsets;
     vector<size_t> counts;
 
+    vector<size_t> offsets_3d;
+    vector<size_t> counts_3d;
+
     double* data_rev;
 
     int i_level = pressure_level_indices[level_str];
@@ -498,14 +501,24 @@ extern void write_tc_pressure_level_data(
     offsets.clear();
     offsets.push_back(0);
     offsets.push_back(0);
-    offsets.push_back(i_level);
     offsets.push_back(i_point);
+
+    offsets_3d.clear();
+    offsets_3d.push_back(0);
+    offsets_3d.push_back(0);
+    offsets_3d.push_back(i_level);
+    offsets_3d.push_back(i_point);
 
     counts.clear();
     counts.push_back(grid.range_n());
     counts.push_back(grid.azimuth_n());
     counts.push_back(1);
-    counts.push_back(1);
+
+    counts_3d.clear();
+    counts_3d.push_back(grid.range_n());
+    counts_3d.push_back(grid.azimuth_n());
+    counts_3d.push_back(1);
+    counts_3d.push_back(1);
 
     data_rev = new double[
         grid.range_n() * grid.azimuth_n()];
@@ -518,7 +531,13 @@ extern void write_tc_pressure_level_data(
         }
     }
 
-    var.putVar(offsets, counts, data_rev);
+    // string label = level_str.substr(0, 1);
+    // if (label == "P") {
+    //     var.putVar(offsets_3d, counts_3d, data_rev);
+    // } else {
+    //     var.putVar(offsets, counts, data_rev);
+    // }
+    var.putVar(offsets_3d, counts_3d, data_rev);
 
     delete[] data_rev;
 }

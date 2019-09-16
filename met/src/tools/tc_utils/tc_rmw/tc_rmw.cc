@@ -629,13 +629,16 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
             // Write data
-            // write_tc_data(nc_out, tcrmw_grid, i_point,
-            //     data_vars[i_var], data_dp.data());
+            if (variable_levels[data_info->name()].size() > 1) {
+                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                    pressure_level_indices, data_info->level().name(),
+                    i_point, data_3d_vars[data_info->name()], data_dp.data());
+            } else {
+                write_tc_data(nc_out, tcrmw_grid, i_point,
+                    data_3d_vars[data_info->name()], data_dp.data());
+            }
             // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
             //     azi_mean_data_vars[i_var], data_dp.data());
-            write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                pressure_level_indices, data_info->level().name(),
-                i_point, data_3d_vars[data_info->name()], data_dp.data());
         }
     } // Close loop over track points
 
