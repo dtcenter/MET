@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
     v_levels.push_back("P900");
     v_levels.push_back("P700");
     v_levels.push_back("P500");
+    v_levels.push_back("P300");
+    v_levels.push_back("P100");
     variable_levels["V"] = v_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
