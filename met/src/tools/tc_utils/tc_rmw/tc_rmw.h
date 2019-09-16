@@ -122,6 +122,10 @@ static map<string, vector<string> > variable_levels;
 static map<string, string> variable_long_names;
 static map<string, string> variable_units;
 
+static set<string> pressure_level_strings;
+static set<float> pressure_levels;
+static map<string, int> pressure_level_indices;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables

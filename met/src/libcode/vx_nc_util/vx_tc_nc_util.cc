@@ -72,6 +72,16 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
 ////////////////////////////////////////////////////////////////////////
 
+set<string> get_pressure_level_strings(
+    map<string, vector<string> > variable_levels) {
+
+    set<string> pressure_level_strings;
+
+    return pressure_level_strings;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 set<float> get_pressure_levels(
     map<string, vector<string> > variable_levels) {
 
@@ -91,6 +101,26 @@ set<float> get_pressure_levels(
     }
 
     return pressure_levels;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+set<float> get_pressure_levels(
+    set<string> pressure_level_strings) {
+
+    set<float> pressure_levels;
+
+    return pressure_levels;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+map<string, int> get_pressure_level_indices(
+    set<string> pressure_level_strings) {
+
+    map<string, int> pressure_level_indices;
+
+    return pressure_level_indices;
 }
 
 ////////////////////////////////////////////////////////////////////////
