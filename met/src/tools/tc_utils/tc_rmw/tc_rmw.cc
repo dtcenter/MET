@@ -483,16 +483,16 @@ void setup_nc_file() {
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
     // Define variables
-    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+    // for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
-        data_info = conf_info.data_info[i_var];
-        def_tc_data(nc_out, range_dim, azimuth_dim,
-            track_point_dim, data_var, data_info);
-        data_vars.push_back(data_var);
+        // data_info = conf_info.data_info[i_var];
+        // def_tc_data(nc_out, range_dim, azimuth_dim,
+        //     track_point_dim, data_var, data_info);
+        // data_vars.push_back(data_var);
         // def_tc_azi_mean_data(nc_out, range_dim,
         //     track_point_dim, data_var, data_info);
         // azi_mean_data_vars.push_back(data_var);
-    }
+    // }
 
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
@@ -629,8 +629,8 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
             // Write data
-            write_tc_data(nc_out, tcrmw_grid, i_point,
-                data_vars[i_var], data_dp.data());
+            // write_tc_data(nc_out, tcrmw_grid, i_point,
+            //     data_vars[i_var], data_dp.data());
             // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
             //     azi_mean_data_vars[i_var], data_dp.data());
             write_tc_pressure_level_data(nc_out, tcrmw_grid,
