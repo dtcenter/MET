@@ -217,8 +217,23 @@ void def_tc_variables(NcFile* nc_out,
     const NcDim& pressure_dim, const NcDim& track_point_dim,
     vector<NcVar>& data_vars) {
 
+    vector<NcDim> dims;
+    dims.push_back(range_dim);
+    dims.push_back(azimuth_dim);
+    dims.push_back(track_point_dim);
+
+    vector<NcDim> dims_3d;
+    dims_3d.push_back(range_dim);
+    dims_3d.push_back(azimuth_dim);
+    dims_3d.push_back(pressure_dim);
+    dims_3d.push_back(track_point_dim);
+
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
+
+        NcVar data_var;
+        string name = i->first;
+        mlog << Debug(3) << i->first << " ";
     }
 }
 
