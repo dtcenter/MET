@@ -36,8 +36,11 @@ extern set<float> get_pressure_levels(
 extern set<float> get_pressure_levels(
     set<string>);
 
+extern map<float, int> get_pressure_level_indices(
+    set<float>);
+
 extern map<string, int> get_pressure_level_indices(
-    map<string, vector<string> >);
+    set<string>, set<float>);
 
 extern void def_tc_pressure(NcFile*,
     const NcDim&, set<float>);

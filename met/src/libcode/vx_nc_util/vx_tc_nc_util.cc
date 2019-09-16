@@ -135,10 +135,36 @@ set<float> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
+map<float, int> get_pressure_level_indices(
+    set<float> pressure_levels) {
+
+    map<float, int> pressure_level_indices;
+
+    int k = pressure_levels.size() - 1;
+
+    for (set<float>::iterator i = pressure_levels.begin();
+        i != pressure_levels.end(); ++i) {
+
+        float level = *i;
+        pressure_level_indices[level] = k; 
+        k--;
+    }
+
+    return pressure_level_indices;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 map<string, int> get_pressure_level_indices(
-    set<string> pressure_level_strings) {
+    set<string> pressure_level_strings, set<float> pressure_levels) {
 
     map<string, int> pressure_level_indices;
+
+    for (set<string>::iterator i = pressure_level_strings.begin();
+        i != pressure_level_strings.end(); ++i) {
+
+        string level_str = *i;
+    }
 
     return pressure_level_indices;
 }
