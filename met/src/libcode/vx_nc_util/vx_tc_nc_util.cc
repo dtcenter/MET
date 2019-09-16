@@ -235,15 +235,20 @@ void def_tc_variables(NcFile* nc_out,
 
         NcVar data_var;
         string var_name = i->first;
-        mlog << Debug(3) << var_name << "\n";
         vector<string> levels = variable_levels[i->first];
+        string long_name = variable_long_names[i->first];
+        string units = variable_units[i->first];
 
         if (levels.size() > 1) {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims_3d);
+            add_att(&data_var, "long_name", long_name);
+            add_att(&data_var, "units", units);
         } else {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims);
+            add_att(&data_var, "long_name", long_name);
+            add_att(&data_var, "units", units);
         }
     }
 }

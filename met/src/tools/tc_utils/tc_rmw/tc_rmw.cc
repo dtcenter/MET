@@ -486,15 +486,15 @@ void setup_nc_file() {
         def_tc_data(nc_out, range_dim, azimuth_dim,
             track_point_dim, data_var, data_info);
         data_vars.push_back(data_var);
-        def_tc_azi_mean_data(nc_out, range_dim,
-            track_point_dim, data_var, data_info);
-        azi_mean_data_vars.push_back(data_var);
+        // def_tc_azi_mean_data(nc_out, range_dim,
+        //     track_point_dim, data_var, data_info);
+        // azi_mean_data_vars.push_back(data_var);
     }
 
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
         range_dim, azimuth_dim, pressure_dim, track_point_dim,
-        data_vars);
+        data_3d_vars);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -628,8 +628,8 @@ void process_fields(const TrackInfoArray& tracks) {
             // Write data
             write_tc_data_rev_range(nc_out, tcrmw_grid, i_point,
                 data_vars[i_var], data_dp.data());
-            write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-                azi_mean_data_vars[i_var], data_dp.data());
+            // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
+            //     azi_mean_data_vars[i_var], data_dp.data());
         }
     } // Close loop over track points
 
