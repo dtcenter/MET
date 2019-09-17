@@ -1,1 +1,0 @@
-./configure --prefix=/Users/fillmore/MET --enable-grib2 CFLAGS="-D__64BIT__" MET_NETCDF=$HOME/software MET_HDF5=$HOME/software MET_GSL=$HOME/software MET_GRIB2C=$HOME/distributions/g2clib-1.6.0
