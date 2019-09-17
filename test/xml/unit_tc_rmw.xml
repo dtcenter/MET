@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_rmw_pressure_lev_out">
+    <exec>&MET_BIN;/tc_rmw</exec>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal142016_short.dat \
+      -config &CONFIG_DIR;/TCRMWConfig_pressure_lev_out \
+      -prefix _unit_test \
+      -out &OUTPUT_DIR;/tc_rmw/pressure_lev_out \
+      -log &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.log \
+      -v 2 \
+      -data &DATA_MODEL_DIR;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_MODEL_DIR;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_MODEL_DIR;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 
+    </param>
+  </test>
+
+</met_test>
