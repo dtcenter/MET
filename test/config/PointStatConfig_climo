@@ -110,6 +110,44 @@ climo_mean = {
 climo_stdev = climo_mean;
 climo_stdev = {
    file_name = [ "${CLIMO_STDEV_FILE}" ];
+
+   field = [
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "KELVIN";
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "CELCIUS";
+        // Standard deviation is the same for units K and C.
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "FAHRENHEIT";
+        // Apply 1.8 scale factor to standard deviation for K to F conversion.
+        convert(x)   = 1.8 * x;
+      },
+      {
+        name         = "TMP";
+        level        = [ "P500" ];
+        message_type = [ "ADPUPA" ];
+      },
+      {
+        name         = "UGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "VGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "WIND";
+        level        = [ "Z10" ];
+      }
+   ];
 }
 
 climo_cdf_bins = 1;
