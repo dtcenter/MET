@@ -18,7 +18,12 @@
 
 SUBDIRS	= tc_dland \
 	tc_pairs \
+<<<<<<< HEAD
 	tc_stat \
 	rmw_analysis
+=======
+	tc_rmw \
+	tc_stat
+>>>>>>> develop
 
 MAINTAINERCLEANFILES 	= Makefile.in

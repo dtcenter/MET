@@ -143,7 +143,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    n_ovx = parse_conf_n_vx(odict);
 
    // Check for a valid number of verification tasks
-   if(n_fvx != n_ovx) {
+   if(n_fvx == 0 || n_fvx != n_ovx) {
       mlog << Error << "\nGridStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
            << conf_key_obs_field << "\" (" << n_ovx

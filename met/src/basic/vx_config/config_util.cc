@@ -62,12 +62,6 @@ void RegridInfo::validate() {
       exit(1);
    }
 
-   // For area-weighted mean the width and shape do not apply
-   if(method == InterpMthd_AW_Mean) {
-      width = bad_data_int;
-      shape = GridTemplateFactory::GridTemplate_None;
-   }
-
    // Check the nearest neighbor special case
    if(width  == 1 &&
       method != InterpMthd_None &&
@@ -76,8 +70,9 @@ void RegridInfo::validate() {
       method != InterpMthd_Upper_Left &&
       method != InterpMthd_Upper_Right &&
       method != InterpMthd_Lower_Right &&
-      method != InterpMthd_Lower_Left) {
-      mlog << Warning << "\n"
+      method != InterpMthd_Lower_Left &&
+      method != InterpMthd_AW_Mean) {
+      mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_nearest_str
@@ -85,13 +80,19 @@ void RegridInfo::validate() {
       method = InterpMthd_Nearest;
    }
 
-   // Check if method is nearest, that width is 1
-   if ((method == InterpMthd_Nearest) &&
-       (width != 1)){
-      mlog << Warning << "\n"
-           << "Resetting the regridding width from "
-           << width << " to 1 for regridding method \""
-           << interpmthd_nearest_str << "\".\n\n";
+   // Check for some methods, that width is 1
+   if((method == InterpMthd_Nearest ||
+       method == InterpMthd_Force ||
+       method == InterpMthd_Upper_Left ||
+       method == InterpMthd_Upper_Right ||
+       method == InterpMthd_Lower_Right ||
+       method == InterpMthd_Lower_Left ||
+       method == InterpMthd_AW_Mean) &&
+      width != 1) {
+      mlog << Warning << "\nRegridInfo::validate() -> "
+           << "Resetting regridding width from "
+           << width << " to 1 for interpolation method \""
+           << interpmthd_to_string(method) << "\".\n\n";
       width = 1;
    }
 
@@ -99,7 +100,7 @@ void RegridInfo::validate() {
    if((method == InterpMthd_Bilin ||
        method == InterpMthd_Budget) &&
       width != 2) {
-      mlog << Warning << "\n"
+      mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding width from "
            << width << " to 2 for regridding method \""
            << interpmthd_to_string(method) << "\".\n\n";
@@ -109,14 +110,14 @@ void RegridInfo::validate() {
    // Check the Gaussian filter
    if(method == InterpMthd_Gaussian) {
       if (width <= 2) {
-         mlog << Warning << "\n"
+         mlog << Warning << "\nRegridInfo::validate() -> "
               << "Resetting the regridding width from "
               << width << " to 3 for regridding method \""
               << interpmthd_to_string(method) << "\".\n\n";
          width = 3;
       }
       if (sigma < 1) {
-         mlog << Warning << "\n"
+         mlog << Warning << "\nRegridInfo::validate() -> "
               << "Resetting the regridding sigma from "
               << sigma << " to 1.0 for regridding method \""
               << interpmthd_to_string(method) << "\".\n\n";
@@ -1188,14 +1189,14 @@ void InterpInfo::validate() {
       // Check the Gaussian filter
       if(methodi == InterpMthd_Gaussian) {
          if (width[i] <= 2) {
-            mlog << Warning << "\n"
+            mlog << Warning << "\nInterpInfo::validate() -> "
                  << "Resetting the interpolation width from "
                  << width[i] << " to 3 for interpolation method \""
                  << method[i] << "\".\n\n";
             width.set(i, 3);
          }
          if (sigma < 1) {
-            mlog << Warning << "\n"
+            mlog << Warning << "\nInterpInfo::validate() -> "
                  << "Resetting the interpolation sigma from "
                  << sigma << " to 1.0 for interpolation method \""
                  << method[i] << "\".\n\n";

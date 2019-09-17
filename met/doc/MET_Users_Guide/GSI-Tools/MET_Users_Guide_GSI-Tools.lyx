@@ -562,7 +562,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for GSI Diagnotic Conventional MPR (Matched Pair) output
+Format information for GSI Diagnostic Conventional MPR (Matched Pair) output
  line type.
 \end_layout
 
@@ -936,7 +936,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for GSI Diagnotic Radiance MPR (Matched Pair) output
+Format information for GSI Diagnostic Radiance MPR (Matched Pair) output
  line type.
 \end_layout
 
@@ -2544,7 +2544,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for GSI Diagnotic Conventional ORANK (Observation Rank)
+Format information for GSI Diagnostic Conventional ORANK (Observation Rank)
  output line type.
 \end_layout
 
@@ -2773,8 +2773,8 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for GSI Diagnotic Radiance ORANK (Observation Rank) output
- line type.
+Format information for GSI Diagnostic Radiance ORANK (Observation Rank)
+ output line type.
 \end_layout
 
 \end_inset
@@ -2798,7 +2798,7 @@ Format information for GSI Diagnotic Radiance ORANK (Observation Rank) output
 \begin_layout Plain Layout
 
 \series bold
-GSI DIAGNOSTIC RADIANCE MPR OUTPUT FILE
+GSI DIAGNOSTIC RADIANCE ORANK OUTPUT FILE
 \end_layout
 
 \end_inset
