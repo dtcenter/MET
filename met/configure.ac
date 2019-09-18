@@ -1038,8 +1038,8 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
+# AC_FUNC_MALLOC
+# AC_FUNC_REALLOC
 AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sqrt strcasecmp strchr strcspn strerror strncasecmp strrchr strstr isatty])
 
 
@@ -1159,6 +1159,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_stat_out/Makefile
                  src/libcode/vx_statistics/Makefile
                  src/libcode/vx_time_series/Makefile
+                 src/libcode/vx_series_data/Makefile
                  src/libcode/vx_regrid/Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
@@ -1195,6 +1196,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
+                 src/tools/tc_utils/tc_rmw/Makefile
                  src/tools/tc_utils/tc_stat/Makefile])
 
 if test -n "$MET_DEVELOPMENT"; then
@@ -1216,6 +1218,7 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal_tests/libcode/vx_plot_util/Makefile
                     internal_tests/libcode/vx_ps/Makefile
                     internal_tests/libcode/vx_tc_util/Makefile
+                    internal_tests/libcode/vx_nc_util/Makefile
                     internal_tests/libcode/vx_solar/Makefile
                     internal_tests/tools/Makefile
                     internal_tests/tools/other/Makefile

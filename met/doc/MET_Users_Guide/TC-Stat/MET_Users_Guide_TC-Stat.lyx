@@ -2736,7 +2736,7 @@ The
 -out_line_type
 \series medium
  option defines the output data that should written.
- This job can write contingency table counts (CTC), contingeny table statistics
+ This job can write contingency table counts (CTC), contingency table statistics
  (CTS), and RIRW matched pairs (MPR).
  The default is CTC and CTS, but the MPR output provides great amount of
  detail.

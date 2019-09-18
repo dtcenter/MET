@@ -46,7 +46,7 @@
 //                    for non-zero accumulation times.
 //   005    12/23/09  Halley Gotway  Call the library read_pds routine.
 //   006    05/21/10  Halley Gotway  Enhance to search multiple
-//                    -pcp_dir directory arguments.
+//                    -pcpdir directory arguments.
 //   007    06/25/10  Halley Gotway  Allow times to be specified in
 //                    HH[MMSS] and YYYYMMDD[_HH[MMSS]] format.
 //   008    06/30/10  Halley Gotway  Enhance grid equality checks.
@@ -73,6 +73,8 @@
 //                    subtraction errors to warnings.
 //   021    03/01/19  Halley Gotway  Add -derive command line option.
 //   022    03/08/19  Halley Gotway  Support multiple -field options.
+//   023    08/29/19  Halley Gotway  Support multiple arguments for the
+//                    the -pcpdir option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -283,7 +285,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_add,        "-add",        0);
    cline.add(set_subtract,   "-subtract",   0);
    cline.add(set_derive,     "-derive",     1);
-   cline.add(set_pcpdir,     "-pcpdir",     1);
+   cline.add(set_pcpdir,     "-pcpdir",    -1);
    cline.add(set_pcprx,      "-pcprx",      1);
    cline.add(set_field,      "-field",      1);
    cline.add(set_name,       "-name",       1);
@@ -1594,8 +1596,9 @@ void usage() {
         << "\t\t\t\"out_accum\" is the desired output accumulation "
         << "interval in HH[MMSS] format (required).\n"
 
-        << "\t\t\t\"-pcpdir path\" overrides the default search "
-        << "directory (" << default_pcp_dir << ") (optional).\n"
+        << "\t\t\t\"-pcpdir path\" is used one or more times to "
+        << "override the default search directory (" << default_pcp_dir
+        << ") and allows wildcards (optional).\n"
 
         << "\t\t\t\"-pcprx reg_exp\" overrides the default regular "
         << "expression for input file naming convention ("
@@ -1700,7 +1703,7 @@ void set_verbosity(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_pcpdir(const StringArray & a) {
-   pcp_dir.add(a[0]);
+   pcp_dir.add(a);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -460,10 +460,12 @@ static const char conf_key_output_flag[]       = "output_flag";
 static const char conf_key_obs_window[]        = "obs_window";
 static const char conf_key_beg[]               = "beg";
 static const char conf_key_end[]               = "end";
+static const char conf_key_data[]              = "data";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
 static const char conf_key_quilt[]             = "quilt";
 static const char conf_key_grid_res[]          = "grid_res";
+static const char conf_key_data_field[]        = "data.field";
 static const char conf_key_fcst_field[]        = "fcst.field";
 static const char conf_key_obs_field[]         = "obs.field";
 static const char conf_key_file_type[]         = "file_type";
@@ -895,7 +897,7 @@ static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
 
 //
-// TC-Pairs and TC-Stat specific parameter key names
+// TC-Pairs, TC-RMW, and TC-Stat specific parameter key names
 //
 
 static const char conf_key_storm_id[]                 = "storm_id";
@@ -957,6 +959,15 @@ static const char conf_key_landfall_end[]             = "landfall_end";
 static const char conf_key_event_equal[]              = "event_equal";
 static const char conf_key_out_init_mask[]            = "out_init_mask";
 static const char conf_key_out_valid_mask[]           = "out_valid_mask";
+
+//
+// TC-RMW specific parameter key names
+//
+static const char conf_key_n_range[]     = "n_range";
+static const char conf_key_n_azimuth[]   = "n_azimuth";
+static const char conf_key_max_range[]   = "max_range_km";
+static const char conf_key_delta_range[] = "delta_range_km";
+static const char conf_key_rmw_scale[]   = "rmw_scale";
 
 //
 // Parameter value names common to multiple tools
@@ -1056,6 +1067,7 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
+
 
 ////////////////////////////////////////////////////////////////////////
 

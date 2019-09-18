@@ -34,6 +34,7 @@ using namespace std;
 #include "vx_util.h"
 #include "polyline.h"
 #include "two_d_array.h"
+#include "vx_grid.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
