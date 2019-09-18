@@ -15,9 +15,9 @@ noinst_PROGRAMS = test_pressure_levels
 test_pressure_levels_SOURCES = test_pressure_levels.cc
 test_pressure_levels_CPPFLAGS = ${MET_CPPFLAGS}
 test_pressure_levels_LDFLAGS = -L. ${MET_LDFLAGS}
-test_pressure_levels_LDADD = -lvx_nc_util \
+test_pressure_levels_LDADD = -lvx_tc_util \
 	-lvx_data2d \
-	-lvx_tc_util \
+	-lvx_nc_util \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
