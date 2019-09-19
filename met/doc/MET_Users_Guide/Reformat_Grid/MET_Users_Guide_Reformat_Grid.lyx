@@ -964,6 +964,8 @@ path
 \end_inset
 
  will override the default setting.
+ This option may be used multiple times and can accept multiple arguments,
+ supporting the use of wildcards.
 \end_layout
 
 \begin_layout Description

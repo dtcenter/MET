@@ -80,6 +80,8 @@ extern  int       hms_to_sec      (int hour, int min, int sec);
 
 extern  int       unix_to_sec_of_day (unixtime u);
 
+extern  long      unix_to_long_yyyymmddhh (unixtime u);
+
 // Parse time strings
 
 extern  void     substring_vx_cal       (const char * text, char * out, int first, int last);

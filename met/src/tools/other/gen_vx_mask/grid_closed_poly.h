@@ -31,6 +31,7 @@
 #include "ncrr_array.h"
 #include "shp_file.h"
 #include "shp_poly_record.h"
+#include "vx_grid.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -78,6 +78,24 @@ struct RotatedLatLonData {
 ////////////////////////////////////////////////////////////////////////
 
 
+struct TcrmwData {
+
+   const char * name;   //  not allocated
+
+   int range_n;
+   int azimuth_n;
+
+   double range_max_km;
+
+   double lat_center;
+   double lon_center;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __LATLON_GRID_DEFINITIONS_H__  */
 
 
