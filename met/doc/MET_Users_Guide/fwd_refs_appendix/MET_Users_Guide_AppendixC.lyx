@@ -5294,21 +5294,36 @@ The Brier score is the mean squared probability error.
 \series bold
 nx2
 \series default
- contingency table via the following equation: 
+ contingency table via the following equation:
+\end_layout
+
+\begin_layout Standard
 \begin_inset ERT
 status open
 
 \begin_layout Plain Layout
 
-$$BS=
+$$BS={1 
 \backslash
-frac{1}{T}[n_{.1}(p_1-1)^2+n_{.0}p_0]$$
+over T}
+\backslash
+sum_{i=1}^K 
+\backslash
+left[ n_{i1} (1 - p_i)^2 + n_{i0} 
+\backslash
+, p_i^2 
+\backslash
+right]$$
 \end_layout
 
 \end_inset
 
- The equation you will most often see in references uses the individual
- probability forecasts (
+ 
+\end_layout
+
+\begin_layout Standard
+The equation you will most often see in references uses the individual probabili
+ty forecasts (
 \begin_inset Formula $\rho_{i}$
 \end_inset
 
