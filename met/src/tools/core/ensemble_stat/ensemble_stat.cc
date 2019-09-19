@@ -2373,6 +2373,13 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name()
                 << var_str << "_" << type_str;
+
+   // Skip variable names that have already been written
+   if(nc_ens_var_sa.has(ens_var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_ens_var_sa.add(ens_var_name);
+
    ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
 
    //
@@ -2422,6 +2429,12 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name()
                 << var_str << "_" << type_str;
+
+   // Skip variable names that have already been written
+   if(nc_ens_var_sa.has(ens_var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_ens_var_sa.add(ens_var_name);
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
@@ -2548,13 +2561,20 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
             << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
-   // Append smoothing information
-   if((wdth > 1) &&
-      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
+   // Append smoothing information, except for the raw observations
+   if(wdth > 1 &&
+      (type_str != "OBS" ||
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
        conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
+
+   // Skip variable names that have already been written
+   if(nc_orank_var_sa.has(var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_orank_var_sa.add(var_name);
 
    // Define the variable
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
@@ -2607,12 +2627,16 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Append smoothing information
-   if((wdth > 1) &&
-      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
-       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
+   if(wdth > 1) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
+
+   // Skip variable names that have already been written
+   if(nc_orank_var_sa.has(var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_orank_var_sa.add(var_name);
 
    // Define the variable
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
