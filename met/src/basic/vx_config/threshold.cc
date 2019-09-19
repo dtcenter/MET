@@ -586,7 +586,8 @@ if ( op == thresh_na )  return ( true );
 if ( Ptype != no_perc_thresh_type && is_bad_data(T) ) {
 
    mlog << Error << "\nSimple_Node::check(double) const -> "
-        << "percentile threshold used before it was set!\n\n";
+        << "percentile threshold \"" << s
+        << "\" used before it was set.\n\n";
 
    exit ( 1 );
 
@@ -713,7 +714,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "not enough information provided to define the "
            << perc_thresh_info[Ptype].long_name
-           << " threshold.\n\n";
+           << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
 
@@ -762,7 +763,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unsupported options for computing the "
            << perc_thresh_info[Ptype].long_name
-           << " threshold.\n\n";
+           << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
 
@@ -777,7 +778,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unable to compute the percentile for the "
            << perc_thresh_info[Ptype].long_name
-           << " threshold.\n\n";
+           << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
    }
@@ -799,7 +800,8 @@ if ( !ptr )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
         << perc_thresh_info[Ptype].long_name
-        << " threshold requested but no data provided.\n\n";
+        << " threshold \"" << s
+        << "\" requested but no data provided.\n\n";
 
    exit ( 1 );
 
@@ -833,7 +835,8 @@ if ( data.n() == 0 )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
         << "can't compute " << perc_thresh_info[Ptype].long_name
-        << " threshold because no valid data was provided.\n\n";
+        << " threshold \"" << s
+        << "\" because no valid data was provided.\n\n";
 
       exit ( 1 );
 
