@@ -1399,6 +1399,12 @@ void process_scores() {
                   apply_mask(obs_dp_dmap,    mask_mp, o_na);
                   apply_mask(obs_dp_thresh,  mask_mp, othr_na);
 
+                  dmap_info.set_options(
+                        conf_info.vx_opt[i].baddeley_p,
+                        conf_info.vx_opt[i].baddeley_max_dist,
+                        conf_info.vx_opt[i].fom_alpha,
+                        conf_info.vx_opt[i].zhu_weight);
+
                   // Compute DMAP statistics
                   dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
                                 conf_info.vx_opt[i].ocat_ta[k],
