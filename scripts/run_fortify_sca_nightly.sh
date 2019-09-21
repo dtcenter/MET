@@ -54,8 +54,8 @@ export MET_CAIROINC=/usr/include/cairo
 export MET_CAIROLIB=/usr/lib
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
-export MET_PYTHON_CC=-I/usr/local/python-2.7.13/include/python2.7
-export MET_PYTHON_LD=-L/usr/local/python-2.7.13/lib -lpython2.7 -lpthread -ldl -lutil
+export MET_PYTHON_CC="-I/usr/local/python-2.7.13/include/python2.7"
+export MET_PYTHON_LD="-L/usr/local/python-2.7.13/lib -lpython2.7 -lpthread -ldl -lutil"
 
 # Variables required to run MET
 export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
