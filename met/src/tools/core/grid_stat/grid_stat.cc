@@ -779,9 +779,9 @@ void process_scores() {
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType_Fcst ||
             interp->field == FieldType_Both) {
-            smooth_field(fcst_dp, fcst_dp_smooth,
-                         interp_mthd, interp->width[j],
-                         interp->shape, interp->sigma, interp->vld_thresh);
+            smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
+                         interp->width[j], interp->shape, interp->vld_thresh,
+                         interp->gaussian_radius, interp->gaussian_dx);
          }
          // Do not smooth the forecast field
          else {
@@ -791,9 +791,9 @@ void process_scores() {
          // If requested in the config file, smooth the observation field
          if(interp->field == FieldType_Obs ||
             interp->field == FieldType_Both) {
-            smooth_field(obs_dp, obs_dp_smooth,
-                         interp_mthd, interp->width[j],
-                         interp->shape, interp->sigma, interp->vld_thresh);
+            smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
+                         interp->width[j], interp->shape, interp->vld_thresh,
+                         interp->gaussian_radius, interp->gaussian_dx);
          }
          // Do not smooth the observation field
          else {
@@ -1033,9 +1033,9 @@ void process_scores() {
                // and climatology U-wind fields
                if(interp->field == FieldType_Fcst ||
                   interp->field == FieldType_Both) {
-                  smooth_field(fu_dp, fu_dp_smooth,
-                               interp_mthd, interp->width[j],
-                               interp->shape, interp->sigma, interp->vld_thresh);
+                  smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
+                               interp->width[j], interp->shape, interp->vld_thresh,
+                               interp->gaussian_radius, interp->gaussian_dx);
                }
                // Do not smooth the forecast field
                else {
@@ -1048,7 +1048,8 @@ void process_scores() {
                   interp->field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
-                               interp->shape, interp->sigma, interp->vld_thresh);
+                               interp->shape, interp->vld_thresh,
+                               interp->gaussian_radius, interp->gaussian_dx);
                }
                // Do not smooth the observation field
                else {

@@ -244,7 +244,8 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   double      sigma;      // Sigma for Gaussian
+   double      gaussian_dx;      // delta distance for Gaussian
+   double      gaussian_radius;  // radius of influence for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
    void        clear();
@@ -252,9 +253,10 @@ struct InterpInfo {
    bool        operator==(const InterpInfo &) const;
 };
 
-// Default sigma value used for Gaussian interpolation and regridding options.
 // Chosen by Hazardous Weather Testbed.
-static const double default_interp_sigma = 1.476;
+// Default radius and delta x for Gaussian interpolation and regridding options.
+static const double default_gaussian_dx = 81.271;
+static const double default_gaussian_radius = 120.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -270,7 +272,8 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-   double       sigma;      // Sigma for Gaussian
+   double       gaussian_dx;      // delta distance for Gaussian
+   double       gaussian_radius;  // radius of influence for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
@@ -580,7 +583,8 @@ static const char conf_key_do_3d_att_flag[]    = "attributes_3d";
 static const char conf_key_grib_ens_hi_res_ctl[]  = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 static const char conf_key_shape[]             = "shape";
-static const char conf_key_sigma[]             = "sigma";
+static const char conf_key_gaussian_dx[]       = "gaussian_dx";
+static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_eclv_points[]       = "eclv_points";
 
 //
