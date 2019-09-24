@@ -1,5 +1,8 @@
 
 
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -21,6 +24,8 @@
 
 #include "so3.h"
 
+#include "vx_vector.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,16 +44,13 @@ class EarthRotation : public SO3 {
       EarthRotation();
      ~EarthRotation();
 
-      EarthRotation & operator=(const EarthRotation &);
-
          //
          //  set stuff
          //
 
-    void set_true_np (double true_lat_north_pole, double true_lon_north_pole, double aux_rotation);
+      void set_np(double true_lat_north_pole, double true_lon_north_pole, double aux_rotation);
 
-    void set_rot_sp  (double rot_lat_south_pole, double rot_lon_south_pole, double aux_rotation, 
-                      double rot_lat_ll, double rot_lon_ll);
+      void set_tcrmw(double lat_center, double lon_center);
 
          //
          //  get stuff
@@ -60,27 +62,30 @@ class EarthRotation : public SO3 {
          //
 
 
+      // Vector forward(const Vector &) const;
+      // Vector reverse(const Vector &) const;
+
+
       void latlon_rot_to_true(double lat_rot, double lon_rot, double & lat_true, double & lon_true) const;
 
       void latlon_true_to_rot(double lat_true, double lon_true, double & lat_rot, double & lon_rot) const;
 
+
+         //
+         //  rotating tangent vector components
+         //
+
+      // void true_to_rot(double  lat_true, double  lon_true, 
+      //                  double   ve_true, double   vn_true, 
+      //                  double & ve_rot,  double & vn_rot) const;
+
+
+      // void rot_to_true(double  lat_rot,   double  lon_rot, 
+      //                  double   ve_rot,   double   vn_rot, 
+      //                  double & ve_true,  double & vn_true) const;
+
+
 };
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-inline EarthRotation & EarthRotation::operator=(const EarthRotation & r)
-
-{
-
-if ( this == &r )  return ( * this );
-
-SO3::assign(r);
-
-return ( * this );
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////

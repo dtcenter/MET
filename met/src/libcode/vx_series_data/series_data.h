@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,37 +6,33 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
 
-
+#ifndef  __SERIES_DATA_H__
+#define  __SERIES_DATA_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#ifndef  __VX_GRID_H__
-#define  __VX_GRID_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-// #include "grid_base.h"
-
-#include "st_grid.h"
-#include "lc_grid.h"
-#include "latlon_grid.h"
-#include "merc_grid.h"
-#include "tcrmw_grid.h"
-
-#include "find_grid_by_name.h"
-
+#include "vx_util.h"
+#include "vx_log.h"
+#include "vx_data2d.h"
+#include "vx_data2d_factory.h"
+#include "vx_grid.h"
 
 ////////////////////////////////////////////////////////////////////////
 
+StringArray parse_file_list(const StringArray&, const GrdFileType);
 
-#endif   //  __VX_GRID_H__
+void get_series_data(int, VarInfo*, DataPlane&);
 
+void get_series_entry(int, VarInfo*, const StringArray&,
+    const GrdFileType, StringArray&, DataPlane&, Grid&);
+
+bool read_single_entry(VarInfo*, const ConcatString&,
+    const GrdFileType, DataPlane&, Grid&);
 
 ////////////////////////////////////////////////////////////////////////
 
+#endif  // __SERIES_DATA_H__
 
-
+////////////////////////////////////////////////////////////////////////

@@ -955,6 +955,7 @@ void process_pbfile(int i_pb) {
    int cape_level, prev_cape_level, IMM, JMM;
    int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
+   float cape_p, cape_h, cape_qm;
 
    // To compute PBL
    int pbl_level;
@@ -984,6 +985,8 @@ void process_pbfile(int i_pb) {
    IMM = JMM =1;
    prev_cape_level = -1;
    p1d = t1d = q1d = r8bfms * 10;
+   cape_h = pbl_h = 0;
+   cape_p = pbl_p = bad_data_float;
 
    diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
@@ -1287,7 +1290,6 @@ void process_pbfile(int i_pb) {
          }
       }
 
-      float cape_p, cape_h, cape_qm;
       if (cal_cape) {
          cape_level = 0;
       }
@@ -1484,15 +1486,11 @@ void process_pbfile(int i_pb) {
                      cape_member_cnt++;
                   }
                   if (is_cape_input && (cape_level == 0)) {
-                     cape_p = obs_arr[2];
-                     cape_h = obs_arr[3];
                      cape_qm = quality_mark;
                   }
                }
 
                if (cal_pbl && (pbl_level == 0)) {
-                  pbl_p = obs_arr[2];
-                  pbl_h = obs_arr[3];
                   pbl_qm = quality_mark;
                }
             }
@@ -1661,7 +1659,7 @@ void process_pbfile(int i_pb) {
                     << ", cin_val: " << cin_val
                     << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
             }
-            else if (cape_val > 0) {
+            else if (cape_val >= 0) {
                obs_arr[1] = cape_code;
                obs_arr[2] = cape_p;
                obs_arr[3] = cape_h;
@@ -1670,8 +1668,8 @@ void process_pbfile(int i_pb) {
                               hdr_lat, hdr_lon, hdr_elv, cape_qm,
                               OBS_BUFFER_SIZE);
                cape_count++;
+               if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
             }
-            else if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
             else cape_cnt_missing_values++;
          }
          else if (1 < buf_nlev) cape_cnt_no_levels++;
@@ -1922,11 +1920,11 @@ void process_pbfile(int i_pb) {
         << n_file_obs << "\n";
 
    if (cal_cape) {
-      mlog << Debug(3) << "\nDerived CAPE\t\t= " << cape_count
+      mlog << Debug(3) << "\nDerived CAPE = " << cape_count
+           << "\tZero = " << cape_cnt_zero_values
            << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
            << "\tNo vertical levels = " << (cape_cnt_surface_msgs)
-           << "\n\tfiltered: zero = " << cape_cnt_zero_values
-           << "\tothers = " << cape_cnt_missing_values << ", "
+           << "\n\tfiltered: " << cape_cnt_missing_values << ", "
            << cape_cnt_too_big
            << "\n";
    }
@@ -2976,13 +2974,18 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
             it!=pqtzuv_map_merged.end(); ++it) {
          float *pqtzuv = it->second;
-         cout << method_name << "DEBUG 7: TQZ and UV merged  ";
+         ostringstream buf;
+         buf << method_name << "TQZ and UV merged ";
          for (int idx=0; idx<mxr8vt; idx++) {
-           cout << " " << pqtzuv[idx];
+           buf << "  " << pqtzuv[idx];
          }
-         if (0 < pqtzuv_map_tq.count(it->first)) cout << " qtz";
-         if (0 < pqtzuv_map_uv.count(it->first)) cout << " uv";
-         cout << "\n";
+         if (0 < (pqtzuv_map_tq.count(it->first) + pqtzuv_map_tq.count(it->first))) {
+            buf << "   (";
+            if (0 < pqtzuv_map_tq.count(it->first)) buf << " tqz";
+            if (0 < pqtzuv_map_uv.count(it->first)) buf << " uv";
+            buf << " )";
+         }
+         mlog << Debug(7) << buf.str() << "\n";
       }
    }
 
@@ -3003,6 +3006,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int pbl_diff_count = 0;
    static const char *method_name = "compute_pbl() ";
 
+   hpbl = bad_data_float;
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    mlog << Debug(7) << method_name << "is called: TQZ: "

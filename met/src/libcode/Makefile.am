@@ -53,6 +53,7 @@ SUBDIRS += vx_data2d_factory \
 	vx_tc_util \
 	vx_summary \
 	vx_time_series \
+	vx_series_data \
 	vx_regrid \
 	vx_nc_obs \
 	vx_solar
