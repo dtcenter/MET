@@ -101,7 +101,6 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
-
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -119,8 +118,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
-                                     info.method,  info.width, info.shape,
-                                     info.vld_thresh, info.sigma);
+                                     info.method, info.width, info.shape, info.vld_thresh);
 
       }
 
@@ -129,6 +127,11 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    }   //  for yt
 
 }   //  for xt
+
+if (info.method == InterpMthd_Gaussian) {
+   interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx);
+}
+
 
    //
    //  done
