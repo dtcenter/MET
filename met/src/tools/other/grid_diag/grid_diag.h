@@ -64,6 +64,9 @@ static const char* default_config_filename =
 // Default output directory
 static const char* default_out_dir = ".";
 
+// Default output prefix
+static const char* default_out_prefix = "";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -71,11 +74,23 @@ static const char* default_out_dir = ".";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
+static StringArray      data_files, found_data_files;
 static ConcatString     config_file;
 static GridDiagConfInfo conf_info;
+static GrdFileType      ftype;
 
 // Optional arguments
 static ConcatString out_dir;
+static ConcatString out_prefix;
+
+// Data plane, mask plane, and grid
+static DataPlane  dp;
+static MaskPlane  mp;
+static Grid       grid;
+
+// Data file factory and input files
+static Met2dDataFileFactory mtddf_factory;
+static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
 
 #endif  //  __GRID_DIAG_H__
 
