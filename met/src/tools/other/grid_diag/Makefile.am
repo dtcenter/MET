@@ -8,6 +8,7 @@ grid_diag_SOURCES = grid_diag.cc \
 grid_diag_CPPFLAGS = ${MET_CPPFLAGS}
 grid_diag_LDFLAGS = ${MET_LDFLAGS}
 grid_diag_LDADD = \
+	-lvx_series_data \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \

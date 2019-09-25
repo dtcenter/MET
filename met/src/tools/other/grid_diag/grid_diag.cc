@@ -20,6 +20,8 @@
 
 #include "grid_diag.h"
 
+#include "series_data.h"
+
 static void usage();
 static void process_command_line(int, char**);
 static void set_data_files(const StringArray&);
