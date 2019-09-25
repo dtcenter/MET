@@ -96,6 +96,10 @@ void process_command_line(int argc, char **argv) {
     conf_info.read_config(default_config_file.c_str(),
                           config_file.c_str());
 
+    // Get data file type from config
+    ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
+        conf_key_data));
+
     // Process the configuration
     conf_info.process_config(ftype);
 
