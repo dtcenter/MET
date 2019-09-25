@@ -143,8 +143,16 @@ void set_verbosity(const StringArray& a) {
 
 void process_fields() {
 
-    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+    VarInfo *data_info = (VarInfo *) 0;
+    DataPlane data_dp;
+
+    for (int i_entry = 0; i_entry < data_files.n_elements(); i_entry++) {
+        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+            data_info = conf_info.data_info[i_var];
+            get_series_entry(i_entry, data_info,
+                data_files, ftype, found_data_files,
+                data_dp, latlon_arr);
+        }
     }
 }
-
 ////////////////////////////////////////////////////////////////////////

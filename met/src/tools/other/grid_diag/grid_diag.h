@@ -87,6 +87,7 @@ static ConcatString out_prefix;
 static DataPlane  dp;
 static MaskPlane  mp;
 static Grid       grid;
+static Grid       latlon_arr;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
