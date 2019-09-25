@@ -35,6 +35,9 @@ class GridDiagConfInfo {
 
         void init_from_scratch();
 
+        // Number of data fields
+        int n_data;
+
     public:
 
         // GridDiag configuration object
@@ -52,10 +55,18 @@ class GridDiagConfInfo {
         void clear();
 
         void read_config(const char*, const char*);
-        void process_config();
+        void process_config(GrdFileType);
 
         int get_n_data() const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int GridDiagConfInfo::get_n_data() const {
+    return n_data;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 #endif  /*  __GRID_DIAG_CONF_INFO_H__  */
 

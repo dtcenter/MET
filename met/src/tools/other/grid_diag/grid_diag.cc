@@ -27,6 +27,7 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
+static void process_fields();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,6 +38,9 @@ int main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
+
+    // Process data fields
+    process_fields();
 
     return(0);
 }
@@ -93,7 +97,7 @@ void process_command_line(int argc, char **argv) {
                           config_file.c_str());
 
     // Process the configuration
-    conf_info.process_config();
+    conf_info.process_config(ftype);
 
     return;
 }
@@ -127,6 +131,14 @@ void set_logfile(const StringArray& a) {
 
 void set_verbosity(const StringArray& a) {
     mlog.set_verbosity_level(atoi(a[0].c_str()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_fields() {
+
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
