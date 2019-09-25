@@ -264,7 +264,7 @@
       &DATA_DIR_MODEL;/met_nc/hrrr/HRRR_20190518_013_036_24h.nc \
       G211 \
       &OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_GAUSSIAN.nc \
-      -field 'name="MXUPHL_24"; level="A24";'
+      -field 'name="MXUPHL_24"; level="A24";' \
       -method GAUSSIAN -width 27 -gaussian_radius 120 -gaussian_dx 81.271 -v 1
     </param>
     <output>
