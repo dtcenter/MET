@@ -57,7 +57,6 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
-static const double     DefaultInterpSigma = default_interp_sigma;
 static const double     DefaultVldThresh  = 0.5;
 
 static const float      MISSING_LATLON = -999.0;
@@ -116,7 +115,8 @@ static void usage();
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
-static void set_sigma(const StringArray &);
+static void set_gaussian_dx(const StringArray &);
+static void set_gaussian_radius(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
@@ -183,7 +183,8 @@ void process_command_line(int argc, char **argv) {
    RGInfo.field      = FieldType_None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
-   RGInfo.sigma      = DefaultInterpSigma;
+   RGInfo.gaussian_dx     = default_gaussian_dx;
+   RGInfo.gaussian_radius = default_gaussian_radius;
    RGInfo.vld_thresh = DefaultVldThresh;
    RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
 
@@ -201,7 +202,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_method,     "-method",     1);
    cline.add(set_shape,      "-shape",      1);
    cline.add(set_width,      "-width",      1);
-   cline.add(set_sigma,      "-sigma",      1);
+   cline.add(set_gaussian_radius, "-gaussian_radius", 1);
+   cline.add(set_gaussian_dx,     "-gaussian_dx",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
@@ -248,7 +250,7 @@ void process_command_line(int argc, char **argv) {
           || att_val == "Mesoscale" )
       set_goes_interpolate_option();
    }
-
+cout << "  DEBUG HS gaussian_radius: " << RGInfo.gaussian_radius << ", gaussian_dx: " << RGInfo.gaussian_dx << " width: " << RGInfo.width << "\n";
    RGInfo.validate();
 
    return;
@@ -1283,7 +1285,8 @@ void usage() {
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-        << "\t[-sigma n]\n"
+        << "\t[-gaussan_dx n]\n"
+        << "\t[-gaussan_radius n]\n"
         << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
@@ -1314,8 +1317,11 @@ void usage() {
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
 
-        << "\t\t\"-sigma n\" overrides the default regridding "
-        << "sigma (" << RGInfo.sigma << "). Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian_dx << ". Ignored if not Gaussian method (optional).\n"
+
+        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian_radius << "). Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
@@ -1354,6 +1360,11 @@ void set_method(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_gaussian_dx(const StringArray &a) {
+   RGInfo.gaussian_dx = atof(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
    opt_override_width = true;
@@ -1361,8 +1372,8 @@ void set_width(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_sigma(const StringArray &a) {
-   RGInfo.sigma = atof(a[0].c_str());
+void set_gaussian_radius(const StringArray &a) {
+   RGInfo.gaussian_radius = atof(a[0].c_str());
 }
 
 

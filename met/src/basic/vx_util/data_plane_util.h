@@ -42,12 +42,12 @@ extern void rescale_probability(DataPlane &);
 extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                InterpMthd mthd, int width,
                const GridTemplateFactory::GridTemplates shape,
-               double sigma, double t);
+               double t, const double gaussian_radius, const double gaussian_dx);
 
 extern DataPlane smooth_field(const DataPlane &dp,
                     InterpMthd mthd, int width,
                     const GridTemplateFactory::GridTemplates shape,
-                    double sigma, double t);
+                    double t, const double gaussian_radius, const double gaussian_dx);
 
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,

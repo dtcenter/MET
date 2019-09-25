@@ -95,7 +95,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double sigma, double t) {
+                  double t, const double gaussian_radius, const double gaussian_dx) {
    double v;
    int x, y;
 
@@ -113,7 +113,6 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
         << "Smoothing field using the " << interpmthd_to_string(mthd)
         << "(" << gt->size() << ") " << gt->getClassName()
         << " interpolation method.\n";
-
 
    // Otherwise, apply smoothing to each grid point
    for(x=0; x<dp.nx(); x++) {
@@ -139,7 +138,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                break;
 
             case(InterpMthd_Gaussian): // Unweighted Mean
-               v = interp_gaussian(dp, *gt, (double) x, (double) y, sigma, t);
+               v = interp_max(dp, *gt, x, y, 0);
                break;
 
             // Distance-weighted mean, area-weighted mean, least-squares
@@ -160,6 +159,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       } // end for y
    } // end for x
+   
+   if (mthd == InterpMthd_Gaussian) {
+     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx);
+   }
    delete gt;
    return;
 }
@@ -174,10 +177,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double sigma, double t) {
+                       double t, const double gaussian_radius, const double gaussian_dx) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, sigma, t);
+   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian_radius, gaussian_dx);
 
    return(smooth_dp);
 }
