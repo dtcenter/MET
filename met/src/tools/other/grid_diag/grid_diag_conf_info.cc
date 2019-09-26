@@ -44,7 +44,7 @@ void GridDiagConfInfo::init_from_scratch() {
 
 void GridDiagConfInfo::clear() {
 
-    Version.clear();
+    version.clear();
 
     // Clear data_info
     if(data_info) {
@@ -87,9 +87,9 @@ void GridDiagConfInfo::process_config(GrdFileType ftype) {
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;
 
-    // Conf: Version
-    Version = Conf.lookup_string(conf_key_version);
-    check_met_version(Version.c_str());
+    // Conf: version
+    version = Conf.lookup_string(conf_key_version);
+    check_met_version(version.c_str());
 
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);
@@ -137,6 +137,12 @@ void GridDiagConfInfo::process_config(GrdFileType ftype) {
     }
 
     return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagConfInfo::process_mask(const Grid&) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////

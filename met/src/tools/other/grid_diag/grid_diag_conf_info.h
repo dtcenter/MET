@@ -25,7 +25,18 @@ class GridDiagVxOpt {
         GridDiagVxOpt();
         ~GridDiagVxOpt();
 
+        StringArray mask_grid; // Masking grid strings
+        StringArray mask_poly; // Masking polyline strings
+        StringArray mask_name; // Masking region names
+
+        int get_n_mask() const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int GridDiagVxOpt::get_n_mask() const {
+    return mask_name.n_elements();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +55,12 @@ class GridDiagConfInfo {
         MetConfig Conf;
 
         // Config file version
-        ConcatString Version;
+        ConcatString version;
+
+        // Masking grid or polyline
+        ConcatString mask_grid;
+        ConcatString mask_poly;
+        ConcatString mask_name;
 
         // Variable information
         VarInfo** data_info;
@@ -56,6 +72,7 @@ class GridDiagConfInfo {
 
         void read_config(const char*, const char*);
         void process_config(GrdFileType);
+        void process_mask(const Grid&);
 
         int get_n_data() const;
 };
