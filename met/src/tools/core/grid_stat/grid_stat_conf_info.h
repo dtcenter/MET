@@ -57,7 +57,9 @@ static const int i_grad   = 18;
 
 static const int i_vcnt   = 19;
 
-static const int n_txt    = 20;
+static const int i_dmap   = 20;
+
+static const int n_txt    = 21;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -88,6 +90,7 @@ static const STATLineType txt_file_type[n_txt] = {
 
    stat_grad,       //  18
    stat_vcnt,       //  19
+   stat_dmap        //  20
 
 };
 
@@ -103,6 +106,7 @@ struct GridStatNcOutInfo {
    bool do_nbrhd;
    bool do_fourier;
    bool do_gradient;
+   bool do_distance_map;
    bool do_apply_mask;
 
       //////////////////////////////////////////////////////////////////
@@ -171,6 +175,12 @@ class GridStatVxOpt {
       // Gradient Options
       IntArray         grad_dx;          // Gradient step size in the X direction
       IntArray         grad_dy;          // Gradient step size in the Y direction
+
+      // Distance Map Options
+      int              baddeley_p;        // Exponent for lp-norm
+      double           baddeley_max_dist; // Maximum distance constant
+      double           fom_alpha;         // FOM Alpha
+      double           zhu_weight;        // Zhu Weight 
 
       bool             rank_corr_flag;   // Flag for computing rank correlations
 

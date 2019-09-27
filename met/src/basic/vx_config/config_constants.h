@@ -131,6 +131,7 @@ enum STATLineType {
    stat_relp,
    stat_eclv,
    stat_grad,
+   stat_dmap,
    stat_header,
 
    no_stat_line_type
@@ -164,6 +165,7 @@ static const char stat_nbrctc_str[] = "NBRCTC";
 static const char stat_nbrcts_str[] = "NBRCTS";
 static const char stat_nbrcnt_str[] = "NBRCNT";
 static const char stat_grad_str[]   = "GRAD";
+static const char stat_dmap_str[]   = "DMAP";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_ecnt_str[]   = "ECNT";
@@ -615,13 +617,18 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 //
 // Grid-Stat specific parameter key names
 //
-static const char conf_key_nc_pairs_var_str[] = "nc_pairs_var_str";
-static const char conf_key_fourier[]          = "fourier";
-static const char conf_key_wave_1d_beg[]      = "wave_1d_beg";
-static const char conf_key_wave_1d_end[]      = "wave_1d_end";
-static const char conf_key_gradient[]         = "gradient";
-static const char conf_key_dx[]               = "dx";
-static const char conf_key_dy[]               = "dy";
+static const char conf_key_nc_pairs_var_str[]  = "nc_pairs_var_str";
+static const char conf_key_fourier[]           = "fourier";
+static const char conf_key_wave_1d_beg[]       = "wave_1d_beg";
+static const char conf_key_wave_1d_end[]       = "wave_1d_end";
+static const char conf_key_gradient[]          = "gradient";
+static const char conf_key_dx[]                = "dx";
+static const char conf_key_dy[]                = "dy";
+static const char conf_key_distance_map[]      = "distance_map";
+static const char conf_key_baddeley_p[]        = "baddeley_p";
+static const char conf_key_baddeley_max_dist[] = "baddeley_max_dist";
+static const char conf_key_fom_alpha[]         = "fom_alpha";
+static const char conf_key_zhu_weight[]        = "zhu_weight";
 
 //
 // Wavelet-Stat specific parameter key names

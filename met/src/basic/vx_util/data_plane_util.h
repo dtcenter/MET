@@ -74,6 +74,8 @@ extern DataPlane normal_cdf_inv(const double, const DataPlane &,
 
 extern DataPlane gradient(const DataPlane &, int dim, int delta);
 
+extern DataPlane distance_map(const DataPlane &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA_PLANE_UTIL__
