@@ -3372,19 +3372,19 @@ void write_dmap_cols(const DMAPInfo &dmap_info,
    at.set_entry(r, c+15, // FOM_MEAN
       dmap_info.fom_mean);
 
-   at.set_entry(r, c+11, // ZHU_FO
+   at.set_entry(r, c+16, // ZHU_FO
       dmap_info.zhu_fo);
 
-   at.set_entry(r, c+12, // ZHU_OF
+   at.set_entry(r, c+17, // ZHU_OF
       dmap_info.zhu_of);
 
-   at.set_entry(r, c+13, // ZHU_MIN
+   at.set_entry(r, c+18, // ZHU_MIN
       dmap_info.zhu_min);
 
-   at.set_entry(r, c+14, // ZHU_MAX
+   at.set_entry(r, c+19, // ZHU_MAX
       dmap_info.zhu_max);
 
-   at.set_entry(r, c+15, // ZHU_MEAN
+   at.set_entry(r, c+20, // ZHU_MEAN
       dmap_info.zhu_mean);
 
    return;
