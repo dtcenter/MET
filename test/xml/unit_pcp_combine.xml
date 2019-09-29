@@ -357,7 +357,7 @@
       &OUTPUT_DIR;/pcp_combine/subtract_ROT_LL_CEIL_minus_MTERH.nc
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/pcp_combine/subtract_ROTLL_CEIL_minus_MTERH.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/subtract_ROT_LL_CEIL_minus_MTERH.nc</grid_nc>
     </output>
   </test>
 
