@@ -76,6 +76,7 @@ static const char* default_out_prefix = "";
 // Input files
 static StringArray      data_files, found_data_files;
 static ConcatString     config_file;
+static ConcatString     mask_file;
 static GridDiagConfInfo conf_info;
 static GrdFileType      ftype;
 

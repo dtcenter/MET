@@ -26,6 +26,7 @@ static void usage();
 static void process_command_line(int, char**);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
+static void set_mask(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
@@ -79,6 +80,7 @@ void process_command_line(int argc, char **argv) {
 
     cline.add(set_data_files, "-data",  -1);
     cline.add(set_config,     "-config", 1);
+    cline.add(set_mask,       "-mask",   1);
     cline.add(set_out,        "-out",    1);
     cline.add(set_logfile,    "-log",    1);
     cline.add(set_verbosity,  "-v",      1);
@@ -118,6 +120,12 @@ void set_data_files(const StringArray& a) {
 
 void set_config(const StringArray& a) {
     config_file = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask(const StringArray& a) {
+    mask_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
