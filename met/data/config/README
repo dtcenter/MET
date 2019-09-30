@@ -1256,7 +1256,10 @@ gradient = {
 // distances larger than this number will be reset to this constant. A value of
 // NA indicates that no maximum distance value should be used. The "fom_alpha"
 // entry is a floating point number specifying the scaling constant to be used
-// when computing Pratt's Figure of Merit.
+// when computing Pratt's Figure of Merit.  The "zhu_weight" specifies a value
+// between 0 and 1 to define the importance of the RMSE of the binary fields
+// (i.e. amount of overlap) versus the mean-error distance (MED).  The default
+// value of 0.5 gives equal weighting.
 //
 // This configuration option may be set separately in each "obs.field" entry.
 //
@@ -1264,6 +1267,7 @@ distance_map = {
    baddeley_p        = 2;
    baddeley_max_dist = NA;
    fom_alpha         = 0.1;
+   zhu_weight        = 0.5;
 }
 
 //

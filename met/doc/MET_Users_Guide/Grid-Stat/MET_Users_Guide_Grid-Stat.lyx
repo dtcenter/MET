@@ -112,9 +112,9 @@ The Grid-Stat tool provides verification statistics for a matched forecast
  However, the interpolation parameters may be used to perform a smoothing
  operation on the forecast and observation fields prior to verification.
  In addition to traditional verification approaches, the Grid-Stat tool
- includes fourier decompositions, gradient statistics, and neighborhood
- methods, designed to examine forecast performance as a function of spatial
- scale.
+ includes fourier decompositions, gradient statistics, distance metrics,
+ and neighborhood methods, designed to examine forecast performance as a
+ function of spatial scale.
 \end_layout
 
 \begin_layout Standard
@@ -610,6 +610,21 @@ Differences are computed in both of the horizontal grid directions and is
  Further, the score depends on the domain and spacing of the grid, so can
  only be compared on forecasts with identical grids.
  
+\end_layout
+
+\begin_layout Subsection
+Distance Metrics 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:GS_Distance_Metrics"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+JHG: Add distance map documentation here.
 \end_layout
 
 \begin_layout Section
@@ -1538,6 +1553,105 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+distance_map = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   baddeley_p        = 2;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   baddeley_max_dist = NA;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   fom_alpha         = 0.1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   zhu_weight        = 0.5;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+distance_map
+\series medium
+ entry is a dictionary containing options related to the distance map statistics
+ in the 
+\series bold
+DMAP
+\series medium
+ output line type.
+ The 
+\series bold
+baddeley_p
+\series medium
+ entry is an integer specifying the exponent used in the Lp-norm when computing
+ the Baddeley Delta metric.
+ The 
+\series bold
+baddeley_max_dist
+\series medium
+ entry is a floating point number specifying the maximum allowable distance
+ for each distance map.
+ Any distances larger than this number will be reset to this constant.
+ A value of 
+\series bold
+NA
+\series medium
+ indicates that no maximum distance value should be used.
+ The 
+\series bold
+fom_alpha
+\series medium
+ entry is a floating point number specifying the scaling constant to be
+ used when computing Pratt's Figure of Merit.
+ The 
+\series bold
+zhu_weight
+\series medium
+ specifies a value between 0 and 1 to define the importance of the RMSE
+ of the binary fields (i.e.
+ amount of overlap) versus the mean-error distance (MED).
+ The default value of 0.5 gives equal weighting.
+ This configuration option may be set separately in each 
+\series bold
+obs.field
+\series medium
+ entry.
+\series default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
@@ -1659,6 +1773,12 @@ vcnt   = BOTH;
 
 \series bold
    grad   = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   dmap   = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1855,6 +1975,14 @@ GRAD
  for Gradient Statistics
 \end_layout
 
+\begin_layout Enumerate
+
+\series bold
+DMAP
+\series default
+ for Distance Map Statistics
+\end_layout
+
 \begin_layout Standard
 
 \series medium
@@ -1891,49 +2019,55 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   latlon     = TRUE;
+   latlon       = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   raw        = TRUE;
+   raw          = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   diff       = TRUE;
+   diff         = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   climo      = TRUE;
+   climo        = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   weight     = FALSE;
+   weight       = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   nbrhd      = FALSE;
+   nbrhd        = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   gradient   = FALSE;
+   gradient     = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   distance_map = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
    
 \series bold
-apply_mask = TRUE;
+apply_mask   = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -2009,6 +2143,12 @@ gradient
 \series medium
  entry controls the creation of output variables for the FCST and OBS gradients
  in the grid-x and grid-y directions.
+ The 
+\series bold
+distance_map
+\series medium
+ entry controls the creation of output variables for the FCST and OBS distance
+ maps in the grid-x and grid-y directions.
  The 
 \series bold
 apply_mask
