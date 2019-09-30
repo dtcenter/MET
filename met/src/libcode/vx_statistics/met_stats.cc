@@ -3098,7 +3098,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
            << fthr_na.n()  << ", " << othr_na.n() << ")\n\n";
       exit(1);
    }
-
+   
    // Initialize
    clear();
 
@@ -3157,33 +3157,39 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       abs_diff_distance = abs(fdmap_na[i] - odmap_na[i]);
       if (hausdorff < abs_diff_distance) hausdorff = abs_diff_distance;
    }
-   
+
    max_events = max(fy, oy);
 
    // Mean error distance
-   med_fo = med_fo_sum / oy;
-   med_of = med_of_sum / fy;
-   med_max = max(med_fo, med_of);
-   med_min = min(med_fo, med_of);
-   med_mean = (med_fo + med_of) / 2;
+   med_fo = (oy == 0 ? bad_data_double : med_fo_sum / oy);
+   med_of = (fy == 0 ? bad_data_double : med_of_sum / fy);
+   if(!is_bad_data(med_fo) && !is_bad_data(med_of)) {
+      med_max  = max(med_fo, med_of);
+      med_min  = min(med_fo, med_of);
+      med_mean = (med_fo + med_of) / 2;
+   }
    
    // Distance metrics
    baddeley = pow(baddeley_delta_sum/(double)total, 1.0/baddeley_p);
    
    // Pratt's Figure of Merit
-   fom_fo = fom_fo_sum / max_events;
-   fom_of = fom_of_sum / max_events;
-   fom_max = max(fom_fo, fom_of);
-   fom_min = min(fom_fo, fom_of);
-   fom_mean = (fom_fo + fom_of) / 2;
+   if(max_events > 0) {
+      fom_fo = fom_fo_sum / max_events;
+      fom_of = fom_of_sum / max_events;
+      fom_max = max(fom_fo, fom_of);
+      fom_min = min(fom_fo, fom_of);
+      fom_mean = (fom_fo + fom_of) / 2;
+   }
    
    // Zhu Metric
    zhu_common = zhu_weight * sqrt(sum_event_diff / total);
-   zhu_fo = zhu_common + (1-zhu_weight) * med_fo;
-   zhu_of = zhu_common + (1-zhu_weight) * med_of;
-   zhu_max = max(zhu_fo, zhu_of);
-   zhu_min = min(zhu_fo, zhu_of);
-   zhu_mean = (zhu_fo + zhu_of) / 2;
+   zhu_fo = (is_bad_data(med_fo) ? bad_data_double : zhu_common + (1-zhu_weight) * med_fo);
+   zhu_of = (is_bad_data(med_of) ? bad_data_double : zhu_common + (1-zhu_weight) * med_of);
+   if(!is_bad_data(zhu_fo) && !is_bad_data(zhu_of)) {
+      zhu_max  = max(zhu_fo, zhu_of);
+      zhu_min  = min(zhu_fo, zhu_of);
+      zhu_mean = (zhu_fo + zhu_of) / 2;
+   }
 
    mlog << Debug(4) << " DMAP: nf=" << fy << ", no=" << oy << ", total=" << total
         << "\tbaddeley=" << baddeley << ", hausdorff=" << hausdorff
