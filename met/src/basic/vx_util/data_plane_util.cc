@@ -705,11 +705,7 @@ double euclide_distance(int x, int y) {
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane distance_map(const DataPlane &dp) {
-   DataPlane dm;
-
-   // TODO: actually compute the distance map here
-   DataPlane g_distance;
-
+   DataPlane g_distance, dm;
    bool debug_g_distance = false;
    double distance_value;
    int ix, iy;
@@ -738,16 +734,18 @@ DataPlane distance_map(const DataPlane &dp) {
             distance_value = 0.0;
             event_count++;
          }
-         else
+         else {
             distance_value = (1.0 + g_distance.get(ix, (iy-1)));
+         }
          g_distance.set(distance_value, ix, iy);
       }
       
       // Meijster scan 2
       for (iy = ny-2; iy>=0; iy--) {
          distance_value = g_distance.get(ix, (iy+1));
-         if (distance_value < g_distance.get(ix, iy))
+         if (distance_value < g_distance.get(ix, iy)) {
             g_distance.set((1.0 + distance_value), ix, iy);
+         }
       }
    }
    
@@ -824,6 +822,9 @@ DataPlane distance_map(const DataPlane &dp) {
          mlog << Debug(debug_level) << message.str() << "\n";
       }
    }
+
+   // Mask the distance map with bad data values of the input field
+   mask_bad_data(dm, dp);
 
    return(dm);
 }

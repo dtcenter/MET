@@ -3020,6 +3020,8 @@ void DMAPInfo::clear() {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void DMAPInfo::reset_options() {
    baddeley_p = 2;          // Exponent for lp-norm
    baddeley_max_dist = 5.0; // Maximum distance constant
@@ -3106,13 +3108,6 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    fthresh = fthr;
    othresh = othr;
 
-   total = fdmap_na.n();
-   if(total == 0) {
-      mlog << Error << "\nDMAPInfo::set() -> "
-           << "count is zero!\n\n";
-      exit(1);
-   }
-   
    // Compute actual DMAP statistics here.
    int max_events;
    int non_zero_count;
@@ -3131,7 +3126,13 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
         << ", baddeley_max_dist=" << baddeley_max_dist
         << ", fom_alpha=" << fom_alpha
         << ", zhu_weight=" << zhu_weight << "\n";
-   for (int i=0; i<total; i++) {
+
+   for (int i=0; i<fdmap_na.n(); i++) {
+
+      // Skip bad data
+      if (is_bad_data(fdmap_na[i]) || is_bad_data(odmap_na[i]) ||
+          is_bad_data(fthr_na[i])  || is_bad_data(othr_na[i])) continue;
+
       if (fthr_na[i] > 0) {
          fy++;
          med_of_sum += odmap_na[i];
@@ -3156,6 +3157,15 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       // Distance metrics
       abs_diff_distance = abs(fdmap_na[i] - odmap_na[i]);
       if (hausdorff < abs_diff_distance) hausdorff = abs_diff_distance;
+
+      // Increment counter
+      total++;
+   }
+
+   if(total == 0) {
+      mlog << Error << "\nDMAPInfo::set() -> "
+           << "count is zero!\n\n";
+      exit(1);
    }
 
    max_events = max(fy, oy);
