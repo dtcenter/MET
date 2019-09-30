@@ -3146,8 +3146,12 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       
       sum_event_diff += (fthr_na[i] - othr_na[i]) * (fthr_na[i] - othr_na[i]);
       
-      f_distance = (fdmap_na[i] > baddeley_max_dist) ? baddeley_max_dist : fdmap_na[i];
-      o_distance = (odmap_na[i] > baddeley_max_dist) ? baddeley_max_dist : odmap_na[i];
+      f_distance = (!is_bad_data(baddeley_max_dist) &&
+                    fdmap_na[i] > baddeley_max_dist ?
+                    baddeley_max_dist : fdmap_na[i]);
+      o_distance = (!is_bad_data(baddeley_max_dist) &&
+                    odmap_na[i] > baddeley_max_dist ?
+                    baddeley_max_dist : odmap_na[i]);
       abs_diff_distance = abs(f_distance - o_distance);
       if (abs_diff_distance > 0.0) {
          baddeley_delta_sum += pow((double)abs_diff_distance, baddeley_p);
