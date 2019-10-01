@@ -6666,6 +6666,745 @@ The overall proportion of grid points with observed events to total grid
 \end_layout
 
 \begin_layout Section
+MET verification measures for distance map methods
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-distance_maps"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The results of the distance map verification approaches that are included
+ in the Grid-Stat tool are summarized using a variety of measures.
+ These measures include Baddeley's 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure
+ of Merit, and Zhu's Measure.
+ Their equations are listed below.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Baddeley's 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ Metric and Hausdorff Distance
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called 
+\begin_inset Quotes eld
+\end_inset
+
+BADDELEY
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+HAUSDORFF
+\begin_inset Quotes erd
+\end_inset
+
+ in the DMAP output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_DMAP"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+The 
+\series medium
+Baddeley's 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ Metric is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\varDelta_{p,w}(A,B)=\left[\frac{1}{N}\overset{\sum}{_{s\in D}}\mid w(d(s,A))-w(d(s,B))\mid\right]^{1/p}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $d(s,\cdot)$
+\end_inset
+
+is the distance map for the respective event area, 
+\begin_inset Formula $w(\cdot)$
+\end_inset
+
+ is an optional concave function (i.e., 
+\begin_inset Formula $w(t+u)\leq w(t)+w(u)$
+\end_inset
+
+) that is strictly increasing at zero with 
+\begin_inset Formula $w(t)=0$
+\end_inset
+
+ if and only if 
+\begin_inset Formula $t=0$
+\end_inset
+
+, 
+\begin_inset Formula $N$
+\end_inset
+
+ is the size of the domain, and 
+\begin_inset Formula $p$
+\end_inset
+
+ is a user chosen parameter for the 
+\begin_inset Formula $L_{p}$
+\end_inset
+
+ norm.
+ The default choice of 
+\begin_inset Formula $p=2$
+\end_inset
+
+ corresponds to a Euclidean average, 
+\begin_inset Formula $p=1$
+\end_inset
+
+ is a simple average of the difference in distance maps, and the limiting
+ case of 
+\begin_inset Formula $p=\infty$
+\end_inset
+
+ gives the maximum difference between the two distance maps and is called
+ the Hausdorff distance, denoted as 
+\begin_inset Formula $H(A,B)$
+\end_inset
+
+, and is the metric that motivated the development of Baddeley’s 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ metric.
+ A typical choice, and the only available with MET, for 
+\begin_inset Formula $w(\cdot)$
+\end_inset
+
+ is 
+\begin_inset Formula $w(t)=\min\{t,c\}$
+\end_inset
+
+, where 
+\begin_inset Formula $c$
+\end_inset
+
+ is a user-chosen constant with
+\begin_inset Formula $c=\infty$
+\end_inset
+
+ meaning that 
+\begin_inset Formula $w(\cdot)$
+\end_inset
+
+ is not applied.
+ This choice of 
+\begin_inset Formula $w(\cdot)$
+\end_inset
+
+ provides a cutoff for distances beyond the pre-specified amount given by
+ 
+\begin_inset Formula $c$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In terms of distance maps, Baddeley’s 
+\series medium
+
+\begin_inset Formula $\Delta$
+\end_inset
+
+
+\series default
+ is the 
+\begin_inset Formula $L_{p}$
+\end_inset
+
+ norm of the top left panel in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_DMAP"
+
+\end_inset
+
+ provided 
+\begin_inset Formula $c=\infty$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $0<c<\infty$
+\end_inset
+
+, then the distance maps in the bottom row of 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+ would be replaced by 
+\begin_inset Formula $c$
+\end_inset
+
+ wherever they would otherwise exceed 
+\begin_inset Formula $c$
+\end_inset
+
+ before calculating their absolute differences in the top left panel of
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Mean-error Distance
+\end_layout
+
+\begin_layout Standard
+Called 
+\begin_inset Quotes eld
+\end_inset
+
+MED_FO
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+MED_OF
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+MED_MIN
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+MED_MAX
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+MED_MEAN
+\begin_inset Quotes erd
+\end_inset
+
+ in the DMAP output (
+\series medium
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_DMAP"
+
+\end_inset
+
+
+\series default
+)
+\end_layout
+
+\begin_layout Standard
+The mean-error distance (MED) is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $MED(A,B)=\frac{1}{n_{B}}\overset{\sum}{_{s\in B}}d(x,A)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $n_{B}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ is the number of non-zero grid points that fall in the event set 
+\begin_inset Formula $B$
+\end_inset
+
+.
+ That is, it is the average of the distance map for the event set 
+\begin_inset Formula $A$
+\end_inset
+
+ calculated only over those grid points that fall inside the event set 
+\begin_inset Formula $B$
+\end_inset
+
+.
+ It gives the average shortest-distance from every point in 
+\begin_inset Formula $B$
+\end_inset
+
+ to the nearest point in 
+\begin_inset Formula $A$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Unlike Baddeley’s
+\series medium
+ 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ 
+\series default
+metric, the MED is not a mathematical metric because it fails the symmetry
+ property.
+ However, if a metric is desired, then any of the following modifications,
+ which are metrics, can be employed instead, and all are available through
+ MET.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $minMED(A,B)=min\{MED(A,B),MED(B,A)\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $maxMED(A,B)=max\{MED(A,B),MED(B,A)\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $meanMED(A,B)=\frac{1}{2}\{MED(A,B)+MED(B,A)\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From the distance map perspective, 
+\begin_inset Formula $MED(A,B)$
+\end_inset
+
+ is the average of the values in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+ (top right), and 
+\begin_inset Formula $MED(B,A)$
+\end_inset
+
+ is the average of the values in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+ (bottom left).
+ Note that the average is only over the circular regions depicted in the
+ figure.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Pratt's Figure of Merit
+\end_layout
+
+\begin_layout Standard
+Called 
+\begin_inset Quotes eld
+\end_inset
+
+FOM_FO
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+FOM_OF
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+FOM_MIN
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+FOM_MAX
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+FOM_MEAN
+\begin_inset Quotes erd
+\end_inset
+
+ in the DMAP output (
+\series medium
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_DMAP"
+
+\end_inset
+
+
+\series default
+)
+\end_layout
+
+\begin_layout Standard
+Pratt’s Figure of Merit (FOM) is given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $FOM(A,B)=\frac{1}{max\{n_{A},n_{B}\}}\overset{\sum}{_{s\in B}}\frac{1}{1+\alpha d(s,A)^{2}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $n_{A}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ and 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $n_{B}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+are the number of events within event areas 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+, respectively, 
+\begin_inset Formula $d(s,A)$
+\end_inset
+
+ is the distance map related to the event area 
+\begin_inset Formula $A$
+\end_inset
+
+, and 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is a user-defined scaling constant.
+ The default, and usual choice, is 
+\begin_inset Formula $\alpha=\frac{1}{9}$
+\end_inset
+
+ when the distances of the distance map are normalized so that the smallest
+ nonzero distance between grid point neighbors equals one.
+ Clearly, FOM is not a metric because like MED, it is not symmetric.
+ Like MED, MET computes the minimum, maximum, and average of FOM_FO and
+ FOM_OF.
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $d(s,A)$
+\end_inset
+
+ in the denominator is summed only over the grid squares falling within
+ the event set 
+\begin_inset Formula $B$
+\end_inset
+
+.
+ That is, it represents the circular area in the top right panel of 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Zhu's Measure
+\end_layout
+
+\begin_layout Standard
+Called 
+\begin_inset Quotes eld
+\end_inset
+
+ZHU_FO
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ZHU_OF
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ZHU_MIN
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ZHU_MAX
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+ZHU_MEAN
+\begin_inset Quotes erd
+\end_inset
+
+ in the DMAP output (
+\series medium
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_DMAP"
+
+\end_inset
+
+
+\series default
+)
+\end_layout
+
+\begin_layout Standard
+Another measure incorporates the amount of actual overlap between the event
+ sets across the fields in addition to the MED from above and was proposed
+ by Zhu et al.
+ (2011).
+ Their main proposed measure was a comparative forecast performance measure
+ of two competing forecasts against the same observation, which is not included
+ here, but as defined is a true mathematical metric.
+ They also proposed a similar measure of only the forecast against the observati
+on, which is included in MET.
+ It is simply 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Z(A,B)=\lambda\sqrt{\frac{1}{N}\overset{\sum}{_{s\in D}}(I_{F}(s)-I_{O}(s))^{2}}+(1-\lambda)\cdot MED(A,B)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $MED(A,B)$
+\end_inset
+
+ is as in the Mean-error distance, 
+\begin_inset Formula $N$
+\end_inset
+
+ is the total number of grid squares as in Baddeley's
+\series medium
+
+\begin_inset Formula $\Delta$
+\end_inset
+
+
+\series default
+ metric, 
+\begin_inset Formula $I_{F}(s)$
+\end_inset
+
+ (
+\begin_inset Formula $(I_{O}(s)$
+\end_inset
+
+) is the binary field derived from the forecast (observation), and 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is a user-chosen weight.
+ The first term is just the RMSE of the binary forecast and observed fields,
+ so it measures the average amount of overlap of event areas where zero
+ would be a perfect score.
+ It is not a metric because of the MED in the second term.
+ A user might choose different weights depending on whether they want to
+ emphasize the overlap or the MED terms more, but generally equal weight
+ (
+\begin_inset Formula $\lambda=\frac{1}{2}$
+\end_inset
+
+) is sufficient.
+ In Zhu et al (2011), they actually only consider 
+\begin_inset Formula $Z(F,O)$
+\end_inset
+
+ and not 
+\begin_inset Formula $Z(O,F)$
+\end_inset
+
+, but both are included in MET for the same reasons as argued with MED.
+ Similar to MED, the average of these two directions (avg Z), as well as
+ the min and max are also provided for convenience.
+ 
+\end_layout
+
+\begin_layout Section
 Calculating Percentiles
 \end_layout
 
