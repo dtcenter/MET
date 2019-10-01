@@ -670,7 +670,8 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    }
 
    // Initialize to bad data values
-   grad_dp.set_size(dp.nx(), dp.ny());
+   grad_dp = dp;
+   grad_dp.set_constant(bad_data_double);
 
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
@@ -712,11 +713,11 @@ DataPlane distance_map(const DataPlane &dp) {
    int nx = dp.nx();
    int ny = dp.ny();
    int max_distance = nx + ny;
-   
-   //debug_g_distance = !debug_g_distance;
-   g_distance.set_size(nx, ny);
+
+   // Initialize to the maximum distance   
+   g_distance = dp;
    g_distance.set_constant(max_distance);
-   dm.set_size(nx, ny);
+   dm = dp;
    dm.set_constant(max_distance);
    
    int event_count = 0;
