@@ -670,7 +670,8 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    }
 
    // Initialize to bad data values
-   grad_dp.set_size(dp.nx(), dp.ny());
+   grad_dp = dp;
+   grad_dp.set_constant(bad_data_double);
 
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
