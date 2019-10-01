@@ -47,7 +47,6 @@ using namespace netCDF;
 #include "vx_tc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
-#include "vx_statistics.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -77,7 +76,7 @@ static const char* default_out_prefix = "";
 // Input files
 static StringArray      data_files, found_data_files;
 static ConcatString     config_file;
-static ConcatString     mask_grid_str;
+static ConcatString     mask_file;
 static GridDiagConfInfo conf_info;
 static GrdFileType      ftype;
 

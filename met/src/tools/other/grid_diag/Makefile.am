@@ -17,12 +17,15 @@ grid_diag_LDADD = \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_regrid \
+	-lvx_statistics \
 	-lvx_config \
 	-lvx_config \
 	-lvx_log \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
+	-lvx_color \
 	$(PYTHON_LIBS) \
         -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 

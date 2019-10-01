@@ -30,7 +30,6 @@ static void set_mask(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
-static void process_mask();
 static void process_fields();
 
 ////////////////////////////////////////////////////////////////////////
@@ -42,9 +41,6 @@ int main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
-
-    // Process mask
-    process_mask();
 
     // Process data fields
     process_fields();
@@ -129,7 +125,7 @@ void set_config(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask(const StringArray& a) {
-    mask_grid_str = a[0];
+    mask_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -149,13 +145,6 @@ void set_logfile(const StringArray& a) {
 
 void set_verbosity(const StringArray& a) {
     mlog.set_verbosity_level(atoi(a[0].c_str()));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_mask() {
-    ConcatString name;
-    parse_grid_mask(mask_grid_str, grid, mp, name);
 }
 
 ////////////////////////////////////////////////////////////////////////
