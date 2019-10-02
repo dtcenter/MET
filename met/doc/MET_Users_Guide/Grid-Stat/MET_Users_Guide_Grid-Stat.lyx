@@ -1878,8 +1878,9 @@ zhu_weight
 obs.field
 \series medium
  entry.
-\series default
+\end_layout
 
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
