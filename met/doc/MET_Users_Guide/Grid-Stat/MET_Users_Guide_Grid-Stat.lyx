@@ -2391,7 +2391,7 @@ gradient
 distance_map
 \series medium
  entry controls the creation of output variables for the FCST and OBS distance
- maps in the grid-x and grid-y directions.
+ maps for each categorical threshold.
  The 
 \series bold
 apply_mask
