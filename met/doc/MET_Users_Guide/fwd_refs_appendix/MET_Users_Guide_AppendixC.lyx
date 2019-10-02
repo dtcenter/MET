@@ -6692,7 +6692,7 @@ The results of the distance map verification approaches that are included
 
 \begin_layout Standard
 
-\series medium
+\series bold
 Baddeley's 
 \begin_inset Formula $\Delta$
 \end_inset
@@ -6895,7 +6895,7 @@ reference "Fig4_Grid-Stat"
 
 \begin_layout Standard
 
-\series medium
+\series bold
 Mean-error Distance
 \end_layout
 
@@ -7087,7 +7087,7 @@ reference "Fig4_Grid-Stat"
 
 \begin_layout Standard
 
-\series medium
+\series bold
 Pratt's Figure of Merit
 \end_layout
 
@@ -7270,7 +7270,7 @@ reference "Fig4_Grid-Stat"
 
 \begin_layout Standard
 
-\series medium
+\series bold
 Zhu's Measure
 \end_layout
 
