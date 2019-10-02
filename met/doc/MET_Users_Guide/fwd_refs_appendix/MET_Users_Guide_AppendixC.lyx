@@ -154,10 +154,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -799,7 +795,21 @@ T
 \series medium
 The categorical verification measures produced by the Point-Stat and Grid-Stat
  tools are described in the following subsections.
- They are presented in the order shown in Tables 4-3 through 4-8.
+ They are presented in the order shown in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+ through 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS_cont"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -823,13 +833,27 @@ Base rate
 \begin_layout Standard
 
 \series medium
-Called "O_RATE" in FHO output (Table 4-3)
+Called "O_RATE" in FHO output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "BASER" in CTS output (Table 4-5)
+Called "BASER" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -872,13 +896,27 @@ Mean forecast
 \begin_layout Standard
 
 \series medium
-Called "F_RATE" in FHO output (Table 4-3); 
+Called "F_RATE" in FHO output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "FMEAN" in CTS output (Table 4-5)
+Called "FMEAN" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -921,7 +959,16 @@ Accuracy
 \end_layout
 
 \begin_layout Standard
-Called "ACC" in CTS output (Table 4-5) 
+Called "ACC" in CTS output 
+\series medium
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -978,7 +1025,14 @@ Frequency Bias
 \begin_layout Standard
 
 \series medium
-Called "FBIAS" in CTS output (Table 4-5)
+Called "FBIAS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1026,13 +1080,27 @@ Probability of Detection (POD)
 \begin_layout Standard
 
 \series medium
-Called "H_RATE" in FHO output (Table 4-3); 
+Called "H_RATE" in FHO output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "PODY" in CTS output (Table 4-5) 
+Called "PODY" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1074,7 +1142,14 @@ Probability of False Detection (POFD)
 \begin_layout Standard
 
 \series medium
-Called "POFD" in CTS output (Table 4-5)
+Called "POFD" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1115,7 +1190,14 @@ Probability of Detection of the non-event (PODn)
 \begin_layout Standard
 
 \series medium
-Called "PODN" in CTS output (Table 4-5)
+Called "PODN" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1158,7 +1240,14 @@ False Alarm Ratio (FAR)
 \begin_layout Standard
 
 \series medium
-Called "FAR" in CTS output (Table 4-5)
+Called "FAR" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1200,7 +1289,14 @@ Critical Success Index (CSI)
 \begin_layout Standard
 
 \series medium
-Called "CSI" in CTS output (Table 4-5)
+Called "CSI" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1257,7 +1353,14 @@ Gilbert Skill Score (GSS)
 \begin_layout Standard
 
 \series medium
-Called "GSS" in CTS output (Table 4-5)
+Called "GSS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1324,7 +1427,14 @@ Hanssen-Kuipers Discriminant (H-K)
 \begin_layout Standard
 
 \series medium
-Called "HK" in CTS output (Table 4-5)
+Called "HK" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1387,7 +1497,16 @@ Heidke Skill Score (HSS)
 \end_layout
 
 \begin_layout Standard
-Called "HSS" in CTS output (Table 4-5)
+Called "HSS" in CTS output 
+\series medium
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1452,7 +1571,14 @@ Odds Ratio (OR)
 \begin_layout Standard
 
 \series medium
-Called "ODDS" in CTS output (Table 4-5)
+Called "ODDS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1528,7 +1654,14 @@ Logarithm of the Odds Ratio (LODDS)
 \begin_layout Standard
 
 \series medium
-Called "LODDS" in CTS output (Table 4-5)
+Called "LODDS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1564,7 +1697,14 @@ Odds Ratio Skill Score (ORSS)
 \begin_layout Standard
 
 \series medium
-Called "ORSS" in CTS output (Table 4-5)
+Called "ORSS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1605,7 +1745,14 @@ Extreme Dependency Score (EDS)
 \begin_layout Standard
 
 \series medium
-Called "EDS" in CTS output (Table 4-5)
+Called "EDS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1665,7 +1812,16 @@ Extreme Dependency Index (EDI)
 \end_layout
 
 \begin_layout Standard
-Called "EDI" in CTS output (Table 4-5)
+Called "EDI" in CTS output 
+\series medium
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1697,7 +1853,14 @@ Symmetric Extreme Dependency Score (SEDS)
 \begin_layout Standard
 
 \series medium
-Called "SEDS" in CTS output (Table 4-5)
+Called "SEDS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1762,7 +1925,14 @@ Symmetric Extremal Dependency Index (SEDI)
 \begin_layout Standard
 
 \series medium
-Called "SEDI" in CTS output (Table 4-5)
+Called "SEDI" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1865,7 +2035,14 @@ Bias Adjusted Gilbert Skill Score (GSS)
 \begin_layout Standard
 
 \series medium
-Called "BAGSS" in CTS output (Table 4-5)
+Called "BAGSS" in CTS output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -1883,7 +2060,14 @@ Economic Cost Loss Relative Value (ECLV)
 \begin_layout Standard
 
 \series medium
-Called "ECLV" in CNT output (Table 4-5)
+Included in ECLV output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_ECLV"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2053,13 +2237,27 @@ Mean forecast
 \begin_layout Standard
 
 \series medium
-Called "FBAR" in CNT output (Table 4-6)
+Called "FBAR" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "FBAR" in SL1L2 output (Table 4-11)
+Called "FBAR" in SL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2092,13 +2290,27 @@ Mean observation
 \begin_layout Standard
 
 \series medium
-Called "OBAR" in CNT output (Table 4-6)
+Called "OBAR" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "OBAR" in SL1L2 output (Table 4-11)
+Called "OBAR" in SL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2131,7 +2343,14 @@ Forecast standard deviation
 \begin_layout Standard
 
 \series medium
-Called "FSTDEV" in CNT output (Table 4-6)
+Called "FSTDEV" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2183,7 +2402,14 @@ Observation standard deviation
 \begin_layout Standard
 
 \series medium
-Called "OSTDEV" in CNT output (Table 4-6)
+Called "OSTDEV" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2235,7 +2461,14 @@ Pearson Correlation Coefficient
 \begin_layout Standard
 
 \series medium
-Called "PR_CORR" in CNT output (Table 4-6)
+Called "PR_CORR" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2307,7 +2540,14 @@ Spearman rank correlation coefficient (
 \begin_layout Standard
 
 \series medium
-Called "SP_CORR" in CNT (Table 4-6)
+Called "SP_CORR" in CNT (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2388,7 +2628,16 @@ Kendall's Tau statistic (
 \end_layout
 
 \begin_layout Standard
-Called "KT_CORR" in CNT output (Table 4-6)
+Called "KT_CORR" in CNT output 
+\series medium
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2505,7 +2754,14 @@ Mean Error (ME)
 \begin_layout Standard
 
 \series medium
-Called "ME" in CNT output (Table 4-6)
+Called "ME" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2554,7 +2810,14 @@ Mean Error Squared (ME2)
 \begin_layout Standard
 
 \series medium
-Called "ME2" in CNT output (Table 4-6)
+Called "ME2" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2594,7 +2857,14 @@ Multiplicative Bias
 \begin_layout Standard
 
 \series medium
-Called "MBIAS" in CNT output (Table 4-6)
+Called "MBIAS" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2628,7 +2898,14 @@ Mean-squared error (MSE)
 \begin_layout Standard
 
 \series medium
-Called "MSE" in CNT output (Table 4-6)
+Called "MSE" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2649,7 +2926,14 @@ Root-mean-squared error (RMSE)
 \begin_layout Standard
 
 \series medium
-Called "RMSE" in CNT output (Table 4-6)
+Called "RMSE" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2670,7 +2954,14 @@ Standard deviation of the error
 \begin_layout Standard
 
 \series medium
-Called "ESTDEV" in CNT output (Table 4-6)
+Called "ESTDEV" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2680,7 +2971,14 @@ Bias-Corrected MSE
 \begin_layout Standard
 
 \series medium
-Called "BCMSE" in CNT output (Table 4-6)
+Called "BCMSE" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2817,7 +3115,14 @@ Mean Absolute Error (MAE)
 \begin_layout Standard
 
 \series medium
-Called "MAE" in CNT output (Table 4-6)
+Called "MAE" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2845,7 +3150,14 @@ Inter Quartile Range of the Errors (IQR)
 \begin_layout Standard
 
 \series medium
-Called "IQR" in CNT output (Table 4-6)
+Called "IQR" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2882,7 +3194,16 @@ Median Absolute Deviation (MAD)
 \end_layout
 
 \begin_layout Standard
-Called "MAD" in CNT output (Table 4-6)
+Called "MAD" in CNT output 
+\series medium
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2921,7 +3242,14 @@ Mean Squared Error Skill Score
 \begin_layout Standard
 
 \series medium
-Called "MSESS" in CNT output (Table 4-6)
+Called "MSESS" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2968,7 +3296,14 @@ Root-mean-squared Forecast Anomaly
 \begin_layout Standard
 
 \series medium
-Called "RMSFA" in CNT output (Table 4-6)
+Called "RMSFA" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -2989,7 +3324,14 @@ Root-mean-squared Observation Anomaly
 \begin_layout Standard
 
 \series medium
-Called "RMSOA" in CNT output (Table 4-6)
+Called "RMSOA" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3010,7 +3352,14 @@ Percentiles of the errors
 \begin_layout Standard
 
 \series medium
-Called "E10", "E25", "E50", "E75", "E90" in CNT output (Table 4-6)
+Called "E10", "E25", "E50", "E75", "E90" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3034,7 +3383,14 @@ Anomaly Correlation Coefficient
 \begin_layout Standard
 
 \series medium
-Called "ANOM_CORR" in CNT output (Table 4-6)
+Called "ANOM_CORR" in CNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3109,8 +3465,35 @@ Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect
 \end_layout
 
 \begin_layout Subsubsection*
-Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2) (Tables 4-11, 4-12, 4-13,
- and 4-14)
+Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2) (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SL1L2"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SAL1L2"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_VL1L2"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_VAL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3171,8 +3554,14 @@ Scalar L1 and L2 values
 \begin_layout Standard
 
 \series medium
-Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output (Table
- 4-11)
+Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3316,8 +3705,14 @@ Scalar anomaly L1 and L2 values
 \begin_layout Standard
 
 \series medium
-Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output (Table
- 4-12)
+Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SAL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3456,7 +3851,14 @@ Vector L1 and L2 values
 
 \series medium
 Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR"
- in VL1L2 output (Table 4-13)
+ in VL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_VL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3704,7 +4106,14 @@ Vector anomaly L1 and L2 values
 
 \series medium
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR
-" in VAL1L2 output (Table 4-14)
+" in VAL1L2 output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_VAL1L2"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -3907,7 +4316,14 @@ Gradient values
 
 \series medium
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RAT
-IO" in GRAD output (Table 4-15)
+IO" in GRAD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_GRAD"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5177,6 +5593,21 @@ Reliability
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"RELIABILITY"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 A component of the Brier score.
@@ -5212,6 +5643,21 @@ overline o_i)^2}$$
 
 \begin_layout Subsubsection*
 Resolution 
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"RESOLUTION"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5253,6 +5699,21 @@ Uncertainty
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"UNCERTAINTY"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 A component of the Brier score.
@@ -5284,6 +5745,21 @@ frac{n_{.1}}{T})$$
 
 \begin_layout Subsubsection*
 Brier score 
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"BRIER"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5431,6 +5907,25 @@ Brier Skill Score (BSS)
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"BSS"
+\series default
+ and 
+\series medium
+"BSS_SMPL"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 BSS is a skill score based on the Brier Scores of the forecast and a reference
@@ -5457,9 +5952,29 @@ hbox{BS}_{ref}}}.$$
 
 \end_layout
 
+\begin_layout Standard
+BSS is computed using the climatology specified in the confguration file
+ while BSS_SMPL is computed using the sample climatology of the current
+ set of observations.
+\end_layout
+
 \begin_layout Subsubsection*
-OY_TP - Observed Yes Total Proportion.
- 
+OY_TP - Observed Yes Total Proportion
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"OY_TP"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5499,8 +6014,22 @@ hbox{probability}(o_{i1})$$
 \end_layout
 
 \begin_layout Subsubsection*
-ON_TP - Observed No Total Proportion.
- 
+ON_TP - Observed No Total Proportion
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"ON_TP"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5540,6 +6069,21 @@ hbox{probability}(o_{i0})$$
 
 \begin_layout Subsubsection*
 Calibration 
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"CALIBRATION"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5588,6 +6132,21 @@ Refinement
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"REFINEMENT"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The relative frequency associated with each forecast probability, sometimes
@@ -5623,6 +6182,21 @@ hbox{probability}(p_i)$$
 
 \begin_layout Subsubsection*
 Likelihood 
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"LIKELIHOOD"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5674,6 +6248,21 @@ Likelihood values are also used to create "discrimination" plots that compare
 
 \begin_layout Subsubsection*
 Base Rate 
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"BASER"
+\series default
+ in PJC output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -5920,6 +6509,21 @@ Area Under the ROC curve (AUC)
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"ROC_AUC"
+\series default
+ in PSTD output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The area under the receiver operating characteristic (ROC) curve is often
@@ -5969,6 +6573,21 @@ name "sec:App_C-ensemble"
 
 \begin_layout Subsubsection*
 CRPS
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"CRPS"
+\series default
+ in ECNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6134,6 +6753,21 @@ CRPS Skill Score
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"CRPSS"
+\series default
+ in ECNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The continuous ranked probability skill score (CRPSS) is similar to the
@@ -6167,6 +6801,21 @@ hbox{CRPS}_{ref} }$$
 
 \begin_layout Subsubsection*
 IGN
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"IGN"
+\series default
+ in ECNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6246,6 +6895,21 @@ PIT
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"PIT"
+\series default
+ in ORANK output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The probability integral transform (PIT) is the analog of the rank histogram
@@ -6263,6 +6927,21 @@ The probability integral transform (PIT) is the analog of the rank histogram
 
 \begin_layout Subsubsection*
 RANK
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"RANK"
+\series default
+ in ORANK output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6295,16 +6974,46 @@ SPREAD
 \end_layout
 
 \begin_layout Standard
+Called 
+\series medium
+"SPREAD"
+\series default
+ in ECNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+Called 
+\series medium
+"SPREAD"
+\series default
+ in ORANK output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The ensemble spread for a single observation is the standard deviation of
  the ensemble member forecast values at that location.
  When verifying against point observations, these values are written to
- the ENS_SPREAD column of the Observation Rank (ORANK) line type.
+ the SPREAD column of the Observation Rank (ORANK) line type.
  The ensemble spread computed over a spatial masking region is the average
  of the spread values for all observations falling within the mask.
- These values are written to the SPREAD column of the Ranked Histogram (RHIST)
- line type.
+ These values are written to the SPREAD column of the Ensemble Continuous
+ Statistics (ECNT) line type.
 \end_layout
 
 \begin_layout Section
@@ -6340,79 +7049,170 @@ ood tool, and included in the NBRCTS output, are listed below:
 \begin_layout Standard
 
 \series medium
-* Base Rate (called "BASER" in Table 5-3)
+* Base Rate (called "BASER" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Mean Forecast (called "FMEAN" in Table 5-3)
+* Mean Forecast (called "FMEAN" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Accuracy (called "ACC" in Table 5-3)
+* Accuracy (called "ACC" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Frequency Bias (called "FBIAS" in Table 5-3)
+* Frequency Bias (called "FBIAS" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Probability of Detection (called "PODY" in Table 5-3)
+* Probability of Detection (called "PODY" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Probability of Detection of the non-event (called "PODN" in Table 5-3)
+* Probability of Detection of the non-event (called "PODN" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Probability of False Detection (called "POFD" in Table 5-3)
+* Probability of False Detection (called "POFD" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* False Alarm Ratio (called "FAR" in Table 5-3)
+* False Alarm Ratio (called "FAR" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Critical Success Index (called "CSI" in Table 5-3)
+* Critical Success Index (called "CSI" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Gilbert Skill Score (called "GSS" in Table 5-3)
+* Gilbert Skill Score (called "GSS" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Hanssen-Kuipers Discriminant (called "H-K" in Table 5-3)
+* Hanssen-Kuipers Discriminant (called "HK" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Heidke Skill Score (called "HSS" in Table 5-3)
+* Heidke Skill Score (called "HSS" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-* Odds Ratio (called "ODDS" in Table 5-3)
+* Odds Ratio (called "ODDS" in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCTS"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6441,7 +7241,14 @@ Fractions Brier Score
 \begin_layout Standard
 
 \series medium
-Called "FBS" in NBRCNT output (Table 5-4)
+Called "FBS" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6531,7 +7338,14 @@ Fractions Skill Score
 \begin_layout Standard
 
 \series medium
-Called "FSS" in NBRCNT output (Table 5-4)
+Called "FSS" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6591,7 +7405,14 @@ Asymptotic Fractions Skill Score
 \end_layout
 
 \begin_layout Standard
-Called "AFSS" in NBRCNT output (Table 5-4)
+Called "AFSS" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6612,7 +7433,14 @@ Uniform Fractions Skill Score
 \begin_layout Standard
 
 \series medium
-Called "UFSS" in NBRCNT output (Table 5-4)
+Called "UFSS" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6635,7 +7463,14 @@ Forecast Rate
 \begin_layout Standard
 
 \series medium
-Called "F_rate" in NBRCNT output (Table 5-4)
+Called "F_rate" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6653,7 +7488,14 @@ Observation Rate
 \begin_layout Standard
 
 \series medium
-Called "O_rate" in NBRCNT output (Table 5-4)
+Called "O_rate" in NBRCNT output (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_format_info_NBRCNT"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -6740,7 +7582,38 @@ Baddeley's
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $\varDelta_{p,w}(A,B)=\left[\frac{1}{N}\overset{\sum}{_{s\in D}}\mid w(d(s,A))-w(d(s,B))\mid\right]^{1/p}$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+Delta_{p,w}(A,B)=[
+\backslash
+frac{1}{N}
+\backslash
+sum_{s
+\backslash
+in D}^{ }|w(d(s,A))-w(d(s,B))|]^{
+\backslash
+frac{1}{p}}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
@@ -6959,7 +7832,34 @@ The mean-error distance (MED) is given by
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $MED(A,B)=\frac{1}{n_{B}}\overset{\sum}{_{s\in B}}d(x,A)$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+MED(A,B)=
+\backslash
+frac{1}{n_{B}}
+\backslash
+sum_{s
+\backslash
+in B}^{ }d(x,A)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
@@ -7036,27 +7936,88 @@ metric, the MED is not a mathematical metric because it fails the symmetry
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $minMED(A,B)=min\{MED(A,B),MED(B,A)\}$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+minMED(A,B)=min{MED(A,B),MED(B,A)}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $maxMED(A,B)=max\{MED(A,B),MED(B,A)\}$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+maxMED(A,B)=max{MED(A,B),MED(B,A)}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $meanMED(A,B)=\frac{1}{2}\{MED(A,B)+MED(B,A)\}$
-\end_inset
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
 
 
+\backslash
+begin{eqnarray*}
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+
+meanMED(A,B)=
+\backslash
+frac{1}{2}{MED(A,B)+MED(B,A)}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
+\end_inset
+
 From the distance map perspective, 
 \begin_inset Formula $MED(A,B)$
 \end_inset
@@ -7151,7 +8112,38 @@ Pratt’s Figure of Merit (FOM) is given by
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $FOM(A,B)=\frac{1}{max\{n_{A},n_{B}\}}\overset{\sum}{_{s\in B}}\frac{1}{1+\alpha d(s,A)^{2}}$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+FOM(A,B)=
+\backslash
+frac{1}{max(n_{A},n_{B})}
+\backslash
+sum_{s
+\backslash
+in B}^{ }
+\backslash
+frac{1}{1+
+\backslash
+alpha d(s,A)^{2}}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
@@ -7343,7 +8335,42 @@ on, which is included in MET.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $Z(A,B)=\lambda\sqrt{\frac{1}{N}\overset{\sum}{_{s\in D}}(I_{F}(s)-I_{O}(s))^{2}}+(1-\lambda)\cdot MED(A,B)$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{eqnarray*}
+\end_layout
+
+\begin_layout Plain Layout
+
+Z(A,B)=
+\backslash
+lambda 
+\backslash
+sqrt{
+\backslash
+frac{1}{N}
+\backslash
+sum_{s
+\backslash
+in D}^{ }(I_{F}(s)-I_{O}(s))^{2}}+(1-
+\backslash
+lambda)
+\backslash
+cdot MED(A,B)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{eqnarray*}
+\end_layout
+
 \end_inset
 
 
