@@ -7519,6 +7519,80 @@ name "sec:App_C-distance_maps"
 \end_layout
 
 \begin_layout Standard
+The distance map statistics include Baddeley's 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ Metric, a statistic which is a true mathematical metric.
+ The definition of a mathematical metric is included below.
+\end_layout
+
+\begin_layout Standard
+A mathematical metric, 
+\begin_inset Formula $m(A,B)\geq0$
+\end_inset
+
+, must have the following three properties:
+\end_layout
+
+\begin_layout Enumerate
+Identity: 
+\begin_inset Formula $m(A,B)=0$
+\end_inset
+
+ if and only if 
+\begin_inset Formula $A=B$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Symmetry: 
+\begin_inset Formula $m(A,B)=m(B,A)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Triangle inequality: 
+\begin_inset Formula $m(A,C)\leq m(A,B)+m(B,C)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The first establishes that a perfect score is zero and that the only way
+ to obtain a perfect score is if the two sets are identical according to
+ the metric.
+ The second requirement ensures that the order by which the two sets are
+ evaluated will not change the result.
+ The third property ensures that if 
+\begin_inset Formula $C$
+\end_inset
+
+ is closer to 
+\begin_inset Formula $A$
+\end_inset
+
+ than 
+\begin_inset Formula $B$
+\end_inset
+
+ is to 
+\begin_inset Formula $A$
+\end_inset
+
+, then 
+\begin_inset Formula $m(A,C)<M(A,B)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The results of the distance map verification approaches that are included
@@ -7688,7 +7762,7 @@ is the distance map for the respective event area,
 \begin_inset Formula $c$
 \end_inset
 
- is a user-chosen constant with
+ is a user-chosen constant with 
 \begin_inset Formula $c=\infty$
 \end_inset
 
@@ -7723,10 +7797,10 @@ In terms of distance maps, Baddeley’s
 \begin_inset Formula $L_{p}$
 \end_inset
 
- norm of the top left panel in 
+ norm of the top left panel in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "table_GS_format_info_DMAP"
+reference "Fig4_Grid-Stat"
 
 \end_inset
 
@@ -7739,7 +7813,7 @@ reference "table_GS_format_info_DMAP"
 \begin_inset Formula $0<c<\infty$
 \end_inset
 
-, then the distance maps in the bottom row of 
+, then the distance maps in the bottom row of Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig3_Grid-Stat"
@@ -7755,7 +7829,7 @@ reference "Fig3_Grid-Stat"
 \end_inset
 
  before calculating their absolute differences in the top left panel of
- 
+ Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig4_Grid-Stat"
@@ -7764,6 +7838,11 @@ reference "Fig4_Grid-Stat"
 
 .
  
+\end_layout
+
+\begin_layout Standard
+The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0
+ indicating a perfect forecast.
 \end_layout
 
 \begin_layout Standard
@@ -7948,7 +8027,7 @@ begin{eqnarray*}
 
 \begin_layout Plain Layout
 
-minMED(A,B)=min{MED(A,B),MED(B,A)}
+minMED(A,B)=min(MED(A,B),MED(B,A))
 \end_layout
 
 \begin_layout Plain Layout
@@ -7976,7 +8055,7 @@ begin{eqnarray*}
 
 \begin_layout Plain Layout
 
-maxMED(A,B)=max{MED(A,B),MED(B,A)}
+maxMED(A,B)=max(MED(A,B),MED(B,A))
 \end_layout
 
 \begin_layout Plain Layout
@@ -8006,7 +8085,7 @@ begin{eqnarray*}
 
 meanMED(A,B)=
 \backslash
-frac{1}{2}{MED(A,B)+MED(B,A)}
+frac{1}{2}(MED(A,B)+MED(B,A))
 \end_layout
 
 \begin_layout Plain Layout
@@ -8022,7 +8101,7 @@ From the distance map perspective,
 \begin_inset Formula $MED(A,B)$
 \end_inset
 
- is the average of the values in 
+ is the average of the values in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig4_Grid-Stat"
@@ -8033,7 +8112,7 @@ reference "Fig4_Grid-Stat"
 \begin_inset Formula $MED(B,A)$
 \end_inset
 
- is the average of the values in 
+ is the average of the values in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig4_Grid-Stat"
@@ -8044,6 +8123,11 @@ reference "Fig4_Grid-Stat"
  Note that the average is only over the circular regions depicted in the
  figure.
  
+\end_layout
+
+\begin_layout Standard
+The range for MED is 0 to infinity, with a score of 0 indicating a perfect
+ forecast.
 \end_layout
 
 \begin_layout Standard
@@ -8206,7 +8290,7 @@ where
 \uwave default
 \noun default
 \color inherit
-are the number of events within event areas 
+ are the number of events within event areas 
 \begin_inset Formula $A$
 \end_inset
 
@@ -8249,7 +8333,8 @@ Note that
 \end_inset
 
 .
- That is, it represents the circular area in the top right panel of 
+ That is, it represents the circular area in the top right panel of Figure
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig4_Grid-Stat"
@@ -8258,6 +8343,10 @@ reference "Fig4_Grid-Stat"
 
 .
  
+\end_layout
+
+\begin_layout Standard
+The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 \end_layout
 
 \begin_layout Standard
@@ -8429,6 +8518,11 @@ where
  Similar to MED, the average of these two directions (avg Z), as well as
  the min and max are also provided for convenience.
  
+\end_layout
+
+\begin_layout Standard
+The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect
+ forecast.
 \end_layout
 
 \begin_layout Section
