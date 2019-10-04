@@ -343,4 +343,22 @@
     </output>
   </test>
 
+  <!--                                               -->
+  <!--  pcp_combine -subtract rotated lat/lon        -->
+  <!--                                               -->
+  <test name="pcp_combine_sub_ROT_LL">
+     <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib2/galwem-rd/PS.557WW_SC.U_DI.C_GP.GALWEM-RD_GR.C4KM_AR.BALTIC_DD.20180102_CY.00_FH.006_DF.GR2 \
+      'name="CEIL"; level="L0";' \
+      &DATA_DIR_MODEL;/grib2/galwem-rd/PS.557WW_SC.U_DI.C_GP.GALWEM-RD_GR.C4KM_AR.BALTIC_DD.20180102_CY.00_FH.006_DF.GR2 \
+      'name="MTERH"; level="L0";' \
+      &OUTPUT_DIR;/pcp_combine/subtract_ROT_LL_CEIL_minus_MTERH.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/subtract_ROT_LL_CEIL_minus_MTERH.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
