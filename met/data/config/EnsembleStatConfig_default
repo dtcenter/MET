@@ -127,7 +127,7 @@ ens_phist_bin_size = 0.05;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = {
 
@@ -145,6 +145,11 @@ climo_mean = {
    match_month        = TRUE;
    match_day          = FALSE;
    time_step          = 21600;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
