@@ -3188,13 +3188,15 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    
    // Pratt's Figure of Merit
    if(max_events > 0) {
-      fom_fo = fom_fo_sum / max_events;
-      fom_of = fom_of_sum / max_events;
-      fom_max = max(fom_fo, fom_of);
-      fom_min = min(fom_fo, fom_of);
-      fom_mean = (fom_fo + fom_of) / 2;
+      if(oy > 0) fom_fo = fom_fo_sum / max_events;
+      if(fy > 0) fom_of = fom_of_sum / max_events;
+      if(!is_bad_data(fom_fo) && !is_bad_data(fom_of)) {
+         fom_max = max(fom_fo, fom_of);
+         fom_min = min(fom_fo, fom_of);
+         fom_mean = (fom_fo + fom_of) / 2;
+      }
    }
-   
+ 
    // Zhu Metric
    zhu_common = zhu_weight * sqrt(sum_event_diff / total);
    zhu_fo = (is_bad_data(med_fo) ? bad_data_double : zhu_common + (1-zhu_weight) * med_fo);
