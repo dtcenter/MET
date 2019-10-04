@@ -7593,6 +7593,13 @@ The first establishes that a perfect score is zero and that the only way
 \end_layout
 
 \begin_layout Standard
+It has been argued in Gilleland (2017) that the second property of symmetry
+ is not necessarily an important quality to have for a summary measure for
+ verification purposes because lack of symmetry allows for information about
+ false alarms and misses.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The results of the distance map verification approaches that are included
