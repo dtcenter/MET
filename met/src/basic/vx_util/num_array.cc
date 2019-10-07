@@ -375,6 +375,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void NumArray::add_seq(int beg, int end)
+
+{
+
+extend(Nelements + (end - beg + 1));
+
+int j;
+
+for (j=beg; j<=end; ++j)  {
+
+   e[Nelements++] = j;
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::add_css(const char *text)
 
 {
