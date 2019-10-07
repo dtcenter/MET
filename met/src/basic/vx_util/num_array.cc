@@ -375,6 +375,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void NumArray::add_const(double v, int n)
+
+{
+
+extend(Nelements + n);
+
+int j;
+
+for (j=0; j<n; ++j)  {
+
+   e[Nelements++] = v;
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::add_seq(int beg, int end)
 
 {
