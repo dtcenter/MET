@@ -28,6 +28,7 @@ SUBDIRS	= vx_data2d \
 	vx_plot_util \
 	vx_tc_util \
 	vx_nc_util \
+	vx_physics \
 	vx_series_data
 
 MAINTAINERCLEANFILES 	= Makefile.in
