@@ -325,11 +325,18 @@ void CTSInfo::allocate_n_alpha(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 void CTSInfo::add(double f, double o) {
+   add(f, o, bad_data_double, bad_data_double);
+   return;
+}
 
-   if     ( fthresh.check(f) &&  othresh.check(o)) cts.inc_fy_oy();
-   else if( fthresh.check(f) && !othresh.check(o)) cts.inc_fy_on();
-   else if(!fthresh.check(f) &&  othresh.check(o)) cts.inc_fn_oy();
-   else if(!fthresh.check(f) && !othresh.check(o)) cts.inc_fn_on();
+////////////////////////////////////////////////////////////////////////
+
+void CTSInfo::add(double f, double o, double cmn, double csd) {
+
+   if     ( fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fy_oy();
+   else if( fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fy_on();
+   else if(!fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fn_oy();
+   else if(!fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fn_on();
 
    return;
 }
@@ -593,11 +600,18 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 void MCTSInfo::add(double f, double o) {
+   add(f, o, bad_data_double, bad_data_double);
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::add(double f, double o, double cmn, double csd) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
-   r = fthresh.check_bins(f);
-   c = othresh.check_bins(o);
+   r = fthresh.check_bins(f, cmn, csd);
+   c = othresh.check_bins(o, cmn, csd);
 
    // Increment the corresponding contingency table entry.
    cts.inc_entry(r, c);
@@ -1178,10 +1192,10 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    PairDataPoint pd_all, pd;
 
    // Check for mismatch
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(f_na.n() != o_na.n()) {
       mlog << Error << "\nSL1L2Info::set() -> "
            << "forecast and observation count mismatch ("
-           << f_na.n_elements() << " != " << o_na.n_elements()
+           << f_na.n() << " != " << o_na.n()
            << ")\n\n";
       exit(1);
    }
@@ -1252,7 +1266,7 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
+void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    double fbar, obar, ffbar, fobar, oobar, den;
    int n;
 
@@ -1685,25 +1699,25 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    zero_out();
 
    // Check that the number of pairs are the same
-   if(uf_in_na.n_elements() != uo_in_na.n_elements() ||
-      uf_in_na.n_elements() != vf_in_na.n_elements() ||
-      vf_in_na.n_elements() != vo_in_na.n_elements()) {
+   if(uf_in_na.n() != uo_in_na.n() ||
+      uf_in_na.n() != vf_in_na.n() ||
+      vf_in_na.n() != vo_in_na.n()) {
       mlog << Error << "\nVL1L2Info::set() -> "
            << "unequal number of UGRD and VGRD pairs ("
-           << uf_in_na.n_elements() << " != " << uo_in_na.n_elements()
+           << uf_in_na.n() << " != " << uo_in_na.n()
            << ")\n\n";
       exit(1);
    }
 
    // Check for climatology values
-   cflag = (uc_in_na.n_elements() == uf_in_na.n_elements() &&
-            vc_in_na.n_elements() == vf_in_na.n_elements());
+   cflag = (uc_in_na.n() == uf_in_na.n() &&
+            vc_in_na.n() == vf_in_na.n());
    wflag = set_climo_flag(uf_in_na, w_in_na);
 
        //////////////////////////////////////////////////////
 
    // Loop through the pair data and filter
-   for(i=0; i<uf_in_na.n_elements(); i++)  {
+   for(i=0; i<uf_in_na.n(); i++)  {
 
       // Retrieve the U,V values
       uf = uf_in_na[i];
@@ -1745,7 +1759,7 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
 
    // Loop through the filtered pair data compute partial sums
 
-   for(i=0; i<uf_na.n_elements(); i++)  {
+   for(i=0; i<uf_na.n(); i++)  {
 
       // Retrieve the U,V values
       uf = uf_na[i];
@@ -1806,7 +1820,7 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
        //////////////////////////////////////////////////////
 
    mlog << Debug(3)
-        << "Using " << vcount << " of " << uf_na.n_elements()
+        << "Using " << vcount << " of " << uf_na.n()
         << " vector pairs for forecast wind speed threshold "
         << fthresh.get_str() << ", observation wind speed threshold "
         << othresh.get_str() << ", and field logic "
@@ -2905,15 +2919,15 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    double w, w_sum;
 
    // Check for mismatch
-   if(fgx_na.n_elements() != fgy_na.n_elements() ||
-      fgx_na.n_elements() != ogx_na.n_elements() ||
-      fgx_na.n_elements() != ogy_na.n_elements() ||
-      fgx_na.n_elements() !=   w_na.n_elements()) {
+   if(fgx_na.n() != fgy_na.n() ||
+      fgx_na.n() != ogx_na.n() ||
+      fgx_na.n() != ogy_na.n() ||
+      fgx_na.n() !=   w_na.n()) {
       mlog << Error << "\nGRADInfo::set() -> "
            << "count mismatch ("
-           << fgx_na.n_elements() << ", " << fgy_na.n_elements() << ", "
-           << ogx_na.n_elements() << ", " << ogy_na.n_elements() << ", "
-           <<   w_na.n_elements() << ")\n\n";
+           << fgx_na.n() << ", " << fgy_na.n() << ", "
+           << ogx_na.n() << ", " << ogy_na.n() << ", "
+           <<   w_na.n() << ")\n\n";
       exit(1);
    }
 
@@ -2925,13 +2939,13 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    dy = grad_dy;
 
    // Check for no matched pairs to process
-   if(fgx_na.n_elements() == 0) return;
+   if(fgx_na.n() == 0) return;
 
    // Get the sum of the weights
    w_sum = w_na.sum();
 
    // Loop through the pairs and compute sums
-   for(i=0; i<fgx_na.n_elements(); i++) {
+   for(i=0; i<fgx_na.n(); i++) {
 
       // Skip bad data
       if(is_bad_data(fgx_na[i]) || is_bad_data(fgy_na[i]) ||
@@ -3091,9 +3105,9 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
                    const NumArray &fthr_na,  const NumArray &othr_na) {
 
    // Check for mismatch
-   if(fdmap_na.n_elements() != odmap_na.n_elements() ||
-      fdmap_na.n_elements() != fthr_na.n_elements()  ||
-      fdmap_na.n_elements() != othr_na.n_elements()) {
+   if(fdmap_na.n() != odmap_na.n() ||
+      fdmap_na.n() != fthr_na.n()  ||
+      fdmap_na.n() != othr_na.n()) {
       mlog << Error << "\nDMAPInfo::set() -> "
            << "count mismatch ("
            << fdmap_na.n() << ", " << odmap_na.n() << ", "
@@ -3228,7 +3242,6 @@ void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dis
    fom_alpha = _fom_alpha;
    zhu_weight = _zhu_weight;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -3520,24 +3533,27 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                     const NumArray &c_na, const NumArray &w_na,
-                     const NumArray &i_na,
-                     int precip_flag, int rank_flag, int normal_ci_flag,
+void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
+                     bool precip_flag, bool rank_flag, bool normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
    double f, o, c, w, w_sum;
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
-   NumArray err_na, dev_na;
    bool cflag;
+
+   //
+   // Allocate memory to store the differences
+   //
+   NumArray err_na, dev_na;
+   err_na.extend(pd.f_na.n());
+   dev_na.extend(pd.f_na.n());
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements() ||
-      f_na.n_elements() == 0) {
+   if(pd.f_na.n() != pd.o_na.n() || pd.f_na.n() == 0) {
       mlog << Error << "\ncompute_cntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "non-zero length!\n\n";
@@ -3547,12 +3563,12 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Flag to process climo
    //
-   cflag = set_climo_flag(f_na, c_na);
+   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
 
    //
    // Get the sum of the weights
    //
-   w_sum = w_na.sum();
+   w_sum = pd.wgt_na.sum();
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
@@ -3561,17 +3577,17 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    f_bar   = o_bar       = ff_bar     = oo_bar  = fo_bar  = 0.0;
    fa_bar  = oa_bar      = ffa_bar    = ooa_bar = foa_bar = 0.0;
    err_bar = abs_err_bar = err_sq_bar = 0.0;
-   for(i=0; i<i_na.n_elements(); i++) {
+   for(i=0; i<i_na.n(); i++) {
 
       //
       // Get the index to be used from the index num array
       //
       j = nint(i_na[i]);
 
-      f = f_na[j];
-      o = o_na[j];
-      c = (cflag ? c_na[j] : bad_data_double);
-      w = w_na[i]/w_sum;
+      f = pd.f_na[j];
+      o = pd.o_na[j];
+      c = (cflag ? pd.cmn_na[j] : bad_data_double);
+      w = pd.wgt_na[i]/w_sum;
 
       //
       // Should be no bad data, but checking to be sure
@@ -3673,7 +3689,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute the median absolute deviation
    //
-   for(i=0; i<err_na.n_elements(); i++) {
+   for(i=0; i<err_na.n(); i++) {
       dev_na.add(fabs(err_na[i] - cnt_info.e50.v));
    }
    cnt_info.mad.v = dev_na.percentile_array(0.50);
@@ -3742,10 +3758,10 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
             //
             // Only copy them over if f > 0 or o > 0
             //
-            if(f_na[j] > 0.0001 || o_na[j] > 0.0001) {
-               f_na2.add(f_na[j]);
-               o_na2.add(o_na[j]);
-               w_na2.add(w_na[j]);
+            if(pd.f_na[j] > 0.0001 || pd.o_na[j] > 0.0001) {
+               f_na2.add(pd.f_na[j]);
+               o_na2.add(pd.o_na[j]);
+               w_na2.add(pd.wgt_na[j]);
             }
             else {
                n_zero_zero++;
@@ -3760,9 +3776,9 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 
          for(i=0; i<n; i++) {
             j = nint(i_na[i]);
-            f_na2.add(f_na[j]);
-            o_na2.add(o_na[j]);
-            w_na2.add(w_na[j]);
+            f_na2.add(pd.f_na[j]);
+            o_na2.add(pd.o_na[j]);
+            w_na2.add(pd.wgt_na[j]);
          }
          n_zero_zero = 0;
       }
@@ -3876,55 +3892,44 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                       const NumArray &c_na, const NumArray &w_na,
-                       int skip, int precip_flag, int rank_flag,
-                       int normal_ci_flag, CNTInfo &cnt_info) {
-   int i, n, count;
-   NumArray f_na_i, o_na_i, c_na_i, w_na_i, i_na_i;
+void compute_i_cntinfo(const PairDataPoint &pd, int skip,
+                       bool precip_flag, bool rank_flag,
+                       bool normal_ci_flag, CNTInfo &cnt_info) {
+   int n;
+   NumArray i_na;
    bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_i_cntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    if(skip < 0 || skip > n) {
       mlog << Error << "\ncompute_i_cntinfo() -> "
-           << "the skip index (" << skip << ") is out of bounds!\n\n"
-          ;
+           << "the skip index (" << skip << ") is out of bounds!\n\n";
       throw(1);
    }
 
    //
    // Flag to process climo
    //
-   cflag = set_climo_flag(f_na, c_na);
+   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
 
    //
-   // Copy over the forecast, observation, and index values except
-   // for the one to be skipped
+   // Exclude the i-th element
    //
-   for(i=0, count=0; i<n; i++) {
-      if(i == skip) continue;
-      f_na_i.add(f_na[i]);
-      o_na_i.add(o_na[i]);
-      if(cflag) c_na_i.add(c_na[i]);
-      w_na_i.add(w_na[i]);
-      i_na_i.add(count);
-      count++;
-   }
+   i_na.add_seq(0, skip-1);
+   i_na.add_seq(skip+1, n-1);
 
-   compute_cntinfo(f_na_i, o_na_i, c_na_i, w_na_i, i_na_i,
-                   precip_flag, rank_flag, normal_ci_flag,
+   compute_cntinfo(pd, i_na, precip_flag, rank_flag, normal_ci_flag,
                    cnt_info);
 
    return;
@@ -3932,16 +3937,15 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
-                     const NumArray &i_na,
-                     int cts_flag, int normal_ci_flag,
+void compute_ctsinfo(const PairDataPoint &pd, const NumArray &i_na,
+                     bool cts_flag, bool normal_ci_flag,
                      CTSInfo &cts_info) {
    int i, j, n;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_ctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
@@ -3951,7 +3955,7 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Loop over the length of the index array
    //
-   n = i_na.n_elements();
+   n = i_na.n();
 
    //
    // Reset the CTS object
@@ -3971,7 +3975,7 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Add this pair to the contingency table
       //
-      cts_info.add(f_na[j], o_na[j]);
+      cts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
 
    } // end for i
 
@@ -3993,63 +3997,52 @@ void compute_ctsinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_i_ctsinfo(const NumArray &f_na, const NumArray &o_na,
-                       int skip,
-                       int normal_ci_flag,
-                       CTSInfo &cts_info) {
-   int i, n, count;
-   NumArray f_na_i, o_na_i, i_na_i;
+void compute_i_ctsinfo(const PairDataPoint &pd, int skip,
+                       bool normal_ci_flag, CTSInfo &cts_info) {
+   int n;
+   NumArray i_na;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_i_ctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    if(skip < 0 || skip > n) {
       mlog << Error << "\ncompute_i_ctsinfo() -> "
-           << "the skip index (" << skip << ") is out of bounds!\n\n"
-          ;
+           << "the skip index (" << skip << ") is out of bounds!\n\n";
       throw(1);
    }
 
    //
-   // Copy over the forecast, observation, and index values except
-   // for the one to be skipped
+   // Exclude the i-th element
    //
-   for(i=0, count=0; i<n; i++) {
-      if(i == skip) continue;
-      f_na_i.add(f_na[i]);
-      o_na_i.add(o_na[i]);
-      i_na_i.add(count);
-      count++;
-   }
+   i_na.add_seq(0, skip-1);
+   i_na.add_seq(skip+1, n-1);
 
-   compute_ctsinfo(f_na_i, o_na_i, i_na_i,
-                   1, normal_ci_flag, cts_info);
+   compute_ctsinfo(pd, i_na, 1, normal_ci_flag, cts_info);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
-                      const NumArray &i_na,
-                      int mcts_flag, int normal_ci_flag,
+void compute_mctsinfo(const PairDataPoint &pd, const NumArray &i_na,
+                      bool mcts_flag, bool normal_ci_flag,
                       MCTSInfo &mcts_info) {
    int i, j, n;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_mctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
@@ -4059,7 +4052,7 @@ void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Loop over the length of the index array
    //
-   n = i_na.n_elements();
+   n = i_na.n();
 
    //
    // Reset the MCTS object
@@ -4079,7 +4072,7 @@ void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Add this pair to the contingency table
       //
-      mcts_info.add(f_na[j], o_na[j]);
+      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
 
    } // end for i
 
@@ -4101,78 +4094,71 @@ void compute_mctsinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_i_mctsinfo(const NumArray &f_na, const NumArray &o_na,
-                        int skip, int normal_ci_flag,
-                        MCTSInfo &mcts_info) {
-   int i, n, count;
-   NumArray f_na_i, o_na_i, i_na_i;
+void compute_i_mctsinfo(const PairDataPoint &pd, int skip,
+                        bool normal_ci_flag, MCTSInfo &mcts_info) {
+   int n;
+   NumArray i_na;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_i_mctsinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    if(skip < 0 || skip > n) {
       mlog << Error << "\ncompute_i_mctsinfo() -> "
-           << "the skip index (" << skip << ") is out of bounds!\n\n"
-          ;
+           << "the skip index (" << skip << ") is out of bounds!\n\n";
       throw(1);
    }
 
    //
-   // Copy over the forecast, observation, and index values except
-   // for the one to be skipped
+   // Exclude the i-th element
    //
-   for(i=0, count=0; i<n; i++) {
-      if(i == skip) continue;
-      f_na_i.add(f_na[i]);
-      o_na_i.add(o_na[i]);
-      i_na_i.add(count);
-      count++;
-   }
+   i_na.add_seq(0, skip-1);
+   i_na.add_seq(skip+1, n-1);
 
-   compute_mctsinfo(f_na_i, o_na_i, i_na_i,
-                    1, normal_ci_flag, mcts_info);
+   compute_mctsinfo(pd, i_na, 1, normal_ci_flag, mcts_info);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
-                     const NumArray &c_na,
-                     int pstd_flag, PCTInfo &pct_info) {
+void compute_pctinfo(const PairDataPoint &pd,
+                     bool pstd_flag, PCTInfo &pct_info) {
    int i, n_thresh, n_pair;
-   NumArray p_thresh;
-   SingleThresh ot;
+   NumArray p_thresh, climo_prob;
    bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_pctinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
    }
-   n_pair = f_na.n_elements();
+   n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cflag = set_climo_flag(f_na, c_na);
+   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
+
+   // Derive climatological probabilities
+   if(cflag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+                                            pct_info.othresh);
 
    //
    // Store the probability threshold values
    //
-   n_thresh = pct_info.fthresh.n_elements();
+   n_thresh = pct_info.fthresh.n();
    for(i=0; i<n_thresh; i++) p_thresh.add(pct_info.fthresh[i].get_value());
 
    //
@@ -4190,11 +4176,6 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    pct_info.climo_pct.set_thresholds(p_thresh.vals());
 
    //
-   // Get the observation threshold value to be applied
-   //
-   ot = pct_info.othresh;
-
-   //
    // Loop through the pair data and fill in the contingency table
    //
    for(i=0; i<n_pair; i++) {
@@ -4202,13 +4183,13 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Check the observation thresholds and increment accordingly
       //
-      if(ot.check(o_na[i])) {
-         pct_info.pct.inc_event(f_na[i]);
-         if(cflag) pct_info.climo_pct.inc_event(c_na[i]);
+      if(pct_info.othresh.check(pd.o_na[i])) {
+         pct_info.pct.inc_event(pd.f_na[i]);
+         if(cflag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
       else {
-         pct_info.pct.inc_nonevent(f_na[i]);
-         if(cflag) pct_info.climo_pct.inc_nonevent(c_na[i]);
+         pct_info.pct.inc_nonevent(pd.f_na[i]);
+         if(cflag) pct_info.climo_pct.inc_nonevent(climo_prob[i]);
       }
    } // end for i
 
@@ -4230,10 +4211,10 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
-                        const NumArray &f_thr_na, const NumArray &o_thr_na,
-                        const NumArray &w_na, const NumArray &i_na,
-                        NBRCNTInfo &nbrcnt_info, int nbrcnt_flag) {
+void compute_nbrcntinfo(const PairDataPoint &pd,
+                        const PairDataPoint &pd_thr,
+                        const NumArray &i_na,
+                        NBRCNTInfo &nbrcnt_info, bool nbrcnt_flag) {
    int i, j, n;
    double f, o, w, w_sum, ff_bar, oo_bar, fo_bar;
    double f_thr_bar, o_thr_bar;
@@ -4241,10 +4222,10 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Check that the input arrays have the same length
    //
-   if(f_na.n_elements() != o_na.n_elements() ||
-      f_na.n_elements() != f_thr_na.n_elements() ||
-      f_na.n_elements() != o_thr_na.n_elements() ||
-      f_na.n_elements() == 0) {
+   if(pd.f_na.n() != pd.o_na.n()     ||
+      pd.f_na.n() != pd_thr.f_na.n() ||
+      pd.f_na.n() != pd_thr.o_na.n() ||
+      pd.f_na.n() == 0) {
       mlog << Error << "\ncompute_nbrcntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "non-zero length!\n\n";
@@ -4254,12 +4235,12 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Loop over the length of the index array
    //
-   n = i_na.n_elements();
+   n = i_na.n();
 
    //
    // Get the sum of the weights
    //
-   w_sum = w_na.sum();
+   w_sum = pd.wgt_na.sum();
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
@@ -4273,16 +4254,16 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       //
       j = nint(i_na[i]);
 
-      f = f_na[j];
-      o = o_na[j];
-      w = w_na[i]/w_sum;
+      f = pd.f_na[j];
+      o = pd.o_na[j];
+      w = pd.wgt_na[i]/w_sum;
 
       ff_bar += w*f*f;
       oo_bar += w*o*o;
       fo_bar += w*f*o;
 
-      f_thr_bar += w*f_thr_na[j];
-      o_thr_bar += w*o_thr_na[j];
+      f_thr_bar += w*pd_thr.f_na[j];
+      o_thr_bar += w*pd_thr.o_na[j];
    } // end for i
 
    //
@@ -4315,24 +4296,23 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
-                          const NumArray &f_thr_na, const NumArray &o_thr_na,
-                          const NumArray &w_na, int skip,
+void compute_i_nbrcntinfo(const PairDataPoint &pd,
+                          const PairDataPoint &pd_thr, int skip,
                           NBRCNTInfo &nbrcnt_info) {
-   int i, n, count;
-   NumArray f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, w_na_i, i_na_i;
+   int i, n;
+   NumArray i_na;
 
    //
    // Check that the forecast and observation arrays of the same length
    //
-   if(f_na.n_elements() != o_na.n_elements()) {
+   if(pd.f_na.n() != pd.o_na.n()) {
       mlog << Error << "\ncompute_i_nbrcntinfo() -> "
            << "the forecast and observation arrays must have the same "
            << "length!\n\n";
       throw(1);
    }
    else {
-      n = f_na.n_elements();
+      n = pd.f_na.n();
    }
 
    if(skip < 0 || skip > n) {
@@ -4343,22 +4323,12 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    }
 
    //
-   // Copy over the forecast, observation, and index values except
-   // for the one to be skipped
+   // Exclude the i-th element
    //
-   for(i=0, count=0; i<n; i++) {
-      if(i == skip) continue;
-      f_na_i.add(f_na[i]);
-      o_na_i.add(o_na[i]);
-      f_thr_na_i.add(f_thr_na[i]);
-      o_thr_na_i.add(o_thr_na[i]);
-      w_na_i.add(w_na[i]);
-      i_na_i.add(count);
-      count++;
-   }
+   i_na.add_seq(0, skip-1);
+   i_na.add_seq(skip+1, n-1);
 
-   compute_nbrcntinfo(f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, w_na_i,
-                      i_na_i, nbrcnt_info, 1);
+   compute_nbrcntinfo(pd, pd_thr, i_na, nbrcnt_info, 1);
 
    return;
 }
@@ -4366,7 +4336,7 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
-                        int normal_ci_flag, double alpha,
+                        bool normal_ci_flag, double alpha,
                         CIInfo &mean_ci, CIInfo &stdev_ci) {
    int i, j, n;
    double v, sum, sum_sq;
@@ -4375,7 +4345,7 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
    //
    // Loop over the length of the index array
    //
-   n = i_na.n_elements();
+   n = i_na.n();
 
    //
    // Loop over the values provided
@@ -4452,12 +4422,12 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_i_mean_stdev(const NumArray &v_na,
-                          int normal_ci_flag, double alpha, int skip,
+                          bool normal_ci_flag, double alpha, int skip,
                           CIInfo &mean_ci, CIInfo &stdev_ci) {
    int i, n, count;
    NumArray v_na_i, i_na_i;
 
-   n = v_na.n_elements();
+   n = v_na.n();
 
    if(skip < 0 || skip > n) {
       mlog << Error << "\ncompute_i_mean_stdev() -> "

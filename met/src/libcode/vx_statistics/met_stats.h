@@ -12,6 +12,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "contable.h"
+#include "pair_data_point.h"
 
 #include "vx_config.h"
 #include "vx_util.h"
@@ -44,7 +45,6 @@ class CIInfo {
 
       // Variance inflation factor for time series
       double vif;
-
 
       // Confidence interval computed using a normal approximation
       double *v_ncl;
@@ -94,6 +94,7 @@ class CTSInfo {
       void clear();
       void allocate_n_alpha(int);
       void add(double, double);
+      void add(double, double, double, double);
       void compute_stats();
       void compute_ci();
 
@@ -134,6 +135,7 @@ class MCTSInfo {
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
       void add(double, double);
+      void add(double, double, double, double);
       void compute_stats();
       void compute_ci();
 };
@@ -617,7 +619,6 @@ class GRADInfo {
       void clear();
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Class to store distance map statistics
@@ -703,44 +704,38 @@ extern double compute_ufss(double);
 
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
 
-extern void   compute_cntinfo(const SL1L2Info &, int, CNTInfo &);
+extern void   compute_cntinfo(const SL1L2Info &, bool, CNTInfo &);
 
-extern void   compute_cntinfo(const NumArray &, const NumArray &,
-                              const NumArray &, const NumArray &,
-                              const NumArray &,
-                              int, int, int, CNTInfo &);
-extern void   compute_i_cntinfo(const NumArray &, const NumArray &,
-                                const NumArray &, const NumArray &,
-                                int, int, int, int, CNTInfo &);
+extern void   compute_cntinfo(const PairDataPoint &, const NumArray &,
+                              bool, bool, bool, CNTInfo &);
+extern void   compute_i_cntinfo(const PairDataPoint &, int,
+                                bool, bool, bool, CNTInfo &);
 
-extern void   compute_ctsinfo(const NumArray &, const NumArray &,
-                              const NumArray &,
-                              int, int, CTSInfo &);
-extern void   compute_i_ctsinfo(const NumArray &, const NumArray &,
-                                int, int, CTSInfo &);
+extern void   compute_ctsinfo(const PairDataPoint &, const NumArray &,
+                              bool, bool, CTSInfo &);
+extern void   compute_i_ctsinfo(const PairDataPoint &, int,
+                                bool, CTSInfo &);
 
-extern void   compute_mctsinfo(const NumArray &, const NumArray &,
-                               const NumArray &, int, int, MCTSInfo &);
-extern void   compute_i_mctsinfo(const NumArray &, const NumArray &,
-                                 int, int, MCTSInfo &);
+extern void   compute_mctsinfo(const PairDataPoint &, const NumArray &,
+                               bool, bool, MCTSInfo &);
+extern void   compute_i_mctsinfo(const PairDataPoint &, int,
+                                 bool, MCTSInfo &);
 
-extern void   compute_pctinfo(const NumArray &, const NumArray &,
-                              const NumArray &, int, PCTInfo &);
+extern void   compute_pctinfo(const PairDataPoint &, bool, PCTInfo &);
 
-extern void   compute_nbrcntinfo(const NumArray &, const NumArray &,
-                                 const NumArray &, const NumArray &,
-                                 const NumArray &, const NumArray &,
-                                 NBRCNTInfo &, int);
-extern void   compute_i_nbrcntinfo(const NumArray &, const NumArray &,
-                                   const NumArray &, const NumArray &,
-                                   const NumArray &,
+extern void   compute_nbrcntinfo(const PairDataPoint &,
+                                 const PairDataPoint &,
+                                 const NumArray &,
+                                 NBRCNTInfo &, bool);
+extern void   compute_i_nbrcntinfo(const PairDataPoint &,
+                                   const PairDataPoint &,
                                    int, NBRCNTInfo &);
 
 extern void   compute_mean_stdev(const NumArray &, const NumArray &,
-                                 int, double,
+                                 bool, double,
                                  CIInfo &, CIInfo &);
 extern void   compute_i_mean_stdev(const NumArray &,
-                                   int, double, int,
+                                   bool, double, int,
                                    CIInfo &, CIInfo &);
 
 ////////////////////////////////////////////////////////////////////////
