@@ -21,6 +21,7 @@ using namespace std;
 #include "util_constants.h"
 
 #include "vx_config.h"
+#include "vx_gsl_prob.h"
 #include "vx_math.h"
 #include "vx_log.h"
 #include "is_bad_data.h"
@@ -120,11 +121,23 @@ bool Or_Node::check(double x) const
 
 {
 
-const bool tf_left = left_child->check(x);
+return ( check(x, bad_data_double, bad_data_double) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Or_Node::check(double x, double cmn, double csd) const
+
+{
+
+const bool tf_left = left_child->check(x, cmn, csd);
 
 if ( tf_left )  return ( true );
 
-const bool tf_right = right_child->check(x);
+const bool tf_right = right_child->check(x, cmn, csd);
 
 return ( tf_left || tf_right );
 
@@ -274,11 +287,23 @@ bool And_Node::check(double x) const
 
 {
 
-const bool tf_left = left_child->check(x);
+return ( check(x, bad_data_double, bad_data_double) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool And_Node::check(double x, double cmn, double csd) const
+
+{
+
+const bool tf_left = left_child->check(x, cmn, csd);
 
 if ( ! tf_left )  return ( false );
 
-const bool tf_right = right_child->check(x);
+const bool tf_right = right_child->check(x, cmn, csd);
 
 return ( tf_left && tf_right );
 
@@ -427,7 +452,19 @@ bool Not_Node::check(double x) const
 
 {
 
-const bool tf = child->check(x);
+return ( check(x, bad_data_double, bad_data_double) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Not_Node::check(double x, double cmn, double csd) const
+
+{
+
+const bool tf = child->check(x, cmn, csd);
 
 return ( ! tf );
 
@@ -577,15 +614,55 @@ bool Simple_Node::check(double x) const
 
 {
 
+return ( check(x, bad_data_double, bad_data_double) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool Simple_Node::check(double x, double cmn, double csd) const
+
+{
+
 if ( op == thresh_na )  return ( true );
+
+double tval;
+
+   //
+   //  check climo distribution percentile thresholds
+   //
+
+if ( Ptype == perc_thresh_climo_dist ) {
+
+   if(is_bad_data(cmn) || is_bad_data(csd)) {
+
+      mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
+           << "climatological distribution percentile threshold \"" << s
+           << "\" requested with invalid mean (" << cmn
+           << ") or standard deviation (" << csd << ").\n\n";
+
+      exit ( 1 );
+
+   }
+
+   tval = normal_cdf_inv(PT/100.0, cmn, csd);
+
+}
+else {
+
+   tval = T;
+
+}
 
    //
    //  check that percentile thresholds have been resolved
    //
 
-if ( Ptype != no_perc_thresh_type && is_bad_data(T) ) {
+if ( Ptype != no_perc_thresh_type && is_bad_data(tval) ) {
 
-   mlog << Error << "\nSimple_Node::check(double) const -> "
+   mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
         << "percentile threshold \"" << s
         << "\" used before it was set.\n\n";
 
@@ -594,22 +671,22 @@ if ( Ptype != no_perc_thresh_type && is_bad_data(T) ) {
 }
 
 bool tf = false;
-const bool eq = is_eq(x, T);
+const bool eq = is_eq(x, tval);
 const bool is_na = is_bad_data(x);
 
 switch ( op )  {
 
-   case thresh_le:   tf = !is_na && ( eq || (x <= T));  break;
-   case thresh_lt:   tf = !is_na && (!eq && (x <  T));  break;
+   case thresh_le:   tf = !is_na && ( eq || (x <= tval));  break;
+   case thresh_lt:   tf = !is_na && (!eq && (x <  tval));  break;
 
-   case thresh_ge:   tf = !is_na && ( eq || (x >= T));  break;
-   case thresh_gt:   tf = !is_na && (!eq && (x >  T));  break;
+   case thresh_ge:   tf = !is_na && ( eq || (x >= tval));  break;
+   case thresh_gt:   tf = !is_na && (!eq && (x >  tval));  break;
 
    case thresh_eq:   tf =  eq;  break;
    case thresh_ne:   tf = !eq;  break;
 
    default:
-      mlog << Error << "\nSimple_Node::check(double) const -> "
+      mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
            << "bad op ... " << op << "\n\n";
       exit ( 1 );
       break;
@@ -1413,27 +1490,32 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Begin miscellaneous functions
-//
-////////////////////////////////////////////////////////////////////////
 
 
-bool check_threshold(double v, double t, int t_ind)
+bool SingleThresh::check(double x) const
 
 {
 
-SingleThresh st;
+return ( check(x, bad_data_double, bad_data_double) );
 
-st.set(t, (ThreshType) t_ind);
+}
 
-return(st.check(v));
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool SingleThresh::check(double x, double cmn, double csd) const
+
+{
+
+return ( node ? node->check(x, cmn, csd) : true  );
+
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 //
-// End miscellaneous functions
+// End code for class SingleThresh
 //
 ////////////////////////////////////////////////////////////////////////
