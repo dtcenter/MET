@@ -29,6 +29,10 @@ if ENABLE_PYTHON
   SUBDIRS += vx_data2d_python
 endif
 
+if ENABLE_PYTHON3
+  SUBDIRS += vx_python3_utils
+endif
+
 if ENABLE_GRIB2
   SUBDIRS += vx_data2d_grib2
 endif
