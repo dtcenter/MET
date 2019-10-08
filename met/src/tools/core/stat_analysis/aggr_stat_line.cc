@@ -163,163 +163,163 @@ void StatHdrInfo::add(const STATLine &line) {
 void StatHdrInfo::check_shc(const ConcatString &cur_case) {
 
    // MODEL
-   if(model.n_elements() > 1) {
+   if(model.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << model.n_elements()
+           << model.n()
            << " unique MODEL values: "
            << write_css(model) << "\n";
    }
 
    // DESC
-   if(desc.n_elements() > 1) {
+   if(desc.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << desc.n_elements()
+           << desc.n()
            << " unique DESC values: "
            << write_css(desc) << "\n";
    }
 
    // FCST_LEAD
-   if(fcst_lead.n_elements() > 1) {
+   if(fcst_lead.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << fcst_lead.n_elements()
+           << fcst_lead.n()
            << " unique FCST_LEAD values: "
            << write_css_hhmmss(fcst_lead) << "\n";
    }
 
    // OBS_LEAD
-   if(obs_lead.n_elements() > 1) {
+   if(obs_lead.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obs_lead.n_elements()
+           << obs_lead.n()
            << " unique OBS_LEAD values: "
            << write_css_hhmmss(obs_lead) << "\n";
    }
 
    // FCST_VAR
-   if(fcst_var.n_elements() > 1) {
+   if(fcst_var.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << fcst_var.n_elements()
+           << fcst_var.n()
            << " unique FCST_VAR values: "
            << write_css(fcst_var) << "\n";
    }
 
    // FCST_UNITS
-   if(fcst_units.n_elements() > 1) {
+   if(fcst_units.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << fcst_units.n_elements()
+           << fcst_units.n()
            << " unique FCST_UNITS values: "
            << write_css(fcst_units) << "\n";
    }
 
    // FCST_LEV
-   if(fcst_lev.n_elements() > 1) {
+   if(fcst_lev.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << fcst_lev.n_elements()
+           << fcst_lev.n()
            << " unique FCST_LEV values: "
            << write_css(fcst_lev) << "\n";
    }
 
    // OBS_VAR
-   if(obs_var.n_elements() > 1) {
+   if(obs_var.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obs_var.n_elements()
+           << obs_var.n()
            << " unique OBS_VAR values: "
            << write_css(obs_var) << "\n";
    }
 
    // OBS_UNITS
-   if(obs_units.n_elements() > 1) {
+   if(obs_units.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obs_units.n_elements()
+           << obs_units.n()
            << " unique OBS_UNITS values: "
            << write_css(obs_units) << "\n";
    }
 
    // OBS_LEV
-   if(obs_lev.n_elements() > 1) {
+   if(obs_lev.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obs_lev.n_elements()
+           << obs_lev.n()
            << " unique OBS_LEV values: "
            << write_css(obs_lev) << "\n";
    }
 
    // OBTYPE
-   if(obtype.n_elements() > 1) {
+   if(obtype.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obtype.n_elements()
+           << obtype.n()
            << " unique OBTYPE values: "
            << write_css(obtype) << "\n";
    }
 
    // VX_MASK
-   if(vx_mask.n_elements() > 1) {
+   if(vx_mask.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << vx_mask.n_elements()
+           << vx_mask.n()
            << " unique VX_MASK values: "
            << write_css(vx_mask) << "\n";
    }
 
    // INTERP_MTHD
-   if(interp_mthd.n_elements() > 1) {
+   if(interp_mthd.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << interp_mthd.n_elements()
+           << interp_mthd.n()
            << " unique INTERP_MTHD values: "
            << write_css(interp_mthd) << ".\n";
    }
 
    // INTERP_PNTS
-   if(interp_pnts.n_elements() > 1) {
+   if(interp_pnts.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << interp_pnts.n_elements()
+           << interp_pnts.n()
            << " unique INTERP_PNTS values: "
            << write_css(interp_pnts) << ".\n";
    }
 
    // FCST_THRESH
-   if(fcst_thresh.n_elements() > 1) {
+   if(fcst_thresh.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << fcst_thresh.n_elements()
+           << fcst_thresh.n()
            << " unique FCST_THRESH values: "
            << write_css(fcst_thresh) << "\n";
    }
 
    // OBS_THRESH
-   if(obs_thresh.n_elements() > 1) {
+   if(obs_thresh.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << obs_thresh.n_elements()
+           << obs_thresh.n()
            << " unique OBS_THRESH values: "
            << write_css(obs_thresh) << "\n";
    }
 
    // COV_THRESH
-   if(cov_thresh.n_elements() > 1) {
+   if(cov_thresh.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << cov_thresh.n_elements()
+           << cov_thresh.n()
            << " unique COV_THRESH values: "
            << write_css(cov_thresh) << ".\n";
    }
 
    // ALPHA
-   if(alpha.n_elements() > 1) {
+   if(alpha.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << alpha.n_elements()
+           << alpha.n()
            << " unique ALPHA values: "
            << write_css(alpha) << ".\n";
    }
@@ -360,10 +360,10 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
-   if(fcst_lead.n_elements() > 1) {
+   if(fcst_lead.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << fcst_lead.n_elements()
+           << fcst_lead.n()
            << " unique FCST_LEAD values: " << css << "\n";
    }
    if(hdr_cols.has("FCST_LEAD", index)) {
@@ -389,10 +389,10 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // OBS_LEAD
    css = write_css_hhmmss(obs_lead);
-   if(obs_lead.n_elements() > 1) {
+   if(obs_lead.n() > 1) {
       mlog << Debug(2)
            << "For case \"" << cur_case << "\", found "
-           << obs_lead.n_elements()
+           << obs_lead.n()
            << " unique OBS_LEAD values: " << css << "\n";
    }
    if(hdr_cols.has("OBS_LEAD", index)) {
@@ -463,10 +463,10 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
-   if(interp_pnts.n_elements() > 1) {
+   if(interp_pnts.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << interp_pnts.n_elements()
+           << interp_pnts.n()
            << " unique INTERP_PNTS values: " << css << ".\n";
       wdth = bad_data_int;
    }
@@ -499,10 +499,10 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 
    // ALPHA
    css = write_css(alpha);
-   if(alpha.n_elements() > 1) {
+   if(alpha.n() > 1) {
       mlog << Warning
            << "For case \"" << cur_case << "\", found "
-           << alpha.n_elements()
+           << alpha.n()
            << " unique ALPHA values: " << css << ".\n";
       out_alpha = bad_data_double;
    }
@@ -539,10 +539,10 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
    css = write_css(col_vals);
 
    // Check for multiple entries
-   if(col_vals.n_elements() > 1) {
+   if(col_vals.n() > 1) {
       ConcatString msg;
       msg << "For case \"" << cur_case << "\", found "
-          << col_vals.n_elements() << " unique " << col_name
+          << col_vals.n() << " unique " << col_name
           << " values: " << css << "\n";
       if(warning) mlog << Warning  << msg;
       else        mlog << Debug(2) << msg;
@@ -606,12 +606,12 @@ void AggrTimeSeriesInfo::sort() {
    ri_sort.obs_var  = obs_var;
 
    // Sort by valid time
-   if(valid_ts.n_elements() == f_na.n_elements()) {
+   if(valid_ts.n() == f_na.n()) {
 
       ri_sort.valid_ts = valid_ts;
       ri_sort.valid_ts.sort_array();
 
-      for(int i=0; i<valid_ts.n_elements(); i++) {
+      for(int i=0; i<valid_ts.n(); i++) {
          j = valid_ts.index(ri_sort.valid_ts[i]);
          ri_sort.f_na.add(f_na[j]);
          ri_sort.o_na.add(o_na[j]);
@@ -619,13 +619,13 @@ void AggrTimeSeriesInfo::sort() {
       }
    }
    // Sort by initialization time
-   else if(init_ts.n_elements() == f_na.n_elements()) {
+   else if(init_ts.n() == f_na.n()) {
 
       ri_sort.init_ts = init_ts;
       ri_sort.init_ts.sort_array();
       ri_sort.valid_ts = valid_ts; // Single value
 
-      for(int i=0; i<init_ts.n_elements(); i++) {
+      for(int i=0; i<init_ts.n(); i++) {
          j = init_ts.index(ri_sort.init_ts[i]);
          ri_sort.f_na.add(f_na[j]);
          ri_sort.o_na.add(o_na[j]);
@@ -669,20 +669,20 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
    //
    // Build list of requested line types and column names
    //
-   for(i=0; i<j.column.n_elements(); i++) {
+   for(i=0; i<j.column.n(); i++) {
 
       // Split -column entry on colon
       sa = ConcatString(j.column[i]).split(":");
 
       // Option 1: Use -line_type once with no colons in -column option
-      if(sa.n_elements() == 1 && j.line_type.n_elements() == 1) {
+      if(sa.n() == 1 && j.line_type.n() == 1) {
          cs << cs_erase << j.line_type[0] << ":" << sa[0];
          req_stat.add(cs);
          req_lty.add(j.line_type[0]);
          req_col.add(sa[0]);
       }
       // Option 2: Use colons in -column option
-      else if(sa.n_elements() == 2) {
+      else if(sa.n() == 2) {
          req_stat.add(j.column[i]);
          req_lty.add(sa[0]);
          req_col.add(sa[1]);
@@ -742,7 +742,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.val.clear();
             aggr.wgt.clear();
-            for(i=0; i<req_stat.n_elements(); i++) {
+            for(i=0; i<req_stat.n(); i++) {
                aggr.val[req_stat[i]] = empty_na;
                aggr.wgt[req_stat[i]] = empty_na;
             }
@@ -778,7 +778,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Update the map entries for each requested statistic
          //
-         for(i=0,n_add=0; i<req_col.n_elements(); i++) {
+         for(i=0,n_add=0; i<req_col.n(); i++) {
 
             //
             // Store the current requested line type
@@ -1006,7 +1006,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Check for the minimum length of time series
       //
-      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+      if(j.vif_flag && it->second.valid_ts.n() < min_time_series) {
          mlog << Warning << "\naggr_ctc_lines() -> "
               << "the variance inflation factor adjustment can only "
               << "be computed for at least " << min_time_series
@@ -1024,7 +1024,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          n = it->second.valid_ts.rank_array(n_ties);
 
-         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+         if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_ctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
             throw(1);
@@ -1198,7 +1198,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Check for the minimum length of time series
       //
-      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+      if(j.vif_flag && it->second.valid_ts.n() < min_time_series) {
          mlog << Warning << "\naggr_mctc_lines() -> "
               << "the variance inflation factor adjustment can only "
               << "be computed for at least " << min_time_series
@@ -1216,7 +1216,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          n = it->second.valid_ts.rank_array(n_ties);
 
-         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+         if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_mctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
             throw(1);
@@ -1390,7 +1390,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Check for the minimum length of time series
       //
-      if(j.vif_flag && it->second.valid_ts.n_elements() < min_time_series) {
+      if(j.vif_flag && it->second.valid_ts.n() < min_time_series) {
          mlog << Warning << "\naggr_pct_lines() -> "
               << "the variance inflation factor adjustment can only "
               << "be computed for at least " << min_time_series
@@ -1408,7 +1408,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          n = it->second.valid_ts.rank_array(n_ties);
 
-         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+         if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_pct_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
             throw(1);
@@ -1583,7 +1583,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
       // Check for the minimum length of time series
       //
       if(j.vif_flag && j.out_line_type.has(stat_cnt_str) &&
-         it->second.valid_ts.n_elements() < min_time_series) {
+         it->second.valid_ts.n() < min_time_series) {
          mlog << Warning << "\naggr_psum_lines() -> "
               << "the variance inflation factor adjustment can only "
               << "be computed for at least " << min_time_series
@@ -1601,7 +1601,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          n = it->second.valid_ts.rank_array(n_ties);
 
-         if(n_ties > 0 || n != it->second.valid_ts.n_elements()) {
+         if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_psum_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
             throw(1);
@@ -1986,7 +1986,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       // Loop over the pairs for the current map entry
       //
-      for(i=0; i<it->second.hdr_sa.n_elements(); i++) {
+      for(i=0; i<it->second.hdr_sa.n(); i++) {
 
          //
          // Check for missing UGRD data
@@ -2150,12 +2150,12 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if((j.out_line_type.has(stat_cnt_str) ||
              j.out_line_type.has(stat_sl1l2_str)) &&
-            (j.out_fcst_thresh.n_elements() > 0 ||
-             j.out_obs_thresh.n_elements()  > 0)) {
+            (j.out_fcst_thresh.n() > 0 ||
+             j.out_obs_thresh.n()  > 0)) {
 
             SingleThresh fst, ost;
-            if(j.out_fcst_thresh.n_elements() > 0) fst = j.out_fcst_thresh[0];
-            if(j.out_obs_thresh.n_elements()  > 0) ost = j.out_obs_thresh[0];
+            if(j.out_fcst_thresh.n() > 0) fst = j.out_fcst_thresh[0];
+            if(j.out_obs_thresh.n()  > 0) ost = j.out_obs_thresh[0];
 
             if(!check_fo_thresh(cur.fcst, fst, cur.obs, ost, j.out_cnt_logic)) {
                mlog << Debug(4) << "aggr_mpr_lines() -> "
@@ -2174,16 +2174,21 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.f_na.clear();
-            aggr.o_na.clear();
-            aggr.cmn_na.clear();
-            aggr.csd_na.clear();
-            aggr.cdf_na.clear();
-            aggr.f_na.add(cur.fcst);
-            aggr.o_na.add(cur.obs);
-            aggr.cmn_na.add(cur.climo_mean);
-            aggr.csd_na.add(cur.climo_stdev);
-            aggr.cdf_na.add(cur.climo_cdf);
+
+            aggr.pd.f_na.clear();
+            aggr.pd.o_na.clear();
+            aggr.pd.cmn_na.clear();
+            aggr.pd.csd_na.clear();
+            aggr.pd.cdf_na.clear();
+            aggr.pd.wgt_na.clear();
+
+            aggr.pd.n_obs = 1;
+            aggr.pd.f_na.add(cur.fcst);
+            aggr.pd.o_na.add(cur.obs);
+            aggr.pd.cmn_na.add(cur.climo_mean);
+            aggr.pd.csd_na.add(cur.climo_stdev);
+            aggr.pd.cdf_na.add(cur.climo_cdf);
+
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
             aggr.hdr.clear();
@@ -2194,11 +2199,13 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          else {
 
-            m[key].f_na.add(cur.fcst);
-            m[key].o_na.add(cur.obs);
-            m[key].cmn_na.add(cur.climo_mean);
-            m[key].csd_na.add(cur.climo_stdev);
-            m[key].cdf_na.add(cur.climo_cdf);
+            m[key].pd.n_obs++;
+            m[key].pd.f_na.add(cur.fcst);
+            m[key].pd.o_na.add(cur.obs);
+            m[key].pd.cmn_na.add(cur.climo_mean);
+            m[key].pd.csd_na.add(cur.climo_stdev);
+            m[key].pd.cdf_na.add(cur.climo_cdf);
+            m[key].pd.wgt_na.add(default_grid_weight);
 
             //
             // Only aggregate consistent variable names
@@ -2390,7 +2397,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
          baser_fbias_sum = 0.0;
 
          // Loop through all scores for this scale
-         for(k=0; k<it->second.total_na[i].n_elements(); k++) {
+         for(k=0; k<it->second.total_na[i].n(); k++) {
 
             // Compute the weight for each score to be aggregated
             // based on the number of points it represents
@@ -2678,10 +2685,10 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Check for N_RANK remaining constant
          //
-         if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
+         if(m[key].ens_pd.rhist_na.n() != cur.n_rank) {
             mlog << Error << "\naggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
-                 << m[key].ens_pd.rhist_na.n_elements() << " != " << cur.n_rank
+                 << m[key].ens_pd.rhist_na.n() << " != " << cur.n_rank
                  << ").  Try setting \"-column_eq N_RANK n\".\n\n";
             throw(1);
          }
@@ -2694,7 +2701,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Aggregate the ranked histogram counts
          //
-         for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
+         for(i=0; i<m[key].ens_pd.rhist_na.n(); i++) {
             m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
          }
 
@@ -2781,7 +2788,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Aggregate the probability integral transform histogram counts
             //
-            for(i=0; i<m[key].ens_pd.phist_na.n_elements(); i++) {
+            for(i=0; i<m[key].ens_pd.phist_na.n(); i++) {
                m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + cur.phist_na[i]);
             }
          } // end else
@@ -2857,10 +2864,10 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Check for N_ENS remaining constant
             //
-            if(m[key].ens_pd.relp_na.n_elements() != cur.n_ens) {
+            if(m[key].ens_pd.relp_na.n() != cur.n_ens) {
                mlog << Error << "\naggr_relp_lines() -> "
                     << "the \"N_ENS\" column must remain constant ("
-                    << m[key].ens_pd.relp_na.n_elements() << " != " << cur.n_ens
+                    << m[key].ens_pd.relp_na.n() << " != " << cur.n_ens
                     << ").  Try setting \"-column_eq N_ENS n\".\n\n";
                throw(1);
             }
@@ -2868,7 +2875,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Aggregate the RELP histogram counts
             //
-            for(i=0; i<m[key].ens_pd.relp_na.n_elements(); i++) {
+            for(i=0; i<m[key].ens_pd.relp_na.n(); i++) {
                m[key].ens_pd.relp_na.set(i, m[key].ens_pd.relp_na[i] + cur.relp_na[i]);
             }
          } // end else
@@ -3005,7 +3012,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(!is_bad_data(cur.pit)) {
             i = (is_eq(cur.pit, 1.0) ?
-                 m[key].ens_pd.phist_na.n_elements() - 1:
+                 m[key].ens_pd.phist_na.n() - 1:
                  floor(cur.pit / m[key].ens_pd.phist_bin_size));
             m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + 1);
          }
@@ -3236,7 +3243,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
 void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
                 CTSInfo &cts_info) {
    int i;
-   int n = info.f_na.n_elements();
+   int n = info.pd.f_na.n();
    SingleThresh ft = j.out_fcst_thresh[0];
    SingleThresh ot = j.out_obs_thresh[0];
 
@@ -3250,13 +3257,13 @@ void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    for(i=0; i<n; i++) {
 
-      if(      ft.check(info.f_na[i]) &&  ot.check(info.o_na[i]))
+      if(      ft.check(info.pd.f_na[i]) &&  ot.check(info.pd.o_na[i]))
          cts_info.cts.inc_fy_oy();
-      else if( ft.check(info.f_na[i]) && !ot.check(info.o_na[i]))
+      else if( ft.check(info.pd.f_na[i]) && !ot.check(info.pd.o_na[i]))
          cts_info.cts.inc_fy_on();
-      else if(!ft.check(info.f_na[i]) &&  ot.check(info.o_na[i]))
+      else if(!ft.check(info.pd.f_na[i]) &&  ot.check(info.pd.o_na[i]))
          cts_info.cts.inc_fn_oy();
-      else if(!ft.check(info.f_na[i]) && !ot.check(info.o_na[i]))
+      else if(!ft.check(info.pd.f_na[i]) && !ot.check(info.pd.o_na[i]))
          cts_info.cts.inc_fn_on();
    }
 
@@ -3278,7 +3285,7 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
+   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
 
    //
    // Store the out_alpha value
@@ -3298,13 +3305,13 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    cts_info_ptr = &cts_info;
    if(j.boot_interval == boot_bca_flag) {
-      compute_cts_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
+      compute_cts_stats_ci_bca(rng_ptr, info.pd,
          j.n_boot_rep,
          cts_info_ptr, 1, 1,
          j.rank_corr_flag, tmp_dir);
    }
    else {
-      compute_cts_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
+      compute_cts_stats_ci_perc(rng_ptr, info.pd,
          j.n_boot_rep, j.boot_rep_prop,
          cts_info_ptr, 1, 1,
          j.rank_corr_flag, tmp_dir);
@@ -3318,7 +3325,7 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
 void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
                  MCTSInfo &mcts_info) {
    int i;
-   int n = info.f_na.n_elements();
+   int n = info.pd.f_na.n();
 
    //
    // Initialize
@@ -3328,14 +3335,14 @@ void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // Setup
    //
-   mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
+   mcts_info.cts.set_size(j.out_fcst_thresh.n() + 1);
    mcts_info.set_fthresh(j.out_fcst_thresh);
    mcts_info.set_othresh(j.out_obs_thresh);
 
    //
    // Update the contingency table counts
    //
-   for(i=0; i<n; i++) mcts_info.add(info.f_na[i], info.o_na[i]);
+   for(i=0; i<n; i++) mcts_info.add(info.pd.f_na[i], info.pd.o_na[i]);
 
    return;
 }
@@ -3354,12 +3361,12 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
+   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
 
    //
    // Setup
    //
-   mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
+   mcts_info.cts.set_size(j.out_fcst_thresh.n() + 1);
    mcts_info.set_fthresh(j.out_fcst_thresh);
    mcts_info.set_othresh(j.out_obs_thresh);
 
@@ -3374,13 +3381,13 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    // bootstrap confidence intervals
    //
    if(j.boot_interval == boot_bca_flag) {
-      compute_mcts_stats_ci_bca(rng_ptr, info.f_na, info.o_na,
+      compute_mcts_stats_ci_bca(rng_ptr, info.pd,
          j.n_boot_rep,
          mcts_info, 1,
          j.rank_corr_flag, tmp_dir);
    }
    else {
-      compute_mcts_stats_ci_perc(rng_ptr, info.f_na, info.o_na,
+      compute_mcts_stats_ci_perc(rng_ptr, info.pd,
          j.n_boot_rep, j.boot_rep_prop,
          mcts_info, 1,
          j.rank_corr_flag, tmp_dir);
@@ -3406,7 +3413,7 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
+   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
 
    //
    // Set the precip flag based on fcst_var and obs_var
@@ -3421,25 +3428,18 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    cnt_info.alpha[0] = j.out_alpha;
 
    //
-   // Set weights to default values
-   //
-   for(i=0; i<info.f_na.n_elements(); i++) w_na.add(default_grid_weight);
-
-   //
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
    if(j.boot_interval == boot_bca_flag) {
 
-      compute_cnt_stats_ci_bca(rng_ptr,
-         info.f_na, info.o_na, info.cmn_na, w_na,
+      compute_cnt_stats_ci_bca(rng_ptr, info.pd,
          precip_flag, j.rank_corr_flag, j.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
 
-      compute_cnt_stats_ci_perc(rng_ptr,
-         info.f_na, info.o_na, info.cmn_na, w_na,
+      compute_cnt_stats_ci_perc(rng_ptr, info.pd,
          precip_flag, j.rank_corr_flag, j.n_boot_rep, j.boot_rep_prop,
          cnt_info, tmp_dir);
    }
@@ -3452,7 +3452,7 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
 void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
                  SL1L2Info &s_info) {
    int i;
-   int n = info.f_na.n_elements();
+   int n = info.pd.f_na.n();
    int scount, sacount;
    double f, o, c;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
@@ -3476,9 +3476,9 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
       //
       // Update the counts for this matched pair
       //
-      f = info.f_na[i];
-      o = info.o_na[i];
-      c = info.cmn_na[i];
+      f = info.pd.f_na[i];
+      o = info.pd.o_na[i];
+      c = info.pd.cmn_na[i];
 
       f_sum       += f;
       o_sum       += o;
@@ -3529,7 +3529,6 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
 void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
                 PCTInfo &pct_info) {
    int pstd_flag;
-   NumArray c_na;
 
    //
    // Initialize
@@ -3539,7 +3538,7 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    //
    // If there are no matched pairs to process, return
    //
-   if(info.f_na.n_elements() == 0 || info.o_na.n_elements() == 0) return;
+   if(info.pd.f_na.n() == 0 || info.pd.o_na.n() == 0) return;
 
    //
    // Set up the PCTInfo thresholds and alpha values
@@ -3553,14 +3552,9 @@ void mpr_to_pct(STATAnalysisJob &j, const AggrMPRInfo &info,
    else                                   pstd_flag = 0;
 
    //
-   // Compute the climatological probabilities
-   //
-   c_na = derive_climo_prob(info.cmn_na, info.csd_na, pct_info.othresh);
-
-   //
    // Compute the probabilistic counts and statistics
    //
-   compute_pctinfo(info.f_na, info.o_na, c_na, pstd_flag, pct_info);
+   compute_pctinfo(info.pd, pstd_flag, pct_info);
 
    return;
 }
@@ -3574,7 +3568,7 @@ double compute_vif(NumArray &na) {
    corr = stats_lag1_autocorrelation(na);
 
    // Compute the variance inflation factor
-   vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n_elements();
+   vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
    return(vif);
 }
