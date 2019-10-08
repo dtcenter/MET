@@ -868,9 +868,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
-                                    const NumArray &o_na,
-                                    const NumArray &cmn_na) {
+void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
 
    //
    // Compute percentiles for forecast and observation thresholds,
@@ -882,9 +880,9 @@ void GridStatVxOpt::set_perc_thresh(const NumArray &f_na,
    //
    // Sort the input arrays
    //
-   NumArray fsort = f_na;
-   NumArray osort = o_na;
-   NumArray csort = cmn_na;
+   NumArray fsort = pd.f_na;
+   NumArray osort = pd.o_na;
+   NumArray csort = pd.cmn_na;
    fsort.sort_array();
    osort.sort_array();
    csort.sort_array();

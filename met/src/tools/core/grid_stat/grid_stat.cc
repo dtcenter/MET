@@ -135,32 +135,20 @@ static void build_outfile_name(unixtime, int, const char *,
 
 static void process_scores();
 
-static void do_cts   (CTSInfo *&, int,
-                      const NumArray &, const NumArray &);
-static void do_mcts  (MCTSInfo &, int,
-                      const NumArray &, const NumArray &);
-static void do_cnt   (CNTInfo *&, int,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &,
-                      const NumArray &);
-static void do_sl1l2 (SL1L2Info *&, int,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &);
-static void do_vl1l2 (VL1L2Info *&, int,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &,
-                      const NumArray &);
-static void do_pct   (PCTInfo *&, int,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, int i_bin);
-static void do_nbrcts(NBRCTSInfo *&, int, int, int,
-                      const NumArray &, const NumArray &);
-static void do_nbrcnt(NBRCNTInfo &, int, int, int,
-                      const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &,
-                      const NumArray &);
+static void get_mask_points(const MaskPlane &, const DataPlane *,
+                            const DataPlane *, const DataPlane *,
+                            const DataPlane *, const DataPlane *,
+                            PairDataPoint &);
+
+static void do_cts   (CTSInfo *&,   int, const PairDataPoint *);
+static void do_mcts  (MCTSInfo &,   int, const PairDataPoint *);
+static void do_cnt   (CNTInfo *&,   int, const PairDataPoint *);
+static void do_sl1l2 (SL1L2Info *&, int, const PairDataPoint *);
+static void do_vl1l2 (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
+static void do_pct   (PCTInfo *&,   int, const PairDataPoint *, int i_bin);
+
+static void do_nbrcts(NBRCTSInfo *&, int, int, int, const PairDataPoint *);
+static void do_nbrcnt(NBRCNTInfo &,  int, int, int, const PairDataPoint *, const PairDataPoint *);
 
 static void write_nc(const ConcatString &, const DataPlane &, int,
                      const ConcatString &, int, FieldType);
@@ -610,31 +598,27 @@ void process_scores() {
    DataPlane cmn_dp, csd_dp;
    DataPlane cmn_dp_smooth;
 
-   // Forecast, observation, climatology, and weights
-   NumArray f_na, o_na, cmn_na, csd_na, w_na;
+   // Paired forecast, observation, climatology, and weight values
+   PairDataPoint pd;
 
    // Thresholded fractional coverage pairs
-   NumArray fthr_na, othr_na;
+   PairDataPoint pd_thr;
 
    // Allocate memory in one big chunk based on grid size
-   f_na.extend(grid.nx()*grid.ny());
-   o_na.extend(grid.nx()*grid.ny());
-   cmn_na.extend(grid.nx()*grid.ny());
-   csd_na.extend(grid.nx()*grid.ny());
-   w_na.extend(grid.nx()*grid.ny());
+   pd.extend(grid.nx()*grid.ny());
 
    if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
       conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
-      conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
-      fthr_na.extend(grid.nx()*grid.ny());
-      othr_na.extend(grid.nx()*grid.ny());
+      conf_info.output_flag[i_nbrcnt] != STATOutputType_None ||
+      conf_info.output_flag[i_dmap]   != STATOutputType_None) {
+      pd_thr.extend(grid.nx()*grid.ny());
    }
 
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
    DataPlane cmnu_dp, cmnu_dp_smooth;
-   NumArray fu_na, ou_na, cmnu_na;
+   PairDataPoint pd_u;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
    MCTSInfo    mcts_info;
@@ -821,11 +805,8 @@ void process_scores() {
             }
 
             // Apply the current mask to the current fields
-            apply_mask(fcst_dp_smooth, mask_mp, f_na);
-            apply_mask(obs_dp_smooth,  mask_mp, o_na);
-            apply_mask(cmn_dp,         mask_mp, cmn_na);
-            apply_mask(csd_dp,         mask_mp, csd_na);
-            apply_mask(wgt_dp,         mask_mp, w_na);
+            get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+                            &cmn_dp, &csd_dp, &wgt_dp, pd);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
@@ -837,17 +818,17 @@ void process_scores() {
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
                  << "), over region " << shc.get_mask()
-                 << ", using " << f_na.n_elements() << " matched pairs.\n";
+                 << ", using " << pd.f_na.n() << " matched pairs.\n";
 
             // Continue if no pairs were found
-            if(f_na.n_elements() == 0) continue;
+            if(pd.f_na.n() == 0) continue;
 
             // Process percentile thresholds
-            conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+            conf_info.vx_opt[i].set_perc_thresh(pd);
 
             // Compute CTS scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                       &&
-                conf_info.vx_opt[i].fcat_ta.n_elements() > 0                   &&
+                conf_info.vx_opt[i].fcat_ta.n() > 0                            &&
                (conf_info.vx_opt[i].output_flag[i_fho]  != STATOutputType_None ||
                 conf_info.vx_opt[i].output_flag[i_ctc]  != STATOutputType_None ||
                 conf_info.vx_opt[i].output_flag[i_cts]  != STATOutputType_None ||
@@ -857,10 +838,10 @@ void process_scores() {
                for(m=0; m<n_cat; m++) cts_info[m].clear();
 
                // Compute CTS
-               do_cts(cts_info, i, f_na, o_na);
+               do_cts(cts_info, i, &pd);
 
                // Loop through all of the thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcat_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
 
                   // Write out FHO
                   if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType_None &&
@@ -906,7 +887,7 @@ void process_scores() {
 
             // Compute MCTS scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                       &&
-                conf_info.vx_opt[i].fcat_ta.n_elements() > 1                   &&
+                conf_info.vx_opt[i].fcat_ta.n() > 1                            &&
                (conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType_None ||
                 conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType_None)) {
 
@@ -914,7 +895,7 @@ void process_scores() {
                mcts_info.clear();
 
                // Compute MCTS
-               do_mcts(mcts_info, i, f_na, o_na);
+               do_mcts(mcts_info, i, &pd);
 
                // Write out MCTC
                if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType_None &&
@@ -945,10 +926,10 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na, cmn_na, csd_na, w_na);
+               do_cnt(cnt_info, i, &pd);
 
                // Loop through the continuous thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
 
                   // Write out CNT
                   if(conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None &&
@@ -972,10 +953,10 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
 
                // Compute SL1L2 and SAL1L2
-               do_sl1l2(sl1l2_info, i, f_na, o_na, cmn_na, w_na);
+               do_sl1l2(sl1l2_info, i, &pd);
 
                // Loop through the continuous thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
 
                   // Write out SL1L2
                   if(conf_info.vx_opt[i].output_flag[i_sl1l2] != STATOutputType_None &&
@@ -1059,17 +1040,14 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth, mask_mp, fu_na);
-               apply_mask(ou_dp_smooth, mask_mp, ou_na);
-               apply_mask(cmnu_dp,      mask_mp, cmnu_na);
-               apply_mask(wgt_dp,       mask_mp, w_na);
+               get_mask_points(mask_mp, &fu_dp_smooth, &ou_dp_smooth,
+                               &cmnu_dp, 0, &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
-                        cmnu_na, cmn_na, w_na);
+               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
-               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
@@ -1124,8 +1102,8 @@ void process_scores() {
                for(m=0; m<n_prob; m++) pct_info[m].clear();
 
                // Determine the number of climo bins to process
-               n_cdf_bin = (cmn_na.n_valid() > 0 &&
-                            csd_na.n_valid() > 0 ?
+               n_cdf_bin = (pd.cmn_na.n_valid() > 0 &&
+                            pd.csd_na.n_valid() > 0 ?
                             conf_info.vx_opt[i].get_n_cdf_bin() : 1);
 
                // Loop over the climo_cdf_bins
@@ -1137,8 +1115,7 @@ void process_scores() {
                   shc.set_mask(cs.c_str());
 
                   // Compute PCT
-                  do_pct(pct_info, i, f_na, o_na, cmn_na, csd_na, w_na,
-                         (n_cdf_bin > 1 ? m : bad_data_int));
+                  do_pct(pct_info, i, &pd, (n_cdf_bin > 1 ? m : bad_data_int));
 
                   // Loop through all of the thresholds
                   for(n=0; n<n_prob; n++) {
@@ -1227,11 +1204,9 @@ void process_scores() {
 
             // Allocate memory in one big chunk based on grid size
             DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
-            NumArray  fgx_na, fgy_na, ogx_na, ogy_na;
-            fgx_na.extend(grid.nx()*grid.ny());
-            fgy_na.extend(grid.nx()*grid.ny());
-            ogx_na.extend(grid.nx()*grid.ny());
-            ogy_na.extend(grid.nx()*grid.ny());
+            PairDataPoint pd_gx, pd_gy;
+            pd_gx.extend(grid.nx()*grid.ny());
+            pd_gy.extend(grid.nx()*grid.ny());
 
             // Loop over gradient Dx/Dy
             for(k=0; k<conf_info.vx_opt[i].get_n_grad(); k++) {
@@ -1258,24 +1233,24 @@ void process_scores() {
                   mask_bad_data(mask_mp, ogy_dp);
 
                   // Apply the current mask to the current fields
-                  apply_mask(fgx_dp, mask_mp, fgx_na);
-                  apply_mask(fgy_dp, mask_mp, fgy_na);
-                  apply_mask(ogx_dp, mask_mp, ogx_na);
-                  apply_mask(ogy_dp, mask_mp, ogy_na);
-                  apply_mask(wgt_dp, mask_mp, w_na);
+                  get_mask_points(mask_mp, &fgx_dp, &ogx_dp,
+                                  0, 0, &wgt_dp, pd_gx);
+                  get_mask_points(mask_mp, &fgy_dp, &ogy_dp,
+                                  0, 0, &wgt_dp, pd_gy);
 
                   // Set the mask name
                   shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
 
                   mlog << Debug(2) << "Computing Gradient DX(" << dx << ")/DY("
                        << dy << ") Statistics " << "over region " << shc.get_mask()
-                       << ", using " << fgx_na.n_elements() << " matched pairs.\n";
+                       << ", using " << pd_gx.f_na.n() << " matched pairs.\n";
 
                   // Continue if no pairs were found
-                  if(fgx_na.n_elements() == 0) continue;
+                  if(pd_gx.f_na.n() == 0) continue;
 
                   // Compute GRAD
-                  grad_info.set(dx, dy, fgx_na, fgy_na, ogx_na, ogy_na, w_na);
+                  grad_info.set(dx, dy, pd_gx.f_na, pd_gy.f_na,
+                                pd_gx.o_na, pd_gy.o_na, pd_gx.wgt_na);
 
                   // Write out GRAD
                   if(conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None &&
@@ -1315,11 +1290,10 @@ void process_scores() {
 
             // Allocate memory in one big chunk based on grid size
             DataPlane fcst_dp_dmap, obs_dp_dmap;
-            f_na.extend(grid.nx()*grid.ny());
-            o_na.extend(grid.nx()*grid.ny());
+            pd.extend(grid.nx()*grid.ny());
 
             // Loop over the categorical thresholds
-            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
+            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
                // Initialize
                dmap_info.clear();
@@ -1340,12 +1314,11 @@ void process_scores() {
                      conf_info.vx_opt[i].ocat_ta.need_perc()) {
 
                      // Apply the current mask
-                     apply_mask(fcst_dp, mask_mp, f_na);
-                     apply_mask(obs_dp,  mask_mp, o_na);
-                     apply_mask(cmn_dp,  mask_mp, cmn_na);
+                     get_mask_points(mask_mp, &fcst_dp, &obs_dp,
+                                     &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
-                     conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+                     conf_info.vx_opt[i].set_perc_thresh(pd);
                   }
 
                   // Store the thresholds
@@ -1395,10 +1368,10 @@ void process_scores() {
 
                   // Apply the current mask to the distance map and
                   // thresholded fields
-                  apply_mask(fcst_dp_dmap,   mask_mp, f_na);
-                  apply_mask(fcst_dp_thresh, mask_mp, fthr_na);
-                  apply_mask(obs_dp_dmap,    mask_mp, o_na);
-                  apply_mask(obs_dp_thresh,  mask_mp, othr_na);
+                  get_mask_points(mask_mp, &fcst_dp_dmap, &obs_dp_dmap,
+                                  0, 0, 0, pd);
+                  get_mask_points(mask_mp, &fcst_dp_thresh, &obs_dp_thresh,
+                                  0, 0, 0, pd_thr);
 
                   dmap_info.set_options(
                         conf_info.vx_opt[i].baddeley_p,
@@ -1409,7 +1382,7 @@ void process_scores() {
                   // Compute DMAP statistics
                   dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
                                 conf_info.vx_opt[i].ocat_ta[k],
-                                f_na, o_na, fthr_na, othr_na);
+                                pd.f_na, pd.o_na, pd_thr.f_na, pd_thr.o_na);
 
                   // Write out DMAP
                   if(conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None &&
@@ -1442,13 +1415,13 @@ void process_scores() {
          for(j=0; j<n_cov; j++) nbrcts_info[j].clear();
 
          // Loop through and apply each of the neighborhood widths
-         for(j=0; j<nbrhd->width.n_elements(); j++) {
+         for(j=0; j<nbrhd->width.n(); j++) {
 
             shc.set_interp_mthd(InterpMthd_Nbrhd, nbrhd->shape);
             shc.set_interp_wdth(nbrhd->width[j]);
 
             // Loop through and apply each of the raw threshold values
-            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
+            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n(); k++) {
 
                // Initialize
                fcst_dp_smooth.clear();
@@ -1470,12 +1443,11 @@ void process_scores() {
                      conf_info.vx_opt[i].ocat_ta.need_perc()) {
 
                      // Apply the current mask
-                     apply_mask(fcst_dp, mask_mp, f_na);
-                     apply_mask(obs_dp,  mask_mp, o_na);
-                     apply_mask(cmn_dp,  mask_mp, cmn_na);
+                     get_mask_points(mask_mp, &fcst_dp, &obs_dp,
+                                     &cmn_dp, 0, 0, pd);
 
                      // Process percentile thresholds
-                     conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+                     conf_info.vx_opt[i].set_perc_thresh(pd);
                   }
 
                   // Process the forecast data
@@ -1570,11 +1542,14 @@ void process_scores() {
 
                   // Apply the current mask to the fractional coverage
                   // and thresholded fields
-                  apply_mask(fcst_dp_smooth, mask_mp, f_na);
-                  apply_mask(fcst_dp_thresh, mask_mp, fthr_na);
-                  apply_mask(obs_dp_smooth,  mask_mp, o_na);
-                  apply_mask(obs_dp_thresh,  mask_mp, othr_na);
-                  apply_mask(wgt_dp,         mask_mp, w_na);
+                  get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+                                  0, 0, &wgt_dp, pd);
+                  get_mask_points(mask_mp, &fcst_dp_thresh, &obs_dp_thresh,
+                                  0, 0, 0, pd_thr);
+
+                  // Store climatology values as bad data
+                  pd.cmn_na.add_const(bad_data_double, pd.f_na.n());
+                  pd.csd_na.add_const(bad_data_double, pd.f_na.n());
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.vx_opt[i].fcst_info->magic_str()
@@ -1588,11 +1563,11 @@ void process_scores() {
                        << " and "
                        << conf_info.vx_opt[i].ocat_ta[k].get_str()
                        << ", over region " << shc.get_mask()
-                       << ", using " << f_na.n_elements()
+                       << ", using " << pd.f_na.n()
                        << " matched pairs.\n";
 
                   // Continue if no pairs were found
-                  if(f_na.n_elements() == 0) continue;
+                  if(pd.f_na.n() == 0) continue;
 
                   // Compute NBRCTS scores
                   if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
@@ -1603,7 +1578,7 @@ void process_scores() {
                         nbrcts_info[n].clear();
                      }
 
-                     do_nbrcts(nbrcts_info, i, j, k, f_na, o_na);
+                     do_nbrcts(nbrcts_info, i, j, k, &pd);
 
                      // Loop through all of the thresholds
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
@@ -1638,8 +1613,7 @@ void process_scores() {
                      // Initialize
                      nbrcnt_info.clear();
 
-                     do_nbrcnt(nbrcnt_info, i, j, k,
-                               f_na, o_na, fthr_na, othr_na, w_na);
+                     do_nbrcnt(nbrcnt_info, i, j, k, &pd, &pd_thr);
 
                      // Write out NBRCNT
                      if(nbrcnt_info.sl1l2_info.scount > 0 &&
@@ -1741,11 +1715,8 @@ void process_scores() {
             }
 
             // Apply the current mask to the current fields
-            apply_mask(fcst_dp_smooth, mask_mp, f_na);
-            apply_mask(obs_dp_smooth,  mask_mp, o_na);
-            apply_mask(cmn_dp_smooth,  mask_mp, cmn_na);
-            apply_mask(csd_dp,         mask_mp, csd_na); // Set to bad data above
-            apply_mask(wgt_dp,         mask_mp, w_na);
+            get_mask_points(mask_mp, &fcst_dp_smooth, &obs_dp_smooth,
+                            &cmn_dp_smooth, &csd_dp, &wgt_dp, pd);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
@@ -1755,10 +1726,10 @@ void process_scores() {
                  << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
                  << ", for Fourier wave number " << shc.get_interp_mthd()
                  << ", over region " << shc.get_mask()
-                 << ", using " << f_na.n_elements() << " matched pairs.\n";
+                 << ", using " << pd.f_na.n() << " matched pairs.\n";
 
             // Continue if no pairs were found
-            if(f_na.n_elements() == 0) continue;
+            if(pd.f_na.n() == 0) continue;
 
             // Compute CNT scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
@@ -1768,10 +1739,10 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na, cmn_na, csd_na, w_na);
+               do_cnt(cnt_info, i, &pd);
 
                // Loop through the continuous thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
 
                   // Write out CNT
                   if(conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None &&
@@ -1795,10 +1766,10 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
 
                // Compute SL1L2 and SAL1L2
-               do_sl1l2(sl1l2_info, i, f_na, o_na, cmn_na, w_na);
+               do_sl1l2(sl1l2_info, i, &pd);
 
                // Loop through the continuous thresholds
-               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
 
                   // Write out SL1L2
                   if(conf_info.vx_opt[i].output_flag[i_sl1l2] != STATOutputType_None &&
@@ -1886,17 +1857,14 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth,   mask_mp, fu_na);
-               apply_mask(ou_dp_smooth,   mask_mp, ou_na);
-               apply_mask(cmnu_dp_smooth, mask_mp, cmnu_na);
-               apply_mask(wgt_dp,         mask_mp, w_na);
+               get_mask_points(mask_mp, &fu_dp_smooth, &ou_dp_smooth,
+                               &cmnu_dp_smooth, 0, &wgt_dp, pd_u);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
-                        cmnu_na, cmn_na, w_na);
+               do_vl1l2(vl1l2_info, i, &pd_u, &pd);
 
                // Loop through all of the wind speed thresholds
-               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
                   if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
@@ -1976,14 +1944,33 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void get_mask_points(const MaskPlane &mask_mp,
+                     const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
+                     const DataPlane *cmn_ptr,  const DataPlane *csd_ptr,
+                     const DataPlane *wgt_ptr, PairDataPoint &pd) {
+
+    // Apply the mask the data fields provided
+    pd.erase();
+    if(fcst_ptr) apply_mask(*fcst_ptr, mask_mp, pd.f_na);
+    if(obs_ptr)  apply_mask(*obs_ptr,  mask_mp, pd.o_na);
+    if(cmn_ptr)  apply_mask(*cmn_ptr,  mask_mp, pd.cmn_na);
+    if(csd_ptr)  apply_mask(*csd_ptr,  mask_mp, pd.csd_na);
+    if(wgt_ptr)  apply_mask(*wgt_ptr,  mask_mp, pd.wgt_na);
+    pd.n_obs = pd.o_na.n();
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_cts(CTSInfo *&cts_info, int i_vx,
-            const NumArray &f_na, const NumArray &o_na) {
+            const PairDataPoint *pd_ptr) {
    int i, j, n_cts;
 
    //
    // Set up the CTSInfo thresholds and alpha values
    //
-   n_cts = conf_info.vx_opt[i_vx].fcat_ta.n_elements();
+   n_cts = conf_info.vx_opt[i_vx].fcat_ta.n();
    for(i=0; i<n_cts; i++) {
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
@@ -2001,14 +1988,14 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    // bootstrap confidence intervals
    //
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
-      compute_cts_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          cts_info, n_cts,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
-      compute_cts_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_cts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          cts_info, n_cts,
@@ -2022,13 +2009,13 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_mcts(MCTSInfo &mcts_info, int i_vx,
-             const NumArray &f_na, const NumArray &o_na) {
+             const PairDataPoint *pd_ptr) {
    int i;
 
    //
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
-   mcts_info.cts.set_size(conf_info.vx_opt[i_vx].fcat_ta.n_elements() + 1);
+   mcts_info.cts.set_size(conf_info.vx_opt[i_vx].fcat_ta.n() + 1);
    mcts_info.set_fthresh(conf_info.vx_opt[i_vx].fcat_ta);
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
@@ -2042,21 +2029,21 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    //
    // If there are no matched pairs to process, return
    //
-   if(f_na.n_elements() == 0 || o_na.n_elements() == 0) return;
+   if(pd_ptr->f_na.n() == 0 || pd_ptr->o_na.n() == 0) return;
 
    //
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
-      compute_mcts_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          mcts_info,
          conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
-      compute_mcts_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_mcts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          mcts_info,
@@ -2070,18 +2057,16 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_cnt(CNTInfo *&cnt_info, int i_vx,
-            const NumArray &f_na,   const NumArray &o_na,
-            const NumArray &cmn_na, const NumArray &csd_na,
-            const NumArray &w_na) {
+            const PairDataPoint *pd_ptr) {
    int i, j;
-   PairDataPoint pd_all, pd;
+   PairDataPoint pd;
 
    mlog << Debug(2) << "Computing Continuous Statistics.\n";
 
    //
    // Process each filtering threshold
    //
-   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n_elements(); i++) {
+   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -2099,21 +2084,15 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       }
 
       //
-      // Store pairs in PairDataPoint object
-      //
-      pd_all.clear();
-      pd_all.add_pair(f_na, o_na, cmn_na, csd_na, w_na);
-
-      //
       // Apply continuous filtering thresholds to subset pairs
       //
-      pd = subset_pairs(pd_all, cnt_info[i].fthresh, cnt_info[i].othresh,
+      pd = subset_pairs(*pd_ptr, cnt_info[i].fthresh, cnt_info[i].othresh,
                         cnt_info[i].logic);
 
       //
       // Check for no matched pairs to process
       //
-      if(pd.n_obs == 0) continue;
+      if(pd_ptr->n_obs == 0) continue;
 
       //
       // Compute the stats, normal confidence intervals, and
@@ -2123,15 +2102,13 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
                          conf_info.vx_opt[i_vx].obs_info->is_precipitation());
 
       if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr,
-            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
+         compute_cnt_stats_ci_bca(rng_ptr, pd,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep,
             cnt_info[i], conf_info.tmp_dir.c_str());
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr,
-            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
+         compute_cnt_stats_ci_perc(rng_ptr, pd,
             precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
             conf_info.vx_opt[i_vx].boot_info.n_rep,
             conf_info.vx_opt[i_vx].boot_info.rep_prop,
@@ -2145,8 +2122,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_sl1l2(SL1L2Info *&s_info, int i_vx,
-              const NumArray &f_na,   const NumArray &o_na,
-              const NumArray &cmn_na, const NumArray &w_na) {
+              const PairDataPoint *pd_ptr) {
    int i;
 
    mlog << Debug(2)
@@ -2155,7 +2131,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
    //
    // Process each filtering threshold
    //
-   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n_elements(); i++) {
+   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -2167,7 +2143,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
       //
       // Compute partial sums
       //
-      s_info[i].set(f_na, o_na, cmn_na, w_na);
+      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na, pd_ptr->wgt_na);
 
    } // end for i
 
@@ -2177,25 +2153,23 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
-              const NumArray &uf_na, const NumArray &vf_na,
-              const NumArray &uo_na, const NumArray &vo_na,
-              const NumArray &uc_na, const NumArray &vc_na,
-              const NumArray &w_na) {
+              const PairDataPoint *pd_u_ptr,
+              const PairDataPoint *pd_v_ptr) {
    int i;
 
    // Check that the number of pairs are the same
-   if(uf_na.n_elements() != uo_na.n_elements() ||
-      uf_na.n_elements() != vf_na.n_elements() ||
-      vf_na.n_elements() != vo_na.n_elements()) {
+   if(pd_u_ptr->n_obs != pd_u_ptr->n_obs) {
       mlog << Error << "\ndo_vl1l2() -> "
            << "unequal number of UGRD and VGRD pairs ("
-           << uf_na.n_elements() << " != " << uo_na.n_elements()
+           << pd_u_ptr->n_obs << " != " << pd_v_ptr->n_obs
            << ")\n\n";
       exit(1);
    }
 
+   //
    // Set all of the VL1L2Info objects
-   for(i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n_elements(); i++) {
+   //
+   for(i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -2208,7 +2182,10 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       //
       // Compute partial sums
       //
-      v_info[i].set(uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, w_na);
+      v_info[i].set(pd_u_ptr->f_na,   pd_v_ptr->f_na,
+                    pd_u_ptr->o_na,   pd_v_ptr->o_na,
+                    pd_u_ptr->cmn_na, pd_v_ptr->cmn_na,
+                    pd_u_ptr->wgt_na);
 
    } // end for i
 
@@ -2217,23 +2194,16 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(PCTInfo *&pct_info,     int i_vx,
-            const NumArray &f_na,   const NumArray &o_na,
-            const NumArray &cmn_na, const NumArray &csd_na,
-            const NumArray &w_na,   int i_bin) {
+void do_pct(PCTInfo *&pct_info, int i_vx,
+            const PairDataPoint *pd_in_ptr, int i_bin) {
    int i, j, n_pct;
-   PairDataPoint pd_all, pd_bin;
-   PairDataPoint *pd_ptr = (PairDataPoint *) 0;
-   NumArray climo_prob;
-
-   // Store pairs in PairDataPoint object
-   pd_all.add_pair(f_na, o_na, cmn_na, csd_na, w_na);
+   PairDataPoint pd_bin;
+   const PairDataPoint *pd_ptr = pd_in_ptr;
 
    // No binned climatology
    if(is_bad_data(i_bin)) {
       mlog << Debug(2)
            << "Computing Probabilistic Statistics.\n";
-      pd_ptr = &pd_all;
    }
    // Binned climatology
    else {
@@ -2244,21 +2214,20 @@ void do_pct(PCTInfo *&pct_info,     int i_vx,
            << conf_info.vx_opt[i_vx].climo_cdf_ta[i_bin].get_str() << ").\n";
 
       // Subset the matched pairs for the current bin
-      pd_bin = subset_climo_cdf_bin(pd_all,
-                  conf_info.vx_opt[i_vx].climo_cdf_ta, i_bin);
+      pd_bin = subset_climo_cdf_bin(*pd_in_ptr, conf_info.vx_opt[i_vx].climo_cdf_ta,
+                                    i_bin);
       pd_ptr = &pd_bin;
    }
 
    //
    // If there are no matched pairs to process, return
    //
-   if(pd_ptr->f_na.n_elements() == 0 ||
-      pd_ptr->o_na.n_elements() == 0) return;
+   if(pd_ptr->f_na.n() == 0 || pd_ptr->o_na.n() == 0) return;
 
    //
    // Set up the PCTInfo thresholds and alpha values
    //
-   n_pct = conf_info.vx_opt[i_vx].ocat_ta.n_elements();
+   n_pct = conf_info.vx_opt[i_vx].ocat_ta.n();
    for(i=0; i<n_pct; i++) {
 
       // Use all of the selected forecast thresholds
@@ -2274,16 +2243,9 @@ void do_pct(PCTInfo *&pct_info,     int i_vx,
       }
 
       //
-      // Derive the climo probabilities
-      //
-      climo_prob = derive_climo_prob(pd_ptr->cmn_na, pd_ptr->csd_na,
-                                     conf_info.vx_opt[i_vx].ocat_ta[i]);
-
-      //
       // Compute the probabilistic counts and statistics
       //
-      compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na, climo_prob,
-                      conf_info.vx_opt[i_vx].output_flag[i_pstd],
+      compute_pctinfo(*pd_ptr, conf_info.vx_opt[i_vx].output_flag[i_pstd],
                       pct_info[i]);
 
    } // end for i
@@ -2295,7 +2257,7 @@ void do_pct(PCTInfo *&pct_info,     int i_vx,
 
 void do_nbrcts(NBRCTSInfo *&nbrcts_info,
                int i_vx, int i_wdth, int i_thresh,
-               const NumArray &f_na, const NumArray &o_na) {
+               const PairDataPoint *pd_ptr) {
    int i, j, n_nbrcts;
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
@@ -2348,14 +2310,14 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    // bootstrap confidence intervals
    //
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
-      compute_nbrcts_stats_ci_bca(rng_ptr, f_na, o_na,
+      compute_nbrcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcts_info, n_nbrcts,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType_None,
          conf_info.tmp_dir.c_str());
    }
    else {
-      compute_nbrcts_stats_ci_perc(rng_ptr, f_na, o_na,
+      compute_nbrcts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcts_info, n_nbrcts,
@@ -2370,9 +2332,8 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
 
 void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                int i_vx, int i_wdth, int i_thresh,
-               const NumArray &f_na, const NumArray &o_na,
-               const NumArray &fthr_na, const NumArray &othr_na,
-               const NumArray &w_na) {
+               const PairDataPoint *pd_ptr,
+               const PairDataPoint *pd_thr_ptr) {
    int i;
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
@@ -2410,16 +2371,14 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    // bootstrap confidence intervals
    //
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
-      compute_nbrcnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         fthr_na, othr_na, w_na,
+      compute_nbrcnt_stats_ci_bca(rng_ptr, *pd_ptr, *pd_thr_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcnt_info,
          conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType_None,
          conf_info.tmp_dir.c_str());
    }
    else {
-      compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         fthr_na, othr_na, w_na,
+      compute_nbrcnt_stats_ci_perc(rng_ptr, *pd_ptr, *pd_thr_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcnt_info,

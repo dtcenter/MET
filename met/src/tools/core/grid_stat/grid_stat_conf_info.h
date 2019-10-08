@@ -197,7 +197,7 @@ class GridStatVxOpt {
       void parse_nc_info(Dictionary &);
       bool is_uv_match(const GridStatVxOpt &) const;
 
-      void set_perc_thresh(const NumArray &, const NumArray &, const NumArray &);
+      void set_perc_thresh(const PairDataPoint &);
 
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
