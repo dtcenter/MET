@@ -590,8 +590,11 @@ void process_scores() {
    VarInfo *fcst_info = (VarInfo *) 0;
    VarInfo *obs_info  = (VarInfo *) 0;
    PairDataPoint *pd_ptr = (PairDataPoint *) 0;
-   DataPlane fcst_dp, obs_dp, cmn_dp;
-   bool cmn_flag;
+   DataPlane fcst_dp, obs_dp;
+
+   // Climatology mean and standard deviation
+   DataPlane cmn_dp, csd_dp;
+   bool cmn_flag, csd_flag;
 
    // Number of points skipped due to valid data threshold
    int n_skip_zero = 0;
@@ -651,12 +654,18 @@ void process_scores() {
          cmn_dp = read_climo_data_plane(
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                   i_fcst, fcst_dp.valid(), grid);
+         csd_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                  i_fcst, fcst_dp.valid(), grid);
 
          cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny());
+         csd_flag = (csd_dp.nx() == fcst_dp.nx() && csd_dp.ny() == fcst_dp.ny());
+
          mlog << Debug(3)
-              << "Found " << (cmn_flag ? 1 : 0)
-              << " climatology mean field(s) for forecast "
-              << fcst_info->magic_str() << ".\n";
+           << "Found " << (cmn_flag ? 0 : 1)
+           << " climatology mean and " << (csd_flag == 0 ? 0 : 1)
+           << " climatology standard deviation field(s) for forecast "
+           << fcst_info->magic_str() << ".\n";
 
          // Setup the output NetCDF file on the first pass
          if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
@@ -679,9 +688,10 @@ void process_scores() {
             if(!is_bad_data(fcst_dp(x, y)) &&
                !is_bad_data(obs_dp(x, y))  &&
                !is_bad_data(conf_info.mask_area(x, y))) {
+
                pd_ptr[i].add_pair(fcst_dp(x, y), obs_dp(x, y),
-                                  (cmn_flag ? cmn_dp(x, y) : bad_data_double),
-                                  bad_data_double);
+                            (cmn_flag ? cmn_dp(x, y) : bad_data_double),
+                            (csd_flag ? csd_dp(x, y) : bad_data_double));
             }
 
          } // end for i
