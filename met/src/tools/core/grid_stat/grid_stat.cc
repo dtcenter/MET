@@ -617,7 +617,7 @@ void process_scores() {
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
-   DataPlane cmnu_dp, cmnu_dp_smooth;
+   DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
    PairDataPoint pd_u;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
@@ -704,7 +704,7 @@ void process_scores() {
               << ".\n\n";
       }
 
-      // Read climatological mean and standard deviation
+      // Read climatology data
       cmn_dp = read_climo_data_plane(
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                   i, fcst_dp.valid(), grid);
@@ -1011,6 +1011,9 @@ void process_scores() {
                cmnu_dp = read_climo_data_plane(
                            conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                            ui, fcst_dp.valid(), grid);
+               csdu_dp = read_climo_data_plane(
+                           conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                           ui, fcst_dp.valid(), grid);
 
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
@@ -1041,7 +1044,7 @@ void process_scores() {
 
                // Apply the current mask to the U-wind fields
                get_mask_points(mask_mp, &fu_dp_smooth, &ou_dp_smooth,
-                               &cmnu_dp, 0, &wgt_dp, pd_u);
+                               &cmnu_dp, &csdu_dp, &wgt_dp, pd_u);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, &pd_u, &pd);
