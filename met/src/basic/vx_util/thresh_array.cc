@@ -379,6 +379,12 @@ void ThreshArray::check_bin_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::check_bins(double v) const {
+   return(check_bins(v, bad_data_double, bad_data_double));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ThreshArray::check_bins(double v, double mn, double sd) const {
    int i, bin;
 
    // Check for bad data or no thresholds
@@ -388,7 +394,7 @@ int ThreshArray::check_bins(double v) const {
    if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
 
       for(i=0, bin=-1; i<Nelements; i++) {
-         if(t[i].check(v)) {
+         if(t[i].check(v, mn, sd)) {
             bin = i;
             break;
          }
@@ -399,7 +405,7 @@ int ThreshArray::check_bins(double v) const {
    else {
 
       for(i=Nelements-1, bin=-1; i>=0; i--) {
-         if(t[i].check(v)) {
+         if(t[i].check(v, mn, sd)) {
             bin = i+1;
             break;
          }
@@ -415,12 +421,18 @@ int ThreshArray::check_bins(double v) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool ThreshArray::check_dbl(double v) const {
+   return(check_dbl(v, bad_data_double, bad_data_double));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool ThreshArray::check_dbl(double v, double mn, double sd) const {
    int i;
 
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(i=0; i<Nelements; i++) if(!t[i].check(v)) return(false);
+   for(i=0; i<Nelements; i++) if(!t[i].check(v, mn, sd)) return(false);
 
    return(true);
 }

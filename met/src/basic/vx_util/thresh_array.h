@@ -59,6 +59,7 @@ class ThreshArray {
       void parse_thresh_str(const char *);
 
       int n_elements() const;
+      int n() const;
 
       int has(const SingleThresh &) const;
       int has(const SingleThresh &, int & index) const;
@@ -75,13 +76,16 @@ class ThreshArray {
 
       void check_bin_thresh() const;
       int check_bins(double) const;
+      int check_bins(double, double, double) const;
 
       bool check_dbl(double) const;
+      bool check_dbl(double, double, double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int                  ThreshArray::n_elements() const { return ( Nelements ); }
+inline int                  ThreshArray::n()          const { return ( Nelements ); }
 inline const SingleThresh * ThreshArray::thresh()     const { return ( t );         }
 inline       SingleThresh * ThreshArray::buf()        const { return ( t );         }
 
