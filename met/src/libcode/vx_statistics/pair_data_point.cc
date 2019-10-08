@@ -86,6 +86,17 @@ void PairDataPoint::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataPoint::erase() {
+
+   PairBase::erase();
+
+   f_na.erase();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataPoint::extend(int n) {
 
    PairBase::extend(n);
@@ -115,7 +126,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    set_interp_shape(pd.interp_shape);
 
    // Handle point data
-   if(pd.sid_sa.n_elements() == pd.n_obs) {
+   if(pd.sid_sa.n() == pd.n_obs) {
 
       for(i=0; i<pd.n_obs; i++) {
          add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
@@ -171,9 +182,9 @@ bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
    int i;
 
    // Allocate enough memory
-   csd_in.extend(cmn_in.n_elements());
+   csd_in.extend(cmn_in.n());
 
-   for(i=0; i<cmn_in.n_elements(); i++) csd_in.add(bad_data_double);
+   for(i=0; i<cmn_in.n(); i++) csd_in.add(bad_data_double);
 
    return(add_pair(f_in, o_in, cmn_in, csd_in, w_in));
 }
@@ -185,28 +196,28 @@ bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
                              const NumArray &w_in) {
 
    // Check for constant length
-   if(o_in.n_elements() != f_in.n_elements()   ||
-      o_in.n_elements() != cmn_in.n_elements() ||
-      o_in.n_elements() != csd_in.n_elements() ||
-      o_in.n_elements() != w_in.n_elements()) {
+   if(o_in.n() != f_in.n()   ||
+      o_in.n() != cmn_in.n() ||
+      o_in.n() != csd_in.n() ||
+      o_in.n() != w_in.n()) {
       mlog << Error << "\nPairDataPoint::add_pair() -> "
            << "arrays must all have the same length!\n\n";
       exit(1);
    }
 
    // Allocate enough memory
-   extend(o_in.n_elements());
+   extend(o_in.n());
 
    f_na.add(f_in);
    o_na.add(o_in);
    wgt_na.add(w_in);
 
-   for(int i=0; i<o_in.n_elements(); i++) {
+   for(int i=0; i<o_in.n(); i++) {
       add_climo(o_in[i], cmn_in[i], csd_in[i]);
    }
 
    // Increment the number of pairs
-   n_obs += o_in.n_elements();
+   n_obs += o_in.n();
 
    return(true);
 }
@@ -762,7 +773,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    n_try++;
 
    // Check the station ID exclusion list
-   if(sid_exc_filt.n_elements() && sid_exc_filt.has(hdr_sid_str)) {
+   if(sid_exc_filt.n() && sid_exc_filt.has(hdr_sid_str)) {
       rej_sid_exc++;
       return;
    }
@@ -781,9 +792,9 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // Check if the observation quality flag is included in the list
-   if(obs_qty_filt.n_elements() && strcmp(obs_qty, "")) {
+   if(obs_qty_filt.n() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i<obs_qty_filt.n_elements() && !qty_match; i++)
+      for(i=0; i<obs_qty_filt.n() && !qty_match; i++)
          if( obs_qty == obs_qty_filt[i] ) qty_match = true;
 
       if( !qty_match ){
@@ -1278,7 +1289,7 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
       if(check_fo_thresh(pd.f_na[i], ft, pd.o_na[i], ot, type)) {
 
          // Handle point data
-         if(pd.sid_sa.n_elements() == pd.n_obs) {
+         if(pd.sid_sa.n() == pd.n_obs) {
             out_pd.add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                             pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                             pd.lvl_na[i], pd.elv_na[i],
@@ -1308,7 +1319,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
                                    const ThreshArray &ta, int i_bin) {
 
    // Check for no work to be done
-   if(ta.n_elements() == 0) return(pd);
+   if(ta.n() == 0) return(pd);
 
    int i;
    PairDataPoint out_pd;
@@ -1333,7 +1344,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
       if(ta.check_bins(pd.cdf_na[i]) == (i_bin + 1)) {
 
          // Handle point data
-         if(pd.sid_sa.n_elements() == pd.n_obs) {
+         if(pd.sid_sa.n() == pd.n_obs) {
             out_pd.add_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
                             pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                             pd.lvl_na[i], pd.elv_na[i],
@@ -1361,9 +1372,9 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
 
    // The climo values must have non-zero, consistent length and
    // cannot all be bad data
-   if(c_na.n_elements() != f_na.n_elements() ||
-      c_na.n_elements() < 1 ||
-      is_bad_data(c_na.max())) return(false);
+   if(c_na.n() != f_na.n() || c_na.n() < 1 || is_bad_data(c_na.max())) {
+      return(false);
+   }
 
    return(true);
 }
@@ -1391,7 +1402,7 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
            << ".\n";
 
       // Compute probability value for each point
-      for(i=0; i<mn_na.n_elements(); i++) {
+      for(i=0; i<mn_na.n(); i++) {
 
          prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
 

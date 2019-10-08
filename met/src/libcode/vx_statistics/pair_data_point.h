@@ -47,6 +47,7 @@ class PairDataPoint : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       void clear();
+      void erase();
 
       void extend(int);
 
