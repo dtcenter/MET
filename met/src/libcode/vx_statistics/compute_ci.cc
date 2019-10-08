@@ -390,7 +390,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       for(i=0; i<n_cts; i++) {
          for(j=0; j<n; j++) {
-            compute_i_ctsinfo(pd, j, 0, cts_tmp[i]);
+            compute_i_ctsinfo(pd, j, false, cts_tmp[i]);
             write_ctsinfo(cts_i_out[i], cts_tmp[i]);
          }
       } // end for i
@@ -803,7 +803,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_mctsinfo(pd, i, 0, mcts_tmp);
+         compute_i_mctsinfo(pd, i, false, mcts_tmp);
          write_mctsinfo(mcts_i_out, mcts_tmp);
       } // end for i
 
@@ -1471,7 +1471,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
          // cts_flag set and the normal_ci_flag unset
          //
          for(j=0; j<n_cts; j++) {
-            compute_ctsinfo(pd, ir_na, 1, 0, cts_tmp[j]);
+            compute_ctsinfo(pd, ir_na, true, false, cts_tmp[j]);
             write_ctsinfo(cts_r_out[j], cts_tmp[j]);
          } // end for j
       }
@@ -2445,7 +2445,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
       //
       for(i=0; i<n_nbrcts; i++) {
          for(j=0; j<n; j++) {
-            compute_i_ctsinfo(pd, j, 0, nbrcts_tmp[i].cts_info);
+            compute_i_ctsinfo(pd, j, false, nbrcts_tmp[i].cts_info);
             write_ctsinfo(nbrcts_i_out[i], nbrcts_tmp[i].cts_info);
          }
       } // end for i
@@ -3199,7 +3199,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   nbrcts_info[i].cts_info.far.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for csicompute_mean_stdev
+         // Compute bootstrap interval for csi
          //
          s = nbrcts_info[i].cts_info.csi.v;
          read_ldf(nbrcts_r_file[i], c++, sr_na);
@@ -3572,7 +3572,7 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
    //
    i_na.add_seq(0, n-1);
 
-   compute_mean_stdev(v_na, i_na, 1, alpha, mean_ci, stdev_ci);
+   compute_mean_stdev(v_na, i_na, true, alpha, mean_ci, stdev_ci);
 
    //
    // Do not compute bootstrap CI's if n<=1 or the number of
@@ -3585,7 +3585,7 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
    // with the i-th data point removed
    //
    for(i=0; i<n; i++) {
-      compute_i_mean_stdev(v_na, 0, alpha, i,
+      compute_i_mean_stdev(v_na, false, alpha, i,
                            mean_tmp, stdev_tmp);
 
       //
@@ -3605,8 +3605,7 @@ void compute_mean_stdev_ci_bca(const gsl_rng *rng_ptr,
       //
       // Compute the mean and standard deviation for each replicate
       //
-      compute_mean_stdev(v_na, ir_na, 0, alpha,
-                         mean_tmp, stdev_tmp);
+      compute_mean_stdev(v_na, ir_na, false, alpha, mean_tmp, stdev_tmp);
 
       //
       // Store the mean and standard deviation for this replicate
@@ -3651,7 +3650,7 @@ void compute_mean_stdev_ci_perc(const gsl_rng *rng_ptr,
    //
    i_na.add_seq(0, n-1);
 
-   compute_mean_stdev(v_na, i_na, 1, alpha, mean_ci, stdev_ci);
+   compute_mean_stdev(v_na, i_na, true, alpha, mean_ci, stdev_ci);
 
    //
    // Do not compute bootstrap CI's if n<=1 or the number of
@@ -3669,7 +3668,7 @@ void compute_mean_stdev_ci_perc(const gsl_rng *rng_ptr,
       //
       // Compute the mean and standard deviation for each replicate
       //
-      compute_mean_stdev(v_na, ir_na, 0, alpha, mean_tmp, stdev_tmp);
+      compute_mean_stdev(v_na, ir_na, false, alpha, mean_tmp, stdev_tmp);
 
       //
       // Store the mean and standard deviation for this replicate
