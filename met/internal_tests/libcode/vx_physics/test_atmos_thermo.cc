@@ -15,7 +15,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_atmos_thermo.h"
+#include "atmos_thermo.h"
 
 ////////////////////////////////////////////////////////////////////////
 
