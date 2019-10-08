@@ -79,6 +79,7 @@ class TimeArray {
       unixtime max() const;
 
       int n_elements() const;
+      int n() const;
 
 };
 
@@ -87,6 +88,7 @@ class TimeArray {
 
 
 inline int TimeArray::n_elements() const { return ( Nelements ); }
+inline int TimeArray::n()          const { return ( Nelements ); }
 
 
 ////////////////////////////////////////////////////////////////////////
