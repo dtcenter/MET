@@ -83,7 +83,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    climo_files = i_dict.lookup_string_array(conf_key_file_name, false);
 
    // Check for at least one file
-   if(climo_files.n_elements() == 0) return(dpa);
+   if(climo_files.n() == 0) return(dpa);
 
    // Regrid info
    regrid_info = parse_conf_regrid(&i_dict);
@@ -104,7 +104,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    ctype = parse_conf_file_type(&i_dict);
 
    // Search the files for the requested records
-   for(i=0; i<climo_files.n_elements(); i++) {
+   for(i=0; i<climo_files.n(); i++) {
       read_climo_file(climo_files[i].c_str(), ctype, &i_dict, vld_ut,
                       match_month, match_day, time_step,
                       vx_grid, regrid_info, dpa);
@@ -247,23 +247,23 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa,
    // Process each map entry
    for(it = level_map.begin(); it != level_map.end(); it++) {
       cs << cs_erase;
-      for(i=0; i<it->second.n_elements(); i++) {
+      for(i=0; i<it->second.n(); i++) {
          cs << unix_to_yyyymmdd_hhmmss(dpa[i].valid())
-            << (i+1 == it->second.n_elements() ? "" : ", ");
+            << (i+1 == it->second.n() ? "" : ", ");
       }
       mlog << Debug(3)
            << "For forecast valid at " << unix_to_yyyymmdd_hhmmss(vld_ut)
-           << ", found " << it->second.n_elements()
+           << ", found " << it->second.n()
            << " climatology field(s) valid at " << cs << ".\n";
 
       // Add a single field
-      if(it->second.n_elements() == 1) {
+      if(it->second.n() == 1) {
          interp_dpa.add(dpa[it->second[0]],
                         dpa.lower(it->second[0]),
                         dpa.upper(it->second[0]));
       }
       // Do time interpolation
-      else if(it->second.n_elements() == 2) {
+      else if(it->second.n() == 2) {
          mlog << Debug(3)
               << "Interpolating climatology data at "
               << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())
@@ -284,7 +284,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa,
       else {
          mlog << Error << "\nclimo_time_interp() -> "
               << "Expecting 1 or 2 climatology fields but found "
-              << it->second.n_elements() << "\n\n";
+              << it->second.n() << "\n\n";
          exit(1);
       }
    } // end for it
