@@ -108,6 +108,7 @@ class PairBase {
       //////////////////////////////////////////////////////////////////
 
       void clear();
+      void erase();
 
       void extend(int);    // Allocate memory for expected size
 

@@ -103,6 +103,51 @@ void PairBase::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::erase() {
+
+   mask_name.erase();
+   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
+   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+
+   msg_typ.clear();
+   msg_typ_vals.clear();
+
+   interp_mthd = InterpMthd_None;
+   interp_shape = GridTemplateFactory::GridTemplate_None;
+
+   sid_sa.clear();
+   vld_ta.clear();
+   o_qc_sa.clear();
+
+   lat_na.erase();
+   lon_na.erase();
+   x_na.erase();
+   y_na.erase();
+   wgt_na.erase();
+   lvl_na.erase();
+   elv_na.erase();
+   o_na.erase();
+   cmn_na.erase();
+   csd_na.erase();
+   cdf_na.erase();
+
+   n_obs = 0;
+
+   fcst_ut = 0;
+
+   obs_summary = ObsSummary_None;
+   obs_perc_value = bad_data_int;
+   check_unique = false;
+
+   map_key.clear();
+   map_val.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::extend(int n) {
 
    lat_na.extend(n);
@@ -498,7 +543,7 @@ void PairBase::print_obs_summary(){
       ! map_val.size() ) return;
 
    //  iterate over ordered list map keys in the station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -528,7 +573,7 @@ void PairBase::print_obs_summary(){
 void PairBase::calc_obs_summary(){
 
    //  iterate over the keys in the unique station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -698,7 +743,7 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
    }
 
    // Apply censor logic.
-   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+   for(int i=0; i<vinfo->censor_thresh().n(); i++) {
 
       // Break out after the first match.
       if(vinfo->censor_thresh()[i].check(new_v)) {
