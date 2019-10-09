@@ -1691,7 +1691,7 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
    double u_diff, v_diff;
    NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, wgt_na;
-   bool cflag, wgt_flag;
+   bool cflag, wflag;
 
        //////////////////////////////////////////////////////
 
@@ -1710,9 +1710,9 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    }
 
    // Check for climatology values
-   cflag    = (uc_in_na.n() == uf_in_na.n() &&
-               vc_in_na.n() == vf_in_na.n());
-   wgt_flag = set_climo_flag(uf_in_na, wgt_in_na);
+   cflag = (uc_in_na.n() == uf_in_na.n() &&
+            vc_in_na.n() == vf_in_na.n());
+   wflag = set_climo_flag(uf_in_na, wgt_in_na);
 
        //////////////////////////////////////////////////////
 
@@ -1724,9 +1724,9 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
       vf  = vf_in_na[i];
       uo  = uo_in_na[i];
       vo  = vo_in_na[i];
-      uc  = (cflag ?     uc_in_na[i] : bad_data_double);
-      vc  = (cflag ?     vc_in_na[i] : bad_data_double);
-      wgt = (wgt_flag ? wgt_in_na[i] : default_grid_weight);
+      uc  = (cflag ?  uc_in_na[i] : bad_data_double);
+      vc  = (cflag ?  vc_in_na[i] : bad_data_double);
+      wgt = (wflag ? wgt_in_na[i] : default_grid_weight);
 
       // Compute wind speeds
       fwind = convert_u_v_to_wind(uf, vf);
