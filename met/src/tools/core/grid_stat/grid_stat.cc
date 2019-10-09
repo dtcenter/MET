@@ -1950,7 +1950,7 @@ void process_scores() {
 void get_mask_points(const MaskPlane &mask_mp,
                      const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
                      const DataPlane *cmn_ptr,  const DataPlane *csd_ptr,
-                     const DataPlane *wgt_ptr, PairDataPoint &pd) {
+                     const DataPlane *wgt_ptr,  PairDataPoint &pd) {
 
     // Apply the mask the data fields provided
     pd.erase();
@@ -1960,6 +1960,8 @@ void get_mask_points(const MaskPlane &mask_mp,
     if(csd_ptr)  apply_mask(*csd_ptr,  mask_mp, pd.csd_na);
     if(wgt_ptr)  apply_mask(*wgt_ptr,  mask_mp, pd.wgt_na);
     pd.n_obs = pd.o_na.n();
+
+    if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
 
     return;
 }

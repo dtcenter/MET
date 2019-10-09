@@ -344,6 +344,32 @@ void PairBase::set_climo(int i_obs, double obs, double cmn, double csd) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::add_climo_cdf() {
+   int i;
+
+   // The o_na, cmn_na, and csd_na have already been populated
+   if(o_na.n() != cmn_na.n() || o_na.n() != csd_na.n()) {
+      mlog << Error << "\nPairBase::add_climo_cdf() -> "
+           << "the observation, climo mean, and climo stdev arrays "
+           << "must all have the same length (" << o_na.n() << ").\n\n";
+      exit(1);
+   }
+
+   cdf_na.extend(o_na.n());
+
+   for(i=0; i<o_na.n(); i++) {
+      cdf_na.add(is_bad_data(o_na[i])   ||
+                 is_bad_data(cmn_na[i]) ||
+                 is_bad_data(csd_na[i]) ?
+                 bad_data_double :
+                 normal_cdf(o_na[i], cmn_na[i], csd_na[i]));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool PairBase::add_obs(const char *sid,
                        double lat, double lon, double x, double y,
                        unixtime ut, double lvl, double elv,

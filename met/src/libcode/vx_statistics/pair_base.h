@@ -159,6 +159,7 @@ class PairBase {
 
       void add_climo(double, double, double);
       void set_climo(int, double, double, double);
+      void add_climo_cdf();
 
       double process_obs(VarInfo *, double);
 
