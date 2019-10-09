@@ -12,5 +12,5 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_physics.a
 libvx_physics_a_SOURCES = \
-    atmos_thermo.cc atmos_thermo.h
+    thermo.cc thermo.h
 libvx_physics_a_CPPFLAGS = ${MET_CPPFLAGS}
