@@ -17,12 +17,12 @@
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-const double epsilon = 0.622; // molecular weight ratio (water / dry air)
+/* molecular weight ratio M_v / M_d (water vapor / dry air) */
+const double epsilon = 0.622;
 
 ////////////////////////////////////////////////////////////////////////
 
-double mixing_ratio(double part_press, double tot_press);
+double mixing_ratio(double partial_pressure, double pressure);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -34,11 +34,16 @@ double saturation_vapor_pressure(double temperature);
 
 ////////////////////////////////////////////////////////////////////////
 
-double saturation_mixing_ratio(double tot_press, double temperature);
+double saturation_mixing_ratio(double pressure, double temperature);
 
 ////////////////////////////////////////////////////////////////////////
 
 double relative_humidity_from_mixing_ratio(double mixing_ratio,
+    double temperature, double pressure);
+
+////////////////////////////////////////////////////////////////////////
+
+double mixing_ratio_from_relative_humidity(double relative_humidity,
     double temperature, double pressure);
 
 ////////////////////////////////////////////////////////////////////////

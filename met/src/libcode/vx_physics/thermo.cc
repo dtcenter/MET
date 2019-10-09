@@ -27,8 +27,8 @@ double virtual_temperature(double temperature, double mixing_ratio) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double mixing_ratio(double part_press, double tot_press) {
-    return epsilon * part_press / (tot_press - part_press);
+double mixing_ratio(double partial_pressure, double pressure) {
+    return epsilon * partial_pressure / (pressure - partial_pressure);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@ double saturation_vapor_pressure(double temperature) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double saturation_mixing_ratio(double tot_press, double temperature) {
+double saturation_mixing_ratio(double pressure, double temperature) {
     return mixing_ratio(
-        saturation_vapor_pressure(temperature), tot_press);
+        saturation_vapor_pressure(temperature), pressure);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,6 +51,14 @@ double relative_humidity_from_mixing_ratio(double mixing_ratio,
     double temperature, double pressure) {
     return 100 * mixing_ratio
         / saturation_mixing_ratio(pressure, temperature);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double mixing_ratio_from_relative_humidity(double relative_humidity,
+    double temperature, double pressure) {
+    return relative_humidity / 100
+        * saturation_mixing_ratio(pressure, temperature);
 }
 
 ////////////////////////////////////////////////////////////////////////
