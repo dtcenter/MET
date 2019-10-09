@@ -22,11 +22,11 @@ const double epsilon = 0.622;
 
 ////////////////////////////////////////////////////////////////////////
 
-double mixing_ratio(double partial_pressure, double pressure);
+double virtual_temperature(double temperature, double mixing_ratio);
 
 ////////////////////////////////////////////////////////////////////////
 
-double virtual_temperature(double temperature, double mixing_ratio);
+double mixing_ratio(double partial_pressure, double pressure);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +45,13 @@ double relative_humidity_from_mixing_ratio(double mixing_ratio,
 
 double mixing_ratio_from_relative_humidity(double relative_humidity,
     double temperature, double pressure);
+
+////////////////////////////////////////////////////////////////////////
+
+void height_from_pressure(int nlev,
+    double surface_pressure,
+    double* virtual_temperature,
+    double* pressure, double* height);
 
 ////////////////////////////////////////////////////////////////////////
 

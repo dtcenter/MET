@@ -62,3 +62,14 @@ double mixing_ratio_from_relative_humidity(double relative_humidity,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void height_from_pressure(int nlev,
+    double surface_pressure,
+    double* virtual_temperature,
+    double* pressure, double* height) {
+
+    for (int k = 0; k < nlev; k++) {
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
