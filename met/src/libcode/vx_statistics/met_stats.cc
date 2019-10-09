@@ -1186,9 +1186,9 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
-                    const NumArray &c_na, const NumArray &w_na) {
+                    const NumArray &c_na, const NumArray &wgt_na) {
    int i;
-   double f, o, c, w, w_sum;
+   double f, o, c, wgt, wgt_sum;
    PairDataPoint pd_all, pd;
 
    // Check for mismatch
@@ -1204,7 +1204,7 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    zero_out();
 
    // Store pairs in PairDataPoint object
-   pd_all.add_pair(f_na, o_na, c_na, w_na);
+   pd_all.add_pair(f_na, o_na, c_na, wgt_na);
 
    // Apply continuous filtering thresholds to subset pairs
    pd = subset_pairs(pd_all, fthresh, othresh, logic);
@@ -1213,35 +1213,35 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    if(pd.n_obs == 0) return;
 
    // Get the sum of the weights
-   w_sum = pd.wgt_na.sum();
+   wgt_sum = pd.wgt_na.sum();
 
    // Loop through the pair data and compute sums
    for(i=0; i<pd.n_obs; i++) {
 
-      f = pd.f_na[i];
-      o = pd.o_na[i];
-      c = pd.cmn_na[i];
-      w = pd.wgt_na[i]/w_sum;
+      f   = pd.f_na[i];
+      o   = pd.o_na[i];
+      c   = pd.cmn_na[i];
+      wgt = pd.wgt_na[i]/wgt_sum;
 
       // Skip bad data values in the forecast or observation fields
       if(is_bad_data(f) || is_bad_data(o)) continue;
 
       // SL1L2 sums
-      fbar  += w*f;
-      obar  += w*o;
-      fobar += w*f*o;
-      ffbar += w*f*f;
-      oobar += w*o*o;
-      mae   += w*fabs(f-o);
+      fbar  += wgt*f;
+      obar  += wgt*o;
+      fobar += wgt*f*o;
+      ffbar += wgt*f*f;
+      oobar += wgt*o*o;
+      mae   += wgt*fabs(f-o);
       scount++;
 
       // SAL1L2 sums
       if(!is_bad_data(c)) {
-         fabar  += w*(f-c);
-         oabar  += w*(o-c);
-         foabar += w*(f-c)*(o-c);
-         ffabar += w*(f-c)*(f-c);
-         ooabar += w*(o-c)*(o-c);
+         fabar  += wgt*(f-c);
+         oabar  += wgt*(o-c);
+         foabar += wgt*(f-c)*(o-c);
+         ffabar += wgt*(f-c)*(f-c);
+         ooabar += wgt*(o-c)*(o-c);
          sacount++;
       }
    }
@@ -1683,15 +1683,15 @@ return;
 void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
                     const NumArray &uo_in_na, const NumArray &vo_in_na,
                     const NumArray &uc_in_na, const NumArray &vc_in_na,
-                    const NumArray &w_in_na)
+                    const NumArray &wgt_in_na)
 
 {
 
    int i;
-   double uf, vf, uo, vo, uc, vc, fwind, owind, w, w_sum;
+   double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
    double u_diff, v_diff;
-   NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, w_na;
-   bool cflag, wflag;
+   NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, wgt_na;
+   bool cflag, wgt_flag;
 
        //////////////////////////////////////////////////////
 
@@ -1710,9 +1710,9 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    }
 
    // Check for climatology values
-   cflag = (uc_in_na.n() == uf_in_na.n() &&
-            vc_in_na.n() == vf_in_na.n());
-   wflag = set_climo_flag(uf_in_na, w_in_na);
+   cflag    = (uc_in_na.n() == uf_in_na.n() &&
+               vc_in_na.n() == vf_in_na.n());
+   wgt_flag = set_climo_flag(uf_in_na, wgt_in_na);
 
        //////////////////////////////////////////////////////
 
@@ -1720,13 +1720,13 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    for(i=0; i<uf_in_na.n(); i++)  {
 
       // Retrieve the U,V values
-      uf = uf_in_na[i];
-      vf = vf_in_na[i];
-      uo = uo_in_na[i];
-      vo = vo_in_na[i];
-      uc = (cflag ? uc_in_na[i] : bad_data_double);
-      vc = (cflag ? vc_in_na[i] : bad_data_double);
-      w  = (wflag ?  w_in_na[i] : default_grid_weight);
+      uf  = uf_in_na[i];
+      vf  = vf_in_na[i];
+      uo  = uo_in_na[i];
+      vo  = vo_in_na[i];
+      uc  = (cflag ?     uc_in_na[i] : bad_data_double);
+      vc  = (cflag ?     vc_in_na[i] : bad_data_double);
+      wgt = (wgt_flag ? wgt_in_na[i] : default_grid_weight);
 
       // Compute wind speeds
       fwind = convert_u_v_to_wind(uf, vf);
@@ -1745,7 +1745,7 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
          vo_na.add(vo);
          uc_na.add(uc);
          vc_na.add(vc);
-         w_na.add(w);
+         wgt_na.add(wgt);
       }
 
    }   //  for i
@@ -1753,7 +1753,7 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
        //////////////////////////////////////////////////////
 
    // Get the sum of the weights
-   w_sum = w_na.sum();
+   wgt_sum = wgt_na.sum();
 
        //////////////////////////////////////////////////////
 
@@ -1772,47 +1772,47 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
       u_diff = uf - uo;
       v_diff = vf - vo;
 
-      w  = w_na[i]/w_sum;
+      wgt = wgt_na[i]/wgt_sum;
 
       // VL1L2 sums
       vcount     += 1;
 
-      uf_bar     += w*uf;
-      vf_bar     += w*vf;
-      uo_bar     += w*uo;
-      vo_bar     += w*vo;
+      uf_bar     += wgt*uf;
+      vf_bar     += wgt*vf;
+      uo_bar     += wgt*uo;
+      vo_bar     += wgt*vo;
 
-      uvfo_bar   += w*(uf*uo + vf*vo);
-      uvff_bar   += w*(uf*uf + vf*vf);
-      uvoo_bar   += w*(uo*uo + vo*vo);
+      uvfo_bar   += wgt*(uf*uo + vf*vo);
+      uvff_bar   += wgt*(uf*uf + vf*vf);
+      uvoo_bar   += wgt*(uo*uo + vo*vo);
 
 
-      f_bar      += w*sqrt(uf*uf + vf*vf);
-      o_bar      += w*sqrt(uo*uo + vo*vo);
+      f_bar      += wgt*sqrt(uf*uf + vf*vf);
+      o_bar      += wgt*sqrt(uo*uo + vo*vo);
 
-      me         += w*sqrt(u_diff*u_diff + v_diff*v_diff);
+      me         += wgt*sqrt(u_diff*u_diff + v_diff*v_diff);
 
-      mse        += w*(u_diff*u_diff + v_diff*v_diff);
+      mse        += wgt*(u_diff*u_diff + v_diff*v_diff);
 
-      speed_bias += w*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
+      speed_bias += wgt*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
 
          //
          //  new stuff from vector stats whitepaper
          //
 
-      f_speed_bar   += w*sqrt(uf*uf + vf*vf);
-      o_speed_bar   += w*sqrt(uo*uo + vo*vo);
+      f_speed_bar   += wgt*sqrt(uf*uf + vf*vf);
+      o_speed_bar   += wgt*sqrt(uo*uo + vo*vo);
 
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
          vacount   += 1;
-         ufa_bar   += w*(uf-uc);
-         vfa_bar   += w*(vf-vc);
-         uoa_bar   += w*(uo-uc);
-         voa_bar   += w*(vo-vc);
-         uvfoa_bar += w*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
-         uvffa_bar += w*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
-         uvooa_bar += w*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+         ufa_bar   += wgt*(uf-uc);
+         vfa_bar   += wgt*(vf-vc);
+         uoa_bar   += wgt*(uo-uc);
+         voa_bar   += wgt*(vo-vc);
+         uvfoa_bar += wgt*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
+         uvffa_bar += wgt*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
+         uvooa_bar += wgt*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
       }
 
    }  //  for i
@@ -2914,20 +2914,20 @@ double GRADInfo::fgog_ratio() const {
 void GRADInfo::set(int grad_dx, int grad_dy,
                    const NumArray &fgx_na, const NumArray &fgy_na,
                    const NumArray &ogx_na, const NumArray &ogy_na,
-                   const NumArray &w_na) {
+                   const NumArray &wgt_na) {
    int i;
-   double w, w_sum;
+   double wgt, wgt_sum;
 
    // Check for mismatch
    if(fgx_na.n() != fgy_na.n() ||
       fgx_na.n() != ogx_na.n() ||
       fgx_na.n() != ogy_na.n() ||
-      fgx_na.n() !=   w_na.n()) {
+      fgx_na.n() != wgt_na.n()) {
       mlog << Error << "\nGRADInfo::set() -> "
            << "count mismatch ("
            << fgx_na.n() << ", " << fgy_na.n() << ", "
            << ogx_na.n() << ", " << ogy_na.n() << ", "
-           <<   w_na.n() << ")\n\n";
+           <<   wgt_na.n() << ")\n\n";
       exit(1);
    }
 
@@ -2942,7 +2942,7 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    if(fgx_na.n() == 0) return;
 
    // Get the sum of the weights
-   w_sum = w_na.sum();
+   wgt_sum = wgt_na.sum();
 
    // Loop through the pairs and compute sums
    for(i=0; i<fgx_na.n(); i++) {
@@ -2952,15 +2952,15 @@ void GRADInfo::set(int grad_dx, int grad_dy,
          is_bad_data(ogx_na[i]) || is_bad_data(ogy_na[i])) continue;
 
       // Get current weight
-      w = w_na[i]/w_sum;
+      wgt = wgt_na[i]/wgt_sum;
 
       // Gradient sums
-      fgbar += w * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
-      ogbar += w * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
-      mgbar += w * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
-                    max(fabs(fgy_na[i]), fabs(ogy_na[i])));
-      egbar += w * (fabs(fgx_na[i] - ogx_na[i]) +
-                    fabs(fgy_na[i] - ogy_na[i]));
+      fgbar += wgt * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
+      ogbar += wgt * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
+      mgbar += wgt * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
+                      max(fabs(fgy_na[i]), fabs(ogy_na[i])));
+      egbar += wgt * (fabs(fgx_na[i] - ogx_na[i]) +
+                      fabs(fgy_na[i] - ogy_na[i]));
       total++;
    }
 
@@ -3537,7 +3537,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
                      bool precip_flag, bool rank_flag, bool normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, c, w, w_sum;
+   double f, o, c, wgt, wgt_sum;
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
@@ -3568,7 +3568,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Get the sum of the weights
    //
-   w_sum = pd.wgt_na.sum();
+   wgt_sum = pd.wgt_na.sum();
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
@@ -3584,10 +3584,10 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       j = nint(i_na[i]);
 
-      f = pd.f_na[j];
-      o = pd.o_na[j];
-      c = (cflag ? pd.cmn_na[j] : bad_data_double);
-      w = pd.wgt_na[i]/w_sum;
+      f   = pd.f_na[j];
+      o   = pd.o_na[j];
+      c   = (cflag ? pd.cmn_na[j] : bad_data_double);
+      wgt = pd.wgt_na[i]/wgt_sum;
 
       //
       // Should be no bad data, but checking to be sure
@@ -3601,22 +3601,22 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       err = f-o;
       err_na.add(err);
 
-      f_bar       += w*f;
-      o_bar       += w*o;
-      ff_bar      += w*f*f;
-      oo_bar      += w*o*o;
-      fo_bar      += w*f*o;
-      err_bar     += w*err;
-      abs_err_bar += w*fabs(err);
-      err_sq_bar  += w*err*err;
+      f_bar       += wgt*f;
+      o_bar       += wgt*o;
+      ff_bar      += wgt*f*f;
+      oo_bar      += wgt*o*o;
+      fo_bar      += wgt*f*o;
+      err_bar     += wgt*err;
+      abs_err_bar += wgt*fabs(err);
+      err_sq_bar  += wgt*err*err;
       n++;
 
       if(cflag) {
-         fa_bar  += w*(f-c);
-         oa_bar  += w*(o-c);
-         foa_bar += w*(f-c)*(o-c);
-         ffa_bar += w*(f-c)*(f-c);
-         ooa_bar += w*(o-c)*(o-c);
+         fa_bar  += wgt*(f-c);
+         oa_bar  += wgt*(o-c);
+         foa_bar += wgt*(f-c)*(o-c);
+         ffa_bar += wgt*(f-c)*(f-c);
+         ooa_bar += wgt*(o-c)*(o-c);
       }
    } // end for i
 
@@ -3741,7 +3741,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    if(rank_flag) {
       int concordant, discordant, extra_f, extra_o;
       int n_zero_zero, n_f_rank, n_o_rank, n_f_rank_ties, n_o_rank_ties;
-      NumArray f_na2, o_na2, f_na_rank, o_na_rank, w_na2;
+      NumArray f_na2, o_na2, f_na_rank, o_na_rank, wgt_na2;
 
       //
       // If verifying precipitation, mask out the (0, 0) cases.
@@ -3761,7 +3761,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
             if(pd.f_na[j] > 0.0001 || pd.o_na[j] > 0.0001) {
                f_na2.add(pd.f_na[j]);
                o_na2.add(pd.o_na[j]);
-               w_na2.add(pd.wgt_na[j]);
+               wgt_na2.add(pd.wgt_na[j]);
             }
             else {
                n_zero_zero++;
@@ -3778,7 +3778,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
             j = nint(i_na[i]);
             f_na2.add(pd.f_na[j]);
             o_na2.add(pd.o_na[j]);
-            w_na2.add(pd.wgt_na[j]);
+            wgt_na2.add(pd.wgt_na[j]);
          }
          n_zero_zero = 0;
       }
@@ -3811,7 +3811,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Get the sum of the weights
       //
-      w_sum = w_na2.sum();
+      wgt_sum = wgt_na2.sum();
 
       //
       // Compute sums for the ranks for use in computing Spearman's
@@ -3820,15 +3820,15 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
       for(i=0; i<n_f_rank; i++) {
 
-         f = f_na_rank[i];
-         o = o_na_rank[i];
-         w = w_na2[i]/w_sum;
+         f   = f_na_rank[i];
+         o   = o_na_rank[i];
+         wgt = wgt_na2[i]/wgt_sum;
 
-         f_bar  += w*f;
-         o_bar  += w*o;
-         ff_bar += w*f*f;
-         oo_bar += w*o*o;
-         fo_bar += w*f*o;
+         f_bar  += wgt*f;
+         o_bar  += wgt*o;
+         ff_bar += wgt*f*f;
+         oo_bar += wgt*o*o;
+         fo_bar += wgt*f*o;
       } // end for i
 
       //
@@ -4216,7 +4216,7 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
                         const NumArray &i_na,
                         NBRCNTInfo &nbrcnt_info, bool nbrcnt_flag) {
    int i, j, n;
-   double f, o, w, w_sum, ff_bar, oo_bar, fo_bar;
+   double f, o, wgt, wgt_sum, ff_bar, oo_bar, fo_bar;
    double f_thr_bar, o_thr_bar;
 
    //
@@ -4240,7 +4240,7 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
    //
    // Get the sum of the weights
    //
-   w_sum = pd.wgt_na.sum();
+   wgt_sum = pd.wgt_na.sum();
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
@@ -4254,16 +4254,16 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
       //
       j = nint(i_na[i]);
 
-      f = pd.f_na[j];
-      o = pd.o_na[j];
-      w = pd.wgt_na[i]/w_sum;
+      f   = pd.f_na[j];
+      o   = pd.o_na[j];
+      wgt = pd.wgt_na[i]/wgt_sum;
 
-      ff_bar += w*f*f;
-      oo_bar += w*o*o;
-      fo_bar += w*f*o;
+      ff_bar += wgt*f*f;
+      oo_bar += wgt*o*o;
+      fo_bar += wgt*f*o;
 
-      f_thr_bar += w*pd_thr.f_na[j];
-      o_thr_bar += w*pd_thr.o_na[j];
+      f_thr_bar += wgt*pd_thr.f_na[j];
+      o_thr_bar += wgt*pd_thr.o_na[j];
    } // end for i
 
    //

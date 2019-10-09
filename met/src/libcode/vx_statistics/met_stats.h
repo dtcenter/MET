@@ -236,7 +236,7 @@ class SL1L2Info {
 
       // Compute sums
       void set(const NumArray &f_na, const NumArray &o_na,
-               const NumArray &c_na, const NumArray &w_na);
+               const NumArray &c_na, const NumArray &wgt_na);
 
       void zero_out();
       void clear();
@@ -349,7 +349,7 @@ class VL1L2Info {
       void set(const NumArray &uf_na, const NumArray &vf_na,
                const NumArray &uo_na, const NumArray &vo_na,
                const NumArray &uc_na, const NumArray &vc_na,
-               const NumArray &w_na);
+               const NumArray &wgt_na);
 
       void zero_out();
       void clear();
@@ -614,7 +614,7 @@ class GRADInfo {
       void set(int grad_dx, int grad_dy,
                const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
-               const NumArray &w_na);
+               const NumArray &wgt_na);
 
       void clear();
 };

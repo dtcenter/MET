@@ -163,11 +163,11 @@ bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
-                             double w) {
+                             double wgt) {
 
    f_na.add(f);
    o_na.add(o);
-   wgt_na.add(w);
+   wgt_na.add(wgt);
    add_climo(o, cmn, csd);
    n_obs++;
 
@@ -177,7 +177,7 @@ bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
-                             const NumArray &cmn_in, const NumArray &w_in) {
+                             const NumArray &cmn_in, const NumArray &wgt_in) {
    NumArray csd_in;
    int i;
 
@@ -186,20 +186,20 @@ bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
 
    for(i=0; i<cmn_in.n(); i++) csd_in.add(bad_data_double);
 
-   return(add_pair(f_in, o_in, cmn_in, csd_in, w_in));
+   return(add_pair(f_in, o_in, cmn_in, csd_in, wgt_in));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
                              const NumArray &cmn_in, const NumArray &csd_in,
-                             const NumArray &w_in) {
+                             const NumArray &wgt_in) {
 
    // Check for constant length
    if(o_in.n() != f_in.n()   ||
       o_in.n() != cmn_in.n() ||
       o_in.n() != csd_in.n() ||
-      o_in.n() != w_in.n()) {
+      o_in.n() != wgt_in.n()) {
       mlog << Error << "\nPairDataPoint::add_pair() -> "
            << "arrays must all have the same length!\n\n";
       exit(1);
@@ -210,7 +210,7 @@ bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
 
    f_na.add(f_in);
    o_na.add(o_in);
-   wgt_na.add(w_in);
+   wgt_na.add(wgt_in);
 
    for(int i=0; i<o_in.n(); i++) {
       add_climo(o_in[i], cmn_in[i], csd_in[i]);
