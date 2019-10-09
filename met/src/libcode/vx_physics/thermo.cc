@@ -21,8 +21,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 double virtual_temperature(double temperature, double mixing) {
-    const double epsilon = 0.622;
     return temperature * (epsilon + mixing) / (epsilon * (1 + mixing));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double mixing_ratio(double part_press, double tot_press) {
+    return epsilon * part_press / (tot_press - part_press);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double saturation_vapor_pressure(double temperature) {
+    return 6.112 * exp(17.67 * (temperature - 273.15) / (temperature - 29.65));
 }
 
 ////////////////////////////////////////////////////////////////////////
