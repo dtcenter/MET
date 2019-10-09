@@ -37,3 +37,9 @@ double saturation_vapor_pressure(double temperature) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double saturation_mixing_ratio(double tot_press, double temperature) {
+    return mixing_ratio(saturation_vapor_pressure(temperature), tot_press);
+}
+
+////////////////////////////////////////////////////////////////////////
