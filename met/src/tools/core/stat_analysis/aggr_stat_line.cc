@@ -2188,6 +2188,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.pd.cmn_na.add(cur.climo_mean);
             aggr.pd.csd_na.add(cur.climo_stdev);
             aggr.pd.cdf_na.add(cur.climo_cdf);
+            aggr.pd.wgt_na.add(default_grid_weight);
 
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
