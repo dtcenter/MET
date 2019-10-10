@@ -8818,8 +8818,8 @@ PODY_i
 \begin_inset Text
 
 \begin_layout Plain Layout
-Probability of detecting yes when forecast is between the ith and i+1th
- probability thresholds (repeated)
+Probability of detecting yes when forecast is less than the i+1th probability
+ threshold (repeated)
 \end_layout
 
 \end_inset
@@ -8848,8 +8848,8 @@ POFD_i
 \begin_inset Text
 
 \begin_layout Plain Layout
-Probability of false detection when forecast is between the ith and i+1th
- probability thresholds (repeated)
+Probability of false detection when forecast is less than the i+1th probability
+ threshold (repeated)
 \end_layout
 
 \end_inset
