@@ -235,8 +235,7 @@ class SL1L2Info {
       double mae;
 
       // Compute sums
-      void set(const NumArray &f_na, const NumArray &o_na,
-               const NumArray &c_na, const NumArray &wgt_na);
+      void set(const PairDataPoint &);
 
       void zero_out();
       void clear();
@@ -346,10 +345,7 @@ class VL1L2Info {
       int    vacount;
 
       // Compute sums
-      void set(const NumArray &uf_na, const NumArray &vf_na,
-               const NumArray &uo_na, const NumArray &vo_na,
-               const NumArray &uc_na, const NumArray &vc_na,
-               const NumArray &wgt_na);
+      void set(const PairDataPoint &, const PairDataPoint &);
 
       void zero_out();
       void clear();

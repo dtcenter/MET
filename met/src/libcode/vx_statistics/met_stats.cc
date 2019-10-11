@@ -1185,26 +1185,22 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
-                    const NumArray &c_na, const NumArray &wgt_na) {
+void SL1L2Info::set(const PairDataPoint &pd_all) {
    int i;
    double f, o, c, wgt, wgt_sum;
-   PairDataPoint pd_all, pd;
+   PairDataPoint pd;
 
    // Check for mismatch
-   if(f_na.n() != o_na.n()) {
+   if(pd_all.f_na.n() != pd_all.o_na.n()) {
       mlog << Error << "\nSL1L2Info::set() -> "
            << "forecast and observation count mismatch ("
-           << f_na.n() << " != " << o_na.n()
+           << pd_all.f_na.n() << " != " << pd_all.o_na.n()
            << ")\n\n";
       exit(1);
    }
 
    // Initialize
    zero_out();
-
-   // Store pairs in PairDataPoint object
-   pd_all.add_pair(f_na, o_na, c_na, wgt_na);
 
    // Apply continuous filtering thresholds to subset pairs
    pd = subset_pairs(pd_all, fthresh, othresh, logic);
@@ -1456,76 +1452,70 @@ void VL1L2Info::zero_out() {
    // VL1L2 Quantities
    //
 
-uf_bar      = 0.0;
-vf_bar      = 0.0;
-uo_bar      = 0.0;
-vo_bar      = 0.0;
-uvfo_bar    = 0.0;
-uvff_bar    = 0.0;
-uvoo_bar    = 0.0;
-f_speed_bar = 0.0;
-o_speed_bar = 0.0;
+   uf_bar      = 0.0;
+   vf_bar      = 0.0;
+   uo_bar      = 0.0;
+   vo_bar      = 0.0;
+   uvfo_bar    = 0.0;
+   uvff_bar    = 0.0;
+   uvoo_bar    = 0.0;
+   f_speed_bar = 0.0;
+   o_speed_bar = 0.0;
 
-f_bar       = 0.0;
-o_bar       = 0.0;
-me          = 0.0;
-mse         = 0.0;
-rmse        = 0.0;
-speed_bias  = 0.0;
+   f_bar       = 0.0;
+   o_bar       = 0.0;
+   me          = 0.0;
+   mse         = 0.0;
+   rmse        = 0.0;
+   speed_bias  = 0.0;
 
-FBAR        = 0.0;
-OBAR        = 0.0;
+   FBAR        = 0.0;
+   OBAR        = 0.0;
 
-FS_RMS      = 0.0;
-OS_RMS      = 0.0;
+   FS_RMS      = 0.0;
+   OS_RMS      = 0.0;
 
- MSVE       = 0.0;
-RMSVE       = 0.0;
+    MSVE       = 0.0;
+   RMSVE       = 0.0;
 
-FSTDEV      = 0.0;
-OSTDEV      = 0.0;
+   FSTDEV      = 0.0;
+   OSTDEV      = 0.0;
 
-// COV         = 0.0;
+   // COV         = 0.0;
 
-FDIR        = 0.0;
-ODIR        = 0.0;
+   FDIR        = 0.0;
+   ODIR        = 0.0;
 
-FBAR_SPEED  = 0.0;
-OBAR_SPEED  = 0.0;
+   FBAR_SPEED  = 0.0;
+   OBAR_SPEED  = 0.0;
 
-VDIFF_SPEED = 0.0;
-VDIFF_DIR   = 0.0;
+   VDIFF_SPEED = 0.0;
+   VDIFF_DIR   = 0.0;
 
-SPEED_ERR   = 0.0;
-SPEED_ABSERR = 0.0;
+   SPEED_ERR   = 0.0;
+   SPEED_ABSERR = 0.0;
 
-DIR_ERR     = 0.0;
-DIR_ABSERR  = 0.0;
+   DIR_ERR     = 0.0;
+   DIR_ABSERR  = 0.0;
 
-vcount      = 0;
+   vcount      = 0;
 
    //
    // VAL1L2 Quantities
    //
 
-ufa_bar     = 0.0;
-vfa_bar     = 0.0;
-uoa_bar     = 0.0;
-voa_bar     = 0.0;
-uvfoa_bar   = 0.0;
-uvffa_bar   = 0.0;
-uvooa_bar   = 0.0;
+   ufa_bar     = 0.0;
+   vfa_bar     = 0.0;
+   uoa_bar     = 0.0;
+   voa_bar     = 0.0;
+   uvfoa_bar   = 0.0;
+   uvffa_bar   = 0.0;
+   uvooa_bar   = 0.0;
 
-vacount     = 0;
+   vacount     = 0;
 
-   //
-   //  done
-   //
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1586,55 +1576,44 @@ void VL1L2Info::assign(const VL1L2Info &c) {
       //  NCEP stats
       //
 
-FBAR = c.FBAR;
-OBAR = c.OBAR;
+   FBAR = c.FBAR;
+   OBAR = c.OBAR;
 
-FS_RMS = c.FS_RMS;
-OS_RMS = c.OS_RMS;
+   FS_RMS = c.FS_RMS;
+   OS_RMS = c.OS_RMS;
 
- MSVE = c.MSVE;
-RMSVE = c.RMSVE;
+    MSVE = c.MSVE;
+   RMSVE = c.RMSVE;
 
-FSTDEV = c.FSTDEV;
-OSTDEV = c.OSTDEV;
+   FSTDEV = c.FSTDEV;
+   OSTDEV = c.OSTDEV;
 
-FDIR = c.FDIR;
-ODIR = c.ODIR;
+   FDIR = c.FDIR;
+   ODIR = c.ODIR;
 
-FBAR_SPEED = c.FBAR_SPEED;
-OBAR_SPEED = c.OBAR_SPEED;
+   FBAR_SPEED = c.FBAR_SPEED;
+   OBAR_SPEED = c.OBAR_SPEED;
 
-VDIFF_SPEED = c.VDIFF_SPEED;
-VDIFF_DIR = c.VDIFF_DIR;
+   VDIFF_SPEED = c.VDIFF_SPEED;
+   VDIFF_DIR = c.VDIFF_DIR;
 
-SPEED_ERR = c.SPEED_ERR;
-SPEED_ABSERR = c.SPEED_ABSERR;
+   SPEED_ERR = c.SPEED_ERR;
+   SPEED_ABSERR = c.SPEED_ABSERR;
 
-DIR_ERR = c.DIR_ERR;
-DIR_ABSERR = c.DIR_ABSERR;
+   DIR_ERR = c.DIR_ERR;
+   DIR_ABSERR = c.DIR_ABSERR;
 
-   //
-   //  done
-   //
-
-
-return;
-
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void VL1L2Info::calc_ncep_stats()
+void VL1L2Info::calc_ncep_stats() {
+   double u_diff, v_diff;
 
-{
-
-double u_diff, v_diff;
-
-u_diff = uf_bar - uo_bar;
-v_diff = vf_bar - vo_bar;
-
-      //
+   u_diff = uf_bar - uo_bar;
+   v_diff = vf_bar - vo_bar;
 
    FBAR         = f_speed_bar;
    OBAR         = o_speed_bar;
@@ -1667,112 +1646,57 @@ v_diff = vf_bar - vo_bar;
 
    DIR_ABSERR   = fabs(DIR_ERR);
 
-
-   //
-   //
-   //
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
-                    const NumArray &uo_in_na, const NumArray &vo_in_na,
-                    const NumArray &uc_in_na, const NumArray &vc_in_na,
-                    const NumArray &wgt_in_na)
-
-{
-
+void VL1L2Info::set(const PairDataPoint &pd_u_all,
+                    const PairDataPoint &pd_v_all) {
    int i;
    double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
    double u_diff, v_diff;
-   NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, wgt_na;
+   PairDataPoint pd_u, pd_v;
    bool cflag, wflag;
-
-       //////////////////////////////////////////////////////
 
    // Initialize
    zero_out();
 
    // Check that the number of pairs are the same
-   if(uf_in_na.n() != uo_in_na.n() ||
-      uf_in_na.n() != vf_in_na.n() ||
-      vf_in_na.n() != vo_in_na.n()) {
+   if(pd_u_all.f_na.n() != pd_u_all.o_na.n() ||
+      pd_u_all.f_na.n() != pd_v_all.f_na.n() ||
+      pd_v_all.f_na.n() != pd_v_all.o_na.n()) {
       mlog << Error << "\nVL1L2Info::set() -> "
            << "unequal number of UGRD and VGRD pairs ("
-           << uf_in_na.n() << " != " << uo_in_na.n()
+           << pd_u_all.f_na.n() << " != " << pd_u_all.o_na.n()
            << ")\n\n";
       exit(1);
    }
 
-   // Check for climatology values
-   cflag = (uc_in_na.n() == uf_in_na.n() &&
-            vc_in_na.n() == vf_in_na.n());
-   wflag = set_climo_flag(uf_in_na, wgt_in_na);
+   // Apply wind speed filtering thresholds to subset pairs
+   subset_wind_pairs(pd_u_all, pd_v_all, fthresh, othresh, logic, pd_u, pd_v);
 
-       //////////////////////////////////////////////////////
-
-   // Loop through the pair data and filter
-   for(i=0; i<uf_in_na.n(); i++)  {
-
-      // Retrieve the U,V values
-      uf  = uf_in_na[i];
-      vf  = vf_in_na[i];
-      uo  = uo_in_na[i];
-      vo  = vo_in_na[i];
-      uc  = (cflag ?  uc_in_na[i] : bad_data_double);
-      vc  = (cflag ?  vc_in_na[i] : bad_data_double);
-      wgt = (wflag ? wgt_in_na[i] : default_grid_weight);
-
-      // Compute wind speeds
-      fwind = convert_u_v_to_wind(uf, vf);
-      owind = convert_u_v_to_wind(uo, vo);
-
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(uf)    || is_bad_data(vf) ||
-         is_bad_data(uo)    || is_bad_data(vo) ||
-         is_bad_data(fwind) || is_bad_data(owind)) continue;
-
-      // Check wind speed thresholds
-      if(check_fo_thresh(fwind, fthresh, owind, othresh, logic)) {
-         uf_na.add(uf);
-         vf_na.add(vf);
-         uo_na.add(uo);
-         vo_na.add(vo);
-         uc_na.add(uc);
-         vc_na.add(vc);
-         wgt_na.add(wgt);
-      }
-
-   }   //  for i
-
-       //////////////////////////////////////////////////////
+   // Check for no matched pairs to process
+   if(pd_u.n_obs == 0) return;
 
    // Get the sum of the weights
-   wgt_sum = wgt_na.sum();
-
-       //////////////////////////////////////////////////////
+   wgt_sum = pd_u.wgt_na.sum();
 
    // Loop through the filtered pair data compute partial sums
-
-   for(i=0; i<uf_na.n(); i++)  {
+   for(i=0; i<pd_u.f_na.n(); i++)  {
 
       // Retrieve the U,V values
-      uf = uf_na[i];
-      vf = vf_na[i];
-      uo = uo_na[i];
-      vo = vo_na[i];
-      uc = uc_na[i];
-      vc = vc_na[i];
+      uf = pd_u.f_na[i];
+      vf = pd_v.f_na[i];
+      uo = pd_u.o_na[i];
+      vo = pd_v.o_na[i];
+      uc = pd_u.cmn_na[i];
+      vc = pd_v.cmn_na[i];
 
       u_diff = uf - uo;
       v_diff = vf - vo;
 
-      wgt = wgt_na[i]/wgt_sum;
+      wgt = pd_u.wgt_na[i]/wgt_sum;
 
       // VL1L2 sums
       vcount     += 1;
@@ -1815,29 +1739,9 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
          uvooa_bar += wgt*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
       }
 
-   }  //  for i
+   }  // end for i
 
-       //////////////////////////////////////////////////////
-
-   mlog << Debug(3)
-        << "Using " << vcount << " of " << uf_na.n()
-        << " vector pairs for forecast wind speed threshold "
-        << fthresh.get_str() << ", observation wind speed threshold "
-        << othresh.get_str() << ", and field logic "
-        << setlogic_to_string(logic) << ".\n";
-
-
-       //////////////////////////////////////////////////////
-
-
-if ( vcount > 0 )  {
-
-   calc_ncep_stats();
-
-}
-
-
-       //////////////////////////////////////////////////////
+   if(vcount > 0) calc_ncep_stats();
 
    // Check for 0 points
    if(vcount == 0) {
@@ -1885,13 +1789,10 @@ if ( vcount > 0 )  {
       DIR_ABSERR    = bad_data_double;
 
    } else {
-
-      rmse       = sqrt(mse);
-
+      rmse          = sqrt(mse);
    }
 
    if(vacount == 0) {
-
       ufa_bar   = bad_data_double;
       vfa_bar   = bad_data_double;
       uoa_bar   = bad_data_double;
@@ -1899,16 +1800,9 @@ if ( vcount > 0 )  {
       uvfoa_bar = bad_data_double;
       uvffa_bar = bad_data_double;
       uvooa_bar = bad_data_double;
-
    }
 
-
-      //
-      //  done
-      //
-
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
