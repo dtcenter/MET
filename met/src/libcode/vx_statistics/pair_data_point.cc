@@ -177,21 +177,6 @@ bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
-                             const NumArray &cmn_in, const NumArray &wgt_in) {
-   NumArray csd_in;
-   int i;
-
-   // Allocate enough memory
-   csd_in.extend(cmn_in.n());
-
-   for(i=0; i<cmn_in.n(); i++) csd_in.add(bad_data_double);
-
-   return(add_pair(f_in, o_in, cmn_in, csd_in, wgt_in));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
                              const NumArray &cmn_in, const NumArray &csd_in,
                              const NumArray &wgt_in) {
 

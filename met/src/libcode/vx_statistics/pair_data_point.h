@@ -57,9 +57,6 @@ class PairDataPoint : public PairBase {
 
       bool add_pair(double, double, double, double, double);
 
-      bool add_pair(const NumArray &f_in, const NumArray &o_in,
-                    const NumArray &c_in, const NumArray &w_in);
-
       bool add_pair(const NumArray &f_in,   const NumArray &o_in,
                     const NumArray &cmn_in, const NumArray &csd_in,
                     const NumArray &w_in);
