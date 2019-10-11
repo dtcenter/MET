@@ -1976,14 +1976,20 @@ void get_mask_points(const MaskPlane &mask_mp,
                      const DataPlane *cmn_ptr,  const DataPlane *csd_ptr,
                      const DataPlane *wgt_ptr,  PairDataPoint &pd) {
 
-    // Apply the mask the data fields provided
+    // Initialize
     pd.erase();
-    if(fcst_ptr) apply_mask(*fcst_ptr, mask_mp, pd.f_na);
-    if(obs_ptr)  apply_mask(*obs_ptr,  mask_mp, pd.o_na);
-    if(cmn_ptr)  apply_mask(*cmn_ptr,  mask_mp, pd.cmn_na);
-    if(csd_ptr)  apply_mask(*csd_ptr,  mask_mp, pd.csd_na);
-    if(wgt_ptr)  apply_mask(*wgt_ptr,  mask_mp, pd.wgt_na);
+
+    // Apply the mask the data fields or fill with default values
+    apply_mask(*fcst_ptr, mask_mp, pd.f_na);
+    apply_mask(*obs_ptr,  mask_mp, pd.o_na);
     pd.n_obs = pd.o_na.n();
+
+    if(cmn_ptr) apply_mask(*cmn_ptr,  mask_mp, pd.cmn_na);
+    else        pd.cmn_na.add_const(bad_data_double, pd.n_obs);
+    if(csd_ptr) apply_mask(*csd_ptr,  mask_mp, pd.csd_na);
+    else        pd.csd_na.add_const(bad_data_double, pd.n_obs);
+    if(wgt_ptr) apply_mask(*wgt_ptr,  mask_mp, pd.wgt_na);
+    else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
     if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
 
