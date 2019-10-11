@@ -2371,6 +2371,12 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   climo_cdp    = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    weight       = FALSE;
 \end_layout
 
@@ -2452,14 +2458,26 @@ climo
 nbrhd
 \series medium
  entries control the creation of output variables for the climatological
- mean field, the grid area weights applied, and the fractional coverage
- fields computed for neighborhood verification methods.
+ mean and standard deviation fields, the grid area weights applied, and
+ the fractional coverage fields computed for neighborhood verification methods.
  Setting these entries to 
 \series default
 TRUE
 \series medium
  indicates that they should be written, while setting them to FALSE disables
  their creation.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Setting the 
+\series bold
+climo_cdf
+\series medium
+ entry to TRUE enables the creation of an output variable for each climatologica
+l distribution percentile (CDP) threshold requested in the configuration
+ file.
  Note that enabling 
 \series bold
 nbrhd

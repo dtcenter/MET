@@ -67,6 +67,15 @@ The configuration file language supports the following data types:
            "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
            observations and then chooses a forecast threshold which results in a
            frequency bias of 1.
+         - "CDP" for climatological distribution percentile thresholds.
+           These thresholds require that the climatological mean and standard
+           deviation be defined using the climo_mean and climo_stdev config file
+           options, respectively.  The categorical (cat_thresh), conditional
+           (cnt_thresh), or wind speed (wind_thresh) thresholds are defined relative
+           to the climatological distribution at each point.  Therefore, the actual
+           numeric threshold applied can change for each point.
+           e.g. ">CDP50" means greater than the 50-th percentile of the
+           climatological distribution for each point.
       - When percentile thresholds are requested and computed, MET recomputes
         the actual percentile that the threshold represents. If the requested
         percentile and actual percentile differ by more than 5%, a warning
@@ -787,9 +796,9 @@ fcst = {
 obs = fcst;
 
 //
-// The "climo_mean" dictionary specifies climatology data to be read by the
-// Grid-Stat, Point-Stat, and Ensemble-Stat tools.  It consists of several
-// entires defining the climatology file names and fields to be used.
+// The "climo_mean" dictionary specifies climatology mean data to be read by the
+// Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis. It consists of
+// several entires defining the climatology file names and fields to be used.
 //
 //   - The "file_names" entry specifies one or more file names containing
 //     the gridded climatology data to be used.
@@ -828,7 +837,7 @@ obs = fcst;
 //
 climo_mean = {
 
-   file_name = [];
+   file_name = [ "/path/to/climatological/mean/files" ];
    field     = [];
 
    regrid = {
@@ -845,17 +854,24 @@ climo_mean = {
 
 //
 // The "climo_stdev" dictionary specifies climatology standard deviation data to
-// be read by the Grid-Stat and Point-Stat tools.  This data is used to subset
-// matched pairs into climatological bins based on where the observation value
-// falls within the climatological distribution.  This dictionary is identical
-// to the "climo_mean" dictionary described above but points to files containing
-// climatological spread values rather than means.  In the example below, this
-// dictionary is set by copying over the "climo_mean" setting and then updating
-// the "file_name" entry.
+// be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis. 
+// The "climo_mean" and "climo_stdev" data define the climatological distribution
+// for each grid point, assuming normailty.  These climatological distributions
+// are used in two ways:
+// (1) To define climatological distribution percentile (CDP) thresholds which
+//     can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
+//     speed (wind_thresh) thresholds.
+// (2) To subset matched pairs into climatological bins based on where the
+//     observation value falls within the climatological distribution.
+//
+// This dictionary is identical to the "climo_mean" dictionary described above
+// but points to files containing climatological standard deviation values rather
+// than means.  In the example below, this dictionary is set by copying over the
+// "climo_mean" setting and then updating the "file_name" entry.
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "/path/to/climatological/standard/deviation" ];
+   file_name = [ "/path/to/climatological/standard/deviation/files" ];
 }
 
 //
@@ -1417,15 +1433,17 @@ output_flag = {
 // netcdf output will be generated.
 //
 nc_pairs_flag = {
-   latlon     = TRUE;
-   raw        = TRUE;
-   diff       = TRUE;
-   climo      = TRUE;
-   weight     = FALSE;
-   nbrhd      = FALSE;
-   fourier    = FALSE;
-   gradient   = FALSE;
-   apply_mask = TRUE;
+   latlon       = TRUE;
+   raw          = TRUE;
+   diff         = TRUE;
+   climo        = TRUE;
+   climo_cdp    = FALSE;
+   weight       = FALSE;
+   nbrhd        = FALSE;
+   fourier      = FALSE;
+   gradient     = FALSE;
+   distance_map = FLASE;
+   apply_mask   = TRUE;
 }
 
 //
