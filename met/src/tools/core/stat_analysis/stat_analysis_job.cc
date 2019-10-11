@@ -1750,9 +1750,9 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Check for matching component lengths
       //
-      if(it->second.uf_na.n() != it->second.vf_na.n() ||
-         it->second.uo_na.n() != it->second.vo_na.n() ||
-         it->second.uf_na.n() != it->second.uo_na.n()) {
+      if(it->second.pd_u.f_na.n() != it->second.pd_v.f_na.n() ||
+         it->second.pd_u.o_na.n() != it->second.pd_v.o_na.n() ||
+         it->second.pd_u.f_na.n() != it->second.pd_u.o_na.n()) {
          mlog << Error << "\nwrite_job_aggr_wind() -> "
               << "the number of U and V forecast and observation points "
               << "must be the same.\n\n";
@@ -1762,18 +1762,18 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Store the number of vectors
       //
-      n = it->second.uf_na.n();
+      n = it->second.pd_u.f_na.n();
 
       //
       // Compute the mean forecast and observation angles
       // from the unit vectors
       //
       if(n > 0) {
-         uf   = it->second.uf_na.sum()/it->second.uf_na.n();
-         vf   = it->second.vf_na.sum()/it->second.vf_na.n();
+         uf   = it->second.pd_u.f_na.sum()/it->second.pd_u.f_na.n();
+         vf   = it->second.pd_v.f_na.sum()/it->second.pd_v.f_na.n();
          fbar = convert_u_v_to_wdir(uf, vf);
-         uo   = it->second.uo_na.sum()/it->second.uo_na.n();
-         vo   = it->second.vo_na.sum()/it->second.vo_na.n();
+         uo   = it->second.pd_u.o_na.sum()/it->second.pd_u.o_na.n();
+         vo   = it->second.pd_v.o_na.sum()/it->second.pd_v.o_na.n();
          obar = convert_u_v_to_wdir(uo, vo);
       }
       else {
@@ -1795,15 +1795,15 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       me = mae = (n > 0 ? 0.0 : bad_data_double);
       for(i=0; i<n; i++) {
 
-         angle = angle_difference(it->second.uf_na[i], it->second.vf_na[i],
-                                  it->second.uo_na[i], it->second.vo_na[i]);
+         angle = angle_difference(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
+                                  it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
 
          if(mlog.verbosity_level() > 3) {
             mlog << Debug(4) << "write_job_aggr_wind() -> "
                  << "ROW_MEAN_WDIR: [" << i+1 << "] difference of forecast direction "
-                 << convert_u_v_to_wdir(it->second.uf_na[i], it->second.vf_na[i])
+                 << convert_u_v_to_wdir(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i])
                  << " - observed direction "
-                 << convert_u_v_to_wdir(it->second.uo_na[i], it->second.vo_na[i])
+                 << convert_u_v_to_wdir(it->second.pd_u.o_na[i], it->second.pd_v.o_na[i])
                  << " = " << angle << " degrees\n";
          }
 

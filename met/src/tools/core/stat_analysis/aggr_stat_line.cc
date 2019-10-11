@@ -1778,10 +1778,8 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.uf_na.clear();
-            aggr.vf_na.clear();
-            aggr.uo_na.clear();
-            aggr.vo_na.clear();
+            aggr.pd_u.clear();
+            aggr.pd_v.clear();
             aggr.vl1l2_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
@@ -1794,12 +1792,12 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
-         // Append the unit vectors
+         // Append the unit vectors with no climatological values
          //
-         m[key].uf_na.add(uf);
-         m[key].vf_na.add(vf);
-         m[key].uo_na.add(uo);
-         m[key].vo_na.add(vo);
+         m[key].pd_u.add_pair(uf, uo, bad_data_double, bad_data_double,
+                              default_grid_weight);
+         m[key].pd_v.add_pair(vf, vo, bad_data_double, bad_data_double,
+                              default_grid_weight);
 
          //
          // Keep track of the unique header column entries
@@ -1823,7 +1821,9 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
    VL1L2Info v_info;
    MPRData cur;
    ConcatString hdr, key;
-   double uf, vf, uo, vo, fwind, owind;
+   double uf, uo, ucmn, ucsd;
+   double vf, vo, vcmn, vcsd;
+   double fcst_wind, obs_wind, cmn_wind, csd_wind;
    bool is_ugrd;
    int i;
    map<ConcatString, AggrWindInfo>::iterator it;
@@ -1845,8 +1845,12 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          is_ugrd = (cur.fcst_var == ugrd_abbr_str);
          uf      = (is_ugrd ? cur.fcst        : bad_data_double);
          uo      = (is_ugrd ? cur.obs         : bad_data_double);
+         ucmn    = (is_ugrd ? cur.climo_mean  : bad_data_double);
+         ucsd    = (is_ugrd ? cur.climo_stdev : bad_data_double);
          vf      = (is_ugrd ? bad_data_double : cur.fcst);
          vo      = (is_ugrd ? bad_data_double : cur.obs);
+         vcmn    = (is_ugrd ? bad_data_double : cur.climo_mean);
+         vcsd    = (is_ugrd ? bad_data_double : cur.climo_stdev);
 
          //
          // Build header string for matching UGRD and VGRD lines
@@ -1887,19 +1891,15 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             aggr.vl1l2_info.clear();
             aggr.hdr_sa.clear();
-            aggr.uf_na.clear();
-            aggr.vf_na.clear();
-            aggr.uo_na.clear();
-            aggr.vo_na.clear();
+            aggr.pd_u.clear();
+            aggr.pd_v.clear();
 
             //
             // Initialize values
             //
             aggr.hdr_sa.add(hdr);
-            aggr.uf_na.add(uf);
-            aggr.vf_na.add(vf);
-            aggr.uo_na.add(uo);
-            aggr.vo_na.add(vo);
+            aggr.pd_u.add_pair(uf, uo, ucmn, ucsd, default_grid_weight);
+            aggr.pd_v.add_pair(vf, vo, vcmn, vcsd, default_grid_weight);
 
             //
             // Add the new map entry
@@ -1920,8 +1920,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                //
                // Check for duplicate UGRD lines
                //
-               if((!is_bad_data(uf) && !is_bad_data(m[key].uf_na[i])) ||
-                  (!is_bad_data(uo) && !is_bad_data(m[key].uo_na[i]))) {
+               if((!is_bad_data(uf) && !is_bad_data(m[key].pd_u.f_na[i])) ||
+                  (!is_bad_data(uo) && !is_bad_data(m[key].pd_u.o_na[i]))) {
                   mlog << Warning << "\naggr_mpr_wind_lines() -> "
                        << "found duplicate UGRD lines for header:\n"
                        << hdr << "\n\n";
@@ -1930,8 +1930,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                //
                // Check for duplicate VGRD lines
                //
-               if((!is_bad_data(vf) && !is_bad_data(m[key].vf_na[i])) ||
-                  (!is_bad_data(vo) && !is_bad_data(m[key].vo_na[i]))) {
+               if((!is_bad_data(vf) && !is_bad_data(m[key].pd_v.f_na[i])) ||
+                  (!is_bad_data(vo) && !is_bad_data(m[key].pd_v.o_na[i]))) {
                   mlog << Warning << "\naggr_mpr_wind_lines() -> "
                        << "found duplicate VGRD lines for header:\n"
                        << hdr << "\n\n";
@@ -1940,20 +1940,22 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                //
                // Update the existing values
                //
-               if(!is_bad_data(uf)) m[key].uf_na.set(i, uf);
-               if(!is_bad_data(vf)) m[key].vf_na.set(i, vf);
-               if(!is_bad_data(uo)) m[key].uo_na.set(i, uo);
-               if(!is_bad_data(vo)) m[key].vo_na.set(i, vo);
+               if(!is_bad_data(uf))   m[key].pd_u.f_na.set(i, uf);
+               if(!is_bad_data(uo))   m[key].pd_u.o_na.set(i, uo);
+               if(!is_bad_data(ucmn)) m[key].pd_u.cmn_na.set(i, ucmn);
+               if(!is_bad_data(ucsd)) m[key].pd_u.csd_na.set(i, ucsd);
+               if(!is_bad_data(vf))   m[key].pd_v.f_na.set(i, vf);
+               if(!is_bad_data(vo))   m[key].pd_v.o_na.set(i, vo);
+               if(!is_bad_data(vcmn)) m[key].pd_v.cmn_na.set(i, vcmn);
+               if(!is_bad_data(vcsd)) m[key].pd_v.csd_na.set(i, vcsd);
             }
             //
             // Add data for a new header entry
             //
             else {
                m[key].hdr_sa.add(hdr);
-               m[key].uf_na.add(uf);
-               m[key].vf_na.add(vf);
-               m[key].uo_na.add(uo);
-               m[key].vo_na.add(vo);
+               m[key].pd_u.add_pair(uf, uo, ucmn, ucsd, default_grid_weight);
+               m[key].pd_v.add_pair(vf, vo, vcmn, vcsd, default_grid_weight);
             }
          }
 
@@ -1977,11 +1979,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
       //
       aggr.hdr = it->second.hdr;
       aggr.vl1l2_info.clear();
-      aggr.hdr_sa.clear();
-      aggr.uf_na.clear();
-      aggr.vf_na.clear();
-      aggr.uo_na.clear();
-      aggr.vo_na.clear();
+      aggr.pd_u.clear();
+      aggr.pd_v.clear();
 
       //
       // Loop over the pairs for the current map entry
@@ -1991,8 +1990,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Check for missing UGRD data
          //
-         if(is_bad_data(it->second.uf_na[i]) ||
-            is_bad_data(it->second.uo_na[i])) {
+         if(is_bad_data(it->second.pd_u.f_na[i]) ||
+            is_bad_data(it->second.pd_u.o_na[i])) {
             mlog << Warning << "\naggr_mpr_wind_lines() -> "
                  << "could not find matching UGRD line for header:\n"
                  << it->second.hdr_sa[i] << "\n\n";
@@ -2002,8 +2001,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Check for missing VGRD data
          //
-         if(is_bad_data(it->second.vf_na[i]) ||
-            is_bad_data(it->second.vo_na[i])) {
+         if(is_bad_data(it->second.pd_v.f_na[i]) ||
+            is_bad_data(it->second.pd_v.o_na[i])) {
             mlog << Warning << "\naggr_mpr_wind_lines() -> "
                  << "could not find matching VGRD line for header:\n"
                  << it->second.hdr_sa[i] << "\n\n";
@@ -2017,20 +2016,28 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             j.out_obs_wind_thresh.get_type()  != thresh_na) {
 
             // Compute wind speeds
-            fwind = convert_u_v_to_wind(it->second.uf_na[i], it->second.vf_na[i]);
-            owind = convert_u_v_to_wind(it->second.uo_na[i], it->second.vo_na[i]);
+            fcst_wind = convert_u_v_to_wind(it->second.pd_u.f_na[i],
+                                            it->second.pd_v.f_na[i]);
+             obs_wind = convert_u_v_to_wind(it->second.pd_u.o_na[i],
+                                            it->second.pd_v.o_na[i]);
+             cmn_wind = convert_u_v_to_wind(it->second.pd_u.cmn_na[i],
+                                            it->second.pd_v.cmn_na[i]);
+             csd_wind = convert_u_v_to_wind(it->second.pd_u.csd_na[i],
+                                            it->second.pd_v.csd_na[i]);
 
-            if(!check_fo_thresh(fwind, j.out_fcst_wind_thresh,
-                                owind, j.out_obs_wind_thresh,
+            // No climo mean and standard deviation in the input VL1L2 lines,
+            // so just fill with bad data.
+            if(!check_fo_thresh(fcst_wind, obs_wind, cmn_wind, csd_wind,
+                                j.out_fcst_wind_thresh, j.out_obs_wind_thresh,
                                 j.out_wind_logic)) {
                mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
                     << "skipping vector forecast ("
-                    << it->second.uf_na[i] << ", " << it->second.vf_na[i]
-                    << ") wind speed threshold (" << fwind << " "
+                    << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
+                    << ") wind speed threshold (" << fcst_wind << " "
                     << j.out_fcst_wind_thresh.get_str()
                     << ") and vector observation ("
-                    << it->second.uo_na[i] << ", " << it->second.vo_na[i]
-                    << ") wind speed threshold (" << owind << " "
+                    << it->second.pd_u.o_na[i] << ", " << it->second.pd_v.o_na[i]
+                    << ") wind speed threshold (" << obs_wind << " "
                     << j.out_obs_wind_thresh.get_str()
                     << ") with " << setlogic_to_string(j.out_wind_logic)
                     << " logic for header:\n"
@@ -2043,34 +2050,34 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          // Keep running partial sums of matches
          //
          v_info.vcount      = 1;
-         v_info.uf_bar      = it->second.uf_na[i];
-         v_info.vf_bar      = it->second.vf_na[i];
-         v_info.uo_bar      = it->second.uo_na[i];
-         v_info.vo_bar      = it->second.vo_na[i];
-         v_info.uvfo_bar    = it->second.uf_na[i]*it->second.uo_na[i] +
-                              it->second.vf_na[i]*it->second.vo_na[i];
-         v_info.uvff_bar    = it->second.uf_na[i]*it->second.uf_na[i] +
-                              it->second.vf_na[i]*it->second.vf_na[i];
-         v_info.uvoo_bar    = it->second.uo_na[i]*it->second.uo_na[i] +
-                              it->second.vo_na[i]*it->second.vo_na[i];
-         v_info.f_speed_bar = sqrt(it->second.uf_na[i]*it->second.uf_na[i] +
-                                   it->second.vf_na[i]*it->second.vf_na[i]);
-         v_info.o_speed_bar = sqrt(it->second.uo_na[i]*it->second.uo_na[i] +
-                                   it->second.vo_na[i]*it->second.vo_na[i]);
+         v_info.uf_bar      = it->second.pd_u.f_na[i];
+         v_info.vf_bar      = it->second.pd_v.f_na[i];
+         v_info.uo_bar      = it->second.pd_u.o_na[i];
+         v_info.vo_bar      = it->second.pd_v.o_na[i];
+         v_info.uvfo_bar    = it->second.pd_u.f_na[i]*it->second.pd_u.o_na[i] +
+                              it->second.pd_v.f_na[i]*it->second.pd_v.o_na[i];
+         v_info.uvff_bar    = it->second.pd_u.f_na[i]*it->second.pd_u.f_na[i] +
+                              it->second.pd_v.f_na[i]*it->second.pd_v.f_na[i];
+         v_info.uvoo_bar    = it->second.pd_u.o_na[i]*it->second.pd_u.o_na[i] +
+                              it->second.pd_v.o_na[i]*it->second.pd_v.o_na[i];
+         v_info.f_speed_bar = sqrt(it->second.pd_u.f_na[i]*it->second.pd_u.f_na[i] +
+                                   it->second.pd_v.f_na[i]*it->second.pd_v.f_na[i]);
+         v_info.o_speed_bar = sqrt(it->second.pd_u.o_na[i]*it->second.pd_u.o_na[i] +
+                                   it->second.pd_v.o_na[i]*it->second.pd_v.o_na[i]);
          aggr.vl1l2_info += v_info;
 
          //
          // Check for vectors of length zero
          //
-         if((is_eq(it->second.uf_na[i], 0.0) &&
-             is_eq(it->second.vf_na[i], 0.0)) ||
-            (is_eq(it->second.uo_na[i], 0.0) &&
-             is_eq(it->second.vo_na[i], 0.0))) {
+         if((is_eq(it->second.pd_u.f_na[i], 0.0) &&
+             is_eq(it->second.pd_v.f_na[i], 0.0)) ||
+            (is_eq(it->second.pd_u.o_na[i], 0.0) &&
+             is_eq(it->second.pd_v.o_na[i], 0.0))) {
             mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
                  << "angle not defined for zero forecast ("
-                 << it->second.uf_na[i] << ", " << it->second.vf_na[i]
+                 << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
                  << ") or observation ("
-                 << it->second.uo_na[i] << ", " << it->second.vo_na[i]
+                 << it->second.pd_u.o_na[i] << ", " << it->second.pd_v.o_na[i]
                  << ") vector for header:\n"
                  << it->second.hdr_sa[i] << "\n";
             continue;
@@ -2080,12 +2087,12 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          // Convert to and append unit vectors
          //
          aggr.hdr_sa.add(it->second.hdr_sa[i]);
-         convert_u_v_to_unit(it->second.uf_na[i], it->second.vf_na[i], uf, vf);
-         convert_u_v_to_unit(it->second.uo_na[i], it->second.vo_na[i], uo, vo);
-         aggr.uf_na.add(uf);
-         aggr.vf_na.add(vf);
-         aggr.uo_na.add(uo);
-         aggr.vo_na.add(vo);
+         convert_u_v_to_unit(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i], uf, vf);
+         convert_u_v_to_unit(it->second.pd_u.o_na[i], it->second.pd_v.o_na[i], uo, vo);
+         aggr.pd_u.add_pair(uf, uo, bad_data_double, bad_data_double,
+                            default_grid_weight);
+         aggr.pd_v.add_pair(vf, vo, bad_data_double, bad_data_double,
+                            default_grid_weight);
       }
 
       //
@@ -2157,7 +2164,8 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
             if(j.out_fcst_thresh.n() > 0) fst = j.out_fcst_thresh[0];
             if(j.out_obs_thresh.n()  > 0) ost = j.out_obs_thresh[0];
 
-            if(!check_fo_thresh(cur.fcst, fst, cur.obs, ost, j.out_cnt_logic)) {
+            if(!check_fo_thresh(cur.fcst, cur.obs, cur.climo_mean, cur.climo_stdev,
+                                fst, ost, j.out_cnt_logic)) {
                mlog << Debug(4) << "aggr_mpr_lines() -> "
                     << "skipping forecast ("
                     << cur.fcst << " " << j.out_fcst_thresh.get_str()

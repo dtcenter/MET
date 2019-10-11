@@ -1594,8 +1594,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, const PairDataPoint *pd_ptr) {
       //
       // Compute partial sums
       //
-      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na,
-                    pd_ptr->cmn_na, pd_ptr->wgt_na);
+      s_info[i].set(*pd_ptr);
 
    } // end for i
 
@@ -1635,10 +1634,8 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       //
       // Compute partial sums
       //
-      v_info[i].set(pd_u_ptr->f_na,   pd_v_ptr->f_na,
-                    pd_u_ptr->o_na,   pd_v_ptr->o_na,
-                    pd_u_ptr->cmn_na, pd_v_ptr->cmn_na,
-                    pd_u_ptr->wgt_na);
+      v_info[i].set(*pd_u_ptr, *pd_v_ptr);
+
    } // end for i
 
    return;

@@ -102,6 +102,7 @@ struct GridStatNcOutInfo {
    bool do_raw;
    bool do_diff;
    bool do_climo;
+   bool do_climo_cdp;
    bool do_weight;
    bool do_nbrhd;
    bool do_fourier;

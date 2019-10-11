@@ -694,7 +694,8 @@ void process_scores() {
 
                pd_ptr[i].add_pair(fcst_dp(x, y), obs_dp(x, y),
                             (cmn_flag ? cmn_dp(x, y) : bad_data_double),
-                            (csd_flag ? csd_dp(x, y) : bad_data_double));
+                            (csd_flag ? csd_dp(x, y) : bad_data_double),
+                            default_grid_weight);
             }
 
          } // end for i
@@ -996,12 +997,8 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
 void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
    int i, j;
    SL1L2Info s_info;
-   NumArray wgt_na;
 
    mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
-
-   // Set weights to constant value
-   wgt_na.add_const(default_grid_weight, pd_ptr->f_na.n());
 
    // Loop over the continuous thresholds and compute scalar partial sums
    for(i=0; i<conf_info.fcnt_ta.n(); i++) {
@@ -1012,7 +1009,7 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
       s_info.logic   = conf_info.cnt_logic;
 
       // Compute partial sums
-      s_info.set(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na, wgt_na);
+      s_info.set(*pd_ptr);
 
       // Add statistic value for each possible SL1L2 column
       for(j=0; j<conf_info.output_stats[stat_sl1l2].n(); j++) {

@@ -1201,6 +1201,30 @@ void process_scores() {
                      i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
          }
 
+         // Write out the fields of requested climo distribution percentile threshold values
+         if(conf_info.vx_opt[i].nc_info.do_climo_cdp && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
+
+            // Construct one list of all thresholds
+            ThreshArray ta;
+            ta.add(conf_info.vx_opt[i].fcnt_ta);
+            ta.add(conf_info.vx_opt[i].ocnt_ta);
+            ta.add(conf_info.vx_opt[i].fcat_ta);
+            ta.add(conf_info.vx_opt[i].ocat_ta);
+
+            // Process all the simple thresholds
+            vector<Simple_Node> simp;
+            ta.get_simple_nodes(simp);
+
+            for(vector<Simple_Node>::iterator it = simp.begin();
+                it != simp.end(); it++) {
+               if(it->ptype() == perc_thresh_climo_dist) {
+                  cs << cs_erase << "CLIMO_CDP" << nint(it->pvalue());
+                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp),
+                           i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
+               }
+            } // end for it
+         }
+
          // Compute gradient statistics if requested in the config file
          if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
             conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None) {
@@ -2148,7 +2172,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
       //
       // Compute partial sums
       //
-      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na, pd_ptr->wgt_na);
+      s_info[i].set(*pd_ptr);
 
    } // end for i
 
@@ -2187,10 +2211,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       //
       // Compute partial sums
       //
-      v_info[i].set(pd_u_ptr->f_na,   pd_v_ptr->f_na,
-                    pd_u_ptr->o_na,   pd_v_ptr->o_na,
-                    pd_u_ptr->cmn_na, pd_v_ptr->cmn_na,
-                    pd_u_ptr->wgt_na);
+      v_info[i].set(*pd_u_ptr, *pd_v_ptr);
 
    } // end for i
 
@@ -2540,6 +2561,20 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology cumulative distribution function for "
+                   << conf_info.vx_opt[i_vx].obs_info->name() << " at "
+                   << conf_info.vx_opt[i_vx].obs_info->level_name();
+         level_att = shc.get_obs_lev();
+         units_att = conf_info.vx_opt[i_vx].obs_info->units();
+      }
+      else if(strncmp(field_name.c_str(), "CLIMO_CDP", 9) == 0) {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
+                   << conf_info.vx_opt[i_vx].obs_info->level_name()
+                   << var_str << "_" << mask_str;
+         name_att  = shc.get_obs_var();
+         long_att  << cs_erase
+                   << "Climatology distribution percentile thresholds for "
                    << conf_info.vx_opt[i_vx].obs_info->name() << " at "
                    << conf_info.vx_opt[i_vx].obs_info->level_name();
          level_att = shc.get_obs_lev();
