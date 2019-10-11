@@ -1286,7 +1286,9 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
          (wflag && is_bad_data(pd.wgt_na[i]))) continue;
 
       // Keep pairs which meet the threshold criteria
-      if(check_fo_thresh(pd.f_na[i], ft, pd.o_na[i], ot, type)) {
+      if(check_fo_thresh(pd.f_na[i],   pd.o_na[i],
+                         pd.cmn_na[i], pd.csd_na[i],
+                         ft, ot, type)) {
 
          // Handle point data
          if(pd.sid_sa.n() == pd.n_obs) {
@@ -1299,7 +1301,7 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
          // Handle gridded data
          else {
             out_pd.add_pair(pd.f_na[i], pd.o_na[i],
-                            pd.cmn_na[i], pd.wgt_na[i]);
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
       }
    } // end for
@@ -1311,6 +1313,99 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
         << ", and field logic " << setlogic_to_string(type) << ".\n";
 
    return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
+                       const SingleThresh &ft, const SingleThresh &ot,
+                       const SetLogic type,
+                       PairDataPoint &out_pd_u, PairDataPoint &out_pd_v) {
+
+   // Check for no work to be done
+   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
+      out_pd_u = pd_u;
+      out_pd_v = pd_v;
+      return;
+   }
+
+   int i;
+   double fcst_wind, obs_wind, cmn_wind, csd_wind;
+   double uf, vf, uo, vo, uc, vc, wgt;
+
+   // Initialize and allocate memory for output pairs
+   out_pd_u.erase();
+   out_pd_v.erase();
+   out_pd_u.extend(pd_u.n_obs);
+   out_pd_v.extend(pd_v.n_obs);
+
+   bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.cmn_na);
+   bool csd_flag = set_climo_flag(pd_u.f_na, pd_u.csd_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.csd_na);
+   bool wgt_flag = set_climo_flag(pd_u.f_na, pd_u.wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<pd_u.n_obs; i++) {
+
+      // Retrieve the U,V values
+      uf  = pd_u.f_na[i];
+      vf  = pd_v.f_na[i];
+      uo  = pd_u.o_na[i];
+      vo  = pd_v.o_na[i];
+      uc  = (cmn_flag ? pd_u.cmn_na[i] : bad_data_double);
+      vc  = (cmn_flag ? pd_v.cmn_na[i] : bad_data_double);
+      wgt = (wgt_flag ? pd_u.wgt_na[i] : default_grid_weight);
+
+      // Compute wind speeds
+      fcst_wind = convert_u_v_to_wind(pd_u.f_na[i], pd_v.f_na[i]);
+      obs_wind  = convert_u_v_to_wind(pd_u.o_na[i], pd_v.o_na[i]);
+      cmn_wind  = (cmn_flag ?
+                   convert_u_v_to_wind(pd_u.cmn_na[i], pd_v.cmn_na[i]) :
+                   bad_data_double);
+      csd_wind  = (csd_flag ?
+                   convert_u_v_to_wind(pd_u.csd_na[i], pd_v.csd_na[i]) :
+                   bad_data_double);
+
+      // Skip bad data values in the forecast or observation fields
+      if(is_bad_data(fcst_wind) || is_bad_data(obs_wind)) continue;
+
+      // Check wind speed thresholds
+      if(check_fo_thresh(fcst_wind, obs_wind,
+                         cmn_wind,  csd_wind,
+                         ft, ot, type)) {
+
+         // Handle point data
+         if(pd_u.sid_sa.n() == pd_u.n_obs) {
+            out_pd_u.add_pair(pd_u.sid_sa[i].c_str(), pd_u.lat_na[i], pd_u.lon_na[i],
+                              pd_u.x_na[i], pd_u.y_na[i], pd_u.vld_ta[i],
+                              pd_u.lvl_na[i], pd_u.elv_na[i],
+                              pd_u.f_na[i], pd_u.o_na[i], pd_u.o_qc_sa[i].c_str(),
+                              pd_u.cmn_na[i], pd_u.csd_na[i], pd_u.wgt_na[i]);
+            out_pd_v.add_pair(pd_v.sid_sa[i].c_str(), pd_v.lat_na[i], pd_v.lon_na[i],
+                              pd_v.x_na[i], pd_v.y_na[i], pd_v.vld_ta[i],
+                              pd_v.lvl_na[i], pd_v.elv_na[i],
+                              pd_v.f_na[i], pd_v.o_na[i], pd_v.o_qc_sa[i].c_str(),
+                              pd_v.cmn_na[i], pd_v.csd_na[i], pd_v.wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd_u.add_pair(pd_u.f_na[i], pd_u.o_na[i],
+                              pd_u.cmn_na[i], pd_u.csd_na[i], pd_u.wgt_na[i]);
+            out_pd_v.add_pair(pd_v.f_na[i], pd_v.o_na[i],
+                              pd_v.cmn_na[i], pd_v.csd_na[i], pd_v.wgt_na[i]);
+         }
+      }
+   } // end for i
+
+   mlog << Debug(3)
+        << "Using " << out_pd_u.n_obs << " of " << pd_u.n_obs
+        << " vector pairs for forecast wind speed threshold "
+        << ft.get_str() << ", observation wind speed threshold "
+        << ot.get_str() << ", and field logic "
+        << setlogic_to_string(type) << ".\n";
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1354,7 +1449,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
          // Handle gridded data
          else {
             out_pd.add_pair(pd.f_na[i], pd.o_na[i],
-                            pd.cmn_na[i], pd.wgt_na[i]);
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
       }
    } // end for

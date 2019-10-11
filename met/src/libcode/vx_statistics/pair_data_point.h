@@ -53,11 +53,9 @@ class PairDataPoint : public PairBase {
 
       bool add_pair(const char *, double, double, double, double,
                     unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+                    const char *, double, double, double);
 
-      bool add_pair(double, double, double, double,
-                    double wgt = default_grid_weight);
+      bool add_pair(double, double, double, double, double);
 
       bool add_pair(const NumArray &f_in, const NumArray &o_in,
                     const NumArray &c_in, const NumArray &w_in);
@@ -68,8 +66,7 @@ class PairDataPoint : public PairBase {
 
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+                    const char *, double, double, double);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -245,6 +242,11 @@ class VxPairDataPoint {
 PairDataPoint subset_pairs(const PairDataPoint &,
                            const SingleThresh &, const SingleThresh &,
                            const SetLogic);
+
+// Apply conditional thresholds to subset the wind pairs
+void subset_wind_pairs(const PairDataPoint &, const PairDataPoint &,
+                       const SingleThresh &, const SingleThresh &,
+                       const SetLogic, PairDataPoint &, PairDataPoint &);
 
 // Subset pairs for a specific climatology CDF bin
 PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
