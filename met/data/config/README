@@ -861,8 +861,9 @@ climo_mean = {
 // (1) To define climatological distribution percentile (CDP) thresholds which
 //     can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
 //     speed (wind_thresh) thresholds.
-// (2) To subset matched pairs into climatological bins based on where the
-//     observation value falls within the climatological distribution.
+// (2) To subset probabilistic forecast matched pairs into climatological bins
+//     based on where the observation value falls within the climatological
+//     distribution.
 // This dictionary is identical to the "climo_mean" dictionary described above
 // but points to files containing climatological standard deviation values rather
 // than means.  In the example below, this dictionary is set by copying over the
