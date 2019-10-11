@@ -250,6 +250,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Or_Node::get_simple_nodes(vector<Simple_Node> &v) const
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error << "\nOr_Node::get_simple_nodes() -> "
+        << "node not populated!\n\n";
+
+   exit ( 1 );
+
+}
+
+ left_child->get_simple_nodes(v);
+right_child->get_simple_nodes(v);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class And_Node
    //
@@ -416,6 +440,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void And_Node::get_simple_nodes(vector<Simple_Node> &v) const
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error << "\nAnd_Node::get_simple_nodes() -> "
+        << "node not populated!\n\n";
+
+   exit ( 1 );
+
+}
+
+ left_child->get_simple_nodes(v);
+right_child->get_simple_nodes(v);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class Not_Node
    //
@@ -565,6 +613,29 @@ if ( ! child )  {
 }
 
 child->multiply_by(x);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Not_Node::get_simple_nodes(vector<Simple_Node> &v) const
+
+{
+
+if ( !child )  {
+
+   mlog << Error << "\nNot_Node::get_simple_nodes() -> "
+        << "node not populated!\n\n";
+
+   exit ( 1 );
+
+}
+
+child->get_simple_nodes(v);
 
 return;
 
@@ -1021,6 +1092,20 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void Simple_Node::get_simple_nodes(vector<Simple_Node> &v) const
+
+{
+
+v.push_back(*this);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class SingleThresh
 //
@@ -1392,6 +1477,22 @@ if ( node )  {
 
 }
 
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleThresh::get_simple_nodes(vector<Simple_Node> &v) const {
+
+if ( node )  {
+
+    node->get_simple_nodes(v);
+
+}
+    
 return;
 
 }

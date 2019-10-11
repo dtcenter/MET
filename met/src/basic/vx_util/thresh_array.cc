@@ -508,6 +508,18 @@ void ThreshArray::multiply_by(const double x) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
+
+   if(Nelements == 0) return;
+
+   for(int i=0; i<Nelements; i++) t[i].get_simple_nodes(v);
+
+   return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // External utility for parsing probability thresholds.
 //

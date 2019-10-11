@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "concat_string.h"
 #include "vx_cal.h"
@@ -127,6 +128,7 @@ struct PC_info {
 
 
 class SingleThresh;
+class Simple_Node;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,6 +165,8 @@ class ThreshNode {
                             const SingleThresh *, const SingleThresh *) = 0;
 
       virtual void multiply_by(const double) = 0;
+
+      virtual void get_simple_nodes(vector<Simple_Node> &) const = 0;
 
       ConcatString s;
       ConcatString abbr_s;
@@ -201,6 +205,8 @@ class Or_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -246,6 +252,8 @@ class And_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -293,6 +301,8 @@ class Not_Node : public ThreshNode {
                     const SingleThresh *, const SingleThresh *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
       ThreshNode * copy() const;
 
@@ -354,6 +364,8 @@ class Simple_Node : public ThreshNode {
       double pvalue() const;
 
       bool need_perc() const;
+
+      void get_simple_nodes(vector<Simple_Node> &) const;
 
          //
          //  do stuff
@@ -423,6 +435,7 @@ class SingleThresh {
       double         get_value() const;
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
+      void           get_simple_nodes(vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
 

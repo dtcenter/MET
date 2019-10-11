@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "concat_string.h"
 #include "threshold.h"
@@ -70,6 +71,8 @@ class ThreshArray {
                     const ThreshArray *, const ThreshArray *);
 
       void multiply_by(const double);
+
+      void get_simple_nodes(vector<Simple_Node> &);
 
       ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
       ConcatString get_abbr_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
