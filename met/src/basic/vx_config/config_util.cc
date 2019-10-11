@@ -1999,12 +1999,13 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool check_fo_thresh(const double f, const SingleThresh &ft,
-                     const double o, const SingleThresh &ot,
+bool check_fo_thresh(const double f,   const double o,
+                     const double cmn, const double csd,
+                     const SingleThresh &ft, const SingleThresh &ot,
                      const SetLogic type) {
    bool status = true;
-   bool fcheck = ft.check(f);
-   bool ocheck = ot.check(o);
+   bool fcheck = ft.check(f, cmn, csd);
+   bool ocheck = ot.check(o, cmn, csd);
    SetLogic t  = type;
 
    // If either of the thresholds is NA, reset the logic to intersection

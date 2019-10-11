@@ -71,8 +71,8 @@ extern void         check_climo_n_vx(Dictionary *dict, const int);
 extern InterpMthd   int_to_interpmthd(int);
 extern void         check_mctc_thresh(const ThreshArray &);
 
-extern bool         check_fo_thresh(const double, const SingleThresh &,
-                                    const double, const SingleThresh &,
+extern bool         check_fo_thresh(const double, const double, const double, const double,
+                                    const SingleThresh &, const SingleThresh &,
                                     const SetLogic);
 
 extern const char * statlinetype_to_string(const STATLineType);
