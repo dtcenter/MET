@@ -797,8 +797,8 @@ obs = fcst;
 
 //
 // The "climo_mean" dictionary specifies climatology mean data to be read by the
-// Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis. It consists of
-// several entires defining the climatology file names and fields to be used.
+// Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
+// of several entires defining the climatology file names and fields to be used.
 //
 //   - The "file_names" entry specifies one or more file names containing
 //     the gridded climatology data to be used.
@@ -854,16 +854,15 @@ climo_mean = {
 
 //
 // The "climo_stdev" dictionary specifies climatology standard deviation data to
-// be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis. 
+// be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. 
 // The "climo_mean" and "climo_stdev" data define the climatological distribution
-// for each grid point, assuming normailty.  These climatological distributions
+// for each grid point, assuming normality.  These climatological distributions
 // are used in two ways:
 // (1) To define climatological distribution percentile (CDP) thresholds which
 //     can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
 //     speed (wind_thresh) thresholds.
 // (2) To subset matched pairs into climatological bins based on where the
 //     observation value falls within the climatological distribution.
-//
 // This dictionary is identical to the "climo_mean" dictionary described above
 // but points to files containing climatological standard deviation values rather
 // than means.  In the example below, this dictionary is set by copying over the
@@ -1104,7 +1103,7 @@ boot = {
 
 //
 // The "interp" entry is a dictionary that specifies what interpolation or
-// smoothing (for the Grid-Stat tools) methods should be applied.
+// smoothing (for the Grid-Stat tool) methods should be applied.
 // This dictionary may include the following entries:
 //
 //    - The "field" entry specifies to which field(s) the interpolation method
