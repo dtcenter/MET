@@ -3260,20 +3260,15 @@ void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Initialize
    //
    cts_info.clear();
+   cts_info.fthresh = ft;
+   cts_info.othresh = ot;
 
    //
-   // Update the contingency table counts
+   // Populate the contingency table
    //
    for(i=0; i<n; i++) {
-
-      if(      ft.check(info.pd.f_na[i]) &&  ot.check(info.pd.o_na[i]))
-         cts_info.cts.inc_fy_oy();
-      else if( ft.check(info.pd.f_na[i]) && !ot.check(info.pd.o_na[i]))
-         cts_info.cts.inc_fy_on();
-      else if(!ft.check(info.pd.f_na[i]) &&  ot.check(info.pd.o_na[i]))
-         cts_info.cts.inc_fn_oy();
-      else if(!ft.check(info.pd.f_na[i]) && !ot.check(info.pd.o_na[i]))
-         cts_info.cts.inc_fn_on();
+      cts_info.add(info.pd.f_na[i], info.pd.o_na[i],
+                   info.pd.cmn_na[i], info.pd.csd_na[i]);
    }
 
    return;
