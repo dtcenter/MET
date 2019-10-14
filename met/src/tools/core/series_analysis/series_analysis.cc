@@ -12,18 +12,20 @@
 //
 //   Description:
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    12/10/12  Halley Gotway   New
-//   001    05/27/14  Halley Gotway   Add EIQR and MAD to CNT line type.
-//   002    11/14/14  Halley Gotway   Pass the obtype entry from the
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    12/10/12  Halley Gotway  New
+//   001    05/27/14  Halley Gotway  Add EIQR and MAD to CNT line type.
+//   002    11/14/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output file.
-//   003    02/25/15  Halley Gotway   Add automated regridding.
-//   004    08/04/15  Halley Gotway   Add conditional continuous verification.
-//   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
-//   006    04/20/16  Halley Gotway   Add -paired command line option.
-//   007    05/15/17  Prestopnikk P   Add shape for regrid.
-//   008    10/06/17  Halley Gotway   Add RMSFA and RMSOA stats.
+//   003    02/25/15  Halley Gotway  Add automated regridding.
+//   004    08/04/15  Halley Gotway  Add conditional continuous verification.
+//   005    09/21/15  Halley Gotway  Add climatology and SAL1L2 output.
+//   006    04/20/16  Halley Gotway  Add -paired command line option.
+//   007    05/15/17  Prestopnikk P  Add shape for regrid.
+//   008    10/06/17  Halley Gotway  Add RMSFA and RMSOA stats.
+//   009    10/14/19  Halley Gotway  Add support for climo distribution
+//                    percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 

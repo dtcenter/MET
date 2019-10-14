@@ -15,28 +15,30 @@
 //      of analysis jobs on the STAT output of the Grid-Stat,
 //      Point-Stat, and Wavelet-Stat tools.
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    09/05/07  Halley Gotway   New
-//   001    07/01/08  Halley Gotway   Add the rank_corr_flag to the
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    09/05/07  Halley Gotway  New
+//   001    07/01/08  Halley Gotway  Add the rank_corr_flag to the
 //                    config file to disable computing rank
 //                    correlations.
-//   002    06/21/10  Halley Gotway   Add the vif_flag to correct normal
+//   002    06/21/10  Halley Gotway  Add the vif_flag to correct normal
 //                    CI's for time series aggregations.
-//   003    08/15/11  Oldenburg       Fix a bug related to parsing the
+//   003    08/15/11  Oldenburg      Fix a bug related to parsing the
 //                    config file alpha value list
-//   004    08/16/11  Halley Gotway   Reimplementation of GO Index job
+//   004    08/16/11  Halley Gotway  Reimplementation of GO Index job
 //                    with addition of generalized Skill Score Index
-//   005    10/26/11  Holmes          Added use of command line class to
-//                                    parse the command line arguments.
-//   006    11/14/11  Holmes          Added code to enable reading of
-//                                    multiple config files.
-//   007    01/20/12  Halley Gotway   Modify logic so that command line
+//   005    10/26/11  Holmes         Added use of command line class to
+//                    parse the command line arguments.
+//   006    11/14/11  Holmes         Added code to enable reading of
+//                    multiple config files.
+//   007    01/20/12  Halley Gotway  Modify logic so that command line
 //                    job options override config file job options.
-//   008    05/03/12  Halley Gotway   Switch to using vx_config library.
-//   009    05/21/12  Halley Gotway   Add support of -fcst_valid_hour
+//   008    05/03/12  Halley Gotway  Switch to using vx_config library.
+//   009    05/21/12  Halley Gotway  Add support of -fcst_valid_hour
 //                    and -obs_valid_hour job command options.
-//   010    07/26/18  Halley Gotway   Support masks from gen_vx_mask.
+//   010    07/26/18  Halley Gotway  Support masks from gen_vx_mask.
+//   011    10/14/19  Halley Gotway  Add support for climo distribution
+//                    percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 

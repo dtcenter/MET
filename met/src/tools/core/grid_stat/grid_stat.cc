@@ -12,31 +12,31 @@
 //
 //   Description:
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    04/18/07  Halley Gotway   New
-//   001    10/05/07  Halley Gotway   Add checks to only compute
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    04/18/07  Halley Gotway  New
+//   001    10/05/07  Halley Gotway  Add checks to only compute
 //                    confidence intervals for sufficiently large
 //                    sample sizes.
-//   002    10/19/07  Halley Gotway   Add ability to smooth the forecast
+//   002    10/19/07  Halley Gotway  Add ability to smooth the forecast
 //                    field using the interp_method and interp_width
 //                    parameters
-//   003    01/11/08  Halley Gotway   Modify sprintf statements which
+//   003    01/11/08  Halley Gotway  Modify sprintf statements which
 //                    use the GRIB code abbreviation string
-//   004    02/06/08  Halley Gotway   Modify to read the updated NetCDF
+//   004    02/06/08  Halley Gotway  Modify to read the updated NetCDF
 //                    output of PCP-Combine
-//   005    02/11/08  Halley Gotway   Remove BIAS from the CNT line
+//   005    02/11/08  Halley Gotway  Remove BIAS from the CNT line
 //                    since it's the same as the ME.
-//   006    02/12/08  Halley Gotway   Fix bug in writing COP line to
+//   006    02/12/08  Halley Gotway  Fix bug in writing COP line to
 //                    write out OY and ON rather than FY and FN.
-//   007    02/14/08  Halley Gotway   Apply the smoothing operation to
+//   007    02/14/08  Halley Gotway  Apply the smoothing operation to
 //                    both forecast and observation fields rather than
 //                    just the forecast.
-//   008    02/25/08  Halley Gotway   Write the STAT lines using the
+//   008    02/25/08  Halley Gotway  Write the STAT lines using the
 //                    routines in the vx_met_util library.
-//   009    02/25/08  Halley Gotway   Add support for the NBRCTS and
+//   009    02/25/08  Halley Gotway  Add support for the NBRCTS and
 //                    NBRCNT line types.
-//   010    07/01/08  Halley Gotway   Add the rank_corr_flag to the
+//   010    07/01/08  Halley Gotway  Add the rank_corr_flag to the
 //                    config file to disable computing rank
 //                    correlations.
 //   011    09/23/08  Halley Gotway  Change argument sequence for the
@@ -78,11 +78,11 @@
 //   031    02/19/15  Halley Gotway  Add automated regridding.
 //   032    08/04/15  Halley Gotway  Add conditional continuous verification.
 //   033    09/04/15  Halley Gotway  Add climatology and SAL1L2 and VAL1L2
-//                                   output line types.
+//                    output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   036    02/14/17  Win            MET-621 enhancement support- additional
-//                                   nc_pairs_flag 'apply_mask'
+//                    nc_pairs_flag 'apply_mask'
 //   037    05/15/17  Prestopnik P   Add shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    08/18/17  Halley Gotway  Add fourier decomposition.
@@ -96,6 +96,8 @@
 //   045    04/08/19  Halley Gotway  Add percentile thresholds.
 //   046    04/01/19  Fillmore       Add FCST and OBS units.
 //   047    06/19/19  Halley Gotway  Add DMAP output line type.
+//   048    10/14/19  Halley Gotway  Add support for climo distribution
+//                    percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 

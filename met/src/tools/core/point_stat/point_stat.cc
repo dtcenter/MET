@@ -87,6 +87,8 @@
 //   039    08/24/18  Halley Gotway  Add ECNT output for HiRA.
 //   040    04/01/10  Fillmore       Add FCST and OBS units.
 //   041    04/08/19  Halley Gotway  Add percentile thresholds.
+//   042    10/14/19  Halley Gotway  Add support for climo distribution
+//                    percentile thresholds.
 //
 ////////////////////////////////////////////////////////////////////////
 
