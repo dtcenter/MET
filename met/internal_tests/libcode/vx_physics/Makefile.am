@@ -10,12 +10,12 @@ include ${top_srcdir}/Make-include
 
 # Test programs
 
-noinst_PROGRAMS = test_atmos_thermo
+noinst_PROGRAMS = test_thermo
 
-test_atmos_thermo_SOURCES = test_atmos_thermo.cc
-test_atmos_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../src/libcode/vx_physics
-test_atmos_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../src/libcode/vx_physics
-test_atmos_thermo_LDADD = \
+test_thermo_SOURCES = test_thermo.cc
+test_thermo_CPPFLAGS = ${MET_CPPFLAGS} -I../../../src/libcode/vx_physics
+test_thermo_LDFLAGS = -L. ${MET_LDFLAGS} -L../../../src/libcode/vx_physics
+test_thermo_LDADD = \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
