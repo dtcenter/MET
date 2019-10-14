@@ -31,7 +31,7 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
+cat_thresh  = [ ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
@@ -42,24 +42,36 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_exc    = [];
-   cat_thresh = [];
-   message_type = [ "ADPUPA" ];
-   level = ["P500", "P850"];
-
    field = [
-      { name = "TMP";  },
-      { name = "UGRD"; },
-      { name = "VGRD"; },
-      { name = "WIND"; }
+      { name = "TMP";  level = [ "P500" ]; },
+      { name = "UGRD"; level = [ "P500" ]; },
+      { name = "VGRD"; level = [ "P500" ]; },
+      { name = "WIND"; level = [ "P500" ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
    ];
 }
-obs = fcst;
+obs = {
+   cnt_thresh  = [ NA, <CDP50, >=CDP50, <CDP25||>CDP75, >=CDP25&&<=CDP75 ];
+   wind_thresh = cnt_thresh;
+   field = [
+      { name = "TMP";  level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "UGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "VGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "WIND"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
+   ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = fcst;
 climo_mean = {
@@ -83,6 +95,15 @@ climo_mean = {
    match_month        = TRUE;
    match_day          = TRUE;
    time_step          = 43200;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+
+   file_name = [ "${CLIMO_DIR}/t850hPa_stdev.grib",
+                 "${CLIMO_DIR}/u850hPa_stdev.grib",
+                 "${CLIMO_DIR}/v850hPa_stdev.grib",
+                 "${CLIMO_DIR}/ws850hPa_stdev.grib" ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,7 +178,7 @@ hira = {
 //
 output_flag = {
    fho    = NONE;
-   ctc    = NONE;
+   ctc    = BOTH;
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;

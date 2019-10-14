@@ -78,7 +78,7 @@
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &CONFIG_DIR;/PointStatConfig_climo \
-      -outdir &OUTPUT_DIR;/climatology -v 4
+      -outdir &OUTPUT_DIR;/climatology -v 2
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V.stat</stat>
@@ -99,7 +99,7 @@
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &CONFIG_DIR;/PointStatConfig_climo_WMO \
-      -outdir &OUTPUT_DIR;/climatology -v 4
+      -outdir &OUTPUT_DIR;/climatology -v 2
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat</stat>
@@ -110,6 +110,36 @@
     </output>
   </test>
 
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_AGG_STAT">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type CTC -fcst_lev P850 -by FCST_VAR -out_thresh '>CDP90' \
+      -out_stat &OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_FILTER">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/climatology</value></pair>
+    </env>
+    <param> \
+      -lookin &OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
+      -job filter -line_type MPR -column_thresh CLIMO_CDF 'lt0.1||gt0.9' \
+      -dump_row &OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat</stat>
+    </output>
+  </test>
+  
   <test name="climatology_GRID_STAT_WMO_1.5DEG">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
@@ -140,7 +170,7 @@
       &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &CONFIG_DIR;/PointStatConfig_climo_prob \
-      -outdir &OUTPUT_DIR;/climatology -v 4
+      -outdir &OUTPUT_DIR;/climatology -v 2
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V.stat</stat>
@@ -190,6 +220,54 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/climatology/stat_analysis_MPR_to_PSTD.stat</stat>
+    </output>
+  </test>
+
+  <test name="climatology_SERIES_ANALYSIS">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>CLIMO_DIR</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg</value></pair>
+    </env>
+    <param> \
+      -fcst   &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F003.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F009.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F015.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F021.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F027.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F030.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F033.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F036.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F039.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F042.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F045.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F048.grib2 \
+      -obs    &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0000_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0600_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0600_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1800_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1800_003.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120411_0000_000.grb2 \
+      -paired \
+      -out    &OUTPUT_DIR;/climatology/series_analysis_GFS_CLIMO_1.0DEG.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_climatology \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/climatology/series_analysis_GFS_CLIMO_1.0DEG.nc</grid_nc>
     </output>
   </test>
 
