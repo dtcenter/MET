@@ -3481,8 +3481,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Should be no bad data, but checking to be sure
       //
-      if(is_bad_data(f)  ||
-         is_bad_data(o)) ||
+      if(is_bad_data(f) ||
+         is_bad_data(o) ||
          (cmn_flag && is_bad_data(c))) continue;
 
       //
