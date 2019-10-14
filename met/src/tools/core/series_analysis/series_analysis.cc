@@ -687,16 +687,17 @@ void process_scores() {
             // Convert n to x, y
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
 
-            // Store valid fcst/obs/climo pairs where the mask is on
-            if(!is_bad_data(fcst_dp(x, y)) &&
-               !is_bad_data(obs_dp(x, y))  &&
-               !is_bad_data(conf_info.mask_area(x, y))) {
+            // Skip points outside the mask and bad data
+            if(!conf_info.mask_area(x, y)              ||
+               is_bad_data(fcst_dp(x, y))              ||
+               is_bad_data(obs_dp(x,y))                ||
+               (cmn_flag && is_bad_data(cmn_dp(x, y))) ||
+               (csd_flag && is_bad_data(csd_dp(x, y)))) continue; 
 
-               pd_ptr[i].add_pair(fcst_dp(x, y), obs_dp(x, y),
-                            (cmn_flag ? cmn_dp(x, y) : bad_data_double),
-                            (csd_flag ? csd_dp(x, y) : bad_data_double),
-                            default_grid_weight);
-            }
+            pd_ptr[i].add_pair(fcst_dp(x, y), obs_dp(x, y),
+                               (cmn_flag ? cmn_dp(x, y) : bad_data_double),
+                               (csd_flag ? csd_dp(x, y) : bad_data_double),
+                               default_grid_weight);
 
          } // end for i
 
