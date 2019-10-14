@@ -202,8 +202,8 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
     process_track_files(files, files_model_suffix, adeck_tracks,
                         false, false);
 
-    // ConcatString adeck_track_file("adeck.nc");
-    // write_tc_tracks(adeck_track_file, adeck_tracks);
+    ConcatString adeck_track_file("adeck.nc");
+    write_tc_tracks(adeck_track_file, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -265,10 +265,10 @@ void get_atcf_files(const StringArray& source,
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_files(const StringArray& files,
-                                const StringArray& model_suffix,
-                                TrackInfoArray& tracks,
-                                bool check_keep,
-                                bool check_anly) {
+                         const StringArray& model_suffix,
+                         TrackInfoArray& tracks,
+                         bool check_keep,
+                         bool check_anly) {
     int cur_read, cur_add, tot_read, tot_add;
 
     LineDataFile f;
@@ -297,6 +297,9 @@ void process_track_files(const StringArray& files,
 
         // Read each line
         while(f >> line) {
+
+            // line.dump(cout);
+            // cout << line.get_line() << "\n";
 
             // Increment line counts
             cur_read++;
@@ -577,7 +580,7 @@ void process_fields(const TrackInfoArray& tracks) {
     lon_arr = new double[
         tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
 
-    // Assume single track for now
+    // Take only first track
     TrackInfo track = tracks[0];
 
     // Loop over track points
