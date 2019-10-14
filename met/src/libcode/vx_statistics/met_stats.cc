@@ -1481,8 +1481,6 @@ void VL1L2Info::zero_out() {
    FSTDEV      = 0.0;
    OSTDEV      = 0.0;
 
-   // COV         = 0.0;
-
    FDIR        = 0.0;
    ODIR        = 0.0;
 
@@ -1657,7 +1655,6 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
    double u_diff, v_diff;
    PairDataPoint pd_u, pd_v;
-   bool cflag, wflag;
 
    // Initialize
    zero_out();
@@ -1724,8 +1721,8 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
          //  new stuff from vector stats whitepaper
          //
 
-      f_speed_bar   += wgt*sqrt(uf*uf + vf*vf);
-      o_speed_bar   += wgt*sqrt(uo*uo + vo*vo);
+      f_speed_bar += wgt*sqrt(uf*uf + vf*vf);
+      o_speed_bar += wgt*sqrt(uo*uo + vo*vo);
 
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
@@ -1770,8 +1767,6 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
       FSTDEV        = bad_data_double;
       OSTDEV        = bad_data_double;
-
-      // COV         = bad_data_double;
 
       FDIR          = bad_data_double;
       ODIR          = bad_data_double;
@@ -3435,7 +3430,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
-   bool cflag;
+   bool cmn_flag;
 
    //
    // Allocate memory to store the differences
@@ -3457,7 +3452,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Flag to process climo
    //
-   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
+   cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
 
    //
    // Get the sum of the weights
@@ -3480,14 +3475,15 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
 
       f   = pd.f_na[j];
       o   = pd.o_na[j];
-      c   = (cflag ? pd.cmn_na[j] : bad_data_double);
+      c   = (cmn_flag ? pd.cmn_na[j] : bad_data_double);
       wgt = pd.wgt_na[i]/wgt_sum;
 
       //
       // Should be no bad data, but checking to be sure
       //
-      if((is_bad_data(f) || is_bad_data(o)) ||
-         (cflag          && is_bad_data(c))) continue;
+      if(is_bad_data(f)  ||
+         is_bad_data(o)) ||
+         (cmn_flag && is_bad_data(c))) continue;
 
       //
       // Compute the error
@@ -3505,7 +3501,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       err_sq_bar  += wgt*err*err;
       n++;
 
-      if(cflag) {
+      if(cmn_flag) {
          fa_bar  += wgt*(f-c);
          oa_bar  += wgt*(o-c);
          foa_bar += wgt*(f-c)*(o-c);
@@ -3549,7 +3545,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Process anomaly scores
    //
-   if(cflag) {
+   if(cmn_flag) {
 
       //
       // Compute Anomaly Correlation
@@ -3791,7 +3787,6 @@ void compute_i_cntinfo(const PairDataPoint &pd, int skip,
                        bool normal_ci_flag, CNTInfo &cnt_info) {
    int n;
    NumArray i_na;
-   bool cflag;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -3811,11 +3806,6 @@ void compute_i_cntinfo(const PairDataPoint &pd, int skip,
            << "the skip index (" << skip << ") is out of bounds!\n\n";
       throw(1);
    }
-
-   //
-   // Flag to process climo
-   //
-   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
 
    //
    // Exclude the i-th element
@@ -4029,7 +4019,7 @@ void compute_pctinfo(const PairDataPoint &pd,
                      bool pstd_flag, PCTInfo &pct_info) {
    int i, n_thresh, n_pair;
    NumArray p_thresh, climo_prob;
-   bool cflag;
+   bool cmn_flag;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -4043,11 +4033,11 @@ void compute_pctinfo(const PairDataPoint &pd,
    n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cflag = set_climo_flag(pd.f_na, pd.cmn_na);
+   cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
 
    // Derive climatological probabilities
-   if(cflag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
-                                            pct_info.othresh);
+   if(cmn_flag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+                                               pct_info.othresh);
 
    //
    // Store the probability threshold values
@@ -4079,11 +4069,11 @@ void compute_pctinfo(const PairDataPoint &pd,
       //
       if(pct_info.othresh.check(pd.o_na[i])) {
          pct_info.pct.inc_event(pd.f_na[i]);
-         if(cflag) pct_info.climo_pct.inc_event(climo_prob[i]);
+         if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
       else {
          pct_info.pct.inc_nonevent(pd.f_na[i]);
-         if(cflag) pct_info.climo_pct.inc_nonevent(climo_prob[i]);
+         if(cmn_flag) pct_info.climo_pct.inc_nonevent(climo_prob[i]);
       }
    } // end for i
 

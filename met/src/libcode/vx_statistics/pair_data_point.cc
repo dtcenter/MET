@@ -1258,17 +1258,19 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
    // Allocate memory for output pairs
    out_pd.extend(pd.n_obs);
 
-   bool cflag = set_climo_flag(pd.f_na, pd.cmn_na);
-   bool wflag = set_climo_flag(pd.f_na, pd.wgt_na);
+   bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
+   bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
 
    // Loop over the pairs
    for(i=0; i<pd.n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(pd.f_na[i]) ||
-         is_bad_data(pd.o_na[i]) ||
-         (cflag && is_bad_data(pd.cmn_na[i])) ||
-         (wflag && is_bad_data(pd.wgt_na[i]))) continue;
+      if(is_bad_data(pd.f_na[i])                 ||
+         is_bad_data(pd.o_na[i])                 ||
+         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
+         (csd_flag && is_bad_data(pd.csd_na[i])) ||
+         (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
 
       // Keep pairs which meet the threshold criteria
       if(check_fo_thresh(pd.f_na[i],   pd.o_na[i],
@@ -1352,8 +1354,12 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
                    convert_u_v_to_wind(pd_u.csd_na[i], pd_v.csd_na[i]) :
                    bad_data_double);
 
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(fcst_wind) || is_bad_data(obs_wind)) continue;
+      // Check for bad data
+      if(is_bad_data(fcst_wind)              ||
+         is_bad_data(obs_wind)               ||
+         (cmn_flag && is_bad_data(cmn_wind)) ||
+         (csd_flag && is_bad_data(csd_wind)) ||
+         (wgt_flag && is_bad_data(wgt))) continue;
 
       // Check wind speed thresholds
       if(check_fo_thresh(fcst_wind, obs_wind,
@@ -1407,17 +1413,19 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    // Allocate memory for output pairs
    out_pd.extend(pd.n_obs);
 
-   bool cflag = set_climo_flag(pd.f_na, pd.cmn_na);
-   bool wflag = set_climo_flag(pd.f_na, pd.wgt_na);
+   bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
+   bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
 
    // Loop over the pairs
    for(i=0; i<pd.n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(pd.f_na[i]) ||
-         is_bad_data(pd.o_na[i]) ||
-         (cflag && is_bad_data(pd.cmn_na[i])) ||
-         (wflag && is_bad_data(pd.wgt_na[i]))) continue;
+      if(is_bad_data(pd.f_na[i])                 ||
+         is_bad_data(pd.o_na[i])                 ||
+         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
+         (csd_flag && is_bad_data(pd.csd_na[i])) ||
+         (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
 
       // Keep pairs for the current bin.
       // check_bins() returns a 1-based bin value.
