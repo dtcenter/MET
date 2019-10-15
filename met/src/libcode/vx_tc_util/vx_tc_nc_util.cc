@@ -42,7 +42,7 @@ void write_tc_tracks(const ConcatString& track_nc_file,
     }
 
     NcVar track_lines_var = nc_out->addVar(
-        "TrackLines", ncChar, track_line_dim);
+        "TrackLines", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
         "Lat", ncFloat, track_point_dim);
@@ -73,9 +73,10 @@ void write_tc_tracks(const ConcatString& track_nc_file,
         offsets.push_back(i);
         counts.clear();
         counts.push_back(1);
-        ConcatString line = track_lines[i];
+        string line = track_lines[i];
         mlog << Debug(2) << line << "\n";
-        // track_lines_var.putVar(offsets, counts, line);
+        const char* str = line.c_str();
+        track_lines_var.putVar(offsets, counts, &str);
     }
 
     offsets.clear();
