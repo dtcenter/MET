@@ -1794,10 +1794,10 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Append the unit vectors with no climatological values
          //
-         m[key].pd_u.add_pair(uf, uo, bad_data_double, bad_data_double,
-                              default_grid_weight);
-         m[key].pd_v.add_pair(vf, vo, bad_data_double, bad_data_double,
-                              default_grid_weight);
+         m[key].pd_u.add_grid_pair(uf, uo, bad_data_double,
+                        bad_data_double, default_grid_weight);
+         m[key].pd_v.add_grid_pair(vf, vo, bad_data_double,
+                        bad_data_double, default_grid_weight);
 
          //
          // Keep track of the unique header column entries
@@ -1898,8 +1898,10 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             // Initialize values
             //
             aggr.hdr_sa.add(hdr);
-            aggr.pd_u.add_pair(uf, uo, ucmn, ucsd, default_grid_weight);
-            aggr.pd_v.add_pair(vf, vo, vcmn, vcsd, default_grid_weight);
+            aggr.pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
+                         default_grid_weight);
+            aggr.pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
+                         default_grid_weight);
 
             //
             // Add the new map entry
@@ -1954,8 +1956,10 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             else {
                m[key].hdr_sa.add(hdr);
-               m[key].pd_u.add_pair(uf, uo, ucmn, ucsd, default_grid_weight);
-               m[key].pd_v.add_pair(vf, vo, vcmn, vcsd, default_grid_weight);
+               m[key].pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
+                              default_grid_weight);
+               m[key].pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
+                              default_grid_weight);
             }
          }
 
@@ -2087,12 +2091,14 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          // Convert to and append unit vectors
          //
          aggr.hdr_sa.add(it->second.hdr_sa[i]);
-         convert_u_v_to_unit(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i], uf, vf);
-         convert_u_v_to_unit(it->second.pd_u.o_na[i], it->second.pd_v.o_na[i], uo, vo);
-         aggr.pd_u.add_pair(uf, uo, bad_data_double, bad_data_double,
-                            default_grid_weight);
-         aggr.pd_v.add_pair(vf, vo, bad_data_double, bad_data_double,
-                            default_grid_weight);
+         convert_u_v_to_unit(it->second.pd_u.f_na[i],
+                             it->second.pd_v.f_na[i], uf, vf);
+         convert_u_v_to_unit(it->second.pd_u.o_na[i],
+                             it->second.pd_v.o_na[i], uo, vo);
+         aggr.pd_u.add_grid_pair(uf, uo, bad_data_double,
+                                 bad_data_double, default_grid_weight);
+         aggr.pd_v.add_grid_pair(vf, vo, bad_data_double,
+                                 bad_data_double, default_grid_weight);
       }
 
       //
@@ -2981,7 +2987,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_obs(0.0, 0.0, cur.obs, cur.climo, bad_data_double);
+         m[key].ens_pd.add_grid_obs(0.0, 0.0, cur.obs, cur.climo,
+                                    bad_data_double, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);

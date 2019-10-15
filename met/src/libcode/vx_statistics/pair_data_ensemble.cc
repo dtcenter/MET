@@ -1352,13 +1352,13 @@ void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
-                                 const char *hdr_typ_str,
-                                 const char *hdr_sid_str,
-                                 unixtime hdr_ut,
-                                 const char *obs_qty, float *obs_arr,
-                                 Grid &gr, const char *var_name,
-                                 const DataPlane *wgt_dp) {
+void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
+                                       const char *hdr_typ_str,
+                                       const char *hdr_sid_str,
+                                       unixtime hdr_ut,
+                                       const char *obs_qty, float *obs_arr,
+                                       Grid &gr, const char *var_name,
+                                       const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
@@ -1369,7 +1369,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
-      mlog << Error << "\nVxPairDataEnsemble::add_obs() -> "
+      mlog << Error << "\nVxPairDataEnsemble::add_point_obs() -> "
            << "when processing point observations, the observation "
            << "VarInfo type must be GRIB.\n\n";
       exit(1);
@@ -1504,7 +1504,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
 
          // Check for table entries for this variable and message type
          if(!obs_error_table.has(obs_info->name().c_str(), hdr_typ_str)) {
-            mlog << Warning << "\nVxPairDataEnsemble::add_obs() -> "
+            mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
                  << "Disabling observation error logic since the "
                  << "obs error table contains no entry for OBS_VAR("
                  << obs_info->name() << ") and MESSAGE_TYPE("
@@ -1581,7 +1581,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
                 pd[0][0][k].interp_mthd == InterpMthd_Max    ||
                 pd[0][0][k].interp_mthd == InterpMthd_Median ||
                 pd[0][0][k].interp_mthd == InterpMthd_Best)) {
-               mlog << Warning << "\nVxPairDataEnsemble::add_obs() -> "
+               mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
                     << "applying the "
                     << interpmthd_to_string(pd[0][0][k].interp_mthd)
                     << " interpolation method to climatological spread "
@@ -1602,10 +1602,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Add the observation value
             // Weight is from the nearest grid point
-            pd[i][j][k].add_obs(hdr_sid_str, hdr_lat, hdr_lon,
-                                obs_x, obs_y, hdr_ut,
-                                obs_lvl, obs_hgt, obs_v, obs_qty,
-                                cmn_v, csd_v, wgt_v);
+            pd[i][j][k].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
+                           obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
+                           obs_v, obs_qty, cmn_v, csd_v, wgt_v);
             pd[i][j][k].add_obs_error_entry(oerr_ptr);
          } // end for k
       } // end for j

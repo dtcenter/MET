@@ -696,10 +696,10 @@ void process_scores() {
                (cmn_flag && is_bad_data(cmn_dp(x, y))) ||
                (csd_flag && is_bad_data(csd_dp(x, y)))) continue; 
 
-            pd_ptr[i].add_pair(fcst_dp(x, y), obs_dp(x, y),
-                               (cmn_flag ? cmn_dp(x, y) : bad_data_double),
-                               (csd_flag ? csd_dp(x, y) : bad_data_double),
-                               default_grid_weight);
+            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
+                         (cmn_flag ? cmn_dp(x, y) : bad_data_double),
+                         (csd_flag ? csd_dp(x, y) : bad_data_double),
+                         default_grid_weight);
 
          } // end for i
 

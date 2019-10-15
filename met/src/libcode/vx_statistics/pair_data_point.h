@@ -51,19 +51,19 @@ class PairDataPoint : public PairBase {
 
       void extend(int);
 
-      bool add_pair(const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double, double);
+      bool add_point_pair(const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(double, double, double, double, double);
+      void set_point_pair(int, const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(const NumArray &f_in,   const NumArray &o_in,
-                    const NumArray &cmn_in, const NumArray &csd_in,
-                    const NumArray &w_in);
+      bool add_grid_pair(double, double, double, double, double);
 
-      void set_pair(int, const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double, double);
+      bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
+                         const NumArray &cmn_in, const NumArray &csd_in,
+                         const NumArray &w_in);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -207,9 +207,9 @@ class VxPairDataPoint {
 
       void set_sfc_info(const SurfaceInfo &);
 
-      void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &, const char * = 0,
-                   const DataPlane * = 0);
+      void add_point_obs(float *, const char *, const char *, unixtime,
+                         const char *, float *, Grid &, const char * = 0,
+                         const DataPlane * = 0);
 
       int  get_n_pair() const;
 

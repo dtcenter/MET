@@ -879,9 +879,10 @@ void process_obs_file(int i_nc) {
             if(conf_info.vx_opt[j].vx_pd.fcst_dpa.n_planes() == 0) continue;
 
             // Attempt to add the observation to the conf_info.vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty_str, obs_arr, grid,
-                                              var_name);
+            conf_info.vx_opt[j].vx_pd.add_point_obs(hdr_arr,
+                                         hdr_typ_str, hdr_sid_str,
+                                         hdr_ut, obs_qty_str, obs_arr,
+                                         grid, var_name);
          }
 
          obs_arr[1] = grib_code;
@@ -1757,7 +1758,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             is_bad_data(pd_ptr->cmn_na[j])) continue;
 
          // Store the observation value
-         hira_pd.add_obs(pd_ptr->sid_sa[j].c_str(),
+         hira_pd.add_point_obs(pd_ptr->sid_sa[j].c_str(),
             pd_ptr->lat_na[j], pd_ptr->lon_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
@@ -1884,7 +1885,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             }
 
             // Store the fractional coverage pair
-            hira_pd.add_pair(pd_ptr->sid_sa[k].c_str(),
+            hira_pd.add_point_pair(pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],

@@ -257,9 +257,9 @@ class VxPairDataEnsemble {
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
 
-      void add_obs(float *, int *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &, const char * = 0,
-                   const DataPlane * = 0);
+      void add_point_obs(float *, int *, const char *, const char *,
+                         unixtime, const char *, float *, Grid &,
+                         const char * = 0, const DataPlane * = 0);
 
       void add_ens(int, bool mn);
 

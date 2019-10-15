@@ -370,11 +370,11 @@ void PairBase::add_climo_cdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairBase::add_obs(const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+bool PairBase::add_point_obs(const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
 
    bool ret = false;
 
@@ -450,6 +450,38 @@ bool PairBase::add_obs(const char *sid,
    }
 
    return ret;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_point_obs(int i_obs, const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
+
+   if(i_obs < 0 || i_obs >= n_obs) {
+      mlog << Error << "\nPairBase::set_point_obs() -> "
+           << "range check error: " << i_obs << " not in (0, "
+           << n_obs << ").\n\n"
+          ;
+      exit(1);
+   }
+
+   sid_sa.set(i_obs, sid);
+   lat_na.set(i_obs, lat);
+   lon_na.set(i_obs, lon);
+   x_na.set(i_obs, x);
+   y_na.set(i_obs, y);
+   wgt_na.set(i_obs, wgt);
+   vld_ta.set(i_obs, ut);
+   lvl_na.set(i_obs, lvl);
+   elv_na.set(i_obs, elv);
+   o_na.set(i_obs, o);
+   o_qc_sa.set(i_obs, qc);
+   set_climo(i_obs, o, cmn, csd);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -673,8 +705,8 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_obs(double x, double y, double o,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_grid_obs(double x, double y, double o,
+                            double cmn, double csd, double wgt) {
 
    sid_sa.add(na_str);
    lat_na.add(bad_data_double);
@@ -697,43 +729,11 @@ void PairBase::add_obs(double x, double y, double o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_obs(int i_obs, const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+void PairBase::set_grid_obs(int i_obs, double x, double y,
+                            double o, double cmn, double csd, double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
-      exit(1);
-   }
-
-   sid_sa.set(i_obs, sid);
-   lat_na.set(i_obs, lat);
-   lon_na.set(i_obs, lon);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, ut);
-   lvl_na.set(i_obs, lvl);
-   elv_na.set(i_obs, elv);
-   o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, qc);
-   set_climo(i_obs, o, cmn, csd);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_obs(int i_obs, double x, double y,
-                       double o, double cmn, double csd, double wgt) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
+      mlog << Error << "\nPairBase::set_grid_obs() -> "
            << "range check error: " << i_obs << " not in (0, "
            << n_obs << ").\n\n";
       exit(1);

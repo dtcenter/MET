@@ -1028,9 +1028,11 @@ void process_point_obs(int i_nc) {
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
-                                              hdr_sid_str.c_str(), hdr_ut, obs_qty_str.c_str(),
-                                              obs_arr, grid, var_name.c_str());
+            conf_info.vx_opt[j].vx_pd.add_point_obs(hdr_arr,
+                                         hdr_typ_arr, hdr_typ_str.c_str(),
+                                         hdr_sid_str.c_str(), hdr_ut,
+                                         obs_qty_str.c_str(), obs_arr,
+                                         grid, var_name.c_str());
          }
       }
    } // end for i_start
@@ -1795,8 +1797,8 @@ void process_grid_scores(int i_vx,
          cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, oraw_dp(x, y),
-                    cmn, bad_data_double, wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cmn,
+                         bad_data_double, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {
