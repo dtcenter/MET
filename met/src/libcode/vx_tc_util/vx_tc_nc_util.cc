@@ -45,6 +45,7 @@ void write_tc_tracks(const ConcatString& track_nc_file,
     float* track_mrd_data = new float[track.n_points()];
 
     for(int i = 0; i < track.n_points(); i++) {
+        mlog << Debug(4) << track[i].serialize() << "\n";
         track_lat_data[i] = track[i].lat();
         track_lon_data[i] = track[i].lon();
         track_mrd_data[i] = track[i].mrd();

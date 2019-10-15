@@ -327,7 +327,12 @@ void process_track_files(const StringArray& files,
         // Close current file
         f.close();
 
-    } // end loop over files
+    } // End loop over files
+
+    // Issue warning if more than one track found
+    if (tracks.n_tracks() > 1) {
+        mlog << Warning << "Found " << tracks.n_tracks() << " tracks.\n";
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
