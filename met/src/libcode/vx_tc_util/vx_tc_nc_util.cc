@@ -17,8 +17,21 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
     mlog << Debug(2) << "Writing " << track_nc_file << "\n";
 
+    TrackInfo track = tracks[0];
+    StringArray track_lines = track.track_lines();
+
+    mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
+         << track_lines.n_elements() << "\n";
+
+    mlog << Debug(4) << track.serialize() << "\n";
+
+    for(int i = 0; i < track_lines.n_elements(); i++) {
+        mlog << Debug(4) << track_lines[i] << "\n";
+    }
+
     NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
 
+    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
     NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     if (IS_INVALID_NC_P(nc_out)) {
@@ -34,8 +47,6 @@ void write_tc_tracks(const ConcatString& track_nc_file,
         "Lon", ncFloat, track_point_dim);
     NcVar track_mrd_var = nc_out->addVar(
         "MRD", ncFloat, track_point_dim);
-
-    TrackInfo track = tracks[0];
 
     mlog << Debug(2) << "write_tc_tracks:n_points:"
          << track.n_points() << "\n";
