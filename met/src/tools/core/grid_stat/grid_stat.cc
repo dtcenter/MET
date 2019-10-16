@@ -1217,9 +1217,12 @@ void process_scores() {
             vector<Simple_Node> simp;
             ta.get_simple_nodes(simp);
 
+            // Process all CDP thresholds except 0 and 100
             for(vector<Simple_Node>::iterator it = simp.begin();
                 it != simp.end(); it++) {
-               if(it->ptype() == perc_thresh_climo_dist) {
+               if(it->ptype() == perc_thresh_climo_dist &&
+                  !is_eq(it->pvalue(), 0.0) &&
+                  !is_eq(it->pvalue(), 100.0)) {
                   cs << cs_erase << "CLIMO_CDP" << nint(it->pvalue());
                   write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp),
                            i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);

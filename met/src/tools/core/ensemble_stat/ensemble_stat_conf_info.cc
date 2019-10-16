@@ -718,7 +718,8 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    msg_typ = parse_conf_message_type(&odict, point_vx);
 
    // Conf: othr_thresh
-   othr_ta = odict.lookup_thresh_array(conf_key_obs_thresh);
+   othr_ta = process_perc_thresh_bins(
+                odict.lookup_thresh_array(conf_key_obs_thresh));
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);

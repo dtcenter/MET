@@ -74,8 +74,10 @@ class ThreshArray {
 
       void get_simple_nodes(vector<Simple_Node> &);
 
-      ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
-      ConcatString get_abbr_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
+      ConcatString get_str(const char * = thresh_default_sep,
+                           int precision = thresh_default_precision) const;
+      ConcatString get_abbr_str(const char * = thresh_default_sep,
+                                int precision = thresh_default_precision) const;
 
       void check_bin_thresh() const;
       int check_bins(double) const;
@@ -94,10 +96,11 @@ inline       SingleThresh * ThreshArray::buf()        const { return ( t );     
 
 ////////////////////////////////////////////////////////////////////////
 
-extern ThreshArray  string_to_prob_thresh(const char *);
-extern ConcatString prob_thresh_to_string(const ThreshArray &);
-extern bool         check_prob_thresh    (const ThreshArray &, bool error_out = true);
-extern ConcatString write_css            (const ThreshArray &);
+extern ThreshArray  string_to_prob_thresh   (const char *);
+extern ConcatString prob_thresh_to_string   (const ThreshArray &);
+extern bool         check_prob_thresh       (const ThreshArray &, bool error_out = true);
+extern ThreshArray  process_perc_thresh_bins(const ThreshArray &);
+extern ConcatString write_css               (const ThreshArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -750,8 +750,10 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
 
    // Conf: cnt_thresh
-   fcnt_ta = fdict.lookup_thresh_array(conf_key_cnt_thresh);
-   ocnt_ta = odict.lookup_thresh_array(conf_key_cnt_thresh);
+   fcnt_ta = process_perc_thresh_bins(
+                fdict.lookup_thresh_array(conf_key_cnt_thresh));
+   ocnt_ta = process_perc_thresh_bins(
+                odict.lookup_thresh_array(conf_key_cnt_thresh));
 
    // Conf: cnt_logic
    cnt_logic = check_setlogic(
@@ -759,8 +761,10 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       int_to_setlogic(odict.lookup_int(conf_key_cnt_logic)));
 
    // Conf: wind_thresh
-   fwind_ta = fdict.lookup_thresh_array(conf_key_wind_thresh);
-   owind_ta = odict.lookup_thresh_array(conf_key_wind_thresh);
+   fwind_ta = process_perc_thresh_bins(
+                 fdict.lookup_thresh_array(conf_key_wind_thresh));
+   owind_ta = process_perc_thresh_bins(
+                 odict.lookup_thresh_array(conf_key_wind_thresh));
 
    // Conf: wind_logic
    wind_logic = check_setlogic(

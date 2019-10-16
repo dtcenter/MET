@@ -65,7 +65,7 @@ fcst = {
    ];
 }
 obs = {
-   cnt_thresh = [ NA, <CDP50, >=CDP50, <CDP25||>CDP75, >=CDP25&&<=CDP75 ];
+   cnt_thresh = [ NA, <CDP50, >=CDP50, ==CDP25 ];
    field = [
       { name = "TMP";  level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
       { name = "UGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
