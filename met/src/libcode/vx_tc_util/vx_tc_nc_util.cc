@@ -50,10 +50,19 @@ void write_tc_tracks(NcFile* nc_out,
 
     NcVar track_lat_var = nc_out->addVar(
         "Lat", ncFloat, track_point_dim);
+    add_att(&track_lat_var, "long_name", "Track Point Latitude");
+    add_att(&track_lat_var, "units", "degrees_east");
+    add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
         "Lon", ncFloat, track_point_dim);
+    add_att(&track_lon_var, "long_name", "Track Point Longitude");
+    add_att(&track_lon_var, "units", "degrees_north");
+    add_att(&track_lon_var, "standard_name", "longitude_track");
     NcVar track_mrd_var = nc_out->addVar(
-        "MRD", ncFloat, track_point_dim);
+        "RMW", ncFloat, track_point_dim);
+    add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
+    add_att(&track_mrd_var, "units", "nautical_miles");
+    add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
     mlog << Debug(2) << "write_tc_tracks:n_points:"
          << track.n_points() << "\n";
