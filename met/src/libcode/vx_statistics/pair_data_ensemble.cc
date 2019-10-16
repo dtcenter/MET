@@ -828,19 +828,28 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
    pd.obs_error_entry = obs_error_entry;
    pd.obs_error_flag  = obs_error_flag;
 
+   bool cmn_flag = set_climo_flag(o_na, cmn_na);
+   bool csd_flag = set_climo_flag(o_na, csd_na);
+   bool wgt_flag = set_climo_flag(o_na, wgt_na);
+
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
 
       // Check for bad data and apply observation threshold
-      if(is_bad_data(o_na[i]) || skip_ba[i] || !ot.check(o_na[i])) continue;
+      if(is_bad_data(o_na[i])                 ||
+         skip_ba[i]                           ||
+         (cmn_flag && is_bad_data(cmn_na[i])) ||
+         (csd_flag && is_bad_data(csd_na[i])) ||
+         (wgt_flag && is_bad_data(wgt_na[i])) ||
+         !ot.check(o_na[i], cmn_na[i], csd_na[i])) continue;
 
       // Add data for the current observation but only include data
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, v_na, r_na, crps_na, ign_na, pit_na,
-      //   spread_na, spread_oerr_na, spread_plus_oerr_na,
-      //   mn_na, mn_oerr_na, e_na
+      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na, crps_na,
+      //   ign_na, pit_na, spread_na, spread_oerr_na,
+      //   spread_plus_oerr_na, mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -848,6 +857,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
 
       pd.wgt_na.add(wgt_na[i]);
       pd.o_na.add(o_na[i]);
+      pd.cmn_na.add(cmn_na[i]);
+      pd.csd_na.add(csd_na[i]);
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
       pd.crps_na.add(crps_na[i]);
