@@ -12,10 +12,14 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_tracks(const ConcatString& track_nc_file,
+// void write_tc_tracks(const ConcatString& track_nc_file,
+//     const TrackInfoArray& tracks) {
+
+void write_tc_tracks(NcFile* nc_out,
+    const NcDim& track_point_dim,
     const TrackInfoArray& tracks) {
 
-    mlog << Debug(2) << "Writing " << track_nc_file << "\n";
+    // mlog << Debug(2) << "Writing " << track_nc_file << "\n";
 
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
@@ -29,17 +33,17 @@ void write_tc_tracks(const ConcatString& track_nc_file,
         mlog << Debug(4) << track_lines[i] << "\n";
     }
 
-    NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
+    // NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
 
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
-    NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+    // NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
-    if (IS_INVALID_NC_P(nc_out)) {
-        mlog << Error << "\nwrite_nc_tracks() -> "
-             << "unable to open NetCDF file " 
-             << track_nc_file << "\n\n";
-        exit(1);
-    }
+    // if (IS_INVALID_NC_P(nc_out)) {
+    //     mlog << Error << "\nwrite_nc_tracks() -> "
+    //          << "unable to open NetCDF file " 
+    //          << track_nc_file << "\n\n";
+    //     exit(1);
+    // }
 
     NcVar track_lines_var = nc_out->addVar(
         "TrackLines", ncString, track_line_dim);
