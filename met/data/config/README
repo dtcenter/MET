@@ -42,8 +42,8 @@ The configuration file language supports the following data types:
    - Percentile Thresholds:
       - Thresholds may be defined as percentiles of the data being processed in
         several places:
-         - In Point-Stat and Grid-Stat when setting "cat_thresh" and
-           "cnt_thresh".
+         - In Point-Stat and Grid-Stat when setting "cat_thresh", "wind_thresh",
+           and "cnt_thresh".
          - In Wavelet-Stat when setting "cat_thresh".
          - In MODE when setting "conv_thresh" and "merge_thresh".
          - In Ensemble-Stat when setting "obs_thresh".
@@ -71,28 +71,29 @@ The configuration file language supports the following data types:
            These thresholds require that the climatological mean and standard
            deviation be defined using the climo_mean and climo_stdev config file
            options, respectively.  The categorical (cat_thresh), conditional
-           (cnt_thresh), or wind speed (wind_thresh) thresholds are defined relative
-           to the climatological distribution at each point.  Therefore, the actual
-           numeric threshold applied can change for each point.
+           (cnt_thresh), or wind speed (wind_thresh) thresholds are defined
+           relative to the climatological distribution at each point. Therefore,
+           the actual numeric threshold applied can change for each point.
            e.g. ">CDP50" means greater than the 50-th percentile of the
            climatological distribution for each point.
-      - When percentile thresholds are requested for continuous filtering thresholds
-        (cnt_thresh), wind speed thresholds (wind_thresh), or observation filtering
-        thresholds (obs_thresh in ensemble_stat), the following special logic is
-        applied.  Percentile thresholds of type equality are automatically converted 
-        to percentile bins which span the values from 0 to 100.
+      - When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
+        for continuous filtering thresholds (cnt_thresh), wind speed thresholds
+        (wind_thresh), or observation filtering thresholds (obs_thresh in
+        ensemble_stat), the following special logic is applied.  Percentile
+        thresholds of type equality are automatically converted to percentile
+        bins which span the values from 0 to 100.
         For example, "==CDP25" is automatically expanded to 4 percentile bins:
            >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
-      - When sample percentile thresholds (SFP, SOP, SCP, and FBIAS1) are requested
-        and computed, MET recomputes the actual percentile that the threshold
-        represents. If the requested percentile and actual percentile differ by more
-        than 5%, a warning message is printed. This may occur when the sample size
-        is small or the data values are not truly continuous.
-      - When percentile thresholds are used, the actual threshold value is
-        appended to the FCST_THRESH and OBS_THRESH output columns.  For example,
-        if the 90-th percentile of the current set of forecast values is 3.5,
-        then the requested threshold "<=SFP90" is written to the output as
-        "<=SFP90(3.5)".
+      - When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
+        requested, MET recomputes the actual percentile that the threshold
+        represents. If the requested percentile and actual percentile differ by
+        more than 5%, a warning message is printed. This may occur when the
+        sample size is small or the data values are not truly continuous.
+      - When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
+        actual threshold value is appended to the FCST_THRESH and OBS_THRESH
+        output columns.  For example, if the 90-th percentile of the current set
+        of forecast values is 3.5, then the requested threshold "<=SFP90" is
+        written to the output as "<=SFP90(3.5)".
       - When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
         ignores the actual percentile values listed in parentheses.
    - Piecewise-Linear Function (currently used only by MODE):
