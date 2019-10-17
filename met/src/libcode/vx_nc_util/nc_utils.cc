@@ -2062,6 +2062,36 @@ bool get_nc_data(NcVar *var, char *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data(NcVar *var, uchar *data) {
+   bool return_status = false;
+
+   if (!IS_INVALID_NC_P(var)) {
+      //
+      // Retrieve the unsigned char value from the NetCDF variable.
+      //
+      var->getVar(data);
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, unsigned short *data) {
+   bool return_status = false;
+
+   if (!IS_INVALID_NC_P(var)) {
+      //
+      // Retrieve the unsigned char value from the NetCDF variable.
+      //
+      var->getVar(data);
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data(NcFile *nc, const char *var_name, char *data,
                  const long *dim, const long *cur) {
 
