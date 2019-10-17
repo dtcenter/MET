@@ -71,6 +71,7 @@ static const char* default_out_dir = ".";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
+static StringArray          data_files;
 static ConcatString         config_file;
 static RMWAnalysisConfInfo  conf_info;
 
