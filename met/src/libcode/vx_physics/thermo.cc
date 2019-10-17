@@ -68,8 +68,19 @@ void height_from_pressure(int nlev,
     double* virtual_temperature,
     double* pressure, double* height) {
 
-    for (int k = 0; k < nlev; k++) {
+    // Z_2 - Z_1 = (R_d / g) <T_v> log(p_1 / p_2)
+    // R_d / g = 29.3
+    // <T_v> = integral_p_2^p_1 T_v(p) (dp / p) / log(p_1 / p_2)
+
+    height[0]
+        = 29.3 * virtual_temperature[0]
+        * log(surface_pressure / pressure[0]);
+
+    for(int k = 0; k < nlev; k++) {
+        height[k + 1] = height[k]
+            + 29.3 * (virtual_temperature[k]
+            + virtual_temperature[k + 1]) / 2
+            * log(pressure[k] / pressure[k + 1]);
     }
 }
-
 ////////////////////////////////////////////////////////////////////////
