@@ -175,6 +175,15 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
    ReqName = dict.lookup_string(conf_key_name, true);
 
+   //
+   //  check for a probability boolean setting
+   //
+
+   if(dict.lookup_bool(conf_key_prob, false)) {
+      set_p_flag(true);
+      return;
+   }
+
    return;
 }
 
