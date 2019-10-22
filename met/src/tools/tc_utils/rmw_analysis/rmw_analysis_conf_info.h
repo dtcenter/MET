@@ -24,15 +24,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-struct ConsensusInfo {
-    ConcatString Name;
-    StringArray  Members;
-    NumArray     Required;
-    int          MinReq;
-};
-
-////////////////////////////////////////////////////////////////////////
-
 class RMWAnalysisConfInfo {
 
     private:
@@ -46,6 +37,32 @@ class RMWAnalysisConfInfo {
 
         // RMWAnalysis configuration object
         MetConfig Conf;
+
+        // Track filtering criteria
+        StringArray Model;     // List of model names
+        StringArray StormId;   // List of storm ids
+        StringArray Basin;     // List of basin names
+        StringArray Cyclone;   // List of cyclone numbers
+        StringArray StormName; // List of storm names
+
+        // Timing information
+        unixtime  InitBeg, InitEnd;
+        TimeArray InitInc;
+        TimeArray InitExc;
+        NumArray  InitHour;
+        NumArray  LeadReq;
+        unixtime  ValidBeg, ValidEnd;
+
+        // Polyline masking regions
+        ConcatString InitMaskName;
+        MaskPoly     InitPolyMask;
+        Grid         InitGridMask;
+        MaskPlane    InitAreaMask;
+
+        ConcatString ValidMaskName;
+        MaskPoly     ValidPolyMask;
+        Grid         ValidGridMask;
+        MaskPlane    ValidAreaMask;
 
         // Variable information
         VarInfo** data_info;
