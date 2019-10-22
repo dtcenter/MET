@@ -343,6 +343,25 @@
     </output>
   </test>
   
+  <test name="regrid_data_plane_GOES_16_ADP">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20192662141196_e20192662143569_c20192662145547.nc \
+      G212 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GOES_16_ADP.nc \
+      -field 'name="AOD_Smoke";  level="(*,*)";' \
+      -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20192662141196_e20192662143569_c20192662144526.nc \
+      -qc 1,2 -method MAX \
+      -v 5:warning
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GOES_16_ADP.nc</grid_nc>
+    </output>
+  </test>
+  
   <test name="regrid_data_plane_GOES_16_AOD_TO_G212_GRID_MAP">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <env>
