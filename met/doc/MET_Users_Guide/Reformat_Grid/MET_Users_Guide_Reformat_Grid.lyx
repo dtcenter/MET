@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation 0bp
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -1880,6 +1886,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-adp adp_file_name]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-name list]
 \end_layout
 
@@ -2098,6 +2120,40 @@ The
 \series default
 The 
 \series bold
+-adp adp_file_name
+\series default
+ option provides additional ADP (Aerosol Detection Product) information
+ on aerosols, dust, and smoke.
+ This option is ignored if the requested varaible is not AOD (
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Dust
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Smoke
+\begin_inset Quotes erd
+\end_inset
+
+).
+ The regrided data is filtered by the presence of dust/smoke.
+ If -qc options is given, it's applied to QC of dust/smoke, too (First filtering
+ with AOD QC values and the second filtering with dust/smoke QC values).
+\end_layout
+
+\begin_layout Description
+
+\series medium
+12.
+ 
+\series default
+The 
+\series bold
 -name list
 \series default
  specifies a comma-separated list of output variable names for each field
@@ -2107,7 +2163,7 @@ The
 \begin_layout Description
 
 \series medium
-12.
+13.
  The 
 \series bold
 -log file
@@ -2126,7 +2182,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-13.
+14.
  The 
 \series bold
 -v level
@@ -2152,7 +2208,7 @@ level
 \begin_layout Description
 
 \series medium
-14.
+15.
 
 \series default
  The 

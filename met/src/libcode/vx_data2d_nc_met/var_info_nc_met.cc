@@ -234,12 +234,6 @@ void VarInfoNcMet::set_dict(Dictionary &dict){
              dict.lookup_string("level"));
    set_req_name(dict.lookup_string("name").c_str());
 
-   // Check for a probability boolean setting
-   if(dict.lookup_bool(conf_key_prob, false)) {
-      set_p_flag(true);
-      return;
-   }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

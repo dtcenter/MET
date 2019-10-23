@@ -307,16 +307,9 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    //  call the parent to set the level information
    set_level_info_grib(dict);
 
-   //  check for a probability boolean setting
-   if( dict.lookup_bool(conf_key_prob, false) ){
-      set_p_flag( true );
-      return;
-   }
-
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
-   if( NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false)) )
-      return;
+   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))) return;
 
    //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
@@ -324,8 +317,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    field_code             = dict_prob->lookup_int   (conf_key_GRIB1_code, false);
 
    //  if field_code is not found - look for the deprecated name (GRIB1_rec)
-   if(field_code == bad_data_int)
-   {
+   if(field_code == bad_data_int) {
       field_code          = dict_prob->lookup_int   (conf_key_GRIB1_rec, false);
    }
    double thresh_lo       = dict_prob->lookup_double(conf_key_thresh_lo, false);
