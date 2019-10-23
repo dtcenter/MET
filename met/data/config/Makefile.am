@@ -36,6 +36,7 @@ config_DATA = \
 	STATAnalysisConfig_GO_Index \
 	TCPairsConfig_default \
 	TCRMWConfig_default \
+	RMWAnalysisConfig_default \
 	TCStatConfig_default \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \

@@ -149,6 +149,19 @@ gradient = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Distance Map statistics
+// May be set separately in each "obs.field" entry
+//
+distance_map = {
+   baddeley_p        = 2;
+   baddeley_max_dist = NA;
+   fom_alpha         = 0.1;
+   zhu_weight        = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -172,21 +185,23 @@ output_flag = {
    nbrcts = BOTH;
    nbrcnt = BOTH;
    grad   = NONE;
+   dmap   = NONE;
 }
 
 //
 // NetCDF matched pairs output file
 //
-nc_pairs_flag   = {
-   latlon     = TRUE;
-   raw        = TRUE;
-   diff       = TRUE;
-   climo      = TRUE;
-   weight     = FALSE;
-   nbrhd      = TRUE;
-   fourier    = FALSE;
-   gradient   = FALSE;
-   apply_mask = TRUE;
+nc_pairs_flag = {
+   latlon       = TRUE;
+   raw          = TRUE;
+   diff         = TRUE;
+   climo        = TRUE;
+   weight       = FALSE;
+   nbrhd        = TRUE;
+   fourier      = FALSE;
+   gradient     = FALSE;
+   distance_map = FALSE;
+   apply_mask   = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +210,6 @@ grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V8.1";
+version          = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -39,7 +39,8 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
-   sigma = bad_data_double;
+   gaussian_dx = bad_data_double;
+   gaussian_radius = bad_data_double;
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -109,19 +110,12 @@ void RegridInfo::validate() {
 
    // Check the Gaussian filter
    if(method == InterpMthd_Gaussian) {
-      if (width <= 2) {
-         mlog << Warning << "\nRegridInfo::validate() -> "
-              << "Resetting the regridding width from "
-              << width << " to 3 for regridding method \""
-              << interpmthd_to_string(method) << "\".\n\n";
-         width = 3;
-      }
-      if (sigma < 1) {
-         mlog << Warning << "\nRegridInfo::validate() -> "
-              << "Resetting the regridding sigma from "
-              << sigma << " to 1.0 for regridding method \""
-              << interpmthd_to_string(method) << "\".\n\n";
-         sigma = 1.0;
+      if (gaussian_radius < gaussian_dx) {
+         mlog << Error << "\n"
+              << "The radius of influence (" << gaussian_radius
+              << ") is less than the delta distance (" << gaussian_dx
+              << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
+         exit(1);
       }
    }
 
@@ -1116,9 +1110,11 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
 
-   // Conf: sigma
-   double sig = regrid_dict->lookup_double(conf_key_sigma, false);
-   info.sigma = (is_bad_data(sig) ? default_interp_sigma : sig);
+   // Conf: gaussian dx and radius
+   double conf_value = regrid_dict->lookup_double(conf_key_gaussian_dx, false);
+   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   conf_value = regrid_dict->lookup_double(conf_key_gaussian_radius, false);
+   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
 
    info.validate();
 
@@ -1188,19 +1184,12 @@ void InterpInfo::validate() {
 
       // Check the Gaussian filter
       if(methodi == InterpMthd_Gaussian) {
-         if (width[i] <= 2) {
-            mlog << Warning << "\nInterpInfo::validate() -> "
-                 << "Resetting the interpolation width from "
-                 << width[i] << " to 3 for interpolation method \""
-                 << method[i] << "\".\n\n";
-            width.set(i, 3);
-         }
-         if (sigma < 1) {
-            mlog << Warning << "\nInterpInfo::validate() -> "
-                 << "Resetting the interpolation sigma from "
-                 << sigma << " to 1.0 for interpolation method \""
-                 << method[i] << "\".\n\n";
-            sigma = 1.0;
+         if (gaussian_radius < gaussian_dx) {
+            mlog << Error << "\n"
+                 << "The radius of influence (" << gaussian_radius
+                 << ") is less than the delta distance (" << gaussian_dx
+                 << ") for regridding method \"" << method[i] << "\".\n\n";
+            exit(1);
          }
       }
    }
@@ -1274,9 +1263,11 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
 
-   // Conf: sigma
-   double sig = interp_dict->lookup_double(conf_key_sigma, false);
-   info.sigma = (is_bad_data(sig) ? default_interp_sigma : sig);
+   // Conf: gaussian dx and radius
+   double conf_value = interp_dict->lookup_double(conf_key_gaussian_dx, false);
+   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   conf_value = interp_dict->lookup_double(conf_key_gaussian_radius, false);
+   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
@@ -2080,6 +2071,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
 
       case(stat_grad):         s = stat_grad_str;    break;
+      case(stat_dmap):         s = stat_dmap_str;    break;
       case(stat_isc):          s = stat_isc_str;     break;
       case(stat_wdir):         s = stat_wdir_str;    break;
 
@@ -2142,6 +2134,7 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
 
    else if(strcasecmp(s, stat_grad_str)   == 0) t = stat_grad;
+   else if(strcasecmp(s, stat_dmap_str)   == 0) t = stat_dmap;
    else if(strcasecmp(s, stat_isc_str)    == 0) t = stat_isc;
    else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
 

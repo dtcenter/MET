@@ -1,0 +1,51 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default RMW Analysis configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// ATCF file format reference:
+//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//
+
+//
+// Model
+//
+model = "";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Storm name
+//
+storm_name = "";
+
+//
+// Storm identifier
+//
+storm_id = "";
+
+//
+// Cyclone number
+//
+cyclone = -1;
+
+//
+// Model initialization time
+//
+// init_time = "";
+
+//
+// Lead times in hours
+//
+// lead_time = [];
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V8.1";
