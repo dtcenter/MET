@@ -1,90 +1,108 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2019
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __GRID_DIAG_CONF_INFO_H__
 #define  __GRID_DIAG_CONF_INFO_H__
 
-using namespace std;
+////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 
 #include "vx_config.h"
-#include "vx_data2d_factory.h"
 #include "vx_data2d.h"
+#include "vx_grid.h"
 #include "vx_util.h"
-
-////////////////////////////////////////////////////////////////////////
-
-class GridDiagVxOpt {
-
-    private:
-
-        void init_from_scratch();
-
-    public:
-
-        GridDiagVxOpt();
-        ~GridDiagVxOpt();
-
-        StringArray mask_grid; // Masking grid strings
-        StringArray mask_poly; // Masking polyline strings
-        StringArray mask_name; // Masking region names
-
-        int get_n_mask() const;
-};
-
-////////////////////////////////////////////////////////////////////////
-
-inline int GridDiagVxOpt::get_n_mask() const {
-    return mask_name.n_elements();
-}
+#include "vx_cal.h"
+#include "vx_math.h"
+#include "vx_gsl_prob.h"
+#include "vx_statistics.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 class GridDiagConfInfo {
 
-    private:
+   private:
 
-        void init_from_scratch();
+      void init_from_scratch();
 
-        // Number of data fields
-        int n_data;
+      // Counts based on the contents of the config file
+      int n_fcst;                          // Number of forecast fields
+      int n_obs;                           // Number of observation fields
 
-    public:
+   public:
 
-        // GridDiag configuration object
-        MetConfig Conf;
+      // Series-Analysis configuration object
+      MetConfig conf;
 
-        // Config file version
-        ConcatString version;
+      // Store data parsed from the Series-Analysis configuration object
+      ConcatString     model;              // Model name
+      ConcatString     desc;               // Description
+      ConcatString     obtype;             // Observation type
 
-        // Masking grid or polyline
-        ConcatString mask_grid;
-        ConcatString mask_poly;
-        ConcatString mask_name;
+      VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
+      VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
 
-        // Variable information
-        VarInfo** data_info;
+      ThreshArray      fcat_ta;            // Categorical fcst thresholds
+      ThreshArray      ocat_ta;            // Categorical obs thresholds
 
-        GridDiagConfInfo();
-        ~GridDiagConfInfo();
+      ThreshArray      fcnt_ta;            // Continuous fcst thresholds
+      ThreshArray      ocnt_ta;            // Continuous obs thresholds
+      SetLogic         cnt_logic;          // Continuous threshold field logic
 
-        void clear();
+      NumArray         ci_alpha;           // Alpha value for confidence intervals
+      BootIntervalType boot_interval;      // Bootstrap CI type
+      double           boot_rep_prop;      // Bootstrap replicate proportion
+      int              n_boot_rep;         // Number of bootstrap replicates
+      ConcatString     boot_rng;           // GSL random number generator
+      ConcatString     boot_seed;          // GSL RNG seed value
 
-        void read_config(const char*, const char*);
-        void process_config(GrdFileType);
-        void process_mask(const Grid&);
+      ConcatString     mask_grid_file;     // Path for masking grid area
+      ConcatString     mask_grid_name;     // Name of masking grid area
+      ConcatString     mask_poly_file;     // Path for masking poly area
+      ConcatString     mask_poly_name;     // Name of masking poly area
+      MaskPlane        mask_area;
 
-        int get_n_data() const;
+      int              block_size;         // Number of grid points to read concurrently
+      double           vld_data_thresh;    // Minimum valid data ratio for each point
+      bool             rank_corr_flag;     // Flag for computing rank correlations
+
+      ConcatString     tmp_dir;            // Directory for temporary files
+      ConcatString     version;            // Config file version
+
+      // Mapping of line type to output statistics
+      map<STATLineType,StringArray> output_stats;
+
+      GridDiagConfInfo();
+     ~GridDiagConfInfo();
+
+      void clear();
+
+      void read_config   (const char *, const char *);
+      void process_config(GrdFileType, GrdFileType);
+      void process_masks (const Grid &);
+      int get_compression_level();
+
+      // Dump out the counts
+      int get_n_fcst() const;
+      int get_n_obs()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GridDiagConfInfo::get_n_data() const {
-    return n_data;
-}
+inline int GridDiagConfInfo::get_n_fcst() const { return(n_fcst); }
+inline int GridDiagConfInfo::get_n_obs()  const { return(n_obs);  }
+inline int GridDiagConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif  /*  __GRID_DIAG_CONF_INFO_H__  */
+#endif   /*  __GRID_DIAG_CONF_INFO_H__  */
 
 ////////////////////////////////////////////////////////////////////////
