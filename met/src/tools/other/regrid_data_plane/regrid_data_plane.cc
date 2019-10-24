@@ -395,7 +395,7 @@ void process_data_file() {
           exit(1);
       }
       
-      // Open ADP file is exists
+      // Open ADP file if it exists
       if (0 < AdpFilename.length()) {
          if (file_exists(AdpFilename.c_str())) {
             nc_adp = open_ncfile(AdpFilename.c_str());
@@ -537,8 +537,8 @@ void process_data_file() {
    // Close the output file
    close_nc();
 
-   // nc_in->close();
-   delete nc_in;  nc_in = 0;
+   delete nc_in;  nc_in  = 0;
+   delete nc_adp; nc_adp = 0;
 
    delete [] cellMapping;   cellMapping = 0;
 
@@ -1261,8 +1261,10 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       }
    }
 
-   delete [] qc_data;   qc_data = 0;
-   delete [] from_data; from_data = 0;
+   delete [] qc_data;     qc_data     = 0;
+   delete [] adp_data;    adp_data    = 0;
+   delete [] from_data;   from_data   = 0;
+   delete [] adp_qc_data; adp_qc_data = 0;
 
    mlog << Debug(4) << method_name << " Count: missing: "
         << missing_count << ", non_missing: " << non_missing_count
