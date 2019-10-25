@@ -161,7 +161,7 @@ class GridStatVxOpt {
 
       NumArray         eclv_points;      // ECLV points
 
-      ThreshArray      climo_cdf_ta;     // Climo CDF thresh array
+      ClimoCDFInfo     cdf_info;         // Climo CDF info
 
       NumArray         ci_alpha;         // Alpha value for confidence intervals
 
@@ -227,7 +227,7 @@ class GridStatVxOpt {
 inline int  GridStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());         }
 inline int  GridStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);           }
 inline int  GridStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());       }
-inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);  }
+inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);                 }
 inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return(nbrhd_info.width.n_elements());  }
 inline int  GridStatVxOpt::get_n_cov_thresh()  const { return(nbrhd_info.cov_ta.n_elements()); }
 inline int  GridStatVxOpt::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());       }

@@ -288,6 +288,22 @@ struct RegridInfo {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store Climatological CDF Info
+//
+
+struct ClimoCDFInfo {
+   bool        flag;       // Flag to turn on/off climo CDF logic
+   int         n_bin;      // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;     // Array of CDF thresholds
+   bool        write_bins; // Flag for writing the individual bins
+
+   ClimoCDFInfo();
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Struct to store neighborhood information
 //
 
@@ -595,10 +611,12 @@ static const char conf_key_eclv_points[]       = "eclv_points";
 //
 // Climatology parameter key names
 //
-
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
 static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
-static const char conf_key_climo_cdf_bins[]     = "climo_cdf_bins";
+static const char conf_key_climo_cdf[]          = "climo_cdf";
+static const char conf_key_cdf_bins[]           = "cdf_bins";
+static const char conf_key_center_bins[]        = "center_bins";
+static const char conf_key_write_bins[]         = "write_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
 static const char conf_key_match_month[]        = "match_month";
 static const char conf_key_match_day[]          = "match_day";

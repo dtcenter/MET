@@ -508,7 +508,7 @@ void GridStatVxOpt::clear() {
 
    eclv_points.clear();
 
-   climo_cdf_ta.clear();
+   cdf_info.clear();
 
    ci_alpha.clear();
 
@@ -676,8 +676,8 @@ void GridStatVxOpt::process_config(
    // Conf: eclv_points
    eclv_points = parse_conf_eclv_points(&odict);
 
-   // Conf: climo_cdf_bins
-   climo_cdf_ta = parse_conf_climo_cdf_bins(&odict);
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&odict);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);
@@ -856,7 +856,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
-   //    eclv_points, climo_cdf_ta, ci_alpha
+   //    eclv_points, cdf_info, ci_alpha
    //    boot_info, nbrhd_info,
    //    wave_1d_beg, wave_1d_end, grad_dx, grad_dy,
    //    rank_corr_flag, output_flag, nc_info

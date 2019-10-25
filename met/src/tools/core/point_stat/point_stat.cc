@@ -1662,11 +1662,11 @@ void do_pct(PCTInfo *&pct_info, int i_vx, const PairDataPoint *pd_ptr,
            << "Computing Probabilistic Statistics "
            << "for climo CDF bin number " << i_bin+1 << " of "
            << conf_info.vx_opt[i_vx].get_n_cdf_bin() << " ("
-           << conf_info.vx_opt[i_vx].climo_cdf_ta[i_bin].get_str() << ").\n";
+           << conf_info.vx_opt[i_vx].cdf_info.cdf_ta[i_bin].get_str() << ").\n";
 
       // Subset the matched pairs for the current bin
-      pd_bin = subset_climo_cdf_bin(*pd_ptr, conf_info.vx_opt[i_vx].climo_cdf_ta,
-                                    i_bin);
+      pd_bin = subset_climo_cdf_bin(*pd_ptr,
+                  conf_info.vx_opt[i_vx].cdf_info.cdf_ta, i_bin);
       pd_ptr = &pd_bin;
    }
 

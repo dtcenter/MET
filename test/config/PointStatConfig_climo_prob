@@ -112,7 +112,14 @@ climo_stdev = {
   file_name = [ "${CLIMO_STDEV_FILE}" ];
 }
 
-climo_cdf_bins = 10;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 10;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

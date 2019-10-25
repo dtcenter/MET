@@ -1111,7 +1111,7 @@ void process_scores() {
                             pd.csd_na.n_valid() > 0 ?
                             conf_info.vx_opt[i].get_n_cdf_bin() : 1);
 
-               // Loop over the climo_cdf_bins
+               // Loop over the climo cdf bins
                for(m=0; m<n_cdf_bin; m++) {
 
                   // Store the verification masking region
@@ -2248,11 +2248,11 @@ void do_pct(PCTInfo *&pct_info, int i_vx,
            << "Computing Probabilistic Statistics "
            << "for climo CDF bin number " << i_bin+1 << " of "
            << conf_info.vx_opt[i_vx].get_n_cdf_bin() << " ("
-           << conf_info.vx_opt[i_vx].climo_cdf_ta[i_bin].get_str() << ").\n";
+           << conf_info.vx_opt[i_vx].cdf_info.cdf_ta[i_bin].get_str() << ").\n";
 
       // Subset the matched pairs for the current bin
-      pd_bin = subset_climo_cdf_bin(*pd_in_ptr, conf_info.vx_opt[i_vx].climo_cdf_ta,
-                                    i_bin);
+      pd_bin = subset_climo_cdf_bin(*pd_in_ptr,
+                  conf_info.vx_opt[i_vx].cdf_info.cdf_ta, i_bin);
       pd_ptr = &pd_bin;
    }
 
