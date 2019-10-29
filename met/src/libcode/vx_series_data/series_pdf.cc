@@ -21,6 +21,16 @@
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
+    int n ,vector<int>& pdf) {
+
+    for(int k = 0; k < n; k++) {
+        pdf.push_back(0);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void init_pdf(
     float min, float max, float delta,
     vector<int>& pdf) {
 
