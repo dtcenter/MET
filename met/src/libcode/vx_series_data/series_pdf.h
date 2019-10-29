@@ -21,7 +21,19 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void bin_series_data(const VarInfo*,
+#include <vector>
+using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+void init_pdf(
+    float min, float max, float delta,
+    vector<int>& pdf);
+
+void update_pdf(
+    float min, float delta,
+    vector<int>& pdf,
+    const Grid& grid,
     const DataPlane&,
     const MaskPlane&);
 
