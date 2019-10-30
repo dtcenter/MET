@@ -22,4 +22,5 @@ test_series_data_LDADD = \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_log
+	-lvx_log \
+	-lvx_series_data
