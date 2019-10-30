@@ -1,4 +1,4 @@
-Model Evaluation Tools version 8.1.1 (July 2019)
+Model Evaluation Tools version 8.1.2 (October 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -325,8 +325,33 @@ Release Notes
   describes the bugfix, enhancement, or new feature:
   https://github.com/NCAR/MET/issues
 
+Version 8.1.2 Bugfix Release Notes:
+----------------------------------
+https://github.com/NCAR/MET/milestone/61?closed=1
+
+- Fix Wavelet-Stat bug when writing NetCDF output files (#1211).
+- Fix python-embedding for probability data (#1210).
+- Fix Point-Stat cnt_thresh logic where climo standard deviation values are not
+  correct (#1208).
+- Fix ASCII2NC return value for errors (#1207).
+- Fix Grid-Stat attributes for NetCDF output XGRAD/YGRAD variables (#1206).
+- Fix PB2NC deriviation of CAPE (#1167).
+- Fix Ensemble-Stat error when writing ORANK NetCDF output file (#1198).
+- Correct the Brier Score documentation in Appendix C (#1196).
+- Fix Grid-Stat error checking for the number of verification fields (#1195).
+- Fix compilation problem with rpl_malloc in config.h (#1171).
+- Fix python-embedding scaling of longitude values when parsing grid information
+  (#1180).
+- Fix equality checking for rotated lat/lon grids (#1170).
+- Fix TC-Pairs parsing of suffix=string (#1166).
+- Fix auto-regridding of masking regions (#1163).
+- Fix PB2NC handling of the ANOWPM message type (#1162).
+- Write met_config temporary files to the tmp_dir location instead of the
+  current working directory (#1161).
+
 Version 8.1.1 Bugfix Release Notes:
 ----------------------------------
+https://github.com/NCAR/MET/milestone/60?closed=1
 
 - Fix MET to correctly handle the updated "V8.1.1" version number (#1153).
 - Interpret the NetCDF COARDS convention as being CF-compliant (#1155).

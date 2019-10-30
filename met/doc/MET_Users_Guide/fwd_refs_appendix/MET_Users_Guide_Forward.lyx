@@ -131,10 +131,10 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v8.1.1
+Bugfixes for MET v8.1
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:New-for-MET-1"
+name "sec:Bugfixes-for-MET"
 
 \end_inset
 
@@ -146,18 +146,19 @@ name "sec:New-for-MET-1"
 \series medium
 Since the v8.1 release, the MET source code has moved to GitHub.
  Each of the following release notes is followed by the GitHub issue number
- which describes the bugfix:
+ which describes the bugfix.
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Subsection*
+Bugfixes for v8.1.2: 
 \series medium
+
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
-https://github.com/NCAR/MET/issues
+https://github.com/NCAR/MET/milestone/61?closed=1
 \end_layout
 
 \end_inset
@@ -165,8 +166,88 @@ https://github.com/NCAR/MET/issues
 
 \end_layout
 
+\begin_layout Itemize
+Fix Wavelet-Stat bug when writing NetCDF output files (#1211).
+\end_layout
+
+\begin_layout Itemize
+Fix python-embedding for probability data (#1210).
+\end_layout
+
+\begin_layout Itemize
+Fix Point-Stat cnt_thresh logic where climo standard deviation values are
+ not correct (#1208).
+\end_layout
+
+\begin_layout Itemize
+Fix ASCII2NC return value for errors (#1207).
+\end_layout
+
+\begin_layout Itemize
+Fix Grid-Stat attributes for NetCDF output XGRAD/YGRAD variables (#1206).
+\end_layout
+
+\begin_layout Itemize
+Fix PB2NC deriviation of CAPE (#1167).
+\end_layout
+
+\begin_layout Itemize
+Fix Ensemble-Stat error when writing ORANK NetCDF output file (#1198).
+\end_layout
+
+\begin_layout Itemize
+Correct the Brier Score documentation in Appendix C (#1196).
+\end_layout
+
+\begin_layout Itemize
+Fix Grid-Stat error checking for the number of verification fields (#1195).
+\end_layout
+
+\begin_layout Itemize
+Fix compilation problem with rpl_malloc in config.h (#1171).
+\end_layout
+
+\begin_layout Itemize
+Fix python-embedding scaling of longitude values when parsing grid information
+ (#1180).
+\end_layout
+
+\begin_layout Itemize
+Fix equality checking for rotated lat/lon grids (#1170).
+\end_layout
+
+\begin_layout Itemize
+Fix TC-Pairs parsing of suffix=string (#1166).
+\end_layout
+
+\begin_layout Itemize
+Fix auto-regridding of masking regions (#1163).
+\end_layout
+
+\begin_layout Itemize
+Fix PB2NC handling of the ANOWPM message type (#1162).
+\end_layout
+
+\begin_layout Itemize
+Write met_config temporary files to the tmp_dir location instead of the
+ current working directory (#1161).
+\end_layout
+
 \begin_layout Subsection*
-Bugfixes:
+Bugfixes for v8.1.1: 
+\series medium
+
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/NCAR/MET/milestone/60?closed=1
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
