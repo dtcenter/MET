@@ -31,7 +31,7 @@ void init_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
-    float min, float max, float delta,
+    double min, double max, double delta,
     vector<int>& pdf) {
 
     int n = (max - min) / delta;
@@ -42,16 +42,15 @@ void init_pdf(
 
 ////////////////////////////////////////////////////////////////////////
 
-void series_data_pdf(
-    float min, float delta,
+void update_pdf(
+    double min, double delta,
     vector<int>& pdf,
-    const Grid& grid,
     const DataPlane& dp,
     const MaskPlane& mp) {
 
-    for(int i = 0; i < grid.nx(); i++) {
-        for(int j = 0; j < grid.ny(); j++) {
-            float value = dp.get(i, j);
+    for(int i = 0; i < dp.nx(); i++) {
+        for(int j = 0; j < dp.ny(); j++) {
+            double value = dp.get(i, j);
             int k = (value - min) / delta;
             if(k < 0) k = 0;
             if(k >= pdf.size()) k = pdf.size() - 1;

@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     int nbin = 10;
     double min = 0;
     double max = 1;
+    double delta = (max - min) / nbin;
     double width = 10;
 
     vector<int> pdf;
@@ -69,6 +70,8 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    update_pdf(min, delta, pdf, dp, mp);
 
     return 0;
 }

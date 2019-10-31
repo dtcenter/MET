@@ -32,15 +32,14 @@ void init_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
-    float min, float max, float delta,
+    double min, double max, double delta,
     vector<int>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
 void update_pdf(
-    float min, float delta,
+    double min, double delta,
     vector<int>& pdf,
-    const Grid& grid,
     const DataPlane&,
     const MaskPlane&);
 
