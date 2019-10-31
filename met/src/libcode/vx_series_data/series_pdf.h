@@ -14,6 +14,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <vector>
+using namespace std;
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_util.h"
 #include "vx_log.h"
@@ -23,24 +28,23 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include <vector>
-using namespace std;
+void init_pdf(
+    int n,
+    vector<int>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
-    int n, vector<int>& pdf);
-
-////////////////////////////////////////////////////////////////////////
-
-void init_pdf(
-    double min, double max, double delta,
+    double min,
+    double max,
+    double delta,
     vector<int>& pdf);
 
 ////////////////////////////////////////////////////////////////////////
 
 void update_pdf(
-    double min, double delta,
+    double min,
+    double delta,
     vector<int>& pdf,
     const DataPlane&,
     const MaskPlane&);
@@ -48,7 +52,17 @@ void update_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void print_pdf(
-    double min, double delta,
+    double min,
+    double delta,
+    const vector<int>& pdf);
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_pdf(
+    NcFile* nc_out,
+    const VarInfo&,
+    double min,
+    double delta,
     const vector<int>& pdf);
 
 ////////////////////////////////////////////////////////////////////////

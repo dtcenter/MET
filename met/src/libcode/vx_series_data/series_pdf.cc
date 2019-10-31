@@ -21,7 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
-    int n ,vector<int>& pdf) {
+    int n,
+    vector<int>& pdf) {
 
     for(int k = 0; k < n; k++) {
         pdf.push_back(0);
@@ -31,7 +32,9 @@ void init_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void init_pdf(
-    double min, double max, double delta,
+    double min,
+    double max,
+    double delta,
     vector<int>& pdf) {
 
     int n = (max - min) / delta;
@@ -43,7 +46,8 @@ void init_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void update_pdf(
-    double min, double delta,
+    double min,
+    double delta,
     vector<int>& pdf,
     const DataPlane& dp,
     const MaskPlane& mp) {
@@ -64,7 +68,8 @@ void update_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void print_pdf(
-    double min, double delta,
+    double min,
+    double delta,
     const vector<int>& pdf) {
 
     for(int k = 0; k < pdf.size(); k++) {
@@ -73,6 +78,17 @@ void print_pdf(
         cout << "[" << bin_min << ", " << bin_max << "] "
              << pdf[k] << "\n";
     }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_pdf(
+    NcFile* nc_out,
+    const VarInfo&,
+    double min,
+    double delta,
+    const vector<int>& pdf) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////
