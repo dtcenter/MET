@@ -37,10 +37,10 @@ int main(int argc, char *argv[]) {
 
     int nx = 90;
     int ny = 45;
-    int i_min = 10;
-    int i_max = 20;
-    int j_min = 10;
-    int j_max = 20;
+    int i_min = -10;
+    int i_max = 10;
+    int j_min = -10;
+    int j_max = 10;
 
     int nbin = 10;
     double min = 0;
@@ -72,6 +72,8 @@ int main(int argc, char *argv[]) {
     }
 
     update_pdf(min, delta, pdf, dp, mp);
+
+    print_pdf(min, delta, pdf);
 
     return 0;
 }
