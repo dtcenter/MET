@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     int nbin = 10;
     double min = 0;
-    double max = 1;
+    double max = 0.5;
     double delta = (max - min) / nbin;
     double width = 10;
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < nx; i++) {
         for(int j = 0; j < ny; j++) {
-            double value = exp(-(i*i + j*j) / width);
+            double value = exp(-(i*i + j*j) / (width * width));
             dp.set(value, i, j);
             mask = (i_min <= i && i <= i_max)
                 && (j_min <= j && j <= j_max);
