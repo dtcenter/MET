@@ -84,11 +84,13 @@ void print_pdf(
 
 void write_nc_pdf(
     NcFile* nc_out,
-    const VarInfo&,
+    const VarInfo& info,
     double min,
     double delta,
     const vector<int>& pdf) {
 
+    NcDim var_dim = nc_out->addDim(info.name(), pdf.size());
+    NcVar var = nc_out->addVar(info.name(), ncDouble, var_dim);
 }
 
 ////////////////////////////////////////////////////////////////////////

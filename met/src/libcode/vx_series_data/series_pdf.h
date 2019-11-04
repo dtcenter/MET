@@ -60,7 +60,7 @@ void print_pdf(
 
 void write_nc_pdf(
     NcFile* nc_out,
-    const VarInfo&,
+    const VarInfo& info,
     double min,
     double delta,
     const vector<int>& pdf);
