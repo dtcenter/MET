@@ -102,6 +102,8 @@ class DataPlane {
       void threshold(const SingleThresh &);
       void censor   (const ThreshArray &, const NumArray &);
 
+      void replace_bad_data(const double value);
+
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
 
@@ -212,6 +214,9 @@ class DataPlaneArray {
          //
 
       void add(const DataPlane &, double _low, double _up);   //  for two-level plane
+
+      void replace_bad_data(const double value);
+
 };
 
 ////////////////////////////////////////////////////////////////////////
