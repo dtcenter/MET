@@ -187,5 +187,71 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  example: 
+   //
+   //       pickle.dump( data, open( "save.p", "wb" ) )
+   //
+
+
+void Python3_Script::write_pickle(const char * variable, const char * pickle_filename) const
+
+{
+
+ConcatString command;
+
+command << "pickle.dump( "
+        << variable
+        << ", open( \""
+        << pickle_filename
+        << "\", \"wb\" ) )";
+
+
+cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
+
+// run(command);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  example:
+   //
+   //      data = pickle.load( open( "save.p", "rb" ) )
+   //
+
+
+void Python3_Script::read_pickle(const char * variable, const char * pickle_filename) const
+
+{
+
+ConcatString command;
+
+command << variable 
+        << " = pickle.load( open( \""
+        << pickle_filename
+        << "\", \"rb\" ) )";
+
+
+
+cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
+
+// run(command);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 

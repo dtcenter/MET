@@ -75,8 +75,6 @@ class Python3_Numpy {
          //  set stuff
          //
 
-      void set(PyObject * _obj, const char * _name);
-
       void set(Python3_Script & , const char * _name);
 
          //

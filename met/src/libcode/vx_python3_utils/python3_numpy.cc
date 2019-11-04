@@ -48,9 +48,9 @@ Python3_Numpy::~Python3_Numpy()
 
 {
 
-clear();
+if ( Object )  PyBuffer_Release(&View);
 
-PyBuffer_Release(&View);
+clear();
 
 }
 
