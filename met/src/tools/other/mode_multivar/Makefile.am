@@ -14,7 +14,7 @@ mode_multivar_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_nc_util \
-        -lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 EXTRA_DIST = mode_multivar_conf_info.h \
 	mode_multivar.h
