@@ -8,10 +8,14 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-# The program
+# The library
 
-bin_PROGRAMS    = mode
-mode_SOURCES = mode.cc \
+EXTRA_DIST = mode_exec.h \
+	mode_ps_file.h \
+	mode_ps_table_defs.h
+
+noinst_LIBRARIES=libmode.a
+libmode_a_SOURCES = \
 	mode_ps_file.cc \
 	plot_engine.cc \
 	page_1.cc \
@@ -20,9 +24,10 @@ mode_SOURCES = mode.cc \
 	cluster_page.cc \
 	overlap_page.cc \
 	mode_exec.cc
-mode_CPPFLAGS = ${MET_CPPFLAGS}
-mode_LDFLAGS = ${MET_LDFLAGS}
-mode_LDADD = -lvx_pxm \
+
+libmode_a_CPPFLAGS = ${MET_CPPFLAGS}
+libmode_LDFLAGS = ${MET_LDFLAGS}
+libmode_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
 	-lvx_render \
@@ -50,7 +55,3 @@ mode_LDADD = -lvx_pxm \
 	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
-
-EXTRA_DIST = mode_exec.h \
-	mode_ps_file.h \
-	mode_ps_table_defs.h
