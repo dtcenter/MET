@@ -335,7 +335,11 @@ void DataPlane::replace_bad_data(const double value)
 
 int j;
 
-if ( is_bad_data(Data[j]) )  Data[j] = value;
+for (j=0; j<Nxy; ++j)  {
+
+   if ( is_bad_data(Data[j]) )  Data[j] = value;
+
+}
 
 return;
 
