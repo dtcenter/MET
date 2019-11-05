@@ -1288,7 +1288,7 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
          // Handle gridded data
          else {
             out_pd.add_pair(pd.f_na[i], pd.o_na[i],
-                            pd.cmn_na[i], pd.wgt_na[i]);
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
       }
    } // end for
@@ -1343,7 +1343,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
          // Handle gridded data
          else {
             out_pd.add_pair(pd.f_na[i], pd.o_na[i],
-                            pd.cmn_na[i], pd.wgt_na[i]);
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
          }
       }
    } // end for

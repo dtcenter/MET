@@ -95,6 +95,7 @@
 //   044    02/22/19  Halley Gotway  Make gradient dx/dy configurable.
 //   045    04/08/19  Halley Gotway  Add percentile thresholds.
 //   046    04/01/19  Fillmore       Add FCST and OBS units.
+//   047    06/19/19  Halley Gotway  Add DMAP output line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -644,6 +645,7 @@ void process_scores() {
    NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
    PCTInfo    *pct_info    = (PCTInfo *) 0;
    GRADInfo    grad_info;
+   DMAPInfo    dmap_info;
 
    // Store the maximum number of each threshold type
    n_cnt  = conf_info.get_max_n_cnt_thresh();
@@ -779,9 +781,9 @@ void process_scores() {
          // If requested in the config file, smooth the forecast field
          if(interp->field == FieldType_Fcst ||
             interp->field == FieldType_Both) {
-            smooth_field(fcst_dp, fcst_dp_smooth,
-                         interp_mthd, interp->width[j],
-                         interp->shape, interp->sigma, interp->vld_thresh);
+            smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
+                         interp->width[j], interp->shape, interp->vld_thresh,
+                         interp->gaussian_radius, interp->gaussian_dx);
          }
          // Do not smooth the forecast field
          else {
@@ -791,9 +793,9 @@ void process_scores() {
          // If requested in the config file, smooth the observation field
          if(interp->field == FieldType_Obs ||
             interp->field == FieldType_Both) {
-            smooth_field(obs_dp, obs_dp_smooth,
-                         interp_mthd, interp->width[j],
-                         interp->shape, interp->sigma, interp->vld_thresh);
+            smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
+                         interp->width[j], interp->shape, interp->vld_thresh,
+                         interp->gaussian_radius, interp->gaussian_dx);
          }
          // Do not smooth the observation field
          else {
@@ -1033,9 +1035,9 @@ void process_scores() {
                // and climatology U-wind fields
                if(interp->field == FieldType_Fcst ||
                   interp->field == FieldType_Both) {
-                  smooth_field(fu_dp, fu_dp_smooth,
-                               interp_mthd, interp->width[j],
-                               interp->shape, interp->sigma, interp->vld_thresh);
+                  smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
+                               interp->width[j], interp->shape, interp->vld_thresh,
+                               interp->gaussian_radius, interp->gaussian_dx);
                }
                // Do not smooth the forecast field
                else {
@@ -1048,7 +1050,8 @@ void process_scores() {
                   interp->field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
-                               interp->shape, interp->sigma, interp->vld_thresh);
+                               interp->shape, interp->vld_thresh,
+                               interp->gaussian_radius, interp->gaussian_dx);
                }
                // Do not smooth the observation field
                else {
@@ -1305,6 +1308,123 @@ void process_scores() {
             } // end for k (n_grad)
 
          } // end if GRAD
+
+         // Compute distance map statistics if requested in the config file
+         if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
+             conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None) {
+
+            // Allocate memory in one big chunk based on grid size
+            DataPlane fcst_dp_dmap, obs_dp_dmap;
+            f_na.extend(grid.nx()*grid.ny());
+            o_na.extend(grid.nx()*grid.ny());
+
+            // Loop over the categorical thresholds
+            for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
+
+               // Initialize
+               dmap_info.clear();
+               fcst_dp_dmap.clear();
+               obs_dp_dmap.clear();
+
+               // Loop through the masks to be applied
+               for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
+
+                  // Set the mask name
+                  shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
+
+                  // Store the current mask
+                  mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
+
+                  // Process percentile thresholds
+                  if(conf_info.vx_opt[i].fcat_ta.need_perc() ||
+                     conf_info.vx_opt[i].ocat_ta.need_perc()) {
+
+                     // Apply the current mask
+                     apply_mask(fcst_dp, mask_mp, f_na);
+                     apply_mask(obs_dp,  mask_mp, o_na);
+                     apply_mask(cmn_dp,  mask_mp, cmn_na);
+
+                     // Process percentile thresholds
+                     conf_info.vx_opt[i].set_perc_thresh(f_na, o_na, cmn_na);
+                  }
+
+                  // Store the thresholds
+                  dmap_info.fthresh = conf_info.vx_opt[i].fcat_ta[k];
+                  dmap_info.othresh = conf_info.vx_opt[i].ocat_ta[k];
+
+                  // Compute forecast distance map, if necessary.
+                  if(fcst_dp_dmap.is_empty() ||
+                     fcst_dp_thresh.is_empty() ||
+                     conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
+
+                     fcst_dp_thresh = fcst_dp;
+                     fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
+                     fcst_dp_dmap = distance_map(fcst_dp_thresh);
+
+                     // Write out the distance map if requested in the config file
+                     if(conf_info.vx_opt[i].nc_info.do_distance_map) {
+                        ConcatString cs;
+                        cs << cs_erase << "FCST_DMAP_"
+                           << conf_info.vx_opt[i].fcat_ta[k].get_abbr_str();
+                        write_nc(cs, fcst_dp_dmap, i, mthd, pnts,
+                                 conf_info.vx_opt[i].interp_info.field);
+                     }
+                  }
+
+                  // Compute observation distance map, if necessary.
+                  if(obs_dp_dmap.is_empty() ||
+                     obs_dp_thresh.is_empty() ||
+                     conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
+
+                     obs_dp_thresh = obs_dp;
+                     obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
+                     obs_dp_dmap = distance_map(obs_dp_thresh);
+
+                     // Write out the distance map if requested in the config file
+                     if(conf_info.vx_opt[i].nc_info.do_distance_map) {
+                        ConcatString cs;
+                        cs << cs_erase << "OBS_DMAP_"
+                           << conf_info.vx_opt[i].ocat_ta[k].get_abbr_str();
+                        write_nc(cs, obs_dp_dmap, i, mthd, pnts,
+                                 conf_info.vx_opt[i].interp_info.field);
+                     }
+                  }
+
+                  mlog << Debug(2) << "Computing Distance Map Statistics over region "
+                       << shc.get_mask() << ".\n";
+
+                  // Apply the current mask to the distance map and
+                  // thresholded fields
+                  apply_mask(fcst_dp_dmap,   mask_mp, f_na);
+                  apply_mask(fcst_dp_thresh, mask_mp, fthr_na);
+                  apply_mask(obs_dp_dmap,    mask_mp, o_na);
+                  apply_mask(obs_dp_thresh,  mask_mp, othr_na);
+
+                  dmap_info.set_options(
+                        conf_info.vx_opt[i].baddeley_p,
+                        conf_info.vx_opt[i].baddeley_max_dist,
+                        conf_info.vx_opt[i].fom_alpha,
+                        conf_info.vx_opt[i].zhu_weight);
+
+                  // Compute DMAP statistics
+                  dmap_info.set(conf_info.vx_opt[i].fcat_ta[k],
+                                conf_info.vx_opt[i].ocat_ta[k],
+                                f_na, o_na, fthr_na, othr_na);
+
+                  // Write out DMAP
+                  if(conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None &&
+                     dmap_info.total > 0) {
+
+                     write_dmap_row(shc, dmap_info,
+                        conf_info.vx_opt[i].output_flag[i_dmap] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_dmap], i_txt_row[i_dmap]);
+                  }
+               } // end for m (n_mask)
+
+            } // end for k
+
+         } // end if DMAP
 
       } // end for j (n_interp)
 
@@ -2494,6 +2614,42 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Gradient of "
+                   << conf_info.vx_opt[i_vx].obs_info->name() << " at "
+                   << conf_info.vx_opt[i_vx].obs_info->level_name();
+         level_att = shc.get_obs_lev();
+         units_att = conf_info.vx_opt[i_vx].obs_info->units();
+      }
+      else if(check_reg_exp("FCST_DMAP_", field_name.c_str())) {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
+                   << conf_info.vx_opt[i_vx].fcst_info->level_name()
+                   << var_str << "_" << mask_str;
+         if(field_type == FieldType_Fcst ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         name_att  = shc.get_fcst_var();
+         long_att  << cs_erase
+                   << "Distance Map for "
+                   << conf_info.vx_opt[i_vx].fcst_info->name() << " at "
+                   << conf_info.vx_opt[i_vx].fcst_info->level_name();
+         level_att = shc.get_fcst_lev();
+         units_att = conf_info.vx_opt[i_vx].fcst_info->units();
+      }
+      else if(check_reg_exp("OBS_DMAP_", field_name.c_str())) {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
+                   << conf_info.vx_opt[i_vx].obs_info->level_name()
+                   << var_str << "_" << mask_str;
+         if(field_type == FieldType_Obs ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         name_att  = shc.get_obs_var();
+         long_att  << cs_erase
+                   << "Distance Map for "
                    << conf_info.vx_opt[i_vx].obs_info->name() << " at "
                    << conf_info.vx_opt[i_vx].obs_info->level_name();
          level_att = shc.get_obs_lev();

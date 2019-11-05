@@ -205,12 +205,11 @@ int main(int argc, char *argv[]) {
    FileHandler *file_handler = create_file_handler(ascii_format,
                                                    asfile_list[0]);
 
-   if (file_handler == 0)
-     return 0;
+   if(file_handler == 0) return(0);
 
    int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = config_info.get_compression_level();
-   if (deflate_level > 9) deflate_level = config_info.get_compression_level();
+   if(deflate_level < 0) deflate_level = config_info.get_compression_level();
+   if(deflate_level > 9) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
    file_handler->setSummaryInfo(config_info.getSummaryInfo());
 
@@ -238,16 +237,14 @@ int main(int argc, char *argv[]) {
    // call to writeNetcdfFile in this case so that we can include the
    // summarization details.
    //
-   if (config_info.getSummaryInfo().flag)
-   {
+   if(config_info.getSummaryInfo().flag) {
       file_handler->summarizeObs(config_info.getSummaryInfo());
    }
 
    int status = file_handler->writeNetcdfFile(ncfile.text());
    delete file_handler;
 
-   if (!status)
-     return(1);
+   if(!status) return(1);
 
    return(0);
 }
@@ -256,157 +253,145 @@ int main(int argc, char *argv[]) {
 
 FileHandler *create_file_handler(const ASCIIFormat format,
                                  const ConcatString &ascii_filename) {
-  //
-  // If the ASCII format was specified, just create the appropriate
-  // object and return it.  If it wasn't specified, look in the
-  // file to guess the format.
-  //
-  switch (format)
-  {
-  case ASCIIFormat_MET:
-  {
-    return (FileHandler *)new MetHandler(program_name);
-  }
+   //
+   // If the ASCII format was specified, just create the appropriate
+   // object and return it.  If it wasn't specified, look in the
+   // file to guess the format.
+   //
+   switch(format) {
+      case ASCIIFormat_MET: {
+         return((FileHandler *) new MetHandler(program_name));
+      }
 
-  case ASCIIFormat_Little_R:
-  {
-    return (FileHandler *)new LittleRHandler(program_name);
-  }
+      case ASCIIFormat_Little_R: {
+         return((FileHandler *) new LittleRHandler(program_name));
+      }
 
-  case ASCIIFormat_SurfRad:
-  {
-    return (FileHandler *)new SurfradHandler(program_name);
-  }
+      case ASCIIFormat_SurfRad: {
+         return((FileHandler *) new SurfradHandler(program_name));
+      }
 
-  case ASCIIFormat_WWSIS:
-  {
-    return (FileHandler *)new WwsisHandler(program_name);
-  }
+      case ASCIIFormat_WWSIS: {
+         return((FileHandler *) new WwsisHandler(program_name));
+      }
 
-  case ASCIIFormat_Aeronet_v2:
-  {
-    AeronetHandler *handler = new AeronetHandler(program_name);
-    handler->setFormatVersion(2);
-    return (FileHandler *) handler;
-  }
+      case ASCIIFormat_Aeronet_v2: {
+         AeronetHandler *handler = new AeronetHandler(program_name);
+         handler->setFormatVersion(2);
+         return((FileHandler *) handler);
+      }
 
-  case ASCIIFormat_Aeronet_v3:
-  {
-    AeronetHandler *handler = new AeronetHandler(program_name);
-    handler->setFormatVersion(3);
-    return (FileHandler *) handler;
-  }
+      case ASCIIFormat_Aeronet_v3: {
+         AeronetHandler *handler = new AeronetHandler(program_name);
+         handler->setFormatVersion(3);
+         return((FileHandler *) handler);
+      }
 
-  case ASCIIFormat_None:
-  {
-    return determine_ascii_format(ascii_filename);
-  }
+      default: {
+        return(determine_ascii_format(ascii_filename));
+      }
+   }
 
-  }
-
-  return 0;
+   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
-  //
-  // Use the contents of the file to try to guess its format.
-  //
+   //
+   // Use the contents of the file to try to guess its format.
+   //
 
-  //
-  // Open the input ASCII observation file
-  //
-  LineDataFile f_in;
+   //
+   // Open the input ASCII observation file
+   //
+   LineDataFile f_in;
 
-  if(!f_in.open(ascii_filename.c_str())) {
-    mlog << Error << "\ndetermine_ascii_format() -> "
-         << "can't open input ASCII file \"" << ascii_filename
-         << "\" for reading\n\n";
-    exit(1);
-  }
+   if(!f_in.open(ascii_filename.c_str())) {
+     mlog << Error << "\ndetermine_ascii_format() -> "
+          << "can't open input ASCII file \"" << ascii_filename
+          << "\" for reading\n\n";
+     exit(1);
+   }
 
-  //
-  // See if this is a MET file.
-  //
-  f_in.rewind();
-  MetHandler *met_file = new MetHandler(program_name);
+   //
+   // See if this is a MET file.
+   //
+   f_in.rewind();
+   MetHandler *met_file = new MetHandler(program_name);
 
-  if (met_file->isFileType(f_in))
-  {
-    f_in.close();
-    return (FileHandler *)met_file;
-  }
+   if (met_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) met_file);
+   }
 
-  delete met_file;
+   delete met_file;
 
-  //
-  // See if this is a Little R file.
-  //
-  f_in.rewind();
-  LittleRHandler *little_r_file = new LittleRHandler(program_name);
+   //
+   // See if this is a Little R file.
+   //
+   f_in.rewind();
+   LittleRHandler *little_r_file = new LittleRHandler(program_name);
 
-  if (little_r_file->isFileType(f_in))
-  {
-    f_in.close();
-    return (FileHandler *)little_r_file;
-  }
+   if (little_r_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) little_r_file);
+   }
 
-  delete little_r_file;
+   delete little_r_file;
 
-  //
-  // See if this is a SURFRAD file.
-  //
-  f_in.rewind();
-  SurfradHandler *surfrad_file = new SurfradHandler(program_name);
+   //
+   // See if this is a SURFRAD file.
+   //
+   f_in.rewind();
+   SurfradHandler *surfrad_file = new SurfradHandler(program_name);
 
-  if (surfrad_file->isFileType(f_in))
-  {
-    f_in.close();
-    return (FileHandler *)surfrad_file;
-  }
+   if (surfrad_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) surfrad_file);
+   }
 
-  delete surfrad_file;
+   delete surfrad_file;
 
-  //
-  // See if this is a WWSIS file.
-  //
-  f_in.rewind();
-  WwsisHandler *wwsis_file = new WwsisHandler(program_name);
+   //
+   // See if this is a WWSIS file.
+   //
+   f_in.rewind();
+   WwsisHandler *wwsis_file = new WwsisHandler(program_name);
 
-  if (wwsis_file->isFileType(f_in))
-  {
-    f_in.close();
-    return (FileHandler *)wwsis_file;
-  }
+   if(wwsis_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) wwsis_file);
+   }
 
-  delete wwsis_file;
+   delete wwsis_file;
 
-  //
-  // See if this is a Aeronet file.
-  //
-  f_in.rewind();
-  AeronetHandler *aeronet_file = new AeronetHandler(program_name);
+   //
+   // See if this is a Aeronet file.
+   //
+   f_in.rewind();
+   AeronetHandler *aeronet_file = new AeronetHandler(program_name);
 
-  if (aeronet_file->isFileType(f_in))
-  {
-    f_in.close();
-    return (FileHandler *)aeronet_file;
-  }
+   if(aeronet_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) aeronet_file);
+   }
 
-  delete aeronet_file;
+   delete aeronet_file;
 
-  //
-  // If we get here, we didn't recognize the file contents.
-  //
+   //
+   // If we get here, we didn't recognize the file contents.
+   //
 
-  mlog << Error << "\ndetermine_ascii_format() -> "
-       << "could not determine file format based on file contents\n\n";
+   mlog << Error << "\ndetermine_ascii_format() -> "
+        << "could not determine file format based on file contents\n\n";
 
-  f_in.close();
+   f_in.close();
 
-  return 0;
+   exit(1);
+
+   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////

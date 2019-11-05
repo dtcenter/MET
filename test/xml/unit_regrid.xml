@@ -258,22 +258,17 @@
     </output>
   </test>
 
-  <test name="regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5">
+  <test name="regrid_data_plane_HRRR_GAUSSIAN_5">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
-      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
-      &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
-      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5.nc \
-      -field 'name="APCP"; level="A6";' \
-      -field 'name="TMP";  level="Z2";' \
-      -field 'name="UGRD"; level="Z10";' \
-      -field 'name="VGRD"; level="Z10";' \
-      -field 'name="HGT";  level="P500";' \
-      -method GAUSSIAN -width 5 -sigma 2 \
-      -v 1
+      &DATA_DIR_MODEL;/met_nc/hrrr/HRRR_20190518_013_036_24h.nc \
+      G211 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_GAUSSIAN.nc \
+      -field 'name="MXUPHL_24"; level="A24";' \
+      -method GAUSSIAN -width 27 -gaussian_radius 120 -gaussian_dx 81.271 -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_GAUSSIAN_5.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_GAUSSIAN.nc</grid_nc>
     </output>
   </test>
 
@@ -345,6 +340,25 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GOES_16_AOD_TO_G212_compute.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="regrid_data_plane_GOES_16_ADP">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20192662141196_e20192662143569_c20192662145547.nc \
+      G212 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GOES_16_ADP.nc \
+      -field 'name="AOD_Smoke";  level="(*,*)";' \
+      -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20192662141196_e20192662143569_c20192662144526.nc \
+      -qc 1,2 -method MAX \
+      -v 5:warning
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GOES_16_ADP.nc</grid_nc>
     </output>
   </test>
   

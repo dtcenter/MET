@@ -45,6 +45,7 @@ class CIInfo {
       // Variance inflation factor for time series
       double vif;
 
+
       // Confidence interval computed using a normal approximation
       double *v_ncl;
       double *v_ncu;
@@ -614,6 +615,66 @@ class GRADInfo {
                const NumArray &w_na);
 
       void clear();
+};
+
+
+////////////////////////////////////////////////////////////////////////
+//
+// Class to store distance map statistics
+//
+////////////////////////////////////////////////////////////////////////
+
+class DMAPInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const DMAPInfo &);
+
+      // Distance Map Options
+      int    baddeley_p;           // Exponent for lp-norm
+      double baddeley_max_dist;    // Maximum distance constant
+      double fom_alpha;            // FOM Alpha
+      double zhu_weight;           // Zhu Weight 
+
+   public:
+
+      DMAPInfo();
+      ~DMAPInfo();
+      DMAPInfo(const DMAPInfo &);
+      DMAPInfo & operator=(const DMAPInfo &);
+
+      // Thresholds
+      SingleThresh fthresh;
+      SingleThresh othresh;
+
+      // Counts
+      int total, fy, oy;
+
+      // Distance metrics
+      double baddeley, hausdorff;
+
+      // Mean error distance
+      double med_fo, med_of, med_min, med_max, med_mean;
+
+      // Pratt's Figure of Merit
+      double fom_fo, fom_of, fom_min, fom_max, fom_mean;
+
+      // Zhu Metric
+      double zhu_fo, zhu_of, zhu_min, zhu_max, zhu_mean;
+
+      // Compute statistics
+      double fbias() const; // fbias = fy / oy
+
+      // Compute statistics
+      void set(const SingleThresh &fthr, const SingleThresh &othr,
+               const NumArray &fdmap_na, const NumArray &odmap_na,
+               const NumArray &fthr_na,  const NumArray &othr_na);
+
+      void set_options(const int _baddeley_p, const double _baddeley_max_dist,
+                       const double _fom_alpha, const double _zhu_weight);
+
+      void clear();
+      void reset_options();
 };
 
 ////////////////////////////////////////////////////////////////////////
