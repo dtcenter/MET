@@ -72,7 +72,8 @@ void RegridInfo::validate() {
       method != InterpMthd_Upper_Right &&
       method != InterpMthd_Lower_Right &&
       method != InterpMthd_Lower_Left &&
-      method != InterpMthd_AW_Mean) {
+      method != InterpMthd_AW_Mean &&
+      method != InterpMthd_Gaussian) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
@@ -1148,7 +1149,8 @@ void InterpInfo::validate() {
          methodi  != InterpMthd_Upper_Left &&
          methodi  != InterpMthd_Upper_Right &&
          methodi  != InterpMthd_Lower_Right &&
-         methodi  != InterpMthd_Lower_Left) {
+         methodi  != InterpMthd_Lower_Left &&
+         methodi  != InterpMthd_Gaussian) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
