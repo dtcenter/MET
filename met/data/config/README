@@ -827,21 +827,17 @@ obs = fcst;
 //      - UW_MEAN for average of data before and after
 //      - DW_MEAN for linear interpolation in time of data before and after
 //
-//   - The "match_month" entry may be set to TRUE or FALSE.  Set to TRUE to
-//     only consider data where the climatology month matches the forecast
-//     valid month.
-//      - match_month = FALSE to use a persistence forecast
-//      - match_month = TRUE  for typical climatology data
+//   - The "day_interval" entry is an integer specifying the spacing in days of
+//     the climatology data. Use 31 for monthly data or 1 for daily data.
+//     Use "NA" if the timing of the climatology data should not be checked.
 //
-//   - The "match_day" entry may be set to TRUE or FALSE.  Set to TRUE to
-//     only consider data where the climatology day matches the forecast
-//     valid day.
-//      - match_day = FALSE for monthly climatology
-//      - match_day = TRUE  for daily climatology
+//   - The "hour_interval" entry is an integer specifying the spacing in hours of
+//     the climatology data for each day. This should be set between 0 and 24,
+//     with 6 and 12 being common choices. Use "NA" if the timing of the
+//     climatology data should not be checked.
 //
-//   - The "time_step" entry specifies the spacing of climatology data in
-//     seconds.  Set to 60*60*6 = 21600 for 6-hourly data or 60*60 = 3600
-//     for hourly data.
+//   - The "day_interval" and "hour_interval" entries replace the deprecated
+//     entries "match_month", "match_day", and "time_step".
 //
 climo_mean = {
 
@@ -855,9 +851,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interal       = 6;
 }
 
 //

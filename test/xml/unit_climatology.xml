@@ -20,11 +20,11 @@
   <test name="climatology_POINT_STAT_GFS_2.5DEG">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_2.5DEG</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
-      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590415</value></pair>
-      <pair><name>MATCH_MONTH</name>      <value>TRUE</value></pair>
-      <pair><name>MATCH_DAY</name>        <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>         <value>GFS_CLIMO_2.5DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>  <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590315", "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415"</value></pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name> <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590315", "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590415"</value></pair>
+      <pair><name>DAY_INTERVAL</name>          <value>31</value></pair>
+      <pair><name>HOUR_INTERVAL</name>         <value>6</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
@@ -47,8 +47,8 @@
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
-      <pair><name>MATCH_MONTH</name>      <value>TRUE</value></pair>
-      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+      <pair><name>DAY_INTERVAL</name>     <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name>    <value>6</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
@@ -65,14 +65,15 @@
     </output>
   </test>
 
+<!-- JHG THIS IS NOT A GOOD TEST OF PERSISTENCE FORECASTS
   <test name="climatology_POINT_STAT_GFS_MATCH_MONTH_FALSE">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_MATCH_MONTH_FALSE</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790309</value></pair>
-      <pair><name>MATCH_MONTH</name>      <value>FALSE</value></pair>
-      <pair><name>MATCH_DAY</name>        <value>FALSE</value></pair>
+      <pair><name>DAY_INTERVAL</name>     <value>NA</value></pair>
+      <pair><name>HOUR_INTERVAL</name>    <value>NA</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
@@ -88,6 +89,7 @@
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_MATCH_MONTH_FALSE_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
+ -->
 
   <test name="climatology_POINT_STAT_WMO_1.5DEG">
     <exec>&MET_BIN;/point_stat</exec>
@@ -164,7 +166,7 @@
       <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
-      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+      <pair><name>DAY_INTERVAL</name>    <value>1</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
@@ -189,7 +191,7 @@
       <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
       <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
-      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+      <pair><name>DAY_INTERVAL</name>    <value>1</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \

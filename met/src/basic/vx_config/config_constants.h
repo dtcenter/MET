@@ -618,9 +618,8 @@ static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
 static const char conf_key_write_bins[]         = "write_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
-static const char conf_key_match_month[]        = "match_month";
-static const char conf_key_match_day[]          = "match_day";
-static const char conf_key_time_step[]          = "time_step";
+static const char conf_key_day_interval[]       = "day_interval";
+static const char conf_key_hour_interval[]      = "hour_interval";
 
 //
 // Point-Stat specific parameter key names

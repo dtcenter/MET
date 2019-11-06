@@ -77,9 +77,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = TRUE;
-   time_step          = 21600;
+   day_interval       = 1;
+   hour_interval      = 6;
 }
 
 climo_stdev = climo_mean;

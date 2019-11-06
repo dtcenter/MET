@@ -102,9 +102,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = TRUE;
-   time_step          = 43200;
+   day_interval       = 1;
+   hour_interval      = 12;
 }
 
 climo_stdev = climo_mean;

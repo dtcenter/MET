@@ -1544,6 +1544,20 @@ const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 double v;
 
+   //
+   //  Check for NA
+   //
+
+if ( Entry )  {
+
+    if ( Entry->type() == ThresholdType &&
+         Entry->thresh_value()->get_type() == thresh_na )  {
+
+       return ( bad_data_double );
+
+    }
+}
+
 if ( Entry )  is_correct_type = (Entry->type() == FloatType ||
                                  Entry->type() == IntegerType);
 
