@@ -374,9 +374,8 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    // Check for variable not found
    if(!info) {
       mlog << Warning << "\n" << method_name
-           << "can't find requested variable name \""
-           << vinfo_nc->req_name() << "\" in NetCDF file \""
-           << Filename << "\".\n\n";
+           << "can't find NetCDF variable \"" << vinfo_nc->req_name()
+           << "\" in file \"" << Filename << "\".\n\n";
       return(time_offsets);
    }
 
