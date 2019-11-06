@@ -89,8 +89,15 @@ void write_nc_pdf(
     double delta,
     const vector<int>& pdf) {
 
+    vector<double> intervals;
+
+    for(int k = 0; k < (pdf.size() + 1); k++) {
+        intervals.push_back(min + delta * k);
+    }
+
     NcDim var_dim = nc_out->addDim(info.name(), pdf.size());
-    NcVar var = nc_out->addVar(info.name(), ncDouble, var_dim);
+    NcVar var = nc_out->addVar(info.name(), ncFloat, var_dim);
+    var.putVar(intervals.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
