@@ -432,6 +432,9 @@ void process_search_dirs() {
    //
    if(default_job.job_type == stat_job_go_index) {
 
+      mlog << Debug(1) << "GO Index Config File: "
+           << replace_path(go_index_config_file) << "\n";
+
       //
       // Read config file constants followed by the config file which
       // defines the GO Index.
@@ -592,6 +595,9 @@ void process_job(const char * jobstring, int n_job) {
    // Special processing for the GO Index job.
    //
    if(job.job_type == stat_job_go_index) {
+
+      mlog << Debug(1) << "GO Index Config File: "
+           << replace_path(go_index_config_file) << "\n";
 
       //
       // Read config file constants followed by the config file which
