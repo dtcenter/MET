@@ -1207,10 +1207,6 @@ double compute_horz_interp(const DataPlane &dp,
          v = interp_xy(dp, floor(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Gaussian):    // Gaussian filter of the grid box
-         v = interp_max(dp, *gt, x, y, 0);
-         break;
-
       case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
          v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v);
          break;

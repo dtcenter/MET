@@ -359,6 +359,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    return(n_rec);
 }
 
+////////////////////////////////////////////////////////////////////////
 
 LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    int n_rec = 0;
@@ -369,6 +370,16 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
 
    LongArray time_offsets;
    NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
+
+   // Check for variable not found
+   if(!info) {
+      mlog << Warning << "\n" << method_name
+           << "can't find requested variable name \""
+           << vinfo_nc->req_name() << "\" in NetCDF file \""
+           << Filename << "\".\n\n";
+      return(time_offsets);
+   }
+
    double time_lower = bad_data_double;
    double time_upper = bad_data_double;
    int error_code = error_code_no_error;
