@@ -704,41 +704,40 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_lookin_path(const StringArray & a)
-{
-   for (int i = 0; i < a.n_elements(); i++)
+void set_lookin_path(const StringArray & a) {
+   for(int i = 0; i < a.n_elements(); i++)
       set_search_dir(a[i].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_filename(const StringArray & a)
-{
+void set_out_filename(const StringArray & a) {
    set_out_file(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_tmp_dir(const StringArray & a)
-{
+void set_tmp_dir(const StringArray & a) {
    tmp_dir << a[0];
    DIR * dp = 0;
-   if( (dp = met_opendir(tmp_dir.c_str())) == NULL ) {
+
+   if((dp = met_opendir(tmp_dir.c_str())) == NULL) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
    }
-
-   met_closedir(dp);   dp = 0;
+   else {
+      met_closedir(dp);
+      dp = 0;
+   }
 
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
-{
+void set_logfile(const StringArray & a) {
    ConcatString filename;
 
    filename = a[0];
@@ -748,18 +747,14 @@ void set_logfile(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_verbosity_level(const StringArray & a)
-{
+void set_verbosity_level(const StringArray & a) {
    set_verbosity(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a)
-{
+void set_config_file(const StringArray & a) {
    set_config(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-
