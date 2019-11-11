@@ -1567,19 +1567,19 @@ void process_pbfile(int i_pb) {
          }
          if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
             float *tmp_pqtzuv = new float[mxr8vt];
-            for(kk=0; kk<mxr8vt; kk++) {
-               tmp_pqtzuv[kk] = pqtzuv[kk];
-            }
 
-            if (!is_eq(tmp_pqtzuv[4],bad_data_float)
-                  && !is_eq(tmp_pqtzuv[5],bad_data_float)) {
+            for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
+
+            if (!is_eq(tmp_pqtzuv[4],bad_data_float) &&
+                !is_eq(tmp_pqtzuv[5],bad_data_float)) {
                pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
             }
-            else if (!is_eq(tmp_pqtzuv[2],bad_data_float)
-                  && (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL)
-                  && (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
+            else if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
+                     (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL) &&
+                     (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
             }
+            if(tmp_pqtzuv) { delete [] tmp_pqtzuv; tmp_pqtzuv = (float *) 0; }
          }
       } // end for lv
 
@@ -2361,6 +2361,7 @@ void process_pbfile_metadata(int i_pb) {
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
+
    return;
 }
 
