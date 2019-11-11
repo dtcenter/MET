@@ -1566,7 +1566,7 @@ void process_pbfile(int i_pb) {
             if (cape_member_cnt >= 3) cape_level++;
          }
          if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
-            float *tmp_pqtzuv = new float[mxr8vt];
+            float tmp_pqtzuv[mxr8vt];
 
             for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
@@ -1579,7 +1579,6 @@ void process_pbfile(int i_pb) {
                      (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
             }
-            if(tmp_pqtzuv) { delete [] tmp_pqtzuv; tmp_pqtzuv = (float *) 0; }
          }
       } // end for lv
 
