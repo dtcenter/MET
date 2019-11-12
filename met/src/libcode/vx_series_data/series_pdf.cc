@@ -45,6 +45,18 @@ void init_pdf(
 
 ////////////////////////////////////////////////////////////////////////
 
+void init_joint_pdf(
+    int n_A,
+    int n_B,
+    vector<int>& pdf) {
+
+    for(int k = 0; k < n_A * n_B; k++) {
+        pdf.push_back(0);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void update_pdf(
     double min,
     double delta,
