@@ -690,6 +690,12 @@ extern int    min_int(const int *, int);
 extern void   dbl_to_str(double, char *);
 extern void   dbl_to_str(double, char *, int);
 
+////////////////////////////////////////////////////////////////////////
+//
+// Utility functions for computing statistics.
+//
+////////////////////////////////////////////////////////////////////////
+
 extern double compute_stdev(double, double, int);
 
 extern double compute_corr(double, double, double, double, double, int);
@@ -699,40 +705,6 @@ extern double compute_afss(double, double);
 extern double compute_ufss(double);
 
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
-
-extern void   compute_cntinfo(const SL1L2Info &, bool, CNTInfo &);
-
-extern void   compute_cntinfo(const PairDataPoint &, const NumArray &,
-                              bool, bool, bool, CNTInfo &);
-extern void   compute_i_cntinfo(const PairDataPoint &, int,
-                                bool, bool, bool, CNTInfo &);
-
-extern void   compute_ctsinfo(const PairDataPoint &, const NumArray &,
-                              bool, bool, CTSInfo &);
-extern void   compute_i_ctsinfo(const PairDataPoint &, int,
-                                bool, CTSInfo &);
-
-extern void   compute_mctsinfo(const PairDataPoint &, const NumArray &,
-                               bool, bool, MCTSInfo &);
-extern void   compute_i_mctsinfo(const PairDataPoint &, int,
-                                 bool, MCTSInfo &);
-
-extern void   compute_pctinfo(const PairDataPoint &, bool, PCTInfo &);
-
-extern void   compute_nbrcntinfo(const PairDataPoint &,
-                                 const PairDataPoint &,
-                                 const NumArray &,
-                                 NBRCNTInfo &, bool);
-extern void   compute_i_nbrcntinfo(const PairDataPoint &,
-                                   const PairDataPoint &,
-                                   int, NBRCNTInfo &);
-
-extern void   compute_mean_stdev(const NumArray &, const NumArray &,
-                                 bool, double,
-                                 CIInfo &, CIInfo &);
-extern void   compute_i_mean_stdev(const NumArray &,
-                                   bool, double, int,
-                                   CIInfo &, CIInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 

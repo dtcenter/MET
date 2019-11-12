@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "compute_ci.h"
+#include "compute_stats.h"
 
 #include "vx_gsl_prob.h"
 #include "vx_util.h"
