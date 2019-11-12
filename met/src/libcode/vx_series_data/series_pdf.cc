@@ -103,6 +103,9 @@ void write_nc_pdf(
     NcVar var_min = nc_out->addVar(info.name(), ncFloat, var_dim);
     NcVar var_max = nc_out->addVar(info.name(), ncFloat, var_dim);
     NcVar var_mid = nc_out->addVar(info.name(), ncFloat, var_dim);
+    var_min.putAtt("units", info.units());
+    var_max.putAtt("units", info.units());
+    var_mid.putAtt("units", info.units());
     var_min.putVar(bin_min.data());
     var_max.putVar(bin_max.data());
     var_mid.putVar(bin_mid.data());
