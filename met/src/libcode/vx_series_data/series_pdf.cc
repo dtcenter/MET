@@ -99,16 +99,34 @@ void write_nc_pdf(
         bin_mid.push_back(min + delta * (k + 0.5));
     }
 
+    ConcatString var_name = info.name();
+    ConcatString var_min_name = var_name;
+    ConcatString var_max_name = var_name;
+    ConcatString var_mid_name = var_name;
+
+    var_min_name.add("_min");
+    var_max_name.add("_max");
+    var_mid_name.add("_mid");
+
+    ConcatString var_pdf_name("hist_");
+    var_pdf_name.add(var_name);
+
     NcDim var_dim = nc_out->addDim(info.name(), pdf.size());
-    NcVar var_min = nc_out->addVar(info.name(), ncFloat, var_dim);
-    NcVar var_max = nc_out->addVar(info.name(), ncFloat, var_dim);
-    NcVar var_mid = nc_out->addVar(info.name(), ncFloat, var_dim);
+    NcVar var_min = nc_out->addVar(
+        var_min_name, ncFloat, var_dim);
+    NcVar var_max = nc_out->addVar(
+        var_max_name, ncFloat, var_dim);
+    NcVar var_mid = nc_out->addVar(
+        var_mid_name, ncFloat, var_dim);
+    NcVar var_pdf = nc_out->addVar(
+        var_pdf_name, ncUint, var_dim);
     var_min.putAtt("units", info.units());
     var_max.putAtt("units", info.units());
     var_mid.putAtt("units", info.units());
     var_min.putVar(bin_min.data());
     var_max.putVar(bin_max.data());
     var_mid.putVar(bin_mid.data());
+    var_pdf.putVar(pdf.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
