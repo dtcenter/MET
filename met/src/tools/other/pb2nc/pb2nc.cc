@@ -1566,7 +1566,9 @@ void process_pbfile(int i_pb) {
             if (cape_member_cnt >= 3) cape_level++;
          }
          if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
-            float tmp_pqtzuv[mxr8vt];
+
+            // Allocated memory is deleted after all observations are processed
+            float *tmp_pqtzuv = new float [mxr8vt];
 
             for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
