@@ -89,15 +89,23 @@ void write_nc_pdf(
     double delta,
     const vector<int>& pdf) {
 
-    vector<double> intervals;
+    vector<double> bin_min;
+    vector<double> bin_max;
+    vector<double> bin_mid;
 
-    for(int k = 0; k < (pdf.size() + 1); k++) {
-        intervals.push_back(min + delta * k);
+    for(int k = 0; k < pdf.size(); k++) {
+        bin_min.push_back(min + delta * k);
+        bin_max.push_back(min + delta * (k + 1));
+        bin_mid.push_back(min + delta * (k + 0.5));
     }
 
     NcDim var_dim = nc_out->addDim(info.name(), pdf.size());
-    NcVar var = nc_out->addVar(info.name(), ncFloat, var_dim);
-    var.putVar(intervals.data());
+    NcVar var_min = nc_out->addVar(info.name(), ncFloat, var_dim);
+    NcVar var_max = nc_out->addVar(info.name(), ncFloat, var_dim);
+    NcVar var_mid = nc_out->addVar(info.name(), ncFloat, var_dim);
+    var_min.putVar(bin_min.data());
+    var_max.putVar(bin_max.data());
+    var_mid.putVar(bin_mid.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
