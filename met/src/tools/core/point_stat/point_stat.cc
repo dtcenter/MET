@@ -1128,9 +1128,9 @@ void process_scores() {
 
                // Compute CNT, SL1L2, and SAL1L2 scores
                if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
-                  (conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None ||
-                   conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None ||
-                   conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None)) {
+                  (conf_info.vx_opt[i].output_flag[i_cnt]    != STATOutputType_None ||
+                   conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType_None ||
+                   conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType_None)) {
                   do_cnt_sl1l2(conf_info.vx_opt[i], pd_ptr);
                }
 
