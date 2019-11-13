@@ -1048,7 +1048,7 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n, n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -1066,24 +1066,31 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
    int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
+   // Determine row multiplier for climatology bins
+   if(cdf_info.write_bins) {
+      n_bin = get_n_cdf_bin();
+      if(n_bin > 1) n_bin++;
+   }
+   else {
+      n_bin = 1;
+   }
+
    // Switch on the index of the line type
    switch(i_txt_row) {
 
       case(i_fho):
       case(i_ctc):
          // Number of FHO or CTC lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh());
          break;
 
       case(i_cts):
          // Number of CTS lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh() * get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() * 
+              get_n_ci_alpha());
          break;
 
       case(i_mctc):
@@ -1094,35 +1101,31 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_mcts):
          // Number of MCTS lines =
-         //    Message Types * Masks * Interpolations *
-         //    Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_ci_alpha());
          break;
 
       case(i_cnt):
          // Number of CNT lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cnt_thresh() * get_n_ci_alpha());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins * Alphas
+         n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin *
+              get_n_ci_alpha());
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
          // Number of SL1L2 and SAL1L2 lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cnt_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin);
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
       case(i_vcnt):
          // Number of VL1L2 or VAL1L2 lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
+         //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
          break;
@@ -1131,31 +1134,30 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_pjc):
       case(i_prc):
          // Number of PCT, PJC, or PRC lines possible =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Climo Bins
-         n = (!prob_flag ? 0 : n_pd *
-              get_n_oprob_thresh() * get_n_cdf_bin());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (!prob_flag ? 0 : n_pd * get_n_oprob_thresh() * n_bin);
 
          // Number of HiRA PCT, PJC, or PRC lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * HiRA widths
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    HiRA widths
          if(hira_info.flag) {
-            n += (prob_flag ? 0 : n_pd *
-                  get_n_cat_thresh() * hira_info.width.n_elements());
+            n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
+                  hira_info.width.n_elements());
          }
 
          break;
 
       case(i_pstd):
          // Number of PSTD lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * Alphas * Climo Bins
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas * Climo Bins
          n = (!prob_flag ? 0 : n_pd *
-              get_n_oprob_thresh() * get_n_ci_alpha() * get_n_cdf_bin());
+              get_n_oprob_thresh() * get_n_ci_alpha() * n_bin);
 
          // Number of HiRA PSTD lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds * HiRA widths * Alphas
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    HiRA widths * Alphas
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd *
                   get_n_cat_thresh() * hira_info.width.n_elements() *
@@ -1166,11 +1168,10 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_ecnt):
          // Number of HiRA ECNT lines =
-         //    Message Types * Masks * Interpolations *
-         //    HiRA widths * Alphas
+         //    Message Types * Masks * Interpolations * HiRA widths *
+         //    Alphas
          if(hira_info.flag) {
-            n = n_pd * hira_info.width.n_elements() *
-                get_n_ci_alpha();
+            n = n_pd * hira_info.width.n_elements() * get_n_ci_alpha();
          }
          else {
             n = 0;
@@ -1180,18 +1181,16 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_eclv):
          // Number of CTC -> ECLV lines =
-         //    Message Types * Masks * Interpolations *
-         //    Thresholds
-         n = (prob_flag ? 0 : n_pd *
-              get_n_cat_thresh());
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Climo Bins
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() * n_bin);
 
          // Number of PCT -> ECLV lines =
          //    Message Types * Masks * Interpolations *
          //    Observation Probability Thresholds *
          //    Forecast Probability Thresholds * Climo Bins
          n += (!prob_flag ? 0 : n_pd *
-               get_n_oprob_thresh() * get_n_fprob_thresh() *
-               get_n_cdf_bin());
+               get_n_oprob_thresh() * get_n_fprob_thresh() * n_bin);
 
          break;
 

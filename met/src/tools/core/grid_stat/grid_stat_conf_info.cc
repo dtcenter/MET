@@ -907,7 +907,7 @@ void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n, n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -921,6 +921,15 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
 
    bool prob_flag = fcst_info->is_prob();
    bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());
+
+   // Determine row multiplier for climatology bins
+   if(cdf_info.write_bins) {
+      n_bin = get_n_cdf_bin();
+      if(n_bin > 1) n_bin++;
+   }
+   else {
+      n_bin = 1;
+   }
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -958,19 +967,20 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_cnt):
          // Number of CNT lines =
          //    Masks * (Smoothing Methods + Fourier Waves) *
-         //    Thresholds * Alphas
+         //    Thresholds * Climo Bins * Alphas
          n = (prob_flag ? 0 :
               get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
-              get_n_cnt_thresh() * get_n_ci_alpha());
+              get_n_cnt_thresh() * n_bin * get_n_ci_alpha());
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
          // Number of SL1L2 or SAL1L2 lines =
-         //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds
+         //    Masks * (Smoothing Methods + Fourier Waves) *
+         //    Thresholds * Climo Bins
          n = (prob_flag ? 0 :
               get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
-              get_n_cnt_thresh());
+              get_n_cnt_thresh() * n_bin);
          break;
 
       case(i_vl1l2):
@@ -1015,7 +1025,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Masks * Smoothing Methods * Thresholds * Climo Bins
          n = (!prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-              get_n_cdf_bin());
+              n_bin);
          break;
 
       case(i_pstd):
@@ -1024,7 +1034,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Climo Bins
          n = (!prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-              get_n_ci_alpha() * get_n_cdf_bin());
+              get_n_ci_alpha() * n_bin);
          break;
 
       case(i_eclv):
@@ -1039,7 +1049,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Max Forecast Probability Thresholds * Climo Bins
          n += (!prob_flag ? 0 :
                get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
-               get_n_fprob_thresh() * get_n_cdf_bin());
+               get_n_fprob_thresh() * n_bin);
          break;
 
       case(i_grad):
