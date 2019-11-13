@@ -133,14 +133,13 @@ static void process_fcst_climo_files();
 static void process_obs_file(int);
 static void process_scores();
 
-static void do_cts      (CTSInfo   *&, int, const PairDataPoint *);
-static void do_mcts     (MCTSInfo   &, int, const PairDataPoint *);
-static void do_cnt      (CNTInfo   *&, int, const PairDataPoint *);
-static void do_sl1l2    (SL1L2Info *&, int, const PairDataPoint *);
-static void do_vl1l2    (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
-static void do_pct      (PCTInfo   *&, int, const PairDataPoint *, int i_bin);
-static void do_hira_ens (              int, const PairDataPoint *);
-static void do_hira_prob(              int, const PairDataPoint *);
+static void do_cts       (CTSInfo   *&, int, const PairDataPoint *);
+static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
+static void do_cnt_sl1l2 (const PointStatVxOpt &, const PairDataPoint *);
+static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
+static void do_pct       (PCTInfo   *&, int, const PairDataPoint *, int i_bin);
+static void do_hira_ens  (              int, const PairDataPoint *);
+static void do_hira_prob (              int, const PairDataPoint *);
 
 
 static void finish_txt_files();
@@ -911,8 +910,6 @@ void process_scores() {
    PairDataPoint *pd_ptr     = (PairDataPoint *) 0;
    CTSInfo       *cts_info   = (CTSInfo *)       0;
    MCTSInfo       mcts_info;
-   CNTInfo       *cnt_info   = (CNTInfo *)       0;
-   SL1L2Info     *sl1l2_info = (SL1L2Info *)     0;
    VL1L2Info     *vl1l2_info = (VL1L2Info *)     0;
    PCTInfo       *pct_info   = (PCTInfo *)       0;
 
@@ -930,8 +927,6 @@ void process_scores() {
 
    // Allocate space for output statistics types
    cts_info   = new CTSInfo   [n_cat];
-   cnt_info   = new CNTInfo   [n_cnt];
-   sl1l2_info = new SL1L2Info [n_cnt];
    vl1l2_info = new VL1L2Info [n_wind];
    pct_info   = new PCTInfo   [n_prob];
 
@@ -1131,67 +1126,13 @@ void process_scores() {
                   }
                } // end Compute MCTS scores
 
-               // Compute CNT scores
+               // Compute CNT, SL1L2, and SAL1L2 scores
                if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
-                   conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None) {
-
-                  // Initialize
-                  for(m=0; m<n_cnt; m++) cnt_info[m].clear();
-
-                  // Compute CNT
-                  do_cnt(cnt_info, i, pd_ptr);
-
-                  // Loop through the continuous thresholds
-                  for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
-
-                     if(cnt_info[m].n == 0) continue;
-
-                     // Write out CNT
-                     if(conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None) {
-                        write_cnt_row(shc, cnt_info[m],
-                           conf_info.vx_opt[i].output_flag[i_cnt] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_cnt], i_txt_row[i_cnt]);
-                     }
-                  } // end for m
-               } // end Compute CNT
-
-               // Compute SL1L2 and SAL1L2 scores as long as the
-               // vflag is not set
-               if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
-                  (conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType_None ||
-                   conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType_None)) {
-
-                  // Initialize
-                  for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
-
-                  // Compute SL1L2 and SAL1L2
-                  do_sl1l2(sl1l2_info, i, pd_ptr);
-
-                  // Loop through the continuous thresholds
-                  for(m=0; m<conf_info.vx_opt[i].fcnt_ta.n(); m++) {
-
-                     // Write out SL1L2
-                     if(conf_info.vx_opt[i].output_flag[i_sl1l2] != STATOutputType_None &&
-                        sl1l2_info[m].scount > 0) {
-
-                        write_sl1l2_row(shc, sl1l2_info[m],
-                           conf_info.vx_opt[i].output_flag[i_sl1l2] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
-                     }
-
-                     // Write out SAL1L2
-                     if(conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType_None &&
-                        sl1l2_info[m].sacount > 0) {
-
-                        write_sal1l2_row(shc, sl1l2_info[m],
-                           conf_info.vx_opt[i].output_flag[i_sal1l2] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                          txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
-                     }
-                  } // end for m
-               }  // end Compute SL1L2 and SAL1L2
+                  (conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None ||
+                   conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None ||
+                   conf_info.vx_opt[i].output_flag[i_cnt] != STATOutputType_None)) {
+                  do_cnt_sl1l2(conf_info.vx_opt[i], pd_ptr);
+               }
 
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
                if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
@@ -1399,8 +1340,6 @@ void process_scores() {
 
    // Deallocate memory
    if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   0; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0; }
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
    if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) 0; }
    if(pct_info)   { delete [] pct_info;   pct_info   = (PCTInfo *)   0; }
 
@@ -1511,95 +1450,179 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(CNTInfo *&cnt_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i, j;
-   PairDataPoint pd;
+void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   int i, j, k, n_bin;
+   PairDataPoint pd_thr, pd;
+   SL1L2Info *sl1l2_info = (SL1L2Info *) 0;
+   CNTInfo   *cnt_info   = (CNTInfo *)   0;
 
    mlog << Debug(2)
-        << "Computing Continuous Statistics.\n";
+        << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
-   //
-   // Process each filtering threshold
-   //
-   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n(); i++) {
+   // Determine the number of climo CDF bins
+   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+            vx_opt.get_n_cdf_bin() : 1);
 
-      //
-      // Store thresholds
-      //
-      cnt_info[i].fthresh = conf_info.vx_opt[i_vx].fcnt_ta[i];
-      cnt_info[i].othresh = conf_info.vx_opt[i_vx].ocnt_ta[i];
-      cnt_info[i].logic   = conf_info.vx_opt[i_vx].cnt_logic;
+   // Set flags
+   bool do_sl1l2    = (vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
+                       vx_opt.output_flag[i_sal1l2] != STATOutputType_None);
+   bool do_cnt      = (vx_opt.output_flag[i_cnt]    != STATOutputType_None);
+   bool precip_flag = (vx_opt.vx_pd.fcst_info->is_precipitation() &&
+                       vx_opt.vx_pd.obs_info->is_precipitation());
+   
+   // Allocate memory
+   if(do_cnt)   { cnt_info   = new CNTInfo   [n_bin]; }
+   if(do_sl1l2) { sl1l2_info = new SL1L2Info [n_bin]; }
 
-      //
-      // Setup alpha values
-      //
-      cnt_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
-         cnt_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
-      }
+   // Process each continuous filtering threshold
+   for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
-      //
       // Apply continuous filtering thresholds to subset pairs
-      //
-      pd = subset_pairs(*pd_ptr, cnt_info[i].fthresh, cnt_info[i].othresh,
-                        conf_info.vx_opt[i_vx].cnt_logic);
+      pd_thr = subset_pairs(*pd_ptr, vx_opt.fcnt_ta[i],
+                            vx_opt.ocnt_ta[i], vx_opt.cnt_logic);
 
-      //
       // Check for no matched pairs to process
-      //
-      if(pd.n_obs == 0) continue;
+      if(pd_thr.n_obs == 0) continue;
 
-      //
-      // Compute the stats, normal confidence intervals, and bootstrap
-      // bootstrap confidence intervals
-      //
-      int precip_flag = (conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
-                         conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation());
+      // Process the climo CDF bins
+      for(j=0; j<n_bin; j++) {
+          
+         // Apply climo CDF bins logic to subset pairs
+         if(n_bin > 1) pd = subset_climo_cdf_bin(pd_thr,
+                               vx_opt.cdf_info.cdf_ta, j);
+         else          pd = pd_thr;
 
-      if(conf_info.vx_opt[i_vx].boot_info.interval == boot_bca_flag) {
-         compute_cnt_stats_ci_bca(rng_ptr, pd,
-            precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
-            conf_info.vx_opt[i_vx].boot_info.n_rep,
-            cnt_info[i], conf_info.tmp_dir.c_str());
-      }
-      else {
-         compute_cnt_stats_ci_perc(rng_ptr, pd,
-            precip_flag, conf_info.vx_opt[i_vx].rank_corr_flag,
-            conf_info.vx_opt[i_vx].boot_info.n_rep, conf_info.vx_opt[i_vx].boot_info.rep_prop,
-            cnt_info[i], conf_info.tmp_dir.c_str());
-      }
-   } // end for i
+         // Check for no matched pairs to process
+         if(pd.n_obs == 0) continue;
 
-   return;
-}
+         // Compute and write SL1L2 and SAL1L2 output
+         if(do_sl1l2) {
 
-////////////////////////////////////////////////////////////////////////
+            // Store thresholds
+            sl1l2_info[j].fthresh = vx_opt.fcnt_ta[i];
+            sl1l2_info[j].othresh = vx_opt.ocnt_ta[i];
+            sl1l2_info[j].logic   = vx_opt.cnt_logic;
+            
+            // Compute partial sums
+            sl1l2_info[j].set(pd);
 
-void do_sl1l2(SL1L2Info *&s_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i;
+            // Write out SL1L2
+            if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+               vx_opt.output_flag[i_sl1l2] != STATOutputType_None &&
+               sl1l2_info[j].scount > 0) {
 
-   mlog << Debug(2)
-        << "Computing Scalar Partial Sums.\n";
+               write_sl1l2_row(shc, sl1l2_info[j],
+                  vx_opt.output_flag[i_sl1l2],
+                  j, n_bin, stat_at, i_stat_row,
+                  txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
+            }
 
-   //
-   // Process each filtering threshold
-   //
-   for(i=0; i<conf_info.vx_opt[i_vx].fcnt_ta.n(); i++) {
+            // Write out SAL1L2
+            if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+               vx_opt.output_flag[i_sal1l2] != STATOutputType_None &&
+               sl1l2_info[j].sacount > 0) {
 
-      //
-      // Store thresholds
-      //
-      s_info[i].zero_out();
-      s_info[i].fthresh = conf_info.vx_opt[i_vx].fcnt_ta[i];
-      s_info[i].othresh = conf_info.vx_opt[i_vx].ocnt_ta[i];
-      s_info[i].logic   = conf_info.vx_opt[i_vx].cnt_logic;
+               write_sal1l2_row(shc, sl1l2_info[j],
+                  vx_opt.output_flag[i_sal1l2],
+                  j, n_bin, stat_at, i_stat_row,
+                  txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
+            }
+         } // end do_sl1l2
 
-      //
-      // Compute partial sums
-      //
-      s_info[i].set(*pd_ptr);
+         // Compute and write CNT output
+         if(do_cnt) {
 
-   } // end for i
+            // Store thresholds
+            cnt_info[j].fthresh = vx_opt.fcnt_ta[i];
+            cnt_info[j].othresh = vx_opt.ocnt_ta[i];
+            cnt_info[j].logic   = vx_opt.cnt_logic;
+
+            // Setup the CNTInfo alpha values
+            cnt_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
+            for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+               cnt_info[j].alpha[k] = vx_opt.ci_alpha[k];
+            }
+
+            // Compute the stats, normal confidence intervals, and
+            // bootstrap confidence intervals
+            if(vx_opt.boot_info.interval == BootIntervalType_BCA) {
+               compute_cnt_stats_ci_bca(rng_ptr, pd,
+                  precip_flag, vx_opt.rank_corr_flag,
+                  vx_opt.boot_info.n_rep,
+                  cnt_info[j], conf_info.tmp_dir.c_str());
+            }
+            else {
+               compute_cnt_stats_ci_perc(rng_ptr, pd,
+                  precip_flag, vx_opt.rank_corr_flag,
+                  vx_opt.boot_info.n_rep,
+                  vx_opt.boot_info.rep_prop,
+                  cnt_info[j], conf_info.tmp_dir.c_str());
+            }
+
+            // Write out CNT
+            if((n_bin == 1 || vx_opt.cdf_info.write_bins) && 
+               vx_opt.output_flag[i_cnt] != STATOutputType_None &&
+               cnt_info[j].n > 0) {
+
+               write_cnt_row(shc, cnt_info[j],
+                  vx_opt.output_flag[i_cnt], j, n_bin,
+                  stat_at, i_stat_row, txt_at[i_cnt], i_txt_row[i_cnt]);
+            }
+         } // end if do_cnt
+      } // end for j (n_bin)
+      
+      // Write the mean of the climo CDF bins
+      if(n_bin > 1) {
+         
+         // Compute SL1L2 climo CDF bin means
+         if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
+            vx_opt.output_flag[i_sal1l2] != STATOutputType_None) {
+         
+            SL1L2Info sl1l2_mean;
+            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
+         
+            // Write out SL1L2
+            if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None &&
+               sl1l2_mean.scount > 0) {
+
+               write_sl1l2_row(shc, sl1l2_mean,
+                  vx_opt.output_flag[i_sl1l2],
+                  -1, n_bin, stat_at, i_stat_row,
+                  txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
+            }
+
+            // Write out SAL1L2
+            if(vx_opt.output_flag[i_sal1l2] != STATOutputType_None &&
+               sl1l2_mean.sacount > 0) {
+
+               write_sal1l2_row(shc, sl1l2_mean,
+                  vx_opt.output_flag[i_sal1l2],
+                  -1, n_bin, stat_at, i_stat_row,
+                  txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
+            }
+         }
+
+         // Compute CNT climo CDF bin means
+         if(vx_opt.output_flag[i_cnt] != STATOutputType_None) {
+            
+            CNTInfo cnt_mean;
+            compute_cnt_mean(cnt_info, n_bin, cnt_mean);
+            
+            if(cnt_mean.n > 0) {
+
+               write_cnt_row(shc, cnt_mean,
+                  vx_opt.output_flag[i_cnt],
+                  -1, n_bin, stat_at, i_stat_row,
+                  txt_at[i_cnt], i_txt_row[i_cnt]);
+            }
+         }
+      } // end if n_bin > 1
+
+   } // end for i (fcnt_ta)
+
+   // Dealloate memory
+   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
+   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0;  }
 
    return;
 }
