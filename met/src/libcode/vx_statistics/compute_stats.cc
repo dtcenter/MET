@@ -1046,3 +1046,175 @@ void compute_i_mean_stdev(const NumArray &v_na,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute an unweighted mean of scalar partial sums.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_sl1l2_mean(const SL1L2Info *sl1l2_info, int n,
+                        SL1L2Info &sl1l2_mean) {
+   int i, n_sl1l2, n_sal1l2;
+
+   // Initialize
+   sl1l2_mean.clear();
+   if(n == 0) return;
+
+   // Store thresholds using the first array entry
+   sl1l2_mean.fthresh = sl1l2_info[0].fthresh;
+   sl1l2_mean.othresh = sl1l2_info[0].othresh;
+   sl1l2_mean.logic   = sl1l2_info[0].logic;
+
+   // Compute running sums
+   for(i=n_sl1l2=n_sal1l2=0; i<n; i++) {
+
+      if(sl1l2_info[i].scount > 0) {
+         n_sl1l2++;
+         sl1l2_mean.scount += sl1l2_info[i].scount;
+         sl1l2_mean.fbar   += sl1l2_info[i].fbar;
+         sl1l2_mean.obar   += sl1l2_info[i].obar;
+         sl1l2_mean.ffbar  += sl1l2_info[i].ffbar;
+         sl1l2_mean.oobar  += sl1l2_info[i].oobar;
+         sl1l2_mean.mae    += sl1l2_info[i].mae;
+      }
+
+      if(sl1l2_info[i].sacount > 0) {
+         n_sal1l2++;
+         sl1l2_mean.sacount += sl1l2_info[i].sacount;
+         sl1l2_mean.fabar   += sl1l2_info[i].fabar;
+         sl1l2_mean.oabar   += sl1l2_info[i].oabar;
+         sl1l2_mean.ffabar  += sl1l2_info[i].ffabar;
+         sl1l2_mean.ooabar  += sl1l2_info[i].ooabar;
+      }
+   } // end for i
+
+   // Compute means
+   if(sl1l2_mean.scount > 0) {
+      sl1l2_mean.fbar  /= n_sl1l2;
+      sl1l2_mean.obar  /= n_sl1l2;
+      sl1l2_mean.ffbar /= n_sl1l2;
+      sl1l2_mean.oobar /= n_sl1l2;
+      sl1l2_mean.mae   /= n_sl1l2;
+   }
+   if(sl1l2_mean.sacount > 0) {
+      sl1l2_mean.fabar  /= n_sal1l2;
+      sl1l2_mean.oabar  /= n_sal1l2;
+      sl1l2_mean.ffabar /= n_sal1l2;
+      sl1l2_mean.ooabar /= n_sal1l2;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute an unweighted mean of continuous statistics.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_cnt_mean(const CNTInfo *cnt_info, int n,
+                      CNTInfo &cnt_mean) {
+   int i;
+   NumArray na;
+
+   // Initialize
+   cnt_mean.clear();
+   if(n == 0) return;
+
+   // Store thresholds using the first array entry
+   cnt_mean.fthresh = cnt_info[0].fthresh;
+   cnt_mean.othresh = cnt_info[0].othresh;
+   cnt_mean.logic   = cnt_info[0].logic;
+
+   // Allocate one alpha value but compute no confidence intervals
+   cnt_mean.allocate_n_alpha(1);
+   cnt_mean.alpha[0] = bad_data_double;
+
+   // Compute the sum of the counts
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].n);
+   cnt_mean.n = na.sum();
+
+   // Compute means, skipping n_ranks, frank_ties, and orank_ties
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].fbar.v);
+   cnt_mean.fbar.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].fstdev.v);
+   cnt_mean.fstdev.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].obar.v);
+   cnt_mean.obar.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].ostdev.v);
+   cnt_mean.ostdev.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].pr_corr.v);
+   cnt_mean.pr_corr.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].sp_corr.v);
+   cnt_mean.sp_corr.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].kt_corr.v);
+   cnt_mean.kt_corr.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr.v);
+   cnt_mean.anom_corr.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsfa.v);
+   cnt_mean.rmsfa.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsoa.v);
+   cnt_mean.rmsoa.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].me.v);
+   cnt_mean.me.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].me2.v);
+   cnt_mean.me2.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].estdev.v);
+   cnt_mean.estdev.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mbias.v);
+   cnt_mean.mbias.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mae.v);
+   cnt_mean.mae.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mse.v);
+   cnt_mean.mse.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].msess.v);
+   cnt_mean.msess.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bcmse.v);
+   cnt_mean.bcmse.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmse.v);
+   cnt_mean.rmse.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e10.v);
+   cnt_mean.e10.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e25.v);
+   cnt_mean.e25.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e50.v);
+   cnt_mean.e50.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e75.v);
+   cnt_mean.e75.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e90.v);
+   cnt_mean.e90.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].eiqr.v);
+   cnt_mean.eiqr.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mad.v);
+   cnt_mean.mad.v = na.mean();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+

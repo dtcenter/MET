@@ -58,6 +58,15 @@ extern void   compute_i_mean_stdev(const NumArray &,
                                    CIInfo &, CIInfo &);
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute means of statistics for climatological bins.
+//
+////////////////////////////////////////////////////////////////////////
+
+extern void compute_sl1l2_mean(const SL1L2Info *, int, SL1L2Info &);
+extern void compute_cnt_mean  (const CNTInfo *, int, CNTInfo &);
+
+////////////////////////////////////////////////////////////////////////
 
 #endif   // __COMPUTE_STATS_H__
 
