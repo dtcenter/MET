@@ -44,11 +44,11 @@
   <test name="climatology_POINT_STAT_GFS_1.0DEG">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_1.0DEG</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
-      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
-      <pair><name>DAY_INTERVAL</name>     <value>1</value></pair>
-      <pair><name>HOUR_INTERVAL</name>    <value>6</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>         <value>GFS_CLIMO_1.0DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>  <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409"</value></pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name> <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409"</value></pair>
+      <pair><name>DAY_INTERVAL</name>          <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name>         <value>6</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
@@ -70,8 +70,8 @@
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_MATCH_MONTH_FALSE</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309</value></pair>
-      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790309</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>  <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309"</value></pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name> <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790309"</value></pair>
       <pair><name>DAY_INTERVAL</name>     <value>NA</value></pair>
       <pair><name>HOUR_INTERVAL</name>    <value>NA</value></pair>
     </env>
