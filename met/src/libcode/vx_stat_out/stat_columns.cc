@@ -79,6 +79,22 @@ void close_txt_file(ofstream *&out, const char *file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString append_climo_bin(const ConcatString &mask_name,
+                              int i_bin, int n_bin) {
+
+   if(n_bin == 1) return(mask_name);
+   
+   // Append the climo CDF bin number.
+   ConcatString cs;
+   cs << mask_name << "_BIN_";
+   if(i_bin == -1) cs << "MEAN";
+   else            cs << i_bin+1;
+   
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_header_row(const char **cols, int n_cols, int hdr_flag,
                       AsciiTable &at, int r, int c) {
    int i;
@@ -709,10 +725,11 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
+   ConcatString mask_name = shc.get_mask();
 
    // CNT line type
    shc.set_line_type(stat_cnt_str);
@@ -724,6 +741,10 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
 
    // Write a line for each alpha value
    for(i=0; i<cnt_info.n_alpha; i++) {
@@ -738,7 +759,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
       write_cnt_cols(cnt_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -749,15 +770,19 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
       stat_row++;
    }
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                     bool txt_flag,
+                     STATOutputType out_type,  int i_bin, int n_bin,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
+   ConcatString mask_name = shc.get_mask();
 
    // SL1L2 line type
    shc.set_line_type(stat_sl1l2_str);
@@ -771,6 +796,10 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -778,7 +807,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sl1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -788,15 +817,19 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                      bool txt_flag,
+                      STATOutputType out_type,  int i_bin, int n_bin,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
+   ConcatString mask_name = shc.get_mask();
 
    // SAL1L2 line type
    shc.set_line_type(stat_sal1l2_str);
@@ -810,6 +843,10 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -817,7 +854,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sal1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -826,6 +863,9 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
 
    // Increment the STAT row counter
    stat_row++;
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
 
    return;
 }

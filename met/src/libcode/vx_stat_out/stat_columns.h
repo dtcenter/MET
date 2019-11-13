@@ -441,6 +441,9 @@ extern void close_txt_file(ofstream *&,  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
+// Update the mask name with climo CDF bin information
+extern ConcatString append_climo_bin(const ConcatString &, int, int);
+
 // Write out the header row for fixed length line types
 extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
 
@@ -466,12 +469,12 @@ extern void write_mctc_row  (StatHdrColumns &, const MCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_mcts_row  (StatHdrColumns &, const MCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
-extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+extern void write_cnt_row   (StatHdrColumns &, const CNTInfo &, STATOutputType,
+                             int, int, AsciiTable &, int &, AsciiTable &, int &);
+extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, STATOutputType,
+                             int, int, AsciiTable &, int &, AsciiTable &, int &);
+extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, STATOutputType,
+                             int, int, AsciiTable &, int &, AsciiTable &, int &);
 
 extern void write_vl1l2_row (StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
