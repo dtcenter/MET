@@ -232,14 +232,29 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
                           clm_hr, clm_min, clm_sec);
 
       // Check the day time step.
-      if(!is_bad_data(day_ts) && labs(ut - vld_ut) >= day_ts) {
-         mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field since the time offset ("
-              << labs(ut - vld_ut) << " seconds) >= the \""
-              << conf_key_day_interval << "\" entry (" << day_ts
-              << " seconds) from file: " << climo_file << "\n";
-         continue;
+      if(!is_bad_data(day_ts)) {
+
+         // For daily climatology, check the hour timestep. 
+         if(day_ts <= 3600*24 && labs(ut - vld_ut) >= hour_ts) {
+            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
+                 << info->magic_str()
+                 << "\" climatology field since the time offset ("
+                 << labs(ut - vld_ut) << " seconds) >= the \""
+                 << conf_key_hour_interval << "\" entry (" << hour_ts
+                 << " seconds) from daily climatology file: "
+                 << climo_file << "\n";
+            continue;
+         }
+         // For non-daily climatology, check the day timestep. 
+         else if(labs(ut - vld_ut) >= day_ts) {
+            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
+                 << info->magic_str()
+                 << "\" climatology field since the time offset ("
+                 << labs(ut - vld_ut) << " seconds) >= the \""
+                 << conf_key_day_interval << "\" entry (" << day_ts
+                 << " seconds) from file: " << climo_file << "\n";
+            continue;
+         }
       }
 
       // Regrid, if needed
@@ -254,7 +269,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       else {
          dp = cur_dpa[i];
       }
-           
+
       // Set the climo time as valid YYYY and climo MMDD_HHMMSS.
       dp.set_valid(ut);
 
