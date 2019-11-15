@@ -111,9 +111,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +208,6 @@ rng = {
 
 grid_weight_flag = ${GRID_WEIGHT};
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V8.1";
+version          = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

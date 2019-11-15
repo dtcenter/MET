@@ -34,6 +34,8 @@ config_DATA = \
 	STATAnalysisConfig_default \
 	STATAnalysisConfig_GO_Index \
 	TCPairsConfig_default \
+	TCRMWConfig_default \
+	RMWAnalysisConfig_default \
 	TCStatConfig_default \
 	TCGenConfig_default \
 	WaveletStatConfig_default \

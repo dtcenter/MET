@@ -135,7 +135,8 @@ class PointStatVxOpt {
       StringArray     mask_name;          // Masking names
 
       NumArray        eclv_points;        // ECLV points
-      ThreshArray     climo_cdf_ta;       // Climo CDF thresh array
+
+      ClimoCDFInfo    cdf_info;           // Climo CDF info
 
       NumArray        ci_alpha;           // Alpha value for confidence intervals
 
@@ -190,7 +191,7 @@ inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n_elemen
 inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);         }
 
 inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());     }
-inline int PointStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
+inline int PointStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);               }
 inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
 
 ////////////////////////////////////////////////////////////////////////

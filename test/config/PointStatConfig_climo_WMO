@@ -31,7 +31,7 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
+cat_thresh  = [ ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
@@ -59,7 +59,7 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = fcst;
 climo_mean = {
@@ -80,9 +80,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = TRUE;
-   time_step          = 43200;
+   day_interval       = 1;
+   hour_interval      = 12;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,6 +182,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V8.1";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

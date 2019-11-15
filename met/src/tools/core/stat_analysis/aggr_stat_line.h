@@ -131,13 +131,13 @@ struct AggrWindInfo {
    StatHdrInfo hdr;
    VL1L2Info vl1l2_info;
    StringArray hdr_sa;
-   NumArray uf_na, vf_na, uo_na, vo_na;
+   PairDataPoint pd_u, pd_v;
 };
 
 struct AggrMPRInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
-   NumArray f_na, o_na, cmn_na, csd_na, cdf_na;
+   PairDataPoint pd;
 };
 
 struct AggrISCInfo {

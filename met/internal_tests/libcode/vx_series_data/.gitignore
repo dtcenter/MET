@@ -1,0 +1,6 @@
+test_series_data
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

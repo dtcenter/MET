@@ -40,6 +40,7 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \

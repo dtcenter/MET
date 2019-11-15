@@ -93,7 +93,7 @@ obs = fcst;
 climo_mean = fcst;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
       method     = BILIN;
@@ -102,17 +102,61 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = ${MATCH_MONTH};
-   match_day          = ${MATCH_DAY};
-   time_step          = 21600;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "${CLIMO_STDEV_FILE}" ];
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+
+   field = [
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "KELVIN";
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "CELCIUS";
+        // Standard deviation is the same for units K and C.
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "FAHRENHEIT";
+        // Apply 1.8 scale factor to standard deviation for K to F conversion.
+        convert(x)   = 1.8 * x;
+      },
+      {
+        name         = "TMP";
+        level        = [ "P500" ];
+        message_type = [ "ADPUPA" ];
+      },
+      {
+        name         = "UGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "VGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "WIND";
+        level        = [ "Z10" ];
+      }
+   ];
 }
 
-climo_cdf_bins = 1;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -212,6 +256,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V8.1";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

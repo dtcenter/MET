@@ -42,12 +42,12 @@ regrid = {
 //
 censor_thresh = [];
 censor_val    = [];
-cat_thresh  = [];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+cat_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -66,7 +66,7 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = fcst;
 climo_mean = {
@@ -87,11 +87,9 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = TRUE;
-   time_step          = 43200;
+   day_interval       = 1;
+   hour_interval      = 12;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,6 +170,19 @@ gradient = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Distance Map statistics
+// May be set separately in each "obs.field" entry
+//
+distance_map = {
+   baddeley_p        = 2;
+   baddeley_max_dist = NA;
+   fom_alpha         = 0.1;
+   zhu_weight        = 0.5;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -195,21 +206,24 @@ output_flag = {
    nbrcts = NONE;
    nbrcnt = NONE;
    grad   = STAT;
+   dmap   = NONE;
 }
 
 //
 // NetCDF matched pairs output file
 //
-nc_pairs_flag   = {
-   latlon     = TRUE;
-   raw        = TRUE;
-   diff       = TRUE;
-   climo      = TRUE;
-   weight     = TRUE;
-   nbrhd      = FALSE;
-   fourier    = FALSE;
-   gradient   = TRUE;
-   apply_mask = FALSE;
+nc_pairs_flag = {
+   latlon       = TRUE;
+   raw          = TRUE;
+   diff         = TRUE;
+   climo        = TRUE;
+   climo_cdp    = FALSE;
+   weight       = TRUE;
+   nbrhd        = FALSE;
+   fourier      = FALSE;
+   gradient     = TRUE;
+   distance_map = FALSE;
+   apply_mask   = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,6 +232,6 @@ grid_weight_flag = COS_LAT;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V8.1";
+version          = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

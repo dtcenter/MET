@@ -131,6 +131,7 @@ enum STATLineType {
    stat_relp,
    stat_eclv,
    stat_grad,
+   stat_dmap,
    stat_header,
 
    no_stat_line_type
@@ -164,6 +165,7 @@ static const char stat_nbrctc_str[] = "NBRCTC";
 static const char stat_nbrcts_str[] = "NBRCTS";
 static const char stat_nbrcnt_str[] = "NBRCNT";
 static const char stat_grad_str[]   = "GRAD";
+static const char stat_dmap_str[]   = "DMAP";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_ecnt_str[]   = "ECNT";
@@ -244,7 +246,8 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   double      sigma;      // Sigma for Gaussian
+   double      gaussian_dx;      // delta distance for Gaussian
+   double      gaussian_radius;  // radius of influence for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
    void        clear();
@@ -252,9 +255,10 @@ struct InterpInfo {
    bool        operator==(const InterpInfo &) const;
 };
 
-// Default sigma value used for Gaussian interpolation and regridding options.
 // Chosen by Hazardous Weather Testbed.
-static const double default_interp_sigma = 1.476;
+// Default radius and delta x for Gaussian interpolation and regridding options.
+static const double default_gaussian_dx = 81.271;
+static const double default_gaussian_radius = 120.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -270,7 +274,8 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-   double       sigma;      // Sigma for Gaussian
+   double       gaussian_dx;      // delta distance for Gaussian
+   double       gaussian_radius;  // radius of influence for Gaussian
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
@@ -278,6 +283,22 @@ struct RegridInfo {
 
    void         clear();
    void         validate(); // ensure that width and method are accordant
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store Climatological CDF Info
+//
+
+struct ClimoCDFInfo {
+   bool        flag;       // Flag to turn on/off climo CDF logic
+   int         n_bin;      // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;     // Array of CDF thresholds
+   bool        write_bins; // Flag for writing the individual bins
+
+   ClimoCDFInfo();
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -460,10 +481,12 @@ static const char conf_key_output_flag[]       = "output_flag";
 static const char conf_key_obs_window[]        = "obs_window";
 static const char conf_key_beg[]               = "beg";
 static const char conf_key_end[]               = "end";
+static const char conf_key_data[]              = "data";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
 static const char conf_key_quilt[]             = "quilt";
 static const char conf_key_grid_res[]          = "grid_res";
+static const char conf_key_data_field[]        = "data.field";
 static const char conf_key_fcst_field[]        = "fcst.field";
 static const char conf_key_obs_field[]         = "obs.field";
 static const char conf_key_file_type[]         = "file_type";
@@ -570,6 +593,7 @@ static const char conf_key_latlon_flag[]       = "latlon";
 static const char conf_key_raw_flag[]          = "raw";
 static const char conf_key_diff_flag[]         = "diff";
 static const char conf_key_climo_flag[]        = "climo";
+static const char conf_key_climo_cdp_flag[]    = "climo_cdp";
 static const char conf_key_apply_mask_flag[]   = "apply_mask";
 static const char conf_key_object_raw_flag[]   = "object_raw";
 static const char conf_key_object_id_flag[]    = "object_id";
@@ -580,20 +604,22 @@ static const char conf_key_do_3d_att_flag[]    = "attributes_3d";
 static const char conf_key_grib_ens_hi_res_ctl[]  = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 static const char conf_key_shape[]             = "shape";
-static const char conf_key_sigma[]             = "sigma";
+static const char conf_key_gaussian_dx[]       = "gaussian_dx";
+static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_eclv_points[]       = "eclv_points";
 
 //
 // Climatology parameter key names
 //
-
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
 static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
-static const char conf_key_climo_cdf_bins[]     = "climo_cdf_bins";
+static const char conf_key_climo_cdf[]          = "climo_cdf";
+static const char conf_key_cdf_bins[]           = "cdf_bins";
+static const char conf_key_center_bins[]        = "center_bins";
+static const char conf_key_write_bins[]         = "write_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
-static const char conf_key_match_month[]        = "match_month";
-static const char conf_key_match_day[]          = "match_day";
-static const char conf_key_time_step[]          = "time_step";
+static const char conf_key_day_interval[]       = "day_interval";
+static const char conf_key_hour_interval[]      = "hour_interval";
 
 //
 // Point-Stat specific parameter key names
@@ -609,13 +635,18 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 //
 // Grid-Stat specific parameter key names
 //
-static const char conf_key_nc_pairs_var_str[] = "nc_pairs_var_str";
-static const char conf_key_fourier[]          = "fourier";
-static const char conf_key_wave_1d_beg[]      = "wave_1d_beg";
-static const char conf_key_wave_1d_end[]      = "wave_1d_end";
-static const char conf_key_gradient[]         = "gradient";
-static const char conf_key_dx[]               = "dx";
-static const char conf_key_dy[]               = "dy";
+static const char conf_key_nc_pairs_var_str[]  = "nc_pairs_var_str";
+static const char conf_key_fourier[]           = "fourier";
+static const char conf_key_wave_1d_beg[]       = "wave_1d_beg";
+static const char conf_key_wave_1d_end[]       = "wave_1d_end";
+static const char conf_key_gradient[]          = "gradient";
+static const char conf_key_dx[]                = "dx";
+static const char conf_key_dy[]                = "dy";
+static const char conf_key_distance_map[]      = "distance_map";
+static const char conf_key_baddeley_p[]        = "baddeley_p";
+static const char conf_key_baddeley_max_dist[] = "baddeley_max_dist";
+static const char conf_key_fom_alpha[]         = "fom_alpha";
+static const char conf_key_zhu_weight[]        = "zhu_weight";
 
 //
 // Wavelet-Stat specific parameter key names
@@ -975,6 +1006,15 @@ static const char conf_key_genesis_window[]           = "genesis_window";
 static const char conf_key_genesis_radius[]           = "genesis_radius";
 
 //
+// TC-RMW specific parameter key names
+//
+static const char conf_key_n_range[]     = "n_range";
+static const char conf_key_n_azimuth[]   = "n_azimuth";
+static const char conf_key_max_range[]   = "max_range_km";
+static const char conf_key_delta_range[] = "delta_range_km";
+static const char conf_key_rmw_scale[]   = "rmw_scale";
+
+//
 // Parameter value names common to multiple tools
 //
 
@@ -1072,6 +1112,7 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
+
 
 ////////////////////////////////////////////////////////////////////////
 

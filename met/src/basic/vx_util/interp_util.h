@@ -77,6 +77,9 @@ extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int 
 extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
 extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
 extern double   interp_gaussian  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, const double sigma, double t, const MaskPlane *mp = 0);
+extern void     interp_gaussian_dp(DataPlane &, const double gaussian_radius, const double gaussian_dx);
+extern double   interp_gaussian  (const DataPlane &, const DataPlane &g_dp, double obs_x, double obs_y, int max_r);
+
 extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *, const MaskPlane *mp = 0);
@@ -109,8 +112,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
-                                  double interp_thresh, const double sigma = 0,
-                                  const SingleThresh *cat_thresh = 0);
+                                  double interp_thresh, const SingleThresh *cat_thresh = 0);
 
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);

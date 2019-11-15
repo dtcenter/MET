@@ -31,6 +31,7 @@ mode_analysis_LDADD = -lvx_stat_out \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \

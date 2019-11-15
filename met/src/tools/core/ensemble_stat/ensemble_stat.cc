@@ -101,8 +101,8 @@ static void process_grid_scores   (int,
                const DataPlane *, const DataPlane *,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
-               const MaskPlane &, ObsErrorEntry *,
-               PairDataEnsemble &);
+               const DataPlane &, const MaskPlane &,
+               ObsErrorEntry *,   PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
@@ -342,10 +342,23 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id);
 
+   // Parse regridding logic
+   RegridInfo ri;
+   if(conf_info.get_n_ens_var() > 0) {
+      ri = conf_info.ens_info[0]->regrid();
+   }
+   else if(conf_info.get_n_vx() > 0) {
+      ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
+   }
+   else {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "at least one ensemble field or verification field must be provided!\n\n";
+      exit(1);
+   }
+
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.ens_info[0]->regrid(),
-                        &(ens_mtddf->grid()),
-                        (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
+   grid = parse_vx_grid(ri, &(ens_mtddf->grid()),
+             (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
 
    // Compute weight for each grid point
    parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
@@ -812,19 +825,24 @@ void process_point_vx() {
 
 void process_point_climo() {
    int i;
-   DataPlaneArray cmn_dpa;
+   DataPlaneArray cmn_dpa, csd_dpa;
 
    // Loop through each of the fields to be verified and extract
    // the climatology fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // Read climatology mean fields
+      // Read climatology data
       cmn_dpa = read_climo_data_plane_array(
                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, ens_valid_ut, grid);
+      csd_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       // Store climatology information
       conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_climo_sd_dpa(csd_dpa);
+
    } // end for i
 
    return;
@@ -1028,9 +1046,11 @@ void process_point_obs(int i_nc) {
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
-                                              hdr_sid_str.c_str(), hdr_ut, obs_qty_str.c_str(),
-                                              obs_arr, grid, var_name.c_str());
+            conf_info.vx_opt[j].vx_pd.add_point_obs(hdr_arr,
+                                         hdr_typ_arr, hdr_typ_str.c_str(),
+                                         hdr_sid_str.c_str(), hdr_ut,
+                                         obs_qty_str.c_str(), obs_arr,
+                                         grid, var_name.c_str());
          }
       }
    } // end for i_start
@@ -1332,7 +1352,7 @@ void process_grid_vx() {
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fraw_dp = (DataPlane *) 0;
    DataPlane  obs_dp, oraw_dp;
-   DataPlane emn_dp, cmn_dp;
+   DataPlane emn_dp, cmn_dp, csd_dp;
    PairDataEnsemble pd_all, pd;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
 
@@ -1449,10 +1469,14 @@ void process_grid_vx() {
       cmn_dp = read_climo_data_plane(
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                   i, ens_valid_ut, grid);
+      csd_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                  i, ens_valid_ut, grid);
 
       mlog << Debug(3)
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
-           << " climatology mean field(s) for forecast "
+           << " climatology mean field(s) and " << (csd_dp.nx() == 0 ? 0 : 1)
+           << " climatology standard deviation field(s) for forecast "
            << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
@@ -1529,7 +1553,8 @@ void process_grid_vx() {
          ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
          InterpMthd   mthd       = string_to_interpmthd(mthd_str.c_str());
          int          wdth       = conf_info.vx_opt[i].interp_info.width[j];
-         double       sigma      = conf_info.vx_opt[i].interp_info.sigma;
+         double       gaussian_dx     = conf_info.vx_opt[i].interp_info.gaussian_dx;
+         double       gaussian_radius = conf_info.vx_opt[i].interp_info.gaussian_radius;
          double       vld_thresh = conf_info.vx_opt[i].interp_info.vld_thresh;
          GridTemplateFactory::GridTemplates shape = conf_info.vx_opt[i].interp_info.shape;
          FieldType    field      = conf_info.vx_opt[i].interp_info.field;
@@ -1554,13 +1579,13 @@ void process_grid_vx() {
          if(ens_mean_flag &&
             (field == FieldType_Fcst || field == FieldType_Both)) {
             emn_dp = smooth_field(emn_dp, mthd, wdth, shape,
-                                  sigma, vld_thresh);
+                                  vld_thresh, gaussian_radius, gaussian_dx);
          }
 
          // Smooth the observation field, if requested
          if(field == FieldType_Obs || field == FieldType_Both) {
             obs_dp = smooth_field(obs_dp, mthd, wdth, shape,
-                                  sigma, vld_thresh);
+                                  vld_thresh, gaussian_radius, gaussian_dx);
          }
 
          // Store a copy of the unperturbed observation field
@@ -1582,8 +1607,8 @@ void process_grid_vx() {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
-               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth,
-                                         shape, sigma, vld_thresh);
+               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape,
+                                         vld_thresh, gaussian_radius, gaussian_dx);
             }
 
             // Store a copy of the unperturbed ensemble field
@@ -1621,7 +1646,7 @@ void process_grid_vx() {
             process_grid_scores(i,
                                 fcst_dp, fraw_dp,
                                 obs_dp, oraw_dp,
-                                emn_dp, cmn_dp,
+                                emn_dp, cmn_dp, csd_dp,
                                 mask_mp, oerr_ptr,
                                 pd_all);
 
@@ -1768,10 +1793,10 @@ void process_grid_scores(int i_vx,
         const DataPlane *fcst_dp, const DataPlane *fraw_dp,
         const DataPlane &obs_dp,  const DataPlane &oraw_dp,
         const DataPlane &emn_dp,  const DataPlane &cmn_dp,
-        const MaskPlane &mask_mp, ObsErrorEntry *oerr_ptr,
-        PairDataEnsemble &pd) {
+        const DataPlane &csd_dp,  const MaskPlane &mask_mp,
+        ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double cmn;
+   double cmn, csd;
    ObsErrorEntry *e = (ObsErrorEntry *) 0;
 
    // Allocate memory in one big chunk based on grid size
@@ -1780,6 +1805,8 @@ void process_grid_scores(int i_vx,
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
                     cmn_dp.ny() == obs_dp.ny());
+   bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
+                    csd_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1790,12 +1817,12 @@ void process_grid_scores(int i_vx,
          if(is_bad_data(obs_dp(x, y)) ||
             !mask_mp.s_is_on(x, y)) continue;
 
-         // Get current climatology value
+         // Get current climatology values
          cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
+         csd = (csd_flag ? csd_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, oraw_dp(x, y),
-                    cmn, bad_data_double, wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cmn, csd, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {
@@ -2373,6 +2400,13 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name()
                 << var_str << "_" << type_str;
+
+   // Skip variable names that have already been written
+   if(nc_ens_var_sa.has(ens_var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_ens_var_sa.add(ens_var_name);
+
    ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
 
    //
@@ -2422,6 +2456,12 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name()
                 << var_str << "_" << type_str;
+
+   // Skip variable names that have already been written
+   if(nc_ens_var_sa.has(ens_var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_ens_var_sa.add(ens_var_name);
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
@@ -2548,13 +2588,20 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
             << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
-   // Append smoothing information
-   if((wdth > 1) &&
-      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
+   // Append smoothing information, except for the raw observations
+   if(wdth > 1 &&
+      (type_str != "OBS" ||
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
        conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
+
+   // Skip variable names that have already been written
+   if(nc_orank_var_sa.has(var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_orank_var_sa.add(var_name);
 
    // Define the variable
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
@@ -2607,12 +2654,16 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Append smoothing information
-   if((wdth > 1) &&
-      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
-       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
+   if(wdth > 1) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
+
+   // Skip variable names that have already been written
+   if(nc_orank_var_sa.has(var_name)) return;
+
+   // Otherwise, add to the list of previously defined variables
+   nc_orank_var_sa.add(var_name);
 
    // Define the variable
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);

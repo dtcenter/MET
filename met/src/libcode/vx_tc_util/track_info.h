@@ -134,6 +134,8 @@ class TrackInfo {
       int                  valid_inc()        const;
       int                  n_points()         const;
 
+      StringArray          track_lines()      const;
+
          //
          //  do stuff
          //
@@ -179,7 +181,7 @@ inline int                  TrackInfo::init_hour()        const { return(InitTim
 inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);            }
 inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);            }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                 }
-
+inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);              }
 ////////////////////////////////////////////////////////////////////////
 //
 // TrackInfoArray class stores an array of TrackInfo objects.

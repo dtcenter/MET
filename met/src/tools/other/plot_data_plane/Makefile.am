@@ -32,8 +32,9 @@ plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_gnomon \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lm -lz -lnetcdf_c++4 -lnetcdf
+	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

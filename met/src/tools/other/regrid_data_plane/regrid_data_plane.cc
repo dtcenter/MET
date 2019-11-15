@@ -57,7 +57,6 @@ static ConcatString program_name;
 // Constants
 static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
 static const int        DefaultInterpWdth = 1;
-static const double     DefaultInterpSigma = default_interp_sigma;
 static const double     DefaultVldThresh  = 0.5;
 
 static const float      MISSING_LATLON = -999.0;
@@ -91,6 +90,7 @@ static const char * GOES_global_attr_names[] = {
 // Variables for command line arguments
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
+static ConcatString AdpFilename;
 static StringArray FieldSA;
 static RegridInfo RGInfo;
 static StringArray VarNameSA;
@@ -116,13 +116,15 @@ static void usage();
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
-static void set_sigma(const StringArray &);
+static void set_gaussian_dx(const StringArray &);
+static void set_gaussian_radius(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
+static void set_adp(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -133,6 +135,8 @@ static const char *dim_name_lat = "lat";
 static const char *dim_name_lon = "lon";
 static const char *var_name_lat = "latitude";
 static const char *var_name_lon = "longitude";
+static const ConcatString vname_dust("Dust");
+static const ConcatString vname_smoke("Smoke");
 
 static IntArray qc_flags;
 
@@ -141,11 +145,14 @@ static void get_grid_mapping(Grid &fr_grid, Grid to_grid, IntArray *cellMapping,
                              ConcatString geostationary_file);
 static int  get_lat_count(NcFile *);
 static int  get_lon_count(NcFile *);
-static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid, bool grid_map=true);
+static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
+                             bool exit_if_error=true);
+static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
+      ConcatString regrid_name, bool grid_map=true);
 static IntArray *read_grid_mapping(const char *grid_map_file);
 static void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-      Grid fr_grid, Grid to_grid, IntArray *cellMapping);
+      Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
 static void save_geostationary_data(const ConcatString geostationary_file,
       const float *latitudes, const float *longitudes,
       const GoesImagerData grid_data);
@@ -153,6 +160,7 @@ static void set_goes_interpolate_option();
 static void set_qc_flags(const StringArray &);
 static void write_grid_mapping(const char *grid_map_file,
       IntArray *cellMapping, Grid fr_grid, Grid to_grid);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -183,7 +191,8 @@ void process_command_line(int argc, char **argv) {
    RGInfo.field      = FieldType_None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
-   RGInfo.sigma      = DefaultInterpSigma;
+   RGInfo.gaussian_dx     = default_gaussian_dx;
+   RGInfo.gaussian_radius = default_gaussian_radius;
    RGInfo.vld_thresh = DefaultVldThresh;
    RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
 
@@ -201,13 +210,15 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_method,     "-method",     1);
    cline.add(set_shape,      "-shape",      1);
    cline.add(set_width,      "-width",      1);
-   cline.add(set_sigma,      "-sigma",      1);
+   cline.add(set_gaussian_radius, "-gaussian_radius", 1);
+   cline.add(set_gaussian_dx,     "-gaussian_dx",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
    cline.add(set_verbosity,  "-v",          1);
    cline.add(set_compress,   "-compress",   1);
    cline.add(set_qc_flags,   "-qc",         1);
+   cline.add(set_adp,        "-adp",        1);
 
    cline.allow_numbers();
 
@@ -248,7 +259,6 @@ void process_command_line(int argc, char **argv) {
           || att_val == "Mesoscale" )
       set_goes_interpolate_option();
    }
-
    RGInfo.validate();
 
    return;
@@ -267,6 +277,7 @@ void process_data_file() {
    int global_attr_count;
    bool opt_all_attrs = false;
    NcFile *nc_in = (NcFile *)0;
+   NcFile *nc_adp = (NcFile *)0;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_data_file() ";
 
@@ -347,9 +358,9 @@ void process_data_file() {
    if (is_geostationary) {
       ConcatString env_coord_name;
       grid_map_file.add("/");
-      grid_map_file.add(make_geostationary_filename(fr_grid, to_grid));
+      grid_map_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
       geostationary_file.add("/");
-      geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, false));
+      geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name, false));
       if (file_exists(grid_map_file.c_str())) {
          run_cs << " with " << grid_map_file;
       }
@@ -379,6 +390,47 @@ void process_data_file() {
 
       nc_in = open_ncfile(InputFilename.c_str());
 
+      if (IS_INVALID_NC_P(nc_in)) {
+          mlog << Error << method_name << "Can't open the input \"" << InputFilename << "\"\n";
+          exit(1);
+      }
+      
+      // Open ADP file if it exists
+      if (0 < AdpFilename.length()) {
+         if (file_exists(AdpFilename.c_str())) {
+            nc_adp = open_ncfile(AdpFilename.c_str());
+            if (IS_INVALID_NC_P(nc_adp)) {
+               mlog << Error << method_name << "Can't open the ADP input \"" << AdpFilename << "\"\n";
+               exit(1);
+            }
+            else {
+               // Verify the coverage start and end times
+               bool mismatch_times = false;
+               ConcatString aod_start_time, aod_end_time;
+               ConcatString adp_start_time, adp_end_time;
+               get_att_value_string(nc_in,  (string)"time_coverage_start", aod_start_time);
+               get_att_value_string(nc_in,  (string)"time_coverage_end",   aod_end_time  );
+               get_att_value_string(nc_adp, (string)"time_coverage_start", adp_start_time);
+               get_att_value_string(nc_adp, (string)"time_coverage_end",   adp_end_time  );
+               
+               if ((aod_start_time != adp_start_time) || (aod_end_time != adp_end_time)) {
+                  ConcatString log_message;
+                  log_message << "The ADP input does nat match with AOD input\n";
+                  if (aod_start_time != adp_start_time) {
+                     log_message << "\tThe start time: "
+                          << aod_start_time << " != " << adp_start_time << "\n";
+                  }
+                  if (aod_end_time != adp_end_time) {
+                     log_message << "\tThe end time: "
+                          << aod_end_time << " != " << adp_end_time << "\n";
+                  }
+                  mlog << Error << method_name << log_message;
+                  exit(1);
+               }
+            }
+         }
+      }
+      
       multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
 
       valid_time = find_valid_time(mapVar);
@@ -412,7 +464,7 @@ void process_data_file() {
          to_dp.set_init(valid_time);
          to_dp.set_valid(valid_time);
          regrid_goes_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp,
-               fr_grid, to_grid, cellMapping);
+               fr_grid, to_grid, cellMapping, nc_adp);
       }
       else {
          // Get the data plane from the file for this VarInfo object
@@ -458,11 +510,13 @@ void process_data_file() {
 
       if (is_geostationary) {
          NcVar to_var = get_nc_var(nc_out, vname.c_str());
-         NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
-         for (int idx=0; idx<global_attr_count; idx++) {
-	   copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
+         NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
+         if(!IS_INVALID_NC(var_data)) {
+            for (int idx=0; idx<global_attr_count; idx++) {
+               copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
+            }
+            copy_nc_atts(&var_data, &to_var, opt_all_attrs);
          }
-         copy_nc_atts(&var_data, &to_var, opt_all_attrs);
       }
 
    } // end for i
@@ -483,8 +537,8 @@ void process_data_file() {
    // Close the output file
    close_nc();
 
-   // nc_in->close();
-   delete nc_in;  nc_in = 0;
+   delete nc_in;  nc_in  = 0;
+   delete nc_adp; nc_adp = 0;
 
    delete [] cellMapping;   cellMapping = 0;
 
@@ -635,7 +689,7 @@ unixtime find_valid_time(multimap<string,NcVar> mapVar) {
       if ((*itVar).first == "t" || (*itVar).first == "time") {
          from_var = (*itVar).second;
          get_nc_data(&from_var, time_values);
-	 get_nc_att(&from_var, (string)"units", time_unit);
+             get_nc_att(&from_var, (string)"units", time_unit);
          valid_time = get_reference_unixtime(time_unit);
          valid_time += (unixtime)nint(time_values[0]);
          mlog << Debug(2) << method_name << "valid time: " << time_values[0]
@@ -861,8 +915,24 @@ int get_lon_count(NcFile *_nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString make_geostationary_filename(
-      Grid fr_grid, Grid to_grid, bool grid_map) {
+static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
+                             bool exit_if_error) {
+   NcVar var_data = get_nc_var(nc, var_name.c_str());
+   if (IS_INVALID_NC(var_data)) {
+       var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
+   }
+   if (IS_INVALID_NC(var_data)) {
+      mlog << Error << "The variable \"" << var_name << "\" does not exist\n";
+      if (exit_if_error) exit(1);
+   }
+   return var_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
+      ConcatString regrid_name, bool grid_map) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -885,7 +955,13 @@ static ConcatString make_geostationary_filename(
             << "_" << int(info.gi->y_image_bounds[0] * factor_float_to_int);
    }
    if (grid_map) {
-      geo_data_filename << "_to_" << to_grid.name() << ".grid_map";
+      geo_data_filename << "_to_";
+      if (file_exists(regrid_name.c_str())) {
+          StringArray file_names = regrid_name.split("\\/");
+          geo_data_filename << file_names[file_names.n_elements()-1];
+      }
+      else geo_data_filename << to_grid.name();
+      geo_data_filename << ".grid_map";
    }
    else {
       geo_data_filename << ".nc";
@@ -945,7 +1021,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                }
             }
             else if ( strcasecmp(str_arr[0].c_str(), "nx") == 0 )  {
- 	       nx = atoi(str_arr[1].c_str());
+               nx = atoi(str_arr[1].c_str());
                if ((nx > 0) && (ny > 0)) {
                   if (cellMapping == 0) {
                      map_size = nx * ny;
@@ -957,7 +1033,7 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
                }
             }
             else if ( strcasecmp(str_arr[0].c_str(), "ny") == 0 )  {
-	       ny = atoi(str_arr[1].c_str());
+               ny = atoi(str_arr[1].c_str());
                if ((nx > 0) && (ny > 0)) {
                   if (cellMapping == 0) {
                      map_size = nx * ny;
@@ -987,36 +1063,85 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
 
 void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-      Grid fr_grid, Grid to_grid, IntArray *cellMapping) {
+      Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
 
    bool has_qc_var = false;
+   bool has_adp_qc_var = false;
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
    int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
    int from_data_size = from_lat_count * from_lon_count;
+   ConcatString goes_var_name;
+   ConcatString goes_var_sub_name;
    ConcatString qc_var_name;
    ncbyte qc_value;
+   unsigned short adp_qc_value;
    ncbyte  *qc_data = new ncbyte[from_data_size];
+   uchar *adp_data = new uchar[from_data_size];
    float *from_data = new float[from_data_size];
+   unsigned short *adp_qc_data = new unsigned short[from_data_size];
    static const char *method_name = "regrid_goes_variable() ";
 
    // -99 is arbitrary number as invalid QC value
    memset(qc_data, -99, from_data_size*sizeof(ncbyte));
 
    NcVar var_qc;
-   NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
-   if (IS_INVALID_NC(var_data)) {
-      mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
-      exit(1);
+   NcVar var_adp;
+   NcVar var_adp_qc;
+   NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
+   //if (IS_INVALID_NC(var_data)) {
+   //   mlog << Error << "The variable \"" << vinfo->name() << "\" does not exist\n";
+   //   exit(1);
+   //}
+   bool is_dust_only = false;
+   bool is_smoke_only = false;
+   string actual_var_name = GET_NC_NAME(var_data);
+   int  actual_var_len = actual_var_name.length();
+   bool is_adp_variable = (0 != actual_var_name.compare(vinfo->name().c_str()));
+
+   memset(adp_data, 1, from_data_size*sizeof(uchar));   // Default: 1 = data present
+   memset(adp_qc_data, 65535, from_data_size*sizeof(unsigned short));
+   if (is_adp_variable && !IS_INVALID_NC_P(nc_adp)) {
+      is_dust_only  = (0 == vinfo->name().comparecase((actual_var_len + 1),
+            vname_dust.length(), vname_dust.c_str()));
+      is_smoke_only = (0 == vinfo->name().comparecase((actual_var_len + 1),
+            vname_smoke.length(), vname_smoke.c_str()));
+      
+      if      (is_dust_only)    var_adp = get_goes_nc_var(nc_adp, vname_dust);
+      else if (is_smoke_only)   var_adp = get_goes_nc_var(nc_adp, vname_smoke);
+      
+      if (!IS_INVALID_NC(var_adp)) {
+         get_nc_data(&var_adp, adp_data);
+         
+         //Smoke:ancillary_variables = "DQF" ; ubyte DQF(y, x) ;
+         if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
+            var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
+            if (!IS_INVALID_NC(var_adp_qc)) {
+               get_nc_data(&var_adp_qc, adp_qc_data);
+               has_adp_qc_var = true;
+               mlog << Debug(5) << method_name << "found QC var: " << qc_var_name
+                    << " for " << GET_NC_NAME(var_adp) << ".\n";
+            }
+         }
+         else mlog << Warning << method_name << "found QC var name (" << qc_var_name
+                   << " for " << GET_NC_NAME(var_adp) << ") but does not exist.\n";
+      }
    }
+   mlog << Debug(5) << method_name << " is_dust: "  << is_dust_only
+        << ", is_smoke: " << is_smoke_only
+        << "\n";
 
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
-      get_nc_data(&var_qc, qc_data);
-      has_qc_var = true;
-      mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
+      if (!IS_INVALID_NC(var_qc)) {
+         get_nc_data(&var_qc, qc_data);
+         has_qc_var = true;
+         mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
+      }
+      else mlog << Warning << method_name << "found QC var name ("
+                << qc_var_name << ") but does not exist.\n";
    }
 
    get_nc_data(&var_data, (float *)from_data);
@@ -1030,11 +1155,14 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
 
    int offset = 0;
+   int from_index;
    int valid_count = 0;
+   int absent_count = 0;
    int censored_count = 0;
    int missing_count = 0;
    int non_missing_count = 0;
    int qc_filtered_count = 0;
+   int adp_qc_filtered_count = 0;
    // int global_attr_count;
    float data_value;
    float from_min_value =  10e10;
@@ -1043,6 +1171,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    float qc_max_value = -10e10;
    IntArray cellArray;
    NumArray dataArray;
+   int particle_qc;
    bool has_qc_flags = (qc_flags.n_elements() > 0);
 
    missing_count = non_missing_count = 0;
@@ -1056,7 +1185,8 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             valid_count = 0;
             dataArray.clear();
             for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
-               data_value = from_data[cellArray[dIdx]];
+               from_index = cellArray[dIdx];
+               data_value = from_data[from_index];
                if (is_eq(data_value, bad_data_float)) {
                   missing_count++;
                   continue;
@@ -1069,7 +1199,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                }
 
                //Filter by QC flag
-               qc_value = qc_data[cellArray[dIdx]];
+               qc_value = qc_data[from_index];
                if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
                   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
                      // Break out after the first match.
@@ -1079,6 +1209,21 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                         break;
                      }
                   }
+                  if (0 == adp_data[from_index]) {
+                     absent_count++;
+                     continue;
+                  }
+                  
+                  if (has_adp_qc_var && has_qc_flags) {
+                     int shift_bits = 2;
+                     if (is_dust_only) shift_bits += 2;
+                     particle_qc = ((adp_qc_data[from_index] >> shift_bits) & 0x03);
+                     if (!qc_flags.has(particle_qc)) {
+                        adp_qc_filtered_count++;
+                        continue;
+                     }
+                  }
+                  
                   dataArray.add(data_value);
                   if (mlog.verbosity_level() >= 4) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
@@ -1090,6 +1235,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                }
                valid_count++;
             }
+            
             if (0 < dataArray.n_elements()) {
                int data_count = dataArray.n_elements();
                float to_value;
@@ -1115,14 +1261,18 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       }
    }
 
-   delete [] qc_data;   qc_data = 0;
-   delete [] from_data; from_data = 0;
+   delete [] qc_data;     qc_data     = 0;
+   delete [] adp_data;    adp_data    = 0;
+   delete [] from_data;   from_data   = 0;
+   delete [] adp_qc_data; adp_qc_data = 0;
 
    mlog << Debug(4) << method_name << " Count: missing: "
         << missing_count << ", non_missing: " << non_missing_count
-        << ", value range: [" << from_min_value << " - " << from_max_value
-        << "] QCed: Filtered: " << qc_filtered_count
-        << " [" << qc_min_value << " - " << qc_max_value << "]\n";
+        << ",  Filtered: by QC: " << qc_filtered_count
+        << ", by adp QC: " << adp_qc_filtered_count
+        << ", by absent: " << absent_count
+        << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
+        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1283,7 +1433,8 @@ void usage() {
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-        << "\t[-sigma n]\n"
+        << "\t[-gaussan_dx n]\n"
+        << "\t[-gaussan_radius n]\n"
         << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
@@ -1307,6 +1458,8 @@ void usage() {
         << "\t\t\"-qc flags\" specifies a comma-separated list of QC flags, for example \"0,1\" (optional).\n"
         << "\t\t\tOnly applied if grid_mapping is set to \"goes_imager_projection\" and the QC variable exists.\n"
 
+        << "\t\t\"-adp adp_file_name\" specifies a ADP data input for AOD dataset (ignored if the input is not AOD from GOES16/17).\n"
+
         << "\t\t\"-method type\" overrides the default regridding "
         << "method (" << interpmthd_to_string(RGInfo.method)
         << ") (optional).\n"
@@ -1314,8 +1467,11 @@ void usage() {
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
 
-        << "\t\t\"-sigma n\" overrides the default regridding "
-        << "sigma (" << RGInfo.sigma << "). Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian_dx << ". Ignored if not Gaussian method (optional).\n"
+
+        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian_radius << "). Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
@@ -1354,6 +1510,11 @@ void set_method(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_gaussian_dx(const StringArray &a) {
+   RGInfo.gaussian_dx = atof(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
    opt_override_width = true;
@@ -1361,8 +1522,8 @@ void set_width(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_sigma(const StringArray &a) {
-   RGInfo.sigma = atof(a[0].c_str());
+void set_gaussian_radius(const StringArray &a) {
+   RGInfo.gaussian_radius = atof(a[0].c_str());
 }
 
 
@@ -1425,3 +1586,16 @@ void set_qc_flags(const StringArray & a) {
       if ( !qc_flags.has(qc_flag) ) qc_flags.add(qc_flag);
    }
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void set_adp(const StringArray & a) {
+   AdpFilename = a[0];
+   if (!file_exists(AdpFilename.c_str())) {
+      mlog << Error << "\nset_adp() -> "
+           << "\"" << AdpFilename << "\" does not exist\n\n";
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////

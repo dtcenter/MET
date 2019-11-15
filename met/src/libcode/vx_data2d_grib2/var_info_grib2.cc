@@ -370,22 +370,15 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  call the parent to set the level information
    set_level_info_grib(dict);
 
-   //  check for a probability boolean setting
-   if( dict.lookup_bool(conf_key_prob, false) ){
-      set_p_flag( true );
-      return;
-   }
-
    //  if the level type is a record number, set the data member
-   set_record( Level.type() == LevelType_RecNumber ?
-               nint(Level.lower()) : -1 );
+   set_record(Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1);
 
    //  if the field is not probabilistic, work is done
-   if( field_name != "PROB" ) return;
+   if(field_name != "PROB") return;
 
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
-   if( NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false)) ){
+   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "if the field name is set to \"PROB\", then a prob information "
            << "section must be present\n\n";
@@ -401,8 +394,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
-                               tab, tab_match) ){
+   if(!GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
+                              field_parm, mtab, cntr, ltab, tab, tab_match)){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "unrecognized GRIB2 probability field abbreviation '"
            << prob_name << "'\n\n";
@@ -413,8 +406,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_parm_cat   ( tab.index_b );
    set_parm       ( tab.index_c );
    set_p_flag     ( true        );
-   set_p_units    ( tab.units.c_str()   );
-   set_units      ( tab.units.c_str()   );
+   set_p_units    ( tab.units.c_str() );
+   set_units      ( "%" );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
