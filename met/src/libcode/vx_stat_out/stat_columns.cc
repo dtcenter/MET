@@ -516,7 +516,7 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 ////////////////////////////////////////////////////////////////////////
 
 void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -539,7 +539,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_fho_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -555,7 +555,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -578,7 +578,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_ctc_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -594,7 +594,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -623,7 +623,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
       write_cts_cols(cts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -640,7 +640,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -663,7 +663,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    write_mctc_cols(mcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -679,7 +679,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -708,7 +708,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
       write_mcts_cols(mcts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -873,7 +873,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -896,7 +896,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_vl1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -912,7 +912,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
 
@@ -935,7 +935,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_val1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -952,7 +952,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 
 
 void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -975,7 +975,7 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
    write_vcnt_cols(vcnt_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1253,7 +1253,7 @@ void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                    const NumArray &eclv_points, bool txt_flag,
+                    const NumArray &eclv_points, STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1277,7 +1277,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
                    stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1293,7 +1293,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -1318,7 +1318,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    write_nbrctc_cols(nbrcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1334,7 +1334,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1366,7 +1366,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1383,7 +1383,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1413,7 +1413,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1430,7 +1430,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1451,7 +1451,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
    write_grad_cols(grad_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1467,7 +1467,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1490,7 +1490,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
    write_dmap_cols(dmap_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1506,7 +1506,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
@@ -1540,7 +1540,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
       write_mpr_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1557,7 +1557,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1583,7 +1583,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
       write_isc_cols(isc_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1600,7 +1600,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1624,7 +1624,7 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_ecnt_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1640,7 +1640,7 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -1664,7 +1664,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_rhist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1680,7 +1680,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -1704,7 +1704,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_phist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1720,7 +1720,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1748,7 +1748,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
       write_orank_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1765,7 +1765,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     double alpha, bool txt_flag,
+                     double alpha, STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1792,7 +1792,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                        stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1810,7 +1810,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1834,7 +1834,7 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_relp_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter

@@ -1029,7 +1029,7 @@ void process_scores() {
                // Write out the MPR lines
                if(conf_info.vx_opt[i].output_flag[i_mpr] != STATOutputType_None) {
                   write_mpr_row(shc, pd_ptr,
-                     conf_info.vx_opt[i].output_flag[i_mpr] == STATOutputType_Both,
+                     conf_info.vx_opt[i].output_flag[i_mpr],
                      stat_at, i_stat_row,
                      txt_at[i_mpr], i_txt_row[i_mpr]);
 
@@ -1060,7 +1060,7 @@ void process_scores() {
                      // Write out FHO
                      if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType_None) {
                         write_fho_row(shc, cts_info[m],
-                           conf_info.vx_opt[i].output_flag[i_fho] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_fho],
                            stat_at, i_stat_row,
                            txt_at[i_fho], i_txt_row[i_fho]);
                      }
@@ -1068,7 +1068,7 @@ void process_scores() {
                      // Write out CTC
                      if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType_None) {
                         write_ctc_row(shc, cts_info[m],
-                           conf_info.vx_opt[i].output_flag[i_ctc] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_ctc],
                            stat_at, i_stat_row,
                            txt_at[i_ctc], i_txt_row[i_ctc]);
                      }
@@ -1076,7 +1076,7 @@ void process_scores() {
                      // Write out CTS
                      if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType_None) {
                         write_cts_row(shc, cts_info[m],
-                           conf_info.vx_opt[i].output_flag[i_cts] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_cts],
                            stat_at, i_stat_row,
                            txt_at[i_cts], i_txt_row[i_cts]);
                      }
@@ -1084,7 +1084,7 @@ void process_scores() {
                      // Write out ECLV
                      if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType_None) {
                         write_eclv_row(shc, cts_info[m], conf_info.vx_opt[i].eclv_points,
-                           conf_info.vx_opt[i].output_flag[i_eclv] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_eclv],
                            stat_at, i_stat_row,
                            txt_at[i_eclv], i_txt_row[i_eclv]);
                      }
@@ -1108,7 +1108,7 @@ void process_scores() {
                      mcts_info.cts.total() > 0) {
 
                      write_mctc_row(shc, mcts_info,
-                        conf_info.vx_opt[i].output_flag[i_mctc] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_mctc],
                         stat_at, i_stat_row,
                         txt_at[i_mctc], i_txt_row[i_mctc]);
                   }
@@ -1118,7 +1118,7 @@ void process_scores() {
                      mcts_info.cts.total() > 0) {
 
                      write_mcts_row(shc, mcts_info,
-                        conf_info.vx_opt[i].output_flag[i_mcts] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_mcts],
                         stat_at, i_stat_row,
                         txt_at[i_mcts], i_txt_row[i_mcts]);
                   }
@@ -1180,7 +1180,7 @@ void process_scores() {
                      if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
                         vl1l2_info[m].vcount > 0) {
                         write_vl1l2_row(shc, vl1l2_info[m],
-                           conf_info.vx_opt[i].output_flag[i_vl1l2] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_vl1l2],
                            stat_at, i_stat_row,
                            txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                      }
@@ -1189,7 +1189,7 @@ void process_scores() {
                      if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
                         vl1l2_info[m].vacount > 0) {
                         write_val1l2_row(shc, vl1l2_info[m],
-                           conf_info.vx_opt[i].output_flag[i_val1l2] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_val1l2],
                            stat_at, i_stat_row,
                            txt_at[i_val1l2], i_txt_row[i_val1l2]);
                      }
@@ -1199,7 +1199,7 @@ void process_scores() {
                      if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
                         vl1l2_info[m].vcount > 0) {
                         write_vcnt_row(shc, vl1l2_info[m],
-                           conf_info.vx_opt[i].output_flag[i_vcnt] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_vcnt],
                            stat_at, i_stat_row,
                            txt_at[i_vcnt], i_txt_row[i_vcnt]);
                      }
@@ -1823,7 +1823,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
          write_ecnt_row(shc, &hira_pd,
-            conf_info.vx_opt[i_vx].output_flag[i_ecnt] == STATOutputType_Both,
+            conf_info.vx_opt[i_vx].output_flag[i_ecnt],
             stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       }
@@ -1956,7 +1956,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // Write out the MPR lines
          if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType_None) {
             write_mpr_row(shc, &hira_pd,
-               conf_info.vx_opt[i_vx].output_flag[i_mpr] == STATOutputType_Both,
+               conf_info.vx_opt[i_vx].output_flag[i_mpr],
                stat_at, i_stat_row,
                txt_at[i_mpr], i_txt_row[i_mpr], false);
 

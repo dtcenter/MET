@@ -461,7 +461,7 @@ void process_scores() {
                shc.set_obs_thresh(conf_info.ocat_ta[i][k]);
 
                write_isc_row(shc, isc_info[j][k],
-                  conf_info.output_flag[i_isc] == STATOutputType_Both,
+                  conf_info.output_flag[i_isc],
                   stat_at, i_stat_row, isc_at, i_isc_row);
             } // end for k
          } // end if
@@ -483,7 +483,7 @@ void process_scores() {
             aggregate_isc_info(isc_info, i, j, isc_aggr);
 
             write_isc_row(shc, isc_aggr,
-               conf_info.output_flag[i_isc] == STATOutputType_Both,
+               conf_info.output_flag[i_isc],
                stat_at, i_stat_row, isc_at, i_isc_row);
          }
       }

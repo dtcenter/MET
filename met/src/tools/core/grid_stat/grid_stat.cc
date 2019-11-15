@@ -841,7 +841,7 @@ void process_scores() {
                      cts_info[m].cts.n() > 0) {
 
                      write_fho_row(shc, cts_info[m],
-                        conf_info.vx_opt[i].output_flag[i_fho] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_fho],
                         stat_at, i_stat_row,
                         txt_at[i_fho], i_txt_row[i_fho]);
                   }
@@ -851,7 +851,7 @@ void process_scores() {
                      cts_info[m].cts.n() > 0) {
 
                      write_ctc_row(shc, cts_info[m],
-                        conf_info.vx_opt[i].output_flag[i_ctc] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_ctc],
                         stat_at, i_stat_row,
                         txt_at[i_ctc], i_txt_row[i_ctc]);
                   }
@@ -861,7 +861,7 @@ void process_scores() {
                      cts_info[m].cts.n() > 0) {
 
                      write_cts_row(shc, cts_info[m],
-                        conf_info.vx_opt[i].output_flag[i_cts] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_cts],
                         stat_at, i_stat_row,
                         txt_at[i_cts], i_txt_row[i_cts]);
                   }
@@ -871,7 +871,7 @@ void process_scores() {
                      cts_info[m].cts.n() > 0) {
 
                      write_eclv_row(shc, cts_info[m], conf_info.vx_opt[i].eclv_points,
-                        conf_info.vx_opt[i].output_flag[i_eclv] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_eclv],
                         stat_at, i_stat_row,
                         txt_at[i_eclv], i_txt_row[i_eclv]);
                   }
@@ -895,7 +895,7 @@ void process_scores() {
                   mcts_info.cts.total() > 0) {
 
                   write_mctc_row(shc, mcts_info,
-                     conf_info.vx_opt[i].output_flag[i_mctc] == STATOutputType_Both,
+                     conf_info.vx_opt[i].output_flag[i_mctc],
                      stat_at, i_stat_row,
                      txt_at[i_mctc], i_txt_row[i_mctc]);
                }
@@ -905,7 +905,7 @@ void process_scores() {
                   mcts_info.cts.total() > 0) {
 
                   write_mcts_row(shc, mcts_info,
-                     conf_info.vx_opt[i].output_flag[i_mcts] == STATOutputType_Both,
+                     conf_info.vx_opt[i].output_flag[i_mcts],
                      stat_at, i_stat_row,
                      txt_at[i_mcts], i_txt_row[i_mcts]);
                }
@@ -996,7 +996,7 @@ void process_scores() {
                      vl1l2_info[m].vcount > 0) {
 
                      write_vl1l2_row(shc, vl1l2_info[m],
-                        conf_info.vx_opt[i].output_flag[i_vl1l2] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
                         txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                   }
@@ -1006,7 +1006,7 @@ void process_scores() {
                      vl1l2_info[m].vacount > 0) {
 
                      write_val1l2_row(shc, vl1l2_info[m],
-                        conf_info.vx_opt[i].output_flag[i_val1l2] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
@@ -1017,7 +1017,7 @@ void process_scores() {
                      vl1l2_info[m].vcount > 0) {
 
                      write_vcnt_row(shc, vl1l2_info[m],
-                        conf_info.vx_opt[i].output_flag[i_vcnt] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_vcnt],
                         stat_at, i_stat_row,
                         txt_at[i_vcnt], i_txt_row[i_vcnt]);
                   }
@@ -1161,7 +1161,7 @@ void process_scores() {
                      grad_info.total > 0) {
 
                      write_grad_row(shc, grad_info,
-                        conf_info.vx_opt[i].output_flag[i_grad] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_grad],
                         stat_at, i_stat_row,
                         txt_at[i_grad], i_txt_row[i_grad]);
                   }
@@ -1293,7 +1293,7 @@ void process_scores() {
                      dmap_info.total > 0) {
 
                      write_dmap_row(shc, dmap_info,
-                        conf_info.vx_opt[i].output_flag[i_dmap] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_dmap],
                         stat_at, i_stat_row,
                         txt_at[i_dmap], i_txt_row[i_dmap]);
                   }
@@ -1494,7 +1494,7 @@ void process_scores() {
                            if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None) {
 
                               write_nbrctc_row(shc, nbrcts_info[n],
-                                 conf_info.vx_opt[i].output_flag[i_nbrctc] == STATOutputType_Both,
+                                 conf_info.vx_opt[i].output_flag[i_nbrctc],
                                  stat_at, i_stat_row,
                                  txt_at[i_nbrctc], i_txt_row[i_nbrctc]);
                            }
@@ -1503,7 +1503,7 @@ void process_scores() {
                            if(conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None) {
 
                               write_nbrcts_row(shc, nbrcts_info[n],
-                                 conf_info.vx_opt[i].output_flag[i_nbrcts] == STATOutputType_Both,
+                                 conf_info.vx_opt[i].output_flag[i_nbrcts],
                                  stat_at, i_stat_row,
                                  txt_at[i_nbrcts], i_txt_row[i_nbrcts]);
                            }
@@ -1524,7 +1524,7 @@ void process_scores() {
                         conf_info.vx_opt[i].output_flag[i_nbrcnt]) {
 
                         write_nbrcnt_row(shc, nbrcnt_info,
-                           conf_info.vx_opt[i].output_flag[i_nbrcnt] == STATOutputType_Both,
+                           conf_info.vx_opt[i].output_flag[i_nbrcnt],
                            stat_at, i_stat_row,
                            txt_at[i_nbrcnt], i_txt_row[i_nbrcnt]);
                      }
@@ -1721,7 +1721,7 @@ void process_scores() {
                      vl1l2_info[m].vcount > 0) {
 
                      write_vl1l2_row(shc, vl1l2_info[m],
-                        conf_info.vx_opt[i].output_flag[i_vl1l2] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_vl1l2],
                         stat_at, i_stat_row,
                         txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                   }
@@ -1731,7 +1731,7 @@ void process_scores() {
                      vl1l2_info[m].vacount > 0) {
 
                      write_val1l2_row(shc, vl1l2_info[m],
-                        conf_info.vx_opt[i].output_flag[i_val1l2] == STATOutputType_Both,
+                        conf_info.vx_opt[i].output_flag[i_val1l2],
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
