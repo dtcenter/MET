@@ -1217,4 +1217,63 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute an unweighted mean of probabilistic statistics.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_pct_mean(const PCTInfo *cnt_info, int n,
+                      PCTInfo &pct_mean) {
+   int i;
+   NumArray na;
+
+   // Initialize
+   pct_mean.clear();
+   if(n == 0) return;
+
+   // Store thresholds using the first array entry
+   pct_mean.fthresh = cnt_info[0].fthresh;
+   pct_mean.othresh = cnt_info[0].othresh;
+
+   // Allocate one alpha value but compute no confidence intervals
+   pct_mean.allocate_n_alpha(1);
+   pct_mean.alpha[0] = bad_data_double;
+   
+   // Compute the sum of the totals
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].total);
+   pct_mean.total = na.sum();
+
+   // Compute means of statistics
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].baser.v);
+   pct_mean.baser.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].reliability);
+   pct_mean.reliability = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].resolution);
+   pct_mean.resolution = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].uncertainty);
+   pct_mean.uncertainty = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].roc_auc);
+   pct_mean.roc_auc = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].brier.v);
+   pct_mean.brier.v = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].briercl.v);
+   pct_mean.briercl.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bss);
+   pct_mean.bss = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bss_smpl);
+   pct_mean.bss_smpl = na.mean();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 

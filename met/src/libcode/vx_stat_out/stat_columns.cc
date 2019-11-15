@@ -1093,7 +1093,6 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
@@ -3021,7 +3020,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    BSS,         BSS_SMPL,    [THRESH] (for each threshold)
    //
    at.set_entry(r, c+0,  // Total count
-      pct_info.pct.n());
+      pct_info.total);
 
    at.set_entry(r, c+1,  // N_THRESH
       pct_info.pct.nrows() + 1);
@@ -3036,16 +3035,16 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
       pct_info.baser.v_ncu[alpha_i]);
 
    at.set_entry(r, c+5,  // RELIABILITY
-      pct_info.pct.reliability());
+      pct_info.reliability);
 
    at.set_entry(r, c+6,  // RESOLUTION
-      pct_info.pct.resolution());
+      pct_info.resolution);
 
    at.set_entry(r, c+7,  // UNCERTAINTY
-      pct_info.pct.uncertainty());
+      pct_info.uncertainty);
 
    at.set_entry(r, c+8,  // ROC_AUC
-      pct_info.pct.roc_auc());
+      pct_info.roc_auc);
 
    at.set_entry(r, c+9,  // BRIER
       pct_info.brier.v);
@@ -3069,7 +3068,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
       pct_info.bss);
 
    at.set_entry(r, c+16, // Brier Skill Score using sample climo
-      pct_info.pct.bss_smpl());
+      pct_info.bss_smpl);
 
    //
    // Write THRESH_i for each probability threshold

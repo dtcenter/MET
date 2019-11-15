@@ -1660,7 +1660,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
 
          // Write out PCT
-         if(vx_opt.output_flag[i_pct] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pct] != STATOutputType_None) {
             write_pct_row(shc, pct_info[j],
                vx_opt.output_flag[i_pct],
                j, n_bin, stat_at, i_stat_row,
@@ -1668,7 +1669,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PSTD
-         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pstd] != STATOutputType_None) {
             write_pstd_row(shc, pct_info[j],
                vx_opt.output_flag[i_pstd],
                j, n_bin, stat_at, i_stat_row,
@@ -1676,7 +1678,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PJC
-         if(vx_opt.output_flag[i_pjc] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pjc] != STATOutputType_None) {
             write_pjc_row(shc, pct_info[j],
                vx_opt.output_flag[i_pjc],
                j, n_bin, stat_at, i_stat_row,
@@ -1684,7 +1687,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PRC
-         if(vx_opt.output_flag[i_prc] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_prc] != STATOutputType_None) {
             write_prc_row(shc, pct_info[j],
                vx_opt.output_flag[i_prc],
                j, n_bin, stat_at, i_stat_row,
@@ -1692,7 +1696,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out ECLV
-         if(vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_eclv] != STATOutputType_None) {
             write_eclv_row(shc, pct_info[j], vx_opt.eclv_points,
                vx_opt.output_flag[i_eclv],
                j, n_bin, stat_at, i_stat_row,
@@ -1700,7 +1705,20 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
       } // end for j (n_bin)
 
-      // JHG write means!
+      // Write the mean of the climo CDF bins
+      if(n_bin > 1) {
+
+         PCTInfo pct_mean;
+         compute_pct_mean(pct_info, n_bin, pct_mean);
+
+         // Write out PSTD
+         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+            write_pstd_row(shc, pct_mean,
+               vx_opt.output_flag[i_pstd],
+               -1, n_bin, stat_at, i_stat_row,
+               txt_at[i_pstd], i_txt_row[i_pstd]);
+         }
+      } // end if n_bin > 1
 
    } // end for i (ocnt_ta)
 

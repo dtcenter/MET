@@ -2048,14 +2048,14 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
             vx_opt.output_flag[i_sal1l2] != STATOutputType_None) {
          
-            SL1L2Info s_mean;
-            compute_sl1l2_mean(sl1l2_info, n_bin, s_mean);
+            SL1L2Info sl1l2_mean;
+            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
          
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None &&
-               s_mean.scount > 0) {
+               sl1l2_mean.scount > 0) {
 
-               write_sl1l2_row(shc, s_mean,
+               write_sl1l2_row(shc, sl1l2_mean,
                   vx_opt.output_flag[i_sl1l2],
                   -1, n_bin, stat_at, i_stat_row,
                   txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
@@ -2063,9 +2063,9 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Write out SAL1L2
             if(vx_opt.output_flag[i_sal1l2] != STATOutputType_None &&
-               s_mean.sacount > 0) {
+               sl1l2_mean.sacount > 0) {
 
-               write_sal1l2_row(shc, s_mean,
+               write_sal1l2_row(shc, sl1l2_mean,
                   vx_opt.output_flag[i_sal1l2],
                   -1, n_bin, stat_at, i_stat_row,
                   txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
@@ -2186,9 +2186,10 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Compute the probabilistic counts and statistics
          compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
-
+         
          // Write out PCT
-         if(vx_opt.output_flag[i_pct] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pct] != STATOutputType_None) {
             write_pct_row(shc, pct_info[j],
                vx_opt.output_flag[i_pct],
                j, n_bin, stat_at, i_stat_row,
@@ -2196,7 +2197,8 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PSTD
-         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pstd] != STATOutputType_None) {
             write_pstd_row(shc, pct_info[j],
                vx_opt.output_flag[i_pstd],
                j, n_bin, stat_at, i_stat_row,
@@ -2204,7 +2206,8 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PJC
-         if(vx_opt.output_flag[i_pjc] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_pjc] != STATOutputType_None) {
             write_pjc_row(shc, pct_info[j],
                vx_opt.output_flag[i_pjc],
                j, n_bin, stat_at, i_stat_row,
@@ -2212,7 +2215,8 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out PRC
-         if(vx_opt.output_flag[i_prc] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_prc] != STATOutputType_None) {
             write_prc_row(shc, pct_info[j],
                vx_opt.output_flag[i_prc],
                j, n_bin, stat_at, i_stat_row,
@@ -2220,7 +2224,8 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Write out ECLV
-         if(vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+         if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+            vx_opt.output_flag[i_eclv] != STATOutputType_None) {
             write_eclv_row(shc, pct_info[j], vx_opt.eclv_points,
                vx_opt.output_flag[i_eclv],
                j, n_bin, stat_at, i_stat_row,
@@ -2228,7 +2233,20 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
       } // end for j (n_bin)
 
-      // JHG write means!
+      // Write the mean of the climo CDF bins
+      if(n_bin > 1) {
+
+         PCTInfo pct_mean;
+         compute_pct_mean(pct_info, n_bin, pct_mean);
+
+         // Write out PSTD
+         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+            write_pstd_row(shc, pct_mean,
+               vx_opt.output_flag[i_pstd],
+               -1, n_bin, stat_at, i_stat_row,
+               txt_at[i_pstd], i_txt_row[i_pstd]);
+         }
+      } // end if n_bin > 1
 
    } // end for i (ocnt_ta)
 

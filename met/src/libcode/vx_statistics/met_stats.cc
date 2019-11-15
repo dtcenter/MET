@@ -2328,10 +2328,16 @@ void PCTInfo::clear() {
    fthresh.clear();
    othresh.clear();
 
+   total = bad_data_int;
    baser.clear();
+   reliability = bad_data_double;
+   resolution = bad_data_double;
+   uncertainty = bad_data_double;
+   roc_auc = bad_data_double;
    brier.clear();
    briercl.clear();
    bss = bad_data_double;
+   bss_smpl = bad_data_double;
 
    return;
 }
@@ -2343,19 +2349,25 @@ void PCTInfo::assign(const PCTInfo &c) {
 
    clear();
 
-   pct = c.pct;
+   pct       = c.pct;
    climo_pct = c.climo_pct;
-   fthresh = c.fthresh;
-   othresh  = c.othresh;
+   fthresh   = c.fthresh;
+   othresh   = c.othresh;
 
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
-   baser   = c.baser;
-   brier   = c.brier;
-   briercl = c.briercl;
-   bss     = c.bss;
-
+   total       = c.total;
+   baser       = c.baser;
+   reliability = c.reliability;
+   resolution  = c.resolution;
+   uncertainty = c.uncertainty;
+   roc_auc     = c.roc_auc;
+   brier       = c.brier;
+   briercl     = c.briercl;
+   bss         = c.bss;
+   bss_smpl    = c.bss_smpl;
+   
    return;
 }
 
@@ -2387,9 +2399,15 @@ void PCTInfo::allocate_n_alpha(int i) {
 
 void PCTInfo::compute_stats() {
 
-   baser.v   = pct.baser();
-   brier.v   = pct.brier_score();
-   briercl.v = climo_pct.brier_score();
+   total       = pct.n();
+   baser.v     = pct.baser();
+   reliability = pct.reliability();
+   resolution  = pct.resolution();
+   uncertainty = pct.uncertainty();
+   roc_auc     = pct.roc_auc();
+   brier.v     = pct.brier_score();
+   briercl.v   = climo_pct.brier_score();
+   bss_smpl    = pct.bss_smpl();
 
    //
    // Compute the brier skill score

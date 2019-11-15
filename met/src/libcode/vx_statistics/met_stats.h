@@ -529,10 +529,17 @@ class PCTInfo {
       // Single threshold for the scalar observation
       SingleThresh othresh;
 
+      // PSTD statistics
+      int    total;
       CIInfo baser;
+      double reliability;
+      double resolution;
+      double uncertainty;
+      double roc_auc;
       CIInfo brier;
       CIInfo briercl; // Climatological brier score
       double bss;
+      double bss_smpl;
 
       void clear();
       void allocate_n_alpha(int);
