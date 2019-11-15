@@ -72,7 +72,7 @@
       <pair><name>CLIMO_MEAN_FILE_LIST</name>  <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790309"</value></pair>
       <pair><name>CLIMO_STDEV_FILE_LIST</name> <value>"&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790309"</value></pair>
       <pair><name>DAY_INTERVAL</name>          <value>NA</value></pair>
-      <pair><name>HOUR_INTERVAL</name>         <value>NA</value></pair>
+      <pair><name>HOUR_INTERVAL</name>         <value>6</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
