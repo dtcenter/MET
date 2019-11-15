@@ -2549,7 +2549,11 @@ grid_stat
  The output files are written to the default output directory or the directory
  specified by the -outdir
 \series medium
- command-line option.
+ 
+\series default
+command line
+\series medium
+ option.
  
 \end_layout
 

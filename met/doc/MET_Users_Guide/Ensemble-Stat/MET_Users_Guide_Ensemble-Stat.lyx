@@ -2004,18 +2004,104 @@ name "subsec:ensemble_stat-output"
 \begin_layout Standard
 
 \series bold
+ensemble_stat
+\series default
+ can produce output in STAT, ASCII, and NetCDF formats.
+ The ASCII output duplicates the STAT output but has the data organized
+ by line type.
+ The output files are written to the default output directory or the directory
+ specified by the -outdir
+\series medium
+ 
+\series default
+command line
+\series medium
+ option.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output STAT file is named using the following naming convention: 
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat
+\series medium
+ where 
+\series default
+PREFIX
+\series medium
+ indicates the user-defined output prefix and 
+\series default
+YYYYMMDD_HHMMSSV
+\series medium
+ indicates the forecast valid time.
+ Note that
+\series default
+ the forecast lead time is not included in the output file names 
+\series medium
+since it would not be well-defined for time-lagged ensembles.
+ When verifying multiple lead times for the same valid time, users should
+ either write the output to separate directories or specify a output prefix
+ to ensure unqiue file names.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output ASCII files are named similarly: 
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt
+\series medium
+ where 
+\series default
+TYPE
+\series medium
+ is one of 
+\series default
+ecnt, rhist, phist, relp, orank, and ssvar
+\series medium
+ to indicate the line type it contains.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When fields are requested in the ens dictionary of the configuration file
+ or verificaiton against gridded fields is performed, 
+\series bold
+ensemble_stat
+\series medium
+ can produce output NetCDF files using the following naming convention:
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_
+\series medium
+TYPE.nc where TYPE is either ens or orank.
+ The orank 
+\series default
+NetCDF output file contains gridded fields of observation ranks when the
+ -grid_obs command line option is used.
+
+\series medium
+ The ens NetCDF output file contains ensemble products derived from the
+ fields requested in the ens dictionary of the configuration file.
+ 
+\series default
 The Ensemble-Stat tool can calculate any of the following fields from the
- input ensemble members:
+ input ensemble members, as specified in the ensemble_flag dictionary in
+ the configuration file:
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
 Ensemble Mean fields
-\end_layout
-
-\begin_layout Standard
-Ensemble Median and Mode fields
 \end_layout
 
 \begin_layout Standard
@@ -2063,46 +2149,55 @@ Ensemble Valid Data Count fields
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Ensemble Relative Frequency by threshold fields
+Ensemble Relative Frequency by threshold fields (e.g.
+ ensemble probabilities)
+\end_layout
+
+\begin_layout Standard
+Rank for each Observation Value (if gridded observation field provided)
+\end_layout
+
+\begin_layout Standard
+When gridded or point observations are provided, using the -grid_obs and
+ -point_obs command line options, repsectively, the Ensemble-Stat tool can
+ compute the following statistics for the fields specified in the fcst and
+ obs dictionaries of the configuration file:
+\end_layout
+
+\begin_layout Standard
+Continuous Ensemble Statistics
+\end_layout
+
+\begin_layout Standard
+\noindent
+Ranked Histograms
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Ranked Histograms (if Observation Field Provided)
+Probability Integral Transform (PIT) Histograms
+\end_layout
+
+\begin_layout Standard
+Relative Position Histograms
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Probability Integral Transform (PIT) Histograms (if Observation Field Provided)
+Spread/Skill Variance
 \end_layout
 
 \begin_layout Standard
-\paragraph_spacing single
-\noindent
-Spread/Skill variance (if Observation Field Provided)
+Ensemble Matched Pair information
 \end_layout
 
 \begin_layout Standard
 
-\series bold
-The Ensemble-Stat tool then writes:
-\end_layout
-
-\begin_layout Standard
-Gridded fields of Ensemble forecast values to a NetCDF file
-\end_layout
-
-\begin_layout Standard
-Gridded field of Observation Ranks to a NetCDF file (if Gridded Observations
- Provided)
-\end_layout
-
-\begin_layout Standard
-STAT file and optional ASCII files with Ranked Histograms, Probability Integral
- Transform (PIT) Histogram, Spread/Skill Information, and Ensemble Matched
- Pair Information (if Point Observations Provided)
+\series medium
+The format of the STAT and ASCII output of the Ensemble-Stat tool are described
+ below.
 \end_layout
 
 \begin_layout Standard

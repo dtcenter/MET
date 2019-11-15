@@ -2639,7 +2639,7 @@ wavelet_stat
 \series bold
 -outdir
 \series default
- command-line option.
+ command line option.
  
 \end_layout
 
