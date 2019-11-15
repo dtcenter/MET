@@ -169,7 +169,6 @@ void StatHdrColumns::set_fcst_var(const ConcatString s) {
 
 void StatHdrColumns::set_fcst_units(const ConcatString s) {
    fcst_units = check_hdr_str(s, true);
-   mlog << Debug(4) << "set FCST_UNITS:" << fcst_units << "\n";
    return;
 }
 
@@ -191,7 +190,6 @@ void StatHdrColumns::set_obs_var(const ConcatString s) {
 
 void StatHdrColumns::set_obs_units(const ConcatString s) {
    obs_units = check_hdr_str(s, true);
-   mlog << Debug(4) << "set OBS_UNITS:" << obs_units << "\n";
    return;
 }
 
