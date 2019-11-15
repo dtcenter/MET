@@ -11,9 +11,9 @@
 //   Filename:   point_stat.cc
 //
 //   Description:
-//      Based on user specified parameters, this tool compares a
+//      Based on user-specified parameters, this tool compares a
 //      a gridded forecast field to the point observation output of
-//      the PB2NC or ASCII2NC tool.  It computes many verification
+//      the point pre-processing tools. It computes many verification
 //      scores and statistics, including confidence intervals, to
 //      summarize the comparison.
 //
@@ -89,7 +89,8 @@
 //   041    04/08/19  Halley Gotway  Add percentile thresholds.
 //   042    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
-//   043    11/15/19  Halley Gotway  Add support for climo bin stats.
+//   043    11/15/19  Halley Gotway  Apply climatology bins to
+//                    continuous and probabilistic statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 

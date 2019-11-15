@@ -11,6 +11,10 @@
 //   Filename:   grid_stat.cc
 //
 //   Description:
+//      Based on user-specified parameters, this tool compares a
+//      a gridded forecast fields to gridded analyses. It computes
+//      many verification scores and statistics, including confidence
+//      intervals, to summarize the comparison.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
@@ -98,7 +102,8 @@
 //   047    06/19/19  Halley Gotway  Add DMAP output line type.
 //   048    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
-//   049    11/15/19  Halley Gotway  Add support for climo bin stats.
+//   049    11/15/19  Halley Gotway  Apply climatology bins to
+//                    continuous and probabilistic statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
