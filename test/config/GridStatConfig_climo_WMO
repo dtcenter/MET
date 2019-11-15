@@ -91,15 +91,6 @@ climo_mean = {
    hour_interval      = 12;
 }
 
-climo_stdev = climo_mean;
-climo_stdev = {
-
-   file_name = [ "${CLIMO_DIR}/t850hPa_stdev.grib",
-                 "${CLIMO_DIR}/u850hPa_stdev.grib",
-                 "${CLIMO_DIR}/v850hPa_stdev.grib",
-                 "${CLIMO_DIR}/ws850hPa_stdev.grib" ];
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
