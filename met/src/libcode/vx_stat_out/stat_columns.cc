@@ -86,7 +86,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
    
    // Append the climo CDF bin number.
    ConcatString cs;
-   cs << mask_name << "_BIN_";
+   cs << mask_name << "_BIN";
    if(i_bin == -1) cs << "MEAN";
    else            cs << i_bin+1;
    
@@ -988,15 +988,14 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
 void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
+   ConcatString mask_name = shc.get_mask();
 
    // PCT line type
    shc.set_line_type(stat_pct_str);
@@ -1012,6 +1011,10 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -1019,7 +1022,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pct_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1029,17 +1032,21 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                    bool txt_flag,
+                    STATOutputType out_type, int i_bin, int n_bin,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row,
                     bool update_thresh) {
    int i;
+   ConcatString mask_name = shc.get_mask();
 
    // PSTD line type
    shc.set_line_type(stat_pstd_str);
@@ -1051,6 +1058,10 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
 
    // Write a line for each alpha value
    for(i=0; i<pct_info.n_alpha; i++) {
@@ -1065,7 +1076,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       write_pstd_cols(pct_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1076,6 +1087,9 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       stat_row++;
    }
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
@@ -1083,10 +1097,11 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
+   ConcatString mask_name = shc.get_mask();
 
    // PJC line type
    shc.set_line_type(stat_pjc_str);
@@ -1102,6 +1117,10 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -1109,7 +1128,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pjc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1119,17 +1138,21 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
-
+   ConcatString mask_name = shc.get_mask();
+ 
    // PRC line type
    shc.set_line_type(stat_prc_str);
 
@@ -1144,6 +1167,10 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -1151,7 +1178,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_prc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1160,6 +1187,66 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 
    // Increment the STAT row counter
    stat_row++;
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
+                    const NumArray &eclv_points,
+                    STATOutputType out_type, int i_bin, int n_bin,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   int i;
+   ConcatString mask_name = shc.get_mask();
+
+   // ECLV line type
+   shc.set_line_type(stat_eclv_str);
+
+   // Set the threshold columns, if requested.
+   shc.set_obs_thresh(pct_info.othresh);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
+   // Write ECLV line for each PCT row
+   for(i=0; i<pct_info.pct.nrows(); i++) {
+
+      // Update the forecast threshold
+      shc.set_fcst_thresh(pct_info.fthresh[i+1]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data for the 2x2 contingency table for this row
+      write_eclv_cols(pct_info.pct.ctc_by_row(i), eclv_points,
+                      stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+
+   } // end for i
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
 
    return;
 }
@@ -1200,54 +1287,6 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 
    // Increment the STAT row counter
    stat_row++;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                    const NumArray &eclv_points, bool txt_flag,
-                    AsciiTable &stat_at, int &stat_row,
-                    AsciiTable &txt_at, int &txt_row) {
-   int i;
-
-   // ECLV line type
-   shc.set_line_type(stat_eclv_str);
-
-   // Set the threshold columns, if requested.
-   shc.set_obs_thresh(pct_info.othresh);
-   shc.set_thresh_logic(SetLogic_None);
-   shc.set_cov_thresh(na_str);
-
-   // Not Applicable
-   shc.set_alpha(bad_data_double);
-
-   // Write ECLV line for each PCT row
-   for(i=0; i<pct_info.pct.nrows(); i++) {
-
-      // Update the forecast threshold
-      shc.set_fcst_thresh(pct_info.fthresh[i+1]);
-
-      // Write the header columns
-      write_header_cols(shc, stat_at, stat_row);
-
-      // Write the data for the 2x2 contingency table for this row
-      write_eclv_cols(pct_info.pct.ctc_by_row(i), eclv_points,
-                      stat_at, stat_row, n_header_columns);
-
-      // If requested, copy row to the text file
-      if(txt_flag) {
-         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
-
-         // Increment the text row counter
-         txt_row++;
-      }
-
-      // Increment the STAT row counter
-      stat_row++;
-
-   } // end for i
 
    return;
 }
