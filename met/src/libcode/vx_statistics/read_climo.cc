@@ -119,20 +119,6 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
       exit(1);
    }
 
-   // Either neither or both should be set to bad data, which indicates
-   // that timing information should not be checked.
-   if(( is_bad_data(day_interval) && !is_bad_data(hour_interval)) ||
-      (!is_bad_data(day_interval) &&  is_bad_data(hour_interval))) {
-      mlog << Error << "\nread_climo_data_plane_array() -> "
-           << "Either neither or both of the \""
-           << conf_key_day_interval << "\" (" << day_interval
-           << ") and \""
-           << conf_key_hour_interval << "\" (" << hour_interval
-           << ") entries can be set to " << na_str
-           << ".\n\n";
-      exit(1);
-   }
-
    // Check if file_type was specified
    ctype = parse_conf_file_type(&i_dict);
 
@@ -319,7 +305,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
 
       // Check if day_ts is set to bad data.
       if(is_bad_data(day_ts)) {
-         if(it->second.n() > 0) {
+         if(it->second.n() > 1) {
             mlog << Warning << "\nclimo_time_interp() -> "
                  << "Found multiple matches (" << it->second.n()
                  << ") for climatology field at "
