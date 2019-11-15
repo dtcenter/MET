@@ -175,7 +175,7 @@ void StatHdrColumns::set_fcst_units(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_lev(const char *s) {
-   fcst_lev = check_hdr_str((string)s);
+   fcst_lev = check_hdr_str((string)s, true);
    return;
 }
 
@@ -196,7 +196,7 @@ void StatHdrColumns::set_obs_units(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_lev(const char *s) {
-   obs_lev = check_hdr_str((string)s);
+   obs_lev = check_hdr_str((string)s, true);
    return;
 }
 

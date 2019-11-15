@@ -2814,7 +2814,7 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(eng.conf_info.fcst_info->level_name());
+   s = check_hdr_str(eng.conf_info.fcst_info->level_name(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
@@ -2826,7 +2826,7 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(eng.conf_info.obs_info->level_name());
+   s = check_hdr_str(eng.conf_info.obs_info->level_name(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation type

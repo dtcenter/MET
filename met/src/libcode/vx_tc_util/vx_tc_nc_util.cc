@@ -240,6 +240,9 @@ void def_tc_pressure(NcFile* nc_out,
 
     put_nc_data(&pressure_var, &pressure_data[0]);
 
+    // Cleanup
+    if(pressure_data) { delete [] pressure_data; pressure_data = (float *) 0; }
+
     return;
 }
 
@@ -278,6 +281,10 @@ void def_tc_range_azimuth(NcFile* nc_out,
     // Write coordinates
     put_nc_data(&range_var, &range_data[0]);
     put_nc_data(&azimuth_var, &azimuth_data[0]);
+
+    // Cleanup
+    if(range_data)   { delete [] range_data;   range_data   = (float *) 0; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (float *) 0; }
 
     return;
 }
