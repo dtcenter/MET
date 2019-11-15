@@ -1231,9 +1231,10 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
    pct_mean.clear();
    if(n == 0) return;
 
-   // Store thresholds using the first array entry
+   // Initialize with the first array entry
    pct_mean.fthresh = cnt_info[0].fthresh;
    pct_mean.othresh = cnt_info[0].othresh;
+   pct_mean.pct     = cnt_info[0].pct;
 
    // Allocate one alpha value but compute no confidence intervals
    pct_mean.allocate_n_alpha(1);
