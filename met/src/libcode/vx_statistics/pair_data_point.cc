@@ -1457,7 +1457,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
 
    mlog << Debug(3)
         << "Using " << out_pd.n_obs << " of " << pd.n_obs
-        << " pairs for climatology bin number " << i+1 << ".\n";
+        << " pairs for climatology bin number " << i_bin+1 << ".\n";
 
    return(out_pd);
 }
