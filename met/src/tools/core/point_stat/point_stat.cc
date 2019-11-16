@@ -1,5 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1644,9 +1643,6 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = *pd_ptr;
-
-         // Check for no matched pairs to process
-         if(pd.n_obs == 0) continue; 
 
          // Store thresholds
          pct_info[j].fthresh = vx_opt.fcat_ta;
