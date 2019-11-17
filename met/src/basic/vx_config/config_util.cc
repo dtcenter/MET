@@ -1367,15 +1367,13 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
       double cdf_val = (center ? cdf_inc/2           : cdf_inc    );
 
       // Add thresholds between 0.0 and 1.0
-      while(cdf_val < 1.0) {
+      while(cdf_val < 1.0 && !is_eq(cdf_val, 1.0)) {
          info.cdf_ta.add(cdf_val, thresh_ge);
          cdf_val += cdf_inc;
       }
 
-      // Add the last threshold for 1.0, if needed
-      if(!is_eq(info.cdf_ta[info.cdf_ta.n()-1].get_value(), 1.0)) {
-         info.cdf_ta.add(1.0, thresh_ge);
-      }
+      // Add the last threshold for 1.0
+      info.cdf_ta.add(1.0, thresh_ge);
 
       mlog << Debug(4) << "parse_conf_climo_cdf() -> "
            << "For \"" << conf_key_cdf_bins << "\" (" << bins[0] << ") and \""
