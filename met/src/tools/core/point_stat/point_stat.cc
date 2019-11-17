@@ -1656,6 +1656,9 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          // Compute the probabilistic counts and statistics
          compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
 
+         // Check for no matched pairs to process	
+         if(pd.n_obs == 0) continue; 
+
          // Write out PCT
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
             vx_opt.output_flag[i_pct] != STATOutputType_None) {
