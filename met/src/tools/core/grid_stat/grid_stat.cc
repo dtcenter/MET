@@ -588,7 +588,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 void process_scores() {
    int i, j, k, m, n;
-   int n_cat, n_cnt, n_wind, n_prob, n_cov, n_cdf_bin;
+   int n_cat, n_wind, n_cov;
    double dmin, dmax;
    ConcatString cs;
 
@@ -633,10 +633,8 @@ void process_scores() {
    DMAPInfo    dmap_info;
 
    // Store the maximum number of each threshold type
-   n_cnt  = conf_info.get_max_n_cnt_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh();
    n_wind = conf_info.get_max_n_wind_thresh();
-   n_prob = conf_info.get_max_n_oprob_thresh();
    n_cov  = conf_info.get_max_n_cov_thresh();
 
    // Allocate space for output statistics types

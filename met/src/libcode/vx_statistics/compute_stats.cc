@@ -891,7 +891,7 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
 void compute_i_nbrcntinfo(const PairDataPoint &pd,
                           const PairDataPoint &pd_thr, int skip,
                           NBRCNTInfo &nbrcnt_info) {
-   int i, n;
+   int n;
    NumArray i_na;
 
    //

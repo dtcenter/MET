@@ -1552,7 +1552,7 @@ void VL1L2Info::calc_ncep_stats() {
 void VL1L2Info::set(const PairDataPoint &pd_u_all,
                     const PairDataPoint &pd_v_all) {
    int i;
-   double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
+   double uf, vf, uo, vo, uc, vc, wgt, wgt_sum;
    double u_diff, v_diff;
    PairDataPoint pd_u, pd_v;
 

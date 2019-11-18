@@ -1318,8 +1318,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    }
 
    int i;
-   double fcst_wind, obs_wind, cmn_wind, csd_wind;
-   double uf, vf, uo, vo, uc, vc, wgt;
+   double fcst_wind, obs_wind, cmn_wind, csd_wind, wgt;
 
    // Initialize and allocate memory for output pairs
    out_pd_u.erase();
@@ -1335,14 +1334,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
 
    // Loop over the pairs
    for(i=0; i<pd_u.n_obs; i++) {
-
-      // Retrieve the U,V values
-      uf  = pd_u.f_na[i];
-      vf  = pd_v.f_na[i];
-      uo  = pd_u.o_na[i];
-      vo  = pd_v.o_na[i];
-      uc  = (cmn_flag ? pd_u.cmn_na[i] : bad_data_double);
-      vc  = (cmn_flag ? pd_v.cmn_na[i] : bad_data_double);
+      
       wgt = (wgt_flag ? pd_u.wgt_na[i] : default_grid_weight);
 
       // Compute wind speeds

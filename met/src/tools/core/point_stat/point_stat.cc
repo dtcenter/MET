@@ -904,7 +904,7 @@ void process_obs_file(int i_nc) {
 
 void process_scores() {
    int i, j, k, l, m, n;
-   int n_cat, n_cnt, n_wind;
+   int n_cat, n_wind;
    ConcatString cs;
 
    // Initialize pointers
@@ -920,7 +920,6 @@ void process_scores() {
    setup_txt_files();
 
    // Store the maximum number of each threshold type
-   n_cnt  = conf_info.get_max_n_cnt_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh();
    n_wind = conf_info.get_max_n_wind_thresh();
 
