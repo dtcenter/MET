@@ -1408,8 +1408,8 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                        vx_opt.vx_pd.obs_info->is_precipitation());
    
    // Allocate memory
-   if(do_cnt)   { cnt_info   = new CNTInfo   [n_bin]; }
-   if(do_sl1l2) { sl1l2_info = new SL1L2Info [n_bin]; }
+   cnt_info   = new CNTInfo   [n_bin];
+   sl1l2_info = new SL1L2Info [n_bin];
 
    // Process each continuous filtering threshold
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
