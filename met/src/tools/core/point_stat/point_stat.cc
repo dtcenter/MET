@@ -903,7 +903,7 @@ void process_obs_file(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k, l, m, n;
+   int i, j, k, l, m;
    int n_cat, n_wind;
    ConcatString cs;
 

@@ -1274,7 +1274,6 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
    //  attempt to read the record
    gribfield *gfld;
-   unsigned char *cgrib;
    g2int numfields;
    float v, v_miss[2];
    int n_miss, i;

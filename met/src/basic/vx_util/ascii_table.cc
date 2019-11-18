@@ -131,7 +131,7 @@ char tmp_str[512];
 
 if ( !e.empty() )  {
 
-   int j, n;
+   int n;
 
    n = Nrows*Ncols;
 
@@ -190,8 +190,6 @@ return;
 void AsciiTable::erase()
 
 {
-
-int j;
 
 const int NRC = Nrows*Ncols;
 
@@ -252,7 +250,7 @@ if ( a.e.empty() )  return;
 set_size(a.nrows(), a.ncols());
 
 
-int j, r, c;
+int r, c;
 
 
 ColWidth = a.ColWidth;
@@ -324,7 +322,6 @@ if ( (NR <= 0) || (NC <= 0) )  {
 
 clear();
 
-int j;
 const int NRC = NR*NC;
 
 e.resize(NRC);

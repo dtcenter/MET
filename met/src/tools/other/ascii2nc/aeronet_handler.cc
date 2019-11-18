@@ -462,9 +462,9 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   
   if (format_version == 3) {
     double aod_at_675, aod_at_440;
-    double aod_at_550_expected, angstrom_675_440_expected;
-    double angstrom_675_440, aod_at_550;
-    
+    double aod_at_550_expected, aod_at_550;
+    //double angstrom_675_440_expected, angstrom_675_440;
+
     aod_at_675 = 0.645283;
     aod_at_440 = 0.794593;
     aod_at_550_expected = 0.71286864;

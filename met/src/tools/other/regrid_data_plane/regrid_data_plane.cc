@@ -1076,8 +1076,7 @@ void regrid_goes_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    ConcatString goes_var_sub_name;
    ConcatString qc_var_name;
    ncbyte qc_value;
-   unsigned short adp_qc_value;
-   ncbyte  *qc_data = new ncbyte[from_data_size];
+   ncbyte *qc_data = new ncbyte[from_data_size];
    uchar *adp_data = new uchar[from_data_size];
    float *from_data = new float[from_data_size];
    unsigned short *adp_qc_data = new unsigned short[from_data_size];

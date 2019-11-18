@@ -960,7 +960,6 @@ void process_pbfile(int i_pb) {
    // To compute PBL
    int pbl_level;
    int pbl_code = -1;
-   int pbl_buf_level, prev_pbl_level;
    float pbl_p, pbl_h, pbl_qm;
 
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
@@ -2390,11 +2389,11 @@ void write_netcdf_hdr_data() {
    else {
       dim_count = pb_hdr_count;
       if (do_summary) {
-         int summmary_hdr_cnt = summary_obs->countSummaryHeaders();
+         int summary_hdr_cnt = summary_obs->countSummaryHeaders();
          if (save_summary_only)
-            dim_count = summmary_hdr_cnt;
+            dim_count = summary_hdr_cnt;
          else
-            dim_count += summmary_hdr_cnt;
+            dim_count += summary_hdr_cnt;
       }
    }
 
@@ -2873,7 +2872,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
       NumArray common_pres_array;
-      float first_pres, prev_pres, cur_pres, next_pres;
+      float first_pres, prev_pres, cur_pres;
       float *pqtzuv_tq, *pqtzuv_uv;
       float *cur_pqtzuv, *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;

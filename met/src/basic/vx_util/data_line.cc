@@ -700,7 +700,7 @@ if ( !(*in) )  {
    //  get filename
    //
 
-int j, n;
+int n;
 
 n = strlen(path);
 
@@ -900,9 +900,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return ( lgr );
 
-int j, k, N;
-char c;
-
+int j;
 
 // k = L.N_items - 1;   //  last item
 // 

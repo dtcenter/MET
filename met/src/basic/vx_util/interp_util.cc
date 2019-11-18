@@ -619,7 +619,6 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    int count;
    int ix, iy;
    int nx, ny, g_nx;
-   double dx, dy;
    double value, gaussian_value, gaussian_weight, max_raw;
    double interp_value = bad_data_double;
 
