@@ -844,7 +844,8 @@ compareDiff = function(file1, file2, verb=0){
 listHeaderCols = c("VERSION", "DESC", "MODEL",
                    "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                    "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
-                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV",
+                   "FCST_VAR", "FCST_UNITS", "FCST_LEV",
+                   "OBS_VAR", "OBS_UNITS", "OBS_LEV",
                    "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS",
                    "FCST_THRESH", "OBS_THRESH", "COV_THRESH", "ALPHA",
                    "LINE_TYPE");
