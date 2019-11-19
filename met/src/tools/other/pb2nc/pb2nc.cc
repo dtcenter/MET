@@ -959,7 +959,8 @@ void process_pbfile(int i_pb) {
    int prev_cape_level, IMM, JMM;
    int cape_level=0, cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs=0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
-   float cape_p, cape_h, cape_qm;
+   float cape_p, cape_h;
+   float cape_qm = bad_data_float;
 
    // To compute PBL
    int pbl_level = 0;

@@ -1640,7 +1640,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   DuplicateType t;
+   DuplicateType t = DuplicateType_None;
    int v;
 
    if(!dict) {

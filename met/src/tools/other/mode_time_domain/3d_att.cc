@@ -1303,7 +1303,7 @@ dist = 0.0;
 
 nt = a.Tmax - a.Tmin + 1;
 
-for (j=0; j<nt; ++j)  {
+for (j=0,x_old=0,y_old=0; j<nt; ++j)  {
 
    t = j + a.Tmin;
 
