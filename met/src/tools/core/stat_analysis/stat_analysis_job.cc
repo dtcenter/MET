@@ -1722,7 +1722,8 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
                          map<ConcatString, AggrWindInfo> &m,
                          AsciiTable &at) {
    map<ConcatString, AggrWindInfo>::iterator it;
-   int i, n, n_row, n_col, r, c, count;
+   int i, n, n_row, n_col, r, c;
+   int count = 0;
    double uf, vf, uo, vo, fbar, obar;
    double angle, me, mae;
 
@@ -2349,6 +2350,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output table
    //
+   n_row = 0;
    n_col = 1 + j.by_column.n();
    if(lt == stat_ecnt) {
       n_row  = 1 + m.size();

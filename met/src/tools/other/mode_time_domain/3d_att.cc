@@ -1309,9 +1309,16 @@ for (j=0; j<nt; ++j)  {
 
    mask.calc_2d_centroid_at_t(t, xbar_2d, ybar_2d);
 
-   if ( j == 0 )  { x_old = xbar_2d;  y_old = ybar_2d;  continue; }
+   if ( j == 0 )  {
 
-   dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
+       x_old = xbar_2d;
+       y_old = ybar_2d;
+
+   } else {
+ 
+      dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
+
+   }   //  else
 
 }
 

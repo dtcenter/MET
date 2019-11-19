@@ -1274,7 +1274,6 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
 
    //  attempt to read the record
    gribfield *gfld;
-   unsigned char *cgrib;
    g2int numfields;
    float v, v_miss[2];
    int n_miss, i;
@@ -1313,7 +1312,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
       for(int y=0; y < n_y; y++){
 
          //  determine the data index, depending on the scan mode
-         int idx_data;
+         int idx_data = 0;
          switch(ScanMode){
          case 0:   /* 0000 0000 */ idx_data = (n_y - y - 1)*n_x + x;               break;
          case 128: /* 1000 0000 */ idx_data = (n_y - y - 1)*n_x + (n_x - x - 1);   break;

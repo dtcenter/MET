@@ -1087,7 +1087,7 @@ mlog << Debug(10) << method_name
 int count_replaced = 0;
 string nested_value;
 size_t pos, pos_end, pos_env, pos_env_end;
-pos = 0;
+pos = pos_env_end = 0;
 while ((pos = str.find('$', pos)) != string::npos) {
    string nested_name;
    pos_env = pos + 1;

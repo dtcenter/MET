@@ -758,7 +758,7 @@ if ( (row < 0) || (row >= 3) || (col < 0) || (col >= 3) )  {
 }
 
 int k;
-double x;
+double x = 0.0;
 
 
 k = 3*row + col;

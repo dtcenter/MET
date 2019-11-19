@@ -792,6 +792,8 @@ void process_pbfile(int i_pb) {
    unixtime msg_ut, beg_ut, end_ut;
    unixtime min_msg_ut, max_msg_ut;
 
+   beg_ut = end_ut = (unixtime) 0;
+
    ConcatString file_name, blk_prefix, blk_file, log_message;
    ConcatString prefix;
    char     time_str[max_str_len];
@@ -801,9 +803,11 @@ void process_pbfile(int i_pb) {
    char     hdr_typ[max_str_len];
    ConcatString hdr_sid;
    char     modified_hdr_typ[max_str_len];
-   double   hdr_lat, hdr_lon, hdr_elv;
+   double   hdr_lat = bad_data_double;
+   double   hdr_lon = bad_data_double;
+   double   hdr_elv = bad_data_double;
    float    pb_report_type, in_report_type, instrument_type;
-   unixtime hdr_vld_ut;
+   unixtime hdr_vld_ut = (unixtime) 0;
 
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
@@ -952,27 +956,30 @@ void process_pbfile(int i_pb) {
                     // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
    float p1d,t1d,q1d;
-   int cape_level, prev_cape_level, IMM, JMM;
-   int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
+   int prev_cape_level, IMM, JMM;
+   int cape_level=0, cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs=0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
    float cape_p, cape_h, cape_qm;
 
    // To compute PBL
-   int pbl_level;
+   int pbl_level = 0;
    int pbl_code = -1;
-   int pbl_buf_level, prev_pbl_level;
-   float pbl_p, pbl_h, pbl_qm;
+   float pbl_p, pbl_h;
+   float pbl_qm = bad_data_float;
 
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
 
    bool     is_same_header;
-   unixtime prev_hdr_vld_ut;
+   unixtime prev_hdr_vld_ut = (unixtime) 0;
    float    prev_quality_mark;
    char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
    map<float, float*> pqtzuv_map_tq;
    map<float, float*> pqtzuv_map_uv;
+
+   // Initialize
+   prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
 
    if (cal_pbl) {
       is_same_header = false;
@@ -2390,11 +2397,11 @@ void write_netcdf_hdr_data() {
    else {
       dim_count = pb_hdr_count;
       if (do_summary) {
-         int summmary_hdr_cnt = summary_obs->countSummaryHeaders();
+         int summary_hdr_cnt = summary_obs->countSummaryHeaders();
          if (save_summary_only)
-            dim_count = summmary_hdr_cnt;
+            dim_count = summary_hdr_cnt;
          else
-            dim_count += summmary_hdr_cnt;
+            dim_count += summary_hdr_cnt;
       }
    }
 
@@ -2743,7 +2750,7 @@ bool keep_level_category(int category) {
 
 float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
                        double lat, float &qty) {
-   float result;
+   float result = bad_data_float;
    double p, q, t, z, u, v, w, vp;
 
    switch(gc) {
@@ -2873,9 +2880,10 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
       NumArray common_pres_array;
-      float first_pres, prev_pres, cur_pres, next_pres;
+      float first_pres, prev_pres, cur_pres;
       float *pqtzuv_tq, *pqtzuv_uv;
-      float *cur_pqtzuv, *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
+      float *cur_pqtzuv = (float *) 0;
+      float *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;
 
       first_pres = bad_data_float;

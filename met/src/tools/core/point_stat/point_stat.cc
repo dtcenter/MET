@@ -1,5 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=* // ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -904,8 +903,8 @@ void process_obs_file(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k, l, m, n;
-   int n_cat, n_cnt, n_wind;
+   int i, j, k, l, m;
+   int n_cat, n_wind;
    ConcatString cs;
 
    // Initialize pointers
@@ -921,7 +920,6 @@ void process_scores() {
    setup_txt_files();
 
    // Store the maximum number of each threshold type
-   n_cnt  = conf_info.get_max_n_cnt_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh();
    n_wind = conf_info.get_max_n_wind_thresh();
 
@@ -1409,8 +1407,8 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                        vx_opt.vx_pd.obs_info->is_precipitation());
    
    // Allocate memory
-   if(do_cnt)   { cnt_info   = new CNTInfo   [n_bin]; }
-   if(do_sl1l2) { sl1l2_info = new SL1L2Info [n_bin]; }
+   cnt_info   = new CNTInfo   [n_bin];
+   sl1l2_info = new SL1L2Info [n_bin];
 
    // Process each continuous filtering threshold
    for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
@@ -1645,9 +1643,6 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = *pd_ptr;
 
-         // Check for no matched pairs to process
-         if(pd.n_obs == 0) continue; 
-
          // Store thresholds
          pct_info[j].fthresh = vx_opt.fcat_ta;
          pct_info[j].othresh = vx_opt.ocat_ta[i];
@@ -1659,6 +1654,9 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Compute the probabilistic counts and statistics
          compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
+
+         // Check for no matched pairs to process	
+         if(pd.n_obs == 0) continue; 
 
          // Write out PCT
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&

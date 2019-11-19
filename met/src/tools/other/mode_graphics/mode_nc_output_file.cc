@@ -689,7 +689,7 @@ if ( !f )  {
 }
 
 int x, y;
-int value;
+int value = 0;
 int count;
 DataPlane fdata;
 

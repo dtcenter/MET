@@ -965,9 +965,16 @@ void do_derive_command() {
    DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
-   int i, j, n, nxy, nc_accum, nc_accum_sum;
+   int nc_accum, nc_accum_sum;
+   int i, j, n, nxy;
    ConcatString derive_list_css;
    double v;
+
+   //
+   // Initialize
+   //
+   nc_init_time = nc_valid_time = (unixtime) 0;
+   nc_accum = nc_accum_sum = nxy = 0;
 
    //
    // List of all requested field derivations.

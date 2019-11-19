@@ -430,7 +430,7 @@ Cgraph plot;
 Ppm image;
 Box whole_box, map_box, anno_box;
 bool is_object_field = false;
-int n_fcst, n_obs, n;
+int n_fcst=0, n_obs=0, n;
 
 mlog << Debug(1)
      << "Reading MODE file: " << mode_nc_filename << "\n";

@@ -378,7 +378,7 @@ ConcatString str_trim(const ConcatString str){
 ////////////////////////////////////////////////////////////////////////
 
 int parse_thresh_index(const char *col_name) {
-   int i;
+   int i = 0;
    const char *ptr = (const char *) 0;
 
    if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);

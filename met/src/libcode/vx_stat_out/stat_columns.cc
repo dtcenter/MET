@@ -86,7 +86,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
    
    // Append the climo CDF bin number.
    ConcatString cs;
-   cs << mask_name << "_BIN";
+   cs << mask_name << "_BIN_";
    if(i_bin == -1) cs << "MEAN";
    else            cs << i_bin+1;
    

@@ -3414,7 +3414,6 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
                 gsl_rng *rng_ptr) {
    bool precip_flag = false;
    NumArray w_na;
-   int i;
 
    //
    // Initialize

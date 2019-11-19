@@ -429,7 +429,7 @@ void CTSInfo::compute_ci() {
 ////////////////////////////////////////////////////////////////////////
 
 double CTSInfo::get_stat(const char *stat_name) {
-   double v;
+   double v = bad_data_double;
 
         if(strcmp(stat_name, "TOTAL") == 0) v = cts.n();
    else if(strcmp(stat_name, "BASER") == 0) v = cts.baser();
@@ -989,7 +989,7 @@ void CNTInfo::compute_ci() {
 ////////////////////////////////////////////////////////////////////////
 
 double CNTInfo::get_stat(const char *stat_name) {
-   double v;
+   double v = bad_data_double;
 
         if(strcmp(stat_name, "TOTAL"     ) == 0) v = n;
    else if(strcmp(stat_name, "FBAR"      ) == 0) v = fbar.v;
@@ -1552,7 +1552,7 @@ void VL1L2Info::calc_ncep_stats() {
 void VL1L2Info::set(const PairDataPoint &pd_u_all,
                     const PairDataPoint &pd_v_all) {
    int i;
-   double uf, vf, uo, vo, uc, vc, fwind, owind, wgt, wgt_sum;
+   double uf, vf, uo, vo, uc, vc, wgt, wgt_sum;
    double u_diff, v_diff;
    PairDataPoint pd_u, pd_v;
 
@@ -1703,7 +1703,7 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 ////////////////////////////////////////////////////////////////////////
 
 double VL1L2Info::get_stat(const char *stat_name) {
-   double v;
+   double v = bad_data_double;
 
         if(strcmp(stat_name, "TOTAL"       ) == 0) v = vcount;
    else if(strcmp(stat_name, "FBAR"        ) == 0) v = FBAR;

@@ -425,8 +425,8 @@ DataPlane climo_hms_interp(const DataPlaneArray &dpa,
    for(i=0; i<idx.n(); i++) {
       if(dpa[idx[i]].valid() % sec_per_day != vld_hms) continue;
       dt = vld_ut - dpa[idx[i]].valid();
-      if(dt >= 0 && dt < dt_prv) { dt = dt_prv; i_prv = idx[i]; }
-      if(dt <= 0 && dt > dt_nxt) { dt = dt_nxt; i_nxt = idx[i]; }
+      if(dt >= 0 && dt < dt_prv) { dt_prv = dt; i_prv = idx[i]; }
+      if(dt <= 0 && dt > dt_nxt) { dt_nxt = dt; i_nxt = idx[i]; }
    }
 
    // Range check

@@ -891,7 +891,7 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
 void compute_i_nbrcntinfo(const PairDataPoint &pd,
                           const PairDataPoint &pd_thr, int skip,
                           NBRCNTInfo &nbrcnt_info) {
-   int i, n;
+   int n;
    NumArray i_na;
 
    //
@@ -1232,9 +1232,10 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
    if(n == 0) return;
 
    // Initialize with the first array entry
-   pct_mean.fthresh = cnt_info[0].fthresh;
-   pct_mean.othresh = cnt_info[0].othresh;
-   pct_mean.pct     = cnt_info[0].pct;
+   pct_mean.fthresh   = cnt_info[0].fthresh;
+   pct_mean.othresh   = cnt_info[0].othresh;
+   pct_mean.pct       = cnt_info[0].pct;
+   pct_mean.climo_pct = cnt_info[0].climo_pct;
 
    // Allocate one alpha value but compute no confidence intervals
    pct_mean.allocate_n_alpha(1);

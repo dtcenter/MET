@@ -131,7 +131,7 @@ char tmp_str[512];
 
 if ( !e.empty() )  {
 
-   int j, n;
+   int n;
 
    n = Nrows*Ncols;
 
@@ -190,8 +190,6 @@ return;
 void AsciiTable::erase()
 
 {
-
-int j;
 
 const int NRC = Nrows*Ncols;
 
@@ -252,7 +250,7 @@ if ( a.e.empty() )  return;
 set_size(a.nrows(), a.ncols());
 
 
-int j, r, c;
+int r, c;
 
 
 ColWidth = a.ColWidth;
@@ -324,7 +322,6 @@ if ( (NR <= 0) || (NC <= 0) )  {
 
 clear();
 
-int j;
 const int NRC = NR*NC;
 
 e.resize(NRC);
@@ -902,6 +899,8 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
 void AsciiTable::set_entry(const int r, const int c, const char* text)
 
 {
@@ -954,8 +953,8 @@ else  {
 fix_float(str);
 
 if ( DoCommaString )  {
-  char * junk;
-  strncpy(junk, str.c_str(), str.length());
+   char junk[256];
+   strncpy(junk, str.c_str(), str.length());
    char * p = (char *) 0;
    long X;
    ConcatString s;
@@ -1474,7 +1473,8 @@ if ( !out )  {
    //  get to work
    //
 
-int j, len, offset;
+int j, len;
+int offset = 0;
 
    //
    //  fill the output field with the pad character

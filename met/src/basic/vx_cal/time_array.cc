@@ -475,7 +475,7 @@ if ( Nelements == 0 )  return;
 // Use first point to begin first segment
 beg.add(e[0]);
 
-for(i=1, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
+for(i=1, prv_dt=0, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
    cur_dt = e[i] - e[i-1];
    if(new_ts) {
       prv_dt = cur_dt;

@@ -1542,7 +1542,7 @@ double Dictionary::lookup_double(const char * name, bool error_out)
 
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
-double v;
+double v = bad_data_double;
 
    //
    //  Check for NA

@@ -1694,7 +1694,7 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
 void store_stat_pct(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i;
+   int i = 0;
    double v;
    ConcatString lty_stat, var_name;
 
@@ -1718,13 +1718,13 @@ void store_stat_pct(int n, const ConcatString &col,
    }  // end if
 
    // Get the column value
-        if(c == "TOTAL")                     { v = (double) pct_info.pct.n();                      }
-   else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1;              }
+        if(c == "TOTAL")                             { v = (double) pct_info.pct.n();                      }
+   else if(c == "N_THRESH")                          { v = (double) pct_info.pct.nrows() + 1;              }
    else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);                      }
    else if(check_reg_exp("OY_[0-9]", c.c_str()))     { v = (double) pct_info.pct.event_count_by_row(i);
-                                               d = "OY_I";                                         }
+                                                       d = "OY_I";                                         }
    else if(check_reg_exp("ON_[0-9]", c.c_str()))     { v = (double) pct_info.pct.nonevent_count_by_row(i);
-                                               d = "ON_I";                                         }
+                                                       d = "ON_I";                                         }
    else {
      mlog << Error << "\nstore_stat_pct() -> "
           << "unsupported column name requested \"" << c
@@ -1825,7 +1825,8 @@ void store_stat_pstd(int n, const ConcatString &col,
 
 void store_stat_pjc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i, tot;
+   int i = 0;
+   int tot;
    double v;
    ConcatString lty_stat, var_name;
 
@@ -1852,22 +1853,22 @@ void store_stat_pjc(int n, const ConcatString &col,
    tot = pct_info.pct.n();
 
    // Get the column value
-        if(c == "TOTAL")                          { v = (double) tot;                                       }
-   else if(c == "N_THRESH")                       { v = (double) pct_info.pct.nrows() + 1;                  }
+        if(c == "TOTAL")                                  { v = (double) tot;                                       }
+   else if(c == "N_THRESH")                               { v = (double) pct_info.pct.nrows() + 1;                  }
    else if(check_reg_exp("THRESH_[0-9]", c.c_str()))      { v = pct_info.pct.threshold(i);
-                                                    d = "THRESH_I";                                         }
+                                                            d = "THRESH_I";                                         }
    else if(check_reg_exp("OY_TP_[0-9]", c.c_str()))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;
-                                                    d = "OY_TP_I";                                          }
+                                                            d = "OY_TP_I";                                          }
    else if(check_reg_exp("ON_TP_[0-9]", c.c_str()))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot;
-                                                    d = "ON_TP_I";                                          }
+                                                            d = "ON_TP_I";                                          }
    else if(check_reg_exp("CALIBRATION_[0-9]", c.c_str())) { v = pct_info.pct.row_calibration(i);
-                                                    d = "CALIBRATION_I";                                    }
+                                                            d = "CALIBRATION_I";                                    }
    else if(check_reg_exp("REFINEMENT_[0-9]", c.c_str()))  { v = pct_info.pct.row_refinement(i);
-                                                    d = "REFINEMENT_I";                                     }
+                                                            d = "REFINEMENT_I";                                     }
    else if(check_reg_exp("LIKELIHOOD_[0-9]", c.c_str()))  { v = pct_info.pct.row_event_likelihood(i);
-                                                    d = "LIKELIHOOD_I";                                     }
+                                                            d = "LIKELIHOOD_I";                                     }
    else if(check_reg_exp("BASER_[0-9]", c.c_str()))       { v = pct_info.pct.row_obar(i);
-                                                    d = "BASER_I";                                          }
+                                                            d = "BASER_I";                                          }
    else {
      mlog << Error << "\nstore_stat_pjc() -> "
           << "unsupported column name requested \"" << c
@@ -1902,7 +1903,7 @@ void store_stat_pjc(int n, const ConcatString &col,
 
 void store_stat_prc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i;
+   int i = 0;
    double v;
    ConcatString lty_stat, var_name;
    TTContingencyTable ct;
@@ -1931,14 +1932,14 @@ void store_stat_prc(int n, const ConcatString &col,
    }  // end if
 
    // Get the column value
-        if(c == "TOTAL")                     { v = (double) pct_info.pct.n();         }
-   else if(c == "N_THRESH")                  { v = (double) pct_info.pct.nrows() + 1; }
+        if(c == "TOTAL")                             { v = (double) pct_info.pct.n();         }
+   else if(c == "N_THRESH")                          { v = (double) pct_info.pct.nrows() + 1; }
    else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);
-                                               d = "THRESH_I";                        }
+                                                       d = "THRESH_I";                        }
    else if(check_reg_exp("PODY_[0-9]", c.c_str()))   { v = ct.pod_yes();
-                                               d = "PODY_I";                          }
+                                                       d = "PODY_I";                          }
    else if(check_reg_exp("POFD_[0-9]", c.c_str()))   { v = ct.pofd();
-                                               d = "POFD_I";                          }
+                                                       d = "POFD_I";                          }
    else {
      mlog << Error << "\nstore_stat_prc() -> "
           << "unsupported column name requested \"" << c

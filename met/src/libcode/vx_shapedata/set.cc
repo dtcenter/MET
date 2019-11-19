@@ -555,7 +555,7 @@ int SetCollection::merge()
 {
 
    int j, k;
-   int jm, km;
+   int jm=0, km=0;
    int need_merge;
 
    if( n_sets <= 1 ) return(0);

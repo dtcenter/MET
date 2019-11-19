@@ -279,7 +279,8 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
                               int b, CTSInfo *&cts_info, int n_cts,
                               bool cts_flag, bool rank_flag,
                               const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -725,7 +726,8 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                int b, MCTSInfo &mcts_info,
                                bool mcts_flag, bool rank_flag,
                                const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -930,7 +932,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               bool precip_flag, bool rank_flag,
                               int b, CNTInfo &cnt_info,
                               const char *tmp_dir) {
-   int n, i, c;
+   int n =0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    CNTInfo cnt_tmp;
@@ -1364,7 +1367,8 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                CTSInfo *&cts_info, int n_cts,
                                bool cts_flag, bool rank_flag,
                                const char *tmp_dir) {
-   int n, i, j, m, c;
+   int n = 0;
+   int i, j, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    CTSInfo *cts_tmp = (CTSInfo *) 0;
@@ -1758,7 +1762,8 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                 MCTSInfo &mcts_info,
                                 bool mcts_flag, bool rank_flag,
                                 const char *tmp_dir) {
-   int n, i, m, c;
+   int n = 0;
+   int i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    MCTSInfo mcts_tmp;
@@ -1940,7 +1945,8 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                bool precip_flag, bool rank_flag,
                                int b, double m_prop, CNTInfo &cnt_info,
                                const char *tmp_dir) {
-   int n, i, m, c;
+   int n = 0;
+   int i, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    CNTInfo cnt_tmp;
@@ -2331,7 +2337,8 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
                                  int b, NBRCTSInfo *&nbrcts_info,
                                  int n_nbrcts, bool nbrcts_flag,
                                  const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) 0;
@@ -2770,7 +2777,8 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
                                  int b, NBRCNTInfo &nbrcnt_info,
                                  bool nbrcnt_flag,
                                  const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
@@ -2981,7 +2989,8 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   NBRCTSInfo *&nbrcts_info,
                                   int n_nbrcts, bool nbrcts_flag,
                                   const char *tmp_dir) {
-   int n, i, j, c;
+   int n = 0;
+   int i, j, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) 0;
@@ -3372,7 +3381,8 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                   NBRCNTInfo &nbrcnt_info,
                                   bool nbrcnt_flag,
                                   const char *tmp_dir) {
-   int n, i, c;
+   int n = 0;
+   int i, c;
    double s;
    NumArray i_na, ir_na, sr_na;
    NBRCNTInfo nbrcnt_tmp;
