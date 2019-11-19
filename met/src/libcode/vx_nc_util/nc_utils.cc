@@ -857,7 +857,7 @@ int get_version_no(const NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_version_less_than_1_02(const NcFile *nc) {
-   int version_no = get_version_no(nc);
+   int version_no;
    float att_version_no;
    get_global_att(nc, (const ConcatString) nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);

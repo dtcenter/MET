@@ -2932,8 +2932,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    // Compute actual DMAP statistics here.
    int max_events;
    int non_zero_count;
-   double f_distance, o_distance, zhu_common;
-   double abs_diff_distance = 0.0; 
+   double f_distance, o_distance, zhu_common, abs_diff_distance;
    double sum_event_diff = 0.0;
    double fom_fo_sum = 0.0;
    double fom_of_sum = 0.0;

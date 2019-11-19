@@ -1002,7 +1002,7 @@ void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Diction
 
 ifstream in;
 MapRegion r;
-double map_linewidth = 1.0;
+double map_linewidth;
 ConcatString s;
 ConcatString map_filename;
 Color map_color;

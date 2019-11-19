@@ -758,12 +758,10 @@ void process_obs_file(int i_nc) {
               << "trouble getting obs_qty\n\n";
          exit(1);
       }
-      //obs_qty_array.dump(cout);
    }
 
-   int str_length;
-   int block_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
    // Process each observation in the file
+   int str_length, block_size;
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=block_size) {
       block_size = (obs_count - i_block_start_idx);
       if (block_size > BUFFER_SIZE) block_size = BUFFER_SIZE;

@@ -650,7 +650,7 @@ double NumArray::percentile_array(double t)
 
 {
 
-double v = bad_data_double;
+double v;
 
 //
 // Ensure that the array is sorted before computing the percentile.
@@ -790,8 +790,7 @@ double NumArray::mode() const
 
 int j, k, max_n, max_j;
 NumArray uniq_v, uniq_n;
-
-double v = bad_data_double;
+double v;
 
 for(j=0; j<Nelements; j++) {
 
