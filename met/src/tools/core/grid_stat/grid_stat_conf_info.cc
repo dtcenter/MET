@@ -907,7 +907,8 @@ void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n, n_bin;
+   int n = 0;
+   int n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {

@@ -912,7 +912,7 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n = 0;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {

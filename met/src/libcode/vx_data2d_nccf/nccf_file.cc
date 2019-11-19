@@ -789,8 +789,8 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     }
   }
 
-  bool status;
-  double d;
+  bool status = false;
+  double d = bad_data_double;
   float add_offset = 0.f;
   float scale_factor = 1.f;
   NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");

@@ -899,6 +899,8 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
 void AsciiTable::set_entry(const int r, const int c, const char* text)
 
 {
@@ -951,8 +953,8 @@ else  {
 fix_float(str);
 
 if ( DoCommaString )  {
-  char * junk;
-  strncpy(junk, str.c_str(), str.length());
+   char junk[256];
+   strncpy(junk, str.c_str(), str.length());
    char * p = (char *) 0;
    long X;
    ConcatString s;
@@ -1471,7 +1473,8 @@ if ( !out )  {
    //  get to work
    //
 
-int j, len, offset;
+int j, len;
+int offset = 0;
 
    //
    //  fill the output field with the pad character

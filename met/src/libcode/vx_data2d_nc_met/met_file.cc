@@ -389,7 +389,7 @@ if ( dimCount >= max_met_args )  {
 int i;
 short s;
 float f;
-double d;
+double d = bad_data_double;
 bool status;
 float add_offset   = 0.f;
 float scale_factor = 1.f;

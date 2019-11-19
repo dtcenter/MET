@@ -274,7 +274,7 @@ void process_data_file() {
    ConcatString run_cs, vname;
    //Variables for GOES
    unixtime valid_time = 0;
-   int global_attr_count;
+   int global_attr_count = 0;
    bool opt_all_attrs = false;
    NcFile *nc_in = (NcFile *)0;
    NcFile *nc_adp = (NcFile *)0;
@@ -437,7 +437,7 @@ void process_data_file() {
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
       to_dp.set_size(to_grid.nx(), to_grid.ny());
-      global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
+      global_attr_count = sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
       if (file_exists(grid_map_file.text())) {
          cellMapping = read_grid_mapping(grid_map_file.text());
       }

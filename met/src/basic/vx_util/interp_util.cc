@@ -975,7 +975,7 @@ double compute_sfc_interp(const DataPlane &dp,
                           const GridTemplateFactory::GridTemplates shape,
                           double interp_thresh, const SurfaceInfo &sfc_info,
                           bool is_land_obs) {
-   double v;
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1069,7 +1069,8 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
                            const SurfaceInfo &sfc_info,
                            bool is_land_obs, double obs_elv) {
    MaskPlane mp;
-   int nx, ny;
+   int nx = 0;
+   int ny = 0;
    bool land_ok, topo_ok;
 
    // Initialize the mask
@@ -1131,7 +1132,7 @@ double compute_horz_interp(const DataPlane &dp,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
                            double interp_thresh, const SingleThresh *cat_thresh) {
-   double v;
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1297,7 +1298,9 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    DataPlane dp, dp1, dp2;
    int x, y;
    bool use_min;
-   double v, v1, v2, w1, w2;
+   double v, v1, v2;
+   double w1 = bad_data_double;
+   double w2 = bad_data_double;
 
    // Store min and max valid times.
    dp1 = (in1.valid() <= in2.valid() ? in1 : in2);

@@ -217,7 +217,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
 map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
                                  const STATLineType *line_type, int n_lty) {
    map<STATLineType,STATOutputType> output_map;
-   STATOutputType t;
+   STATOutputType t = STATOutputType_None;
    ConcatString cs;
    int i, v;
 
@@ -1611,7 +1611,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
-   GridWeightType t;
+   GridWeightType t = GridWeightType_None;
    int v;
 
    if(!dict) {
@@ -1674,7 +1674,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ObsSummary parse_conf_obs_summary(Dictionary *dict) {
-   ObsSummary t;
+   ObsSummary t = ObsSummary_None;
    int v;
 
    if(!dict) {
@@ -1763,7 +1763,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
-   GridDecompType t;
+   GridDecompType t = GridDecompType_None;
    int v;
 
    if(!dict) {
@@ -1793,7 +1793,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 WaveletType parse_conf_wavelet_type(Dictionary *dict) {
-   WaveletType t;
+   WaveletType t = WaveletType_None;
    int v;
 
    if(!dict) {
@@ -2006,7 +2006,7 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpMthd int_to_interpmthd(int i) {
-   InterpMthd m;
+   InterpMthd m = InterpMthd_None;
 
         if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
    else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
@@ -2224,7 +2224,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 FieldType int_to_fieldtype(int v) {
-   FieldType t;
+   FieldType t = FieldType_None;
 
    // Convert integer to enumerated FieldType
         if(v == conf_const.lookup_int(conf_val_none)) t = FieldType_None;
@@ -2243,11 +2243,15 @@ FieldType int_to_fieldtype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
-   GridTemplateFactory::GridTemplates t;
+   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplate_Square;
 
    // Convert integer to enumerated FieldType
-   if(v == conf_const.lookup_int(conf_val_square)) t = GridTemplateFactory::GridTemplate_Square;
-   else if(v == conf_const.lookup_int(conf_val_circle)) t = GridTemplateFactory::GridTemplate_Circle;
+   if(v == conf_const.lookup_int(conf_val_square)) {
+      t = GridTemplateFactory::GridTemplate_Square;
+   }
+   else if(v == conf_const.lookup_int(conf_val_circle)) {
+      t = GridTemplateFactory::GridTemplate_Circle;
+   }
    else {
       mlog << Error << "\nint_to_gridtemplate() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2281,7 +2285,7 @@ ConcatString fieldtype_to_string(FieldType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic int_to_setlogic(int v) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert integer to enumerated SetLogic
         if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic_None;
@@ -2300,7 +2304,7 @@ SetLogic int_to_setlogic(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic string_to_setlogic(const char *s) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert string to enumerated SetLogic
         if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic_None;
@@ -2393,7 +2397,7 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // If not equal, select the non-default logic type
         if(t1 == t2)            t = t1;
@@ -2414,7 +2418,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType int_to_tracktype(int v) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert integer to enumerated TrackType
         if(v == conf_const.lookup_int(conf_val_none))  t = TrackType_None;
@@ -2433,7 +2437,7 @@ TrackType int_to_tracktype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType string_to_tracktype(const char *s) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert string to enumerated TrackType
         if(strcasecmp(s, conf_val_none)  == 0) t = TrackType_None;
@@ -2473,7 +2477,7 @@ ConcatString tracktype_to_string(TrackType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type int_to_interp12type(int v) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert integer to enumerated Interp12Type
         if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type_None;
@@ -2491,7 +2495,7 @@ Interp12Type int_to_interp12type(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type string_to_interp12type(const char *s) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert string to enumerated Interp12Type
         if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type_None;
@@ -2529,7 +2533,7 @@ ConcatString interp12type_to_string(Interp12Type type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MergeType int_to_mergetype(int v) {
-   MergeType t;
+   MergeType t = MergeType_None;
 
    // Convert integer to enumerated MergeType
         if(v == conf_const.lookup_int(conf_val_none))   t = MergeType_None;
@@ -2596,7 +2600,7 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MatchType int_to_matchtype(int v) {
-   MatchType t;
+   MatchType t = MatchType_None;
 
    // Convert integer to enumerated MatchType
         if(v == conf_const.lookup_int(conf_val_none))       t = MatchType_None;
@@ -2636,7 +2640,7 @@ ConcatString matchtype_to_string(MatchType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType int_to_disttype(int v) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert integer to enumerated DistType
         if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
@@ -2658,7 +2662,7 @@ DistType int_to_disttype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType string_to_disttype(const char *s) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert string to enumerated DistType
         if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;

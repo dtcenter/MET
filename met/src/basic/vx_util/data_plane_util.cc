@@ -96,7 +96,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
                   double t, const double gaussian_radius, const double gaussian_dx) {
-   double v;
+   double v = 0.0;
    int x, y;
 
    // Initialize the smoothed field to the raw field
@@ -196,7 +196,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
         SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
-   int x, y, n_vld, n_thr;
+   int x, y;
+   int n_vld = 0;
+   int n_thr = 0;
    double v;
 
    // Check that width is set to 1 or greater
@@ -292,7 +294,8 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
         int wdth, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
-   int count_vld, count_thr;
+   int count_vld = 0;
+   int count_thr = 0;
    NumArray box_na;
 
    mlog << Debug(3)

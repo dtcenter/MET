@@ -550,7 +550,7 @@ return ( true );
 
 void read_pds(const GribRecord &r, int &bms_flag,
               unixtime &init_ut, unixtime &valid_ut, int &accum) {
-   double sec_per_fcst_unit;
+   double sec_per_fcst_unit = 0.0;
    unsigned char pp1[2];
    Section1_Header *pds = (Section1_Header *) 0;
 
