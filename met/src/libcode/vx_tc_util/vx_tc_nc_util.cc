@@ -247,7 +247,7 @@ void def_tc_pressure(NcFile* nc_out,
 
 void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
-    const TcrmwGrid& grid) {
+    const TcrmwGrid& grid, float rmw_scale) {
 
     NcVar range_var;
     NcVar azimuth_var;
@@ -261,7 +261,7 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
     // Set attributes
     add_att(&range_var, "long_name", "range");
-    add_att(&range_var, "units", "kilometers");
+    add_att(&range_var, "units", "fraction of RMW");
     add_att(&range_var, "standard_name", "range");
     add_att(&azimuth_var, "long_name", "azimuth");
     add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
@@ -269,7 +269,7 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
     // Compute grid coordinates
     for (int i = 0; i < grid.range_n(); i++) {
-        range_data[i] = i * grid.range_delta_km();
+        range_data[i] = i * rmw_scale;
     }
     for (int j = 0; j < grid.azimuth_n(); j++) {
         azimuth_data[j] = j * grid.azimuth_delta_deg();

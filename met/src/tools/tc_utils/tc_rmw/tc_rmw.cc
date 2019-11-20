@@ -461,7 +461,8 @@ void setup_nc_file() {
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
+        conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
