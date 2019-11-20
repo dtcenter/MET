@@ -115,8 +115,8 @@ climo_stdev = {
 // May be set separately in each "obs.field" entry
 //
 climo_cdf = {
-   cdf_bins    = 10;
-   center_bins = FALSE;
+   cdf_bins    = 11;
+   center_bins = TRUE;
    write_bins  = TRUE;
 }
 
