@@ -584,7 +584,7 @@ snprintf(junk, sizeof(junk), format, Centroid_Lat);
 
    table.set_entry(row, c++, junk);
 
-snprintf(junk, sizeof(junk), format, Centroid_Lon);
+snprintf(junk, sizeof(junk), format, -Centroid_Lon);
 
    table.set_entry(row, c++, junk);
 
