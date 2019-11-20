@@ -338,48 +338,34 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    if(rank_flag) {
       int concordant, discordant, extra_f, extra_o;
-      int n_zero_zero, n_f_rank, n_o_rank, n_f_rank_ties, n_o_rank_ties;
+      int n_f_rank, n_o_rank, n_f_rank_ties, n_o_rank_ties;
       NumArray f_na2, o_na2, f_na_rank, o_na_rank, wgt_na2;
 
       //
-      // If verifying precipitation, mask out the (0, 0) cases.
+      // Allocate memory
       //
-      if(precip_flag) {
+      f_na2.extend(pd.f_na.n());
+      o_na2.extend(pd.f_na.n());
+      wgt_na2.extend(pd.f_na.n());
 
-         for(i=0, n_zero_zero=0; i<n; i++) {
+      for(i=0; i<n; i++) {
 
-            //
-            // Get the index to be used from the index num array
-            //
-            j = nint(i_na[i]);
+         //
+         // Get the index to be used from the index num array
+         //
+         j = nint(i_na[i]);
 
-            //
-            // Only copy them over if f > 0 or o > 0
-            //
-            if(pd.f_na[j] > 0.0001 || pd.o_na[j] > 0.0001) {
-               f_na2.add(pd.f_na[j]);
-               o_na2.add(pd.o_na[j]);
-               wgt_na2.add(pd.wgt_na[j]);
-            }
-            else {
-               n_zero_zero++;
-            }
-         } // end for i
-      }
-      //
-      // Copy over the elements using the indices provided without
-      // masking out the (0, 0) cases
-      //
-      else {
+         //
+         // Skip (0, 0) cases for precipitation
+         //
+         if(precip_flag &&
+            is_eq(pd.f_na[j], 0.0) &&
+            is_eq(pd.o_na[j], 0.0)) continue;
 
-         for(i=0; i<n; i++) {
-            j = nint(i_na[i]);
-            f_na2.add(pd.f_na[j]);
-            o_na2.add(pd.o_na[j]);
-            wgt_na2.add(pd.wgt_na[j]);
-         }
-         n_zero_zero = 0;
-      }
+         f_na2.add(pd.f_na[j]);
+         o_na2.add(pd.o_na[j]);
+         wgt_na2.add(pd.wgt_na[j]);
+      } // end for i
 
       //
       // Compute ranks of the remaining raw data values

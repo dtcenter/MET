@@ -205,7 +205,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   NumArray header_heights;
   IntArray header_var_index;
   StringArray header_var_names;
-  bool has_aod_column_at_550 = false;
   
   sid_idx = elv_idx = lat_idx = lon_idx = -1;
 
@@ -263,8 +262,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       header_var_index.add(var_idx);
       header_var_names.add(var_name.c_str());
       header_heights.add(height_from_header);
-      if (0 == strcmp(var_name.c_str(), AOD_NAME.c_str())
-          && is_eq(height_from_header, 550)) has_aod_column_at_550 = true;
       mlog << Debug(5) << method_name << "header_idx: " << j
            << ", var_idx: " << var_idx << ", var: " << var_name << " from " << hdr_field
            << ", flag: " << flag << ", height: " << height_from_header << "\n";

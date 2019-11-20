@@ -697,7 +697,7 @@ void get_variable_info(const char* tbl_filename) {
          event_names.add(var_name);
          event_members.add(var_desc);
       }
-      read = getline(&line, &len, fp);
+      getline(&line, &len, fp);
 
       // Processing section 3
       while ((read = getline(&line, &len, fp)) != -1) {
@@ -956,7 +956,7 @@ void process_pbfile(int i_pb) {
                     // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
    float p1d,t1d,q1d;
-   int prev_cape_level, IMM, JMM;
+   int IMM, JMM;
    int cape_level=0, cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs=0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
    float cape_p, cape_h;
@@ -991,7 +991,6 @@ void process_pbfile(int i_pb) {
    }
 
    IMM = JMM =1;
-   prev_cape_level = -1;
    p1d = t1d = q1d = r8bfms * 10;
    cape_h = pbl_h = 0;
    cape_p = pbl_p = bad_data_float;
@@ -2751,7 +2750,7 @@ bool keep_level_category(int category) {
 
 float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
                        double lat, float &qty) {
-   float result = bad_data_float;
+   float result;
    double p, q, t, z, u, v, w, vp;
 
    switch(gc) {
@@ -2815,7 +2814,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       default:
-         v = fill_value;
+         result = fill_value;
          break;
    } // end switch
 

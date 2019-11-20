@@ -85,7 +85,7 @@ if ( read(fd, buf, buf_size) != buf_size )  {
    //  close file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    //
    //  check for bufr magic cookie

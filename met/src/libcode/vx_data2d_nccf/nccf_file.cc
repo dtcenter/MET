@@ -1283,7 +1283,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
 
   //string grid_mapping_name = grid_mapping_name_att->getValues(att->as_string(0);
   ConcatString grid_mapping_name;
-  status = get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
+  get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
   if (grid_mapping_name_att) delete grid_mapping_name_att;
 
   // Handle each mapping type defined in the standard

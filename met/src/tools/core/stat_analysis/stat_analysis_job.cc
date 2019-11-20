@@ -4042,7 +4042,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Loop through the terms and compute a skill score for each.
    //
-   ss = ss_sum = weight_sum = 0.0;
+   ss_sum = weight_sum = 0.0;
    for(i=0; i<n_terms; i++) {
 
       //

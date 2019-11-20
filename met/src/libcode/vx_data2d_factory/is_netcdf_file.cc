@@ -66,7 +66,7 @@ bool is_netcdf_file(const char * filename)
 
    n_read = read(fd, buf, netcdf_magic_len);
 
-   close(fd);  fd = -1;
+   close(fd);
 
    if ( n_read != netcdf_magic_len )  return ( false );
 
