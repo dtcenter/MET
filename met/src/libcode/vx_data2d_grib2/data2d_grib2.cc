@@ -937,14 +937,13 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
-   double d;
+   double d, r_km;
    int ResCompFlag;
    char hem = 0;
 
    Raw_Grid = new Grid();
 
    //  determine the radius of the earth
-   double r_km = -1;
    switch( gfld->igdtmpl[0] ){
       case 0:     r_km = 6367.470;  break;
       //  parse earth radius from header

@@ -53,15 +53,32 @@ eclv_points   = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   level = [ "P500", "P850" ];
    field = [
-      { name = "TMP";  },
-      { name = "UGRD"; },
-      { name = "VGRD"; },
-      { name = "WIND"; }
+      { name = "TMP";  level = [ "P500" ]; },
+      { name = "UGRD"; level = [ "P500" ]; },
+      { name = "VGRD"; level = [ "P500" ]; },
+      { name = "WIND"; level = [ "P500" ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
    ];
 }
-obs = fcst;
+obs = {
+
+   cnt_thresh = [ NA, <CDP50, >=CDP50, ==CDP25 ];
+
+   field = [
+      { name = "TMP";  level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "UGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "VGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "WIND"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
+   ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +106,24 @@ climo_mean = {
    time_interp_method = DW_MEAN;
    day_interval       = 1;
    hour_interval      = 12;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+
+   file_name = [ "${CLIMO_DIR}/t850hPa_stdev.grib",
+                 "${CLIMO_DIR}/u850hPa_stdev.grib",
+                 "${CLIMO_DIR}/v850hPa_stdev.grib",
+                 "${CLIMO_DIR}/ws850hPa_stdev.grib" ];
+}
+
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 3;
+   center_bins = TRUE;
+   write_bins  = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +222,7 @@ distance_map = {
 //
 output_flag = {
    fho    = NONE;
-   ctc    = NONE;
+   ctc    = STAT;
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
@@ -217,7 +252,7 @@ nc_pairs_flag = {
    raw          = TRUE;
    diff         = TRUE;
    climo        = TRUE;
-   climo_cdp    = FALSE;
+   climo_cdp    = TRUE;
    weight       = TRUE;
    nbrhd        = FALSE;
    fourier      = FALSE;

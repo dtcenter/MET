@@ -196,10 +196,7 @@ void process_binary() {
    }
 
    // Close the input file
-   if(fd >= 0) {
-      ::close(fd);
-      fd = -1;
-   }
+   if(fd >= 0) ::close(fd);
 
    // Write data for each climo bin
    for(i=0; i<(n_bin-1); i++) {

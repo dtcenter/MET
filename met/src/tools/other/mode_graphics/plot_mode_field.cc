@@ -1002,7 +1002,7 @@ void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Diction
 
 ifstream in;
 MapRegion r;
-double map_linewidth = 1.0;
+double map_linewidth;
 ConcatString s;
 ConcatString map_filename;
 Color map_color;
@@ -1107,7 +1107,6 @@ for (j=1; j<(r.n_points); ++j)  {   //  j starts at one, here
    } else  plot.lineto(x_page_2, y_page_2);
 
    x_page_1 = x_page_2;
-   y_page_1 = y_page_2;
 
 }   //  for j
 

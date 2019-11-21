@@ -417,8 +417,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    ConcatString field_level = dict.lookup_string(conf_key_level, false);
    LevelType lt;
    string lvl_type, lvl_val1, lvl_val2;
-   double lvl1 = -1, lvl2 = -1;
-
+   double lvl1;
+   double lvl2 = -1;
 
    //  if the level string is specified, use it
    if( ! field_level.empty() ){

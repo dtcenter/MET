@@ -229,7 +229,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
    double *data = (double *) 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double median_v = bad_data_double;
+   double median_v;
 
    // Allocate space to store the data points for sorting
    data = new double [gt.size()];
@@ -315,7 +315,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
    double sum = 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double uw_mean_v = bad_data_double;
+   double uw_mean_v;
 
    // Sum the valid data in the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
@@ -620,14 +620,10 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    int ix, iy;
    int nx, ny, g_nx;
    double value, gaussian_value, gaussian_weight, max_raw;
-   double interp_value = bad_data_double;
+   double interp_value;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
-   int x_first = x - max_r;
-   int y_first = y - max_r;
-   int x_last = x + max_r;
-   int y_last = y + max_r;
    
    nx = dp.nx();
    ny = dp.ny();

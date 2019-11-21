@@ -596,8 +596,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       
       lengths[1] = typ_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
-      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
-           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
       for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
          buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
                ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
@@ -618,8 +616,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       
       lengths[1] = sid_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
-      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
-           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
       for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
          buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
                ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
@@ -640,8 +636,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
 
       lengths[1] = vld_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
-      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
-            ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
       for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
          buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
                ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);

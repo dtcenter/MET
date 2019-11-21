@@ -131,10 +131,6 @@ char tmp_str[512];
 
 if ( !e.empty() )  {
 
-   int n;
-
-   n = Nrows*Ncols;
-
    e.clear();
 
 }
@@ -1274,15 +1270,12 @@ void AsciiTable::line_up_decimal_points()
 
 int r, c, n, k;
 int max_left, max_right;
-int w_old, w_new;
 int left[Nrows];
 int right[Nrows];
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
 for (c=0; c<Ncols; ++c)  {
-
-   w_old = ColWidth[c];
 
       //  get the pad size for that column
 
@@ -1304,23 +1297,13 @@ for (c=0; c<Ncols; ++c)  {
 
    }
 
-   w_new = max_left + max_right;
-
-   if ( w_new < w_old )  w_new = w_old;
-
       //
       //  pad each entry in that column
       //
 
    for (r=r_start; r<Nrows; ++r)  {
 
-      n = rc_to_n(r, c);
-
-      // len = (e[n] == (char *) 0 ? 0 : strlen(e[n]));
-
       k = max_right - right[r];
-
-      // k = w_new - len - 1;
 
       if ( k > 0 )  pad_entry_right(r, c, k, fill_char);
 

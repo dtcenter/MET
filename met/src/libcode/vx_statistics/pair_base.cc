@@ -556,14 +556,13 @@ ob_val_t PairBase::compute_uw_mean(string obs_key) {
 ////////////////////////////////////////////////////////////////////////
 
 ob_val_t PairBase::compute_dw_mean(string obs_key) {
-   double total = 0.0;
-   double weight = 0.0;
-   double total_weight = 0.0;
+   double total, weight, total_weight;
    ob_val_t out;
    station_values_t svt = map_val[obs_key];
+
    vector<ob_val_t>::iterator it = svt.obs.begin();
    out.qc = (*it).qc;
-   for(; it != svt.obs.end(); it++) {
+   for(total=total_weight=0.0; it != svt.obs.end(); it++) {
      if( svt.ut == (*it).ut) return *it;
      weight = 1.0 / pow( labs( svt.ut - (*it).ut ), 2.0);
 

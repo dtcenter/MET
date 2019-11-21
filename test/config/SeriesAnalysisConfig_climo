@@ -64,15 +64,12 @@ obs = {
 climo_mean = fcst;
 climo_mean = {
 
-   file_name = [ "${CLIMO_DIR}/cmean_1d.19790409",
-                 "${CLIMO_DIR}/cmean_1d.19790410", 
-                 "${CLIMO_DIR}/cmean_1d.19790411" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
-      method     = NEAREST;
-      width      = 1;
+      method     = BILIN;
+      width      = 2;
       vld_thresh = 0.5;
-      shape      = SQUARE;
    }
 
    time_interp_method = DW_MEAN;
@@ -82,9 +79,7 @@ climo_mean = {
 
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "${CLIMO_DIR}/cstdv_1d.19790409",
-                 "${CLIMO_DIR}/cstdv_1d.19790410", 
-                 "${CLIMO_DIR}/cstdv_1d.19790411" ];
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

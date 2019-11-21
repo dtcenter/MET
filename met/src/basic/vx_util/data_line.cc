@@ -700,9 +700,6 @@ if ( !(*in) )  {
    //  get filename
    //
 
-int n;
-
-n = strlen(path);
 
 Filename.assign(path);
 ShortFilename.assign(get_short_name(path));

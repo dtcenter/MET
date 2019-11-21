@@ -210,7 +210,7 @@ Filename = get_short_name(filename);
    //  done
    //
 
-::close(fd);   fd = -1;
+::close(fd);
 
 return ( true );
 

@@ -1640,7 +1640,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   DuplicateType t;
+   DuplicateType t = DuplicateType_None;
    int v;
 
    if(!dict) {
@@ -1657,8 +1657,8 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
    else if(v == conf_const.lookup_int(conf_val_single)) {
      mlog << Error << "\nparse_conf_duplicate_flag() -> "
-	  << "duplicate_flag = SINGLE has been deprecated\n"
-	  << "Please use obs_summary = NEAREST;\n\n";
+          << "duplicate_flag = SINGLE has been deprecated\n"
+          << "Please use obs_summary = NEAREST;\n\n";
      exit(1);
    }
    else {

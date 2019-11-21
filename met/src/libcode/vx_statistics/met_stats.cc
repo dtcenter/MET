@@ -1509,9 +1509,10 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 
 void VL1L2Info::calc_ncep_stats() {
    double u_diff, v_diff;
+   int n = vcount;
 
-   u_diff = uf_bar - uo_bar;
-   v_diff = vf_bar - vo_bar;
+   u_diff       = uf_bar - uo_bar;
+   v_diff       = vf_bar - vo_bar;
 
    FBAR         = f_speed_bar;
    OBAR         = o_speed_bar;
@@ -1523,8 +1524,8 @@ void VL1L2Info::calc_ncep_stats() {
 
    RMSVE        = sqrt(MSVE);
 
-   FSTDEV       = sqrt(uvff_bar - f_speed_bar*f_speed_bar);
-   OSTDEV       = sqrt(uvoo_bar - o_speed_bar*o_speed_bar);
+   FSTDEV       = compute_stdev(f_speed_bar*n, uvff_bar*n, n);
+   OSTDEV       = compute_stdev(o_speed_bar*n, uvoo_bar*n, n);
 
    FDIR         = convert_u_v_to_wdir(uf_bar, vf_bar);
    ODIR         = convert_u_v_to_wdir(uo_bar, vo_bar);
@@ -2932,8 +2933,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    // Compute actual DMAP statistics here.
    int max_events;
    int non_zero_count;
-   double f_distance, o_distance, zhu_common;
-   double abs_diff_distance = 0.0; 
+   double f_distance, o_distance, zhu_common, abs_diff_distance;
    double sum_event_diff = 0.0;
    double fom_fo_sum = 0.0;
    double fom_of_sum = 0.0;

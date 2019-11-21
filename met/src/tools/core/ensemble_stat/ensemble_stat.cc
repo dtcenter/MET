@@ -924,15 +924,10 @@ void process_point_obs(int i_nc) {
         << " observations from " << (hdr_count)
         << " header messages.\n";
 
-
-   int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
-   int qty_len      = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
-                         (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
+   int qty_len = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
+                   (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
 
    NcHeaderData header_data = get_nc_hdr_data(obs_vars);
-   int typ_len = header_data.typ_len;
-   int sid_len = header_data.sid_len;
-   int vld_len = header_data.vld_len;
 
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
 

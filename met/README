@@ -1,4 +1,4 @@
-Model Evaluation Tools version 8.1 (May 3, 2019)
+Model Evaluation Tools version 9.0 BETA1 (November 21, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -322,6 +322,57 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+When applicable, release notes are followed by the GitHub issue number which
+describes the bugfix, enhancement, or new feature:
+   https://github.com/NCAR/MET/issues
+
+Version 9.0 BETA1 Release Notes:
+-------------------------------
+
+- What's New:
+   - Major Enhancements: python version 3, python embedding overhaul, binned
+     climatologies
+   - New Tools: tc_rmw
+
+- Bugfixes:
+   - Changes for all bugs fixed met-8.1.1 and met-8.1.2.
+      - https://github.com/NCAR/MET/milestone/61?closed=1
+      - https://github.com/NCAR/MET/milestone/60?closed=1
+   - Bugfix for MTD centroid longitude in degrees west, not east (#1214).
+   - Bugfix for reporting the units for GRIB2 probabilities as "%" (#1212).
+   
+- Changes to Output Formats:
+
+- Build Process
+   - Document option to install MET into "exec" rather than "bin" (#1189).
+   - Continued reduction of Fortify findings.
+   - Transition development from Subversion to GitHub (#805).
+
+- Enhancements to Existing Tools:
+   - Common Libraries
+      - Switch python embedding from python 2 to python 3 (#1080).
+      - Report AW_MEAN regridding width at 1, not NA (#1186).
+      - Add support for climatological distribution percentile thresholds,
+        such as >CDP50, (#1138).
+   - TC-RMW
+      - Initial version of the Tropical Cyclone, Radius of Maximum Winds tool
+        (#1085).
+   - PCP-Combine
+      - Support multiple arguments for the -pcpdir command line option (#1191).
+   - Regrid-Data-Plane
+      - Enhance to process smoke and dust data from GOES-16 ADP files (#1194).
+      - Update quality control processing logic (#1168).
+      - Add support for Gaussian regridding method to support the definition
+        of surrogate-severe forcasts (#1136).
+      - Derive AOD at 550nm from 440 and 675 (#1121).
+   - Point-Stat and Grid-Stat
+      - Replace climo_cdf_bins configuration file options with climo_cdf
+        dictionary (#1138).
+      - When applying climatology bins, report the mean of statistics across the
+        bins for SL1L2, SAL1L2, CNT, and PSTD line types (#1138).
+   - Grid-Stat
+      - Add new distance map (DMAP) output line type (#600).
 
 Version 8.1 Release Notes:
 -------------------------

@@ -390,7 +390,6 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    bool time_as_value = !level.is_time_as_offset();
    
    long dim_offset = (time_dim_slot >= 0) ? dimension[time_dim_slot] : -1;
-   long time_value = (time_as_value ? dim_offset : -1);
    bool include_all_times = (dim_offset == vx_data2d_star);
 
    int idx;
@@ -539,6 +538,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                  << " (0 <= offset < " << time_dim_size << ")";
       }
       else if (error_code == error_code_missing_time_value) {
+         long time_value = (time_as_value ? dim_offset : -1);
          log_msg << "does not have the matching time "
                  << unix_to_yyyymmdd_hhmmss(time_value) << " ["
                  << unix_to_yyyymmdd_hhmmss(_file->ValidTime.min()) << " and "
