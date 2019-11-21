@@ -354,7 +354,8 @@ Version 9.0 BETA1 Release Notes:
       - Add support for climatological distribution percentile thresholds,
         such as >CDP50, (#1138).
    - TC-RMW
-      - Initial verison Tropical Cyclone, Radius of Maximum Winds tool (#1085).
+      - Initial version of the Tropical Cyclone, Radius of Maximum Winds tool
+        (#1085).
    - PCP-Combine
       - Support multiple arguments for the -pcpdir command line option (#1191).
    - Regrid-Data-Plane
