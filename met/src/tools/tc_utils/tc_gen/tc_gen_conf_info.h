@@ -20,6 +20,7 @@
 
 #include "vx_tc_util.h"
 #include "vx_config.h"
+#include "vx_grid.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
