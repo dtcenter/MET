@@ -1,3 +1,5 @@
+The docker sub-directory contains a Dockerfile for building a MET software image.
+
 The scripts in this directory are described below.
 
 (1) met_checkout_and_build.sh may be run to build a release of the MET software package.
