@@ -112,9 +112,9 @@ The Grid-Stat tool provides verification statistics for a matched forecast
  However, the interpolation parameters may be used to perform a smoothing
  operation on the forecast and observation fields prior to verification.
  In addition to traditional verification approaches, the Grid-Stat tool
- includes fourier decompositions, gradient statistics, and neighborhood
- methods, designed to examine forecast performance as a function of spatial
- scale.
+ includes fourier decompositions, gradient statistics, distance metrics,
+ and neighborhood methods, designed to examine forecast performance as a
+ function of spatial scale.
 \end_layout
 
 \begin_layout Standard
@@ -612,6 +612,344 @@ Differences are computed in both of the horizontal grid directions and is
  
 \end_layout
 
+\begin_layout Subsection
+Distance Maps 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:GS_Distance_Maps"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following methods can all be computed efficiently by utilizing fast
+ algorithms developed for calculating distance maps.
+ A distance map results from calculating the shortest distance from every
+ grid point, 
+\begin_inset Formula $s=(x,y)$
+\end_inset
+
+, in the domain, 
+\begin_inset Formula $D$
+\end_inset
+
+, to the nearest one-valued grid point.
+ In each of the following, it is understood that they are calculated between
+ event areas 
+\begin_inset Formula $A$
+\end_inset
+
+, from one field and observation event areas 
+\begin_inset Formula $B$
+\end_inset
+
+ from another.
+ If the measure is applied to a feature within a field, then the distance
+ map is still calculated over the entire original domain.
+ Some of the distance map statistics are computed over the entire distance
+ map, while others use only parts of it.
+\end_layout
+
+\begin_layout Standard
+Because these methods rely on the distance map, it is helpful to understand
+ precisely what such maps do.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+ demonstrates the path of the shortest distance to the nearest event point
+ in the event area A marked by the gray rectangle in the diagram.
+ Note that the arrows all point to a grid point on the boundary of the event
+ area A as it would be a longer distance to any point in its interior.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig2_Grid-Stat"
+
+\end_inset
+
+ demonstrates the shortest distances from every grid point inside a second
+ event area marked by the gray circle labeled B to the same event area A
+ as in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+.
+ Note that all of the distances are to points on a small subsection (indicated
+ by the yellow stretch) of the subset A.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename Grid-Stat_fig1.png
+	scale 75
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The above diagram depicts how a distance map is formed.
+ From every grid point in the domain (depicted by the larger rectangle),
+ the shortest distance from that grid to the nearest non-zero grid point
+ (event; depicted by the gray rectangle labeled as A) is calculated (a sample
+ of grid points with arrows indicate the path of the shortest distance with
+ the length of the arrow equal to this distance.
+ In a distance map, the value at each grid point is this distance.
+ For example, grid points within the rectangle A will all have value zero
+ in the distance map.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig1_Grid-Stat"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename Grid-Stat_fig2.png
+	scale 75
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Diagram depicting the shortest distances from one event area to another.
+ The yellow bar indicates the part of the event area A to where all of the
+ shortest distances from B are calculated.
+ That is, the shortest distances from every point inside the set B to the
+ set A all point to a point along the yellow bar.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig2_Grid-Stat"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+While Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+ and Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig2_Grid-Stat"
+
+\end_inset
+
+ are helpful in illustrating the idea of a distance map, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+ shows an actual distance map calculated for binary fields consisting of
+ circular event areas, where one field has two circular event areas labeled
+ A, and the second has one circular event area labeled B.
+ Notice that the values of the distance map inside the event areas are all
+ zero (dark blue) and the distances grow larger in the pattern of concentric
+ circles around these event areas as grid cells move further away.
+ Finally, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+ depicts special situations from which the distance map measures to be discussed
+ are calculated.
+ In particular, the top left panel shows the absolute difference between
+ the two distance maps presented in the bottom row of Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+.
+ The top right panel shows the portion of the distance map for A that falls
+ within the event area of B, and the bottom left depicts the portion of
+ the distance map for B that falls within the event area A.
+ That is, the first shows the shortest distances from every grid point in
+ the set B to the nearest grid point in the event area A, and the latter
+ shows the shortest distance from every grid point in A to the nearest grid
+ point in B.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename Grid-Stat_fig3.png
+	scale 75
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Binary fields (top) with event areas A (consisting of two circular event
+ areas) and a second field with event area B (single circular area) with
+ their respective distance maps (bottom).
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig3_Grid-Stat"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename Grid-Stat_fig4.png
+	scale 75
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The absolute difference between the distance maps in the bottom row of Figure
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+ (top left), the shortest distances from every grid point in B to the nearest
+ grid point in A (top right), and the shortest distances from every grid
+ point in A to the nearest grid points in B (bottom left).
+ The latter two do not have axes in order to emphasize that the distances
+ are now only considered from within the respective event sets.
+ The top right graphic is the distance map of A conditioned on the presence
+ of an event from B, and that in the bottom left is the distance map of
+ B conditioned on the presence of an event from A.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig4_Grid-Stat"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The statistics derived from these distance maps are described in Appendix
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:App_C-distance_maps"
+
+\end_inset
+
+.
+ For each combination of input field and categorical threshold requested
+ in the configuration file, Grid-Stat applies that threshold to define events
+ in the forecast and observation fields and computes distance maps for those
+ binary fields.
+ Statistics for all requested masking regions are derived from those distance
+ maps.
+ Note that the distance maps are computed only once over the full verification
+ domain, not separately for each masking region.
+ Events occurring outside of a masking region can affect the distance map
+ values inside that masking region and, therefore, can also affect the distance
+ maps statistics for that region.
+\end_layout
+
 \begin_layout Section
 Practical information
 \begin_inset CommandInset label
@@ -632,7 +970,7 @@ This section contains information about configuring and running the Grid-Stat
  The input gridded model and observation datasets must be in one of the
  MET supported file formats.
  The requirement of having all gridded fields using the same grid specification
- has been removed with METv5.1.
+ was removed in METv5.1.
  There is a regrid option in the configuration file that allows the user
  to define the grid upon which the scores will be computed.
  The gridded observation data may be a gridded analysis based on observations
@@ -1538,6 +1876,110 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+distance_map = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   baddeley_p        = 2;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   baddeley_max_dist = NA;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   fom_alpha         = 0.1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   zhu_weight        = 0.5;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+distance_map
+\series medium
+ entry is a dictionary containing options related to the distance map statistics
+ in the 
+\series bold
+DMAP
+\series medium
+ output line type.
+ The 
+\series bold
+baddeley_p
+\series medium
+ entry is an integer specifying the exponent used in the Lp-norm when computing
+ the Baddeley 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ metric.
+ The 
+\series bold
+baddeley_max_dist
+\series medium
+ entry is a floating point number specifying the maximum allowable distance
+ for each distance map.
+ Any distances larger than this number will be reset to this constant.
+ A value of 
+\series bold
+NA
+\series medium
+ indicates that no maximum distance value should be used.
+ The 
+\series bold
+fom_alpha
+\series medium
+ entry is a floating point number specifying the scaling constant to be
+ used when computing Pratt's Figure of Merit.
+ The 
+\series bold
+zhu_weight
+\series medium
+ specifies a value between 0 and 1 to define the importance of the RMSE
+ of the binary fields (i.e.
+ amount of overlap) versus the mean-error distance (MED).
+ The default value of 0.5 gives equal weighting.
+ This configuration option may be set separately in each 
+\series bold
+obs.field
+\series medium
+ entry.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
@@ -1659,6 +2101,12 @@ vcnt   = BOTH;
 
 \series bold
    grad   = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   dmap   = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1855,6 +2303,14 @@ GRAD
  for Gradient Statistics
 \end_layout
 
+\begin_layout Enumerate
+
+\series bold
+DMAP
+\series default
+ for Distance Map Statistics
+\end_layout
+
 \begin_layout Standard
 
 \series medium
@@ -1891,49 +2347,61 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   latlon     = TRUE;
+   latlon       = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   raw        = TRUE;
+   raw          = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   diff       = TRUE;
+   diff         = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   climo      = TRUE;
+   climo        = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   weight     = FALSE;
+   climo_cdp    = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   nbrhd      = FALSE;
+   weight       = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   gradient   = FALSE;
+   nbrhd        = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gradient     = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   distance_map = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
    
 \series bold
-apply_mask = TRUE;
+apply_mask   = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1990,14 +2458,26 @@ climo
 nbrhd
 \series medium
  entries control the creation of output variables for the climatological
- mean field, the grid area weights applied, and the fractional coverage
- fields computed for neighborhood verification methods.
+ mean and standard deviation fields, the grid area weights applied, and
+ the fractional coverage fields computed for neighborhood verification methods.
  Setting these entries to 
 \series default
 TRUE
 \series medium
  indicates that they should be written, while setting them to FALSE disables
  their creation.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Setting the 
+\series bold
+climo_cdf
+\series medium
+ entry to TRUE enables the creation of an output variable for each climatologica
+l distribution percentile (CDP) threshold requested in the configuration
+ file.
  Note that enabling 
 \series bold
 nbrhd
@@ -2009,6 +2489,12 @@ gradient
 \series medium
  entry controls the creation of output variables for the FCST and OBS gradients
  in the grid-x and grid-y directions.
+ The 
+\series bold
+distance_map
+\series medium
+ entry controls the creation of output variables for the FCST and OBS distance
+ maps for each categorical threshold.
  The 
 \series bold
 apply_mask
@@ -2081,7 +2567,11 @@ grid_stat
  The output files are written to the default output directory or the directory
  specified by the -outdir
 \series medium
- command-line option.
+ 
+\series default
+command line
+\series medium
+ option.
  
 \end_layout
 
@@ -3876,10 +4366,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -5223,6 +5709,764 @@ Gradient size in the Y-direction
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Format information for DMAP (Distance Map) output line type.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_DMAP"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="24" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+DMAP OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+DMAP Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DMAP
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Distance Map line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast events
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of observation events
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBIAS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Frequency Bias
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BADDELEY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Baddeley's 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ Metric
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HAUSDORFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hausdorff Distance
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MED_FO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean-error Distance from forecast to observation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MED_OF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean-error Distance from observation to forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MED_MIN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum of MED_FO and MED_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+34
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MED_MAX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum of MED_FO and MED_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+35
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MED_MEAN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of MED_FO and MED_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+36
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FOM_FO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pratt's Figure of Merit from forecast to observation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FOM_OF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pratt's Figure of Merit from observation to forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FOM_MIN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum of FOM_FO and FOM_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+39
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FOM_MAX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum of FOM_FO and FOM_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FOM_MEAN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of FOM_FO and FOM_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+41
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ZHU_FO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Zhu's Measure from forecast to observation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+42
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ZHU_OF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Zhu's Measure from observation to forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+43
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ZHU_MIN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum of ZHU_FO and ZHU_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+44
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ZHU_MAX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum of ZHU_FO and ZHU_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+45
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ZHU_MEAN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of ZHU_FO and ZHU_OF
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
 \series medium
 If requested in the 
 \series default
@@ -5386,10 +6630,6 @@ Dimension of the longitude (i.e.
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 

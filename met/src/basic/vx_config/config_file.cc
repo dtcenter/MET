@@ -247,7 +247,6 @@ return;
 
 ConcatString MetConfig::get_tmp_dir()
 {
-   char *ptr;
    ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.

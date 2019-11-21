@@ -139,7 +139,7 @@ if ( read(fd, buf, read_size) != read_size )  {
    //  close file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    //
    //  search buffer for grib magic cookie

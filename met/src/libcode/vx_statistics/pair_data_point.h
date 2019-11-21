@@ -47,28 +47,23 @@ class PairDataPoint : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       void clear();
+      void erase();
 
       void extend(int);
 
-      bool add_pair(const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+      bool add_point_pair(const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(double, double, double, double,
-                    double wgt = default_grid_weight);
+      void set_point_pair(int, const char *, double, double, double, double,
+                          unixtime, double, double, double, double,
+                          const char *, double, double, double);
 
-      bool add_pair(const NumArray &f_in, const NumArray &o_in,
-                    const NumArray &c_in, const NumArray &w_in);
+      bool add_grid_pair(double, double, double, double, double);
 
-      bool add_pair(const NumArray &f_in,   const NumArray &o_in,
-                    const NumArray &cmn_in, const NumArray &csd_in,
-                    const NumArray &w_in);
-
-      void set_pair(int, const char *, double, double, double, double,
-                    unixtime, double, double, double, double,
-                    const char *, double, double,
-                    double wgt = default_grid_weight);
+      bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
+                         const NumArray &cmn_in, const NumArray &csd_in,
+                         const NumArray &w_in);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -212,9 +207,9 @@ class VxPairDataPoint {
 
       void set_sfc_info(const SurfaceInfo &);
 
-      void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &, const char * = 0,
-                   const DataPlane * = 0);
+      void add_point_obs(float *, const char *, const char *, unixtime,
+                         const char *, float *, Grid &, const char * = 0,
+                         const DataPlane * = 0);
 
       int  get_n_pair() const;
 
@@ -244,6 +239,11 @@ class VxPairDataPoint {
 PairDataPoint subset_pairs(const PairDataPoint &,
                            const SingleThresh &, const SingleThresh &,
                            const SetLogic);
+
+// Apply conditional thresholds to subset the wind pairs
+void subset_wind_pairs(const PairDataPoint &, const PairDataPoint &,
+                       const SingleThresh &, const SingleThresh &,
+                       const SetLogic, PairDataPoint &, PairDataPoint &);
 
 // Subset pairs for a specific climatology CDF bin
 PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,

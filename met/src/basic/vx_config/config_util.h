@@ -41,7 +41,7 @@ extern vector<MaskLatLon>
 extern StringArray     parse_conf_obs_qty(Dictionary *dict);
 extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern NumArray        parse_conf_eclv_points(Dictionary *dict);
-extern ThreshArray     parse_conf_climo_cdf_bins(Dictionary *dict);
+extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
@@ -71,8 +71,8 @@ extern void         check_climo_n_vx(Dictionary *dict, const int);
 extern InterpMthd   int_to_interpmthd(int);
 extern void         check_mctc_thresh(const ThreshArray &);
 
-extern bool         check_fo_thresh(const double, const SingleThresh &,
-                                    const double, const SingleThresh &,
+extern bool         check_fo_thresh(const double, const double, const double, const double,
+                                    const SingleThresh &, const SingleThresh &,
                                     const SetLogic);
 
 extern const char * statlinetype_to_string(const STATLineType);

@@ -166,8 +166,6 @@ conv_radius = R;
 //      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
 //      << "\n\n";
 
-min_conv_value = 0.0;
-max_conv_value = 0.0;
 
 const int Nxy = Nx*Ny;
 
@@ -493,8 +491,8 @@ int bad_count;
 static int t_count = 0;
 char junk[256];
 double value, value_front, value_back;
-bool      ok, ok_front, ok_back;
-double moving_sum      = 0.0;
+bool   ok, ok_front, ok_back;
+double moving_sum;
 bool * b               = 0;
 const bool * ok_back_p   = 0;
 const bool * ok_front_p  = 0;
@@ -649,7 +647,7 @@ for (x=0; x<nx; ++x)  {
       value = data_back_p[y*nx];
          ok =   ok_back_p[y*nx];
 
-      if ( ok )  moving_sum += data_back_p[y*nx];
+      if ( ok )  moving_sum += value;
       else       ++bad_count;
 
    }

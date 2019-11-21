@@ -42,8 +42,8 @@ The configuration file language supports the following data types:
    - Percentile Thresholds:
       - Thresholds may be defined as percentiles of the data being processed in
         several places:
-         - In Point-Stat and Grid-Stat when setting "cat_thresh" and
-           "cnt_thresh".
+         - In Point-Stat and Grid-Stat when setting "cat_thresh", "wind_thresh",
+           and "cnt_thresh".
          - In Wavelet-Stat when setting "cat_thresh".
          - In MODE when setting "conv_thresh" and "merge_thresh".
          - In Ensemble-Stat when setting "obs_thresh".
@@ -67,16 +67,33 @@ The configuration file language supports the following data types:
            "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to the
            observations and then chooses a forecast threshold which results in a
            frequency bias of 1.
-      - When percentile thresholds are requested and computed, MET recomputes
-        the actual percentile that the threshold represents. If the requested
-        percentile and actual percentile differ by more than 5%, a warning
-        message is printed. This may occur when the sample size is small or the
-        data values are not truly continuous.
-      - When percentile thresholds are used, the actual threshold value is
-        appended to the FCST_THRESH and OBS_THRESH output columns.  For example,
-        if the 90-th percentile of the current set of forecast values is 3.5,
-        then the requested threshold "<=SFP90" is written to the output as
-        "<=SFP90(3.5)".
+         - "CDP" for climatological distribution percentile thresholds.
+           These thresholds require that the climatological mean and standard
+           deviation be defined using the climo_mean and climo_stdev config file
+           options, respectively.  The categorical (cat_thresh), conditional
+           (cnt_thresh), or wind speed (wind_thresh) thresholds are defined
+           relative to the climatological distribution at each point. Therefore,
+           the actual numeric threshold applied can change for each point.
+           e.g. ">CDP50" means greater than the 50-th percentile of the
+           climatological distribution for each point.
+      - When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
+        for continuous filtering thresholds (cnt_thresh), wind speed thresholds
+        (wind_thresh), or observation filtering thresholds (obs_thresh in
+        ensemble_stat), the following special logic is applied.  Percentile
+        thresholds of type equality are automatically converted to percentile
+        bins which span the values from 0 to 100.
+        For example, "==CDP25" is automatically expanded to 4 percentile bins:
+           >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
+      - When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS1 are
+        requested, MET recomputes the actual percentile that the threshold
+        represents. If the requested percentile and actual percentile differ by
+        more than 5%, a warning message is printed. This may occur when the
+        sample size is small or the data values are not truly continuous.
+      - When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
+        actual threshold value is appended to the FCST_THRESH and OBS_THRESH
+        output columns.  For example, if the 90-th percentile of the current set
+        of forecast values is 3.5, then the requested threshold "<=SFP90" is
+        written to the output as "<=SFP90(3.5)".
       - When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
         ignores the actual percentile values listed in parentheses.
    - Piecewise-Linear Function (currently used only by MODE):
@@ -787,9 +804,9 @@ fcst = {
 obs = fcst;
 
 //
-// The "climo_mean" dictionary specifies climatology data to be read by the
-// Grid-Stat, Point-Stat, and Ensemble-Stat tools.  It consists of several
-// entires defining the climatology file names and fields to be used.
+// The "climo_mean" dictionary specifies climatology mean data to be read by the
+// Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
+// of several entires defining the climatology file names and fields to be used.
 //
 //   - The "file_names" entry specifies one or more file names containing
 //     the gridded climatology data to be used.
@@ -810,25 +827,21 @@ obs = fcst;
 //      - UW_MEAN for average of data before and after
 //      - DW_MEAN for linear interpolation in time of data before and after
 //
-//   - The "match_month" entry may be set to TRUE or FALSE.  Set to TRUE to
-//     only consider data where the climatology month matches the forecast
-//     valid month.
-//      - match_month = FALSE to use a persistence forecast
-//      - match_month = TRUE  for typical climatology data
+//   - The "day_interval" entry is an integer specifying the spacing in days of
+//     the climatology data. Use 31 for monthly data or 1 for daily data.
+//     Use "NA" if the timing of the climatology data should not be checked.
 //
-//   - The "match_day" entry may be set to TRUE or FALSE.  Set to TRUE to
-//     only consider data where the climatology day matches the forecast
-//     valid day.
-//      - match_day = FALSE for monthly climatology
-//      - match_day = TRUE  for daily climatology
+//   - The "hour_interval" entry is an integer specifying the spacing in hours of
+//     the climatology data for each day. This should be set between 0 and 24,
+//     with 6 and 12 being common choices. Use "NA" if the timing of the
+//     climatology data should not be checked.
 //
-//   - The "time_step" entry specifies the spacing of climatology data in
-//     seconds.  Set to 60*60*6 = 21600 for 6-hourly data or 60*60 = 3600
-//     for hourly data.
+//   - The "day_interval" and "hour_interval" entries replace the deprecated
+//     entries "match_month", "match_day", and "time_step".
 //
 climo_mean = {
 
-   file_name = [];
+   file_name = [ "/path/to/climatological/mean/files" ];
    field     = [];
 
    regrid = {
@@ -838,58 +851,95 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interal       = 6;
 }
 
 //
 // The "climo_stdev" dictionary specifies climatology standard deviation data to
-// be read by the Grid-Stat and Point-Stat tools.  This data is used to subset
-// matched pairs into climatological bins based on where the observation value
-// falls within the climatological distribution.  This dictionary is identical
-// to the "climo_mean" dictionary described above but points to files containing
-// climatological spread values rather than means.  In the example below, this
-// dictionary is set by copying over the "climo_mean" setting and then updating
-// the "file_name" entry.
+// be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
+// tools.  The "climo_mean" and "climo_stdev" data define the climatological
+// distribution for each grid point, assuming normality.  These climatological
+// distributions are used in two ways:
+// (1) To define climatological distribution percentile (CDP) thresholds which
+//     can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
+//     speed (wind_thresh) thresholds.
+// (2) To subset matched pairs into climatological bins based on where the
+//     observation value falls within the climatological distribution.  See the
+//     "climo_cdf" dictionary.
+//
+// This dictionary is identical to the "climo_mean" dictionary described above
+// but points to files containing climatological standard deviation values
+// rather than means.  In the example below, this dictionary is set by copying
+// over the "climo_mean" setting and then updating the "file_name" entry.
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "/path/to/climatological/standard/deviation" ];
+   file_name = [ "/path/to/climatological/standard/deviation/files" ];
 }
 
 //
-// The "climo_cdf_bins" entry should be set either to an integer or an array of
-// floats between 0 and 1.  When climatological mean and standard deviation data
-// are provided, this entry defines how matched pairs should be subset into
-// climatological bins.  MET uses the climatological mean and standard deviation
-// to construct a normal PDF at each observation location.  The total area under
-// the PDF is 1.  When set to an integer, this entry specifies the number of
-// equal-area climatological bins to be used.  For example, a value of 10
-// results in 10 bins, each representing 10% of the area under the PDF.
-// Alternatively, this entry may be set to an array of floats to explicitly
-// define non-equal area climatological bins.  If set to an array, it must begin
-// with 0.0 and end with 1.0.  Examples of both options are shown below.
-// Setting the number of bins to 1 effectively disables this logic.
+// The "climo_cdf" dictionary specifies how the the climatological mean 
+// ("climo_mean") and standard deviation ("climo_stdev") data are used to
+// evaluate model performance relative to where the observation value falls
+// within the climatological distribution.  This dictionary consists of 3
+// entries:
+// (1) The "cdf_bins" entry defines the climatological bins either as an integer
+//     or an array of floats between 0 and 1.
+// (2) The "center_bins" entry may be set to TRUE or FALSE.
+// (3) The "write_bins" entry may be set to TRUE or FALSE.
 //
-climo_cdf_bins = 1;
-climo_cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
+// MET uses the climatological mean and standard deviation to construct a normal
+// PDF at each observation location.  The total area under the PDF is 1, and the
+// climatological CDF value is computed as the area of the PDF to the left of
+// the observation value.  Since the CDF is a value between 0 and 1, the CDF
+// bins must span that same range.
+//
+// When "cdf_bins" is set to an array of floats, they explicitly define the
+// climatological bins.  The array must begin with 0.0 and end with 1.0.
+// For example:
+//   cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
+// 
+// When "cdf_bins" is set to an integer, it defines the number of bins to be
+// used.  The "center_bins" flag indicates whether or not the bins should be
+// centered on 0.5.  An odd number of bins can be centered or uncentered while
+// an even number of bins can only be  uncentered.  For example:
+//   4 uncentered bins (cdf_bins = 4; center_bins = FALSE;) yields:
+//     0.0, 0.25, 0.50, 0.75, 1.0
+//   5 uncentered bins (cdf_bins = 5; center_bins = FALSE;) yields:
+//     0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0
+//   5   centered bins (cdf_bins = 5; center_bins = TRUE;) yields:
+//     0.0, 0.125, 0.375, 0.625, 0.875, 1.0
+//
+// When multiple climatological bins are used, statistics are computed
+// separately for each bin, and the average of the statistics across those bins
+// is written to the output.  When "write_bins" is true, the statistics for each
+// bin are also written to the output.  The bin number is appended to the
+// contents of the VX_MASK output column.
+//
+// Setting the number of bins to 1 effectively disables this logic by grouping
+// all pairs into a single climatological bin.
+//
+climo_cdf = {
+   cdf_bins    = 11;    // or an array of floats
+   center_bins = TRUE;  // or FALSE
+   write_bins  = FALSE; // or TRUE
+}
 
 //
-// The binned climatology logic described above is applied only when verifying
-// probability forecasts.  When specifying climatology data for probability
-// forecasts, either supply a probabilistic climo_mean field or
-// non-probabilistic climo_mean and climo_stdev fields from which a normal
-// approximation of the climatological probabilities should be derived.
+// When specifying climatology data for probability forecasts, either supply a
+// probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
+// "climo_stdev" fields from which a normal approximation of the climatological
+// probabilities should be derived.
 //
-// When climo_mean is set to a probability field with a range of [0, 1] and
-// climo_stdev is unset, the MET tools use the climo_mean probability values
+// When "climo_mean" is set to a probability field with a range of [0, 1] and
+// "climo_stdev" is unset, the MET tools use the "climo_mean" probability values
 // directly to compute Brier Skill Score (BSS).
 //
-// When climo_mean and climo_stdev are both set to non-probability fields, the
-// MET tools use the mean, standard deviation, and observation event threshold
-// to derive a normal approximation of the climatological probabilities.  Those
-// derived probability values are used to compute BSS.
+// When "climo_mean" and "climo_stdev" are both set to non-probability fields,
+// the MET tools use the mean, standard deviation, and observation event
+// threshold to derive a normal approximation of the climatological 
+// probabilities.  Those derived probability values are used to compute BSS.
 //
 
 // The "mask_missing_flag" entry specifies how missing data should be handled
@@ -1088,7 +1138,7 @@ boot = {
 
 //
 // The "interp" entry is a dictionary that specifies what interpolation or
-// smoothing (for the Grid-Stat tools) methods should be applied.
+// smoothing (for the Grid-Stat tool) methods should be applied.
 // This dictionary may include the following entries:
 //
 //    - The "field" entry specifies to which field(s) the interpolation method
@@ -1147,7 +1197,7 @@ boot = {
 //         - GEOG_MATCH  for the nearest grid point where the land/sea mask
 //                          and geography criteria are satisfied.
 //
-//         The BUDGET and FORCE regridding options are not valid for
+//         The BUDGET, FORCE, and GAUSSIAN regridding options are not valid for
 //         interpolating. For grid-to-grid comparisons, the only valid options
 //         are MIN, MAX, MEDIAN, and UW_MEAN.
 //
@@ -1245,6 +1295,29 @@ fourier = {
 gradient = {
    dx = [ 1 ];
    dy = [ 1 ];
+}
+
+//
+// The "distance_map" entry is a dictionary containing options related to the
+// distance map statistics in the DMAP output line type. The "baddeley_p" entry
+// is an integer specifying the exponent used in the Lp-norm when computing the
+// Baddeley Delta metric.  The "baddeley_max_dist" entry is a floating point
+// number specifying the maximum allowable distance for each distance map. Any
+// distances larger than this number will be reset to this constant. A value of
+// NA indicates that no maximum distance value should be used. The "fom_alpha"
+// entry is a floating point number specifying the scaling constant to be used
+// when computing Pratt's Figure of Merit.  The "zhu_weight" specifies a value
+// between 0 and 1 to define the importance of the RMSE of the binary fields
+// (i.e. amount of overlap) versus the mean-error distance (MED).  The default
+// value of 0.5 gives equal weighting.
+//
+// This configuration option may be set separately in each "obs.field" entry.
+//
+distance_map = {
+   baddeley_p        = 2;
+   baddeley_max_dist = NA;
+   fom_alpha         = 0.1;
+   zhu_weight        = 0.5;
 }
 
 //
@@ -1394,15 +1467,17 @@ output_flag = {
 // netcdf output will be generated.
 //
 nc_pairs_flag = {
-   latlon     = TRUE;
-   raw        = TRUE;
-   diff       = TRUE;
-   climo      = TRUE;
-   weight     = FALSE;
-   nbrhd      = FALSE;
-   fourier    = FALSE;
-   gradient   = FALSE;
-   apply_mask = TRUE;
+   latlon       = TRUE;
+   raw          = TRUE;
+   diff         = TRUE;
+   climo        = TRUE;
+   climo_cdp    = FALSE;
+   weight       = FALSE;
+   nbrhd        = FALSE;
+   fourier      = FALSE;
+   gradient     = FALSE;
+   distance_map = FLASE;
+   apply_mask   = TRUE;
 }
 
 //
@@ -2533,8 +2608,6 @@ level_category = [];
 //    D_RH    for Relative Humidity in %
 //    D_MIXR  for Humidity Mixing Ratio in kg/kg
 //    D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
-//    D_PBL   for Planetary Boundary Layer
-//    D_CAPE  for Convective Available Potential Energy 
 //
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
@@ -2565,9 +2638,7 @@ obs_prefbufr_map = [
    { key = "D_WIND";  val = "WIND";  },
    { key = "D_RH";    val = "RH";    },
    { key = "D_MIXR";  val = "MIXR";  },
-   { key = "D_PRMSL"; val = "PRMSL"; },
-   { key = "D_PBL";   val = "PBL";   },
-   { key = "D_CAPE";  val = "CAPE";  }
+   { key = "D_PRMSL"; val = "PRMSL"; }
 ];
 
 //

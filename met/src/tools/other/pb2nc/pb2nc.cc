@@ -697,7 +697,7 @@ void get_variable_info(const char* tbl_filename) {
          event_names.add(var_name);
          event_members.add(var_desc);
       }
-      read = getline(&line, &len, fp);
+      getline(&line, &len, fp);
 
       // Processing section 3
       while ((read = getline(&line, &len, fp)) != -1) {
@@ -792,6 +792,8 @@ void process_pbfile(int i_pb) {
    unixtime msg_ut, beg_ut, end_ut;
    unixtime min_msg_ut, max_msg_ut;
 
+   beg_ut = end_ut = (unixtime) 0;
+
    ConcatString file_name, blk_prefix, blk_file, log_message;
    ConcatString prefix;
    char     time_str[max_str_len];
@@ -801,9 +803,11 @@ void process_pbfile(int i_pb) {
    char     hdr_typ[max_str_len];
    ConcatString hdr_sid;
    char     modified_hdr_typ[max_str_len];
-   double   hdr_lat, hdr_lon, hdr_elv;
+   double   hdr_lat = bad_data_double;
+   double   hdr_lon = bad_data_double;
+   double   hdr_elv = bad_data_double;
    float    pb_report_type, in_report_type, instrument_type;
-   unixtime hdr_vld_ut;
+   unixtime hdr_vld_ut = (unixtime) 0;
 
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
@@ -952,27 +956,31 @@ void process_pbfile(int i_pb) {
                     // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
    float p1d,t1d,q1d;
-   int cape_level, prev_cape_level, IMM, JMM;
-   int cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs = 0;
+   int IMM, JMM;
+   int cape_level=0, cape_count=0, cape_cnt_too_big=0, cape_cnt_surface_msgs=0;
    int cape_cnt_no_levels=0, cape_cnt_missing_values=0, cape_cnt_zero_values=0;
-   float cape_p, cape_h, cape_qm;
+   float cape_p, cape_h;
+   float cape_qm = bad_data_float;
 
    // To compute PBL
-   int pbl_level;
+   int pbl_level = 0;
    int pbl_code = -1;
-   int pbl_buf_level, prev_pbl_level;
-   float pbl_p, pbl_h, pbl_qm;
+   float pbl_p, pbl_h;
+   float pbl_qm = bad_data_float;
 
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
 
    bool     is_same_header;
-   unixtime prev_hdr_vld_ut;
+   unixtime prev_hdr_vld_ut = (unixtime) 0;
    float    prev_quality_mark;
    char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
    map<float, float*> pqtzuv_map_tq;
    map<float, float*> pqtzuv_map_uv;
+
+   // Initialize
+   prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
 
    if (cal_pbl) {
       is_same_header = false;
@@ -983,7 +991,6 @@ void process_pbfile(int i_pb) {
    }
 
    IMM = JMM =1;
-   prev_cape_level = -1;
    p1d = t1d = q1d = r8bfms * 10;
    cape_h = pbl_h = 0;
    cape_p = pbl_p = bad_data_float;
@@ -1566,18 +1573,19 @@ void process_pbfile(int i_pb) {
             if (cape_member_cnt >= 3) cape_level++;
          }
          if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
-            float *tmp_pqtzuv = new float[mxr8vt];
-            for(kk=0; kk<mxr8vt; kk++) {
-               tmp_pqtzuv[kk] = pqtzuv[kk];
-            }
 
-            if (!is_eq(tmp_pqtzuv[4],bad_data_float)
-                  && !is_eq(tmp_pqtzuv[5],bad_data_float)) {
+            // Allocated memory is deleted after all observations are processed
+            float *tmp_pqtzuv = new float [mxr8vt];
+
+            for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
+
+            if (!is_eq(tmp_pqtzuv[4],bad_data_float) &&
+                !is_eq(tmp_pqtzuv[5],bad_data_float)) {
                pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
             }
-            else if (!is_eq(tmp_pqtzuv[2],bad_data_float)
-                  && (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL)
-                  && (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
+            else if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
+                     (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL) &&
+                     (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
             }
          }
@@ -2361,6 +2369,7 @@ void process_pbfile_metadata(int i_pb) {
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
+
    return;
 }
 
@@ -2388,11 +2397,11 @@ void write_netcdf_hdr_data() {
    else {
       dim_count = pb_hdr_count;
       if (do_summary) {
-         int summmary_hdr_cnt = summary_obs->countSummaryHeaders();
+         int summary_hdr_cnt = summary_obs->countSummaryHeaders();
          if (save_summary_only)
-            dim_count = summmary_hdr_cnt;
+            dim_count = summary_hdr_cnt;
          else
-            dim_count += summmary_hdr_cnt;
+            dim_count += summary_hdr_cnt;
       }
    }
 
@@ -2805,7 +2814,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       default:
-         v = fill_value;
+         result = fill_value;
          break;
    } // end switch
 
@@ -2871,9 +2880,10 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
       NumArray common_pres_array;
-      float first_pres, prev_pres, cur_pres, next_pres;
+      float first_pres, prev_pres, cur_pres;
       float *pqtzuv_tq, *pqtzuv_uv;
-      float *cur_pqtzuv, *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
+      float *cur_pqtzuv = (float *) 0;
+      float *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;
 
       first_pres = bad_data_float;

@@ -461,7 +461,7 @@ void process_scores() {
                shc.set_obs_thresh(conf_info.ocat_ta[i][k]);
 
                write_isc_row(shc, isc_info[j][k],
-                  conf_info.output_flag[i_isc] == STATOutputType_Both,
+                  conf_info.output_flag[i_isc],
                   stat_at, i_stat_row, isc_at, i_isc_row);
             } // end for k
          } // end if
@@ -483,7 +483,7 @@ void process_scores() {
             aggregate_isc_info(isc_info, i, j, isc_aggr);
 
             write_isc_row(shc, isc_aggr,
-               conf_info.output_flag[i_isc] == STATOutputType_Both,
+               conf_info.output_flag[i_isc],
                stat_at, i_stat_row, isc_at, i_isc_row);
          }
       }
@@ -2262,7 +2262,6 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    label = wavelettype_to_string(conf_info.wvlt_type);
    label << "(" << conf_info.wvlt_member << ")";
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label.c_str());
-   v_tab -= plot_text_sep;
 
    ps_out->showpage();
    n_page++;
@@ -2461,7 +2460,6 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    }
    ps_out->write_centered_text(1, 1, h_tab_d, v_tab, 0.0, 0.5,
                                label.c_str());
-   v_tab -= plot_text_sep;
 
    //
    // If we just filled in the bottom panel or this is the last scale

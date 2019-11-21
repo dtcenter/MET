@@ -144,10 +144,7 @@ void Identifier::set(const char * text)
 
 clear();
 
-int n;
-
 name.assign(text);
-
 
 return;
 

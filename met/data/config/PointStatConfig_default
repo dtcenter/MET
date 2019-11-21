@@ -128,9 +128,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 climo_stdev = climo_mean;
@@ -138,7 +137,14 @@ climo_stdev = {
    file_name = [];
 }
 
-climo_cdf_bins = 1;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -277,6 +283,6 @@ output_flag = {
 
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V8.1";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

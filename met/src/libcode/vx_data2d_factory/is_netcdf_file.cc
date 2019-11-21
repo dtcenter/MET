@@ -42,6 +42,7 @@ static const string nccf_att_name_l = "conventions";
 static const string nccf_att_name_U = "CONVENTIONS";
 static const string nccf_att_value  = "CF-";
 static const string nccf_att_value2 = "CF ";
+static const string nccf_att_value3 = "COARDS";
 
 static const string ncmet_att_version    = "MET_version";
 static const string ncmet_att_projection = "Projection";
@@ -65,7 +66,7 @@ bool is_netcdf_file(const char * filename)
 
    n_read = read(fd, buf, netcdf_magic_len);
 
-   close(fd);  fd = -1;
+   close(fd);
 
    if ( n_read != netcdf_magic_len )  return ( false );
 
@@ -96,10 +97,12 @@ bool is_nccf_file(const char * filename)
          if (!found) found = get_global_att(nc_file, nccf_att_name_l, att_val);
          if (!found) found = get_global_att(nc_file, nccf_att_name_U, att_val);
          if (found) {
-	   status = (att_val.compare(0, nccf_att_value.length(),
-				     nccf_att_value) == 0
-		     || att_val.compare(0, nccf_att_value2.length(),
-					nccf_att_value2) == 0);
+            status = (att_val.compare(0, nccf_att_value.length(),
+                      nccf_att_value) == 0  ||
+                      att_val.compare(0, nccf_att_value2.length(),
+                      nccf_att_value2) == 0 ||
+                      att_val.compare(0, nccf_att_value3.length(),
+                      nccf_att_value3) == 0);
          }
       }
 
@@ -122,7 +125,7 @@ bool is_ncmet_file(const char * filename)
    bool status = false;
    try {
       ConcatString att_val;
-      
+
       NcFile *nc_file = open_ncfile(filename);
 
       if (!IS_INVALID_NC_P(nc_file)) {
@@ -131,10 +134,10 @@ bool is_ncmet_file(const char * filename)
       }
 
       delete nc_file;
-	 
+
    }catch(...) {
    }
-   
+
    return ( status );
 
 }
@@ -162,7 +165,7 @@ bool is_ncpinterp_file(const char * filename)
 
    }catch(...) {
    }
-   
+
    return ( status );
 
 }

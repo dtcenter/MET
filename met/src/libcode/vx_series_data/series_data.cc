@@ -106,9 +106,10 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
     bool found = mtddf->data_plane(*info, dp);
 
     // Store grid
-    if(found) {
-        grid = mtddf->grid();
-    }
+    if(found) grid = mtddf->grid();
+
+    // Cleanup
+    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
     return found;
 }

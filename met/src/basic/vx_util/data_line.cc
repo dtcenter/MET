@@ -700,9 +700,6 @@ if ( !(*in) )  {
    //  get filename
    //
 
-int j, n;
-
-n = strlen(path);
 
 Filename.assign(path);
 ShortFilename.assign(get_short_name(path));
@@ -900,9 +897,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 if ( L.n_items() == 0 )  return ( lgr );
 
-int j, k, N;
-char c;
-
+int j;
 
 // k = L.N_items - 1;   //  last item
 // 

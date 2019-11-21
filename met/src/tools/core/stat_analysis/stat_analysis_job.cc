@@ -174,7 +174,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    //
    // Print warning for by_column option
    //
-   if(j.by_column.n_elements() > 0   &&
+   if(j.by_column.n() > 0              &&
       j.job_type != stat_job_summary   &&
       j.job_type != stat_job_aggr      &&
       j.job_type != stat_job_aggr_stat &&
@@ -399,7 +399,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that the -line_type option has been supplied exactly once
    //
-   if(j.line_type.n_elements() != 1) {
+   if(j.line_type.n() != 1) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "this function may only be called when the \"-line_type\" "
            << "option has been used exactly once to specify the line "
@@ -584,8 +584,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -line_type and -out_line_type options have been
    // supplied only once
    //
-   if(j.line_type.n_elements()     != 1 ||
-      j.out_line_type.n_elements() != 1) {
+   if(j.line_type.n()     != 1 ||
+      j.out_line_type.n() != 1) {
       mlog << Error << "\ndo_job_aggr_stat() -> "
            << "this function may only be called when the "
            << "\"-line_type\" and \"-out_line_type\" options have been "
@@ -746,8 +746,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          out_lt == stat_cts ||
          out_lt == stat_eclv) {
 
-         if(j.out_fcst_thresh.n_elements() != 1 ||
-            j.out_obs_thresh.n_elements()  != 1) {
+         if(j.out_fcst_thresh.n() != 1 ||
+            j.out_obs_thresh.n()  != 1) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to FHO, CTC, "
                  << "CTS, or ECLV, the \"-out_thresh\" option or "
@@ -763,8 +763,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       if(out_lt == stat_mctc ||
          out_lt == stat_mcts) {
 
-         if(j.out_fcst_thresh.n_elements() <= 1 ||
-            j.out_fcst_thresh.n_elements() != j.out_obs_thresh.n_elements()) {
+         if(j.out_fcst_thresh.n() <= 1 ||
+            j.out_fcst_thresh.n() != j.out_obs_thresh.n()) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to MCTC or MCTS "
                  << "the \"-out_thresh\" option or \"-out_fcst_thresh\" and "
@@ -773,7 +773,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             throw(1);
          }
 
-         for(i=0; i<j.out_fcst_thresh.n_elements()-1; i++) {
+         for(i=0; i<j.out_fcst_thresh.n()-1; i++) {
 
             if(j.out_fcst_thresh[i].get_value() >  j.out_fcst_thresh[i+1].get_value() ||
                j.out_obs_thresh[i].get_value()  >  j.out_obs_thresh[i+1].get_value()  ||
@@ -802,7 +802,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          out_lt == stat_pjc  ||
          out_lt == stat_prc) {
 
-         if(j.out_obs_thresh.n_elements() != 1) {
+         if(j.out_obs_thresh.n() != 1) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
@@ -811,11 +811,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          }
 
          // Check for special case of a single probability threshold
-         if(j.out_fcst_thresh.n_elements() == 1) {
+         if(j.out_fcst_thresh.n() == 1) {
             j.out_fcst_thresh = string_to_prob_thresh(j.out_fcst_thresh[0].get_str().c_str());
          }
 
-         n = j.out_fcst_thresh.n_elements();
+         n = j.out_fcst_thresh.n();
 
          // Check that the first threshold is 0 and the last is 1.
          if(n < 3 ||
@@ -1034,7 +1034,7 @@ void write_job_summary(STATAnalysisJob &j,
          //
          // Data columns
          //
-         at.set_entry(r, c++, val_it->second.n_elements());
+         at.set_entry(r, c++, val_it->second.n());
          at.set_entry(r, c++, mean_ci.v);
          at.set_entry(r, c++, mean_ci.v_ncl[0]);
          at.set_entry(r, c++, mean_ci.v_ncu[0]);
@@ -1077,14 +1077,14 @@ void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
    // Setup the output table
    //
    at.set_size(n_row, n_col);
-   setup_table(at, 1 + j.by_column.n_elements(), j.get_precision());
+   setup_table(at, 1 + j.by_column.n(), j.get_precision());
 
    //
    // Write the header information
    //
    c = 0;
    at.set_entry(0, c++, (string)"COL_NAME:");
-   for(i=0; i<j.by_column.n_elements(); i++) {
+   for(i=0; i<j.by_column.n(); i++) {
       at.set_entry(0, c++, j.by_column[i]);
    } // end for i
 
@@ -1101,13 +1101,13 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    NBRCTSInfo nbrcts_info;
    StatHdrColumns shc;
 
-   n_pnt = j.out_eclv_points.n_elements();
+   n_pnt = j.out_eclv_points.n();
 
    //
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_fho)    n_col += n_fho_columns;
    else if(lt == stat_ctc)    n_col += n_ctc_columns;
    else if(lt == stat_cts)    n_col += n_cts_columns;
@@ -1119,7 +1119,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the output header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
@@ -1275,7 +1275,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_mctc) n_col += get_n_mctc_columns(n);
    else if(lt == stat_mcts) n_col += n_mcts_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -1283,7 +1283,7 @@ void write_job_aggr_mctc(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_mctc) write_mctc_header_row(0, n, at, 0, c);
    else if(lt == stat_mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
 
@@ -1371,14 +1371,14 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
       n = max(it->second.pct_info.pct.nrows() + 1, n);
    }
 
-   n_pnt = j.out_eclv_points.n_elements();
+   n_pnt = j.out_eclv_points.n();
 
    //
    // Setup the output table
    //
    if(lt == stat_eclv) n_row = 1 + m.size() * n;
    else                n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_pct)  n_col += get_n_pct_columns(n);
    else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
    else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
@@ -1389,7 +1389,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_pct)  write_pct_header_row (0, n, at, 0, c);
    else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
    else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
@@ -1515,7 +1515,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_sl1l2)  n_col += n_sl1l2_columns;
    else if(lt == stat_sal1l2) n_col += n_sal1l2_columns;
    else if(lt == stat_vl1l2)  n_col += n_vl1l2_columns;
@@ -1528,7 +1528,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
    else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
    else if(lt == stat_vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
@@ -1669,14 +1669,14 @@ void write_job_aggr_grad(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row  = 1 + m.size();
-   n_col  = 1 + j.by_column.n_elements();
+   n_col  = 1 + j.by_column.n();
    n_col += n_grad_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_header_row(grad_columns,  n_grad_columns,  0, at, 0, c);
 
    //
@@ -1722,7 +1722,8 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
                          map<ConcatString, AggrWindInfo> &m,
                          AsciiTable &at) {
    map<ConcatString, AggrWindInfo>::iterator it;
-   int i, n, n_row, n_col, r, c, count;
+   int i, n, n_row, n_col, r, c;
+   int count = 0;
    double uf, vf, uo, vo, fbar, obar;
    double angle, me, mae;
 
@@ -1730,13 +1731,13 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + (2 * m.size());
-   n_col = 1 + j.by_column.n_elements() + n_job_wdir_columns;
+   n_col = 1 + j.by_column.n() + n_job_wdir_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_header_row(job_wdir_columns, n_job_wdir_columns, 0, at, 0, c);
 
    mlog << Debug(2) << "Computing output for "
@@ -1750,9 +1751,9 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Check for matching component lengths
       //
-      if(it->second.uf_na.n_elements() != it->second.vf_na.n_elements() ||
-         it->second.uo_na.n_elements() != it->second.vo_na.n_elements() ||
-         it->second.uf_na.n_elements() != it->second.uo_na.n_elements()) {
+      if(it->second.pd_u.f_na.n() != it->second.pd_v.f_na.n() ||
+         it->second.pd_u.o_na.n() != it->second.pd_v.o_na.n() ||
+         it->second.pd_u.f_na.n() != it->second.pd_u.o_na.n()) {
          mlog << Error << "\nwrite_job_aggr_wind() -> "
               << "the number of U and V forecast and observation points "
               << "must be the same.\n\n";
@@ -1762,18 +1763,18 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       //
       // Store the number of vectors
       //
-      n = it->second.uf_na.n_elements();
+      n = it->second.pd_u.f_na.n();
 
       //
       // Compute the mean forecast and observation angles
       // from the unit vectors
       //
       if(n > 0) {
-         uf   = it->second.uf_na.sum()/it->second.uf_na.n_elements();
-         vf   = it->second.vf_na.sum()/it->second.vf_na.n_elements();
+         uf   = it->second.pd_u.f_na.sum()/it->second.pd_u.f_na.n();
+         vf   = it->second.pd_v.f_na.sum()/it->second.pd_v.f_na.n();
          fbar = convert_u_v_to_wdir(uf, vf);
-         uo   = it->second.uo_na.sum()/it->second.uo_na.n_elements();
-         vo   = it->second.vo_na.sum()/it->second.vo_na.n_elements();
+         uo   = it->second.pd_u.o_na.sum()/it->second.pd_u.o_na.n();
+         vo   = it->second.pd_v.o_na.sum()/it->second.pd_v.o_na.n();
          obar = convert_u_v_to_wdir(uo, vo);
       }
       else {
@@ -1795,15 +1796,15 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       me = mae = (n > 0 ? 0.0 : bad_data_double);
       for(i=0; i<n; i++) {
 
-         angle = angle_difference(it->second.uf_na[i], it->second.vf_na[i],
-                                  it->second.uo_na[i], it->second.vo_na[i]);
+         angle = angle_difference(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
+                                  it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
 
          if(mlog.verbosity_level() > 3) {
             mlog << Debug(4) << "write_job_aggr_wind() -> "
                  << "ROW_MEAN_WDIR: [" << i+1 << "] difference of forecast direction "
-                 << convert_u_v_to_wdir(it->second.uf_na[i], it->second.vf_na[i])
+                 << convert_u_v_to_wdir(it->second.pd_u.f_na[i], it->second.pd_v.f_na[i])
                  << " - observed direction "
-                 << convert_u_v_to_wdir(it->second.uo_na[i], it->second.vo_na[i])
+                 << convert_u_v_to_wdir(it->second.pd_u.o_na[i], it->second.pd_v.o_na[i])
                  << " = " << angle << " degrees\n";
          }
 
@@ -1897,14 +1898,14 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row  = 1 + m.size();
-   n_col  = 1 + j.by_column.n_elements();
+   n_col  = 1 + j.by_column.n();
    n_col += n_ecnt_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_header_row(ecnt_columns,  n_ecnt_columns,  0, at, 0, c);
 
    //
@@ -1957,20 +1958,20 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    // Determine the maximum number of ranks
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n = max(it->second.ens_pd.rhist_na.n_elements(), n);
+      n = max(it->second.ens_pd.rhist_na.n(), n);
    }
 
    //
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements() + get_n_rhist_columns(n);
+   n_col = 1 + j.by_column.n() + get_n_rhist_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_rhist_header_row(0, n, at, 0, c);
 
    //
@@ -2025,20 +2026,20 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
    // Determine the maximum number of bins
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n = max(it->second.ens_pd.phist_na.n_elements(), n);
+      n = max(it->second.ens_pd.phist_na.n(), n);
    }
 
    //
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements() + get_n_phist_columns(n);
+   n_col = 1 + j.by_column.n() + get_n_phist_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_phist_header_row(0, n, at, 0, c);
 
    //
@@ -2093,20 +2094,20 @@ void write_job_aggr_relp(STATAnalysisJob &j, STATLineType lt,
    // Determine the maximum number of RELP values
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n = max(it->second.ens_pd.relp_na.n_elements(), n);
+      n = max(it->second.ens_pd.relp_na.n(), n);
    }
 
    //
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements() + get_n_relp_columns(n);
+   n_col = 1 + j.by_column.n() + get_n_relp_columns(n);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_relp_header_row(0, n, at, 0, c);
 
    //
@@ -2177,13 +2178,13 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + n;
-   n_col = 1 + j.by_column.n_elements() + n_ssvar_columns;
+   n_col = 1 + j.by_column.n() + n_ssvar_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
 
    //
@@ -2337,8 +2338,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    // for RELP.
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
-           if(lt == stat_rhist) n  = max(it->second.ens_pd.rhist_na.n_elements(), n);
-      else if(lt == stat_phist) n  = max(it->second.ens_pd.phist_na.n_elements(), n);
+           if(lt == stat_rhist) n  = max(it->second.ens_pd.rhist_na.n(), n);
+      else if(lt == stat_phist) n  = max(it->second.ens_pd.phist_na.n(), n);
       else if(lt == stat_relp)  n  = max(it->second.ens_pd.n_ens, n);
       else if(lt == stat_ssvar) {
          it->second.ens_pd.compute_ssvar();
@@ -2349,7 +2350,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output table
    //
-   n_col = 1 + j.by_column.n_elements();
+   n_row = 0;
+   n_col = 1 + j.by_column.n();
    if(lt == stat_ecnt) {
       n_row  = 1 + m.size();
       n_col += n_ecnt_columns;
@@ -2375,7 +2377,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
    else if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
    else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
@@ -2526,13 +2528,13 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + (n * m.size());
-   n_col = 1 + j.by_column.n_elements() + n_isc_columns;
+   n_col = 1 + j.by_column.n() + n_isc_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
    write_header_row(isc_columns, n_isc_columns, 0, at, 0, c);
 
    //
@@ -2592,32 +2594,32 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
    //
    n     = 0;
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_fho)    { n_col += n_fho_columns; }
    else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
    else if(lt == stat_cts)    { n_col += n_cts_columns; }
-   else if(lt == stat_eclv)   { n      = j.out_eclv_points.n_elements();
+   else if(lt == stat_eclv)   { n      = j.out_eclv_points.n();
                                 n_col += get_n_eclv_columns(n); }
-   else if(lt == stat_mctc)   { n      = j.out_fcst_thresh.n_elements()+1;
+   else if(lt == stat_mctc)   { n      = j.out_fcst_thresh.n()+1;
                                 n_col += get_n_mctc_columns(n); }
    else if(lt == stat_mcts)   { n_col += n_mcts_columns; }
    else if(lt == stat_cnt)    { n_col += n_cnt_columns; }
    else if(lt == stat_sl1l2)  { n_col += n_sl1l2_columns; }
    else if(lt == stat_sal1l2) { n_col += n_sal1l2_columns; }
-   else if(lt == stat_pct)    { n      = j.out_fcst_thresh.n_elements();
+   else if(lt == stat_pct)    { n      = j.out_fcst_thresh.n();
                                 n_col += get_n_pct_columns(n); }
-   else if(lt == stat_pstd)   { n      = j.out_fcst_thresh.n_elements();
+   else if(lt == stat_pstd)   { n      = j.out_fcst_thresh.n();
                                 n_col += get_n_pstd_columns(n); }
-   else if(lt == stat_pjc)    { n      = j.out_fcst_thresh.n_elements();
+   else if(lt == stat_pjc)    { n      = j.out_fcst_thresh.n();
                                 n_col += get_n_pjc_columns(n); }
-   else if(lt == stat_prc)    { n      = j.out_fcst_thresh.n_elements();
+   else if(lt == stat_prc)    { n      = j.out_fcst_thresh.n();
                                 n_col += get_n_prc_columns(n); }
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
@@ -2648,7 +2650,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       //
       // Process percentile thresholds.
       //
-      j.set_perc_thresh(it->second.f_na, it->second.o_na, it->second.cmn_na);
+      j.set_perc_thresh(it->second.pd.f_na, it->second.pd.o_na, it->second.pd.cmn_na);
 
       //
       // Write the output STAT header columns
@@ -2660,7 +2662,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
             lt == stat_cnt || lt == stat_nbrcnt || lt == stat_pstd) {
             shc.set_alpha(j.out_alpha);
          }
-         if(j.out_fcst_thresh.n_elements() > 0 || j.out_obs_thresh.n_elements() > 0) {
+         if(j.out_fcst_thresh.n() > 0 || j.out_obs_thresh.n() > 0) {
             shc.set_fcst_thresh(j.out_fcst_thresh);
             shc.set_obs_thresh(j.out_obs_thresh);
             if(lt == stat_cnt || lt == stat_sl1l2) {
@@ -2823,7 +2825,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_row = 1 + m.size();
-   n_col = 1 + j.by_column.n_elements();
+   n_col = 1 + j.by_column.n();
         if(lt == stat_vl1l2) n_col += n_vl1l2_columns;
    else if(lt == stat_vcnt)  n_col += n_vcnt_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -2831,7 +2833,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
    //
    // Write the rest of the header row
    //
-   c = 1 + j.by_column.n_elements();
+   c = 1 + j.by_column.n();
         if(lt == stat_vl1l2) write_header_row(vl1l2_columns, n_vl1l2_columns, 0, at, 0, c);
    else if(lt == stat_vcnt)  write_header_row(vcnt_columns,  n_vcnt_columns,  0, at, 0, c);
 
@@ -2920,14 +2922,14 @@ void write_job_ramp(STATAnalysisJob &j,
    if(j.out_line_type.has(stat_ctc_str)) {
       n_row = 1 + m.size();
       n_stat_row += m.size();
-      n_col = 1 + j.by_column.n_elements() +
+      n_col = 1 + j.by_column.n() +
               n_job_ramp_columns + n_ctc_columns;
       write_job_aggr_hdr(j, n_row, n_col, ctc_at);
 
       //
       // Write the ramp job definition and CTC header columns
       //
-      c = 1 + j.by_column.n_elements();
+      c = 1 + j.by_column.n();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, ctc_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(ctc_columns, n_ctc_columns, 0, ctc_at, 0, c);
@@ -2939,14 +2941,14 @@ void write_job_ramp(STATAnalysisJob &j,
    if(j.out_line_type.has(stat_cts_str)) {
       n_row = 1 + m.size();
       n_stat_row += m.size();
-      n_col = 1 + j.by_column.n_elements() +
+      n_col = 1 + j.by_column.n() +
               n_job_ramp_columns + n_cts_columns;
       write_job_aggr_hdr(j, n_row, n_col, cts_at);
 
       //
       // Write the ramp job definition and CTS header columns
       //
-      c = 1 + j.by_column.n_elements();
+      c = 1 + j.by_column.n();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, cts_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(cts_columns, n_cts_columns, 0, cts_at, 0, c);
@@ -2957,16 +2959,16 @@ void write_job_ramp(STATAnalysisJob &j,
    //
    if(j.out_line_type.has(stat_mpr_str)) {
       for(it = m.begin(), n_row = 1; it != m.end(); it++) {
-         n_row += it->second.valid_ts.n_elements();
+         n_row += it->second.valid_ts.n();
       }
-      n_col = 1 + j.by_column.n_elements() +
+      n_col = 1 + j.by_column.n() +
               n_job_ramp_columns + n_job_ramp_mpr_columns;
       write_job_aggr_hdr(j, n_row, n_col, mpr_at);
 
       //
       // Write the ramp job definition and RAMP_MPR header columns
       //
-      c = 1 + j.by_column.n_elements();
+      c = 1 + j.by_column.n();
       write_header_row(job_ramp_columns, n_job_ramp_columns, 0, mpr_at, 0, c);
       c += n_job_ramp_columns;
       write_header_row(job_ramp_mpr_columns, n_job_ramp_mpr_columns, 0, mpr_at, 0, c);
@@ -2994,7 +2996,7 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       // Nothing to do
       //
-      if(it->second.valid_ts.n_elements() == 0) continue;
+      if(it->second.valid_ts.n() == 0) continue;
 
       //
       // Initialize
@@ -3012,8 +3014,8 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       // Check for series of valid (true) or initialization (false) times
       //
-      sort_vld = (it->second.valid_ts.n_elements() ==
-                  it->second.f_na.n_elements());
+      sort_vld = (it->second.valid_ts.n() ==
+                  it->second.f_na.n());
       ts       = (sort_vld ? it->second.valid_ts : it->second.init_ts);
 
       //
@@ -3021,16 +3023,16 @@ void write_job_ramp(STATAnalysisJob &j,
       //
       ts.equal_dt(beg, end);
 
-      if(beg.n_elements() > 1) {
+      if(beg.n() > 1) {
          mlog << Debug(4)
-              << "Processing time series in " << beg.n_elements()
+              << "Processing time series in " << beg.n()
               << " parts due to inconsistent time step.\n";
       }
 
       //
       // Process each consistent time segement
       //
-      for(i=0; i<beg.n_elements(); i++) {
+      for(i=0; i<beg.n(); i++) {
 
          //
          // Get the current segment
@@ -3038,7 +3040,7 @@ void write_job_ramp(STATAnalysisJob &j,
          ts_part = ts.subset(ts.index(beg[i]), ts.index(end[i]));
 
          cur_dt = (beg[i] == end[i] ? 0 :
-                   (end[i] - beg[i]) / (ts_part.n_elements() - 1));
+                   (end[i] - beg[i]) / (ts_part.n() - 1));
 
          mlog << Debug(4)
               << "Processing time series from "
@@ -3109,7 +3111,7 @@ void write_job_ramp(STATAnalysisJob &j,
       // Populate the ramp contingency table
       //
       cts_info.cts.zero_out();
-      for(i=0; i<ts.n_elements(); i++) {
+      for(i=0; i<ts.n(); i++) {
 
          // Initialize
          i_swap = bad_data_int;
@@ -3129,7 +3131,7 @@ void write_job_ramp(STATAnalysisJob &j,
             // Search for points in the time window
             //
             for(k=0, min_dt=bad_data_int, i_min_dt=bad_data_int;
-                k<ts.n_elements(); k++) {
+                k<ts.n(); k++) {
 
                //
                // Skip points before the time window
@@ -3203,11 +3205,11 @@ void write_job_ramp(STATAnalysisJob &j,
             //   OPRV,  OCUR, ODLT, ORAMP,
             //   CATEGORY
             //
-            mpr_at.set_entry(r_mpr, c++, it->second.valid_ts.n_elements());
+            mpr_at.set_entry(r_mpr, c++, it->second.valid_ts.n());
             mpr_at.set_entry(r_mpr, c++, i+1);
-            init_ut  = (it->second.init_ts.n_elements() > 1 ?
+            init_ut  = (it->second.init_ts.n() > 1 ?
                         it->second.init_ts[i] : it->second.init_ts[0]);
-            valid_ut = (it->second.valid_ts.n_elements() > 1 ?
+            valid_ut = (it->second.valid_ts.n() > 1 ?
                        it->second.valid_ts[i] : it->second.valid_ts[0]);
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(init_ut));
             mpr_at.set_entry(r_mpr, c++, sec_to_hhmmss((int) valid_ut - init_ut));
@@ -3524,10 +3526,10 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the input line type, use default if necessary
    //
-   if(j.line_type.n_elements() == 0) {
+   if(j.line_type.n() == 0) {
       j.line_type.add(default_ramp_line_type);
    }
-   if(j.line_type.n_elements() != 1) {
+   if(j.line_type.n() != 1) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-line_type\" option may be used at most once to "
            << "specify the input line type: " << jobstring << "\n\n";
@@ -3537,7 +3539,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the output line type(s), use default if necessary
    //
-   if(j.out_line_type.n_elements() == 0) {
+   if(j.out_line_type.n() == 0) {
       j.out_line_type.add_css(default_ramp_out_line_type);
    }
    if(!j.out_line_type.has(stat_ctc_str) &&
@@ -3552,11 +3554,11 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Determine the ramp columns, use defaults if necessary
    //
-   if(j.column.n_elements() == 0) {
+   if(j.column.n() == 0) {
       j.column.add(default_ramp_fcst_col);
       j.column.add(default_ramp_obs_col);
    }
-   if(j.column.n_elements() != 2) {
+   if(j.column.n() != 2) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-column\" option may be used exactly twice to "
            << "specify the forecast and observation values for the "
@@ -3702,7 +3704,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    // Check that the -model option has been supplied exactly 2 times.
    // The first is the forecast model and the second is the reference.
    //
-   if(j.model.n_elements() != 2) {
+   if(j.model.n() != 2) {
       mlog << Error << "\ncompute_ss_index() -> "
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
@@ -3714,7 +3716,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Use the length of the fcst_var array to infer the number of terms.
    //
-   if((n_terms = j.fcst_var.n_elements()) < 1) {
+   if((n_terms = j.fcst_var.n()) < 1) {
       mlog << Error << "\ncompute_ss_index() -> "
            << "you must define the Skill Score Index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
@@ -3726,11 +3728,11 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that the required elements are of the same length.
    //
-   if(n_terms != j.fcst_lev.n_elements()  ||
-      n_terms != j.fcst_lead.n_elements() ||
-      n_terms != j.line_type.n_elements() ||
-      n_terms != j.column.n_elements()    ||
-      n_terms != j.weight.n_elements()) {
+   if(n_terms != j.fcst_lev.n()  ||
+      n_terms != j.fcst_lead.n() ||
+      n_terms != j.line_type.n() ||
+      n_terms != j.column.n()    ||
+      n_terms != j.weight.n()) {
       mlog << Error << "\ncompute_ss_index() -> "
            << "all filtering parameters for defining the Skill Score "
            << "Index must be of the same length.  Check \"-fcst_var\", "
@@ -3800,7 +3802,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_lead
       //
-      if(j.fcst_lead.n_elements() == n_terms) {
+      if(j.fcst_lead.n() == n_terms) {
          fcst_job[i].fcst_lead.clear();
          fcst_job[i].fcst_lead.add(j.fcst_lead[i]);
       }
@@ -3808,7 +3810,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_lead
       //
-      if(j.obs_lead.n_elements() == n_terms) {
+      if(j.obs_lead.n() == n_terms) {
          fcst_job[i].obs_lead.clear();
          fcst_job[i].obs_lead.add(j.obs_lead[i]);
       }
@@ -3816,7 +3818,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_init_hour
       //
-      if(j.fcst_init_hour.n_elements() == n_terms) {
+      if(j.fcst_init_hour.n() == n_terms) {
          fcst_job[i].fcst_init_hour.clear();
          fcst_job[i].fcst_init_hour.add(j.fcst_init_hour[i]);
       }
@@ -3824,7 +3826,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_init_hour
       //
-      if(j.obs_init_hour.n_elements() == n_terms) {
+      if(j.obs_init_hour.n() == n_terms) {
          fcst_job[i].obs_init_hour.clear();
          fcst_job[i].obs_init_hour.add(j.obs_init_hour[i]);
       }
@@ -3832,7 +3834,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_var
       //
-      if(j.fcst_var.n_elements() == n_terms) {
+      if(j.fcst_var.n() == n_terms) {
          fcst_job[i].fcst_var.clear();
          fcst_job[i].fcst_var.add(j.fcst_var[i]);
       }
@@ -3840,7 +3842,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_var
       //
-      if(j.obs_var.n_elements() == n_terms) {
+      if(j.obs_var.n() == n_terms) {
          fcst_job[i].obs_var.clear();
          fcst_job[i].obs_var.add(j.obs_var[i]);
       }
@@ -3848,7 +3850,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_lev
       //
-      if(j.fcst_lev.n_elements() == n_terms) {
+      if(j.fcst_lev.n() == n_terms) {
          fcst_job[i].fcst_lev.clear();
          fcst_job[i].fcst_lev.add(j.fcst_lev[i]);
       }
@@ -3856,7 +3858,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_lev
       //
-      if(j.obs_lev.n_elements() == n_terms) {
+      if(j.obs_lev.n() == n_terms) {
          fcst_job[i].obs_lev.clear();
          fcst_job[i].obs_lev.add(j.obs_lev[i]);
       }
@@ -3864,7 +3866,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obtype
       //
-      if(j.obtype.n_elements() == n_terms) {
+      if(j.obtype.n() == n_terms) {
          fcst_job[i].obtype.clear();
          fcst_job[i].obtype.add(j.obtype[i]);
       }
@@ -3872,7 +3874,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // vx_mask
       //
-      if(j.vx_mask.n_elements() == n_terms) {
+      if(j.vx_mask.n() == n_terms) {
          fcst_job[i].vx_mask.clear();
          fcst_job[i].vx_mask.add(j.vx_mask[i]);
       }
@@ -3880,7 +3882,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // interp_mthd
       //
-      if(j.interp_mthd.n_elements() == n_terms) {
+      if(j.interp_mthd.n() == n_terms) {
          fcst_job[i].interp_mthd.clear();
          fcst_job[i].interp_mthd.add(j.interp_mthd[i]);
       }
@@ -3888,7 +3890,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // interp_pnts
       //
-      if(j.interp_pnts.n_elements() == n_terms) {
+      if(j.interp_pnts.n() == n_terms) {
          fcst_job[i].interp_pnts.clear();
          fcst_job[i].interp_pnts.add(j.interp_pnts[i]);
       }
@@ -3896,7 +3898,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // fcst_thresh
       //
-      if(j.fcst_thresh.n_elements() == n_terms) {
+      if(j.fcst_thresh.n() == n_terms) {
          fcst_job[i].fcst_thresh.clear();
          fcst_job[i].fcst_thresh.add(j.fcst_thresh[i]);
       }
@@ -3904,7 +3906,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // obs_thresh
       //
-      if(j.obs_thresh.n_elements() == n_terms) {
+      if(j.obs_thresh.n() == n_terms) {
          fcst_job[i].obs_thresh.clear();
          fcst_job[i].obs_thresh.add(j.obs_thresh[i]);
       }
@@ -3912,7 +3914,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // line_type
       //
-      if(j.line_type.n_elements() == n_terms) {
+      if(j.line_type.n() == n_terms) {
          fcst_job[i].line_type.clear();
          fcst_job[i].line_type.add(j.line_type[i]);
 
@@ -3936,7 +3938,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // column
       //
-      if(j.column.n_elements() == n_terms) {
+      if(j.column.n() == n_terms) {
          fcst_job[i].column.clear();
          fcst_job[i].column.add(j.column[i]);
       }
@@ -3944,7 +3946,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
       //
       // weight
       //
-      if(j.weight.n_elements() == n_terms) {
+      if(j.weight.n() == n_terms) {
          fcst_job[i].weight.clear();
          fcst_job[i].weight.add(j.weight[i]);
       }
@@ -4040,7 +4042,7 @@ double compute_ss_index(const ConcatString &jobstring, LineDataFile &f,
    //
    // Loop through the terms and compute a skill score for each.
    //
-   ss = ss_sum = weight_sum = 0.0;
+   ss_sum = weight_sum = 0.0;
    for(i=0; i<n_terms; i++) {
 
       //
@@ -4236,7 +4238,7 @@ void write_case_cols(const ConcatString &cs, AsciiTable &at,
                      int &r, int &c) {
    StringArray sa = cs.split(":");
 
-   for(int i=0; i<sa.n_elements(); i++) at.set_entry(r, c++, sa[i]);
+   for(int i=0; i<sa.n(); i++) at.set_entry(r, c++, sa[i]);
 
    return;
 }

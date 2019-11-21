@@ -50,8 +50,6 @@ if ( info.n_filters() == 0 )  {
 
 }
 
-j = 0;
-
 for (j=0; j<(info.n_filters()); ++j)  {
 
    switch ( info.filter(j) )  {

@@ -718,7 +718,8 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    msg_typ = parse_conf_message_type(&odict, point_vx);
 
    // Conf: othr_thresh
-   othr_ta = odict.lookup_thresh_array(conf_key_obs_thresh);
+   othr_ta = process_perc_thresh_bins(
+                odict.lookup_thresh_array(conf_key_obs_thresh));
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);
@@ -911,7 +912,7 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
-   int n;
+   int n = 0;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {

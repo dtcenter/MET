@@ -91,8 +91,7 @@ interp = {
       { method = UPPER_LEFT;  width = 1;      },
       { method = UPPER_RIGHT; width = 1;      },
       { method = LOWER_RIGHT; width = 1;      },
-      { method = LOWER_LEFT;  width = 1;      },
-      { method = GAUSSIAN;    width = [3, 9]; }
+      { method = LOWER_LEFT;  width = 1;      }
    ];
 }
 
@@ -134,6 +133,6 @@ duplicate_flag = NONE;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V8.1";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////

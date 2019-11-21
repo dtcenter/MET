@@ -468,7 +468,7 @@ reference "compute_GO_Index"
 
 \end_inset
 
-.
+ and are defined by a default Stat-Analysis configuration file.
  The partial sums (SL1L2 lines in the STAT output) for each of these variables
  at each level and lead time must have been computed in a previous step.
  The Stat-Analysis tool then uses the weights in Table 
@@ -480,8 +480,8 @@ reference "compute_GO_Index"
 
  to compute values for the GO Index.
  For a general skill score index, the user can specify the weights and variables
- to use in the calculations.
- 
+ to use in the calculations in a Stat-Analysis configuration file and run
+ the ss_index job type.
 \end_layout
 
 \begin_layout Standard
@@ -2706,7 +2706,7 @@ name "Des_components_STAT_analysis_tool"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top" width="8cm">
@@ -2880,6 +2880,46 @@ Aggregates the statistics output, and converts the input line type to the
 \begin_inset Text
 
 \begin_layout Plain Layout
+ss_index
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Calculates a user-defined Skill Score index as described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:StA_Skill-Score-Index,"
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-model forecast
+\end_layout
+
+\begin_layout Plain Layout
+-model reference
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 go_index
 \end_layout
 
@@ -2889,7 +2929,7 @@ go_index
 \begin_inset Text
 
 \begin_layout Plain Layout
-Calculates the GO Index as described in section
+Calculates the GO Index as described in section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:StA_Skill-Score-Index,"
@@ -2905,11 +2945,11 @@ reference "subsec:StA_Skill-Score-Index,"
 \begin_inset Text
 
 \begin_layout Plain Layout
--fcst_init_begin
+-model forecast
 \end_layout
 
 \begin_layout Plain Layout
--fcst_init_end
+-model reference
 \end_layout
 
 \end_inset
@@ -4424,6 +4464,34 @@ out_obs_thresh
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Job: ss_index
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output from this job consists of three lines, the first two of which
+ contain "
+\series bold
+JOB_LIST
+\series default
+" and "
+\series bold
+COL_NAME
+\series default
+", as described above.
+ The third line contains "
+\series bold
+SS_INDEX
+\series default
+" followed by a colon and then the value computed for the user-defined Skill
+ Score Index.
+ 
 \end_layout
 
 \begin_layout Standard
