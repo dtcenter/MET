@@ -147,7 +147,7 @@ init_hour = [];
 lead = [];
 
 //
-// Spatial masking region (polyline, named grid, or path to gridded data file)
+// Spatial masking region (path to gridded data file or polyline file)
 //
 vx_mask = "";
 
