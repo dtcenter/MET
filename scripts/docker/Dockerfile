@@ -47,9 +47,14 @@ RUN yum -y update \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
- && yum -y install python3 python3-devel python3-pip \
- && pip3 install --upgrade pip \
- && python3 -m pip install numpy xarray
+ && yum -y install python2 python2-pip python2-devel \
+ && pip install --upgrade pip \
+ && pip install xarray numpy
+
+# For Python3
+# && yum -y install python3 python3-devel python3-pip \
+# && pip3 install --upgrade pip \
+# && python3 -m pip install numpy xarray
 
 #
 # Set working directory
@@ -163,3 +168,6 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_test.log \
  && echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make test > ${LOG_FILE} 2>&1
+
+# For Python3
+# MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE}
