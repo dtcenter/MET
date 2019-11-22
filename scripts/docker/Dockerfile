@@ -42,7 +42,7 @@ RUN yum -y update \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
  && yum -y install python3 python3-devel python3-pip \
  && pip3 install --upgrade pip \
- && pip3 install xarray numpy
+ && python3 -m pip install numpy xarray
 
 #
 # Set working directory
