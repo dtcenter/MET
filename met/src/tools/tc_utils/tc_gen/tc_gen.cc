@@ -247,17 +247,18 @@ void process_genesis() {
       } // end j
 
       // Loop through and process the genesis event pairs
-      for(it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++) {
+      for(j=0,it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++,j++) {
          mlog << Debug(2)
-              << "For filter " << i+1 << " of " << conf_info.n_vx()
-              << ", comparing " << it->second.n() << " " << it->first
-              << " forecast genesis events to " << best_ga.n() << " "
+              << "[Filter " << i+1 << ", Model " << j+1 << "] "
+              << "For " << it->first << ", comparing " << it->second.n()
+              << " genesis forecasts to " << best_ga.n() << " "
               << conf_info.BestEventInfo.Technique << " and "
               << oper_ga.n() << " " << conf_info.OperEventInfo.Technique
               << " genesis events.\n";
-         process_genesis_pair(it->first, it->second, best_ga, oper_ga);;
+         process_genesis_pair(it->first, it->second, best_ga, oper_ga);
       }
-   }
+
+   } // end for i
 
    return;
 }
