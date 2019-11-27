@@ -54,6 +54,8 @@ struct EnsembleStatNcOutInfo {
    bool do_range;
    bool do_vld;
    bool do_freq;
+   bool do_nep;
+   bool do_nmep;
    bool do_orank;
    bool do_weight;
 
@@ -189,6 +191,10 @@ class EnsembleStatConfInfo {
       ThreshArray *       ens_ta;           // Array for ensemble thresholds [n_ens_var] (allocated)
       StringArray         ens_var_str;      // Array for ensemble variable name strings [n_ens_var]
 
+      NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
+      int                 n_nbrhd;          // Number of neighborhood sizes
+      InterpInfo          nmep_smooth;      // Neighborhood maximum smoothing information
+
       EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
 
       double              vld_ens_thresh;   // Required ratio of valid input files
@@ -229,6 +235,7 @@ class EnsembleStatConfInfo {
       // Dump out the counts
       int get_n_ens_var()    const;
       int get_max_n_thresh() const;
+      int get_n_nbrhd()      const;
       int get_n_vx()         const;
 
       // Compute the maximum number of output lines possible based
@@ -242,6 +249,7 @@ class EnsembleStatConfInfo {
 
 inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
 inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
 inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
 inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
 

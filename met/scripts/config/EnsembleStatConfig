@@ -83,6 +83,31 @@ ens = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 1.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   type = [
+      {
+         method     = GAUSSIAN;
+         width      = 5;
+         shape      = CIRCLE;
+         vld_thresh = 1.0;
+      },
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -233,6 +258,8 @@ ensemble_flag = {
    range     = TRUE;
    vld_count = TRUE;
    frequency = TRUE;
+   nep       = TRUE;
+   nmep      = TRUE;
    rank      = TRUE;
    weight    = FALSE;
 }
