@@ -101,7 +101,7 @@ nmep_smooth = {
          width      = 5;
          shape      = CIRCLE;
          vld_thresh = 1.0;
-      },
+      }
    ];
 }
 
