@@ -132,7 +132,7 @@ void process_command_line(int argc, char **argv) {
     cline.add(set_adeck,      "-adeck", -1);
     cline.add(set_bdeck,      "-bdeck", -1);
     cline.add(set_config,     "-config", 1);
-    cline.add(set_out_dir,    "-out",    1);
+    cline.add(set_out_dir,    "-outdir", 1);
     cline.add(set_out_prefix, "-prefix", -1);
     cline.add(set_logfile,    "-log",    1);
     cline.add(set_verbosity,  "-v",      1);
