@@ -362,7 +362,7 @@ Version 9.0 BETA1 Release Notes:
       - Enhance to process smoke and dust data from GOES-16 ADP files (#1194).
       - Update quality control processing logic (#1168).
       - Add support for Gaussian regridding method to support the definition
-        of surrogate-severe forcasts (#1136).
+        of surrogate-severe forecasts (#1136).
       - Derive AOD at 550nm from 440 and 675 (#1121).
    - Point-Stat and Grid-Stat
       - Replace climo_cdf_bins configuration file options with climo_cdf
