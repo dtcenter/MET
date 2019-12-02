@@ -1747,6 +1747,8 @@ ens = {
    ];
 }
 
+// JHG, add details here about the nbrhd_prob and nmep_smooth dictionaries.
+// JHG, add details here about the nbrhd_prob and nmep_smooth dictionaries.
 //
 // The fcst and obs entries define the fields for which Ensemble-Stat should
 // compute rank histograms, probability integral transform histograms,
@@ -1873,6 +1875,9 @@ obs_error = {
 //    - "range" for the range of ensemble values
 //    - "vld_count" for the number of valid ensemble members
 //    - "frequency" for the ensemble relative frequency meeting a threshold
+
+// JHG add details about nep and nmep flags
+
 //    - "rank" to write the rank for the gridded observation field to separate
 //      NetCDF output file.
 //    - "weight" to write the grid weights specified in grid_weight_flag to the
@@ -1888,6 +1893,8 @@ ensemble_flag = {
    range     = TRUE;
    vld_count = TRUE;
    frequency = TRUE;
+   nep       = FALSE;
+   nmep      = FALSE;
    rank      = TRUE;
    weight    = FALSE;
 }
