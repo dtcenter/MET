@@ -1470,7 +1470,7 @@ void usage() {
         << " The default is " << RGInfo.gaussian_dx << ". Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian_radius << "). Ignored if not Gaussian method (optional).\n"
+        << " The default is " << RGInfo.gaussian_radius << ". Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
