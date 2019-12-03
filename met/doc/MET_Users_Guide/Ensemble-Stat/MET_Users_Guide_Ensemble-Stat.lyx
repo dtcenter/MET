@@ -184,16 +184,22 @@ $5/10$=0.5
 
 \begin_layout Standard
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble
- probability (NMEP) methods are described in Schwartz et al.
- (2017).
+ probability (NMEP) methods are described in Schwartz and Sobash (2017).
  They are an extension of the ensemble relative frequencies described above.
- The NEP value is computed as the ensemble relative frequency of the event
- computed over the surrounding neighborhood for each ensemble member.
+ The NEP value is computed by averaging the relative frequency of the event
+ within the neighborhood over all ensemble members.
  The NMEP value is computed as the fraction of ensemble members for which
  the event is occurring somewhere within the surrounding neighborhood.
  The NMEP output is typically smoothed using a Gaussian kernel filter.
  The neighborhood sizes and smoothing options are set in the configuration
  file.
+\end_layout
+
+\begin_layout Standard
+The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and
+ NMEP outputs to a NetCDF output file.
+ Probabilistic verification methods can then be applied to those fields
+ by evaluating them with the Grid-Stat and/or Point-Stat tools.
 \end_layout
 
 \begin_layout Subsection
@@ -1362,6 +1368,11 @@ type
 \series medium
  array of dictionaries to define one or more methods for smoothing the neighborh
 ood maximum ensemble probability data.
+ Setting the interpolation method to nearest neighbor (
+\series bold
+NEAREST
+\series medium
+) effectively disables this smoothing step.
 \end_layout
 
 \begin_layout Standard
