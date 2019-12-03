@@ -95,12 +95,14 @@ nbrhd_prob = {
 // NMEP smoothing methods
 //
 nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
    type = [
       {
-         method     = GAUSSIAN;
-         width      = 5;
-         shape      = CIRCLE;
-         vld_thresh = 1.0;
+         method = GAUSSIAN;
+         width  = 1;
       }
    ];
 }
@@ -248,19 +250,35 @@ output_flag = {
 //
 // Ensemble product output types
 //
+// ensemble_flag = {
+//    mean      = TRUE;
+//    stdev     = TRUE;
+//    minus     = TRUE;
+//    plus      = TRUE;
+//    min       = TRUE;
+//    max       = TRUE;
+//    range     = TRUE;
+//    vld_count = TRUE;
+//    frequency = TRUE;
+//    nep       = TRUE;
+//    nmep      = TRUE;
+//    rank      = TRUE;
+//    weight    = FALSE;
+// }
+
 ensemble_flag = {
-   mean      = TRUE;
-   stdev     = TRUE;
-   minus     = TRUE;
-   plus      = TRUE;
-   min       = TRUE;
-   max       = TRUE;
-   range     = TRUE;
-   vld_count = TRUE;
+   mean      = FALSE;
+   stdev     = FALSE;
+   minus     = FALSE;
+   plus      = FALSE;
+   min       = FALSE;
+   max       = FALSE;
+   range     = FALSE;
+   vld_count = FALSE;
    frequency = TRUE;
    nep       = TRUE;
    nmep      = TRUE;
-   rank      = TRUE;
+   rank      = FALSE;
    weight    = FALSE;
 }
 

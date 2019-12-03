@@ -138,13 +138,13 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // Unweighted Mean
+            case(InterpMthd_Gaussian): // For Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
             // Distance-weighted mean, area-weighted mean, least-squares
-            // fit, bilinear, and gaussian interpolation are omitted
-            // here since they are not options for gridded data.
+            // fit, and bilinear are omitted here since they are not
+            // options for gridded data.
 
             default:
                mlog << Error << "\nsmooth_field() -> "
@@ -160,11 +160,15 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       } // end for y
    } // end for x
-   
+
+   // Apply the Gaussian smoother 
    if (mthd == InterpMthd_Gaussian) {
      interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx);
    }
+
+   // Cleanup
    delete gt;
+
    return;
 }
 
