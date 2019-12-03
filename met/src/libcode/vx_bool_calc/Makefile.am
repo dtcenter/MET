@@ -20,11 +20,11 @@ libvx_bool_calc_a_SOURCES = \
 libvx_bool_calc_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 if ENABLE_DEVELOPMENT
-    tokentype_to_string.cc tokentype_to_string.h: token.h
-        ${ENUM_TO_STRING} -concat_string -reverse token.h
+tokentype_to_string.cc tokentype_to_string.h: token.h
+	${ENUM_TO_STRING} -concat_string -reverse token.h
  
-    clean-local:
-        -rm -f tokentype_to_string.cc
-        -rm -f tokentype_to_string.h
+clean-local:
+	-rm -f tokentype_to_string.cc
+	-rm -f tokentype_to_string.h
 endif
 

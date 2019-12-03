@@ -64,7 +64,7 @@ class TokenStack {
 
       int top_prec() const;   //  the "in" prec
 
-      char top_value() const;
+      // char top_value() const;
 
       bool top_is_mark() const;
 

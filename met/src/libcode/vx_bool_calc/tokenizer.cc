@@ -151,7 +151,8 @@ Token Tokenizer::next_token()
 
 int k, old_pos;
 Token tok;
-char c;
+char c, c2;
+
 
    //
    //  skip whitespace
@@ -194,13 +195,24 @@ switch ( c )  {
       break;
 
 
-   case union_char:
-      tok.set_union(old_pos);
+   case union_char[0]:
+      c2 = source[pos++];
+      if ( c2 == union_char[1])  tok.set_union(old_pos);
+      else {
+         cerr << "\n\n  Tokenizer::next_token() -> unrecognized token: " << c << c2 << "\n\n";
+         exit ( 1 );
+      }
       break;
 
 
-   case intersection_char:
+   case intersection_char[0]:
       tok.set_intersection(old_pos);
+      c2 = source[pos++];
+      if ( c2 == intersection_char[1])  tok.set_intersection(old_pos);
+      else {
+         cerr << "\n\n  Tokenizer::next_token() -> unrecognized token: " << c << c2 << "\n\n";
+         exit ( 1 );
+      }
       break;
 
 

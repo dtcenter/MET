@@ -19,14 +19,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char union_char            = '|';
-static const char intersection_char     = '&';
-static const char negation_char         = '!';
+static constexpr const char * const union_char          = "||";
+static constexpr const char * const intersection_char   = "&&";
+static const char negation_char           = '!';
 
 static const char   mark_char           = '(';
 static const char unmark_char           = ')';
 
-// static const char local_var_char        = '$';
 static const char local_var_char        = '#';
 
 
@@ -96,7 +95,7 @@ class Token {
 
       TokenType type;
 
-      char value;
+      ConcatString text;
 
       int  in_prec;
       int out_prec;
@@ -168,8 +167,8 @@ extern ostream & operator<<(ostream &, const Token &);
 
 inline int  Token::prec        () const { return ( out_prec ); }
 
-inline bool Token::is_mark     () const { return ( value == mark_char   ); }
-inline bool Token::is_unmark   () const { return ( value == unmark_char ); }
+inline bool Token::is_mark     () const { return ( type == tok_mark   ); }
+inline bool Token::is_unmark   () const { return ( type == tok_unmark ); }
 
 inline bool Token::is_eof      () const { return ( type == tok_eof ); }
 

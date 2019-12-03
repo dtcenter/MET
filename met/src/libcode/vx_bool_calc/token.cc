@@ -88,7 +88,7 @@ clear();
 
 type        = t.type;
 
-value       = t.value;
+text        = t.text;
 
  in_prec    = t.in_prec;
 out_prec    = t.out_prec;
@@ -139,21 +139,19 @@ void Token::dump(ostream & out, int depth) const
 
 {
 
-int k;
 Indent prefix(depth);
+
 
 out << '\n';
 
 out << prefix << "type      = " << tokentype_to_string(type) << '\n';
 
 
-k = (int) value;
+out << prefix << "text      = ";
 
-out << prefix << "value     = ";
+if ( text.nonempty() )  out << '\"' << text << '\"';
 
-if ( (k >= 32) && (k <= 127) )  out << '\'' << value << '\'' << '\n';
-else                            out << k << '\n';
-
+out << '\n';
 
 // out << prefix << "prec      = (" << in_prec << ' ' << out_prec << ")\n";
 
@@ -182,7 +180,7 @@ void Token::set_eof()
 
 {
 
-value = 0;
+text.clear();
 
 delta = 0;
 
@@ -210,7 +208,7 @@ pos = _pos;
 
 type = tok_union;
 
-value = union_char;
+text = union_char;
 
  in_prec = union_in_prec;
 out_prec = union_out_prec;
@@ -236,7 +234,7 @@ pos = _pos;
 
 type = tok_intersection;
 
-value = intersection_char;
+text = intersection_char;
 
  in_prec = intersection_in_prec;
 out_prec = intersection_out_prec;
@@ -260,7 +258,7 @@ void Token::set_mark(int _pos)
 
 type = tok_mark;
 
-value = mark_char;
+text = mark_char;
 
 in_prec = out_prec = 100;
 
@@ -284,7 +282,7 @@ void Token::set_unmark(int _pos)
 
 type = tok_unmark;
 
-value = unmark_char;
+text = unmark_char;
 
 in_prec = out_prec = 100;
 
@@ -309,7 +307,7 @@ type = tok_local_var;
 
 number_1b = _number_1b;
 
-value = 0;
+text.erase();
 
 in_prec = out_prec = 0;
 
@@ -330,7 +328,7 @@ void Token::set_negation(int _pos)
 
 {
 
-value = negation_char;
+text = negation_char;
 
 type = tok_negation;
 
