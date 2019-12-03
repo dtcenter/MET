@@ -395,7 +395,7 @@ obtype = "ANALYS";
 //         - UPPER_RIGHT for the upper right grid point (width = 1)
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
-//         - GAUSSIAN    for the Gaussian filtering (width = at least 3)
+//         - GAUSSIAN    for the Gaussian filtering
 //
 //         The BEST and GEOG_MATCH interpolation options are not valid for
 //         regridding.
@@ -1791,6 +1791,7 @@ nmep_smooth = {
          width  = 1;
       }
    ];
+}
 
 //
 // The fcst and obs entries define the fields for which Ensemble-Stat should

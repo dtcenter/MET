@@ -77,12 +77,14 @@ nbrhd_prob = {
 // NMEP smoothing methods
 //
 nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
    type = [
       {
-         method     = GAUSSIAN;
-         width      = 5;
-         shape      = CIRCLE;
-         vld_thresh = 1.0;
+         method = GAUSSIAN;
+         width  = 1;
       }
    ];
 }

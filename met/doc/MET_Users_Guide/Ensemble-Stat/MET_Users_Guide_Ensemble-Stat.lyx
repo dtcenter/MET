@@ -1270,6 +1270,30 @@ nmep_smooth = {
 \begin_layout LyX-Code
 
 \series bold
+   vld_thresh      = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape           = CIRCLE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_dx     = 81.27;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_radius = 120;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    type = [
 \end_layout
 
@@ -1282,25 +1306,13 @@ nmep_smooth = {
 \begin_layout LyX-Code
 
 \series bold
-         method     = GAUSSIAN;
+         method = GAUSSIAN;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-         width      = 5;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-         shape      = CIRCLE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-         vld_thresh = 1.0;
+         width  = 1;
 \end_layout
 
 \begin_layout LyX-Code
