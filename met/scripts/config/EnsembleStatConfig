@@ -250,35 +250,19 @@ output_flag = {
 //
 // Ensemble product output types
 //
-// ensemble_flag = {
-//    mean      = TRUE;
-//    stdev     = TRUE;
-//    minus     = TRUE;
-//    plus      = TRUE;
-//    min       = TRUE;
-//    max       = TRUE;
-//    range     = TRUE;
-//    vld_count = TRUE;
-//    frequency = TRUE;
-//    nep       = TRUE;
-//    nmep      = TRUE;
-//    rank      = TRUE;
-//    weight    = FALSE;
-// }
-
 ensemble_flag = {
-   mean      = FALSE;
-   stdev     = FALSE;
-   minus     = FALSE;
-   plus      = FALSE;
-   min       = FALSE;
-   max       = FALSE;
-   range     = FALSE;
-   vld_count = FALSE;
+   mean      = TRUE;
+   stdev     = TRUE;
+   minus     = TRUE;
+   plus      = TRUE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = TRUE;
+   vld_count = TRUE;
    frequency = TRUE;
    nep       = TRUE;
    nmep      = TRUE;
-   rank      = FALSE;
+   rank      = TRUE;
    weight    = FALSE;
 }
 
