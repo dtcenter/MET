@@ -87,8 +87,12 @@ int main(int argc, char *argv[]) {
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
 
+   mlog << Debug(2) << "Enter process_command_line.\n";
+
    // Process the command line arguments
    process_command_line(argc, argv);
+
+   mlog << Debug(2) << "Exit process_command_line.\n";
 
    // Close the text files and deallocate memory
    clean_up();
@@ -163,6 +167,8 @@ void process_command_line(int argc, char **argv) {
         << "Default Config File: " << default_config_file << "\n"
         << "User Config File: "    << config_file << "\n";
 
+   mlog << Debug(2) << "Read config files.\n";
+
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
@@ -170,9 +176,13 @@ void process_command_line(int argc, char **argv) {
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
+   mlog << Debug(2) << "Parse file list.\n";
+
    // Parse the forecast and observation file lists
    fcst_files = parse_file_list(fcst_files, ftype);
    obs_files  = parse_file_list(obs_files,  otype);
+
+   mlog << Debug(2) << "Get mtddf.\n";
 
    // Get mtddf
    fcst_mtddf = get_mtddf(fcst_files, ftype);
@@ -181,6 +191,8 @@ void process_command_line(int argc, char **argv) {
    // Store the input data file types
    ftype = fcst_mtddf->file_type();
    otype = obs_mtddf->file_type();
+
+   mlog << Debug(2) << "Process configuration.\n";
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
@@ -295,6 +307,8 @@ void process_command_line(int argc, char **argv) {
 Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
    int i;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   mlog << "Enter get_mtddf.\n";
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n_elements(); i++) {
@@ -851,6 +865,8 @@ StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
    StringArray list;
 
+   mlog << "Enter parse_file_list.\n";
+
    // Check for empty list
    if(a.n_elements() == 0) {
       mlog << Error << "\nparse_file_list() -> "
@@ -858,8 +874,12 @@ StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
       exit(1);
    }
 
+   mlog << Debug(2) << a[0] << "\n";
+
    // Attempt to read the first file as a gridded data file
    mtddf = mtddf_factory.new_met_2d_data_file(a[0].c_str(), type);
+
+   mlog << Debug(2) << "Read OK in parse_file_list.\n";
 
    // If the read was successful, store the list of gridded files.
    // Otherwise, process entries as ASCII files.
