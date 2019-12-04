@@ -69,6 +69,22 @@ return ( out );
 ////////////////////////////////////////////////////////////////////////
 
 
+PyObject * get_attribute(PyObject * obj, const char * attribute_name)
+
+{
+
+if ( PyObject_HasAttrString(obj, attribute_name) == 0 )  return ( (PyObject *) 0 );
+
+PyObject * att = PyObject_GetAttrString(obj, attribute_name);
+
+return ( att );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void dump_dict(PyObject * obj, int depth)
 
 {

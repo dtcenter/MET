@@ -42,9 +42,9 @@ class Python3_Numpy {
 
       PyObject * Object;        //  the numpy array, not allocated
 
-      Python3_Script * Script;  //  not allocated
+      Python3_Script * Script;  //  not allocated, possibly null
 
-      ConcatString Name;        //  the numpy array variable name
+      ConcatString Name;        //  the numpy array variable name, possibly empty
 
 
       int N_Dims;
@@ -77,6 +77,12 @@ class Python3_Numpy {
 
       void set(Python3_Script & , const char * _name);
 
+      void set(PyObject *);
+
+      void set_name(const char *);
+
+      void set_script(Python3_Script &);
+
          //
          //  get stuff
          //
@@ -95,7 +101,7 @@ class Python3_Numpy {
 
       int n_data() const;
 
-      int dims(int) const;   //  0-based
+      int dim(int) const;   //  0-based
 
       const char * dtype() const;
 

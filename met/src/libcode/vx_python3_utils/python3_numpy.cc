@@ -11,6 +11,8 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "empty_string.h"
+
 #include "python3_numpy.h"
 #include "python3_util.h"
 
@@ -114,7 +116,7 @@ void Python3_Numpy::dump(ostream & out) const
 
 int j;
 
-out << "name      = \"" << name() << "\"\n";
+out << "name      = \"" << Name.contents() << "\"\n";
 out << "n dims    = " << n_dims() << '\n';
 
 out << "dims      = [";
@@ -147,15 +149,70 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int Python3_Numpy::dim(int k) const
+
+{
+
+if ( (k < 0) || (k >= N_Dims) )  {
+
+   cerr << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( Dim[k] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Numpy::set_name(const char * _name)
+
+{
+
+if ( empty(_name) )  {
+
+   cerr << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
+
+   exit ( 1 );
+
+}
+
+Name = _name;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Numpy::set_script(Python3_Script & s)
+
+{
+
+Script = &s;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void Python3_Numpy::set(Python3_Script & script, const char * _name)
 
 {
 
-clear();
+PyObject * obj = script.lookup(_name);
 
-Object = script.lookup(_name);
-
-if ( ! Object )  {
+if ( ! obj )  {
 
    cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "variable named \"" << _name << "\" not found in script \""
@@ -165,9 +222,35 @@ if ( ! Object )  {
 
 }
 
-Name = _name;
+set(obj);
 
-Script = &script;
+set_name(_name);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Numpy::set(PyObject * obj)
+
+{
+
+clear();
+
+if ( ! obj )  {
+
+   cerr << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
+
+   exit ( 1 );
+
+}
+
+Object = obj;
+
+Script = 0;
 
 
    //
@@ -262,6 +345,7 @@ for (j=0; j<N_Data; ++j)  {
    //  get the data type
    //
 
+/*
 ConcatString command;
 ConcatString a;
 
@@ -276,16 +360,41 @@ PyObject * dtype_obj = Script->lookup(junk_var_name);
 // cout << "\n\n  Unicode = " << PyUnicode_Check(dtype_obj) << "\n\n";
 
 Dtype = PyUnicode_AsUTF8(dtype_obj);
-
+*/
 // cout << "\n\n   Dtype = \"" << Dtype << "\"\n\n";
 
 
+PyObject * dtype_obj = get_attribute(Object, "dtype");
+
+if ( ! dtype_obj )  {
+
+   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+        << "can't get numpy dtype attribute!\n\n";
+
+   exit ( 1 );
+
+}
+
+PyObject * dtype_str_obj = get_attribute(dtype_obj, "str");
+
+if ( ! dtype_str_obj )  {
+
+   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+        << "can't get numpy dtype attribute string!\n\n";
+
+   exit ( 1 );
+
+}
+
+Dtype = PyUnicode_AsUTF8(dtype_str_obj);
 
 
 
    //
    //  done
    //
+
+return;
 
 }
 

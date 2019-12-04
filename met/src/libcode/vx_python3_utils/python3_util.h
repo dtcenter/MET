@@ -31,6 +31,15 @@ extern ostream & operator<<(ostream &, PyObject *);
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  returns null if the given object has no attribute of that name
+   //
+
+extern PyObject * get_attribute(PyObject *, const char * attribute_name);
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 extern void dump_dict       (PyObject * dict, int depth);
 

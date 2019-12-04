@@ -9,10 +9,63 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "string.h"
+
 #include "vx_python_utils.h"
+#include "check_endian.h"
 
 #include "dataplane_from_numpy_array.h"
 #include "grid_from_python_dict.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+void load_numpy (void * buf,
+                 const int Nx, const int Ny,
+                 const int data_endian,
+                 void (*shuf)(void *), 
+                 DataPlane & out)
+
+
+{
+
+bool need_swap = (shuf != 0) && (native_endian != data_endian);
+
+int j, x, y, r, c;
+const int Nxy = Nx*Ny;
+T * u = (T *) buf;
+T value;
+
+for (j=0; j<Nxy; ++j)  {
+
+   nympy_array_one_to_two(j, Nx, r, c);
+
+   x = c;
+
+   y = Ny - 1 - r;
+
+   memcpy(&value, u + j, sizeof(T));
+
+   if ( need_swap )  shuf(&value);
+
+   dp_out.set((double) value, x, y);
+
+}   //  for j
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void load_le_double (void * buf, const int Nx, const int Ny, DataPlane & out);
+static void load_le_float  (void * buf, const int Nx, const int Ny, DataPlane & out);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -37,116 +90,108 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool dataplane_from_numpy_array(PyObject * numpy_array, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
+bool dataplane_from_numpy_array(Python3_numpy & np, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {
 
 int j;
-int dim, nrows, ncols, nx, ny, Nxy;
+int dim, nrows, ncols, Nx, Ny, Nxy;
 int r, c, x, y;
 double value;
 int sizes [max_tuple_data_dims];
 void * p  = 0;
 double * pp = 0;
 
-   //
-   //  get size of data array
-   //
-
-PyObject * shape_tuple = PyObject_GetAttrString (numpy_array, "shape");
-
-if ( ! shape_tuple )  {
-
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "trouble getting the \"shape\"\n\n";
-
-   return ( false );
-
-}
-
-dim = PyTuple_Size (shape_tuple);
-
-if ( dim > max_tuple_data_dims )  {
-
-   mlog << Error << "\ndataplane_from_numpy_array() -> "
-        << "too many dimensions in data ... " << dim << "\n\n";
-
-   return ( false );
-
-}
-
-get_tuple_int_values(shape_tuple, dim, sizes);
-
-if ( dim != 2 )  {
-
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "can only handle 2-dimensional data, but given data is "
-        << dim << "-dimensional\n\n";
-
-   return ( false );
-
-}
-
-nrows = sizes[0];
-ncols = sizes[1];
-
-nx = ncols;
-ny = nrows;
-
-Nxy = nx*ny;
-
-dp_out.set_size(nx, ny);
 
    //
-   //  get a pointer to the actual data
+   //  make sure it's a 2D array
    //
 
-PyObject * the_data = PyObject_GetAttrString (numpy_array, "data");
+if ( np.n_dims() != 2 )  {
 
-if ( ! the_data )  {
+   cerr << "\n\n  dataplane_from_numpy_array() -> "
+        << "numpy array is not 2-dimensional! ... "
+        << "(dim = " << (np.n_dims()) << ")\n\n";
 
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "trouble getting the \"data\"\n\n";
+   exit ( 1 );
 
-   return ( false );
-
-}
-
-PyTypeObject * type = (PyTypeObject *) PyObject_Type (the_data);
-
-if ( ! type )  {
-
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "trouble getting the \"type\" of the data\n\n";
-
-   return ( false );
 
 }
 
-if ( type->tp_as_buffer->bf_getreadbuffer (the_data, 0, &p) < 0 )  {
+nrows = np.dim(0);
+ncols = np.dim(1);
 
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "getreadbufferproc errored out\n\n";
+Nx = ncols;
+Ny = nrows;
 
-   return ( false );
+Nxy = Nx*Ny;
+
+dp_out.set_size(Nx, Ny);
+
+   //
+   //  load the data
+   //
+
+const ConcatString dtype = np.dtype();
+
+      //   1 byte integers
+
+     if ( dtype == "|i1"  )   load_numpy <int8_t>    (np.buffer(), Nx, Ny, little_endian,         0, dp_out);
+else if ( dtype == "|u1"  )   load_numpy <uint8_t>   (np.buffer(), Nx, Ny, little_endian,         0, dp_out);
+
+      //   2 byte integers
+
+else if ( dtype == "<i2"  )   load_numpy <int16_t>   (np.buffer(), Nx, Ny, little_endian, shuffle_2, dp_out);
+else if ( dtype == "<u2"  )   load_numpy <uint16_t>  (np.buffer(), Nx, Ny, little_endian, shuffle_2, dp_out);
+
+else if ( dtype == ">i2"  )   load_numpy <int16_t>   (np.buffer(), Nx, Ny,    big_endian, shuffle_2, dp_out);
+else if ( dtype == ">u2"  )   load_numpy <uint16_t>  (np.buffer(), Nx, Ny,    big_endian, shuffle_2, dp_out);
+
+      //   4 byte integers
+
+else if ( dtype == "<i4"  )   load_numpy <int32_t>   (np.buffer(), Nx, Ny, little_endian, shuffle_4, dp_out);
+else if ( dtype == "<u4"  )   load_numpy <uint32_t>  (np.buffer(), Nx, Ny, little_endian, shuffle_4, dp_out);
+
+else if ( dtype == ">i4"  )   load_numpy <int32_t>   (np.buffer(), Nx, Ny,    big_endian, shuffle_4, dp_out);
+else if ( dtype == ">u4"  )   load_numpy <uint32_t>  (np.buffer(), Nx, Ny,    big_endian, shuffle_4, dp_out);
+
+      //   8 byte integers
+
+else if ( dtype == "<i8"  )   load_numpy <int64_t>   (np.buffer(), Nx, Ny, little_endian, shuffle_8, dp_out);
+else if ( dtype == "<u8"  )   load_numpy <uint64_t>  (np.buffer(), Nx, Ny, little_endian, shuffle_8, dp_out);
+
+else if ( dtype == ">i8"  )   load_numpy <int64_t>   (np.buffer(), Nx, Ny,    big_endian, shuffle_8, dp_out);
+else if ( dtype == ">u8"  )   load_numpy <uint64_t>  (np.buffer(), Nx, Ny,    big_endian, shuffle_8, dp_out);
+
+      //   single precision floats
+
+else if ( dtype == "<f4"  )   load_numpy <float>     (np.buffer(), Nx, Ny, little_endian, shuffle_4, dp_out);
+else if ( dtype == ">f4"  )   load_numpy <float>     (np.buffer(), Nx, Ny,    big_endian, shuffle_4, dp_out);
+
+      //   double precision floats
+
+else if ( dtype == "<f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny, little_endian, shuffle_8, dp_out);
+else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bit_endian, shuffle_8, dp_out);
+
+      //
+      //   nope ... the only other numerical data type for numpy arrays 
+      //            is single or double precision complex numbers, and 
+      //            we're not supporting those at this time
+      //
+
+else  {
+
+   mlog << Error
+        << \n\n   dataplane_from_numpy_array() -> unsupported numpy data type \"" 
+        << dtype << "\"\n\n";
+
+   exit ( 1 );
 
 }
 
-pp = (double *) p;
 
-for (j=0; j<Nxy; ++j)  {
 
-   nympy_array_one_to_two(j, ncols, r, c);
 
-   x = c;
-
-   y = ny - 1 - r;
-
-   value = pp[j];
-
-   dp_out.set(value, x, y);
-
-}   //  for j
 
    //
    //  get timestamp info from the attributes dictionary
