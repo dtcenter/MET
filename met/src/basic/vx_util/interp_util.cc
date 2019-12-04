@@ -537,7 +537,6 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
 
 const double trunc_factor = 3.5;
 double max_raw_all;

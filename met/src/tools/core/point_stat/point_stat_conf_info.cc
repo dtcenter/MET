@@ -851,7 +851,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    boot_info = parse_conf_boot(&odict);
 
    // Conf: interp
-   interp_info = parse_conf_interp(&odict);
+   interp_info = parse_conf_interp(&odict, conf_key_interp);
 
    // Conf: hira
    hira_info = parse_conf_hira(&odict);

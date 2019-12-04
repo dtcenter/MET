@@ -686,7 +686,7 @@ void GridStatVxOpt::process_config(
    boot_info = parse_conf_boot(&odict);
 
    // Conf: interp
-   interp_info = parse_conf_interp(&odict);
+   interp_info = parse_conf_interp(&odict, conf_key_interp);
 
    // Loop through interpolation options
    for(i=0; i<interp_info.n_interp; i++) {
@@ -714,7 +714,7 @@ void GridStatVxOpt::process_config(
    } // end for i
 
    // Conf: nbrhd
-   nbrhd_info = parse_conf_nbrhd(&odict);
+   nbrhd_info = parse_conf_nbrhd(&odict, conf_key_nbrhd);
 
    // Conf: fourier
    Dictionary * d = odict.lookup_dictionary(conf_key_fourier);
