@@ -55,8 +55,6 @@ static void get_series_entry(int, VarInfo *, const StringArray &,
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
 
-// static void process_scores();
-
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
                        const ConcatString &, const ConcatString &,
@@ -91,9 +89,6 @@ int main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
-
-   // Compute the scores and write them out
-   // process_scores();
 
    // Close the text files and deallocate memory
    clean_up();
