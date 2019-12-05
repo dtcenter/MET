@@ -30,7 +30,7 @@ SUBDIRS	= vx_grid \
 #endif
 
 if ENABLE_PYTHON
-  SUBDIRS += vx_python3_utils
+  SUBDIRS += vx_python_utils
 endif
 
 if ENABLE_GRIB2

@@ -10,10 +10,9 @@ include ${top_srcdir}/Make-include
 
 # The library
 
-noinst_LIBRARIES = libvx_python_utils.a
-libvx_python_utils_a_SOURCES = \
-              python_dict.h python_dict.cc \
-              python_tuple.h python_tuple.cc \
-              python_numarray.h python_numarray.cc \
-              vx_python_utils.h
-libvx_python_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)
+noinst_LIBRARIES = libvx_python3_utils.a
+libvx_python3_utils_a_SOURCES = \
+              python3_script.h python3_script.cc \
+              python3_numpy.h python3_numpy.cc \
+              python3_util.h python3_util.cc
+libvx_python3_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${MET_PYTHON3_CC} $(MET_PYTHON3_LD)
