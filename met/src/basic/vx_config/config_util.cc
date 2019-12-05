@@ -72,7 +72,8 @@ void RegridInfo::validate() {
       method != InterpMthd_Upper_Right &&
       method != InterpMthd_Lower_Right &&
       method != InterpMthd_Lower_Left &&
-      method != InterpMthd_AW_Mean) {
+      method != InterpMthd_AW_Mean &&
+      method != InterpMthd_Gaussian) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
@@ -110,7 +111,7 @@ void RegridInfo::validate() {
 
    // Check the Gaussian filter
    if(method == InterpMthd_Gaussian) {
-      if (gaussian_radius < gaussian_dx) {
+      if(gaussian_radius < gaussian_dx) {
          mlog << Error << "\n"
               << "The radius of influence (" << gaussian_radius
               << ") is less than the delta distance (" << gaussian_dx
@@ -216,7 +217,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
 map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
                                  const STATLineType *line_type, int n_lty) {
    map<STATLineType,STATOutputType> output_map;
-   STATOutputType t;
+   STATOutputType t = STATOutputType_None;
    ConcatString cs;
    int i, v;
 
@@ -330,7 +331,7 @@ int parse_conf_n_vx(Dictionary *dict) {
       lvl = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
 
       // Increment count by the length of the level array
-      total += (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
+      total += (lvl.n() > 0 ? lvl.n() : 1);
    }
 
    return(total);
@@ -367,7 +368,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
       // Get the level array, which may or may not be defined.
       // If defined, use its length.  If not, use a length of 1.
       lvl    = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
-      n_lvl  = (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
+      n_lvl  = (lvl.n() > 0 ? lvl.n() : 1);
       total += n_lvl;
 
       // Check if we're in the correct entry
@@ -377,7 +378,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
          i_dict = *((*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
-         if(lvl.n_elements() > 0) {
+         if(lvl.n() > 0) {
             entry.set_string(conf_key_level, lvl[index-(total-n_lvl)].c_str());
             i_dict.store(entry);
          }
@@ -403,7 +404,7 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
    sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one message type is provided
-   if(error_out && sa.n_elements() == 0) {
+   if(error_out && sa.n() == 0) {
       mlog << Error << "\nparse_conf_message_type() -> "
            << "At least one message type must be provided.\n\n";
       exit(1);
@@ -428,14 +429,14 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
    sa = dict->lookup_string_array(conf_key_sid_exc);
 
    // Parse station ID's to exclude from each entry
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
      parse_sid_mask(string(sa[i]), cur, mask_name);
       sid_exc_sa.add(cur);
    }
 
    mlog << Debug(4) << "parse_conf_sid_exc() -> "
         << "Station ID exclusion list contains "
-        << sid_exc_sa.n_elements() << " entries.\n";
+        << sid_exc_sa.n() << " entries.\n";
 
    return(sid_exc_sa);
 }
@@ -495,7 +496,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       in.close();
 
       mlog << Debug(4) << "parse_sid_mask() -> "
-           << "parsed " << mask_sid.n_elements() << " station ID's for the \""
+           << "parsed " << mask_sid.n() << " station ID's for the \""
            << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
    }
    // Process list of strings
@@ -527,12 +528,12 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       sa = mask_sid_str.split(":");
 
       // One elements means no colon was specified
-      if(sa.n_elements() == 1) {
+      if(sa.n() == 1) {
          mask_sid.add_css(sa[0]);
-         mask_name = ( mask_sid.n_elements() == 1 ? mask_sid[0] : "MASK_SID" );
+         mask_name = ( mask_sid.n() == 1 ? mask_sid[0] : "MASK_SID" );
       }
       // Two elements means one colon was specified
-      else if(sa.n_elements() == 2) {
+      else if(sa.n() == 2) {
          mask_name = sa[0];
          mask_sid.add_css(sa[1]);
       }
@@ -652,7 +653,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    na = dict->lookup_num_array(conf_key_ci_alpha);
 
    // Check that at least one alpha value is provided
-   if(na.n_elements() == 0) {
+   if(na.n() == 0) {
       mlog << Error << "\nparse_conf_ci_alpha() -> "
            << "At least one confidence interval alpha value must be "
            << "specified.\n\n";
@@ -660,7 +661,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    }
 
    // Check that the values for alpha are between 0 and 1
-   for(i=0; i<na.n_elements(); i++) {
+   for(i=0; i<na.n(); i++) {
       if(na[i] <= 0.0 || na[i] >= 1.0) {
          mlog << Error << "\nparse_conf_ci_alpha() -> "
               << "All confidence interval alpha values ("
@@ -688,7 +689,7 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    na = dict->lookup_num_array(conf_key_eclv_points);
 
    // Check that at least one value is provided
-   if(na.n_elements() == 0) {
+   if(na.n() == 0) {
       mlog << Error << "\nparse_conf_eclv_points() -> "
            << "At least one \"" << conf_key_eclv_points
            << "\" entry must be specified.\n\n";
@@ -696,12 +697,12 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    }
 
    // Intrepet a single value as the step size
-   if(na.n_elements() == 1) {
+   if(na.n() == 1) {
       for(i=2; i*na[0] < 1.0; i++) na.add(na[0]*i);
    }
 
    // Range check cost/loss ratios
-   for(i=0; i<na.n_elements(); i++) {
+   for(i=0; i<na.n(); i++) {
       if(na[i] <= 0.0 || na[i] >= 1.0) {
          mlog << Error << "\nparse_conf_eclv_points() -> "
               << "All cost/loss ratios (" << na[i]
@@ -711,72 +712,6 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    }
 
    return(na);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
-   NumArray na;
-   ThreshArray cdf_thresh;
-   int i;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   na = dict->lookup_num_array(conf_key_climo_cdf_bins);
-
-   // Check that at least one value is provided
-   if(na.n_elements() == 0) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "At least one \"" << conf_key_climo_cdf_bins
-           << "\" entry must be specified.\n\n";
-      exit(1);
-   }
-
-   // Interpret a single value as the number of equal-area bins
-   if(na.n_elements() == 1) {
-      if(na[0] <= 0) {
-         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-              << "The \"" << conf_key_climo_cdf_bins << "\" entry ("
-              << na[0] << ") must be greater than zero.\n\n";
-         exit(1);
-      }
-      for(i=0; i*1.0/na[0] <= 1.0; i++) {
-         cdf_thresh.add(i*1.0/na[0], thresh_ge);
-      }
-   }
-   // Otherwise, the user has specified the actual CDF areas
-   else {
-      for(i=0; i<na.n_elements(); i++) {
-         cdf_thresh.add(na[i], thresh_ge);
-      }
-   }
-
-   // Sanity check the CDF area thresholds
-   if(!is_eq(cdf_thresh[0].get_value(), 0.0) ||
-      !is_eq(cdf_thresh[cdf_thresh.n_elements()-1].get_value(), 1.0)) {
-      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "The \"" << conf_key_climo_cdf_bins << "\" entries must "
-           << "start with 0 and end with 1.\n\n";
-      exit(1);
-   }
-   for(i=0; i<cdf_thresh.n_elements(); i++) {
-      if(cdf_thresh[i].get_value() < 0 ||
-         cdf_thresh[i].get_value() > 1.0) {
-         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-              << "The \"" << conf_key_climo_cdf_bins << "\" entries ("
-              << na[i] << ") must be between 0 and 1.\n\n";
-         exit(1);
-      }
-   }
-
-   // Should be monotonically increasing
-   cdf_thresh.check_bin_thresh();
-
-   return(cdf_thresh);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1148,7 +1083,8 @@ void InterpInfo::validate() {
          methodi  != InterpMthd_Upper_Left &&
          methodi  != InterpMthd_Upper_Right &&
          methodi  != InterpMthd_Lower_Right &&
-         methodi  != InterpMthd_Lower_Left) {
+         methodi  != InterpMthd_Lower_Left &&
+         methodi  != InterpMthd_Gaussian) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
@@ -1214,7 +1150,7 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-InterpInfo parse_conf_interp(Dictionary *dict) {
+InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
    InterpInfo info;
@@ -1231,7 +1167,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    }
 
    // Conf: interp
-   interp_dict = dict->lookup_dictionary(conf_key_interp);
+   interp_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
@@ -1247,7 +1183,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_key_interp << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1305,7 +1241,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       }
 
       // Loop over the methods
-      for(j=0; j<mthd_na.n_elements(); j++) {
+      for(j=0; j<mthd_na.n(); j++) {
 
          // Store interpolation method as a string
          method = int_to_interpmthd(mthd_na[j]);
@@ -1320,7 +1256,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
          }
 
          // Loop over the widths
-         for(k=0; k<wdth_na.n_elements(); k++) {
+         for(k=0; k<wdth_na.n(); k++) {
 
             // Store the current width
             width = nint(wdth_na[k]);
@@ -1337,11 +1273,142 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Check for at least one interpolation method
    if(info.n_interp == 0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "Must define at least one interpolation method in the config file.\n\n";
+           << "Must define at least one interpolation method in the config "
+           << "file.\n\n";
       exit(1);
    }
 
    info.validate();
+
+   return(info);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void ClimoCDFInfo::clear() {
+   flag = false;
+   n_bin = 0;
+   cdf_ta.clear();
+   write_bins = false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo::ClimoCDFInfo() {
+   clear();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
+   Dictionary *cdf_dict = (Dictionary *) 0;
+   ClimoCDFInfo info;
+   NumArray bins;
+   bool center;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: climo_cdf
+   cdf_dict = dict->lookup_dictionary(conf_key_climo_cdf);
+
+   // Conf: cdf_bins
+   bins = cdf_dict->lookup_num_array(conf_key_cdf_bins);
+
+   // Conf: center_bins
+   center = cdf_dict->lookup_bool(conf_key_center_bins);
+
+   // Conf: write_bins
+   info.write_bins = cdf_dict->lookup_bool(conf_key_write_bins);
+
+   // Check that at least one value is provided
+   if(bins.n() == 0) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "At least one \"" << conf_key_cdf_bins
+           << "\" entry must be specified.\n\n";
+      exit(1);
+   }
+
+   // The bins are explicitly defined
+   if(bins.n() > 1) {
+      for(i=0; i<bins.n(); i++) info.cdf_ta.add(bins[i], thresh_ge);
+   }
+   // Interpret a single value as the number of bins
+   else {
+
+      // Must be greater than 0
+      if(bins[0] <= 0) {
+         mlog << Error << "\nparse_conf_climo_cdf() -> "
+              << "The \"" << conf_key_cdf_bins << "\" entry (" << bins[0]
+              << ") must be greater than zero.\n\n";
+         exit(1);
+      }
+
+      // Even number of bins cannot be centered
+      if(nint(bins[0])%2 == 0 && center) {
+         mlog << Warning << "\nparse_conf_climo_cdf() -> "
+              << "Resetting \"" << conf_key_center_bins
+              << "\" to false since the \"" << conf_key_cdf_bins
+              << "\" entry (" << bins[0] << ") is even.\n\n";
+         center = false;
+      }
+
+      // For a single bin, set center to false
+      if(is_eq(bins[0], 1.0)) center = false;
+
+      // Add the first threshold for 0.0
+      info.cdf_ta.add(0.0, thresh_ge);
+
+      double cdf_inc = (center ? 1.0/(bins[0] - 1.0) : 1.0/bins[0]);
+      double cdf_val = (center ? cdf_inc/2           : cdf_inc    );
+
+      // Add thresholds between 0.0 and 1.0
+      while(cdf_val < 1.0 && !is_eq(cdf_val, 1.0)) {
+         info.cdf_ta.add(cdf_val, thresh_ge);
+         cdf_val += cdf_inc;
+      }
+
+      // Add the last threshold for 1.0
+      info.cdf_ta.add(1.0, thresh_ge);
+
+      mlog << Debug(4) << "parse_conf_climo_cdf() -> "
+           << "For \"" << conf_key_cdf_bins << "\" (" << bins[0] << ") and \""
+           << conf_key_center_bins << "\" (" << bool_to_string(center)
+           << "), defined climatology CDF thresholds: "
+           << write_css(info.cdf_ta) << "\n";
+   }
+
+   // Sanity check the end points
+   if(!is_eq(info.cdf_ta[0].get_value(), 0.0) ||
+      !is_eq(info.cdf_ta[info.cdf_ta.n()-1].get_value(), 1.0)) {
+      mlog << Error << "\nparse_conf_climo_cdf() -> "
+           << "The \"" << conf_key_cdf_bins << "\" entries must "
+           << "start with 0 and end with 1.\n\n";
+      exit(1);
+   }
+
+   // Sanity check the interior points
+   for(i=0; i<info.cdf_ta.n(); i++) {
+      if(info.cdf_ta[i].get_value() < 0 ||
+         info.cdf_ta[i].get_value() > 1.0) {
+         mlog << Error << "\nparse_conf_climo_cdf() -> "
+              << "The \"" << conf_key_cdf_bins << "\" entries ("
+              << info.cdf_ta[i].get_value()
+              << ") must be between 0 and 1.\n\n";
+         exit(1);
+      }
+   }
+
+   // Should be monotonically increasing
+   info.cdf_ta.check_bin_thresh();
+
+   // Set the number of bins and the flag
+   info.n_bin = info.cdf_ta.n() - 1;
+   info.flag  = (info.n_bin > 1);
 
    return(info);
 }
@@ -1358,7 +1425,7 @@ void NbrhdInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
+NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    Dictionary *nbrhd_dict = (Dictionary *) 0;
    NbrhdInfo info;
    int i, v;
@@ -1370,7 +1437,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: nbrhd
-   nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
+   nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = nbrhd_dict->lookup_int(conf_key_field, false);
@@ -1385,7 +1452,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "The \"" << conf_key_nbrhd << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1395,14 +1462,14 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    info.width = nbrhd_dict->lookup_num_array(conf_key_width);
 
    // Check that at least one neighborhood width is provided
-   if(info.width.n_elements() == 0) {
+   if(info.width.n() == 0) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
            << "At least one neighborhood width must be provided.\n\n";
       exit(1);
    }
 
    // Check for valid widths
-   for(i=0; i<info.width.n_elements(); i++) {
+   for(i=0; i<info.width.n(); i++) {
 
       if(info.width[i] < 1 || info.width[i]%2 == 0) {
          mlog << Error << "\nparse_conf_nbrhd() -> "
@@ -1423,17 +1490,10 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: cov_thresh
-   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
-
-   // Check that at least one neighborhood coverage threshold is provided
-   if(info.cov_ta.n_elements() == 0) {
-      mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "At least one neighborhood coverage threshold must be provided.\n\n";
-      exit(1);
-   }
+   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh, false);
 
    // Check for valid coverage thresholds
-   for(i=0; i<info.cov_ta.n_elements(); i++) {
+   for(i=0; i<info.cov_ta.n(); i++) {
 
       if(info.cov_ta[i].get_value() < 0.0 ||
          info.cov_ta[i].get_value() > 1.0) {
@@ -1501,14 +1561,14 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    info.width = hira_dict->lookup_num_array(conf_key_width);
 
    // Check that at least one width is provided
-   if(info.width.n_elements() == 0) {
+   if(info.width.n() == 0) {
       mlog << Error << "\nparse_conf_hira() -> "
            << "At least one HiRA width must be provided.\n\n";
       exit(1);
    }
 
    // Check for valid widths
-   for(i=0; i<info.width.n_elements(); i++) {
+   for(i=0; i<info.width.n(); i++) {
 
       if(info.width[i] < 1) {
          mlog << Error << "\nparse_conf_hira() -> "
@@ -1544,7 +1604,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
-   GridWeightType t;
+   GridWeightType t = GridWeightType_None;
    int v;
 
    if(!dict) {
@@ -1573,7 +1633,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   DuplicateType t;
+   DuplicateType t = DuplicateType_None;
    int v;
 
    if(!dict) {
@@ -1590,8 +1650,8 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
    else if(v == conf_const.lookup_int(conf_val_single)) {
      mlog << Error << "\nparse_conf_duplicate_flag() -> "
-	  << "duplicate_flag = SINGLE has been deprecated\n"
-	  << "Please use obs_summary = NEAREST;\n\n";
+          << "duplicate_flag = SINGLE has been deprecated\n"
+          << "Please use obs_summary = NEAREST;\n\n";
      exit(1);
    }
    else {
@@ -1607,7 +1667,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ObsSummary parse_conf_obs_summary(Dictionary *dict) {
-   ObsSummary t;
+   ObsSummary t = ObsSummary_None;
    int v;
 
    if(!dict) {
@@ -1686,8 +1746,9 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
            << tmp_dir_path << "\n\n";
       exit(1);
    }
-
-   if(odir != NULL) met_closedir(odir);
+   else {
+      met_closedir(odir);
+   }
 
    return(tmp_dir_path);
 }
@@ -1695,7 +1756,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
-   GridDecompType t;
+   GridDecompType t = GridDecompType_None;
    int v;
 
    if(!dict) {
@@ -1725,7 +1786,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 WaveletType parse_conf_wavelet_type(Dictionary *dict) {
-   WaveletType t;
+   WaveletType t = WaveletType_None;
    int v;
 
    if(!dict) {
@@ -1813,7 +1874,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    ta = dict->lookup_thresh_array(conf_key_filter_attr_thresh);
 
    // Check for equal number of names and thresholds
-   if(sa.n_elements() != ta.n_elements()) {
+   if(sa.n() != ta.n()) {
       mlog << Error << "\nparse_conf_filter_attr_map() -> "
            << "The \"" << conf_key_filter_attr_name << "\" and \""
            << conf_key_filter_attr_thresh
@@ -1838,7 +1899,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    }
 
    // Process each array entry
-   for(i=0; i<sa.n_elements(); i++) {
+   for(i=0; i<sa.n(); i++) {
 
       // Add threshold to existing map entry
      if(m.count(string(sa[i])) >= 1) {
@@ -1938,7 +1999,7 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpMthd int_to_interpmthd(int i) {
-   InterpMthd m;
+   InterpMthd m = InterpMthd_None;
 
         if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
    else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
@@ -1977,7 +2038,7 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
-   for(i=0; i<ta.n_elements()-1; i++) {
+   for(i=0; i<ta.n()-1; i++) {
 
       if(ta[i].get_value() >  ta[i+1].get_value() ||
          ta[i].get_type()  != ta[i+1].get_type()  ||
@@ -1999,12 +2060,13 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool check_fo_thresh(const double f, const SingleThresh &ft,
-                     const double o, const SingleThresh &ot,
+bool check_fo_thresh(const double f,   const double o,
+                     const double cmn, const double csd,
+                     const SingleThresh &ft, const SingleThresh &ot,
                      const SetLogic type) {
    bool status = true;
-   bool fcheck = ft.check(f);
-   bool ocheck = ot.check(o);
+   bool fcheck = ft.check(f, cmn, csd);
+   bool ocheck = ot.check(o, cmn, csd);
    SetLogic t  = type;
 
    // If either of the thresholds is NA, reset the logic to intersection
@@ -2155,7 +2217,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 FieldType int_to_fieldtype(int v) {
-   FieldType t;
+   FieldType t = FieldType_None;
 
    // Convert integer to enumerated FieldType
         if(v == conf_const.lookup_int(conf_val_none)) t = FieldType_None;
@@ -2174,11 +2236,15 @@ FieldType int_to_fieldtype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
-   GridTemplateFactory::GridTemplates t;
+   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplate_Square;
 
    // Convert integer to enumerated FieldType
-   if(v == conf_const.lookup_int(conf_val_square)) t = GridTemplateFactory::GridTemplate_Square;
-   else if(v == conf_const.lookup_int(conf_val_circle)) t = GridTemplateFactory::GridTemplate_Circle;
+   if(v == conf_const.lookup_int(conf_val_square)) {
+      t = GridTemplateFactory::GridTemplate_Square;
+   }
+   else if(v == conf_const.lookup_int(conf_val_circle)) {
+      t = GridTemplateFactory::GridTemplate_Circle;
+   }
    else {
       mlog << Error << "\nint_to_gridtemplate() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2212,7 +2278,7 @@ ConcatString fieldtype_to_string(FieldType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic int_to_setlogic(int v) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert integer to enumerated SetLogic
         if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic_None;
@@ -2231,7 +2297,7 @@ SetLogic int_to_setlogic(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic string_to_setlogic(const char *s) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // Convert string to enumerated SetLogic
         if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic_None;
@@ -2324,7 +2390,7 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
-   SetLogic t;
+   SetLogic t = SetLogic_None;
 
    // If not equal, select the non-default logic type
         if(t1 == t2)            t = t1;
@@ -2345,7 +2411,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType int_to_tracktype(int v) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert integer to enumerated TrackType
         if(v == conf_const.lookup_int(conf_val_none))  t = TrackType_None;
@@ -2364,7 +2430,7 @@ TrackType int_to_tracktype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType string_to_tracktype(const char *s) {
-   TrackType t;
+   TrackType t = TrackType_None;
 
    // Convert string to enumerated TrackType
         if(strcasecmp(s, conf_val_none)  == 0) t = TrackType_None;
@@ -2404,7 +2470,7 @@ ConcatString tracktype_to_string(TrackType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type int_to_interp12type(int v) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert integer to enumerated Interp12Type
         if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type_None;
@@ -2422,7 +2488,7 @@ Interp12Type int_to_interp12type(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type string_to_interp12type(const char *s) {
-   Interp12Type t;
+   Interp12Type t = Interp12Type_None;
 
    // Convert string to enumerated Interp12Type
         if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type_None;
@@ -2460,7 +2526,7 @@ ConcatString interp12type_to_string(Interp12Type type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MergeType int_to_mergetype(int v) {
-   MergeType t;
+   MergeType t = MergeType_None;
 
    // Convert integer to enumerated MergeType
         if(v == conf_const.lookup_int(conf_val_none))   t = MergeType_None;
@@ -2527,7 +2593,7 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MatchType int_to_matchtype(int v) {
-   MatchType t;
+   MatchType t = MatchType_None;
 
    // Convert integer to enumerated MatchType
         if(v == conf_const.lookup_int(conf_val_none))       t = MatchType_None;
@@ -2567,7 +2633,7 @@ ConcatString matchtype_to_string(MatchType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType int_to_disttype(int v) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert integer to enumerated DistType
         if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
@@ -2589,7 +2655,7 @@ DistType int_to_disttype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType string_to_disttype(const char *s) {
-   DistType t;
+   DistType t = DistType_None;
 
    // Convert string to enumerated DistType
         if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;

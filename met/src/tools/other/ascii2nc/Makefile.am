@@ -38,6 +38,7 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_pb_util \
 	-lvx_cal \
 	-lvx_util \

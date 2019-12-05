@@ -882,7 +882,7 @@ void do_cpp_comment()
 
 {
 
-int c;
+int c = 0;
 
 reading_comment = true;
 
@@ -1119,7 +1119,7 @@ int do_comp()
 
 // if ( verbose )  cout << "\n\n   ... in do_comp()\n\n" << flush;
 
-int return_value;
+int return_value = 0;
 
 Column += strlen(configtext);
 
@@ -1445,8 +1445,7 @@ int do_simple_perc_thresh()
 
 int j, k;
 int index = -1;
-double value;
-
+double value = bad_data_double;
 
 for (j=0; j<n_perc_thresh_infos; ++j)  {
 

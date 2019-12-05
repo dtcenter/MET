@@ -670,7 +670,6 @@ bool GribFile::open(const char *filename)
 {
 
 int j;
-off_t pos;
 
 close();
 
@@ -679,7 +678,6 @@ if ( !(rep = new GribFileRep) )  {
    mlog << Error << "\nGribFile::open(char *) -> memory allocation error\n\n";
 
    exit ( 1 );
-//   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(char *) -> memory allocation error\n\n");
 
 }
 
@@ -700,7 +698,6 @@ if ( !(rep->name = new char [1 + strlen(filename + j)]) )  {
    mlog << Error << "\nGribFile::open(const char *) -> memory allocation error 1\n\n";
 
    exit ( 1 );
-//   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(const char *) -> memory allocation error 1\n\n");
 
 }
 
@@ -713,11 +710,7 @@ if ( (rep->fd = met_open(filename, O_RDONLY)) < 0 )  {
    mlog << Error << "\nGribFile::open(const char *) -> unable to open grib file " << filename << "\n\n";
 
    exit ( 1 );
-//   char temp_str[max_temp_str_length];
 
-//   snprintf(temp_str, sizeof(temp_str), "\n\n  GribFile::open(const char *) -> unable to open grib file %s\n\n", filename);
-
-//   throw GribError(open_error, __LINE__, __FILE__, temp_str);
    return( false );
 }
 
@@ -726,7 +719,6 @@ if ( !(rep->buf = new unsigned char [default_gribfile_buf_size]) )  {
    mlog << Error << "\nGribFile::open(const char *) -> memory allocation error 2\n\n";
 
    exit ( 1 );
-//   throw GribError(mem_alloc_error, __LINE__, __FILE__, "\n\n  GribFile::open(const char *) -> memory allocation error 2\n\n");
 
 }
 
@@ -736,7 +728,7 @@ if(!skip_header()) return ( false );
 
 index_records();
 
-pos = lseek(rep->fd, rep->file_start, SEEK_SET);
+lseek(rep->fd, rep->file_start, SEEK_SET);
 
 return ( true );
 
@@ -818,7 +810,7 @@ size_t len, bytes, n_read, s;
 int j;
 int m, d, y, hh, mm;
 int D, E;
-off_t file_pos, res;
+off_t file_pos;
 off_t bytes_processed;
 unsigned char *c = (unsigned char *) 0, c3[3];
 double t;
@@ -830,7 +822,7 @@ g.reset();
 
 file_pos = find_magic_cookie(rep->fd);
 
-res = lseek(rep->fd, file_pos, SEEK_SET);
+lseek(rep->fd, file_pos, SEEK_SET);
 
 bytes_processed = 0;
 
@@ -1141,7 +1133,7 @@ off_t pos;
 
 bool found = false;
 
-pos = lseek(rep->fd, 0L, SEEK_SET);
+lseek(rep->fd, 0L, SEEK_SET);
 
 pos = lseek(rep->fd, 0L, SEEK_CUR);
 
@@ -1160,17 +1152,12 @@ if ( n_read == 0 )  {
 
    return ( 0 );
 
-//   throw GribError(missing_magic_cookie_error, __LINE__, __FILE__, "\n\n  GribFile::skip_header() -> \"GRIB\" magic cookie not found in grib file!!\n\n");
 }
 
 if ( n_read < 0 )  {
 
-//   mlog << Error << "\nGribFile::skip_header() -> "
-//        << "file read error\n\n";
-
    return ( 0 );
 
-//   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  GribFile::skip_header() -> file read error\n\n");
 }
 
 for (j=0; j<=min(grib_search_bytes, (n_read - 4)); ++j)  {
@@ -1188,12 +1175,11 @@ if ( !found ) {
 
    return ( 0 );
 
-//   throw GribError(file_read_error, __LINE__, __FILE__, "\n\n  GribFile::skip_header() -> can't find \"GRIB\" magic cookie\n\n");
 }
 
 rep->file_start = (long) (pos + j);
 
-pos = lseek(rep->fd, rep->file_start, SEEK_SET);
+lseek(rep->fd, rep->file_start, SEEK_SET);
 
 return ( 1 );
 
@@ -1471,18 +1457,16 @@ return ( rep->name );
 void GribFile::seek_record(int n)
 
 {
-off_t offset;
 
 if ( (n < 0) || (n >= (rep->n_records)) )  {
 
    mlog << Error << "\nGribFile::seek_record(int) -> range check error\n\n";
 
    exit ( 1 );
-//   throw GribError(range_chk_error, __LINE__, __FILE__, "\n\n  GribFile::seek_record(int) -> range check error\n\n");
 
 }
 
-offset = lseek(rep->fd, rep->record_info[n].lseek_offset, SEEK_SET);
+lseek(rep->fd, rep->record_info[n].lseek_offset, SEEK_SET);
 
 return;
 
@@ -1982,7 +1966,6 @@ int j;
 size_t n_read;
 long pos = 0;
 char buf[100];
-off_t offset;
 
 while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
@@ -1994,7 +1977,7 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
          pos += j;
 
-         offset = lseek(fd, pos + 2, SEEK_SET);
+         lseek(fd, pos + 2, SEEK_SET);
 
          return ( pos );
 
@@ -2006,7 +1989,7 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
    pos += n_read - 5;
 
-   offset = lseek(fd, pos, SEEK_SET);
+   lseek(fd, pos, SEEK_SET);
 
 }   //  while
 

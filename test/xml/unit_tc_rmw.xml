@@ -15,16 +15,15 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-  <test name="tc_rmw_pressure_lev_out">
+  <test name="tc_rmw_PRESSURE_LEV_OUT">
     <exec>&MET_BIN;/tc_rmw</exec>
     <param> \
       -adeck &DATA_DIR;/adeck/aal142016_short.dat \
       -config &CONFIG_DIR;/TCRMWConfig_pressure_lev_out \
       -prefix _pressure_lev \
-      -out &OUTPUT_DIR;/tc_rmw/pressure_lev_out \
-      -log &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.log \
-      -v 2 \
-      -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 
+      -out &OUTPUT_DIR;/tc_rmw \
+      -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
+      -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.nc</grid_nc>

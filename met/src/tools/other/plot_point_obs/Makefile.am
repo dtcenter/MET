@@ -35,6 +35,7 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \

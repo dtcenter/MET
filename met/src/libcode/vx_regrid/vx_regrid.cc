@@ -40,7 +40,6 @@ switch ( info.method )  {
    case InterpMthd_LS_Fit:
    case InterpMthd_Bilin:
    case InterpMthd_Nearest:
-   case InterpMthd_Gaussian:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 
@@ -54,6 +53,10 @@ switch ( info.method )  {
 
    case InterpMthd_Force:
       out = met_regrid_force (in, from_grid, to_grid, info);
+      break;
+
+   case InterpMthd_Gaussian:
+      out = met_regrid_gaussian (in, from_grid, to_grid, info);
       break;
 
    default:
@@ -127,11 +130,6 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    }   //  for yt
 
 }   //  for xt
-
-if (info.method == InterpMthd_Gaussian) {
-   interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx);
-}
-
 
    //
    //  done
@@ -271,5 +269,68 @@ if ( from_grid.nx() != to_grid.nx() || from_grid.ny() != to_grid.ny() ) {
 return ( from_data );
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+DataPlane met_regrid_gaussian (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+
+{
+
+int xt, yt;
+int xf, yf;
+double value, lat, lon;
+double x_from, y_from;
+DataPlane to_data;
+
+to_data.set_size(to_grid.nx(), to_grid.ny());
+
+   //
+   //  copy timing info
+   //
+
+to_data.set_init  (from_data.init());
+to_data.set_valid (from_data.valid());
+to_data.set_lead  (from_data.lead());
+to_data.set_accum (from_data.accum());
+
+   //
+   //  copy data
+   //
+for (xt=0; xt<(to_grid.nx()); ++xt)  {
+
+   for (yt=0; yt<(to_grid.ny()); ++yt)  {
+
+      to_grid.xy_to_latlon(xt, yt, lat, lon);
+
+      from_grid.latlon_to_xy(lat, lon, x_from, y_from);
+
+      xf = nint(x_from);
+      yf = nint(y_from);
+
+      if ( (xf < 0) || (xf >= from_grid.nx()) ||
+           (yf < 0) || (yf >= from_grid.ny()) )  {
+
+         value = bad_data_float;
+
+      } else {
+         value = compute_horz_interp(from_data, x_from, y_from,
+                    bad_data_double, InterpMthd_Max, info.width,
+                    info.shape, info.vld_thresh);
+      }
+
+      to_data.put(value, xt, yt);
+
+   }   //  for yt
+
+}   //  for xt
+
+interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx);
+
+return ( to_data );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////

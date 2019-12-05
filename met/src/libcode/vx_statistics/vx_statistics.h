@@ -22,6 +22,7 @@
 #include "compute_ci.h"
 #include "contable.h"
 #include "met_stats.h"
+#include "compute_stats.h"
 #include "pair_base.h"
 #include "pair_data_point.h"
 #include "pair_data_ensemble.h"

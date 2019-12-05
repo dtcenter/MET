@@ -83,6 +83,33 @@ ens = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Neighborhood ensemble probabilities
+//
+nbrhd_prob = {
+   width      = [ 5 ];
+   shape      = CIRCLE;
+   vld_thresh = 0.0;
+}
+
+//
+// NMEP smoothing methods
+//
+nmep_smooth = {
+   vld_thresh      = 0.0;
+   shape           = CIRCLE;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 120;
+   type = [
+      {
+         method = GAUSSIAN;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -150,9 +177,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = FALSE;
-   time_step          = 21600;
+   day_interval       = 31;
+   hour_interval      = 6;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,6 +260,8 @@ ensemble_flag = {
    range     = TRUE;
    vld_count = TRUE;
    frequency = TRUE;
+   nep       = TRUE;
+   nmep      = TRUE;
    rank      = TRUE;
    weight    = FALSE;
 }

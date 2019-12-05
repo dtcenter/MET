@@ -1742,7 +1742,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    // Loop through the output line types and determine the number of
    // output columns
    //
-   for(i=0, n_col=0; i<out_sa.n_elements(); i++) {
+   for(i=0, c=0, n_col=0; i<out_sa.n_elements(); i++) {
       cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
          case stat_sl1l2:  c = n_sl1l2_columns;        break;

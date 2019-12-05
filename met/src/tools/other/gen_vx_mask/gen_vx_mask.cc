@@ -1268,7 +1268,7 @@ bool is_solar_masktype(MaskType t) {
 ////////////////////////////////////////////////////////////////////////
 
 MaskType string_to_masktype(const char *s) {
-   MaskType t;
+   MaskType t = MaskType_None;
 
         if(strcasecmp(s, "poly")      == 0) t = MaskType_Poly;
    else if(strcasecmp(s, "box")       == 0) t = MaskType_Box;

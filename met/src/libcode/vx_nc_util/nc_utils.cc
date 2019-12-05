@@ -857,7 +857,7 @@ int get_version_no(const NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_version_less_than_1_02(const NcFile *nc) {
-   int version_no = get_version_no(nc);
+   int version_no;
    float att_version_no;
    get_global_att(nc, (const ConcatString) nc_att_obs_version, att_version_no);
    version_no = (int)(att_version_no * 100);
@@ -2062,6 +2062,36 @@ bool get_nc_data(NcVar *var, char *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data(NcVar *var, uchar *data) {
+   bool return_status = false;
+
+   if (!IS_INVALID_NC_P(var)) {
+      //
+      // Retrieve the unsigned char value from the NetCDF variable.
+      //
+      var->getVar(data);
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, unsigned short *data) {
+   bool return_status = false;
+
+   if (!IS_INVALID_NC_P(var)) {
+      //
+      // Retrieve the unsigned char value from the NetCDF variable.
+      //
+      var->getVar(data);
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data(NcFile *nc, const char *var_name, char *data,
                  const long *dim, const long *cur) {
 
@@ -2609,17 +2639,20 @@ bool args_ok(const LongArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 NcVar get_var(NcFile *nc, const char *var_name) {
+   string new_var_name = var_name;
+   replace_comma_to_underscore(&new_var_name);
+    
    //
    // Retrieve the variable from the NetCDF file.
    //
    NcVar var;
    multimap<string,NcVar> varMap = GET_NC_VARS_P(nc);
-   multimap<string,NcVar>::iterator it = varMap.find(var_name);
+   multimap<string,NcVar>::iterator it = varMap.find(new_var_name);
    if (it != varMap.end()) {
       NcVar tmpVar = it->second;
       if(IS_INVALID_NC(tmpVar)) {
          mlog << Error << "\nget_var() -> "
-              << "can't read \"" << var_name << "\" variable.\n\n";
+              << "can't read \"" << new_var_name << "\" variable.\n\n";
          exit(1);
       }
 
@@ -2632,22 +2665,13 @@ NcVar get_var(NcFile *nc, const char *var_name) {
 ////////////////////////////////////////////////////////////////////////
 
 NcVar get_nc_var(NcFile *nc, const char *var_name) {
+   string new_var_name = var_name;
+   replace_comma_to_underscore(&new_var_name);
+
    //
    // Retrieve the variable from the NetCDF file.
    //
-   NcVar var = nc->getVar(var_name);
-   //multimap<string,NcVar> varMap = GET_NC_VARS_P(nc);
-   //multimap<string,NcVar>::iterator it = varMap.find(var_name);
-   //if (it != varMap.end()) {
-   //  NcVar tmpVar = it->second;
-   //  if(IS_INVALID_NC(tmpVar)) {
-   //     mlog << Error << "\nget_var() -> "
-   //          << "can't read \"" << var_name << "\" variable.\n\n";
-   //     exit(1);
-   //  }
-   //
-   //  var = tmpVar;
-   //}
+   NcVar var = nc->getVar(new_var_name);
 
    return(var);
 }

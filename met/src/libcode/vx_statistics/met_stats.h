@@ -12,6 +12,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "contable.h"
+#include "pair_data_point.h"
 
 #include "vx_config.h"
 #include "vx_util.h"
@@ -44,7 +45,6 @@ class CIInfo {
 
       // Variance inflation factor for time series
       double vif;
-
 
       // Confidence interval computed using a normal approximation
       double *v_ncl;
@@ -94,6 +94,7 @@ class CTSInfo {
       void clear();
       void allocate_n_alpha(int);
       void add(double, double);
+      void add(double, double, double, double);
       void compute_stats();
       void compute_ci();
 
@@ -134,6 +135,7 @@ class MCTSInfo {
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
       void add(double, double);
+      void add(double, double, double, double);
       void compute_stats();
       void compute_ci();
 };
@@ -233,8 +235,7 @@ class SL1L2Info {
       double mae;
 
       // Compute sums
-      void set(const NumArray &f_na, const NumArray &o_na,
-               const NumArray &c_na, const NumArray &w_na);
+      void set(const PairDataPoint &);
 
       void zero_out();
       void clear();
@@ -344,10 +345,7 @@ class VL1L2Info {
       int    vacount;
 
       // Compute sums
-      void set(const NumArray &uf_na, const NumArray &vf_na,
-               const NumArray &uo_na, const NumArray &vo_na,
-               const NumArray &uc_na, const NumArray &vc_na,
-               const NumArray &w_na);
+      void set(const PairDataPoint &, const PairDataPoint &);
 
       void zero_out();
       void clear();
@@ -531,10 +529,17 @@ class PCTInfo {
       // Single threshold for the scalar observation
       SingleThresh othresh;
 
+      // PSTD statistics
+      int    total;
       CIInfo baser;
+      double reliability;
+      double resolution;
+      double uncertainty;
+      double roc_auc;
       CIInfo brier;
       CIInfo briercl; // Climatological brier score
       double bss;
+      double bss_smpl;
 
       void clear();
       void allocate_n_alpha(int);
@@ -612,11 +617,10 @@ class GRADInfo {
       void set(int grad_dx, int grad_dy,
                const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
-               const NumArray &w_na);
+               const NumArray &wgt_na);
 
       void clear();
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -693,6 +697,12 @@ extern int    min_int(const int *, int);
 extern void   dbl_to_str(double, char *);
 extern void   dbl_to_str(double, char *, int);
 
+////////////////////////////////////////////////////////////////////////
+//
+// Utility functions for computing statistics.
+//
+////////////////////////////////////////////////////////////////////////
+
 extern double compute_stdev(double, double, int);
 
 extern double compute_corr(double, double, double, double, double, int);
@@ -702,46 +712,6 @@ extern double compute_afss(double, double);
 extern double compute_ufss(double);
 
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
-
-extern void   compute_cntinfo(const SL1L2Info &, int, CNTInfo &);
-
-extern void   compute_cntinfo(const NumArray &, const NumArray &,
-                              const NumArray &, const NumArray &,
-                              const NumArray &,
-                              int, int, int, CNTInfo &);
-extern void   compute_i_cntinfo(const NumArray &, const NumArray &,
-                                const NumArray &, const NumArray &,
-                                int, int, int, int, CNTInfo &);
-
-extern void   compute_ctsinfo(const NumArray &, const NumArray &,
-                              const NumArray &,
-                              int, int, CTSInfo &);
-extern void   compute_i_ctsinfo(const NumArray &, const NumArray &,
-                                int, int, CTSInfo &);
-
-extern void   compute_mctsinfo(const NumArray &, const NumArray &,
-                               const NumArray &, int, int, MCTSInfo &);
-extern void   compute_i_mctsinfo(const NumArray &, const NumArray &,
-                                 int, int, MCTSInfo &);
-
-extern void   compute_pctinfo(const NumArray &, const NumArray &,
-                              const NumArray &, int, PCTInfo &);
-
-extern void   compute_nbrcntinfo(const NumArray &, const NumArray &,
-                                 const NumArray &, const NumArray &,
-                                 const NumArray &, const NumArray &,
-                                 NBRCNTInfo &, int);
-extern void   compute_i_nbrcntinfo(const NumArray &, const NumArray &,
-                                   const NumArray &, const NumArray &,
-                                   const NumArray &,
-                                   int, NBRCNTInfo &);
-
-extern void   compute_mean_stdev(const NumArray &, const NumArray &,
-                                 int, double,
-                                 CIInfo &, CIInfo &);
-extern void   compute_i_mean_stdev(const NumArray &,
-                                   int, double, int,
-                                   CIInfo &, CIInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 

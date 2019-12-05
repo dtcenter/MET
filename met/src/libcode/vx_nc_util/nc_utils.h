@@ -23,6 +23,7 @@ using namespace std;
 using namespace netCDF;
 #ifndef ncbyte
 typedef signed char ncbyte; // from ncvalues.h
+typedef unsigned char uchar;
 #endif   /*  ncbyte  */
 
 #include "concat_string.h"
@@ -229,10 +230,12 @@ extern ConcatString* get_string_val(NcVar *var, const int index, const int len, 
 
 extern bool get_nc_data(NcVar *, int    *data);
 extern bool get_nc_data(NcVar *, char   *data);
+extern bool get_nc_data(NcVar *, uchar  *data);
 extern bool get_nc_data(NcVar *, float  *data);
 extern bool get_nc_data(NcVar *, double *data);
 extern bool get_nc_data(NcVar *, time_t *data);
 extern bool get_nc_data(NcVar *, ncbyte *data);
+extern bool get_nc_data(NcVar *, unsigned short *data);
 
 extern bool get_nc_data(NcVar *, int    *data, const long *cur);
 extern bool get_nc_data(NcVar *, char   *data, const long *cur);

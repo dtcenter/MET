@@ -288,6 +288,22 @@ struct RegridInfo {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store Climatological CDF Info
+//
+
+struct ClimoCDFInfo {
+   bool        flag;       // Flag to turn on/off climo CDF logic
+   int         n_bin;      // Number of climo CDF cdf bins
+   ThreshArray cdf_ta;     // Array of CDF thresholds
+   bool        write_bins; // Flag for writing the individual bins
+
+   ClimoCDFInfo();
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Struct to store neighborhood information
 //
 
@@ -577,6 +593,7 @@ static const char conf_key_latlon_flag[]       = "latlon";
 static const char conf_key_raw_flag[]          = "raw";
 static const char conf_key_diff_flag[]         = "diff";
 static const char conf_key_climo_flag[]        = "climo";
+static const char conf_key_climo_cdp_flag[]    = "climo_cdp";
 static const char conf_key_apply_mask_flag[]   = "apply_mask";
 static const char conf_key_object_raw_flag[]   = "object_raw";
 static const char conf_key_object_id_flag[]    = "object_id";
@@ -594,14 +611,15 @@ static const char conf_key_eclv_points[]       = "eclv_points";
 //
 // Climatology parameter key names
 //
-
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
 static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
-static const char conf_key_climo_cdf_bins[]     = "climo_cdf_bins";
+static const char conf_key_climo_cdf[]          = "climo_cdf";
+static const char conf_key_cdf_bins[]           = "cdf_bins";
+static const char conf_key_center_bins[]        = "center_bins";
+static const char conf_key_write_bins[]         = "write_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
-static const char conf_key_match_month[]        = "match_month";
-static const char conf_key_match_day[]          = "match_day";
-static const char conf_key_time_step[]          = "time_step";
+static const char conf_key_day_interval[]       = "day_interval";
+static const char conf_key_hour_interval[]      = "hour_interval";
 
 //
 // Point-Stat specific parameter key names
@@ -653,6 +671,8 @@ static const char conf_key_ens_field[]        = "ens.field";
 static const char conf_key_ens_ens_thresh[]   = "ens.ens_thresh";
 static const char conf_key_ens_vld_thresh[]   = "ens.vld_thresh";
 static const char conf_key_nc_var_str[]       = "nc_var_str";
+static const char conf_key_nbrhd_prob[]       = "nbrhd_prob";
+static const char conf_key_nmep_smooth[]      = "nmep_smooth";
 static const char conf_key_skip_const[]       = "skip_const";
 static const char conf_key_rng_type[]         = "rng.type";
 static const char conf_key_rng_seed[]         = "rng.seed";
@@ -666,6 +686,8 @@ static const char conf_key_max_flag[]         = "max";
 static const char conf_key_range_flag[]       = "range";
 static const char conf_key_vld_count_flag[]   = "vld_count";
 static const char conf_key_frequency_flag[]   = "frequency";
+static const char conf_key_nep_flag[]         = "nep";
+static const char conf_key_nmep_flag[]        = "nmep";
 static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";

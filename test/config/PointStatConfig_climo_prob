@@ -90,7 +90,7 @@ obs = {
 climo_mean = obs;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
 
    regrid = {
       method     = BILIN;
@@ -99,9 +99,8 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
-   match_day          = ${MATCH_DAY};
-   time_step          = 21600;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = 6;
 }
 
 //
@@ -109,10 +108,17 @@ climo_mean = {
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-  file_name = [ "${CLIMO_STDEV_FILE}" ];
+  file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
-climo_cdf_bins = 10;
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 11;
+   center_bins = TRUE;
+   write_bins  = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

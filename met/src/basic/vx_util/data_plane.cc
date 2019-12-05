@@ -328,6 +328,26 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+void DataPlane::replace_bad_data(const double value)
+
+{
+
+int j;
+
+for (j=0; j<Nxy; ++j)  {
+
+   if ( is_bad_data(Data[j]) )  Data[j] = value;
+
+}
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 int DataPlane::two_to_one(int x, int y) const {
    int n;
 
@@ -1361,3 +1381,28 @@ return ( *(Plane[n]) );
 
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlaneArray::replace_bad_data(const double value)
+
+{
+
+int j;
+
+for (j=0; j<Nplanes; ++j)  {
+
+   Plane[j]->replace_bad_data(value);
+
+}
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+

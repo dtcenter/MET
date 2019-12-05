@@ -12,30 +12,57 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_tracks(const ConcatString& track_nc_file,
+// void write_tc_tracks(const ConcatString& track_nc_file,
+//     const TrackInfoArray& tracks) {
+
+void write_tc_tracks(NcFile* nc_out,
+    const NcDim& track_point_dim,
     const TrackInfoArray& tracks) {
 
-    mlog << Debug(2) << "Writing " << track_nc_file << "\n";
+    // mlog << Debug(2) << "Writing " << track_nc_file << "\n";
 
-    NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
+    TrackInfo track = tracks[0];
+    StringArray track_lines = track.track_lines();
 
-    NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+    mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
+         << track_lines.n_elements() << "\n";
 
-    if (IS_INVALID_NC_P(nc_out)) {
-        mlog << Error << "\nwrite_nc_tracks() -> "
-             << "unable to open NetCDF file " 
-             << track_nc_file << "\n\n";
-        exit(1);
+    mlog << Debug(4) << track.serialize() << "\n";
+
+    for(int i = 0; i < track_lines.n_elements(); i++) {
+        mlog << Debug(4) << track_lines[i] << "\n";
     }
+
+    // NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
+
+    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
+    // NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+
+    // if (IS_INVALID_NC_P(nc_out)) {
+    //     mlog << Error << "\nwrite_nc_tracks() -> "
+    //          << "unable to open NetCDF file " 
+    //          << track_nc_file << "\n\n";
+    //     exit(1);
+    // }
+
+    NcVar track_lines_var = nc_out->addVar(
+        "TrackLines", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
         "Lat", ncFloat, track_point_dim);
+    add_att(&track_lat_var, "long_name", "Track Point Latitude");
+    add_att(&track_lat_var, "units", "degrees_east");
+    add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
         "Lon", ncFloat, track_point_dim);
+    add_att(&track_lon_var, "long_name", "Track Point Longitude");
+    add_att(&track_lon_var, "units", "degrees_north");
+    add_att(&track_lon_var, "standard_name", "longitude_track");
     NcVar track_mrd_var = nc_out->addVar(
-        "MRD", ncFloat, track_point_dim);
-
-    TrackInfo track = tracks[0];
+        "RMW", ncFloat, track_point_dim);
+    add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
+    add_att(&track_mrd_var, "units", "nautical_miles");
+    add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
     mlog << Debug(2) << "write_tc_tracks:n_points:"
          << track.n_points() << "\n";
@@ -45,6 +72,7 @@ void write_tc_tracks(const ConcatString& track_nc_file,
     float* track_mrd_data = new float[track.n_points()];
 
     for(int i = 0; i < track.n_points(); i++) {
+        mlog << Debug(4) << track[i].serialize() << "\n";
         track_lat_data[i] = track[i].lat();
         track_lon_data[i] = track[i].lon();
         track_mrd_data[i] = track[i].mrd();
@@ -52,6 +80,17 @@ void write_tc_tracks(const ConcatString& track_nc_file,
 
     vector<size_t> offsets;
     vector<size_t> counts;
+
+    for(int i = 0; i < track_lines.n_elements(); i++) {
+        offsets.clear();
+        offsets.push_back(i);
+        counts.clear();
+        counts.push_back(1);
+        string line = track_lines[i];
+        mlog << Debug(2) << line << "\n";
+        const char* str = line.c_str();
+        track_lines_var.putVar(offsets, counts, &str);
+    }
 
     offsets.clear();
     offsets.push_back(0);
@@ -201,6 +240,9 @@ void def_tc_pressure(NcFile* nc_out,
 
     put_nc_data(&pressure_var, &pressure_data[0]);
 
+    // Cleanup
+    if(pressure_data) { delete [] pressure_data; pressure_data = (float *) 0; }
+
     return;
 }
 
@@ -239,6 +281,10 @@ void def_tc_range_azimuth(NcFile* nc_out,
     // Write coordinates
     put_nc_data(&range_var, &range_data[0]);
     put_nc_data(&azimuth_var, &azimuth_data[0]);
+
+    // Cleanup
+    if(range_data)   { delete [] range_data;   range_data   = (float *) 0; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (float *) 0; }
 
     return;
 }

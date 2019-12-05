@@ -238,8 +238,6 @@ void Polyline::extend_points(int n) {
 int Polyline::is_closed() const {
    int closed;
 
-   closed = 1;
-
    // Consider an empty Polyline closed
    if(n_points == 0) {
 

@@ -764,7 +764,7 @@ table.set_entry(row, c++, s.text());
 
    //  fcst level
 
-s = check_hdr_str(fcst_info->level_name());
+s = check_hdr_str(fcst_info->level_name(), true);
 
 table.set_entry(row, c++, s.text());
 
@@ -782,7 +782,7 @@ table.set_entry(row, c++, s.text());
 
    //  obs level
 
-s = check_hdr_str(obs_info->level_name());
+s = check_hdr_str(obs_info->level_name(), true);
 
 table.set_entry(row, c++, s.text());
 

@@ -648,20 +648,41 @@ The following methods can all be computed efficiently by utilizing fast
  from another.
  If the measure is applied to a feature within a field, then the distance
  map is still calculated over the entire original domain.
- Some of the measures that follow utilize the entire distance map, where
- others use only parts of it.
+ Some of the distance map statistics are computed over the entire distance
+ map, while others use only parts of it.
 \end_layout
 
 \begin_layout Standard
 Because these methods rely on the distance map, it is helpful to understand
  precisely what such maps do.
- Figure 1 demonstrates the path of the shortest distance to the nearest
- event point in the event area A marked by the gray rectangle in the diagram.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+ demonstrates the path of the shortest distance to the nearest event point
+ in the event area A marked by the gray rectangle in the diagram.
  Note that the arrows all point to a grid point on the boundary of the event
  area A as it would be a longer distance to any point in its interior.
- Figure 2 demonstrates the shortest distances from every grid point inside
- a second event area marked by the gray circle labeled B to the same event
- area A as in Figure 1.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig2_Grid-Stat"
+
+\end_inset
+
+ demonstrates the shortest distances from every grid point inside a second
+ event area marked by the gray circle labeled B to the same event area A
+ as in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+.
  Note that all of the distances are to points on a small subsection (indicated
  by the yellow stretch) of the subset A.
 \end_layout
@@ -757,17 +778,51 @@ name "Fig2_Grid-Stat"
 \end_layout
 
 \begin_layout Standard
-While Figure 1 and Figure 2 are helpful in illustrating the idea of a distance
- map, Figure 3 shows an actual distance map calculated for binary fields
- consisting of circular event areas, where one field has two circular event
- areas labeled A, and the second has one circular event area labeled B.
+While Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig1_Grid-Stat"
+
+\end_inset
+
+ and Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig2_Grid-Stat"
+
+\end_inset
+
+ are helpful in illustrating the idea of a distance map, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+ shows an actual distance map calculated for binary fields consisting of
+ circular event areas, where one field has two circular event areas labeled
+ A, and the second has one circular event area labeled B.
  Notice that the values of the distance map inside the event areas are all
- zero (dark blue) and the distance grow larger in the pattern of concentric
+ zero (dark blue) and the distances grow larger in the pattern of concentric
  circles around these event areas as grid cells move further away.
- Finally, Figure 4 depicts special situations from which the distance map
- measures to be discussed are calculated.
+ Finally, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig4_Grid-Stat"
+
+\end_inset
+
+ depicts special situations from which the distance map measures to be discussed
+ are calculated.
  In particular, the top left panel shows the absolute difference between
- the two distance maps presented in the bottom row of Figure 3.
+ the two distance maps presented in the bottom row of Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+.
  The top right panel shows the portion of the distance map for A that falls
  within the event area of B, and the bottom left depicts the portion of
  the distance map for B that falls within the event area A.
@@ -838,9 +893,16 @@ status open
 
 \begin_layout Plain Layout
 The absolute difference between the distance maps in the bottom row of Figure
- 3 (top left), the shortest distances from every grid point in B to the
- nearest grid point in A (top right), and the shortest distances from every
- grid point in A to the nearest grid points in B (bottom left).
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig3_Grid-Stat"
+
+\end_inset
+
+ (top left), the shortest distances from every grid point in B to the nearest
+ grid point in A (top right), and the shortest distances from every grid
+ point in A to the nearest grid points in B (bottom left).
  The latter two do not have axes in order to emphasize that the distances
  are now only considered from within the respective event sets.
  The top right graphic is the distance map of A conditioned on the presence
@@ -865,6 +927,29 @@ name "Fig4_Grid-Stat"
 
 \end_layout
 
+\begin_layout Standard
+The statistics derived from these distance maps are described in Appendix
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:App_C-distance_maps"
+
+\end_inset
+
+.
+ For each combination of input field and categorical threshold requested
+ in the configuration file, Grid-Stat applies that threshold to define events
+ in the forecast and observation fields and computes distance maps for those
+ binary fields.
+ Statistics for all requested masking regions are derived from those distance
+ maps.
+ Note that the distance maps are computed only once over the full verification
+ domain, not separately for each masking region.
+ Events occurring outside of a masking region can affect the distance map
+ values inside that masking region and, therefore, can also affect the distance
+ maps statistics for that region.
+\end_layout
+
 \begin_layout Section
 Practical information
 \begin_inset CommandInset label
@@ -885,7 +970,7 @@ This section contains information about configuring and running the Grid-Stat
  The input gridded model and observation datasets must be in one of the
  MET supported file formats.
  The requirement of having all gridded fields using the same grid specification
- has been removed with METv5.1.
+ was removed in METv5.1.
  There is a regrid option in the configuration file that allows the user
  to define the grid upon which the scores will be computed.
  The gridded observation data may be a gridded analysis based on observations
@@ -1878,8 +1963,9 @@ zhu_weight
 obs.field
 \series medium
  entry.
-\series default
+\end_layout
 
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2285,6 +2371,12 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   climo_cdp    = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    weight       = FALSE;
 \end_layout
 
@@ -2366,14 +2458,26 @@ climo
 nbrhd
 \series medium
  entries control the creation of output variables for the climatological
- mean field, the grid area weights applied, and the fractional coverage
- fields computed for neighborhood verification methods.
+ mean and standard deviation fields, the grid area weights applied, and
+ the fractional coverage fields computed for neighborhood verification methods.
  Setting these entries to 
 \series default
 TRUE
 \series medium
  indicates that they should be written, while setting them to FALSE disables
  their creation.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Setting the 
+\series bold
+climo_cdf
+\series medium
+ entry to TRUE enables the creation of an output variable for each climatologica
+l distribution percentile (CDP) threshold requested in the configuration
+ file.
  Note that enabling 
 \series bold
 nbrhd
@@ -2390,7 +2494,7 @@ gradient
 distance_map
 \series medium
  entry controls the creation of output variables for the FCST and OBS distance
- maps in the grid-x and grid-y directions.
+ maps for each categorical threshold.
  The 
 \series bold
 apply_mask
@@ -2463,7 +2567,11 @@ grid_stat
  The output files are written to the default output directory or the directory
  specified by the -outdir
 \series medium
- command-line option.
+ 
+\series default
+command line
+\series medium
+ option.
  
 \end_layout
 

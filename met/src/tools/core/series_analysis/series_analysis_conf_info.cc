@@ -342,10 +342,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
        output_stats[stat_cnt].n_elements()) > 0) {
 
       // Conf: fcst.cnt_thresh
-      fcnt_ta = fdict->lookup_thresh_array(conf_key_cnt_thresh);
+      fcnt_ta = process_perc_thresh_bins(
+                   fdict->lookup_thresh_array(conf_key_cnt_thresh));
 
       // Conf: obs.cnt_thresh
-      ocnt_ta = odict->lookup_thresh_array(conf_key_cnt_thresh);
+      ocnt_ta = process_perc_thresh_bins(
+                   odict->lookup_thresh_array(conf_key_cnt_thresh));
 
       // Conf: cnt_logic
       cnt_logic = check_setlogic(

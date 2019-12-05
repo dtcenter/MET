@@ -103,6 +103,51 @@ void PairBase::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::erase() {
+
+   mask_name.erase();
+   mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
+   mask_sid_ptr   = (StringArray *) 0;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)  0;  // Not allocated
+
+   msg_typ.clear();
+   msg_typ_vals.clear();
+
+   interp_mthd = InterpMthd_None;
+   interp_shape = GridTemplateFactory::GridTemplate_None;
+
+   sid_sa.clear();
+   vld_ta.clear();
+   o_qc_sa.clear();
+
+   lat_na.erase();
+   lon_na.erase();
+   x_na.erase();
+   y_na.erase();
+   wgt_na.erase();
+   lvl_na.erase();
+   elv_na.erase();
+   o_na.erase();
+   cmn_na.erase();
+   csd_na.erase();
+   cdf_na.erase();
+
+   n_obs = 0;
+
+   fcst_ut = 0;
+
+   obs_summary = ObsSummary_None;
+   obs_perc_value = bad_data_int;
+   check_unique = false;
+
+   map_key.clear();
+   map_val.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::extend(int n) {
 
    lat_na.extend(n);
@@ -299,11 +344,37 @@ void PairBase::set_climo(int i_obs, double obs, double cmn, double csd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairBase::add_obs(const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_climo_cdf() {
+   int i;
+
+   // The o_na, cmn_na, and csd_na have already been populated
+   if(o_na.n() != cmn_na.n() || o_na.n() != csd_na.n()) {
+      mlog << Error << "\nPairBase::add_climo_cdf() -> "
+           << "the observation, climo mean, and climo stdev arrays "
+           << "must all have the same length (" << o_na.n() << ").\n\n";
+      exit(1);
+   }
+
+   cdf_na.extend(o_na.n());
+
+   for(i=0; i<o_na.n(); i++) {
+      cdf_na.add(is_bad_data(o_na[i])   ||
+                 is_bad_data(cmn_na[i]) ||
+                 is_bad_data(csd_na[i]) ?
+                 bad_data_double :
+                 normal_cdf(o_na[i], cmn_na[i], csd_na[i]));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairBase::add_point_obs(const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
 
    bool ret = false;
 
@@ -383,6 +454,38 @@ bool PairBase::add_obs(const char *sid,
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::set_point_obs(int i_obs, const char *sid,
+                             double lat, double lon, double x, double y,
+                             unixtime ut, double lvl, double elv,
+                             double o, const char *qc,
+                             double cmn, double csd, double wgt) {
+
+   if(i_obs < 0 || i_obs >= n_obs) {
+      mlog << Error << "\nPairBase::set_point_obs() -> "
+           << "range check error: " << i_obs << " not in (0, "
+           << n_obs << ").\n\n"
+          ;
+      exit(1);
+   }
+
+   sid_sa.set(i_obs, sid);
+   lat_na.set(i_obs, lat);
+   lon_na.set(i_obs, lon);
+   x_na.set(i_obs, x);
+   y_na.set(i_obs, y);
+   wgt_na.set(i_obs, wgt);
+   vld_ta.set(i_obs, ut);
+   lvl_na.set(i_obs, lvl);
+   elv_na.set(i_obs, elv);
+   o_na.set(i_obs, o);
+   o_qc_sa.set(i_obs, qc);
+   set_climo(i_obs, o, cmn, csd);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ob_val_t PairBase::compute_nearest(string obs_key) {
    station_values_t svt = map_val[obs_key];
    vector<ob_val_t>::iterator it = svt.obs.begin();
@@ -453,14 +556,13 @@ ob_val_t PairBase::compute_uw_mean(string obs_key) {
 ////////////////////////////////////////////////////////////////////////
 
 ob_val_t PairBase::compute_dw_mean(string obs_key) {
-   double total = 0.0;
-   double weight = 0.0;
-   double total_weight = 0.0;
+   double total, weight, total_weight;
    ob_val_t out;
    station_values_t svt = map_val[obs_key];
+
    vector<ob_val_t>::iterator it = svt.obs.begin();
    out.qc = (*it).qc;
-   for(; it != svt.obs.end(); it++) {
+   for(total=total_weight=0.0; it != svt.obs.end(); it++) {
      if( svt.ut == (*it).ut) return *it;
      weight = 1.0 / pow( labs( svt.ut - (*it).ut ), 2.0);
 
@@ -498,7 +600,7 @@ void PairBase::print_obs_summary(){
       ! map_val.size() ) return;
 
    //  iterate over ordered list map keys in the station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -528,7 +630,7 @@ void PairBase::print_obs_summary(){
 void PairBase::calc_obs_summary(){
 
    //  iterate over the keys in the unique station id map
-   for(int i=0; i<map_key.n_elements(); i++) {
+   for(int i=0; i<map_key.n(); i++) {
 
       station_values_t svt = map_val[map_key[i]];
 
@@ -602,8 +704,8 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_obs(double x, double y, double o,
-                       double cmn, double csd, double wgt) {
+void PairBase::add_grid_obs(double x, double y, double o,
+                            double cmn, double csd, double wgt) {
 
    sid_sa.add(na_str);
    lat_na.add(bad_data_double);
@@ -626,43 +728,11 @@ void PairBase::add_obs(double x, double y, double o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_obs(int i_obs, const char *sid,
-                       double lat, double lon, double x, double y,
-                       unixtime ut, double lvl, double elv,
-                       double o, const char *qc,
-                       double cmn, double csd, double wgt) {
+void PairBase::set_grid_obs(int i_obs, double x, double y,
+                            double o, double cmn, double csd, double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n"
-          ;
-      exit(1);
-   }
-
-   sid_sa.set(i_obs, sid);
-   lat_na.set(i_obs, lat);
-   lon_na.set(i_obs, lon);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, ut);
-   lvl_na.set(i_obs, lvl);
-   elv_na.set(i_obs, elv);
-   o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, qc);
-   set_climo(i_obs, o, cmn, csd);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairBase::set_obs(int i_obs, double x, double y,
-                       double o, double cmn, double csd, double wgt) {
-
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_obs() -> "
+      mlog << Error << "\nPairBase::set_grid_obs() -> "
            << "range check error: " << i_obs << " not in (0, "
            << n_obs << ").\n\n";
       exit(1);
@@ -698,7 +768,7 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
    }
 
    // Apply censor logic.
-   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+   for(int i=0; i<vinfo->censor_thresh().n(); i++) {
 
       // Break out after the first match.
       if(vinfo->censor_thresh()[i].check(new_v)) {

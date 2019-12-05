@@ -229,7 +229,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
    double *data = (double *) 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double median_v = bad_data_double;
+   double median_v;
 
    // Allocate space to store the data points for sorting
    data = new double [gt.size()];
@@ -315,7 +315,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
    double sum = 0;
    int num_good_points = 0;
    int num_points = gt.size();
-   double uw_mean_v = bad_data_double;
+   double uw_mean_v;
 
    // Sum the valid data in the neighborhood
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
@@ -537,7 +537,6 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
 
 const double trunc_factor = 3.5;
 double max_raw_all;
@@ -619,16 +618,11 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    int count;
    int ix, iy;
    int nx, ny, g_nx;
-   double dx, dy;
    double value, gaussian_value, gaussian_weight, max_raw;
-   double interp_value = bad_data_double;
+   double interp_value;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
-   int x_first = x - max_r;
-   int y_first = y - max_r;
-   int x_last = x + max_r;
-   int y_last = y + max_r;
    
    nx = dp.nx();
    ny = dp.ny();
@@ -976,7 +970,7 @@ double compute_sfc_interp(const DataPlane &dp,
                           const GridTemplateFactory::GridTemplates shape,
                           double interp_thresh, const SurfaceInfo &sfc_info,
                           bool is_land_obs) {
-   double v;
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1070,7 +1064,8 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
                            const SurfaceInfo &sfc_info,
                            bool is_land_obs, double obs_elv) {
    MaskPlane mp;
-   int nx, ny;
+   int nx = 0;
+   int ny = 0;
    bool land_ok, topo_ok;
 
    // Initialize the mask
@@ -1132,7 +1127,7 @@ double compute_horz_interp(const DataPlane &dp,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
                            double interp_thresh, const SingleThresh *cat_thresh) {
-   double v;
+   double v = bad_data_double;
    int x = nint(obs_x);
    int y = nint(obs_y);
 
@@ -1205,10 +1200,6 @@ double compute_horz_interp(const DataPlane &dp,
 
       case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
          v = interp_xy(dp, floor(obs_x), floor(obs_y));
-         break;
-
-      case(InterpMthd_Gaussian):    // Gaussian filter of the grid box
-         v = interp_max(dp, *gt, x, y, 0);
          break;
 
       case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
@@ -1302,7 +1293,9 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    DataPlane dp, dp1, dp2;
    int x, y;
    bool use_min;
-   double v, v1, v2, w1, w2;
+   double v, v1, v2;
+   double w1 = bad_data_double;
+   double w2 = bad_data_double;
 
    // Store min and max valid times.
    dp1 = (in1.valid() <= in2.valid() ? in1 : in2);

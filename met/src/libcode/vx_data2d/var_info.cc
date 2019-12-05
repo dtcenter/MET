@@ -375,6 +375,10 @@ void VarInfo::set_dict(Dictionary &dict) {
    s = dict.lookup_string(conf_key_lead_time, false);
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s.c_str()));
 
+   // Parse prob as a boolean, if present
+   f = dict.lookup_bool(conf_key_prob, false);
+   if(dict.last_lookup_status()) set_p_flag(f);
+
    // Parse prob_as_scalar, if present
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);
    if(dict.last_lookup_status()) set_p_as_scalar(f);
@@ -413,8 +417,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    ConcatString field_level = dict.lookup_string(conf_key_level, false);
    LevelType lt;
    string lvl_type, lvl_val1, lvl_val2;
-   double lvl1 = -1, lvl2 = -1;
-
+   double lvl1;
+   double lvl2 = -1;
 
    //  if the level string is specified, use it
    if( ! field_level.empty() ){

@@ -155,8 +155,6 @@ void ContingencyTable::zero_out()
     
     if ( n == 0 )  return;
     
-    int j;
-    
     E->assign(n, 0);
     
     return;
@@ -457,7 +455,7 @@ if ( (NR < 2) || (NC < 2) )  {
 
 }
 
-int j, n;
+int n;
 
 n = NR*NC;
 

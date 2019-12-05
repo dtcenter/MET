@@ -736,7 +736,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
 //////////////////////////////////////////////////////////////////////////////
 
 bool is_grid_relative(const GribRecord &r) {
-   unsigned char res_flag;
+   unsigned char res_flag = 0;
 
    // LatLon
    if(r.gds->type == 0) {

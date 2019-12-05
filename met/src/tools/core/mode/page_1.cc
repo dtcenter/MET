@@ -455,7 +455,7 @@ for (j=0; j<(t2.nrows()); ++j)  {
 }
 
 t2.fill_cell(r, 1, light_gray);  t2.fill_cell(r, 2, light_gray);  r+=2;
-t2.fill_cell(r, 1, light_gray);  t2.fill_cell(r, 2, light_gray);  r+=2;
+t2.fill_cell(r, 1, light_gray);  t2.fill_cell(r, 2, light_gray);  // r+=2;
 
 r = 0;
 

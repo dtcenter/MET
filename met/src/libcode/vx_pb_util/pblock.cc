@@ -85,8 +85,8 @@ void pblock(const char *infile, const char *outfile, Action action) {
    //
    // Close in the input and output files
    //
-   close(in);  in = -1;
-   close(out); out = -1;
+   close(in);
+   close(out);
 
    return;
 }
