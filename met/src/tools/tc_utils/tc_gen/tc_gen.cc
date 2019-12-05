@@ -268,7 +268,7 @@ void process_genesis() {
 // Logic for counting hits, misses, and false alarms for TC genesis
 // events:
 //
-// (1) For each genesis forecast find all BEST tracks genesis events
+// (1) For each genesis forecast, find all BEST tracks genesis events
 //     where:
 //     (a) The timestamp falls within the search window centered on the
 //         forecast genesis time.
@@ -279,16 +279,16 @@ void process_genesis() {
 //
 // If the initialization time is within the window defined by the
 // BEST track genesis time [t - lead_window.beg, t - lead_window.end]
-// then we have a "hit."
+// count this as a "hit."
 //
 // If the initialization time is > (t - lead_window.end) hours before
-// the best-track genesis time, then we have a false alarm.
+// the best-track genesis time, count this as a false alarm.
 //
-// If the initialization time is after the best-track genesis time, we
-// discard that forecast.
+// If the initialization time is after the BEST track genesis time,
+// ignore that forecast.
 //
-// If there are no matches in the best-tracks, conduct the same steps as
-// above, but instead check for operational baseline matches.
+// If there are no matches in the BEST tracks, apply the same logic as
+// above, but instead check for matches in the operational baseline.
 //
 ////////////////////////////////////////////////////////////////////////
 

@@ -34,11 +34,6 @@ lead_window = {
 min_duration = 12;
 
 //
-// Define a genesis event as being category = TD or greater,
-// and/or by thresholding the maximum wind speed,
-// and/or by thresholding the minimum sea-level pressure.
-
-//
 // Forecast genesis event criteria.  Defined as tracks reaching the specified
 // intensity category, maximum wind speed threshold, and minimum sea-level
 // pressure threshold.  The forecast genesis time is the valid time of the first
