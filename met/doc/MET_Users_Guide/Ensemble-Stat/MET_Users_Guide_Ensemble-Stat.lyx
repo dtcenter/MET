@@ -1209,8 +1209,7 @@ The
 \series bold
 nbrhd_prob
 \series medium
- dictionary defines the neighborhood ensemble probability options.
- 
+ dictionary defines the neighborhoods used to compute NEP and NMEP output.
 \end_layout
 
 \begin_layout Standard
@@ -1247,8 +1246,8 @@ If
 \series bold
 ensemble_flag.nep
 \series medium
- is set to TRUE, neighborhood ensemble probability output is created for
- each combination of the categorical threshold (
+ is set to TRUE, NEP output is created for each combination of the categorical
+ threshold (
 \series bold
 cat_thresh
 \series medium
@@ -1342,32 +1341,20 @@ nmep_smooth = {
 \begin_layout Standard
 
 \series medium
-The 
-\series bold
-nmep_smooth
-\series medium
- dictionary defines the options for smoothing the neighborhood maximum ensemble
- probability data.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
 Similar to the 
 \series bold
 interp
 \series medium
- dictionary, 
+ dictionary, the 
 \series bold
 nmep_smooth
 \series medium
- includes a 
+ dictionary includes a 
 \series bold
 type
 \series medium
- array of dictionaries to define one or more methods for smoothing the neighborh
-ood maximum ensemble probability data.
+ array of dictionaries to define one or more methods for smoothing the NMEP
+ data.
  Setting the interpolation method to nearest neighbor (
 \series bold
 NEAREST
@@ -1380,8 +1367,8 @@ If
 \series bold
 ensemble_flag.nmep
 \series medium
- is set to TRUE, neighborhood maximum ensemble probability output is created
- for each combination of the categorical threshold (
+ is set to TRUE, NMEP output is created for each combination of the categorical
+ threshold (
 \series bold
 cat_thresh
 \series medium

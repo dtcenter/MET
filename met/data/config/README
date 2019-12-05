@@ -229,7 +229,7 @@ column 10: variable description
 column 11: units
 
 References:
-   http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
+   http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -411,6 +411,10 @@ obtype = "ANALYS";
 // 
 //   - The "gaussian_radius" entry defines the radius of influence for Gaussian
 //     smoothing. The default is 120. Ignored if not Gaussian method.
+//
+//   - The "gaussian_dx" and "gaussian_radius" settings must be in the same units,
+//     such as kilometers or degress.  Their ratio (sigma = gaussian_radius /
+//     gaussian_dx) determines the Guassian weighting function.
 //
 regrid = {
    to_grid         = NONE;
@@ -606,7 +610,7 @@ regrid = {
 //         - GRIB1 Product Definition Section:
 //           http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //         - GRIB2 Product Definition Section:
-//           http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
+//           http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc
 //       - The "level" entry specifies a level type and value:
 //          - ANNN for accumulation interval NNN
 //          - ZNNN for vertical level NNN
@@ -1201,9 +1205,10 @@ boot = {
 //         - GEOG_MATCH  for the nearest grid point where the land/sea mask
 //                          and geography criteria are satisfied.
 //
-//         The BUDGET and FORCE regridding options are not valid for
-//         interpolating. For grid-to-grid comparisons, the only valid options
-//         are MIN, MAX, MEDIAN, UW_MEAN, and GAUSSIAN.
+//         The BUDGET, FORCE, and GAUSSIAN methods are not valid for
+//         interpolating to point locations. For grid-to-grid comparisons, the
+//         only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
+//         GAUSSIAN.
 //
 interp = {
    field      = BOTH;
@@ -1752,16 +1757,16 @@ ens = {
 }
 
 //
-// The nbrhd_prob dictionary defines the neighborhood ensemble probability
-// options. The neighborhood shape is a SQUARE or CIRCLE centered on the
-// current point, and the width array specifies the width of the square or
+// The nbrhd_prob dictionary defines the neighborhoods used to compute NEP
+// and NMEP output. The neighborhood shape is a SQUARE or CIRCLE centered on
+// the current point, and the width array specifies the width of the square or
 // diameter of the circle as an odd integer. The vld_thresh entry is a number
 // between 0 and 1 specifying the required ratio of valid data in the
 // neighborhood for an output value to be computed.
 //
-// If ensemble_flag.nep is set to TRUE, neighborhood ensemble probability
-// output is created for each combination of the categorical threshold
-// (cat_thresh) and neighborhood width specified.
+// If ensemble_flag.nep is set to TRUE, NEP output is created for each
+// combination of the categorical threshold (cat_thresh) and neighborhood width
+// specified.
 //
 nbrhd_prob = {
    width      = [ 5 ];
@@ -1770,15 +1775,14 @@ nbrhd_prob = {
 }
 
 //
-// The nmep_smooth dictionary defines the options for smoothing the neighborhood
-// maximum ensemble probability data. Similar to the interp dictionary,
-// nmep_smooth includes a type array of dictionaries to define one or more
-// methods for smoothing the neighborhood maximum ensemble probability data.
+// Similar to the interp dictionary, the nmep_smooth dictionary includes a type
+// array of dictionaries to define one or more methods for smoothing the NMEP
+// data. Setting the interpolation method to nearest neighbor (NEAREST)
+// effectively disables this smoothing step.
 //
-// If ensemble_flag.nmep is set to TRUE, neighborhood maximum ensemble
-// probability output is created for each combination of the categorical
-// threshold (cat_thresh), neighborhood width (nbrhd_prob.width), and smoothing
-// method (nmep_smooth.type) specified.
+// If ensemble_flag.nmep is set to TRUE, NMEP output is created for each
+// combination of the categorical threshold (cat_thresh), neighborhood width
+// (nbrhd_prob.width), and smoothing method (nmep_smooth.type) specified.
 //
 nmep_smooth = {
    vld_thresh      = 0.0;

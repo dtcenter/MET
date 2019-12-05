@@ -103,8 +103,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
-   // Check that grid template is at least 1 point
-   if(width == 1 || mthd == InterpMthd_Nearest) return;
+   // For nearest neighbor, no work to do.
+   if(width == 1 && mthd == InterpMthd_Nearest) return;
 
    // build the grid template
    GridTemplateFactory gtf;
