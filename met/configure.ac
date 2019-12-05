@@ -967,6 +967,11 @@ AC_SUBST([PYTHON_LIBS])
 
 ########################################################################
 
+
+
+
+########################################################################
+
 # Check for the MET_DEVELOPMENT environment variable
 
 AM_CONDITIONAL([ENABLE_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])

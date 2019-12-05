@@ -24,12 +24,12 @@ SUBDIRS	= vx_grid \
 	vx_data2d_nccf \
 	vx_data2d_nc_pinterp
 
-if ENABLE_PYTHON
-  SUBDIRS += vx_python_utils
-  SUBDIRS += vx_data2d_python
-endif
+#if ENABLE_PYTHON
+#  SUBDIRS += vx_python_utils
+#  SUBDIRS += vx_data2d_python
+#endif
 
-if ENABLE_PYTHON3
+if ENABLE_PYTHON
   SUBDIRS += vx_python3_utils
 endif
 
