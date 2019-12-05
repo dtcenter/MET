@@ -99,7 +99,7 @@ ConcatString path = _script_filename;
 
 path.chomp(".py");
 
-Module = PyImport_ImportModule (path);
+Module = PyImport_ImportModule (path.text());
 
 // PyErr_Print();
 
