@@ -88,8 +88,10 @@ class ConcatString {
      ~ConcatString();
       ConcatString(const ConcatString &);
       ConcatString(const std::string &);
+      ConcatString(const char *);
       ConcatString & operator=(const ConcatString &);
       ConcatString & operator=(const std::string &);
+      ConcatString & operator=(const char *);
       bool operator==(const ConcatString &) const;
       bool operator==(const char *) const;
 
@@ -140,6 +142,8 @@ class ConcatString {
       void add(const ConcatString &);
 
       void add(const std::string &);
+
+      void add(const char *);
 
       void chomp();   //  removes possible trailing newline
 

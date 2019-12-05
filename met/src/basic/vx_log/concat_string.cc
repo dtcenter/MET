@@ -112,6 +112,29 @@ add(Text);
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString::ConcatString(const char * Text)
+
+{
+
+if ( ! Text )  {
+
+   mlog << Error
+        << "\n\n  ConcatString::ConcatString(const char *) -> null pointer!\n\n";
+
+   exit ( 1 );
+
+}
+
+init_from_scratch();
+
+add(::string(Text));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString & ConcatString::operator=(const ConcatString & c)
 {
     if (this != &c) {
@@ -132,6 +155,31 @@ ConcatString & ConcatString::operator=(const std::string & Text)
     init_from_scratch();
     if (s)
         s->assign(Text);
+
+    return(*this);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString & ConcatString::operator=(const char * Text)
+{
+
+
+if ( ! Text )  {
+
+   mlog << Error
+        << "\n\n  ConcatString::operator=(const char *) -> null pointer!\n\n";
+
+   exit ( 1 );
+
+}
+
+    if ( s )  delete s;
+    init_from_scratch();
+
+    (*s) = Text;
 
     return(*this);
 }
@@ -226,6 +274,25 @@ void ConcatString::add(const std::string & a)
     (*s) += a;
 }
 
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ConcatString::add(const char * Text)
+{
+
+if ( !Text )  {
+
+   mlog << Error
+        << "\n\n  ConcatString::add(const char *) -> null pointer\n\n";
+
+   exit ( 1 );
+
+}
+
+    (*s) += ::string(Text);
+}
 
 
 ////////////////////////////////////////////////////////////////////////
