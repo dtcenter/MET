@@ -43,6 +43,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+static void process_command_line_config(int, char **);
+
 static void process_command_line(int, char **);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
@@ -87,17 +89,86 @@ int main(int argc, char *argv[]) {
    // Set handler to be called for memory allocation error
    set_new_handler(oom);
 
-   mlog << Debug(2) << "Enter process_command_line.\n";
-
    // Process the command line arguments
-   process_command_line(argc, argv);
-
-   mlog << Debug(2) << "Exit process_command_line.\n";
+   process_command_line_config(argc, argv);
 
    // Close the text files and deallocate memory
-   clean_up();
+   // clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_command_line_config(int argc, char **argv) {
+   int i;
+   CommandLine cline;
+   ConcatString default_config_file;
+
+   // Check for zero arguments
+   if(argc == 1) usage();
+
+   // Parse the command line into tokens
+   cline.set(argc, argv);
+
+   // Set the usage function
+   cline.set_usage(usage);
+
+   // Add the options function calls
+   cline.add(set_fcst_files,  "-fcst",  -1);
+   cline.add(set_obs_files,   "-obs",   -1);
+   cline.add(set_both_files,  "-both",  -1);
+   cline.add(set_paired,      "-paired", 0);
+   cline.add(set_config_file, "-config", 1);
+   cline.add(set_out_file,    "-out",    1);
+   cline.add(set_log_file,    "-log",    1);
+   cline.add(set_verbosity,   "-v",      1);
+   cline.add(set_compress,    "-compress", 1);
+
+   // Parse the command line
+   cline.parse();
+
+   // Check for error. There should be zero arguments left.
+   if(cline.n() != 0) usage();
+
+   // Check that the required arguments have been set.
+   if(fcst_files.n_elements() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the forecast file list must be set using the "
+           << "\"-fcst\" or \"-both\" option.\n\n";
+      usage();
+   }
+   if(obs_files.n_elements() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the observation file list must be set using the "
+           << "\"-obs\" or \"-both\" option.\n\n";
+      usage();
+   }
+   if(config_file.length() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the configuration file must be set using the "
+           << "\"-config\" option.\n\n";
+      usage();
+   }
+   if(out_file.length() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the output NetCDF file must be set using the "
+           << "\"-out\" option.\n\n";
+      usage();
+   }
+
+   // Create the default config file name
+   default_config_file = replace_path(default_config_filename);
+
+   // List the config files
+   mlog << Debug(1)
+        << "Default Config File: " << default_config_file << "\n"
+        << "User Config File: "    << config_file << "\n";
+
+   mlog << Debug(2) << "Read config files.\n";
+
+   // Read the config files
+   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
