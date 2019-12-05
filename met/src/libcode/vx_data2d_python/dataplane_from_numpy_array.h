@@ -20,7 +20,7 @@
 #include "var_info_python.h"
 #include "vx_grid.h"
 
-#include "python3_Numpy.h"
+#include "python3_numpy.h"
 
 
 extern "C" {
