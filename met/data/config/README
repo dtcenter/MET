@@ -412,6 +412,10 @@ obtype = "ANALYS";
 //   - The "gaussian_radius" entry defines the radius of influence for Gaussian
 //     smoothing. The default is 120. Ignored if not Gaussian method.
 //
+//   - The "gaussian_dx" and "gaussian_radius" settings must be in the same units,
+//     such as kilometers or degress.  Their ratio (sigma = gaussian_radius /
+//     gaussian_dx) determines the Guassian weighting function.
+//
 regrid = {
    to_grid         = NONE;
    method          = NEAREST;
