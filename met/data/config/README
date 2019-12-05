@@ -1201,9 +1201,10 @@ boot = {
 //         - GEOG_MATCH  for the nearest grid point where the land/sea mask
 //                          and geography criteria are satisfied.
 //
-//         The BUDGET and FORCE regridding options are not valid for
-//         interpolating. For grid-to-grid comparisons, the only valid options
-//         are MIN, MAX, MEDIAN, UW_MEAN, and GAUSSIAN.
+//         The BUDGET, FORCE, and GAUSSIAN methods are not valid for
+//         interpolating to point locations. For grid-to-grid comparisons, the
+//         only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
+//         GAUSSIAN.
 //
 interp = {
    field      = BOTH;
