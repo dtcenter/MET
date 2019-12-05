@@ -2412,7 +2412,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    }
 
    // Append smoothing info for all but nearest neighbor
-   if(interp_pnts > 1) {
+   if(interp_pnts > 1 ||
+      interp_mthd == interpmthd_to_string(InterpMthd_Gaussian)) {
       interp_str << "_" << interp_mthd << "_" << interp_pnts;
    }
    // Append Fourier decomposition info
