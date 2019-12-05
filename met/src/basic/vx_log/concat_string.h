@@ -233,16 +233,17 @@ extern std::ostream & operator<<(std::ostream &, const ConcatString &);
    //
 
 
-extern ConcatString & operator << (ConcatString &, const char);
-extern ConcatString & operator << (ConcatString &, const std::string&);
-extern ConcatString & operator << (ConcatString &, const ConcatString &);
-extern ConcatString & operator << (ConcatString &, int);
-extern ConcatString & operator << (ConcatString &, unsigned int);
-extern ConcatString & operator << (ConcatString &, long long);
-extern ConcatString & operator << (ConcatString &, double);
+extern ConcatString & operator<< (ConcatString &, const char);
+extern ConcatString & operator<< (ConcatString &, const char *);
+extern ConcatString & operator<< (ConcatString &, const std::string&);
+extern ConcatString & operator<< (ConcatString &, const ConcatString &);
+extern ConcatString & operator<< (ConcatString &, int);
+extern ConcatString & operator<< (ConcatString &, unsigned int);
+extern ConcatString & operator<< (ConcatString &, long long);
+extern ConcatString & operator<< (ConcatString &, double);
 
-extern ConcatString & operator << (ConcatString &, CSInlineCommand);
-extern ConcatString & operator << (ConcatString &, const Indent &);
+extern ConcatString & operator<< (ConcatString &, CSInlineCommand);
+extern ConcatString & operator<< (ConcatString &, const Indent &);
 
 
    //
