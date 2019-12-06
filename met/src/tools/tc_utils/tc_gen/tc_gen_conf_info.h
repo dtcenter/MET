@@ -117,7 +117,7 @@ class TCGenConfInfo {
       std::vector<TCGenVxOpt> VxOpt;
 
       // Forecast initialization frequency in hours
-      int InitFreq;
+      int InitFreqSec;
 
       // Begin and end forecast hours for genesis
       int LeadSecBeg, LeadSecEnd;

@@ -306,7 +306,7 @@ void TCGenConfInfo::init_from_scratch() {
 void TCGenConfInfo::clear() {
 
    for(size_t i=0; i<VxOpt.size(); i++) VxOpt[i].clear();
-   InitFreq = bad_data_int;
+   InitFreqSec = bad_data_int;
    LeadSecBeg = bad_data_int;
    LeadSecEnd = bad_data_int;
    MinDur = bad_data_int;
@@ -350,7 +350,14 @@ void TCGenConfInfo::process_config() {
    int i, beg, end;
 
    // Conf: init_freq
-   InitFreq = Conf.lookup_int(conf_key_init_freq);
+   InitFreqSec = Conf.lookup_int(conf_key_init_freq)*sec_per_hour;
+
+   if(InitFreqSec <= 0) {
+      mlog << Error << "\nTCGenConfInfo::process_config() -> "
+           << "\"" << conf_key_init_freq << "\" must be greater than "
+           << "zero!\n\n";
+      exit(1);
+   }
 
    // Conf: lead_window
    dict = Conf.lookup_dictionary(conf_key_lead_window);
