@@ -317,6 +317,8 @@ void TCGenConfInfo::clear() {
    DLandGrid.clear();
    DLandData.clear();
    Version.clear();
+   CIAlpha = bad_data_double;
+   OutputMap.clear();
 
    return;
 }
@@ -346,7 +348,7 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 void TCGenConfInfo::process_config() {
    Dictionary *dict = (Dictionary *) 0;
    TCGenVxOpt vx_opt;
-   StringArray sa;
+   bool status;
    int i, beg, end;
 
    // Conf: init_freq
@@ -387,6 +389,27 @@ void TCGenConfInfo::process_config() {
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version.c_str());
 
+   // Conf: CIAlpha
+   CIAlpha = Conf.lookup_double(conf_key_ci_alpha);
+
+   // Conf: OutputMap
+   OutputMap = parse_conf_output_flag(dict, txt_file_type, n_txt);
+
+   for(i=0, status=false; i<OutputMap.size(); i++) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+         status = true;
+         break;
+      }
+   }
+
+   // Check for at least one output line type
+   if(!status) {
+      mlog << Error << "\nTCGenConfInfo::process_config() -> "
+           << "at least one output line type must be requested in \""
+           << conf_key_output_flag << "\"!\n\n";
+      exit(1);
+   }
+
    // Conf: Filter
    dict = Conf.lookup_array(conf_key_filter, false);
 
@@ -403,6 +426,24 @@ void TCGenConfInfo::process_config() {
          VxOpt.push_back(vx_opt);
       }
    }
+
+   // Check that each filter has a unique description
+   if(VxOpt.size() > 1) {
+      StringArray desc_sa;
+      for(i=0; i<VxOpt.size(); i++) {
+         if(desc_sa.has(VxOpt[i].Desc)) {
+             mlog << Error << "\nTCGenConfInfo::process_config() -> "
+                  << "a unique \"" << conf_key_desc
+                  << "\" entry must be specified for each \""
+                  << conf_key_filter << "\" array entry!\n\n";
+             exit(1);
+         }
+         else {
+            desc_sa.add(VxOpt[i].Desc);
+         }
+      } // end for i
+   }
+       
 
    return;
 }

@@ -25,6 +25,23 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+// Indices for the output flag types in the configuration file
+
+static const int i_fho = 0;
+static const int i_ctc = 1;
+static const int i_cts = 2;
+
+static const int n_txt = 3;
+
+// Text file type
+static const STATLineType txt_file_type[n_txt] = {
+   stat_fho,        //  0
+   stat_ctc,        //  1
+   stat_cts         //  2
+};
+
+////////////////////////////////////////////////////////////////////////
+
 //
 // Struct to store genesis event defintion criteria
 //
@@ -137,6 +154,10 @@ class TCGenConfInfo {
 
       // Config file version
       ConcatString Version;
+
+      // Output file options
+      double CIAlpha;
+      map<STATLineType,STATOutputType> OutputMap;
 
       //////////////////////////////////////////////////////////////////
 
