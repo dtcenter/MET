@@ -17,7 +17,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "math_constants.h"
+#include "nav.h"
 
 #include "genesis_info.h"
 
@@ -325,6 +325,27 @@ bool GenesisInfo::set(const TrackInfo &t) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfo::is_match(const GenesisInfo &g,
+        const double rad, const int beg_sec, const int end_sec,
+        double &dist, int &diff) const {
+   bool keep = true;
+
+   // Check for a match in time
+   diff = GenesisTime - g.GenesisTime;
+   if(diff < beg_sec || diff > end_sec) keep = false;
+
+   // Store the absolute value of the difference
+   diff = labs(diff);
+
+   // Check for a match in space
+   dist = gc_dist(Lat, Lon, g.Lat, g.Lon);
+   if(dist > rad) keep = false;
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class GenesisInfoArray
 //
@@ -509,6 +530,35 @@ void GenesisInfoArray::set_dland(int n, double d) {
    Genesis[n].set_dland(d);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GenesisInfoArray::find_match(const GenesisInfo &g,
+       const double rad, const int beg_sec, const int end_sec) const {
+   int i, i_match, cur_diff, min_diff;
+   double cur_dist, min_dist;
+
+   // Loop over the array elements
+   for(i=0, i_match=bad_data_int; i<Genesis.size(); i++) {
+
+       // Check for a match
+       if(Genesis[i].is_match(g, rad, beg_sec, end_sec,
+                              cur_dist, cur_diff)) {
+
+          // Set the first match or update the match for a smaller
+          // distance or the same distance but closer in time.
+          if(is_bad_data(i_match) ||
+             cur_dist < min_dist  ||
+             (is_eq(cur_dist, min_dist) && cur_diff < min_diff)) {
+              i_match  = i;
+              min_diff = cur_diff;
+              min_dist = cur_dist;
+          }
+       }
+   } // end for i
+
+   return(i_match);
 }
 
 ////////////////////////////////////////////////////////////////////////

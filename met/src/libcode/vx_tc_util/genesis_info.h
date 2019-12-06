@@ -111,6 +111,14 @@ class GenesisInfo {
       unixtime             warm_core_min()    const;
       unixtime             warm_core_max()    const;
       int                  warm_core_dur()    const;
+
+         //
+         //  do stuff
+         //
+
+      bool is_match(const GenesisInfo &,
+                    const double, const int, const int,
+                    double &, int &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -186,6 +194,13 @@ class GenesisInfoArray {
 
       const GenesisInfo & operator[](int) const;
       int n() const;
+
+         //
+         //  do stuff
+         //
+
+      int find_match(const GenesisInfo &,
+                     const double, const int, const int) const;
 
 };
 
