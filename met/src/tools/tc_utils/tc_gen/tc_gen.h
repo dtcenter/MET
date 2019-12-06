@@ -34,6 +34,7 @@ using namespace std;
 #include "vx_tc_util.h"
 #include "vx_grid.h"
 #include "vx_util.h"
+#include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -54,6 +55,21 @@ static const char * atcf_reg_exp = ".dat$";
 static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
 
+// Header columns
+static const char **txt_columns[n_txt] = {
+   fho_columns, ctc_columns, cts_columns
+};
+
+// Length of header columns
+static const int n_txt_columns[n_txt] = {
+   n_fho_columns, n_ctc_columns, n_cts_columns
+};
+
+// Text file abbreviations
+static const char *txt_file_abbr[n_txt] = {
+   "fho", "ctc", "cts"
+};
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -71,11 +87,24 @@ static ConcatString out_base;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Miscellaneous Variables
+// Variables for Output Files
 //
 ////////////////////////////////////////////////////////////////////////
 
-static StringArray out_files;
+// Output STAT file
+static ConcatString stat_file;
+static ofstream    *stat_out = (ofstream *)  0;
+static AsciiTable   stat_at;
+static int          i_stat_row;
+
+// Optional ASCII output files
+static ConcatString txt_file[n_txt];
+static ofstream    *txt_out[n_txt];
+static AsciiTable   txt_at[n_txt];
+static int          i_txt_row[n_txt];
+
+// Strings to be output in the STAT and optional text files
+static StatHdrColumns shc;
 
 ////////////////////////////////////////////////////////////////////////
 
