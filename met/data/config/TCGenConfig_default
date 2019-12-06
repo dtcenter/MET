@@ -155,8 +155,8 @@ dland_thresh = NA;
 // Genesis matching time window, in hours relative to the forecast genesis time
 //
 genesis_window = {
-   beg = 0;
-   end = 120;
+   beg = -24;
+   end =  24;
 }
 
 //
