@@ -534,6 +534,22 @@ void GenesisInfoArray::set_dland(int n, double d) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int GenesisInfoArray::n_technique() const {
+   StringArray sa;
+   int i, n;
+
+   for(i=0, n=0; i<Genesis.size(); i++) {
+      if(!sa.has(Genesis[i].technique())) {
+         sa.add(Genesis[i].technique());
+         n++;
+      }
+   }
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int GenesisInfoArray::find_match(const GenesisInfo &g,
        const double rad, const int beg_sec, const int end_sec) const {
    int i, i_match, cur_diff, min_diff;

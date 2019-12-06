@@ -194,6 +194,7 @@ class GenesisInfoArray {
 
       const GenesisInfo & operator[](int) const;
       int n() const;
+      int n_technique() const;
 
          //
          //  do stuff
