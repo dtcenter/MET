@@ -61,6 +61,7 @@ class ContingencyTable {
       virtual ~ContingencyTable();
       ContingencyTable(const ContingencyTable &);
       ContingencyTable & operator=(const ContingencyTable &);
+      ContingencyTable & operator+=(const ContingencyTable &);
 
       void clear();
 
