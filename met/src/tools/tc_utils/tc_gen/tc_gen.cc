@@ -197,10 +197,8 @@ void process_genesis() {
    process_track_files(track_files, track_files_model_suffix,
                        anly_ga, true);
 
-   // Setup output files.
-   // Maximum number of rows is the number of models plus one times the
-   // number of filters.
-   setup_txt_files((fcst_ga.n_technique() + 1) * conf_info.n_vx());
+   // Setup output files based on the number of techniques present
+   setup_txt_files(fcst_ga.n_technique());
 
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
@@ -276,9 +274,9 @@ void process_genesis() {
 
       mlog << Debug(2) << "[Filter " << i+1 << "] "
            << "Aggregated contingency table hits = "
-           << agg_cts_info.cts.fy_oy() << ", misses = "
-           << agg_cts_info.cts.fn_oy() << ", and false alarms = "
-           << agg_cts_info.cts.fy_on() << ".\n";
+           << agg_cts_info.cts.fy_oy() << ", false alarms = "
+           << agg_cts_info.cts.fy_on() << ", and misses = "
+           << agg_cts_info.cts.fn_oy() << ".\n";
 
       // Write output for the current filter
       cs = "ALL";
@@ -324,15 +322,14 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
    int i, j, i_match;
    unixtime ut, init_beg, init_end;
    map<ConcatString,CTSInfo> cts_info_map;
-   IntArray fga_i_match;
+   vector<const GenesisInfo *> fga_match;
    const GenesisInfo *g_ptr;
-   bool hit;
+   bool match;
 
    // Initialize
    cts_info.cts.zero_out();
-   fga_i_match.extend(fga.n());
 
-   // Loop over the model genesis events and search for matches
+   // Loop over the model genesis events to find HITS and FALSE ALARMS
    for(i=0; i<fga.n(); i++) {
 
       // Initialize
@@ -345,7 +342,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                    conf_info.VxOpt[i_vx].GenesisSecEnd);
       if(!is_bad_data(i_match)) g_ptr = &bga[i_match];
 
-      // Otherwise, check for operational track match
+      // Otherwise, find operational track match
       if(is_bad_data(i_match)) {
          i_match = oga.find_match(fga[i],
                       conf_info.VxOpt[i_vx].GenesisRadius,
@@ -354,8 +351,8 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
          if(!is_bad_data(i_match)) g_ptr = &oga[i_match];
       }
 
-      // Store the matching index
-      fga_i_match.add(i_match);
+      // Store the match pointer
+      fga_match.push_back(g_ptr);
 
       // Print log messages about matches
       if(g_ptr) {
@@ -366,6 +363,9 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                << unix_to_yyyymmdd_hhmmss(g_ptr->genesis_time())
                << " genesis at (" << g_ptr->lat() << ", " << g_ptr->lon()
                << ").\n";
+
+          // Increment the HIT count
+          cts_info.cts.inc_fy_oy();
       }
       else {
           mlog << Debug(4) << fga[i].technique() << " "
@@ -378,7 +378,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
       }
    } // end for i fga
 
-   // Loop over the BEST track genesis events
+   // Loop over the BEST track genesis events to find MISSES
    for(i=0; i<bga.n(); i++) {
 
       // Define opportunities to forecast this genesis event
@@ -388,14 +388,12 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
       // Loop over the model opportunities
       for(ut=init_beg; ut<=init_end; ut+=conf_info.InitFreqSec) {
 
-         // Search for ANY forecast genesis event with this
-         // initialization time that matches something.  Do NOT require
-         // that it match this specific BEST track genesis event
-         // because it could match the operational track instead.
+         // Search for forecast genesis events matching this BEST track
+         // genesis event for each possible combination of initialization
+         // and lead time.
 
-         for(j=0, hit=false; j<fga.n(); j++) {
-             if(!is_bad_data(fga_i_match[j]) && fga[j].init() == ut) {
-
+         for(j=0, match=false; j<fga.n(); j++) {
+             if(fga_match[j] == &bga[i] && fga[j].init() == ut) {
                 mlog << Debug(4) << bga[i].technique() << " "
                      << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
                      << " genesis at (" << bga[i].lat() << ", "
@@ -407,18 +405,13 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                      << unix_to_yyyymmdd_hhmmss(fga[j].genesis_time())
                      << " genesis at (" << fga[j].lat() << ", "
                      << fga[j].lon() << ").\n";
-
-                 hit = true;
+                 match = true;
                  break;
              }
          }
 
-         // Increment the HIT count
-         if(hit) {
-            cts_info.cts.inc_fy_oy();
-         }
          // Increment the MISS count
-         else {
+         if(!match) {
             mlog << Debug(4) << bga[i].technique() << " "
                  << unix_to_yyyymmdd_hhmmss(bga[i].genesis_time())
                  << " genesis at (" << bga[i].lat() << ", "
@@ -431,14 +424,14 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
       } // end for ut
    } // end for i bga
 
-   // TODO: This logic is not correct yet.  The same genesis forecast is
-   // being counted as a hit for multiple BEST track genesis events.
+   // TODO: Review this logic for correctness.
 
    mlog << Debug(3) << "For " << model
-        << " model, contingency table hits = " << cts_info.cts.fy_oy()
-        << ", misses = " << cts_info.cts.fn_oy()
-        << ", and false alarms = " << cts_info.cts.fy_on() << ".\n";
-   
+        << " model, contingency table hits = "
+        << cts_info.cts.fy_oy() << ", false alarms = "
+        << cts_info.cts.fy_on() << ", and misses = "
+        << cts_info.cts.fn_oy() << ".\n";
+
    return;
 }
 
@@ -627,8 +620,8 @@ void process_track_files(const StringArray &files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(int n_rows) {
-   int i;
+void setup_txt_files(int n_model) {    
+   int i, n_rows, n_cols;
 
    // Initialize file stream
    stat_out = (ofstream *) 0;
@@ -640,8 +633,9 @@ void setup_txt_files(int n_rows) {
    open_txt_file(stat_out, stat_file.c_str());
 
    // Setup the STAT AsciiTable
-   stat_at.set_size(n_txt * n_rows,
-                    n_cts_columns + n_header_columns + 1);
+   n_rows = 1 + 3 * (n_model + 1) * conf_info.n_vx();
+   n_cols = 1 + n_header_columns + n_cts_columns;
+   stat_at.set_size(n_rows, n_cols);
    setup_table(stat_at);
 
    // Write the text header row
@@ -667,9 +661,9 @@ void setup_txt_files(int n_rows) {
          open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Setup the text AsciiTable
-         txt_at[i].set_size(n_rows,
-                            n_txt_columns[i] + n_header_columns + 1);
-         setup_table(txt_at[i]);
+         n_rows = 1 + (n_model + 1) * conf_info.n_vx();
+         n_cols = 1 + n_header_columns + n_txt_columns[i];
+         txt_at[i].set_size(n_rows, n_cols);
 
          // Write header row
          write_header_row(txt_columns[i], n_txt_columns[i], 1,
