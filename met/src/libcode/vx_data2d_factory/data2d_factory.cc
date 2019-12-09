@@ -26,7 +26,7 @@ using namespace std;
 
 
 #ifdef WITH_PYTHON
-#include "../vx_data2d_python/data2d_python.h"
+#include "data2d_python.h"
 #endif
 
 #ifdef WITH_GRIB2
