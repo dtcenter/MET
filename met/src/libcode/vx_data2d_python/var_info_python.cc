@@ -175,6 +175,12 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
    ReqName = dict.lookup_string(conf_key_name, true);
 
+   //
+   //  hard-code the magic string as PYTHON
+   //
+
+   MagicStr << cs_erase << "PYTHON";
+
    return;
 }
 
