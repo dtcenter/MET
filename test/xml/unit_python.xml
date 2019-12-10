@@ -33,6 +33,21 @@
     </output>
   </test>
 
+  <test name="python_numpy_plot_data_plane_file_type">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_PYTHON;/letter.txt \
+      &OUTPUT_DIR;/python/letter_file_type.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE LETTER"; file_type=PYTHON_NUMPY;' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled plot_data_plane using file_type option" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_file_type.ps</ps>
+    </output>
+  </test>
+
   <test name="python_numpy_mode_mixed">
     <exec>&MET_BIN;/mode</exec>
     <env>
@@ -173,6 +188,25 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/python/regrid_data_plane.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="python_numpy_series_analysis">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+    </env>
+    <param> \
+      -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -obs  &DATA_DIR_PYTHON;/obs.txt  &DATA_DIR_PYTHON;/obs.txt  \
+      -paired \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_python \
+      -out &OUTPUT_DIR;/python/series_analysis.nc \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/series_analysis.nc</grid_nc>
     </output>
   </test>
 
