@@ -175,19 +175,6 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
    ReqName = dict.lookup_string(conf_key_name, true);
 
-   //
-   //  replace MET_PYTHON_INPUT_FILE constant with the current environment
-   //  variable value
-   //
-
-   ConcatString env_val;
-
-   if (get_env(met_python_input_file, env_val))  {
-
-      ReqName.replace(met_python_input_file, env_val.c_str(), false);
-
-   }
-
    return;
 }
 
