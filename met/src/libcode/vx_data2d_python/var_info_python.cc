@@ -130,7 +130,7 @@ void VarInfoPython::set_file_type(const GrdFileType t)
 
 {
 
-   if ( (t == FileType_Python_Numpy) || (t == FileType_Python_Xarray) ) {
+   if ( is_python_grdfiletype(t) ) {
 
       Type = t;
 

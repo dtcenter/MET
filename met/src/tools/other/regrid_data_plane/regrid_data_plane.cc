@@ -322,8 +322,7 @@ void process_data_file() {
    }
 
    // For python types read the first field to set the grid
-   if(ftype == FileType_Python_Numpy ||
-      ftype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(ftype)) {
       config.read_string(FieldSA[0].c_str());
       vinfo->set_dict(config);
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
