@@ -279,7 +279,7 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(is_python_grdfiletype(otype) {
+   if(is_python_grdfiletype(otype)) {
       if(!obs_mtddf->data_plane(*conf_info.vx_opt[0].obs_info, dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";

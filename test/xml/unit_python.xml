@@ -234,7 +234,6 @@
     </output>
   </test>
 
-<!--  
   <test name="python_numpy_ensemble_stat">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
@@ -250,9 +249,9 @@
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat.stat</grid_nc>
+      <stat>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V_ens.nc</grid_nc>
     </output>
   </test>
-  -->
 
 </met_test>
