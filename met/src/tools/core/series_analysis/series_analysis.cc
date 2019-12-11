@@ -60,9 +60,10 @@ using namespace std;
 static void process_command_line(int, char **);
 static void process_vx_grid     (const Grid &, const Grid &);
 
-static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
+static Met2dDataFile *get_mtddf(const StringArray &,
+                                const GrdFileType);
 static bool           file_is_ok(const ConcatString &,
-                                 const GrdFileType type);
+                                 const GrdFileType);
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
@@ -359,7 +360,8 @@ void process_vx_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
+Met2dDataFile *get_mtddf(const StringArray &file_list,
+                         const GrdFileType type) {
    int i;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -386,10 +388,8 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const GrdFileType type) {
-   return(file_exists(file_name.c_str()) ||
-          type == FileType_Python_Numpy  ||
-          type == FileType_Python_Xarray);
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+   return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
