@@ -19,13 +19,16 @@
 //   002    11/14/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output file.
 //   003    02/25/15  Halley Gotway  Add automated regridding.
-//   004    08/04/15  Halley Gotway  Add conditional continuous verification.
+//   004    08/04/15  Halley Gotway  Add conditional continuous
+//                    verification.
 //   005    09/21/15  Halley Gotway  Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway  Add -paired command line option.
 //   007    05/15/17  Prestopnikk P  Add shape for regrid.
 //   008    10/06/17  Halley Gotway  Add RMSFA and RMSOA stats.
 //   009    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
+//   010    12/11/19  Halley Gotway  Reorganize logic to support the use
+//                    of python embedding.
 //
 ////////////////////////////////////////////////////////////////////////
 
