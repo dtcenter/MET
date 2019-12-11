@@ -109,7 +109,6 @@ map<ConcatString, NcVarData> stat_data;
 
 // Grid variables
 static Grid grid;
-static bool is_first_pass = true;
 static int nxy = 0;
 static int n_reads = 1; // Initialize to at least one pass
 
