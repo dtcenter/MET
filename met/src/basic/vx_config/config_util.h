@@ -43,6 +43,8 @@ extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
+extern map<ConcatString,ConcatString> parse_conf_key_value_map(
+                            Dictionary *dict, const char *conf_key_map_name);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern map<ConcatString,StringArray>
