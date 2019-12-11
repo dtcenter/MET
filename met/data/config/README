@@ -677,17 +677,38 @@ regrid = {
 //
 //    - Python (using PYTHON_NUMPY or PYTHON_XARRAY):
 //       - The Python interface for MET is described in Appendix F of the MET
-//         User's Guide. This functionality is used when replacing the path
-//         to a gridded data file with PYTHON_NUMPY or PYTHON_XARRAY.
-//       - The "name" entry specifies the Python command that should be
-//         executed to read the data.
-//       - The "level" entry is not required for Python.
-//       e.g.
-//           field = [
-//             {
-//               name = "read_ascii_numpy.py data/python/fcst.txt FCST";
-//             }
-//           ];
+//         User's Guide.
+//       - Two methods for specifying the Python command and input file name
+//         are supported. For tools which read a single gridded forecast and/or
+//         observation file, both options work. However, only the second option
+//         is supported for tools which read multiple gridded data files, such
+//         as Ensemble-Stat, Series-Analysis, and MTD.
+//
+//       Option 1:
+//          - On the command line, replace the path to the input gridded data
+//            file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
+//          - Specify the configuration "name" entry as the Python command to be
+//            executed to read the data.
+//          - The "level" entry is not required for Python.
+//          e.g.
+//             field = [
+//               { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
+//             ];
+//
+//       Option 2:
+//          - On the command line, leave the path to the input gridded data
+//            as is.
+//          - Set the configuration "file_type" entry to the constant
+//            PYTHON_NUMPY or PYTHON_XARRAY.
+//          - Specify the configuration "name" entry as the Python command to be
+//            executed to read the data, but replace the input gridded data file
+//            with the constant MET_PYTHON_INPUT_FILE.
+//          - The "level" entry is not required for Python.
+//          e.g.
+//             file_type = PYTHON_NUMPY;
+//             field     = [
+//               { name = "read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST"; }
+//             ];
 //
 fcst = {
    censor_thresh = [];
