@@ -308,8 +308,12 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    set_level_info_grib(dict);
 
    //  check for a probability dictionary setting
-   Dictionary* dict_prob;
-   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))) return;
+   Dictionary * dict_prob = (Dictionary *) 0;
+   const DictionaryEntry * e = dict.lookup(conf_key_prob);
+   if(e) {
+      if(e->type() == DictionaryType) dict_prob = e->dict_value();
+   }
+   if(!dict_prob) return;
 
    //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
