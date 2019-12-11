@@ -45,6 +45,7 @@ test_read_rmw_LDADD = -lvx_tc_util \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_util \
+	-lvx_nc_util \
 	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

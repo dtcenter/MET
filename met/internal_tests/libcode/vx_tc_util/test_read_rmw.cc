@@ -16,6 +16,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util.h"
+#include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "vx_tc_nc_util.h"
 
@@ -39,6 +40,8 @@ int main(int argc, char *argv[]) {
     ConcatString inputfile = (string) argv[1];
 
     mlog << Debug(1) << "Reading " << inputfile << "\n";
+
+    NcFile* nc_out = open_ncfile(inputfile.c_str(), false);
 
     return 0;
 }
