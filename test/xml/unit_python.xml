@@ -210,4 +210,49 @@
     </output>
   </test>
 
+  <test name="python_numpy_mtd">
+    <exec>&MET_BIN;/mtd</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
+    </env>
+    <param> \
+      -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -obs  &DATA_DIR_PYTHON;/obs.txt  &DATA_DIR_PYTHON;/obs.txt  \
+      -config &CONFIG_DIR;/MTDConfig_python \
+      -outdir &OUTPUT_DIR;/python \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_single_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_pair_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_single_cluster.txt</exist>
+      <exist>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_3d_pair_cluster.txt</exist>
+      <grid_nc>&OUTPUT_DIR;/python/mtd_PYTHON_20050807_120000V_obj.nc</grid_nc>
+    </output>
+  </test>
+
+<!--  
+  <test name="python_numpy_ensemble_stat">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
+    </env>
+    <param> \
+      2 &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
+      -grid_obs &DATA_DIR_PYTHON;/obs.txt \
+      &CONFIG_DIR;/EnsembleStatConfig_python \
+      -outdir &OUTPUT_DIR;/python \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/ensemble_stat.stat</grid_nc>
+    </output>
+  </test>
+  -->
+
 </met_test>
