@@ -32,7 +32,7 @@
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_simple.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_single_cluster.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_cluster.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</exist>
+      <grid_nc>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</grid_nc>
     </output>
   </test>
 
@@ -50,10 +50,8 @@
     <output>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_2d.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_3d_single_simple.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</exist>
+      <grid_nc>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</grid_nc>
     </output>
   </test>
 
 </met_test>
-
-
