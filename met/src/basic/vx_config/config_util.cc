@@ -111,7 +111,7 @@ void RegridInfo::validate() {
 
    // Check the Gaussian filter
    if(method == InterpMthd_Gaussian) {
-      if (gaussian_radius < gaussian_dx) {
+      if(gaussian_radius < gaussian_dx) {
          mlog << Error << "\n"
               << "The radius of influence (" << gaussian_radius
               << ") is less than the delta distance (" << gaussian_dx
@@ -1150,7 +1150,7 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-InterpInfo parse_conf_interp(Dictionary *dict) {
+InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
    InterpInfo info;
@@ -1167,7 +1167,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    }
 
    // Conf: interp
-   interp_dict = dict->lookup_dictionary(conf_key_interp);
+   interp_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
@@ -1183,7 +1183,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_interp() -> "
-           << "The \"" << conf_key_interp << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1425,7 +1425,7 @@ void NbrhdInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
+NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    Dictionary *nbrhd_dict = (Dictionary *) 0;
    NbrhdInfo info;
    int i, v;
@@ -1437,7 +1437,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: nbrhd
-   nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
+   nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
    v = nbrhd_dict->lookup_int(conf_key_field, false);
@@ -1452,7 +1452,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "The \"" << conf_key_nbrhd << "." << conf_key_vld_thresh
+           << "The \"" << conf_key << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -1490,14 +1490,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    }
 
    // Conf: cov_thresh
-   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
-
-   // Check that at least one neighborhood coverage threshold is provided
-   if(info.cov_ta.n() == 0) {
-      mlog << Error << "\nparse_conf_nbrhd() -> "
-           << "At least one neighborhood coverage threshold must be provided.\n\n";
-      exit(1);
-   }
+   info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh, false);
 
    // Check for valid coverage thresholds
    for(i=0; i<info.cov_ta.n(); i++) {

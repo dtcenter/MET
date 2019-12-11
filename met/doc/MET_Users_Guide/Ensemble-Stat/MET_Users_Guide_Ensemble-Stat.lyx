@@ -182,6 +182,26 @@ $5/10$=0.5
  be thought of as a probability of precipitation.
 \end_layout
 
+\begin_layout Standard
+The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble
+ probability (NMEP) methods are described in Schwartz and Sobash (2017).
+ They are an extension of the ensemble relative frequencies described above.
+ The NEP value is computed by averaging the relative frequency of the event
+ within the neighborhood over all ensemble members.
+ The NMEP value is computed as the fraction of ensemble members for which
+ the event is occurring somewhere within the surrounding neighborhood.
+ The NMEP output is typically smoothed using a Gaussian kernel filter.
+ The neighborhood sizes and smoothing options are set in the configuration
+ file.
+\end_layout
+
+\begin_layout Standard
+The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and
+ NMEP outputs to a NetCDF output file.
+ Probabilistic verification methods can then be applied to those fields
+ by evaluating them with the Grid-Stat and/or Point-Stat tools.
+\end_layout
+
 \begin_layout Subsection
 Ensemble statistics 
 \begin_inset CommandInset label
@@ -1155,6 +1175,229 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+nbrhd_prob = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width      = [ 5 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape      = CIRCLE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+nbrhd_prob
+\series medium
+ dictionary defines the neighborhoods used to compute NEP and NMEP output.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The neighborhood 
+\series bold
+shape
+\series medium
+ is a 
+\series bold
+SQUARE
+\series medium
+ or 
+\series bold
+CIRCLE
+\series medium
+ centered on the current point, and the 
+\series bold
+width
+\series medium
+ array specifies the width of the square or diameter of the circle as an
+ odd integer.
+ The 
+\series bold
+vld_thresh
+\series medium
+ entry is a number between 0 and 1 specifying the required ratio of valid
+ data in the neighborhood for an output value to be computed.
+\end_layout
+
+\begin_layout Standard
+If 
+\series bold
+ensemble_flag.nep
+\series medium
+ is set to TRUE, NEP output is created for each combination of the categorical
+ threshold (
+\series bold
+cat_thresh
+\series medium
+) and neighborhood width specified.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+nmep_smooth = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh      = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape           = CIRCLE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_dx     = 81.27;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_radius = 120;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type = [
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         method = GAUSSIAN;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         width  = 1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Similar to the 
+\series bold
+interp
+\series medium
+ dictionary, the 
+\series bold
+nmep_smooth
+\series medium
+ dictionary includes a 
+\series bold
+type
+\series medium
+ array of dictionaries to define one or more methods for smoothing the NMEP
+ data.
+ Setting the interpolation method to nearest neighbor (
+\series bold
+NEAREST
+\series medium
+) effectively disables this smoothing step.
+\end_layout
+
+\begin_layout Standard
+If 
+\series bold
+ensemble_flag.nmep
+\series medium
+ is set to TRUE, NMEP output is created for each combination of the categorical
+ threshold (
+\series bold
+cat_thresh
+\series medium
+), neighborhood width (
+\series bold
+nbrhd_prob.width
+\series medium
+), and smoothing method (
+\series bold
+nmep_smooth.type
+\series medium
+) specified.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obs_thresh = [ NA ];
 \end_layout
 
@@ -1774,6 +2017,18 @@ ensemble_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   nep       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   nmep      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    rank      = TRUE;
 \end_layout
 
@@ -1845,6 +2100,35 @@ cat_thresh
 \series default
 ) specified.
  This is an uncalibrated probability forecast.
+\end_layout
+
+\begin_layout Enumerate
+Neighborhood Ensemble Probability for each categorical threshold (
+\series bold
+cat_thresh
+\series default
+) and neighborhood width (
+\series bold
+nbrhd_prob.width
+\series default
+) specified.
+\end_layout
+
+\begin_layout Enumerate
+Neighborhood Maximum Ensemble Probability for each categorical threshold
+ (
+\series bold
+cat_thresh
+\series default
+), neighborhood width (
+\series bold
+nbrhd_prob.width
+\series default
+), and smoothing method (
+\series bold
+nmep_smooth.type
+\series default
+) specified.
 \end_layout
 
 \begin_layout Enumerate
@@ -2151,6 +2435,10 @@ Ensemble Valid Data Count fields
 \noindent
 Ensemble Relative Frequency by threshold fields (e.g.
  ensemble probabilities)
+\end_layout
+
+\begin_layout Standard
+Neighborhood Ensemble Probability and Neighborhood Maximum Ensemble Probability
 \end_layout
 
 \begin_layout Standard

@@ -537,11 +537,8 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
 
 const double trunc_factor = 3.5;
-double max_raw_all;
-double max_gaussian;
 
 void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
    int idx_x, idx_y;
@@ -557,12 +554,7 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
    
    int max_r = nint(g_sigma * trunc_factor);
    int g_nx = max_r * 2 + 1;
-   mlog << Debug(7) << "interp_gaussian_dp() "
-        << " max_r: " << max_r << " g_sigma: " << g_sigma
-        << " from gaussian_radius: " << radius << " gaussian_dx: " << dx
-        << "\n";
    
-   //g_sigma = info.sigma / 81.271;
    int nx = dp.nx();
    int ny = dp.ny();
    DataPlane d_dp;
@@ -570,8 +562,6 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
    
    weight_cnt = 0;
    weight_sum = 0.0;
-   max_raw_all = 0.0;
-   max_gaussian = 0.0;
    g_dp.set_size(g_nx, g_nx);
    for(idx_x=-max_r; idx_x<=max_r; idx_x++) {
       for(idx_y=-max_r; idx_y<=max_r; idx_y++) {
@@ -599,10 +589,6 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
       } // end for y
    } // end for x
 
-   mlog << Debug(5) << "interp_gaussian_dp() "
-        << "weight_sum: " << weight_sum << " weight_cnt: " << weight_cnt
-        << " max_raw: " << max_raw_all << ", max_gaussian: " << max_gaussian
-        << "\n";
 }
 
 
@@ -619,8 +605,7 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    int count;
    int ix, iy;
    int nx, ny, g_nx;
-   double value, gaussian_value, gaussian_weight, max_raw;
-   double interp_value;
+   double value, gaussian_value, gaussian_weight;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
@@ -630,7 +615,6 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    g_nx = g_dp.nx();
    
    count = 0;
-   max_raw = 0.0;
    gaussian_value = 0.0;
    for(int x_idx=0; x_idx<g_nx; x_idx++) {
       ix = x - max_r + x_idx;
@@ -642,28 +626,16 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
          gaussian_weight = g_dp.get(x_idx, y_idx);
          if(gaussian_weight <= 0.) continue;
          value = dp.get(ix, iy);
-         if(is_bad_data(value) || value <= 0.) continue;
+         if(is_bad_data(value)) continue;
          gaussian_value += value * gaussian_weight;
          count++;
-         if (max_raw < value) {
-            max_raw = value;
-            if (max_raw_all < value) max_raw_all = value;
-         }
       }
    }
 
-   interp_value = gaussian_value;
+   // Check for no valid data
+   if(count == 0) gaussian_value = bad_data_double;
 
-   if (max_gaussian < gaussian_value) {
-      max_gaussian = gaussian_value;
-      mlog << Debug(7) << "interp_gaussian() "
-           << "count: " << count << ", x: " << x << ", y: " << y
-           << "  raw data: " << dp.get(x, y) << " to interpolated " << interp_value
-           << ", max_raw: " << max_raw << ", max_raw_all: " << max_raw_all
-           << ", max_gaussian: " << max_gaussian
-           << "\n";
-   }
-   return(interp_value);
+   return(gaussian_value);
 }
 
 ////////////////////////////////////////////////////////////////////////
