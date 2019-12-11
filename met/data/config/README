@@ -619,38 +619,41 @@ regrid = {
 //          - PNNN-NNN for a range of pressure levels in hPa
 //          - LNNN for a generic level type
 //          - RNNN for a specific GRIB record number
-//       - The "GRIB_lvl_typ" entry specifies the level type.
-//       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries specify the first
-//         and second level values.
-//       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the
+//       - The "GRIB_lvl_typ" entry is an integer specifying the level type.
+//       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
+//         the first and second level values.
+//       - The "GRIB_ens" entry is a string specifying NCEP's usage of the
 //         extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
 //         "+n", or "-n", for the n-th ensemble member.
-//       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
-//         number.
-//       - The "GRIB1_code" entry specifies the GRIB1 code (wgrib kpds5 value).
-//       - The "GRIB1_center" entry specifies the originating center.
-//       - The "GRIB1_subcenter" entry specifies the originating subcenter.
-//       - The "GRIB2_mtab" entry specifies the master table number.
-//       - The "GRIB2_ltab" entry specifies the local table number.
-//       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
-//       - The "GRIB2_parm_cat" entry specifies the parameter category code.
-//       - The "GRIB2_parm" entry specifies the parameter code.
-//       - The "GRIB2_pdt" entry specifies the product definition template
-//         (Table 4.0).
-//       - The "GRIB2_process" entry specifies the generating process
+//       - The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
+//         table version number.
+//       - The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
+//         kpds5 value).
+//       - The "GRIB1_center" is an integer specifying the originating center.
+//       - The "GRIB1_subcenter" is an integer specifying the originating
+//         subcenter.
+//       - The "GRIB2_mtab" is an integer specifying the master table number.
+//       - The "GRIB2_ltab" is an integer specifying the local table number.
+//       - The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
+//       - The "GRIB2_parm_cat" is an integer specifying the parameter category
+//         code.
+//       - The "GRIB2_parm" is an integer specifying the parameter code.
+//       - The "GRIB2_pdt" is an integer specifying the product definition
+//         template (Table 4.0).
+//       - The "GRIB2_process" is an integer specifying the generating process
 //         (Table 4.3).
-//       - The "GRIB2_cntr" entry specifies the originating center.
-//       - The "GRIB2_ens_type" entry specifies the ensemble type
+//       - The "GRIB2_cntr" is an integer specifying the originating center.
+//       - The "GRIB2_ens_type" is an integer specifying the ensemble type
 //         (Table 4.6).
-//       - The "GRIB2_der_type" entry specifies the derived product type
-//         (Table 4.7).
-//       - The "GRIB2_stat_type" entry specifies the statistical processing type
-//         (Table 4.10).
+//       - The "GRIB2_der_type" is an integer specifying the derived product
+//         type (Table 4.7).
+//       - The "GRIB2_stat_type" is an integer specifying the statistical
+//         processing type (Table 4.10).
 //       - The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
-//         that specify product description template values to be used. The
-//         indices are 0-based. For example, use the following to request a
-//         GRIB2 record whose 9-th and 27-th product description template values
-//         are 1 and 2, respectively:
+//         of integers which specify the product description template values to
+//         be used. The indices are 0-based. For example, use the following to
+//         request a GRIB2 record whose 9-th and 27-th product description
+//         template values are 1 and 2, respectively:
 //            GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
 //
 //    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
