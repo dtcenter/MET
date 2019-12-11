@@ -124,6 +124,24 @@ void RegridInfo::validate() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void RegridInfo::validate_point() {
+
+   // Check for unsupported regridding options
+   if(method != InterpMthd_Max &&
+      method != InterpMthd_Min &&
+      method != InterpMthd_Median &&
+      method != InterpMthd_UW_Mean) {
+      mlog << Warning << "\nRegridInfo::validate_point() -> "
+           << "Resetting the regridding method from \""
+           << interpmthd_to_string(method) << "\" to \""
+           << interpmthd_uw_mean_str << ".\n\n";
+      method = InterpMthd_UW_Mean;
+   }
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 

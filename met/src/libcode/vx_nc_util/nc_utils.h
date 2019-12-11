@@ -33,6 +33,11 @@ typedef unsigned char uchar;
 
 ////////////////////////////////////////////////////////////////////////
 
+static const string C_unknown_str = string("unknown");
+
+#define IS_VALID_NC(ncObj)          (!ncObj.isNull())
+#define IS_VALID_NC_P(ncObjPtr)     (!(ncObjPtr == 0 || ncObjPtr->isNull()))
+
 #define IS_INVALID_NC(ncObj)        ncObj.isNull()
 #define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == 0 || ncObjPtr->isNull())
 
@@ -41,6 +46,9 @@ typedef unsigned char uchar;
 
 #define GET_NC_SIZE(ncObj)          ncObj.getSize()
 #define GET_NC_SIZE_P(ncObjPtr)     ncObjPtr->getSize()
+
+#define GET_SAFE_NC_NAME(ncObj)         (ncObj.isNull() ? C_unknown_str : ncObj.getName())
+#define GET_SAFE_NC_NAME_P(ncObjPtr)    (IS_INVALID_NC_P(ncObjPtr) ? C_unknown_str : ncObjPtr->getName())
 
 #define GET_NC_TYPE_ID(ncObj)           ncObj.getType().getId()
 #define GET_NC_TYPE_ID_P(ncObjPtr)      ncObjPtr->getType().getId()
@@ -301,8 +309,8 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const int len0,
 extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
-extern NcVar    get_var(NcFile *, const char * var_name);
-extern NcVar get_nc_var(NcFile *, const char * var_name);
+extern NcVar    get_var(NcFile *, const char * var_name);   // exit if not exists
+extern NcVar get_nc_var(NcFile *, const char * var_name, bool as_error=false);   // continue even though not exists
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(NcFile *, NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( NcVar *,  NcVar *, const ConcatString attr_name);
