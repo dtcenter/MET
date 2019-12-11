@@ -1473,7 +1473,16 @@ bool Dictionary::lookup_bool(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == BooleanType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == BooleanType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_bool() -> "
+           << "boolean lookup failed for name \"" << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1508,7 +1517,16 @@ int Dictionary::lookup_int(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == IntegerType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == IntegerType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_int() -> "
+           << "integer lookup failed for name \"" << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1558,8 +1576,18 @@ if ( Entry )  {
     }
 }
 
-if ( Entry )  is_correct_type = (Entry->type() == FloatType ||
-                                 Entry->type() == IntegerType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == FloatType ||
+                             Entry->type() == IntegerType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_double() -> "
+           << "double value lookup failed for name \""
+           << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1608,6 +1636,21 @@ if ( Entry )  is_correct_type = (Entry->type() == ArrayType   ||
                                  Entry->type() == IntegerType ||
                                  Entry->type() == FloatType   ||
                                  Entry->type() == BooleanType);
+
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == ArrayType   ||
+                             Entry->type() == IntegerType ||
+                             Entry->type() == FloatType   ||
+                             Entry->type() == BooleanType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_num_array() -> "
+           << "numeric array lookup failed for name \""
+           << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1728,7 +1771,16 @@ ConcatString Dictionary::lookup_string(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == StringType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == StringType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_string() -> "
+           << "string lookup failed for name \"" << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1769,6 +1821,19 @@ StringArray array;
 
 if ( Entry )  is_correct_type = (Entry->type() == ArrayType ||
                                  Entry->type() == StringType);
+
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == ArrayType ||
+                             Entry->type() == StringType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_string_array() -> "
+           << "string array lookup failed for name \""
+           << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1850,7 +1915,16 @@ SingleThresh Dictionary::lookup_thresh(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == ThresholdType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == ThresholdType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_thresh() -> "
+           << "threshold lookup failed for name \"" << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -1889,8 +1963,19 @@ const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 ThreshArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType ||
-                                 Entry->type() == ThresholdType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == ArrayType ||
+                             Entry->type() == ThresholdType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_thresh_array() -> "
+           << "threshold array lookup failed for name \""
+           << name << "\"\n\n";
+
+   }
+}
+
 
 LastLookupStatus = is_correct_type;
 
@@ -1972,7 +2057,18 @@ Dictionary *Dictionary::lookup_dictionary(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == DictionaryType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == DictionaryType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_dictionary() -> "
+           << "dictionary lookup failed for name \""
+           << name << "\"\n\n";
+
+   }
+}
+
 
 LastLookupStatus = is_correct_type;
 
@@ -2007,7 +2103,16 @@ Dictionary *Dictionary::lookup_array(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == ArrayType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_array() -> "
+           << "array lookup failed for name \"" << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
@@ -2116,7 +2221,17 @@ PiecewiseLinear *Dictionary::lookup_pwl(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == PwlFunctionType);
+if ( Entry )  {
+
+   if ( !(is_correct_type = (Entry->type() == PwlFunctionType)) )  {
+
+      mlog << Warning
+           << "\nDictionary::lookup_pwl() -> "
+           << "lookup failed for piecewise linear function name \""
+           << name << "\"\n\n";
+
+   }
+}
 
 LastLookupStatus = is_correct_type;
 
