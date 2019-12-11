@@ -22,7 +22,7 @@
     <param> \
       -fcst    &DATA_DIR;/fcst_files/*.grb \
       -obs     &DATA_DIR;/obs_files/*.grb \
-      -config  &CONFIG_DIR;/MTD_config_simple  \
+      -config  &CONFIG_DIR;/MTDConfig_simple  \
       -outdir  &OUTPUT_DIR;/mtd -v 1
     </param>
 
@@ -43,7 +43,7 @@
     </env>
     <param> \
       -single  &DATA_DIR;/fcst_files/*.grb \
-      -config  &CONFIG_DIR;/MTD_config_simple  \
+      -config  &CONFIG_DIR;/MTDConfig_simple  \
       -outdir  &OUTPUT_DIR;/mtd -v 1
     </param>
 
