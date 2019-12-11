@@ -58,7 +58,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void process_vx_grid     (const Grid &, const Grid &);
+static void process_grid        (const Grid &, const Grid &);
 
 static Met2dDataFile *get_mtddf(const StringArray &,
                                 const GrdFileType);
@@ -326,7 +326,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_vx_grid(const Grid &fcst_grid, const Grid &obs_grid) {
+void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
@@ -480,7 +480,7 @@ void get_series_data(int i_series,
    }
    
    // Setup the verification grid
-   if(nxy == 0) process_vx_grid(fcst_grid, obs_grid);
+   if(nxy == 0) process_grid(fcst_grid, obs_grid);
 
    // Regrid the forecast, if necessary
    if(!(fcst_grid == grid)) {
