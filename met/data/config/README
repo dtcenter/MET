@@ -680,7 +680,7 @@ regrid = {
 //         User's Guide.
 //       - Two methods for specifying the Python command and input file name
 //         are supported. For tools which read a single gridded forecast and/or
-//         observation file, both options work.  However, only the second option
+//         observation file, both options work. However, only the second option
 //         is supported for tools which read multiple gridded data files, such
 //         as Ensemble-Stat, Series-Analysis, and MTD.
 //
