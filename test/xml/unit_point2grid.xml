@@ -36,11 +36,11 @@
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       G212 \
       &OUTPUT_DIR;/regrid/pb2nc_TMP.nc \
-      -field 'name="TMP"; level="*"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
       -name TEMP \
       -v 1
     </param>
-    <!-- valid_time="20120409_120000";  -->
+    <!--  -->
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/pb2nc_TMP.nc</grid_nc>
     </output>
