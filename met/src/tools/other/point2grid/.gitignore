@@ -1,0 +1,6 @@
+point2grid
+*.o
+*.a
+.deps
+Makefile
+Makefile.in
