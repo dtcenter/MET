@@ -377,16 +377,11 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    if(field_name != "PROB") return;
 
    //  check for a probability dictionary setting
-   Dictionary * dict_prob = (Dictionary *) 0;
-   const DictionaryEntry * e = dict.lookup(conf_key_prob);
-   if(e) {
-      if(e->type() == DictionaryType) dict_prob = e->dict_value();
-   }
-
-   if(!dict_prob) {
+   Dictionary* dict_prob;
+   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-           << "if the field name is set to \"PROB\", then a prob information "
-           << "section must be present\n\n";
+           << "if the field name is set to \"PROB\", then a prob dictionary "
+           << "must be defined\n\n";
       exit(1);
    }
 
