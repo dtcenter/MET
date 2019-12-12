@@ -682,16 +682,16 @@ fi
 AC_ARG_ENABLE(point2grid,
           [AS_HELP_STRING([--disable-point2grid], [Disable compilation of point2grid])],
   [case "${enableval}" in
-     yes | no ) ENABLE_POINT_TO_GRID="${enableval}" ;;
+     yes | no ) ENABLE_POINT2GRID="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --disable-point2grid) ;;
    esac],
-  [ENABLE_POINT_TO_GRID="yes"]
+  [ENABLE_POINT2GRID="yes"]
 )
 
-AM_CONDITIONAL([ENABLE_POINT_TO_GRID], [test "x$ENABLE_POINT_TO_GRID" = "xyes"])
+AM_CONDITIONAL([ENABLE_POINT2GRID], [test "x$ENABLE_POINT2GRID" = "xyes"])
 
-if test "x$ENABLE_POINT_TO_GRID" = "xyes"; then
-    AC_DEFINE([ENABLE_POINT_TO_GRID], [], ["build point2grid"])
+if test "x$ENABLE_POINT2GRID" = "xyes"; then
+    AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
     AC_MSG_NOTICE([point2grid will be compiled])
 else
     AC_MSG_NOTICE([point2grid will not be compiled])
