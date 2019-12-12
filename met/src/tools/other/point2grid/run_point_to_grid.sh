@@ -1,1 +1,0 @@
-/d3/personal/hsoh/git/work/run_point_to_grid.sh
