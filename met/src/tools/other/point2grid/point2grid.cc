@@ -95,7 +95,6 @@ static const char * GOES_global_attr_names[] = {
 };
 
 // Beginning and ending retention times
-//static unixtime beg_ut, end_ut;
 static IntArray message_type_list;
 
 // Variables for command line arguments
@@ -650,8 +649,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       requested_valid_time = valid_time;
       if (0 < valid_time) {
          valid_beg_ut = valid_end_ut = valid_time;
-         if (!is_eq(bad_data_int, conf_info.beg_ds) valid_beg_ut += conf_info.beg_ds;
-         if (!is_eq(bad_data_int, conf_info.end_ds) valid_end_ut += conf_info.end_ds;
+         if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+         if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
          for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
             obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
             if (valid_beg_ut <= obs_time and obs_time <= valid_end_ut) {
