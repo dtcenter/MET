@@ -679,23 +679,23 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       
       var_index_array.clear();
       // Select output variable name
-      if(VarNameSA.n_elements() == 0) {
-         vname = vinfo->name();
-         if (use_var_id) {
-            if (!var_names.has(vname, var_idx_or_gc)) {
-               mlog << Error << "\n" << method_name
-                    << "Can not find variable \"" << vname << "\".\n\n";
-               exit(1);
-            }
-            mlog << Debug(4) << method_name
-                 << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
+      vname = vinfo->name();
+      if (use_var_id) {
+         if (!var_names.has(vname, var_idx_or_gc)) {
+            mlog << Error << "\n" << method_name
+                 << "Can not find variable \"" << vname << "\".\n\n";
+            exit(1);
          }
-         else var_idx_or_gc = atoi(vname.c_str());
+      }
+      else var_idx_or_gc = atoi(vname.c_str());
+      if(VarNameSA.n_elements() == 0) {
          vname = conf_info.get_var_name(vinfo->name());
       }
       else {
-         vname = VarNameSA[var_idx];
+         vname = VarNameSA[i];
       }
+      mlog << Debug(4) << method_name
+           << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
       
       var_count = var_count2 = 0;
       filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
@@ -849,7 +849,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
       if (0 == var_count) {
          if (0 == filtered_count) {
-            mlog << Error << method_name << " No matching variable\n";
+            mlog << Error << method_name << " No matching variable [" 
+                 << vinfo->name() << ":" << var_idx_or_gc << "]\n";
          }
          else {
             mlog << Error << method_name << " No valid data ater filtering.\n\t"
