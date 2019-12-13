@@ -163,7 +163,7 @@ void ConcatString::clear()
 
 char ConcatString::char_at(const int idx) const
 {
-   if (0 > idx || s->length() <= idx )
+   if (0 > idx || length() <= idx )
         return '\0';
 
    return s->at(idx);
@@ -260,7 +260,7 @@ void ConcatString::chomp(const char c)
 
 void ConcatString::chomp(const char * suffix)
 {
-    size_t limit = s->length() - strlen(suffix);
+    size_t limit = length() - strlen(suffix);
     size_t pos = s->find(suffix, limit);
     if (pos != string::npos)
         s->erase(pos);
@@ -500,7 +500,7 @@ bool ConcatString::read_line(istream & in)
     getline(in, *s);
     if (!in) {
           // Check for end of file and non-empty line
-          if (in.eof() && (s->length() != 0))
+          if (in.eof() && (length() != 0))
             return true;
           else
             return false;
@@ -555,7 +555,7 @@ return ( lc );
 
 char ConcatString::operator[](const int n) const
 {
-    if ((n < 0) || (n >= s->length()))  {
+    if ((n < 0) || (n >= length()))  {
         mlog << Error << "\nConcatString::operator[](const int) const -> range check error\n\n";
         exit ( 1 );
     }
