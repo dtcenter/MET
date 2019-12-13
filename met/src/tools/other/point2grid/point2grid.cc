@@ -27,17 +27,8 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-//#include <ctime>
-//#include <ctype.h>
 #include <dirent.h>
 #include <iostream>
-//#include <fstream>
-//#include <stdlib.h>
-//#include <math.h>
-//#include <string.h>
-//#include <sys/stat.h>
-//#include <sys/types.h>
-//#include <unistd.h>
 
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
@@ -359,7 +350,7 @@ void process_data_file(int obs_type) {
       exit(1);
    }
 
-//   // For python types read the first field to set the grid
+   // For python types read the first field to set the grid
 
    // Determine the "from" grid
    fr_grid = fr_mtddf->grid();
@@ -414,8 +405,7 @@ void process_data_file(int obs_type) {
 // returns true if no error
 
 bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
-   bool status;
-   status = false;
+   bool status = false;
    NcVar nc_var = get_nc_var(nc, (char *)var_name, stop);
    if (IS_INVALID_NC(nc_var)) {
       if (stop) exit(1);
@@ -430,9 +420,12 @@ bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool sto
 // returns true if no error
 
 bool get_nc_data_int_array(NcFile *nc, const char *var_name, int *data_array, bool stop=true) {
+   bool status = false;
    char *_var_name = strdup(var_name);
-   bool status = get_nc_data_int_array(nc, _var_name, data_array, stop);
-   free(_var_name);
+   if (_var_name) {
+      status = get_nc_data_int_array(nc, _var_name, data_array, stop);
+      free(_var_name);
+   }
    return status;
 }
 
@@ -451,9 +444,12 @@ bool get_nc_data_float_array(NcFile *nc, char *var_name, float *data_array) {
 // returns true if no error
 
 bool get_nc_data_float_array(NcFile *nc, const char *var_name, float *data_array) {
+   bool status = false;
    char *_var_name = strdup(var_name);
-   bool status = get_nc_data_float_array(nc, _var_name, data_array);
-   free(_var_name);
+   if (_var_name) {
+      status = get_nc_data_float_array(nc, _var_name, data_array);
+      free(_var_name);
+   }
    return status;
 }
 
@@ -475,9 +471,12 @@ bool get_nc_data_string_array(NcFile *nc, char *var_name,
 
 bool get_nc_data_string_array(NcFile *nc, const char *var_name,
                               StringArray *stringArray) {
+   bool status = false;    
    char *_var_name = strdup(var_name);
-   bool status = get_nc_data_string_array(nc, _var_name, stringArray);
-   free(_var_name);
+   if (_var_name) {
+      status = get_nc_data_string_array(nc, _var_name, stringArray);
+      free(_var_name);
+   }
    return status;
 }
 
@@ -531,14 +530,11 @@ IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
 
 void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                         const Grid fr_grid, const Grid to_grid) {
-   bool status;
    int nhdr, nobs;
    int nx, ny, var_count, to_count, var_count2;
-   int idx, hdr_idx, var_idx;
+   int idx, hdr_idx;
    int var_idx_or_gc;
-   double dmin, dmax;
    int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
-   GrdFileType ftype;
    ConcatString vname;
    DataPlane fr_dp, to_dp;
    NcVar var_obs_gc, var_obs_var;
@@ -697,7 +693,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       mlog << Debug(4) << method_name
            << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
       
-      var_count = var_count2 = 0;
+      var_count = var_count2 = to_count = 0;
       filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
       for (int idx=0; idx < nobs; idx++) {
          if (var_idx_or_gc == obs_ids[idx]) {
@@ -745,8 +741,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          float data_value;
          float from_min_value =  10e10;
          float from_max_value = -10e10;
-         float qc_min_value =  10e10;
-         float qc_max_value = -10e10;
 
          to_count = 0;
          to_dp.set_constant(bad_data_double);
@@ -784,7 +778,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   int data_count = dataArray.n_elements();
                   if (0 < data_count) {
                      float to_value;
-                     to_value = bad_data_float;
                      if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
                      else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
                      else if (RGInfo.method == InterpMthd_Median) {
