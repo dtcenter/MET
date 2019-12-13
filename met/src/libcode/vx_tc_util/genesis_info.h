@@ -123,33 +123,29 @@ class GenesisInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & GenesisInfo::storm_id()         const { return(StormId);                 }
-inline const ConcatString & GenesisInfo::basin()            const { return(Basin);                   }
-inline const ConcatString & GenesisInfo::cyclone()          const { return(Cyclone);                 }
-inline const ConcatString & GenesisInfo::storm_name()       const { return(StormName);               }
-inline int                  GenesisInfo::technique_number() const { return(TechniqueNumber);         }
-inline const ConcatString & GenesisInfo::technique()        const { return(Technique);               }
-inline const ConcatString & GenesisInfo::initials()         const { return(Initials);                }
-inline double               GenesisInfo::lat()              const { return(Lat);                     }
-inline double               GenesisInfo::lon()              const { return(Lon);                     }
-inline double               GenesisInfo::dland()            const { return(DLand);                   }
-inline unixtime             GenesisInfo::genesis_time()     const { return(GenesisTime);             }
-inline unixtime             GenesisInfo::init()             const { return(InitTime);                }
-inline int                  GenesisInfo::init_hour()        const { return(InitTime % sec_per_hour); }
-inline int                  GenesisInfo::lead_time()        const { return(LeadTime);                }
-inline int                  GenesisInfo::n_points()         const { return(NPoints);                 }
-inline unixtime             GenesisInfo::valid_min()        const { return(MinValidTime);            }
-inline unixtime             GenesisInfo::valid_max()        const { return(MaxValidTime);            }
-inline int                  GenesisInfo::valid_dur()        const { return((MinValidTime == 0 ||
-                                                                            MaxValidTime == 0 ?
-                                                                            bad_data_int :
-                                                                            MaxValidTime - MinValidTime)); }
-inline unixtime             GenesisInfo::warm_core_min()    const { return(MinWarmCoreTime);         }
-inline unixtime             GenesisInfo::warm_core_max()    const { return(MaxWarmCoreTime);         }
-inline int                  GenesisInfo::warm_core_dur()    const { return((MinWarmCoreTime == 0 ||
-                                                                            MaxWarmCoreTime == 0 ?
-                                                                            bad_data_int :
-                                                                            MaxWarmCoreTime - MinWarmCoreTime)); }
+inline const ConcatString & GenesisInfo::storm_id()         const { return(StormId);                      }
+inline const ConcatString & GenesisInfo::basin()            const { return(Basin);                        }
+inline const ConcatString & GenesisInfo::cyclone()          const { return(Cyclone);                      }
+inline const ConcatString & GenesisInfo::storm_name()       const { return(StormName);                    }
+inline int                  GenesisInfo::technique_number() const { return(TechniqueNumber);              }
+inline const ConcatString & GenesisInfo::technique()        const { return(Technique);                    }
+inline const ConcatString & GenesisInfo::initials()         const { return(Initials);                     }
+inline double               GenesisInfo::lat()              const { return(Lat);                          }
+inline double               GenesisInfo::lon()              const { return(Lon);                          }
+inline double               GenesisInfo::dland()            const { return(DLand);                        }
+inline unixtime             GenesisInfo::genesis_time()     const { return(GenesisTime);                  }
+inline unixtime             GenesisInfo::init()             const { return(InitTime);                     }
+inline int                  GenesisInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
+inline int                  GenesisInfo::lead_time()        const { return(LeadTime);                     }
+inline int                  GenesisInfo::n_points()         const { return(NPoints);                      }
+inline unixtime             GenesisInfo::valid_min()        const { return(MinValidTime);                 }
+inline unixtime             GenesisInfo::valid_max()        const { return(MaxValidTime);                 }
+inline int                  GenesisInfo::valid_dur()        const { return((MinValidTime == 0 || MaxValidTime == 0 ?
+                                                                            bad_data_int : MaxValidTime - MinValidTime)); }
+inline unixtime             GenesisInfo::warm_core_min()    const { return(MinWarmCoreTime);              }
+inline unixtime             GenesisInfo::warm_core_max()    const { return(MaxWarmCoreTime);              }
+inline int                  GenesisInfo::warm_core_dur()    const { return((MinWarmCoreTime == 0 || MaxWarmCoreTime == 0 ?
+                                                                            bad_data_int : MaxWarmCoreTime - MinWarmCoreTime)); }
 
 ////////////////////////////////////////////////////////////////////////
 //
