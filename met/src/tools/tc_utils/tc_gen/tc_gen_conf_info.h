@@ -16,8 +16,7 @@
 #include <iostream>
 #include <vector>
 
-#include "mask_poly.h"
-
+#include "vx_statistics.h"
 #include "vx_tc_util.h"
 #include "vx_config.h"
 #include "vx_grid.h"
@@ -57,6 +56,22 @@ struct GenesisEventInfo {
 };
 
 extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);
+
+////////////////////////////////////////////////////////////////////////
+
+struct GenCTCInfo {
+   ConcatString model;
+   CTSInfo cts_info;
+   unixtime fbeg, fend, obeg, oend;
+
+   GenCTCInfo();
+
+   void clear();
+   GenCTCInfo & operator+=(const GenCTCInfo &);
+
+   void add_fcst_valid(const unixtime, const unixtime);
+   void add_obs_valid (const unixtime, const unixtime);
+};
 
 ////////////////////////////////////////////////////////////////////////
 

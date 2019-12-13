@@ -65,6 +65,62 @@ bool GenesisEventInfo::is_keeper(const TrackPoint &p) {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for struct GenCTCInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo::GenCTCInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::clear() {
+   model.clear();
+   cts_info.clear();
+   fbeg = fend = obeg = oend = (unixtime) 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GenCTCInfo & GenCTCInfo::operator+=(const GenCTCInfo &g) {
+
+   // Increment counts
+   cts_info.cts += g.cts_info.cts;
+
+   // Keep track of the minimum and maximum times
+   if(fbeg == 0 || g.fbeg < fbeg) fbeg = g.fbeg;
+   if(fend == 0 || g.fend > fend) fend = g.fend;
+   if(obeg == 0 || g.obeg < obeg) obeg = g.obeg;
+   if(oend == 0 || g.oend > oend) oend = g.oend;
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_fcst_valid(const unixtime beg,
+                                const unixtime end) {
+
+   if(fbeg == 0 || fbeg > beg) fbeg = beg;
+   if(fend == 0 || fend < end) fend = end;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GenCTCInfo::add_obs_valid(const unixtime beg,
+                               const unixtime end) {
+
+   if(obeg == 0 || obeg > beg) obeg = beg;
+   if(oend == 0 || oend < end) oend = end;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for class TCGenVxOpt
 //
 ////////////////////////////////////////////////////////////////////////

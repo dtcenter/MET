@@ -59,11 +59,11 @@ static void   process_genesis_pair (int, const ConcatString &,
                                     const GenesisInfoArray &,
                                     const GenesisInfoArray &,
                                     const GenesisInfoArray &,
-                                    CTSInfo &);
+                                    GenCTCInfo &);
 
 static void   setup_txt_files      (int);
 static void   setup_table          (AsciiTable &);
-static void   write_cts            (int, const ConcatString &, CTSInfo &);
+static void   write_cts            (int, GenCTCInfo &);
 static void   finish_txt_files     ();
 
 static void   usage                ();
@@ -177,7 +177,8 @@ void process_genesis() {
    map<ConcatString,GenesisInfoArray> fcst_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
    ConcatString atcf_id, cs;
-   CTSInfo cur_cts_info, agg_cts_info;
+   
+   GenCTCInfo cur_info, agg_info;
 
    // Get the list of genesis track files
    get_atcf_files(genesis_source, genesis_model_suffix, atcf_gen_reg_exp,
@@ -205,7 +206,7 @@ void process_genesis() {
 
       // Initialize
       fcst_ga_map.clear();
-      agg_cts_info.clear();
+      agg_info.clear();
 
       // Subset the forecast genesis events
       for(j=0; j<fcst_ga.n(); j++) {
@@ -237,8 +238,6 @@ void process_genesis() {
       oper_ga.clear();
       for(j=0; j<anly_ga.n(); j++) {
 
-         // TODO: Consider making the is_keeper logic different for analysis tracks
-
          // Check filters
          if(conf_info.VxOpt[i].is_keeper(anly_ga[j])) {
 
@@ -262,25 +261,26 @@ void process_genesis() {
               << conf_info.OperEventInfo.Technique
               << " genesis events.\n";
          process_genesis_pair(i, it->first, it->second,
-                              best_ga, oper_ga, cur_cts_info);
+                              best_ga, oper_ga, cur_info);
 
          // Increment the contingency table counts
-         agg_cts_info.cts += cur_cts_info.cts;
+         agg_info += cur_info;
 
          // Write output for the current model
-         write_cts(i, it->first, cur_cts_info);
+         cur_info.model = it->first;
+         write_cts(i, cur_info);
 
       } // end for j
 
       mlog << Debug(2) << "[Filter " << i+1 << "] "
            << "Aggregated contingency table hits = "
-           << agg_cts_info.cts.fy_oy() << ", false alarms = "
-           << agg_cts_info.cts.fy_on() << ", and misses = "
-           << agg_cts_info.cts.fn_oy() << ".\n";
+           << agg_info.cts_info.cts.fy_oy() << ", false alarms = "
+           << agg_info.cts_info.cts.fy_on() << ", and misses = "
+           << agg_info.cts_info.cts.fn_oy() << ".\n";
 
       // Write output for the current filter
-      cs = "ALL";
-      write_cts(i, cs, agg_cts_info);
+      agg_info.model = "ALL";
+      if(agg_info.cts_info.cts.n() > 0) write_cts(i, agg_info);
 
    } // end for i n_vx
 
@@ -292,7 +292,7 @@ void process_genesis() {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// For each genesis forecast find the matching BEST tracks genesis
+// For each genesis forecast, find the matching BEST tracks genesis
 // event that is the closest in space and time, where:
 // (1) The difference between the BEST and forecast track genesis falls
 //     within the configurable genesis_window.
@@ -303,14 +303,15 @@ void process_genesis() {
 // If there are no BEST track matches, apply to same logic with the
 // operational baseline genesis events.
 //
+// Any genesis forecast with a BEST or operational match is a HIT.
+//
 // Any genesis forecast with no BEST or operational match is a FALSE
 // ALARM.
 //
 // For each BEST track genesis event, define the timing information for
 // the model's opportunities to forecast that genesis event using the
-// configurable init_freq and lead_window options. Any case for which
-// a match actually exists is a HIT.  Any case for which no match exists
-// is a MISS.
+// configurable init_freq and lead_window options.  Any case for which
+// no match exists is a MISS.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -318,22 +319,25 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                           const GenesisInfoArray &fga,
                           const GenesisInfoArray &bga,
                           const GenesisInfoArray &oga,
-                          CTSInfo &cts_info) {
+                          GenCTCInfo &info) {
    int i, j, i_match;
    unixtime ut, init_beg, init_end;
-   map<ConcatString,CTSInfo> cts_info_map;
+   map<ConcatString,GenCTCInfo> info_map;
    vector<const GenesisInfo *> fga_match;
    const GenesisInfo *g_ptr;
    bool match;
 
    // Initialize
-   cts_info.cts.zero_out();
+   info.clear();
 
    // Loop over the model genesis events to find HITS and FALSE ALARMS
    for(i=0; i<fga.n(); i++) {
 
       // Initialize
       g_ptr = 0;
+
+      // Keep track of timing info
+      info.add_fcst_valid(fga[i].valid_min(), fga[i].valid_max());
 
       // Find BEST track match
       i_match = bga.find_match(fga[i],
@@ -359,13 +363,13 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
           mlog << Debug(4) << fga[i].technique() << " "
                << unix_to_yyyymmdd_hhmmss(fga[i].genesis_time())
                << " genesis at (" << fga[i].lat() << ", " << fga[i].lon()
-               << ") matches " << g_ptr->technique() << " "
+               << ") is a hit for " << g_ptr->technique() << " "
                << unix_to_yyyymmdd_hhmmss(g_ptr->genesis_time())
                << " genesis at (" << g_ptr->lat() << ", " << g_ptr->lon()
                << ").\n";
 
           // Increment the HIT count
-          cts_info.cts.inc_fy_oy();
+          info.cts_info.cts.inc_fy_oy();
       }
       else {
           mlog << Debug(4) << fga[i].technique() << " "
@@ -374,12 +378,15 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                << ") is a false alarm.\n";
 
           // Increment the FALSE ALARM count
-          cts_info.cts.inc_fy_on();
+          info.cts_info.cts.inc_fy_on();
       }
    } // end for i fga
 
    // Loop over the BEST track genesis events to find MISSES
    for(i=0; i<bga.n(); i++) {
+
+      // Keep track of timing info
+      info.add_obs_valid(bga[i].valid_min(), bga[i].valid_max());
 
       // Define opportunities to forecast this genesis event
       init_beg = bga[i].genesis_time() - conf_info.LeadSecEnd;
@@ -418,28 +425,21 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                  << bga[i].lon() << ") for "
                  << unix_to_yyyymmdd_hhmmss(ut) << " initialization "
                  << (bga[i].genesis_time() - ut)/sec_per_hour
-                 << " lead has no match.\n";
-            cts_info.cts.inc_fn_oy();
+                 << " lead is a miss.\n";
+            info.cts_info.cts.inc_fn_oy();
          }
       } // end for ut
    } // end for i bga
 
-   // TODO: Review this logic for correctness.
-
    mlog << Debug(3) << "For " << model
         << " model, contingency table hits = "
-        << cts_info.cts.fy_oy() << ", false alarms = "
-        << cts_info.cts.fy_on() << ", and misses = "
-        << cts_info.cts.fn_oy() << ".\n";
+        << info.cts_info.cts.fy_oy() << ", false alarms = "
+        << info.cts_info.cts.fy_on() << ", and misses = "
+        << info.cts_info.cts.fn_oy() << ".\n";
 
    return;
 }
 
-////////////////////////////////////////////////////////////////////////
-//
-// TODO: This logic isn't sufficient for finding files with "atcf_gen"
-//       embedded in the middle of the filename.
-//
 ////////////////////////////////////////////////////////////////////////
 
 void get_atcf_files(const StringArray &source,
@@ -514,10 +514,12 @@ void process_track_files(const StringArray &files,
             line.set_technique(cs);
          }
 
+         // Check for BEST and operational track technqiue
+         line.set_best_track(line.technique() == conf_info.BestEventInfo.Technique);
+         line.set_oper_track(line.technique() == conf_info.OperEventInfo.Technique);
+
          // Only process the specified BEST and operational track
-         if(is_anly &&
-            line.technique() != conf_info.BestEventInfo.Technique &&
-            line.technique() != conf_info.OperEventInfo.Technique) {
+         if(is_anly && !line.is_best_track() && !line.is_oper_track()) {
             continue;
          }
 
@@ -701,17 +703,33 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_cts(int i_vx, const ConcatString &model, CTSInfo &cts_info) {
-
-   // TODO: populate other header columns.
+void write_cts(int i_vx, GenCTCInfo &info) {
+   ConcatString var_name("GENESIS");
     
    // Setup header columns
-   shc.set_model(model.c_str());
+   shc.set_model(info.model.c_str());
    shc.set_desc(conf_info.VxOpt[i_vx].Desc.c_str());
+   if(conf_info.VxOpt[i_vx].Lead.n() == 1) {
+      shc.set_fcst_lead_sec(conf_info.VxOpt[i_vx].Lead[0]);
+   }
+   shc.set_fcst_valid_beg(conf_info.VxOpt[i_vx].ValidBeg != 0 ?
+                          conf_info.VxOpt[i_vx].ValidBeg : info.fbeg);
+   shc.set_fcst_valid_end(conf_info.VxOpt[i_vx].ValidEnd != 0 ?
+                          conf_info.VxOpt[i_vx].ValidEnd : info.fend);
+   shc.set_obs_valid_beg(conf_info.VxOpt[i_vx].ValidBeg != 0 ?
+                         conf_info.VxOpt[i_vx].ValidBeg : info.obeg);
+   shc.set_obs_valid_end(conf_info.VxOpt[i_vx].ValidEnd != 0 ?
+                         conf_info.VxOpt[i_vx].ValidEnd : info.oend);
+   shc.set_fcst_var(var_name);
+   shc.set_obs_var(var_name);
+   shc.set_obtype(conf_info.BestEventInfo.Technique.c_str());
+   if(!conf_info.VxOpt[i_vx].VxMaskName.empty()) {
+      shc.set_mask(conf_info.VxOpt[i_vx].VxMaskName.c_str());
+   }
 
    // Write out FHO
    if(conf_info.OutputMap[stat_fho] != STATOutputType_None) {
-      write_fho_row(shc, cts_info,
+      write_fho_row(shc, info.cts_info,
                     conf_info.OutputMap[stat_fho],
                     stat_at, i_stat_row,
                     txt_at[i_fho], i_txt_row[i_fho]);
@@ -719,7 +737,7 @@ void write_cts(int i_vx, const ConcatString &model, CTSInfo &cts_info) {
 
    // Write out CTC
    if(conf_info.OutputMap[stat_ctc] != STATOutputType_None) {
-      write_ctc_row(shc, cts_info,
+      write_ctc_row(shc, info.cts_info,
                     conf_info.OutputMap[stat_ctc],
                     stat_at, i_stat_row,
                     txt_at[i_ctc], i_txt_row[i_ctc]);
@@ -729,12 +747,12 @@ void write_cts(int i_vx, const ConcatString &model, CTSInfo &cts_info) {
    if(conf_info.OutputMap[stat_cts] != STATOutputType_None) {
 
       // Compute the statistics
-      cts_info.allocate_n_alpha(1);
-      cts_info.alpha[0] = conf_info.CIAlpha;
-      cts_info.compute_stats();
-      cts_info.compute_ci();
+      info.cts_info.allocate_n_alpha(1);
+      info.cts_info.alpha[0] = conf_info.CIAlpha;
+      info.cts_info.compute_stats();
+      info.cts_info.compute_ci();
 
-      write_cts_row(shc, cts_info,
+      write_cts_row(shc, info.cts_info,
                     conf_info.OutputMap[stat_cts],
                     stat_at, i_stat_row,
                     txt_at[i_cts], i_txt_row[i_cts]);
