@@ -83,6 +83,8 @@ bool GenesisInfo::operator==(const GenesisInfo & g) const {
 void GenesisInfo::clear() {
 
    IsSet       = false;
+   IsBestTrack = false;
+   IsOperTrack = false;
    IsAnlyTrack = false;
 
    StormId.clear();
@@ -118,6 +120,8 @@ void GenesisInfo::assign(const GenesisInfo &g) {
    clear();
 
    IsSet           = true;
+   IsBestTrack     = g.IsBestTrack;
+   IsOperTrack     = g.IsOperTrack;
    IsAnlyTrack     = g.IsAnlyTrack;
 
    StormId         = g.StormId;
@@ -151,7 +155,9 @@ void GenesisInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    out << prefix << "IsSet           = " << bool_to_string(IsSet) << "\n";
-   out << prefix << "IsAnlyTrack     = " << bool_to_string(IsAnlyTrack) << "\n";
+   out << prefix << "IsBest          = " << bool_to_string(IsBestTrack) << "\n";
+   out << prefix << "IsOper          = " << bool_to_string(IsOperTrack) << "\n";
+   out << prefix << "IsAnly          = " << bool_to_string(IsAnlyTrack) << "\n";
    out << prefix << "StormId         = \"" << StormId.contents() << "\"\n";
    out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
    out << prefix << "Cyclone         = \"" << Cyclone.contents() << "\"\n";
@@ -203,7 +209,9 @@ ConcatString GenesisInfo::serialize() const {
 
    s << "GenesisInfo: "
      << "IsSet = " << bool_to_string(IsSet)
-     << ", IsAnlyTrack = " << bool_to_string(IsAnlyTrack)
+     << ", IsBest = " << bool_to_string(IsBestTrack)
+     << ", IsOper = " << bool_to_string(IsOperTrack)
+     << ", IsAnly = " << bool_to_string(IsAnlyTrack)
      << ", StormId = \"" << StormId.contents() << "\""
      << ", Basin = \"" << Basin.contents() << "\""
      << ", Cyclone = \"" << Cyclone.contents() << "\""
@@ -271,7 +279,9 @@ bool GenesisInfo::set(const TrackInfo &t) {
    // Initialize
    clear();
 
-   // Check for a best track
+   // Store track type information
+   IsBestTrack = t.is_best_track();
+   IsOperTrack = t.is_oper_track();
    IsAnlyTrack = t.is_anly_track();
 
    // Initialize
