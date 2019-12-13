@@ -12,6 +12,7 @@
 
 #include "python3_numpy.h"
 #include "python3_script.h"
+#include "python3_dict.h"
 #include "python3_util.h"
 
 

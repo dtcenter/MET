@@ -20,6 +20,9 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <iostream>
+
+
 #include "concat_string.h"
 
 #include "python3_script.h"
@@ -69,7 +72,7 @@ class Python3_Numpy {
       Python3_Numpy();
      ~Python3_Numpy();
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
 
          //
          //  set stuff

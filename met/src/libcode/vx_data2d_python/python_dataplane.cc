@@ -17,6 +17,7 @@
 #include "python_dataplane.h"
 
 #include "global_python.h"
+#include "wchar_argv.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -41,11 +42,16 @@ bool python_dataplane(const char * script_name,
 
 {
 
-PyObject * module      = 0;
-PyObject * module_dict = 0;
-PyObject * key         = 0;
-PyObject * numpy_array = 0;
-PyObject * attrs_dict  = 0;
+PyObject * module_obj      = 0;
+PyObject * module_dict_obj = 0;
+PyObject * key_obj         = 0;
+PyObject * numpy_array_obj = 0;
+PyObject * attrs_dict_obj  = 0;
+
+Wchar_Argv wa;
+
+wa.set(script_argc, script_argv);
+
 
    //
    //  if the global python object has already been initialized,
@@ -82,7 +88,9 @@ get_env("PYTHONPATH", python_path);
 
 if ( script_argc > 0 )  {
 
-   PySys_SetArgv (script_argc, script_argv);
+   // PySys_SetArgv (script_argc, script_argv);
+
+   PySys_SetArgv (wa.wargc(), wa.wargv());
 
 }
 
@@ -90,7 +98,7 @@ if ( script_argc > 0 )  {
    //  import the python script as a module
    //
 
-module = PyImport_ImportModule (script_name);
+module_obj = PyImport_ImportModule (script_name);
 
    //
    //  if needed, reload the module
@@ -98,7 +106,7 @@ module = PyImport_ImportModule (script_name);
 
 if ( do_reload )  {
 
-   module = PyImport_ReloadModule (module);
+   module_obj = PyImport_ReloadModule (module_obj);
 
 }
 
@@ -112,7 +120,7 @@ if ( PyErr_Occurred() )  {
 
 }
 
-if ( ! module )  {
+if ( ! module_obj )  {
 
    mlog << Warning << "\npython_dataplane() -> "
         << "error running python script \"" << python_path
@@ -126,7 +134,7 @@ if ( ! module )  {
    //   get the namespace for the module (as a dictionary)
    //
 
-module_dict = PyModule_GetDict (module);
+module_dict_obj = PyModule_GetDict (module_obj);
 
    //
    //  get handles to the objects of interest from the module_dict
@@ -134,15 +142,15 @@ module_dict = PyModule_GetDict (module);
 
 if ( use_xarray )  {
 
-   PyObject * data_array = 0;
+   PyObject * data_array_obj = 0;
 
       //   look up the data array variable name from the dictionary
 
-   key = PyString_FromString (xarray_dataarray_name);
+   key_obj = PyUnicode_FromString (xarray_dataarray_name);
 
-   data_array = PyDict_GetItem (module_dict, key);
+   data_array_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-   if ( !data_array )  {
+   if ( ! data_array_obj )  {
 
       mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \"" << python_path
@@ -151,21 +159,21 @@ if ( use_xarray )  {
       return ( false );
    }
 
-   dataplane_from_xarray(data_array, met_dp_out, met_grid_out, vinfo);
+   dataplane_from_xarray(data_array_obj, met_dp_out, met_grid_out, vinfo);
 
 } else {    //  numpy array & dict
 
       //   look up the data array variable name from the dictionary
 
-   key = PyString_FromString (numpy_array_name);
+   key_obj = PyUnicode_FromString (numpy_array_name);
 
-   numpy_array = PyDict_GetItem (module_dict, key);
+   numpy_array_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-   key = PyString_FromString (numpy_dict_name);
+   key_obj = PyUnicode_FromString (numpy_dict_name);
 
-   attrs_dict = PyDict_GetItem (module_dict, key);
+   attrs_dict_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-   if ( !numpy_array || !attrs_dict )  {
+   if ( !numpy_array_obj || !attrs_dict_obj )  {
 
       mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \"" << python_path
@@ -174,7 +182,11 @@ if ( use_xarray )  {
       return ( false );
    }
 
-   dataplane_from_numpy_array(numpy_array, attrs_dict, met_dp_out, met_grid_out, vinfo);
+   Python3_Numpy np;
+
+   np.set(numpy_array_obj);
+
+   dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
 
 }
 

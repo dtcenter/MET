@@ -211,7 +211,7 @@ void ConcatString::clear()
 
 char ConcatString::char_at(const int idx) const
 {
-   if (0 > idx || s->length() <= idx )
+   if (0 > idx || length() <= idx )
         return '\0';
 
    return s->at(idx);
@@ -622,7 +622,7 @@ return ( lc );
 
 char ConcatString::operator[](const int n) const
 {
-    if ((n < 0) || (n >= s->length()))  {
+    if ((n < 0) || (n >= length()))  {
         mlog << Error << "\nConcatString::operator[](const int) const -> range check error\n\n";
         exit ( 1 );
     }

@@ -12,6 +12,8 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_python3_utils.a
 libvx_python3_utils_a_SOURCES = \
+              wchar_argv.h wchar_argv.cc \
+              python3_dict.h python3_dict.cc \
               python3_script.h python3_script.cc \
               python3_numpy.h python3_numpy.cc \
               python3_util.h python3_util.cc

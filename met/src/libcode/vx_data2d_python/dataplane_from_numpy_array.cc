@@ -14,8 +14,29 @@
 #include "vx_python_utils.h"
 #include "check_endian.h"
 
+#include "data_plane.h"
 #include "dataplane_from_numpy_array.h"
 #include "grid_from_python_dict.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  2D numpy arrays seem to store things in row-major order
+   //
+
+inline void nympy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
+
+{
+
+row = n/Ncols;
+
+col = n%Ncols;
+
+return;
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,7 +71,7 @@ for (j=0; j<Nxy; ++j)  {
 
    if ( need_swap )  shuf(&value);
 
-   dp_out.set((double) value, x, y);
+   out.set((double) value, x, y);
 
 }   //  for j
 
@@ -64,43 +85,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void load_le_double (void * buf, const int Nx, const int Ny, DataPlane & out);
-static void load_le_float  (void * buf, const int Nx, const int Ny, DataPlane & out);
-
-
-////////////////////////////////////////////////////////////////////////
-
-   //
-   //  2D numpy arrays seem to store things in row-major order
-   //
-
-inline void nympy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
+bool dataplane_from_numpy_array(Python3_Numpy & np, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {
 
-row = n/Ncols;
-
-col = n%Ncols;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool dataplane_from_numpy_array(Python3_numpy & np, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
-
-{
-
-int j;
-int dim, nrows, ncols, Nx, Ny, Nxy;
-int r, c, x, y;
-double value;
-int sizes [max_tuple_data_dims];
-void * p  = 0;
-double * pp = 0;
+int nrows, ncols, Nx, Ny;
 
 
    //
@@ -124,7 +113,7 @@ ncols = np.dim(1);
 Nx = ncols;
 Ny = nrows;
 
-Nxy = Nx*Ny;
+
 
 dp_out.set_size(Nx, Ny);
 
@@ -171,7 +160,7 @@ else if ( dtype == ">f4"  )   load_numpy <float>     (np.buffer(), Nx, Ny,    bi
       //   double precision floats
 
 else if ( dtype == "<f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny, little_endian, shuffle_8, dp_out);
-else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bit_endian, shuffle_8, dp_out);
+else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    big_endian, shuffle_8, dp_out);
 
       //
       //   nope ... the only other numerical data type for numpy arrays 
@@ -182,7 +171,7 @@ else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bi
 else  {
 
    mlog << Error
-        << \n\n   dataplane_from_numpy_array() -> unsupported numpy data type \"" 
+        << "\n\n   dataplane_from_numpy_array() -> unsupported numpy data type \"" 
         << dtype << "\"\n\n";
 
    exit ( 1 );

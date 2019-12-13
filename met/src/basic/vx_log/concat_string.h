@@ -195,7 +195,7 @@ inline const char * ConcatString::text()          const { return ( s ? s->c_str(
 inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : 0); }
 inline const std::string & ConcatString::string() const { return ( *s ); }
 
-inline int          ConcatString::length()       const { return ( s->length() ); }
+inline int          ConcatString::length()       const { return ( (int) (s->length()) ); }
 
 inline int          ConcatString::precision()    const { return ( Precision ); }
 

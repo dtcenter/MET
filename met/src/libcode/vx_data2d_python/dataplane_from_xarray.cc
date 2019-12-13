@@ -49,7 +49,11 @@ attrs_dict  = PyObject_GetAttrString(data_array, attrs_attr_name);
 
    /////////////////////
 
-bool status = dataplane_from_numpy_array(numpy_array, attrs_dict, dp_out, grid_out, vinfo);
+Python3_Numpy np;
+
+np.set(numpy_array);
+
+bool status = dataplane_from_numpy_array(np, attrs_dict, dp_out, grid_out, vinfo);
 
    //
    //  done
