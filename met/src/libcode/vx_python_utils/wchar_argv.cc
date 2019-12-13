@@ -154,28 +154,41 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 clear();
 
 int j, k;
-int len;
 int argv_len;
-const char * argv_start = _argv[0];
+int * len = 0;
 
 
 Argc = _argc;
 
+len = new int [Argc];
 
-argv_len = 0;
 
    //
    //  total length of the argument string ... 
    //
 
+argv_len = 0;
+
 for (j=0; j<_argc; ++j)  {
 
-   argv_len += strlen(_argv[j]);
+   len[j] = strlen(_argv[j]);   //  we're using the len array here because
+                                //  we don't want to call strlen more than 
+                                //  once on each argv value
+
+   argv_len += len[j];
 
    ++argv_len;   //  ... including the end-of-string sentinels (ie, nul chars);
 
 }
 
+   //
+   //  allocate an array of wchars and set them
+   //   all to the wchar equivalent of nul.
+   //
+   //   (Note: I could use memset here, but I don't want
+   //     to assume that wchar nuls are all zero bytes
+   //     (even though they are))
+   //
 
 W_Buf = new wchar_t [argv_len];
 
@@ -185,14 +198,15 @@ for (j=0; j<Argc; ++j)  {
 
 }
 
+   //
+   //  translate the individual argv values into wchar strings
+   //
 
 k = 0;
 
 for (j=0; j<Argc; ++j)  {
 
-   len = strlen(_argv[j]);
-
-   if ( mbstowcs(W_Buf + k, _argv[j], len) == (size_t) -1 )  {
+   if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
       mlog << Error
            << "\n\n  Wchar_Argv::set() -> mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
@@ -201,20 +215,27 @@ for (j=0; j<Argc; ++j)  {
 
    }
 
-   k += (len + 1);
+   k += (len[j] + 1);
 
 }
 
 
-
+   //
+   //  set up the array of pointers into the wchar buffer
+   //
+   //   (Note: we don't want to assume the argv values
+   //      are stored in contiguous memory)
+   //
 
 W_Argv = new wchar_t * [Argc];
 
+k = 0;
+
 for (j=0; j<Argc; ++j)  {
 
-   k = (int) (_argv[j] - argv_start);
-
    W_Argv[j] = W_Buf + k;
+
+   k += (len[j] + 1);
 
 }
 
@@ -223,6 +244,8 @@ for (j=0; j<Argc; ++j)  {
    //
    //  done
    //
+
+if ( len )  { delete [] len;  len = 0; }
 
 return;
 
