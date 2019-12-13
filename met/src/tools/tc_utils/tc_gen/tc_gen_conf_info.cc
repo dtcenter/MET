@@ -201,50 +201,60 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
 
 bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    bool keep = true;
-   int m, d, y, h, mm, s;
 
    // ATCF ID processed elsewhere
 
-   // Parse init time into components
-   unix_to_mdyhms(g.init(), m, d, y, h, mm, s);
+   // Only check basin, storm ID, cyclone number, and storm name for
+   // BEST and operational tracks.
 
-   // Check storm id
-   if(StormId.n() > 0 &&
-      !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
-      keep = false;
+   if(g.is_best_track() || g.is_oper_track()) {
 
-   // Check basin
-   else if(Basin.n() > 0 && !Basin.has(g.basin()))
-      keep = false;
+      // Check storm id
+      if(StormId.n() > 0 &&
+         !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
+         keep = false;
 
-   // Check cyclone
-   else if(Cyclone.n() > 0 &&
-           !Cyclone.has(g.cyclone()))
-      keep = false;
+      // Check basin
+      else if(Basin.n() > 0 && !Basin.has(g.basin()))
+         keep = false;
 
-   // Check storm name
-   else if(StormName.n() > 0 &&
-           !StormName.has(g.storm_name()))
-      keep = false;
+      // Check cyclone
+      else if(Cyclone.n() > 0 && !Cyclone.has(g.cyclone()))
+         keep = false;
 
-   // Initialization time window
-   else if((InitBeg     > 0 &&  InitBeg > g.init())    ||
-           (InitEnd     > 0 &&  InitEnd < g.init())    ||
-           (InitInc.n() > 0 && !InitInc.has(g.init())) ||
-           (InitExc.n() > 0 &&  InitExc.has(g.init())))
-      keep = false;
+      // Check storm name
+      else if(StormName.n() > 0 && !StormName.has(g.storm_name()))
+         keep = false;
+   }
+
+   if(!keep) return(keep);
+
+   // Only check intialization and lead times for forecast and
+   // operational tracks.
+
+   if(!g.is_best_track() || g.is_oper_track()) {
+
+      // Initialization time window
+      if((InitBeg     > 0 &&  InitBeg > g.init())    ||
+         (InitEnd     > 0 &&  InitEnd < g.init())    ||
+         (InitInc.n() > 0 && !InitInc.has(g.init())) ||
+         (InitExc.n() > 0 &&  InitExc.has(g.init())))
+         keep = false;
+
+      // Initialization hours
+      else if(InitHour.n() > 0 && !InitHour.has(g.init_hour()))
+         keep = false;
+
+      // Lead times
+      else if(Lead.n() > 0 && !Lead.has(g.lead_time()))
+         keep = false;
+   }
+
+   if(!keep) return(keep);
 
    // Valid time window
-   else if((ValidBeg > 0 && ValidBeg > g.valid_min()) ||
-           (ValidEnd > 0 && ValidEnd < g.valid_max()))
-      keep = false;
-
-   // Initialization hours
-   else if(InitHour.n() > 0 && !InitHour.has(hms_to_sec(h, mm, s)))
-      keep = false;
-
-   // Lead times
-   else if(Lead.n() > 0 && !Lead.has(g.lead_time()))
+   if((ValidBeg > 0 && ValidBeg > g.valid_min()) ||
+      (ValidEnd > 0 && ValidEnd < g.valid_max()))
       keep = false;
 
    // Poly masking
