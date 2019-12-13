@@ -19,13 +19,16 @@
 //   002    11/14/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output file.
 //   003    02/25/15  Halley Gotway  Add automated regridding.
-//   004    08/04/15  Halley Gotway  Add conditional continuous verification.
+//   004    08/04/15  Halley Gotway  Add conditional continuous
+//                    verification.
 //   005    09/21/15  Halley Gotway  Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway  Add -paired command line option.
 //   007    05/15/17  Prestopnikk P  Add shape for regrid.
 //   008    10/06/17  Halley Gotway  Add RMSFA and RMSOA stats.
 //   009    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
+//   010    12/11/19  Halley Gotway  Reorganize logic to support the use
+//                    of python embedding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,14 +58,18 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
+static void process_grid        (const Grid &, const Grid &);
 
-static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
+static Met2dDataFile *get_mtddf(const StringArray &,
+                                const GrdFileType);
+static bool           file_is_ok(const ConcatString &,
+                                 const GrdFileType);
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
 static void get_series_entry(int, VarInfo *, const StringArray &,
                              const GrdFileType, StringArray &,
-                             DataPlane &);
+                             DataPlane &, Grid &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
 
@@ -219,13 +226,6 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // Determine the verification grid
-   grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
-                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
-
-   // Process masking regions
-   conf_info.process_masks(grid);
-
    // Set the random number generator and seed value to be used when
    // computing bootstrap confidence intervals
    rng_set(rng_ptr, conf_info.boot_rng.c_str(), conf_info.boot_seed.c_str());
@@ -326,13 +326,48 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
+void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
+
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
+                        &fcst_grid, &obs_grid);
+   nxy  = grid.nx() * grid.ny();
+
+   // Process masking regions
+   conf_info.process_masks(grid);
+
+   // Compute the number of reads required
+   n_reads = nint(ceil((double) nxy / conf_info.block_size));
+   
+   mlog << Debug(2)
+        << "Computing statistics using a block size of "
+        << conf_info.block_size << ", requiring " << n_reads
+        << " pass(es) through the " << grid.nx() << " x "
+        << grid.ny() << " grid.\n";
+
+   // Print a warning for too many passes through the data
+   if(n_reads > 4) {
+      mlog << Warning
+           << "\nA block size of " << conf_info.block_size << " for a "
+           << grid.nx() << " x " << grid.ny() << " grid requires "
+           << n_reads << " passes through the data which will be slow.\n"
+           << "Consider increasing \"block_size\" in the configuration "
+           << "file based on available memory.\n\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+Met2dDataFile *get_mtddf(const StringArray &file_list,
+                         const GrdFileType type) {
    int i;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
-      if(file_exists(file_list[i].c_str())) break;
+      if(file_is_ok(file_list[i], type)) break;
    }
 
    // Check for no valid files
@@ -353,9 +388,16 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+   return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void get_series_data(int i_series,
                      VarInfo *fcst_info, VarInfo *obs_info,
                      DataPlane &fcst_dp, DataPlane &obs_dp) {
+   Grid fcst_grid, obs_grid;
 
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
@@ -367,7 +409,7 @@ void get_series_data(int i_series,
 
       case SeriesType_Fcst_Conf:
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp, fcst_grid);
          if(conf_info.get_n_obs() == 1) {
             obs_info->set_valid(fcst_dp.valid());
             mlog << Debug(3)
@@ -376,12 +418,12 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp, obs_grid);
          break;
 
       case SeriesType_Obs_Conf:
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp, obs_grid);
          if(conf_info.get_n_fcst() == 1) {
             fcst_info->set_valid(obs_dp.valid());
             mlog << Debug(3)
@@ -390,13 +432,13 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp, fcst_grid);
          break;
 
       case SeriesType_Fcst_Files:
          found_fcst_files.set(i_series, fcst_files[i_series]);
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp, fcst_grid);
          if(paired) {
             found_obs_files.set(i_series, obs_files[i_series]);
          }
@@ -408,13 +450,13 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp, obs_grid);
          break;
 
       case SeriesType_Obs_Files:
          found_obs_files.set(i_series, obs_files[i_series]);
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp, obs_grid);
          if(paired) {
             found_fcst_files.set(i_series, fcst_files[i_series]);
          }
@@ -426,7 +468,7 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp, fcst_grid);
          break;
 
       default:
@@ -435,6 +477,49 @@ void get_series_data(int i_series,
               << series_type << "\n\n";
          exit(1);
          break;
+   }
+   
+   // Setup the verification grid
+   if(nxy == 0) process_grid(fcst_grid, obs_grid);
+
+   // Regrid the forecast, if necessary
+   if(!(fcst_grid == grid)) {
+      if(!fcst_info->regrid().enable) {
+         mlog << Error << "\nget_series_data() -> "
+              << "The grid of the current series entry does not "
+              << "match the verification grid and regridding is "
+              << "disabled:\n" << fcst_grid.serialize()
+              << " !=\n" << grid.serialize()
+              << "\nSpecify regridding logic in the config file "
+              << "\"regrid\" section.\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(1)
+           << "Regridding field " << fcst_info->magic_str()
+           << " to the verification grid.\n";
+      fcst_dp = met_regrid(fcst_dp, fcst_grid, grid,
+                           fcst_info->regrid());
+   }
+
+   // Regrid the observation, if necessary
+   if(!(obs_grid == grid)) {
+      if(!obs_info->regrid().enable) {
+         mlog << Error << "\nget_series_data() -> "
+              << "The grid of the current series entry does not "
+              << "match the verification grid and regridding is "
+              << "disabled:\n" << obs_grid.serialize()
+              << " !=\n" << grid.serialize()
+              << "\nSpecify regridding logic in the config file "
+              << "\"regrid\" section.\n\n";
+         exit(1);
+      }
+
+      mlog << Debug(1)
+           << "Regridding field " << obs_info->magic_str()
+           << " to the verification grid.\n";
+      obs_dp = met_regrid(obs_dp, obs_grid, grid,
+                          obs_info->regrid());
    }
 
    // Rescale probabilities from [0, 100] to [0, 1]
@@ -461,10 +546,10 @@ void get_series_data(int i_series,
 void get_series_entry(int i_series, VarInfo *info,
                       const StringArray &search_files,
                       const GrdFileType type,
-                      StringArray &found_files, DataPlane &dp) {
+                      StringArray &found_files, DataPlane &dp,
+                      Grid &cur_grid) {
    int i, j;
    bool found = false;
-   Grid cur_grid;
 
    // Initialize
    dp.clear();
@@ -515,28 +600,6 @@ void get_series_entry(int i_series, VarInfo *info,
       mlog << Debug(2)
            << "Found data for " << info->magic_str()
            << " in file: " << found_files[i_series] << "\n";
-
-      // Regrid, if necessary
-      if(!(cur_grid == grid)) {
-
-         // Check if regridding is disabled
-         if(!info->regrid().enable) {
-            mlog << Error << "\nget_series_entry() -> "
-                 << "The grid of the current series entry does not "
-                 << "match the verification grid and regridding is "
-                 << "disabled:\n" << cur_grid.serialize()
-                 << " !=\n" << grid.serialize()
-                 << "\nSpecify regridding logic in the config file "
-                 << "\"regrid\" section.\n\n";
-            exit(1);
-         }
-
-         mlog << Debug(1)
-              << "Regridding field " << info->magic_str()
-              << " to the verification grid.\n";
-         dp = met_regrid(dp, cur_grid, grid,
-                         info->regrid());
-      }
    }
    // No match here results in a warning.
    else {
@@ -564,7 +627,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    bool found = false;
 
    // Check that the file exists
-   if(!file_exists(cur_file.c_str())) {
+   if(!file_is_ok(cur_file, type)) {
       mlog << Warning << "\nread_single_entry() -> "
            << "File does not exist: " << cur_file << "\n\n";
       return(false);
@@ -588,7 +651,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int nxny, i, x, y, i_read, n_reads, i_series, i_point, i_fcst;
+   int i, x, y, i_read, i_series, i_point, i_fcst;
    VarInfo *fcst_info = (VarInfo *) 0;
    VarInfo *obs_info  = (VarInfo *) 0;
    PairDataPoint *pd_ptr = (PairDataPoint *) 0;
@@ -602,29 +665,9 @@ void process_scores() {
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
 
-   // Determine the block size
-   nxny    = grid.nx() * grid.ny();
-   n_reads = nint(ceil((double) nxny / conf_info.block_size));
-
    // Allocate space to store the pairs for each grid point
    pd_ptr = new PairDataPoint [conf_info.block_size];
    for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
-
-   mlog << Debug(2)
-        << "Computing statistics using a block size of "
-        << conf_info.block_size << ", requiring " << n_reads
-        << " pass(es) through the " << grid.nx() << " x "
-        << grid.ny() << " grid.\n";
-
-   // Print a warning for too many passes through the data
-   if(n_reads > 4) {
-      mlog << Warning
-           << "\nA block size of " << conf_info.block_size << " for a "
-           << grid.nx() << " x " << grid.ny() << " grid requires "
-           << n_reads << " passes through the data which will be slow.\n"
-           << "Consider increasing \"block_size\" in the configuration "
-           << "file based on available memory.\n\n";
-   }
 
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
@@ -634,11 +677,6 @@ void process_scores() {
 
       // Starting grid point
       i_point = i_read*conf_info.block_size;
-
-      mlog << Debug(2)
-           << "Processing data pass number " << i_read + 1 << " of "
-           << n_reads << " for grid points " << i_point + 1 << " to "
-           << min(i_point + conf_info.block_size, nxny) << ".\n";
 
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
@@ -654,6 +692,13 @@ void process_scores() {
 
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
+
+         if(i_series == 0) {
+            mlog << Debug(2)
+                 << "Processing data pass number " << i_read + 1 << " of "
+                 << n_reads << " for grid points " << i_point + 1 << " to "
+                 << min(i_point + conf_info.block_size, nxy) << ".\n";
+         }
 
          // Read climatology data for the current series entry
          cmn_dp = read_climo_data_plane(
@@ -684,7 +729,7 @@ void process_scores() {
          set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
 
          // Store matched pairs for each grid point
-         for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+         for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
 
             // Convert n to x, y
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -706,7 +751,7 @@ void process_scores() {
       } // end for i_series
 
       // Compute statistics for each grid point in the block
-      for(i=0; i<conf_info.block_size && (i_point+i)<nxny; i++) {
+      for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
 
          // Determine x,y location
          DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -799,11 +844,11 @@ void process_scores() {
    // Print summary counts
    mlog << Debug(2)
         << "Finished processing statistics for "
-        << nxny - n_skip_zero - n_skip_pos << " of " << nxny
+        << nxy - n_skip_zero - n_skip_pos << " of " << nxy
         << " grid points.\n"
-        << "Skipped " << n_skip_zero << " of " << nxny
+        << "Skipped " << n_skip_zero << " of " << nxy
         << " points with no valid data.\n"
-        << "Skipped " << n_skip_pos << " of " << nxny
+        << "Skipped " << n_skip_pos << " of " << nxy
         << " points that did not meet the valid data threshold.\n";
 
    // Print config file suggestions about missing data

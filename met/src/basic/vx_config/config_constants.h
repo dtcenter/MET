@@ -283,6 +283,7 @@ struct RegridInfo {
 
    void         clear();
    void         validate(); // ensure that width and method are accordant
+   void         validate_point(); // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -607,6 +608,7 @@ static const char conf_key_shape[]             = "shape";
 static const char conf_key_gaussian_dx[]       = "gaussian_dx";
 static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_eclv_points[]       = "eclv_points";
+static const char conf_key_var_name_map[]      = "var_name_map";
 
 //
 // Climatology parameter key names

@@ -41,6 +41,7 @@ config_DATA = \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
+	Point2GridConfig_default \
 	README \
 	README_TC
 

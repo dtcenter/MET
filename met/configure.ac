@@ -677,6 +677,26 @@ else
     AC_MSG_NOTICE([regrid_data_plane will not be compiled])
 fi
 
+# point2grid
+
+AC_ARG_ENABLE(point2grid,
+          [AS_HELP_STRING([--disable-point2grid], [Disable compilation of point2grid])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_POINT2GRID="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-point2grid) ;;
+   esac],
+  [ENABLE_POINT2GRID="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_POINT2GRID], [test "x$ENABLE_POINT2GRID" = "xyes"])
+
+if test "x$ENABLE_POINT2GRID" = "xyes"; then
+    AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
+    AC_MSG_NOTICE([point2grid will be compiled])
+else
+    AC_MSG_NOTICE([point2grid will not be compiled])
+fi
+
 # shift_data_plane
 
 AC_ARG_ENABLE(shift_data_plane,
@@ -1171,6 +1191,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/wwmca_tool/Makefile
                  src/tools/other/gsi_tools/Makefile
                  src/tools/other/regrid_data_plane/Makefile
+                 src/tools/other/point2grid/Makefile
                  src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
                  src/tools/tc_utils/Makefile

@@ -93,31 +93,21 @@ DIR *met_opendir(const char *path) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void met_closedir(DIR * & dp) {
 
-void met_closedir(DIR * & dp)
+   int status = ::closedir(dp);
+   dp = 0;
 
-{
+   if(status < 0) {
 
-int status = ::closedir(dp);
+      mlog << Error << "\nmet_closedir(DIR *) -> "
+           << "trouble closing directory ... " << strerror(errno)
+           << "\n\n";
 
-dp = 0;
+      exit(1);
+   }
 
-if ( status < 0 )  {
-
-   mlog << Error
-        << "\n\n  met_closedir(DIR *) -> trouble closing directory ... "
-        << strerror(errno) << "\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

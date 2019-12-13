@@ -729,10 +729,8 @@ void set_tmp_dir(const StringArray & a) {
            << tmp_dir << "\n\n";
       exit(1);
    }
-   else {
-      met_closedir(dp);
-      dp = 0;
-   }
+
+   if(dp) met_closedir(dp);
 
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }

@@ -169,19 +169,20 @@ inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
 inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
 
-inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                 }
-inline const ConcatString & TrackInfo::basin()            const { return(Basin);                   }
-inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone);                 }
-inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);               }
-inline int                  TrackInfo::technique_number() const { return(TechniqueNumber);         }
-inline const ConcatString & TrackInfo::technique()        const { return(Technique);               }
-inline const ConcatString & TrackInfo::initials()         const { return(Initials);                }
-inline unixtime             TrackInfo::init()             const { return(InitTime);                }
-inline int                  TrackInfo::init_hour()        const { return(InitTime % sec_per_hour); }
-inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);            }
-inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);            }
-inline int                  TrackInfo::n_points()         const { return(NPoints);                 }
-inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);              }
+inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
+inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
+inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone);                      }
+inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);                    }
+inline int                  TrackInfo::technique_number() const { return(TechniqueNumber);              }
+inline const ConcatString & TrackInfo::technique()        const { return(Technique);                    }
+inline const ConcatString & TrackInfo::initials()         const { return(Initials);                     }
+inline unixtime             TrackInfo::init()             const { return(InitTime);                     }
+inline int                  TrackInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
+inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);                 }
+inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);                 }
+inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
+inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
+
 ////////////////////////////////////////////////////////////////////////
 //
 // TrackInfoArray class stores an array of TrackInfo objects.
