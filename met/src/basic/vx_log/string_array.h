@@ -125,9 +125,9 @@ class StringArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int StringArray::n_elements() const { return ( s.size() ); }
+inline int StringArray::n_elements() const { return ( (int) (s.size()) ); }
 
-inline int StringArray::n         () const { return ( s.size() ); }
+inline int StringArray::n         () const { return ( (int) (s.size()) ); }
 
 inline int StringArray::max_length() const { return ( MaxLength ); }
 
