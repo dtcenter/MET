@@ -73,7 +73,6 @@ static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
 static void set_data_files(const StringArray &);
 static void set_both_files(const StringArray &);
-static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
 static void set_log_file(const StringArray &);
@@ -166,8 +165,11 @@ void process_command_line_config(int argc, char **argv) {
    // Get the data file type from config, if present
    dtype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
 
-   // Parse the forecast and observation file lists
+   // Parse the data file lists
    data_files = parse_file_list(data_files, dtype);
+
+   // Get mtddf
+   data_mtddf = get_mtddf(data_files, dtype);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,7 +192,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_fcst_files,  "-fcst",  -1);
    cline.add(set_obs_files,   "-obs",   -1);
    cline.add(set_both_files,  "-both",  -1);
-   cline.add(set_paired,      "-paired", 0);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
    cline.add(set_log_file,    "-log",    1);
@@ -823,33 +824,18 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
-        << "\t-obs   file_1 ... file_n | obs_file_list\n"
-        << "\t[-both file_1 ... file_n | both_file_list]\n"
-        << "\t[-paired]\n"
+        << "\t-data  file_1 ... file_n | data_file_list\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
-        << "forecast files to be used (required).\n"
+        << "\twhere\t\"-data file_1 ... file_n\" are the gridded "
+        << "data files to be used (required).\n"
 
-        << "\t\t\"-fcst fcst_file_list\" is an ASCII file containing "
-        << "a list of gridded forecast files to be used (required).\n"
-
-        << "\t\t\"-obs  file_1 ... file_n\" are the gridded "
-        << "observation files to be used (required).\n"
-
-        << "\t\t\"-obs  obs_file_list\" is an ASCII file containing "
-        << "a list of gridded observation files to be used (required).\n"
-
-        << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
-        << "the same set of files (optional).\n"
-
-        << "\t\t\"-paired\" to indicate that the input -fcst and -obs "
-        << "file lists are already paired (optional).\n"
+        << "\t\t\"-data data_file_list\" is an ASCII file containing "
+        << "a list of gridded data files to be used (required).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file containing "
         << "computed statistics (required).\n"

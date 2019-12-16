@@ -116,6 +116,7 @@ static Grid grid;
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
 static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) 0;
+static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) 0;
