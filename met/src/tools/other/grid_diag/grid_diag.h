@@ -70,8 +70,10 @@ static const char * default_config_filename =
 // Input files
 static StringArray fcst_files, found_fcst_files;
 static StringArray obs_files,  found_obs_files;
+static StringArray data_files,  found_data_files;
 static GrdFileType ftype  = FileType_None;
 static GrdFileType otype  = FileType_None;
+static GrdFileType dtype  = FileType_None;
 static bool        paired = false;
 static int compress_level = -1;
 

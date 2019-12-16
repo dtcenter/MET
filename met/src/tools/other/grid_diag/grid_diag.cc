@@ -71,6 +71,7 @@ static void clean_up();
 static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
+static void set_data_files(const StringArray &);
 static void set_both_files(const StringArray &);
 static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
@@ -91,6 +92,7 @@ int main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line_config(argc, argv);
+   // process_command_line(argc, argv);
 
    // Close the text files and deallocate memory
    // clean_up();
@@ -115,10 +117,7 @@ void process_command_line_config(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_fcst_files,  "-fcst",  -1);
-   cline.add(set_obs_files,   "-obs",   -1);
-   cline.add(set_both_files,  "-both",  -1);
-   cline.add(set_paired,      "-paired", 0);
+   cline.add(set_data_files,  "-data",  -1);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
    cline.add(set_log_file,    "-log",    1);
@@ -132,16 +131,10 @@ void process_command_line_config(int argc, char **argv) {
    if(cline.n() != 0) usage();
 
    // Check that the required arguments have been set.
-   if(fcst_files.n_elements() == 0) {
+   if(data_files.n_elements() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "the forecast file list must be set using the "
-           << "\"-fcst\" or \"-both\" option.\n\n";
-      usage();
-   }
-   if(obs_files.n_elements() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the observation file list must be set using the "
-           << "\"-obs\" or \"-both\" option.\n\n";
+           << "the data file list must be set using the "
+           << "\"-data option.\n\n";
       usage();
    }
    if(config_file.length() == 0) {
@@ -169,6 +162,12 @@ void process_command_line_config(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
+
+   // Get the data file type from config, if present
+   dtype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
+
+   // Parse the forecast and observation file lists
+   data_files = parse_file_list(data_files, dtype);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -880,6 +879,12 @@ void set_fcst_files(const StringArray & a) {
 
 void set_obs_files(const StringArray & a) {
    obs_files = a;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_data_files(const StringArray & a) {
+   data_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
