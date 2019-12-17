@@ -536,7 +536,16 @@ vskip 0.1in
 
 \begin_layout Standard
 It remains to discuss command lines and config files.
- On the command line for any of the MET tools which will be obtaining its
+ Two methods for specifying the Python command and input file name are supported.
+ 
+\end_layout
+
+\begin_layout Standard
+Python Embedding Option 1:
+\end_layout
+
+\begin_layout Standard
+On the command line for any of the MET tools which will be obtaining its
  data from a Python script rather than directly from a data file, the user
  should specify either PYTHON_NUMPY or PYTHON_XARRAY wherever a (forecast
  or observation) data file name would normally be given.
@@ -701,6 +710,92 @@ Attributes: {'name': 'FCST',  'long_name': 'FCST_word',
 \begin_layout Plain Layout
 
 DEBUG 1: Creating postscript file: fcst.ps
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Python Embedding Option 2:
+\end_layout
+
+\begin_layout Standard
+The second option was added to support the use of Python embedding in tools
+ which read multiple input files.
+ Option 1 reads a single field of data from a single source, whereas tools
+ like Ensemble-Stat, Series-Analysis, and MTD read data from multiple input
+ files.
+ While option 2 can be used in any of the MET tools, it is required for
+ Python embedding in Ensemble-Stat, Series-Analysis, and MTD.
+\end_layout
+
+\begin_layout Standard
+On the command line for any of the MET tools, specify the path to the input
+ gridded data file(s) as the usage statement for the tool indicates.
+ Do 
+\series bold
+not
+\series default
+ substitute in PYTHON_NUMPY or PYTHON_XARRAY on the command line.
+ In the config file dictionary set the 
+\family typewriter
+file_type
+\family default
+ entry to either PYTHON_NUMPY or PYTHON_XARRAY to activate the Python embedding
+ logic.
+ Then, in the 
+\family typewriter
+name
+\family default
+ entry of the config file dictionaries for the forecast or observation data,
+ list the Python script to be run followed by any command line arguments
+ for that script.
+ However, in the Python command, replace the name of the input gridded data
+ file with the constant string MET_PYTHON_INPUT_FILE.
+ When looping over multiple input files, the MET tools will replace that
+ constant MET_PYTHON_INPUT_FILE with the path to the file currently being
+ processed.
+ The example 
+\family typewriter
+plot_data_plane
+\family default
+ command listed below yields the same result as the example shown above,
+ but using the option 2 logic instead.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+plot_data_plane data/python/fcst.txt fcst.ps 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  'name="scripts/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST";
+ 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+   file_type=PYTHON_NUMPY;' 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  -title "Python enabled plot_data_plane"
 \end_layout
 
 \end_inset

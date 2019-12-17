@@ -278,7 +278,7 @@ out << '\n';
 
 for (j=start_index; j<=stop_index; ++j)  {
 
-   sprintf(junk, " %.5f %.5f", gr.lat(j), gr.lon(j));
+   snprintf(junk, sizeof(junk), " %.5f %.5f", gr.lat(j), gr.lon(j));
 
    out << junk << '\n';
 

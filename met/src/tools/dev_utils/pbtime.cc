@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
    ireadns_(&file_unit, hdr_typ, &i_date);
 
    // Format and dump out the time string
-   sprintf(time_str, "%.10i", i_date);
+   snprintf(time_str, sizeof(time_str), "%.10i", i_date);
    ut = yyyymmddhh_to_unix(time_str);
    cout << unix_to_yyyymmdd_hhmmss(ut) << "\n" << flush;
 

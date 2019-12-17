@@ -849,10 +849,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
    } // end while
 
-   if( dp != 0 ) {
-      met_closedir(dp);
-      dp = 0;
-   }
+   if(dp) met_closedir(dp);
 
    return(i_rec);
 }

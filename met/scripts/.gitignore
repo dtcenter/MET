@@ -16,6 +16,7 @@ pb2nc
 pcp_combine
 plot_data_plane
 plot_point_obs
+point2grid
 point_stat
 regrid_data_plane
 series_analysis

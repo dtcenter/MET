@@ -204,29 +204,17 @@ for (t=0; t<Nt; ++t)  {
 
    load_handle(handle, *this, t);
 
-   s_below = handle.sum_plane_below;
-   s_this  = handle.sum_plane_this;
-   s_above = handle.sum_plane_above;
+   s_below  = handle.sum_plane_below;
+   s_this   = handle.sum_plane_this;
+   s_above  = handle.sum_plane_above;
 
    ok_below = handle.ok_sum_plane_below;
    ok_this  = handle.ok_sum_plane_this;
    ok_above = handle.ok_sum_plane_above;
 
-   // if ( t == 0 )  data_handle_ppm(handle.sum_plane_this, handle.nx, handle.ny, "sum_00.ppm");
-
       // 
-      //   the order of loops is important, here
+      //   the order of loops is important here
       // 
-
-/*
-   for (y=0; y<Ny; ++y)  {
-
-      for (x=0; x<Nx; ++x)  {
-
-      }   //  for x
-
-   }   //  for y
-*/
 
    for (j=0; j<Nxy; ++j)  {
 
@@ -234,25 +222,7 @@ for (t=0; t<Nt; ++t)  {
 
       if ( !ok )  value = bad_data_double;
       else {
-/*
-         if ( j == 250000 )  {
 
-            cout << "Hello\n";
-
-            cout << "ok_below = " << (*ok_below) << '\n';
-            cout << "ok_this  = " << (*ok_this)  << '\n';
-            cout << "ok_above = " << (*ok_above) << '\n';
-
-            cout << '\n';
-
-            cout << "s_below  = " << (*s_below) << '\n';
-            cout << "s_this   = " << (*s_this)  << '\n';
-            cout << "s_above  = " << (*s_above) << '\n';
-
-            cout << '\n';
-
-         }
-*/
          value = 0.0;
 
          if ( *ok_below )  value += (*s_below);

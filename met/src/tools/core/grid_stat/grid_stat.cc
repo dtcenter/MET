@@ -271,8 +271,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // For python types read the first field to set the grid
-   if(ftype == FileType_Python_Numpy ||
-      ftype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(ftype)) {
       if(!fcst_mtddf->data_plane(*conf_info.vx_opt[0].fcst_info, dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -280,8 +279,7 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(otype == FileType_Python_Numpy ||
-      otype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(otype)) {
       if(!obs_mtddf->data_plane(*conf_info.vx_opt[0].obs_info, dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -2412,7 +2410,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    }
 
    // Append smoothing info for all but nearest neighbor
-   if(interp_pnts > 1) {
+   if(interp_pnts > 1 ||
+      interp_mthd == interpmthd_to_string(InterpMthd_Gaussian)) {
       interp_str << "_" << interp_mthd << "_" << interp_pnts;
    }
    // Append Fourier decomposition info

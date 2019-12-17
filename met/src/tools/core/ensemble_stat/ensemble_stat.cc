@@ -52,6 +52,8 @@
 //   024    04/01/19  Fillmore       Add FCST and OBS units.
 //   025    04/15/19  Halley Gotway  Add percentile thresholds.
 //   026    11/26/19  Halley Gotway  Add neighborhood probabilities.
+//   027    12/11/19  Halley Gotway  Reorganize logic to support the use
+//                    of python embedding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +85,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line  (int, char **);
+static void process_grid          (const Grid &);
 static void process_n_vld         ();
 static void process_ensemble      ();
 static void process_vx            ();
@@ -175,7 +178,6 @@ int main(int argc, char *argv[]) {
 
 void process_command_line(int argc, char **argv) {
    int i;
-   struct stat results;
    CommandLine cline;
    ConcatString default_config_file;
    Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
@@ -202,20 +204,20 @@ void process_command_line(int argc, char **argv) {
    //
    // add the options function calls
    //
-   cline.add(set_grid_obs, "-grid_obs", 1);
-   cline.add(set_point_obs, "-point_obs", 1);
-   cline.add(set_ens_mean, "-ens_mean", 1);
+   cline.add(set_grid_obs,      "-grid_obs", 1);
+   cline.add(set_point_obs,     "-point_obs", 1);
+   cline.add(set_ens_mean,      "-ens_mean", 1);
    cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end, "-obs_valid_end", 1);
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_outdir,        "-outdir", 1);
+   cline.add(set_logfile,       "-log", 1);
+   cline.add(set_verbosity,     "-v", 1);
+   cline.add(set_compress,      "-compress",  1);
 
    //
    // quietly support deprecated -ssvar_mean option
    //
-   cline.add(set_ens_mean, "-ssvar_mean", 1);
+   cline.add(set_ens_mean,      "-ssvar_mean", 1);
 
    //
    // parse the command line
@@ -314,15 +316,19 @@ void process_command_line(int argc, char **argv) {
    // Store the input ensemble file type
    etype = ens_mtddf->file_type();
 
-   bool use_var_id = false;     // Use a variable index from var_name instead of GRIB code
+   // Use a variable index from var_name instead of GRIB code
+   bool use_var_id = false;
+
    // Determine the input observation file type
    if(point_obs_flag) {
       otype = FileType_Gb1;
       if(point_obs_file_list.n() > 0) {
-	use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
+         use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
       }
    }
-   else if(!grid_obs_flag) otype = FileType_None;
+   else if(!grid_obs_flag) {
+      otype = FileType_None;
+   }
    else {
 
       // Get the observation file type from config, if present
@@ -342,28 +348,7 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id);
-
-   // Parse regridding logic
-   RegridInfo ri;
-   if(conf_info.get_n_ens_var() > 0) {
-      ri = conf_info.ens_info[0]->regrid();
-   }
-   else if(conf_info.get_n_vx() > 0) {
-      ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
-   }
-   else {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "at least one ensemble field or verification field must be provided!\n\n";
-      exit(1);
-   }
-
-   // Determine the verification grid
-   grid = parse_vx_grid(ri, &(ens_mtddf->grid()),
-             (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
-
-   // Compute weight for each grid point
-   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
-
+   
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
@@ -400,10 +385,11 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   // Check for missing ensemble files
+   // Check for missing non-python ensemble files
    for(i=0; i<ens_file_list.n(); i++) {
 
-      if(stat(ens_file_list[i].c_str(), &results) != 0) {
+      if(!file_exists(ens_file_list[i].c_str()) &&
+         !is_python_grdfiletype(etype)) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble file: "
               << ens_file_list[i] << "\n\n";
@@ -428,7 +414,7 @@ void process_command_line(int argc, char **argv) {
    // Process ensemble mean information
    ens_mean_flag = false;
    bool need_ens_mean = (
-      conf_info.output_flag[i_ecnt] != STATOutputType_None ||
+      conf_info.output_flag[i_ecnt]  != STATOutputType_None ||
       conf_info.output_flag[i_orank] != STATOutputType_None ||
       conf_info.output_flag[i_ssvar] != STATOutputType_None);
 
@@ -440,7 +426,7 @@ void process_command_line(int argc, char **argv) {
               << "ignoring input -ens_mean file because no ensemble "
               << "mean is needed.\n\n";
       }
-      else if(stat(ens_mean_user.c_str(), &results)) {
+      else if(!file_exists(ens_mean_user.c_str())) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble mean file: "
               << ens_mean_user << "\n\n";
@@ -470,6 +456,74 @@ void process_command_line(int argc, char **argv) {
    // Deallocate memory for data files
    if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
    if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_grid(const Grid &fcst_grid) {
+   Grid obs_grid;
+
+   // Parse regridding logic
+   RegridInfo ri;
+   if(conf_info.get_n_ens_var() > 0) {
+      ri = conf_info.ens_info[0]->regrid();
+   }
+   else if(conf_info.get_n_vx() > 0) {
+      ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
+   }
+   else {
+      mlog << Error << "\nprocess_grid() -> "
+           << "at least one ensemble field or verification field must "
+           << "be provided!\n\n";
+      exit(1);
+   }
+
+   // Read gridded observation data, if necessary
+   if(ri.field == FieldType_Obs) {
+
+      if(!grid_obs_flag) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "attempting to regrid to the observation grid, but no "
+              << "gridded observations provided!\n\n";
+         exit(1); 
+      }
+
+      DataPlane dp;
+      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+      if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+                                 grid_obs_file_list[0].c_str(), otype))) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "trouble reading file \"" << grid_obs_file_list[0]
+              << "\"\n\n";
+         exit(1);
+      }
+
+      if(!mtddf->data_plane(*(conf_info.vx_opt[0].vx_pd.obs_info), dp)) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "observation field \""
+              << conf_info.vx_opt[0].vx_pd.obs_info->magic_str()
+              << "\" not found in file \"" << grid_obs_file_list[0]
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Store the observation grid
+      obs_grid = mtddf->grid();
+
+      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   }
+   else {
+      obs_grid = fcst_grid;
+   }
+
+   // Determine the verification grid
+   grid = parse_vx_grid(ri, &fcst_grid, &obs_grid);
+   nxy  = grid.nx() * grid.ny();
+
+   // Compute weight for each grid point
+   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
 
    return;
 }
@@ -574,8 +628,7 @@ void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp,
-                    bool do_regrid) {
+                    VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -588,6 +641,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
    // Read the gridded data field
    if((found = mtddf->data_plane(*info, dp))) {
+
+      // Setup the verification grid, if necessary
+      if(nxy == 0) process_grid(mtddf->grid());
 
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {
@@ -639,6 +695,9 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
    // Check for at least one field
    if((found = (n > 0))) {
+
+      // Setup the verification grid, if necessary
+      if(nxy == 0) process_grid(mtddf->grid());
 
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {
@@ -1381,14 +1440,11 @@ void process_grid_vx() {
       // Set the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
-
-      // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
-
-      // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1505,6 +1561,15 @@ void process_grid_vx() {
               << " not found in observation files.\n";
          continue;
       }
+
+      // Set the observation variable name
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
+
+      // Set the observation level name
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -1878,19 +1943,16 @@ void process_grid_scores(int i_vx,
 void clear_counts() {
    int i, j, k;
 
-   // Number of grid points
-   const int Nxy = grid.nx()*grid.ny();
-
    // Allocate memory in one big chunk based on grid size, if needed
-   count_na.extend(Nxy);
-   min_na.extend(Nxy);
-   max_na.extend(Nxy);
-   sum_na.extend(Nxy);
-   sum_sq_na.extend(Nxy);
+   count_na.extend(nxy);
+   min_na.extend(nxy);
+   max_na.extend(nxy);
+   sum_na.extend(nxy);
+   sum_sq_na.extend(nxy);
    for(i=0; i<conf_info.get_max_n_thresh(); i++) {
-      thresh_count_na[i].extend(Nxy);
+      thresh_count_na[i].extend(nxy);
       for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-         thresh_nbrhd_count_na[i][j].extend(Nxy);
+         thresh_nbrhd_count_na[i][j].extend(nxy);
       }
    }
 
@@ -1908,7 +1970,7 @@ void clear_counts() {
    }
 
    // Initialize arrays
-   for(i=0; i<Nxy; i++) {
+   for(i=0; i<nxy; i++) {
       count_na.add(0);
       min_na.add(bad_data_double);
       max_na.add(bad_data_double);
@@ -1931,9 +1993,6 @@ void track_counts(int i_vx, const DataPlane &dp) {
    int i, j, k;
    double v;
 
-   // Number of grid points
-   const int Nxy = dp.nx()*dp.ny();
-
    // Pointers to data buffers for faster access
    const double *Data = dp.data();
    double *CountBuf   = count_na.buf();
@@ -1947,7 +2006,7 @@ void track_counts(int i_vx, const DataPlane &dp) {
    SingleThresh *ThreshBuf = conf_info.ens_ta[i_vx].buf();
 
    // Increment counts for each grid point
-   for(i=0; i<Nxy; i++) {
+   for(i=0; i<nxy; i++) {
 
       // Get current value
       v = *Data++;
@@ -1991,7 +2050,7 @@ void track_counts(int i_vx, const DataPlane &dp) {
 
             // Increment counts
             const double *Frac = frac_dp.data();
-            for(k=0; k<Nxy; k++) {
+            for(k=0; k<nxy; k++) {
                if(Frac[k] > 0) thresh_nbrhd_count_na[i][j].inc(k, 1);
             } // end for k 
 
@@ -2245,7 +2304,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
    // Append the timing information
    unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2iV",
+   snprintf(tmp_str, sizeof(tmp_str), "%.4i%.2i%.2i_%.2i%.2i%.2iV",
            yr, mon, day, hr, min, sec);
    str << "_" << tmp_str;
 

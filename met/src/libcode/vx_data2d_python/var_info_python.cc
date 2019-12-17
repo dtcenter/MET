@@ -130,7 +130,7 @@ void VarInfoPython::set_file_type(const GrdFileType t)
 
 {
 
-   if ( (t == FileType_Python_Numpy) || (t == FileType_Python_Xarray) ) {
+   if ( is_python_grdfiletype(t) ) {
 
       Type = t;
 
@@ -174,6 +174,12 @@ void VarInfoPython::set_dict(Dictionary & dict) {
    //
 
    ReqName = dict.lookup_string(conf_key_name, true);
+
+   //
+   //  hard-code the magic string as PYTHON
+   //
+
+   MagicStr << cs_erase << "PYTHON";
 
    return;
 }

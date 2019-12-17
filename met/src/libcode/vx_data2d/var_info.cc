@@ -376,8 +376,10 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s.c_str()));
 
    // Parse prob as a boolean, if present
-   f = dict.lookup_bool(conf_key_prob, false);
-   if(dict.last_lookup_status()) set_p_flag(f);
+   const DictionaryEntry * e = dict.lookup(conf_key_prob);
+   if(e) {
+      if(e->type() == BooleanType) set_p_flag(e->b_value());
+   }
 
    // Parse prob_as_scalar, if present
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);

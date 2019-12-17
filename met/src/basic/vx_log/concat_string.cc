@@ -327,7 +327,7 @@ void ConcatString::chomp(const char c)
 
 void ConcatString::chomp(const char * suffix)
 {
-    size_t limit = s->length() - strlen(suffix);
+    size_t limit = length() - strlen(suffix);
     size_t pos = s->find(suffix, limit);
     if (pos != string::npos)
         s->erase(pos);
@@ -567,7 +567,7 @@ bool ConcatString::read_line(istream & in)
     getline(in, *s);
     if (!in) {
           // Check for end of file and non-empty line
-          if (in.eof() && (s->length() != 0))
+          if (in.eof() && (length() != 0))
             return true;
           else
             return false;

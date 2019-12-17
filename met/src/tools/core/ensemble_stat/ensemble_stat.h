@@ -174,6 +174,7 @@ static int          i_txt_row[n_txt];
 
 // Grid variables
 static Grid grid;
+static int nxy = 0;
 
 // Weight for each grid point
 static DataPlane wgt_dp;

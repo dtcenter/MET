@@ -380,8 +380,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    Dictionary* dict_prob;
    if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false))){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-           << "if the field name is set to \"PROB\", then a prob information "
-           << "section must be present\n\n";
+           << "if the field name is set to \"PROB\", then a prob dictionary "
+           << "must be defined\n\n";
       exit(1);
    }
 
