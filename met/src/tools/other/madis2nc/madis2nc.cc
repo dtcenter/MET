@@ -573,7 +573,7 @@ int process_obs(const int in_gc, const float conversion,
    //
    if(!is_bad_data(obs_arr[4])) {
       char  var_name[max_str_len];
-      sprintf(var_name, "GRIB_%d", (int) obs_arr[1]);
+      snprintf(var_name, sizeof(var_name), "GRIB_%d", (int) obs_arr[1]);
 
       obs_arr[4] *= conversion;
 

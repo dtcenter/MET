@@ -2752,7 +2752,7 @@ void draw_tiles(PSfile *p, Box &dim,
          page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
 
          p->choose_font(28, 20.0);
-         sprintf(label, "%i", i+1);
+         snprintf(label, sizeof(label), "%i", i+1);
          p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
          // Draw outline in black
