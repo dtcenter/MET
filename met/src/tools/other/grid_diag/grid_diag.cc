@@ -170,6 +170,14 @@ void process_command_line_config(int argc, char **argv) {
 
    // Get mtddf
    data_mtddf = get_mtddf(data_files, dtype);
+
+   // Store the input data file types
+   dtype = data_mtddf->file_type();
+
+   mlog << Debug(2) << "Process configuration.\n";
+
+   // Process the configuration
+   conf_info.process_config(dtype, dtype);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -387,8 +395,8 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
    }
 
    // Check for no valid files
-   if(i == fcst_files.n_elements()) {
-      mlog << Error << "\nTrouble reading forecast files.\n\n";
+   if(i == data_files.n_elements()) {
+      mlog << Error << "\nTrouble reading data files.\n\n";
       exit(1);
    }
 
