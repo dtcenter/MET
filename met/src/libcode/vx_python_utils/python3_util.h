@@ -47,14 +47,6 @@ extern PyObject * get_attribute(PyObject *, const char * attribute_name);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void dump_dict       (PyObject * dict, int depth);
-
-extern void dump_dict_value (PyObject * key, PyObject * value, int depth);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #endif   /*  __MET_PYTHON3_UTIL_H__  */
 
 
