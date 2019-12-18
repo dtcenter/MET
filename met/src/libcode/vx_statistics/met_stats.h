@@ -694,8 +694,8 @@ extern int    parse_int_list(const char *, int *&);
 extern int    max_int(const int *, int);
 extern int    min_int(const int *, int);
 
-extern void   dbl_to_str(double, char *);
 extern void   dbl_to_str(double, char *, int);
+extern void   dbl_to_str(double, char *, int, int);
 
 ////////////////////////////////////////////////////////////////////////
 //

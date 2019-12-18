@@ -192,7 +192,7 @@ for (j=0; j<_argc; ++j)  {
 
 W_Buf = new wchar_t [argv_len];
 
-for (j=0; j<Argc; ++j)  {
+for (j=0; j<argv_len; ++j)  {
 
    W_Buf[j] = L'\0';
 

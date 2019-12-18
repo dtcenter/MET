@@ -1,5 +1,4 @@
 MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
-   -fPIC  \
 	     -I${top_builddir}/src/basic/vx_config \
 	     -I${top_builddir}/src/basic/vx_log \
 	     -I${top_builddir}/src/basic/vx_math \
@@ -38,6 +37,8 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_time_series \
 	     -I${top_builddir}/src/libcode/vx_series_data \
 	     -I${top_builddir}/src/libcode/vx_tc_util
+
+#-fPIC  \
 
 MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/basic/vx_config \
