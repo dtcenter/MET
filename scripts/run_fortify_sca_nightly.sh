@@ -54,8 +54,8 @@ export MET_CAIROINC=/usr/include/cairo
 export MET_CAIROLIB=/usr/lib
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
-export MET_PYTHON_CC="-I/usr/local/python-2.7.13/include/python2.7"
-export MET_PYTHON_LD="-L/usr/local/python-2.7.13/lib -lpython2.7 -lpthread -ldl -lutil"
+export MET_PYTHON_CC="-I/var/autofs/mnt/linux-amd64/debian/stretch/local/anaconda3-20190923/include/python3.7m -I/var/autofs/mnt/linux-amd64/debian/stretch/local/anaconda3-20190923/include/python3.7m  -Wno-unused-result -Wsign-compare -march=nocona -mtune=haswell -ftree-vectorize       -fstack-protector-strong -fno-plt -ffunction-sections -pipe  -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/python_1562015400360/work=/usr/local/src/conda/python-3.7.3 -fdebug-prefix-map=/var/autofs/mnt/linux-amd64/debian/stretch/local/anaconda3-20190923=/usr/local/src/conda-prefix -fuse-linker-plugin -DNDEBUG -fwrapv -Wall -fno-lto"
+export MET_PYTHON_LD="-L/var/autofs/mnt/linux-amd64/debian/stretch/local/anaconda3-20190923/lib/python3.7/config-3.7m-x86_64-linux-gnu -L/var/autofs/mnt/linux-amd64/debian/stretch/local/anaconda3-20190923/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lrt -lm  -Xlinker -export-dynamic -fno-lto"
 
 # Variables required to run MET
 export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
