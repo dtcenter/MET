@@ -43,9 +43,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_command_line_config(int, char **);
-
 static void process_command_line(int, char **);
+
+static void process_files(void);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
 
@@ -69,8 +69,6 @@ static void set_range(const int &, int &, int &);
 static void clean_up();
 
 static void usage();
-static void set_fcst_files(const StringArray &);
-static void set_obs_files(const StringArray &);
 static void set_data_files(const StringArray &);
 static void set_both_files(const StringArray &);
 static void set_out_file(const StringArray &);
@@ -90,18 +88,17 @@ int main(int argc, char *argv[]) {
    set_new_handler(oom);
 
    // Process the command line arguments
-   process_command_line_config(argc, argv);
-   // process_command_line(argc, argv);
+   process_command_line(argc, argv);
 
-   // Close the text files and deallocate memory
-   // clean_up();
+   // Close files and deallocate memory
+   clean_up();
 
    return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line_config(int argc, char **argv) {
+void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
@@ -178,114 +175,19 @@ void process_command_line_config(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(dtype, dtype);
+
+   // Determine the verification grid
+   grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
+                        &(data_mtddf->grid()), &(data_mtddf->grid()));
+
+   // Process masking regions
+   conf_info.process_masks(grid);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+void process_files(void) {
    int i;
-   CommandLine cline;
-   ConcatString default_config_file;
-
-   // Check for zero arguments
-   if(argc == 1) usage();
-
-   // Parse the command line into tokens
-   cline.set(argc, argv);
-
-   // Set the usage function
-   cline.set_usage(usage);
-
-   // Add the options function calls
-   cline.add(set_fcst_files,  "-fcst",  -1);
-   cline.add(set_obs_files,   "-obs",   -1);
-   cline.add(set_both_files,  "-both",  -1);
-   cline.add(set_config_file, "-config", 1);
-   cline.add(set_out_file,    "-out",    1);
-   cline.add(set_log_file,    "-log",    1);
-   cline.add(set_verbosity,   "-v",      1);
-   cline.add(set_compress,    "-compress", 1);
-
-   // Parse the command line
-   cline.parse();
-
-   // Check for error. There should be zero arguments left.
-   if(cline.n() != 0) usage();
-
-   // Check that the required arguments have been set.
-   if(fcst_files.n_elements() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the forecast file list must be set using the "
-           << "\"-fcst\" or \"-both\" option.\n\n";
-      usage();
-   }
-   if(obs_files.n_elements() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the observation file list must be set using the "
-           << "\"-obs\" or \"-both\" option.\n\n";
-      usage();
-   }
-   if(config_file.length() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the configuration file must be set using the "
-           << "\"-config\" option.\n\n";
-      usage();
-   }
-   if(out_file.length() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "the output NetCDF file must be set using the "
-           << "\"-out\" option.\n\n";
-      usage();
-   }
-
-   // Create the default config file name
-   default_config_file = replace_path(default_config_filename);
-
-   // List the config files
-   mlog << Debug(1)
-        << "Default Config File: " << default_config_file << "\n"
-        << "User Config File: "    << config_file << "\n";
-
-   mlog << Debug(2) << "Read config files.\n";
-
-   // Read the config files
-   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-
-   // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
-   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
-
-   mlog << Debug(2) << "Parse file list.\n";
-
-   // Parse the forecast and observation file lists
-   fcst_files = parse_file_list(fcst_files, ftype);
-   obs_files  = parse_file_list(obs_files,  otype);
-
-   mlog << Debug(2) << "Get mtddf.\n";
-
-   // Get mtddf
-   fcst_mtddf = get_mtddf(fcst_files, ftype);
-   obs_mtddf  = get_mtddf(obs_files,  otype);
-
-   // Store the input data file types
-   ftype = fcst_mtddf->file_type();
-   otype = obs_mtddf->file_type();
-
-   mlog << Debug(2) << "Process configuration.\n";
-
-   // Process the configuration
-   conf_info.process_config(ftype, otype);
-
-   // Determine the verification grid
-   grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
-                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
-
-   // Process masking regions
-   conf_info.process_masks(grid);
-
-   // Set the random number generator and seed value to be used when
-   // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.boot_rng.c_str(), conf_info.boot_seed.c_str());
 
    // List the lengths of the series options
    mlog << Debug(1)
@@ -341,41 +243,9 @@ void process_command_line(int argc, char **argv) {
            << "all have length one.\n";
    }
 
-   // If paired, check for consistent settings.
-   if(paired) {
-
-      // The number of forecast and observation files must match.
-      if(fcst_files.n_elements() != obs_files.n_elements()) {
-         mlog << Error << "\nprocess_command_line() -> "
-              << "when using the \"-paired\" command line option, the "
-              << "number of forecast (" << fcst_files.n_elements()
-              << ") and observation (" << obs_files.n_elements()
-              << ") files must match.\n\n";
-         usage();
-      }
-
-      // The number of files must match the series length.
-      if(fcst_files.n_elements() != n_series) {
-         mlog << Error << "\nprocess_command_line() -> "
-              << "when using the \"-paired\" command line option, the "
-              << "the file list length (" << fcst_files.n_elements()
-              << ") and series length (" << n_series
-              << ") must match.\n\n";
-         usage();
-      }
-
-      // Set the series file names to the input file lists
-      for(i=0; i<n_series; i++) {
-         found_fcst_files.add(fcst_files[i]);
-         found_obs_files.add(obs_files[i]);
-      }
-   }
-   // If not paired, initialize the series file names.
-   else {
-      for(i=0; i<n_series; i++) {
-         found_fcst_files.add("");
-         found_obs_files.add("");
-      }
+   // Initialize the series file names
+   for(i=0; i<n_series; i++) {
+      found_data_files.add("");
    }
 
    return;
@@ -798,12 +668,6 @@ void set_range(const int &t, int &beg, int &end) {
 
 void clean_up() {
 
-   // Deallocate NetCDF variable for each map entry
-   map<ConcatString, NcVarData>::const_iterator it;
-   for(it=stat_data.begin(); it!=stat_data.end(); it++) {
-      if(it->second.var) { delete it->second.var; }
-   }
-
    // Close the output NetCDF file
    if(nc_out) {
 
@@ -815,11 +679,7 @@ void clean_up() {
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) 0; }
-
-   // Deallocate memory for the random number generator
-   rng_free(rng_ptr);
+   if(data_mtddf) { delete data_mtddf; data_mtddf = (Met2dDataFile *) 0; }
 
    return;
 }

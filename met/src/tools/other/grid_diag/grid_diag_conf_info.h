@@ -36,6 +36,7 @@ class GridDiagConfInfo {
       // Counts based on the contents of the config file
       int n_fcst;                          // Number of forecast fields
       int n_obs;                           // Number of observation fields
+      int n_data;                          // Number of data fields
 
    public:
 
@@ -49,6 +50,7 @@ class GridDiagConfInfo {
 
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
+      VarInfo **       data_info;          // Array of pointers for data VarInfo [n_data]
 
       ThreshArray      fcat_ta;            // Categorical fcst thresholds
       ThreshArray      ocat_ta;            // Categorical obs thresholds
