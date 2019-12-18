@@ -540,7 +540,8 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 
 const double trunc_factor = 3.5;
 
-void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
+void interp_gaussian_dp(DataPlane &dp, const double radius,
+                        const double dx, double t) {
    int idx_x, idx_y;
    int weight_cnt;
    double value;
@@ -584,7 +585,7 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
    } // end for x
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
-         value = interp_gaussian(d_dp, g_dp, (double)idx_x, (double)idx_y, max_r);
+         value = interp_gaussian(d_dp, g_dp, (double)idx_x, (double)idx_y, max_r, t);
          dp.set(value, idx_x, idx_y);
       } // end for y
    } // end for x
@@ -600,40 +601,47 @@ void interp_gaussian_dp(DataPlane &dp, const double radius, const double dx) {
 ////////////////////////////////////////////////////////////////////////
 
 double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
-                       double obs_x, double obs_y, int max_r) {
+                       double obs_x, double obs_y, int max_r, double t) {
 
-   int count;
+   int count, count_vld;
    int ix, iy;
    int nx, ny, g_nx;
-   double value, gaussian_value, gaussian_weight;
+   double value, gaussian_value, gaussian_weight, weight_sum;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
-   
+
    nx = dp.nx();
    ny = dp.ny();
    g_nx = g_dp.nx();
-   
-   count = 0;
-   gaussian_value = 0.0;
+
+   count = count_vld = 0;
+   gaussian_value = weight_sum = 0.0;
    for(int x_idx=0; x_idx<g_nx; x_idx++) {
       ix = x - max_r + x_idx;
       if (0 > ix || ix >= nx) continue;
       for(int y_idx=0; y_idx<g_nx; y_idx++) {
          iy = y - max_r + y_idx;
          if (0 > iy || iy >= ny) continue;
-         
+
          gaussian_weight = g_dp.get(x_idx, y_idx);
          if(gaussian_weight <= 0.) continue;
          value = dp.get(ix, iy);
+         count++;
          if(is_bad_data(value)) continue;
          gaussian_value += value * gaussian_weight;
-         count++;
+         weight_sum += gaussian_weight;
+         count_vld++;
       }
    }
 
-   // Check for no valid data
-   if(count == 0) gaussian_value = bad_data_double;
+   // Check whether enough valid grid points were found
+   if((double) count_vld/count < t || count_vld == 0) {
+      gaussian_value = bad_data_double;
+   }
+   else {
+      gaussian_value /= weight_sum;
+   }
 
    return(gaussian_value);
 }

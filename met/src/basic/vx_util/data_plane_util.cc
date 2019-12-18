@@ -163,7 +163,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    // Apply the Gaussian smoother 
    if (mthd == InterpMthd_Gaussian) {
-     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx);
+     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx, t);
    }
 
    // Cleanup
