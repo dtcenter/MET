@@ -326,7 +326,8 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
 }   //  for xt
 
-interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx);
+interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx,
+                   info.vld_thresh);
 
 return ( to_data );
 
