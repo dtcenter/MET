@@ -18,7 +18,6 @@ grid_diag_LDFLAGS = ${MET_LDFLAGS}
 grid_diag_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
-	-lvx_gsl_prob \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
@@ -36,6 +35,7 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lvx_gsl_prob \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = grid_diag.h \
