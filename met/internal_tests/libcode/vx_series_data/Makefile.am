@@ -15,13 +15,19 @@ noinst_PROGRAMS = test_series_data
 test_series_data_SOURCES = test_series_data.cc
 test_series_data_CPPFLAGS = ${MET_CPPFLAGS}
 test_series_data_LDFLAGS = -L. ${MET_LDFLAGS}
-test_series_data_LDADD = \
-	-lvx_data2d \
+test_series_data_LDADD = -lvx_config \
+	-lvx_series_data \
 	-lvx_nc_util \
-	-lvx_config \
-	-lvx_cal \
+	-lvx_log \
+	-lvx_data2d \
+	-lvx_grid  \
 	-lvx_util \
+	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
-	-lvx_series_data \
+	-lvx_config \
+	-lvx_math \
+	-lvx_log \
+	-lvx_cal \
+	-lvx_util \
 	-lm -lnetcdf_c++4 -lnetcdf
