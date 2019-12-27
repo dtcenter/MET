@@ -118,8 +118,8 @@ ConcatString::ConcatString(const char * Text)
 
 if ( ! Text )  {
 
-   mlog << Error
-        << "\n\n  ConcatString::ConcatString(const char *) -> null pointer!\n\n";
+   mlog << Error << "\nConcatString::ConcatString(const char *) -> "
+        << "null pointer!\n\n";
 
    exit ( 1 );
 
@@ -136,13 +136,17 @@ add(::string(Text));
 
 
 ConcatString & ConcatString::operator=(const ConcatString & c)
+
 {
-    if (this != &c) {
-        delete s;
-        init_from_scratch();
-        assign(c);
-    }
-    return *this;
+
+if (this != &c) {
+   delete s;
+   init_from_scratch();
+   assign(c);
+}
+
+return *this;
+
 }
 
 
@@ -150,13 +154,13 @@ ConcatString & ConcatString::operator=(const ConcatString & c)
 
 
 ConcatString & ConcatString::operator=(const std::string & Text)
-{
-    delete s;
-    init_from_scratch();
-    if (s)
-        s->assign(Text);
 
-    return(*this);
+{
+   delete s;
+   init_from_scratch();
+   if (s) s->assign(Text);
+
+   return(*this);
 }
 
 
@@ -164,24 +168,26 @@ ConcatString & ConcatString::operator=(const std::string & Text)
 
 
 ConcatString & ConcatString::operator=(const char * Text)
+
 {
 
 
 if ( ! Text )  {
 
-   mlog << Error
-        << "\n\n  ConcatString::operator=(const char *) -> null pointer!\n\n";
+   mlog << Error << "\nConcatString::operator=(const char *) -> "
+        << "null pointer!\n\n";
 
    exit ( 1 );
 
 }
 
-    if ( s )  delete s;
-    init_from_scratch();
+   std::string s2 = Text;
+   if ( s )  delete s;
+   init_from_scratch();
 
-    (*s) = Text;
+   (*s) = s2;
 
-    return(*this);
+   return(*this);
 }
 
 
@@ -190,8 +196,8 @@ if ( ! Text )  {
 
 void ConcatString::init_from_scratch()
 {
-    s = new std::string();
-    set_precision(concat_string_default_precision);
+   s = new std::string();
+   set_precision(concat_string_default_precision);
 }
 
 
@@ -200,9 +206,9 @@ void ConcatString::init_from_scratch()
 
 void ConcatString::clear()
 {
-    s->clear();
+   s->clear();
 
-    set_precision(concat_string_default_precision);
+   set_precision(concat_string_default_precision);
 }
 
 
@@ -211,8 +217,7 @@ void ConcatString::clear()
 
 char ConcatString::char_at(const int idx) const
 {
-   if (0 > idx || length() <= idx )
-        return '\0';
+   if (0 > idx || length() <= idx ) return '\0';
 
    return s->at(idx);
 }
@@ -223,12 +228,11 @@ char ConcatString::char_at(const int idx) const
 
 void ConcatString::assign(const ConcatString & c)
 {
-    if (c.text())
-              s->assign(c.text());
-    else
-        s->clear();
-    memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
-    Precision = c.Precision;
+   if (c.text()) s->assign(c.text());
+   else          s->clear();
+
+   memcpy(FloatFormat, c.FloatFormat, sizeof(FloatFormat));
+   Precision = c.Precision;
 }
 
 
@@ -253,7 +257,7 @@ return;
 
 void ConcatString::add(const char c)
 {
-    (*s) += c;
+   (*s) += c;
 }
 
 
@@ -262,7 +266,7 @@ void ConcatString::add(const char c)
 
 void ConcatString::add(const ConcatString & a)
 {
-    (*s) += (*a.s);
+   (*s) += (*a.s);
 }
 
 
@@ -271,7 +275,7 @@ void ConcatString::add(const ConcatString & a)
 
 void ConcatString::add(const std::string & a)
 {
-    (*s) += a;
+   (*s) += a;
 }
 
 
@@ -284,14 +288,14 @@ void ConcatString::add(const char * Text)
 
 if ( !Text )  {
 
-   mlog << Error
-        << "\n\n  ConcatString::add(const char *) -> null pointer\n\n";
+   mlog << Error << "\nConcatString::add(const char *) -> "
+        << "null pointer\n\n";
 
    exit ( 1 );
 
 }
 
-    (*s) += ::string(Text);
+   (*s) += ::string(Text);
 }
 
 
@@ -314,11 +318,9 @@ return;
 
 void ConcatString::chomp(const char c)
 {
-    size_t pos = s->find_last_not_of(c);
-    if (pos != string::npos)
-        s->erase(pos + 1);
-    else
-        s->clear();
+   size_t pos = s->find_last_not_of(c);
+   if (pos != string::npos) s->erase(pos + 1);
+   else                     s->clear();
 }
 
 
@@ -327,10 +329,9 @@ void ConcatString::chomp(const char c)
 
 void ConcatString::chomp(const char * suffix)
 {
-    size_t limit = length() - strlen(suffix);
-    size_t pos = s->find(suffix, limit);
-    if (pos != string::npos)
-        s->erase(pos);
+   size_t limit = length() - strlen(suffix);
+   size_t pos = s->find(suffix, limit);
+   if (pos != string::npos) s->erase(pos);
 }
 
 
@@ -366,7 +367,7 @@ return;
 
 void ConcatString::erase()
 {
-    s->clear();
+   s->clear();
 }
 
 
@@ -375,7 +376,7 @@ void ConcatString::erase()
 
 void ConcatString::set_repeat(char c, int count)
 {
-    s->assign(count, c);
+   s->assign(count, c);
 }
 
 
@@ -384,8 +385,8 @@ void ConcatString::set_repeat(char c, int count)
 
 void ConcatString::elim_trailing_whitespace()
 {
-    // This will work with the standard "C" locale. Others may require a different char set
-    s->erase(s->find_last_not_of(" \n\r\t\v\f") + 1);
+   // This will work with the standard "C" locale. Others may require a different char set
+   s->erase(s->find_last_not_of(" \n\r\t\v\f") + 1);
 }
 
 
@@ -394,8 +395,8 @@ void ConcatString::elim_trailing_whitespace()
 
 bool ConcatString::startswith(const char * Text) const
 {
-    size_t pos = s->rfind(Text, strlen(Text));
-    return (pos != string::npos);
+   size_t pos = s->rfind(Text, strlen(Text));
+   return (pos != string::npos);
 }
 
 
@@ -404,8 +405,8 @@ bool ConcatString::startswith(const char * Text) const
 
 bool ConcatString::endswith(const char * Text) const
 {
-    size_t pos = s->find(Text, s->length() - strlen(Text));
-    return (pos != string::npos);
+   size_t pos = s->find(Text, s->length() - strlen(Text));
+   return (pos != string::npos);
 }
 
 
@@ -414,23 +415,23 @@ bool ConcatString::endswith(const char * Text) const
 
 StringArray ConcatString::split(const char * delim) const
 {
-    StringArray a;
-    if (s->empty()) {
-        return a;
-    }
+   StringArray a;
+   if (s->empty()) {
+       return a;
+   }
 
-    size_t start = 0;
-    size_t end = s->find_first_of(delim);
-    while (end != string::npos) {
-        if (start != end)
-            a.add(s->substr(start, end-start));
-        start = end + 1;
-        end = s->find_first_of(delim, start);
-    }
-    if (start < s->length())
-        a.add(s->substr(start));
+   size_t start = 0;
+   size_t end = s->find_first_of(delim);
+   while (end != string::npos) {
+       if (start != end)
+           a.add(s->substr(start, end-start));
+       start = end + 1;
+       end = s->find_first_of(delim, start);
+   }
+   if (start < s->length())
+       a.add(s->substr(start));
 
-    return a;
+   return a;
 }
 
 
@@ -439,12 +440,12 @@ StringArray ConcatString::split(const char * delim) const
 
 void ConcatString::ws_strip()
 {
-    // This will work with the standard "C" locale.
-    // Other locales may require a different whitespace char set.
-    const char * ws = " \n\r\t\v\f";
+   // This will work with the standard "C" locale.
+   // Other locales may require a different whitespace char set.
+   const char * ws = " \n\r\t\v\f";
 
-    s->erase(0, s->find_first_not_of(ws));
-    s->erase(s->find_last_not_of(ws) + 1);
+   s->erase(0, s->find_first_not_of(ws));
+   s->erase(s->find_last_not_of(ws) + 1);
 }
 
 
@@ -453,9 +454,9 @@ void ConcatString::ws_strip()
 
 void ConcatString::strip_cpp_comment()
 {
-    size_t pos = s->find("//");
-    if (pos != string::npos)
-        s->erase(pos);
+   size_t pos = s->find("//");
+   if (pos != string::npos)
+       s->erase(pos);
 }
 
 
@@ -464,9 +465,9 @@ void ConcatString::strip_cpp_comment()
 
 void ConcatString::strip_paren()
 {
-    size_t pos = s->find("(");
-    if (pos != string::npos)
-        s->erase(pos);
+   size_t pos = s->find("(");
+   if (pos != string::npos)
+       s->erase(pos);
 }
 
 
@@ -475,22 +476,22 @@ void ConcatString::strip_paren()
 
 int ConcatString::format(const char *fmt, ...)
 {
-    va_list vl;
-    int status = -1;
-    char *tmp;
+   va_list vl;
+   int status = -1;
+   char *tmp;
 
-    va_start(vl, fmt);
-    status = vasprintf(&tmp, fmt, vl);
+   va_start(vl, fmt);
+   status = vasprintf(&tmp, fmt, vl);
 
-    if (status == -1) {
-       mlog << Error << "\nConcatString::format() could not allocate a temporary buffer.\n\n";
-       exit(1);
-    }
+   if (status == -1) {
+      mlog << Error << "\nConcatString::format() could not allocate a temporary buffer.\n\n";
+      exit(1);
+   }
 
-    s->assign(tmp);
-    free(tmp);
-    va_end(vl);
-    return status;
+   s->assign(tmp);
+   free(tmp);
+   va_end(vl);
+   return status;
 }
 
 
@@ -503,25 +504,26 @@ void ConcatString::replace_char(int i, char c)
 
 
 void ConcatString::replace(const char * target, const char * replacement,
-                           bool check_env)
+                          bool check_env)
 {
-    if (empty())
-        return;
+   if (empty())
+       return;
 
-    if (::is_empty(target) || ::is_empty(replacement) ) {
-       mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> target and/or replacement string is empty\n\n";
-       exit ( 1 );
-    }
+   if (::is_empty(target) || ::is_empty(replacement) ) {
+      mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> "
+           << "target and/or replacement string is empty\n\n";
+      exit ( 1 );
+   }
 
-    ConcatString repl_env;
-    if (check_env && get_env(replacement, repl_env)) {
-       replacement = repl_env.c_str();
-    }
+   ConcatString repl_env;
+   if (check_env && get_env(replacement, repl_env)) {
+      replacement = repl_env.c_str();
+   }
 
-    size_t pos;
-    while ((pos = s->find(target)) != string::npos) {
-       s->replace(pos, strlen(target), replacement);
-    }
+   size_t pos;
+   while ((pos = s->find(target)) != string::npos) {
+      s->replace(pos, strlen(target), replacement);
+   }
 }
 
 
@@ -530,8 +532,8 @@ void ConcatString::replace(const char * target, const char * replacement,
 
 void ConcatString::set_upper()
 {
-    for (string::iterator c = s->begin(); s->end() != c; ++c)
-        *c = toupper(*c);
+   for (string::iterator c = s->begin(); s->end() != c; ++c)
+      *c = toupper(*c);
 }
 
 
@@ -540,8 +542,8 @@ void ConcatString::set_upper()
 
 void ConcatString::set_lower()
 {
-    for (string::iterator c = s->begin(); s->end() != c; ++c)
-        *c = tolower(*c);
+   for (string::iterator c = s->begin(); s->end() != c; ++c)
+      *c = tolower(*c);
 }
 
 
@@ -550,11 +552,11 @@ void ConcatString::set_lower()
 
 const string ConcatString::contents(const char * str) const
 {
-    if (s->empty() || *s == "") {
+   if (s->empty() || *s == "") {
       return (str ? str : "(nul)");
-    } else {
+   } else {
       return ( *s );
-    }
+   }
 }
 
 
@@ -563,17 +565,17 @@ const string ConcatString::contents(const char * str) const
 
 bool ConcatString::read_line(istream & in)
 {
-    erase();
-    getline(in, *s);
-    if (!in) {
-          // Check for end of file and non-empty line
-          if (in.eof() && (length() != 0))
-            return true;
-          else
-            return false;
-    }
+   erase();
+   getline(in, *s);
+   if (!in) {
+      // Check for end of file and non-empty line
+      if (in.eof() && (length() != 0))
+         return true;
+      else
+         return false;
+   }
 
-    return true;
+   return true;
 }
 
 
@@ -622,12 +624,13 @@ return ( lc );
 
 char ConcatString::operator[](const int n) const
 {
-    if ((n < 0) || (n >= length()))  {
-        mlog << Error << "\nConcatString::operator[](const int) const -> range check error\n\n";
-        exit ( 1 );
-    }
+   if ((n < 0) || (n >= length()))  {
+      mlog << Error << "\nConcatString::operator[](const int) const -> "
+           << "range check error\n\n";
+      exit ( 1 );
+   }
 
-    return(s->at(n));
+   return(s->at(n));
 }
 
 
@@ -764,9 +767,10 @@ switch ( c )  {
    case cs_clear:  a.clear();  break;
 
    default:
-      mlog << Error << "\noperator<<(ostream &, CSInlineCommand) -> bad CSInlineCommand value\n\n";
-      exit ( 1 );
-      break;
+     mlog << Error << "\noperator<<(ostream &, CSInlineCommand) -> "
+          << "bad CSInlineCommand value\n\n";
+     exit ( 1 );
+     break;
 
 }   //  switch
 
@@ -807,11 +811,11 @@ return ( a );
 
 ostream & operator<<(ostream & out, const ConcatString & c)
 {
-    if (c.length()) {
-        out << c.text();
-    }
+   if (c.length()) {
+       out << c.text();
+   }
 
-    return out;
+   return out;
 }
 
 
@@ -1141,7 +1145,7 @@ static const char *method_name = "get_env() ";
 env_value.clear();
 
 if (str.find('/') != string::npos ||
-    (ptr = getenv(env_name)) == NULL) {
+   (ptr = getenv(env_name)) == NULL) {
    return(false);
 }
 
@@ -1212,10 +1216,10 @@ int ConcatString::find(int c)
 {
   std::string::size_type position = s->rfind(c);
   if ( position != std::string::npos) {
-    return position;
+     return position;
   }
   else {
-    return -1;
+     return -1;
   }
 }
 
@@ -1226,7 +1230,7 @@ int ConcatString::find(int c)
 int ConcatString::compare(size_t pos, size_t len, std::string str)
 
 {
-  return s->compare(pos, len, str);
+   return s->compare(pos, len, str);
 }
 
 
@@ -1236,11 +1240,11 @@ int ConcatString::compare(size_t pos, size_t len, std::string str)
 int ConcatString::comparecase(size_t pos, size_t len, std::string str)
 
 {
-  std::string lower_s = *s;
-  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-  std::string lower_str = str;
-  transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
-  return lower_s.compare(pos, len, lower_str);
+   std::string lower_s = *s;
+   transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+   std::string lower_str = str;
+   transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
+   return lower_s.compare(pos, len, lower_str);
 }
 
 
