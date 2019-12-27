@@ -178,7 +178,7 @@ void process_genesis() {
    map<ConcatString,GenesisInfoArray>::iterator it;
    ConcatString atcf_id, cs;
    
-   GenCTCInfo cur_info, agg_info;
+   GenCTCInfo cur_info;
 
    // Get the list of genesis track files
    get_atcf_files(genesis_source, genesis_model_suffix, atcf_gen_reg_exp,
@@ -206,7 +206,6 @@ void process_genesis() {
 
       // Initialize
       fcst_ga_map.clear();
-      agg_info.clear();
 
       // Subset the forecast genesis events
       for(j=0; j<fcst_ga.n(); j++) {
@@ -263,24 +262,11 @@ void process_genesis() {
          process_genesis_pair(i, it->first, it->second,
                               best_ga, oper_ga, cur_info);
 
-         // Increment the contingency table counts
-         agg_info += cur_info;
-
          // Write output for the current model
          cur_info.model = it->first;
          write_cts(i, cur_info);
 
       } // end for j
-
-      mlog << Debug(2) << "[Filter " << i+1 << "] "
-           << "Aggregated contingency table hits = "
-           << agg_info.cts_info.cts.fy_oy() << ", false alarms = "
-           << agg_info.cts_info.cts.fy_on() << ", and misses = "
-           << agg_info.cts_info.cts.fn_oy() << ".\n";
-
-      // Write output for the current filter
-      agg_info.model = "ALL";
-      if(agg_info.cts_info.cts.n() > 0) write_cts(i, agg_info);
 
    } // end for i n_vx
 
@@ -635,7 +621,7 @@ void setup_txt_files(int n_model) {
    open_txt_file(stat_out, stat_file.c_str());
 
    // Setup the STAT AsciiTable
-   n_rows = 1 + 3 * (n_model + 1) * conf_info.n_vx();
+   n_rows = 1 + 3 * n_model * conf_info.n_vx();
    n_cols = 1 + n_header_columns + n_cts_columns;
    stat_at.set_size(n_rows, n_cols);
    setup_table(stat_at);
@@ -663,7 +649,7 @@ void setup_txt_files(int n_model) {
          open_txt_file(txt_out[i], txt_file[i].c_str());
 
          // Setup the text AsciiTable
-         n_rows = 1 + (n_model + 1) * conf_info.n_vx();
+         n_rows = 1 + n_model * conf_info.n_vx();
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
 
