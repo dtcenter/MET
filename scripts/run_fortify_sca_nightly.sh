@@ -54,8 +54,9 @@ export MET_CAIROINC=/usr/include/cairo
 export MET_CAIROLIB=/usr/lib
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
-export MET_PYTHON_CC="-I/usr/local/python-2.7.13/include/python2.7"
-export MET_PYTHON_LD="-L/usr/local/python-2.7.13/lib -lpython2.7 -lpthread -ldl -lutil"
+export MET_PYTHON_CC="-I/opt/python-3.7.3/include/python3.7m"
+export MET_PYTHON_LD="-L/opt/python-3.7.3/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
+export LD_LIBRARY_PATH=/opt/python-3.7.3/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:/usr/local/lib:/usr/lib
 
 # Variables required to run MET
 export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
@@ -63,7 +64,6 @@ export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
 # This is a cron script -- create the shell environment for this job
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
              /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin"
-export LD_LIBRARY_PATH=${MET_NETCDF}/lib:${MET_HDF5}/lib:/usr/local/lib:/usr/lib
 
 # Run scan and check for bad return status
 ${SCRIPTS}/run_fortify_sca.sh develop > ${LOGFILE}

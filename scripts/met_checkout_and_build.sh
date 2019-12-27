@@ -28,9 +28,9 @@
 #    Build a new release and create a branch:
 #       met_checkout_and_build.sh new_branch branch_name
 #    Build an existing tagged release:
-#       MET_checkout_and_build tag tag_name
-#    Build an exisitng branch:
-#       MET_checkout_and_build branch branch_name
+#       met_checkout_and_build tag tag_name
+#    Build an existing branch:
+#       met_checkout_and_build branch branch_name
 #
 #=======================================================================
 

@@ -156,7 +156,7 @@ AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<
 AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python-config --ldflags'.])
 
 if test -n "$MET_PYTHON_CC"; then
-   CPPFLAGS="${CPPFLAGS} ${MET_PYTHON_CC}"
+   CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"
 fi
 
 if test -n "$MET_PYTHON_LD"; then
@@ -978,12 +978,17 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils ${MET_PYTHON_LD}"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
 fi
 AC_SUBST([PYTHON_LIBS])
+
+########################################################################
+
+
+
 
 ########################################################################
 
@@ -1165,6 +1170,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
                  src/libcode/vx_python_utils/Makefile
+                 src/libcode/vx_python2_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile

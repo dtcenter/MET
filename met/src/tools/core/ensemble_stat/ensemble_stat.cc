@@ -2304,7 +2304,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
    // Append the timing information
    unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2iV",
+   snprintf(tmp_str, sizeof(tmp_str), "%.4i%.2i%.2i_%.2i%.2i%.2iV",
            yr, mon, day, hr, min, sec);
    str << "_" << tmp_str;
 

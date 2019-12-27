@@ -8,12 +8,14 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+
 # The library
 
-noinst_LIBRARIES = libvx_python_utils.a
-libvx_python_utils_a_SOURCES = \
-              python_dict.h python_dict.cc \
-              python_tuple.h python_tuple.cc \
-              python_numarray.h python_numarray.cc \
-              vx_python_utils.h
+noinst_LIBRARIES = libvx_python3_utils.a
+libvx_python3_utils_a_SOURCES = \
+              wchar_argv.h wchar_argv.cc \
+              python3_dict.h python3_dict.cc \
+              python3_script.h python3_script.cc \
+              python3_numpy.h python3_numpy.cc \
+              python3_util.h python3_util.cc
 libvx_python_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)

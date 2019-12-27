@@ -766,8 +766,8 @@ k = nint(lon);
 
 if ( k == -180 )  k = -k;
 
-if ( k >= 0 )  sprintf(junk, "%d W",  k);
-else           sprintf(junk, "%d E", -k);
+if ( k >= 0 )  snprintf(junk, sizeof(junk), "%d W",  k);
+else           snprintf(junk, sizeof(junk), "%d E", -k);
 
 
 grid->latlon_to_xy(ms, lon, x_grid, y_grid);
