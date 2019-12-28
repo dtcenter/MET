@@ -35,7 +35,6 @@ class GridDiagConfInfo {
 
       // Counts based on the contents of the config file
       int n_fcst;                          // Number of forecast fields
-      int n_obs;                           // Number of observation fields
       int n_data;                          // Number of data fields
 
    public:
@@ -45,26 +44,9 @@ class GridDiagConfInfo {
 
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name
-      ConcatString     desc;               // Description
-      ConcatString     obtype;             // Observation type
 
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
-      VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
       VarInfo **       data_info;          // Array of pointers for data VarInfo [n_data]
-
-      ThreshArray      fcat_ta;            // Categorical fcst thresholds
-      ThreshArray      ocat_ta;            // Categorical obs thresholds
-
-      ThreshArray      fcnt_ta;            // Continuous fcst thresholds
-      ThreshArray      ocnt_ta;            // Continuous obs thresholds
-      SetLogic         cnt_logic;          // Continuous threshold field logic
-
-      NumArray         ci_alpha;           // Alpha value for confidence intervals
-      BootIntervalType boot_interval;      // Bootstrap CI type
-      double           boot_rep_prop;      // Bootstrap replicate proportion
-      int              n_boot_rep;         // Number of bootstrap replicates
-      ConcatString     boot_rng;           // GSL random number generator
-      ConcatString     boot_seed;          // GSL RNG seed value
 
       ConcatString     mask_grid_file;     // Path for masking grid area
       ConcatString     mask_grid_name;     // Name of masking grid area
@@ -72,15 +54,7 @@ class GridDiagConfInfo {
       ConcatString     mask_poly_name;     // Name of masking poly area
       MaskPlane        mask_area;
 
-      int              block_size;         // Number of grid points to read concurrently
-      double           vld_data_thresh;    // Minimum valid data ratio for each point
-      bool             rank_corr_flag;     // Flag for computing rank correlations
-
-      ConcatString     tmp_dir;            // Directory for temporary files
       ConcatString     version;            // Config file version
-
-      // Mapping of line type to output statistics
-      map<STATLineType,StringArray> output_stats;
 
       GridDiagConfInfo();
      ~GridDiagConfInfo();
@@ -94,13 +68,11 @@ class GridDiagConfInfo {
 
       // Dump out the counts
       int get_n_fcst() const;
-      int get_n_obs()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int GridDiagConfInfo::get_n_fcst() const { return(n_fcst); }
-inline int GridDiagConfInfo::get_n_obs()  const { return(n_obs);  }
 inline int GridDiagConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

@@ -49,19 +49,13 @@ static void process_files(void);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
 
-static void get_series_data(int, VarInfo *, VarInfo *,
-                            DataPlane &, DataPlane &);
+static void get_series_data(int, VarInfo *,
+                            DataPlane &);
 static void get_series_entry(int, VarInfo *, const StringArray &,
                              const GrdFileType, StringArray &,
                              DataPlane &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
-
-static void setup_nc_file(const VarInfo *, const VarInfo *);
-static void add_nc_var(const ConcatString &, const ConcatString &,
-                       const ConcatString &, const ConcatString &,
-                       const ConcatString &, double);
-static void put_nc_val(int, const ConcatString &, float);
 
 static void set_range(const unixtime &, unixtime &, unixtime &);
 static void set_range(const int &, int &, int &);
@@ -70,7 +64,6 @@ static void clean_up();
 
 static void usage();
 static void set_data_files(const StringArray &);
-static void set_both_files(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
 static void set_log_file(const StringArray &);
@@ -193,31 +186,18 @@ void process_files(void) {
    mlog << Debug(1)
         << "Length of configuration \"fcst.field\" = "
         << conf_info.get_n_fcst() << "\n"
-        << "Length of configuration \"obs.field\"  = "
-        << conf_info.get_n_obs() << "\n"
         << "Length of forecast file list         = "
-        << fcst_files.n_elements() << "\n"
-        << "Length of observation file list      = "
-        << obs_files.n_elements() << "\n";
+        << fcst_files.n_elements() << "\n";
 
    // Determine the length of the series to be analyzed.  Series is
    // defined by the first parameter of length greater than one:
    // - Configuration fcst.field
-   // - Configuration obs.field
    // - Forecast file list
-   // - Observation file list
    if(conf_info.get_n_fcst() > 1) {
       series_type = SeriesType_Fcst_Conf;
       n_series = conf_info.get_n_fcst();
       mlog << Debug(1)
            << "Series defined by the \"fcst.field\" configuration entry "
-           << "of length " << n_series << ".\n";
-   }
-   else if(conf_info.get_n_obs() > 1) {
-      series_type = SeriesType_Obs_Conf;
-      n_series = conf_info.get_n_obs();
-      mlog << Debug(1)
-           << "Series defined by the \"obs.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
    else if(fcst_files.n_elements() > 1) {
@@ -227,19 +207,12 @@ void process_files(void) {
            << "Series defined by the forecast file list of length "
            << n_series << ".\n";
    }
-   else if(obs_files.n_elements() > 1) {
-      series_type = SeriesType_Obs_Files;
-      n_series = obs_files.n_elements();
-      mlog << Debug(1)
-           << "Series defined by the observation file list of length "
-           << n_series << ".\n";
-   }
    else {
       series_type = SeriesType_Fcst_Conf;
       n_series = 1;
       mlog << Debug(1)
-           << "The \"fcst.field\" and \"obs.field\" configuration entries "
-           << "and the \"-fcst\" and \"-obs\" command line options "
+           << "The \"fcst.field\" configuration entry "
+           << "and the \"-fcst\" command line option "
            << "all have length one.\n";
    }
 
@@ -283,104 +256,12 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_series_data(int i_series,
-                     VarInfo *fcst_info, VarInfo *obs_info,
-                     DataPlane &fcst_dp, DataPlane &obs_dp) {
+                     VarInfo *fcst_info,
+                     DataPlane &fcst_dp) {
 
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
-        << n_series << ": " << fcst_info->magic_str()
-        << " versus " << obs_info->magic_str() << "\n";
-
-   // Switch on the series type
-   switch(series_type) {
-
-      case SeriesType_Fcst_Conf:
-         get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
-         if(conf_info.get_n_obs() == 1) {
-            obs_info->set_valid(fcst_dp.valid());
-            mlog << Debug(3)
-                 << "Setting the observation valid time search criteria "
-                 << "using the forecast valid time of "
-                 << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
-         }
-         get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
-         break;
-
-      case SeriesType_Obs_Conf:
-         get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
-         if(conf_info.get_n_fcst() == 1) {
-            fcst_info->set_valid(obs_dp.valid());
-            mlog << Debug(3)
-                 << "Setting the forecast valid time search criteria "
-                 << "using the observation valid time of "
-                 << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
-         }
-         get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
-         break;
-
-      case SeriesType_Fcst_Files:
-         found_fcst_files.set(i_series, fcst_files[i_series]);
-         get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
-         if(paired) {
-            found_obs_files.set(i_series, obs_files[i_series]);
-         }
-         else {
-            obs_info->set_valid(fcst_dp.valid());
-            mlog << Debug(3)
-                 << "Setting the observation valid time search criteria "
-                 << "using the forecast valid time of "
-                 << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
-         }
-         get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
-         break;
-
-      case SeriesType_Obs_Files:
-         found_obs_files.set(i_series, obs_files[i_series]);
-         get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
-         if(paired) {
-            found_fcst_files.set(i_series, fcst_files[i_series]);
-         }
-         else {
-            fcst_info->set_valid(obs_dp.valid());
-            mlog << Debug(3)
-                 << "Setting the forecast valid time search criteria "
-                 << "using the observation valid time of "
-                 << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
-         }
-         get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
-         break;
-
-      default:
-         mlog << Error << "\nget_series_data() -> "
-              << "unexpected SeriesType value: "
-              << series_type << "\n\n";
-         exit(1);
-         break;
-   }
-
-   // Rescale probabilities from [0, 100] to [0, 1]
-   if(conf_info.fcst_info[0]->p_flag()) rescale_probability(fcst_dp);
-   if(conf_info.obs_info[0]->p_flag())  rescale_probability(obs_dp);
-
-   // Check that non-zero valid times match
-   if(fcst_dp.valid() != (unixtime) 0 &&
-      obs_dp.valid()  != (unixtime) 0 &&
-      fcst_dp.valid() != obs_dp.valid()) {
-      mlog << Warning << "\nget_series_data() -> "
-           << "Forecast and observation valid times do not match "
-           << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-           << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-           << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str() << ".\n\n";
-   }
+        << n_series << ": " << fcst_info->magic_str() << "\n";
 
    return;
 }
@@ -516,132 +397,6 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
-
-   // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_file.c_str(), true);
-
-   if(IS_INVALID_NC_P(nc_out)) {
-      mlog << Error << "\nsetup_nc_file() -> "
-           << "trouble opening output NetCDF file "
-           << out_file << "\n\n";
-      exit(1);
-   }
-
-   // Add global attributes
-   write_netcdf_global(nc_out, out_file.c_str(), program_name,
-                       conf_info.model.c_str(), conf_info.obtype.c_str(), conf_info.desc.c_str());
-   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name.nonempty() ?
-                                  (string)conf_info.mask_grid_name : na_str));
-   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
-                                  (string)conf_info.mask_poly_name : na_str));
-   add_att(nc_out, "fcst_var",   (string)fcst_info->name());
-   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_name());
-   add_att(nc_out, "fcst_units", (string)fcst_info->units());
-   add_att(nc_out, "obs_var",    (string)obs_info->name());
-   add_att(nc_out, "obs_lev",    (string)obs_info->level_name());
-   add_att(nc_out, "obs_units",  (string)obs_info->units());
-
-   // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
-
-   // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
-
-   int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
-
-   // Add the series length variable
-   //NcVar * var = nc_out->add_var("n_series", ncInt);
-   NcVar var = add_var(nc_out, "n_series", ncInt, deflate_level);
-   add_att(&var, "long_name", "length of series");
-
-   if(!put_nc_data(&var, &n_series)) {
-      mlog << Error << "\nsetup_nc_file() -> "
-           << "error writing the series length variable.\n\n";
-            exit(1);
-   }
-
-   // Load the long name descriptions for each column name
-   parse_long_names();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void add_nc_var(const ConcatString &var_name,
-                const ConcatString &name,
-                const ConcatString &long_name,
-                const ConcatString &fcst_thresh,
-                const ConcatString &obs_thresh,
-                double alpha) {
-   NcVarData d;
-
-   int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
-
-   // Add a new variable to the NetCDF file
-   NcVar var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim, deflate_level);
-   d.var = new NcVar(var);
-
-   // Add variable attributes
-   add_att(d.var, "_FillValue", bad_data_float);
-   if(name.length() > 0)        add_att(d.var, "name", (string)name);
-   if(long_name.length() > 0)   add_att(d.var, "long_name", (string)long_name);
-   if(fcst_thresh.length() > 0) add_att(d.var, "fcst_thresh", (string)fcst_thresh);
-   if(obs_thresh.length() > 0)  add_att(d.var, "obs_thresh", (string)obs_thresh);
-   if(!is_bad_data(alpha))      add_att(d.var, "alpha", alpha);
-
-   // Store the new NcVarData object in the map
-   stat_data[var_name] = d;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void put_nc_val(int n, const ConcatString &var_name, float v) {
-   int x, y;
-
-   // Determine x,y location
-   DefaultTO.one_to_two(grid.nx(), grid.ny(), n, x, y);
-
-   // Check for key in the map
-   if(stat_data.count(var_name) == 0) {
-      mlog << Error << "\nput_nc_val() -> "
-           << "variable name \"" << var_name
-           << "\" does not exist in the map.\n\n";
-      exit(1);
-   }
-
-   // Get the NetCDF variable to be written
-   NcVar *var = stat_data[var_name].var;
-
-   long offsets[2];
-   long lengths[2];
-   offsets[0] = y;
-   offsets[1] = x;
-   lengths[0] = 1;
-   lengths[1] = 1;
-
-   // Store the current value
-   if(!put_nc_data(var, &v, lengths, offsets)) {
-      mlog << Error << "\nput_nc_val() -> "
-           << "error writing to variable " << var_name
-           << " for point (" << x << ", " << y << ").\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
 
    if(t == (unixtime) 0) return;
@@ -725,33 +480,8 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_fcst_files(const StringArray & a) {
-   fcst_files = a;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_files(const StringArray & a) {
-   obs_files = a;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void set_data_files(const StringArray & a) {
    data_files = a;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_both_files(const StringArray & a) {
-   set_fcst_files(a);
-   set_obs_files(a);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_paired(const StringArray & a) {
-   paired = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
