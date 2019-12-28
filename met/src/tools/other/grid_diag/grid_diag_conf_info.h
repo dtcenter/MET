@@ -34,7 +34,6 @@ class GridDiagConfInfo {
       void init_from_scratch();
 
       // Counts based on the contents of the config file
-      int n_fcst;                          // Number of forecast fields
       int n_data;                          // Number of data fields
 
    public:
@@ -45,7 +44,6 @@ class GridDiagConfInfo {
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name
 
-      VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       data_info;          // Array of pointers for data VarInfo [n_data]
 
       ConcatString     mask_grid_file;     // Path for masking grid area
@@ -62,17 +60,17 @@ class GridDiagConfInfo {
       void clear();
 
       void read_config   (const char *, const char *);
-      void process_config(GrdFileType, GrdFileType);
+      void process_config(GrdFileType);
       void process_masks (const Grid &);
       int get_compression_level();
 
       // Dump out the counts
-      int get_n_fcst() const;
+      int get_n_data() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GridDiagConfInfo::get_n_fcst() const { return(n_fcst); }
+inline int GridDiagConfInfo::get_n_data() const { return(n_data); }
 inline int GridDiagConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

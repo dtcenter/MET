@@ -167,7 +167,7 @@ void process_command_line(int argc, char **argv) {
    mlog << Debug(2) << "Process configuration.\n";
 
    // Process the configuration
-   conf_info.process_config(dtype, dtype);
+   conf_info.process_config(dtype);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
@@ -184,35 +184,35 @@ void process_files(void) {
 
    // List the lengths of the series options
    mlog << Debug(1)
-        << "Length of configuration \"fcst.field\" = "
-        << conf_info.get_n_fcst() << "\n"
+        << "Length of configuration \"data.field\" = "
+        << conf_info.get_n_data() << "\n"
         << "Length of forecast file list         = "
-        << fcst_files.n_elements() << "\n";
+        << data_files.n_elements() << "\n";
 
    // Determine the length of the series to be analyzed.  Series is
    // defined by the first parameter of length greater than one:
-   // - Configuration fcst.field
+   // - Configuration data.field
    // - Forecast file list
-   if(conf_info.get_n_fcst() > 1) {
-      series_type = SeriesType_Fcst_Conf;
-      n_series = conf_info.get_n_fcst();
+   if(conf_info.get_n_data() > 1) {
+      series_type = SeriesType_Data_Conf;
+      n_series = conf_info.get_n_data();
       mlog << Debug(1)
-           << "Series defined by the \"fcst.field\" configuration entry "
+           << "Series defined by the \"data.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
-   else if(fcst_files.n_elements() > 1) {
-      series_type = SeriesType_Fcst_Files;
-      n_series = fcst_files.n_elements();
+   else if(data_files.n_elements() > 1) {
+      series_type = SeriesType_Data_Files;
+      n_series = data_files.n_elements();
       mlog << Debug(1)
            << "Series defined by the forecast file list of length "
            << n_series << ".\n";
    }
    else {
-      series_type = SeriesType_Fcst_Conf;
+      series_type = SeriesType_Data_Conf;
       n_series = 1;
       mlog << Debug(1)
-           << "The \"fcst.field\" configuration entry "
-           << "and the \"-fcst\" command line option "
+           << "The \"data.field\" configuration entry "
+           << "and the \"-data\" command line option "
            << "all have length one.\n";
    }
 
@@ -256,12 +256,12 @@ Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_series_data(int i_series,
-                     VarInfo *fcst_info,
-                     DataPlane &fcst_dp) {
+                     VarInfo *data_info,
+                     DataPlane &data_dp) {
 
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
-        << n_series << ": " << fcst_info->magic_str() << "\n";
+        << n_series << ": " << data_info->magic_str() << "\n";
 
    return;
 }

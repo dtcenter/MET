@@ -46,7 +46,7 @@ GridDiagConfInfo::~GridDiagConfInfo() {
 void GridDiagConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info = (VarInfo **)    0;
+   data_info = (VarInfo **)    0;
 
    clear();
 
@@ -67,15 +67,15 @@ void GridDiagConfInfo::clear() {
    mask_area.clear();
    version.clear();
 
-   // Clear fcst_info
-   if(fcst_info) {
-      for(i=0; i<n_fcst; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
+   // Clear data_info
+   if(data_info) {
+      for(i=0; i<n_data; i++)
+         if(data_info[i]) { delete data_info[i]; data_info[i] = (VarInfo *) 0; }
+      delete data_info; data_info = (VarInfo **) 0;
    }
 
    // Reset counts
-   n_fcst = 0;
+   n_data = 0;
 
    return;
 }
@@ -99,8 +99,8 @@ void GridDiagConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridDiagConfInfo::process_config(GrdFileType ftype,
-                                            GrdFileType otype) {
+void GridDiagConfInfo::process_config(GrdFileType ftype) {
+
    int i, n;
    ConcatString s;
    StringArray sa;
@@ -122,46 +122,46 @@ void GridDiagConfInfo::process_config(GrdFileType ftype,
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
 
-   // Conf: fcst.field
-   fdict = conf.lookup_array(conf_key_fcst_field);
+   // Conf: data.field
+   fdict = conf.lookup_array(conf_key_data_field);
 
    // Determine the number of fields (name/level) to be verified
-   n_fcst = parse_conf_n_vx(fdict);
+   n_data = parse_conf_n_vx(fdict);
 
-   // Check for empty fcst
-   if(n_fcst == 0) {
+   // Check for empty data
+   if(n_data == 0) {
       mlog << Error << "\nGridDiagConfInfo::process_config() -> "
-           << "the \"fcst\" settings may not be empty.\n\n";
+           << "the \"data\" settings may not be empty.\n\n";
       exit(1);
    }
 
    // Allocate space based on the number of verification tasks
-   fcst_info = new VarInfo * [n_fcst];
+   data_info = new VarInfo * [n_data];
 
    // Initialize pointers
-   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) 0;
+   for(i=0; i<n_data; i++) data_info[i] = (VarInfo *) 0;
 
-   // Parse the fcst field information
-   for(i=0; i<n_fcst; i++) {
+   // Parse the data field information
+   for(i=0; i<n_data; i++) {
 
       // Allocate new VarInfo objects
-      fcst_info[i] = info_factory.new_var_info(ftype);
+      data_info[i] = info_factory.new_var_info(ftype);
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
 
       // Set the current dictionaries
-      fcst_info[i]->set_dict(i_fdict);
+      data_info[i]->set_dict(i_fdict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
               << "Parsed forecast field number " << i+1 << ":\n";
-         fcst_info[i]->dump(cout);
+         data_info[i]->dump(cout);
       }
 
       // No support for wind direction
-      if(fcst_info[i]->is_wind_direction()) {
+      if(data_info[i]->is_wind_direction()) {
          mlog << Error << "\nGridDiagConfInfo::process_config() -> "
               << "the wind direction field may not be verified "
               << "using grid_diag.\n\n";

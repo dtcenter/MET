@@ -68,10 +68,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray fcst_files, found_fcst_files;
 static StringArray data_files,  found_data_files;
 static GrdFileType ftype  = FileType_None;
-static GrdFileType otype  = FileType_None;
 static GrdFileType dtype  = FileType_None;
 static int compress_level = -1;
 
@@ -112,14 +110,13 @@ static Grid grid;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
 static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
 
 // Enumeration of ways that a series can be defined
 enum SeriesType {
    SeriesType_None,       // Undefined series type
-   SeriesType_Fcst_Conf,  // Defined by fcst.field configuration
-   SeriesType_Fcst_Files, // Defined by -fcst command line option
+   SeriesType_Data_Conf,  // Defined by data.field configuration
+   SeriesType_Data_Files, // Defined by -data command line option
 };
 static SeriesType series_type = SeriesType_None;
 
@@ -127,12 +124,12 @@ static SeriesType series_type = SeriesType_None;
 static int n_series = 0;
 
 // Range of timing values encountered in the data
-static unixtime fcst_init_beg  = (unixtime) 0;
-static unixtime fcst_init_end  = (unixtime) 0;
-static unixtime fcst_valid_beg = (unixtime) 0;
-static unixtime fcst_valid_end = (unixtime) 0;
-static int      fcst_lead_beg  = bad_data_int;
-static int      fcst_lead_end  = bad_data_int;
+static unixtime data_init_beg  = (unixtime) 0;
+static unixtime data_init_end  = (unixtime) 0;
+static unixtime data_valid_beg = (unixtime) 0;
+static unixtime data_valid_end = (unixtime) 0;
+static int      data_lead_beg  = bad_data_int;
+static int      data_lead_end  = bad_data_int;
 
 // Mapping of statistic names to descriptions
 map<ConcatString, ConcatString> stat_long_name;
