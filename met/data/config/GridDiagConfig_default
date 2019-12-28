@@ -1,42 +1,37 @@
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
-// Default GridDiag configuration file
+// GridDiag test configuration file
 //
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 //
 // Model
 //
-model = "";
+model = "GFS-FV3";
 
 //
 // Data fields
 //
 data = {
-    file_type = GRIB2;
     field = [
         {
           name = "PRMSL";
           level = ["L0"];
+          n_bins = 100;
+          range = [95000, 105000]; // Pa
         },
         {
           name = "TMP";
           level = ["L0"];
-        },
-        {
-          name = "UGRD";
-          level = ["L0"];
-        },
-        {
-          name = "VGRD";
-          level = ["L0"];
+          n_bins = 100;
+          range = [270, 310]; // K
         }
     ];
 }
 
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
-version = "V9.0";
+mask = {
+    grid = "";
+    poly = "MET_BASE/poly/SAO.poly";
+}
 
+version = "V9.0";
