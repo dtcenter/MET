@@ -66,7 +66,7 @@ void Python3_Numpy::clear()
 
 Object = 0;
 
-Name   = 0;
+Name.clear();
 
 if ( Dim )  { delete [] Dim;  Dim = 0; }
 
