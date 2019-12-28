@@ -29,49 +29,47 @@
 
 class GridDiagConfInfo {
 
-   private:
+    private:
 
-      void init_from_scratch();
+        void init_from_scratch();
 
-      // Counts based on the contents of the config file
-      int n_data;                          // Number of data fields
+        int n_data; // Number of data fields
 
-   public:
+    public:
 
-      // Series-Analysis configuration object
-      MetConfig conf;
+        // Grid Diagnostics configuration object
+        MetConfig conf;
 
-      // Store data parsed from the Series-Analysis configuration object
-      ConcatString     model;              // Model name
+        ConcatString version; // Config file version
 
-      VarInfo **       data_info;          // Array of pointers for data VarInfo [n_data]
+        ConcatString model; // Model name
 
-      ConcatString     mask_grid_file;     // Path for masking grid area
-      ConcatString     mask_grid_name;     // Name of masking grid area
-      ConcatString     mask_poly_file;     // Path for masking poly area
-      ConcatString     mask_poly_name;     // Name of masking poly area
-      MaskPlane        mask_area;
+        VarInfo ** data_info; // Pointer array for data VarInfo [n_data]
 
-      ConcatString     version;            // Config file version
+        ConcatString mask_grid_file; // Path for masking grid area
+        ConcatString mask_grid_name; // Name of masking grid area
+        ConcatString mask_poly_file; // Path for masking poly area
+        ConcatString mask_poly_name; // Name of masking poly area
+        MaskPlane    mask_area;
 
-      GridDiagConfInfo();
-     ~GridDiagConfInfo();
+        GridDiagConfInfo();
+        ~GridDiagConfInfo();
 
-      void clear();
+        void clear();
 
-      void read_config   (const char *, const char *);
-      void process_config(GrdFileType);
-      void process_masks (const Grid &);
-      int get_compression_level();
+        void read_config(const char *, const char *);
+        void process_config(GrdFileType);
+        void process_masks(const Grid &);
 
-      // Dump out the counts
-      int get_n_data() const;
+        int get_n_data() const;
+        int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int GridDiagConfInfo::get_n_data() const { return(n_data); }
-inline int GridDiagConfInfo::get_compression_level()  { return conf.nc_compression(); }
+inline int GridDiagConfInfo::get_compression_level()
+    { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 
