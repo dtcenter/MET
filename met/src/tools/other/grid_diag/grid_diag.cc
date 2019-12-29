@@ -57,9 +57,6 @@ static void get_series_entry(int, VarInfo *, const StringArray &,
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
 
-static void set_range(const unixtime &, unixtime &, unixtime &);
-static void set_range(const int &, int &, int &);
-
 static void clean_up();
 
 static void usage();
@@ -70,8 +67,8 @@ static void set_log_file(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
-static StringArray parse_file_list(const StringArray &, const GrdFileType);
-static void parse_long_names();
+static StringArray parse_file_list(
+    const StringArray &, const GrdFileType);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -397,30 +394,6 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
-
-   if(t == (unixtime) 0) return;
-
-   beg = (beg == (unixtime) 0 || t < beg ? t : beg);
-   end = (end == (unixtime) 0 || t > end ? t : end);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_range(const int &t, int &beg, int &end) {
-
-   if(is_bad_data(t)) return;
-
-   beg = (is_bad_data(beg) || t < beg ? t : beg);
-   end = (is_bad_data(end) || t > end ? t : end);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void clean_up() {
 
    // Close the output NetCDF file
@@ -550,47 +523,6 @@ StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
    return(list);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void parse_long_names() {
-   ifstream f_in;
-   ConcatString line, key;
-   StringArray sa;
-   ConcatString file_name = replace_path(stat_long_name_file);
-
-   mlog << Debug(1)
-        << "Reading stat column descriptions: " << file_name << "\n";
-
-   // Open the data file
-   f_in.open(file_name.c_str());
-   if(!f_in) {
-      mlog << Error << "\nparse_long_names() -> "
-           << "can't open the ASCII file \"" << file_name
-           << "\" for reading\n\n";
-      exit(1);
-   }
-
-   // Read the lines in the file
-   while(line.read_line(f_in)) {
-
-      // Parse the line
-      sa = line.split("\"");
-
-      // Skip any lines without enough elements
-      if(sa.n_elements() < 2) continue;
-
-      // Store the description
-      key = sa[0];
-      key.ws_strip();
-      stat_long_name[key] = sa[1];
-   }
-
-   // Close the input file
-   f_in.close();
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

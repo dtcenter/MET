@@ -46,6 +46,10 @@ class GridDiagConfInfo {
 
         VarInfo ** data_info; // Pointer array for data VarInfo [n_data]
 
+        NumArray range;
+
+        int n_bins;
+
         ConcatString mask_grid_file; // Path for masking grid area
         ConcatString mask_grid_name; // Name of masking grid area
         ConcatString mask_poly_file; // Path for masking poly area

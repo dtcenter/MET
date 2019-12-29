@@ -59,7 +59,7 @@ static const char * program_name = "grid_diag";
 
 // Default configuration file name
 static const char * default_config_filename =
-   "MET_BASE/config/GridDiagConfig_default";
+    "MET_BASE/config/GridDiagConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -68,9 +68,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray data_files,  found_data_files;
-static GrdFileType ftype  = FileType_None;
-static GrdFileType dtype  = FileType_None;
+static StringArray data_files, found_data_files;
+static GrdFileType dtype = FileType_None;
 static int compress_level = -1;
 
 // Output file
@@ -87,17 +86,7 @@ static GridDiagConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
-static NcDim  lat_dim;
-static NcDim  lon_dim ;
-
-// Structure to store computed statistics and corresponding metadata
-struct NcVarData {
-   NcVar * var; // Pointer to NetCDF variable
-};
-
-// Mapping of NetCDF variable name to computed statistic
-map<ConcatString, NcVarData> stat_data;
+static NcFile *nc_out = (NcFile *) 0;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -114,29 +103,14 @@ static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
 
 // Enumeration of ways that a series can be defined
 enum SeriesType {
-   SeriesType_None,       // Undefined series type
-   SeriesType_Data_Conf,  // Defined by data.field configuration
-   SeriesType_Data_Files, // Defined by -data command line option
+    SeriesType_None,       // Undefined series type
+    SeriesType_Data_Conf,  // Defined by data.field configuration
+    SeriesType_Data_Files, // Defined by -data command line option
 };
 static SeriesType series_type = SeriesType_None;
 
 // Series length
 static int n_series = 0;
-
-// Range of timing values encountered in the data
-static unixtime data_init_beg  = (unixtime) 0;
-static unixtime data_init_end  = (unixtime) 0;
-static unixtime data_valid_beg = (unixtime) 0;
-static unixtime data_valid_end = (unixtime) 0;
-static int      data_lead_beg  = bad_data_int;
-static int      data_lead_end  = bad_data_int;
-
-// Mapping of statistic names to descriptions
-map<ConcatString, ConcatString> stat_long_name;
-static const char stat_long_name_file[] =
-   "MET_BASE/table_files/stat_column_description.txt";
-
-////////////////////////////////////////////////////////////////////////
 
 #endif   //  __GRID_DIAG_H__
 
