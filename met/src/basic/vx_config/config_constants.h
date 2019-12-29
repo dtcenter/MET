@@ -908,6 +908,12 @@ static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
 
 //
+// Grid-Diagnostics specific parameter key names
+//
+
+static const char conf_key_n_bins[] = "n_bins";
+
+//
 // TC-Pairs, TC-RMW, and TC-Stat specific parameter key names
 //
 
