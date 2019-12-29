@@ -19,6 +19,7 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_shapedata \
 	-lvx_analysis_util \
+	-lvx_series_data \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
