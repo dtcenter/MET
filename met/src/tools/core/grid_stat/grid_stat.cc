@@ -1922,7 +1922,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
    // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
+            pd_ptr->csd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
