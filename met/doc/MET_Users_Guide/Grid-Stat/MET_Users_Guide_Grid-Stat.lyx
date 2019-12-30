@@ -1445,6 +1445,18 @@ climo_mean     = {}
 \begin_layout LyX-Code
 
 \series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_cdf      = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 mask           = { grid = [ "FULL" ]; poly = []; }
 \end_layout
 
@@ -2473,7 +2485,7 @@ TRUE
 \series medium
 Setting the 
 \series bold
-climo_cdf
+climo_cdp
 \series medium
  entry to TRUE enables the creation of an output variable for each climatologica
 l distribution percentile (CDP) threshold requested in the configuration

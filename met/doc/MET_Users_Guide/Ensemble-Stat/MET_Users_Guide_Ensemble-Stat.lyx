@@ -280,7 +280,9 @@ et al
 \series medium
 \emph default
 , 2004).
- 
+ The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT)
+ line type, along with other statistics quantifying the ensemble spread
+ and ensemble mean skill.
 \end_layout
 
 \begin_layout Subsection
@@ -918,6 +920,18 @@ regrid         = { ...
 
 \series bold
 climo_mean     = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_cdf      = {}
 \end_layout
 
 \begin_layout LyX-Code

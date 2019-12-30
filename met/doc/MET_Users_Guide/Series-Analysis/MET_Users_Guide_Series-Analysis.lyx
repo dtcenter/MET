@@ -713,6 +713,12 @@ climo_mean     = {}
 \begin_layout LyX-Code
 
 \series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 ci_alpha       = [ 0.05 ];
 \end_layout
 

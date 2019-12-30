@@ -1995,6 +1995,18 @@ climo_mean     = {}
 \begin_layout LyX-Code
 
 \series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_cdf      = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obs_window     = { beg = -5400; end =  5400; }
 \end_layout
 
