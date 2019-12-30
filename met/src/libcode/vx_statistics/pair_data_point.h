@@ -236,23 +236,19 @@ class VxPairDataPoint {
 ////////////////////////////////////////////////////////////////////////
 
 // Apply conditional thresholds to subset the pairs
-PairDataPoint subset_pairs(const PairDataPoint &,
-                           const SingleThresh &, const SingleThresh &,
-                           const SetLogic);
+extern PairDataPoint subset_pairs(const PairDataPoint &,
+                        const SingleThresh &, const SingleThresh &,
+                        const SetLogic);
 
 // Apply conditional thresholds to subset the wind pairs
-void subset_wind_pairs(const PairDataPoint &, const PairDataPoint &,
-                       const SingleThresh &, const SingleThresh &,
-                       const SetLogic, PairDataPoint &, PairDataPoint &);
+extern void subset_wind_pairs(const PairDataPoint &,
+                        const PairDataPoint &, const SingleThresh &,
+                        const SingleThresh &, const SetLogic,
+                        PairDataPoint &, PairDataPoint &);
 
 // Subset pairs for a specific climatology CDF bin
-PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
-                                   const ThreshArray &, int i_bin);
-
-extern bool   set_climo_flag(const NumArray &, const NumArray &);
-
-NumArray      derive_climo_prob(const NumArray &, const NumArray &,
-                                const SingleThresh &);
+extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
+                        const ThreshArray &, int i_bin);
 
 ////////////////////////////////////////////////////////////////////////
 
