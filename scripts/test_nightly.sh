@@ -55,6 +55,7 @@ export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
 export MET_PYTHON_CC="-I/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/include/python3.7m"
 export MET_PYTHON_LD="-L/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
+export PYTHONHOME=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3
 export LD_LIBRARY_PATH=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib
 
 # Variables required to run MET
