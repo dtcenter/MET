@@ -46,7 +46,7 @@ using namespace std;
 
 static void process_command_line(int, char **);
 
-static void process_files(void);
+static void process_series(void);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
 
@@ -163,11 +163,16 @@ void process_command_line(int argc, char **argv) {
 
     // Process masking regions
     conf_info.process_masks(grid);
+
+    // Process series
+    process_series();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_files(void) {
+void process_series(void) {
+    DataPlane dp;
+
     // List the lengths of the series options
     mlog << Debug(1)
          << "Length of configuration \"data.field\" = "
@@ -202,9 +207,10 @@ void process_files(void) {
              << "all have length one.\n";
     }
 
-    // Initialize the series file names
-    for(int i = 0; i < n_series; i++) {
-        found_data_files.add("");
+    // Read series data files
+    for(int i_series = 0; i_series < n_series; i_series++) {
+        get_series_entry(i_series, conf_info.data_info[i_series],
+            data_files, dtype, found_data_files, dp, grid);
     }
 
     return;
