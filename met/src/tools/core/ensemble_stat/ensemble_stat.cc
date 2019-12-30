@@ -54,6 +54,8 @@
 //   026    11/26/19  Halley Gotway  Add neighborhood probabilities.
 //   027    12/11/19  Halley Gotway  Reorganize logic to support the use
 //                    of python embedding.
+//   028    12/17/19  Halley Gotway  Apply climatology bins to ensemble
+//                    continuous statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,6 +109,10 @@ static void process_grid_scores   (int,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const MaskPlane &,
                ObsErrorEntry *,   PairDataEnsemble &);
+
+static void do_ecnt              (const EnsembleStatVxOpt &,
+                                  const SingleThresh &,
+                                  const PairDataEnsemble *);
 
 static void clear_counts();
 static void track_counts(int, const DataPlane &);
@@ -1296,18 +1302,10 @@ void process_point_scores() {
                   // Subset pairs using the current obs_thresh
                   pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
 
-                  // Compute ensemble statistics
-                  pd.compute_stats();
-
-                  // Write ECNT stats
+                  // Compute ECNT scores
                   if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
-
-                     if(pd.n_obs > 0) {
-                        write_ecnt_row(shc, &pd,
-                           conf_info.output_flag[i_ecnt],
-                           stat_at, i_stat_row,
-                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
-                     }
+                     do_ecnt(conf_info.vx_opt[i],
+                             conf_info.vx_opt[i].othr_ta[m], &pd);
                   }
 
                   // Write RHIST counts
@@ -1750,20 +1748,12 @@ void process_grid_vx() {
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
-               // Compute ensemble statistics
-               pd.compute_stats();
-
                if(i == 0) setup_txt_files();
 
-               // Write ECNT stats
+               // Compute ECNT scores
                if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
-
-                  if(pd.n_obs > 0) {
-                     write_ecnt_row(shc, &pd,
-                        conf_info.output_flag[i_ecnt],
-                        stat_at, i_stat_row,
-                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
-                  }
+                  do_ecnt(conf_info.vx_opt[i],
+                          conf_info.vx_opt[i].othr_ta[l], &pd);
                }
 
                // Write RHIST counts
@@ -1936,6 +1926,77 @@ void process_grid_scores(int i_vx,
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_ecnt(const EnsembleStatVxOpt &vx_opt,
+             const SingleThresh &othresh,
+             const PairDataEnsemble *pd_ptr) {
+   int i, n_bin;
+   PairDataEnsemble pd;
+   ECNTInfo *ecnt_info = (ECNTInfo *) 0;
+
+   // Check for valid pointer
+   if(!pd_ptr) return;
+
+   // Determine the number of climo CDF bins
+   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
+            pd_ptr->csd_na.n_valid() > 0 ?
+            vx_opt.get_n_cdf_bin() : 1);
+
+   // Allocate memory
+   ecnt_info = new ECNTInfo [n_bin];
+
+   // Process the climo CDF bins
+   for(i=0; i<n_bin; i++) {
+
+      // Apply climo CDF bins logic to subset pairs
+      if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
+                            vx_opt.cdf_info.cdf_ta, i);
+      else          pd = *pd_ptr;
+
+      // Store threshold
+      ecnt_info[i].othresh = othresh;
+
+      // Check for no matched pairs to process
+      if(pd.n_obs == 0) continue;
+
+      // Compute ensemble statistics
+      ecnt_info[i].set(pd);
+
+      // Write out ECNT
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_ecnt] != STATOutputType_None &&
+         ecnt_info[i].n_pair > 0) {
+         write_ecnt_row(shc, ecnt_info[i], vx_opt.output_flag[i_ecnt],
+                        i, n_bin, stat_at, i_stat_row,
+                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
+      }
+   } // end for i (n_bin)
+
+   // Write the mean of the climo CDF bins
+   if(n_bin > 1) {
+         
+      // Compute ECNT climo CDF bin means
+      if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
+         
+         ECNTInfo ecnt_mean;
+         compute_ecnt_mean(ecnt_info, n_bin, ecnt_mean);
+
+         if(ecnt_mean.n_pair > 0) {
+            write_ecnt_row(shc, ecnt_mean,
+                           vx_opt.output_flag[i_ecnt],
+                           -1, n_bin, stat_at, i_stat_row,
+                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
+         }
+      }
+   } // end if n_bin > 1
+
+   // Dealloate memory
+   if(ecnt_info) { delete [] ecnt_info; ecnt_info = (ECNTInfo *) 0; }
+
+   return;    
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2305,7 +2366,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
    // Append the timing information
    unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
    snprintf(tmp_str, sizeof(tmp_str), "%.4i%.2i%.2i_%.2i%.2i%.2iV",
-           yr, mon, day, hr, min, sec);
+            yr, mon, day, hr, min, sec);
    str << "_" << tmp_str;
 
    // Append the suffix
