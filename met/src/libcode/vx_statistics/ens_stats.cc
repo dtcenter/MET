@@ -215,7 +215,7 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 void ECNTInfo::set(const PairDataEnsemble &pd) {
    int i;
    double w, w_sum;
-   double crps, crps_climo;
+   double crps_climo;
    double fbar, obar, ffbar, oobar, fobar;
    NumArray cur;
 
