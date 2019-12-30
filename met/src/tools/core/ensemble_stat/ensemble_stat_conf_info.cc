@@ -649,6 +649,7 @@ void EnsembleStatVxOpt::clear() {
    mask_name_area.clear();
    msg_typ.clear();
    othr_ta.clear();
+   cdf_info.clear();
    ci_alpha.clear();
    interp_info.clear();
 
@@ -759,6 +760,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: othr_thresh
    othr_ta = process_perc_thresh_bins(
                 odict.lookup_thresh_array(conf_key_obs_thresh));
+
+   // Conf: climo_cdf
+   cdf_info = parse_conf_climo_cdf(&odict);
 
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&odict);
@@ -952,6 +956,7 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
 
 int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
+   int n_bin;
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
@@ -963,18 +968,38 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    // Check if this output line type is requested
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
 
+   // Determine row multiplier for climatology bins
+   if(cdf_info.write_bins) {
+      n_bin = get_n_cdf_bin();
+      if(n_bin > 1) n_bin++;
+   }
+   else {
+      n_bin = 1;
+   }
+
    // Switch on the index of the line type
    switch(i_txt_row) {
 
       case(i_ecnt):
+
+         // Maximum number of ECNT  lines possible =
+         //    Point Vx: Message Types * Masks * Interpolations *
+         //                              Obs Thresholds * Climo Bins
+         //     Grid Vx:                 Masks * Interpolations *
+         //                              Obs Thresholds * Climo Bins
+         n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
+              get_n_o_thresh() * n_bin;
+         break;
+
       case(i_rhist):
       case(i_phist):
       case(i_relp):
+
          // Maximum number of RHIST, PHIST, and RELP lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds
          //     Grid Vx:                 Masks * Interpolations * Obs Thresholds
-         n =   get_n_msg_typ() * get_n_mask() * get_n_interp() * get_n_o_thresh()
-             +                   get_n_mask() * get_n_interp() * get_n_o_thresh();
+         n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
+              get_n_o_thresh();
          break;
 
       case(i_orank):

@@ -779,7 +779,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                     STATOutputType out_type,  int i_bin, int n_bin,
+                     STATOutputType out_type, int i_bin, int n_bin,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
    ConcatString mask_name = shc.get_mask();
@@ -826,7 +826,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                      STATOutputType out_type,  int i_bin, int n_bin,
+                      STATOutputType out_type, int i_bin, int n_bin,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
    ConcatString mask_name = shc.get_mask();
@@ -1598,18 +1598,18 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    STATOutputType out_type,
+    
+void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
+                    STATOutputType out_type, int i_bin, int n_bin,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
-
-   // Check for data to write.  Running Ensemble-Stat with skip_const
-   // set to true may result in no data.
-   if(pd_ptr->n_obs == 0) return;
+   ConcatString mask_name = shc.get_mask();
 
    // ECNT line type
    shc.set_line_type(stat_ecnt_str);
+
+   // Thresholds
+   shc.set_obs_thresh(ecnt_info.othresh);
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
@@ -1617,11 +1617,15 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
    // Write the data columns
-   write_ecnt_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+   write_ecnt_cols(ecnt_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
    if(out_type == STATOutputType_Both) {
@@ -1633,6 +1637,9 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Increment the STAT row counter
    stat_row++;
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
 
    return;
 }
@@ -3593,7 +3600,7 @@ void write_isc_cols(const ISCInfo &isc_info, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
+void write_ecnt_cols(const ECNTInfo &ecnt_info,
                      AsciiTable &at, int r, int c) {
 
    //
@@ -3606,40 +3613,40 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    //    SPREAD_PLUS_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
-      pd_ptr->n_pair);
+      ecnt_info.n_pair);
 
    at.set_entry(r, c+1,  // Number of ensemble members
-      pd_ptr->n_ens);
+      ecnt_info.n_ens);
 
    at.set_entry(r, c+2,  // Continuous Ranked Probability Score
-      pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.crps);
 
    at.set_entry(r, c+3,  // Continuous Ranked Probability Skill Score
-      pd_ptr->crpss);
+      ecnt_info.crpss);
 
    at.set_entry(r, c+4,  // Ignorance Score
-      pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.ign);
 
    at.set_entry(r, c+5,  // ME for unperturbed ensemble mean
-      pd_ptr->me);
+      ecnt_info.me);
 
    at.set_entry(r, c+6,  // RMSE for unperturbed ensemble mean
-      pd_ptr->rmse);
+      ecnt_info.rmse);
 
    at.set_entry(r, c+7,  // Mean of unperturbed ensemble spread
-      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread);
 
    at.set_entry(r, c+8,  // ME for mean of perturbed members
-      pd_ptr->me_oerr);
+      ecnt_info.me_oerr);
 
    at.set_entry(r, c+9,  // RMSE for mean of perturbed members
-      pd_ptr->rmse_oerr);
+      ecnt_info.rmse_oerr);
 
    at.set_entry(r, c+10,  // Mean of perturbed ensemble spread
-      pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread_oerr);
 
    at.set_entry(r, c+11,  // Mean of unperturbed spread plus observation error
-      pd_ptr->spread_plus_oerr_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread_plus_oerr);
 
    return;
 }

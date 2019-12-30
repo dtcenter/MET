@@ -17,7 +17,6 @@
 
 #include "pair_base.h"
 #include "obs_error.h"
-#include "met_stats.h"
 
 #include "vx_util.h"
 #include "vx_grid.h"
@@ -26,6 +25,12 @@
 #include "vx_gsl_prob.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+class SSVARInfo; // forward reference
+
+////////////////////////////////////////////////////////////////////////
 
 // Structures to store the spread/skill point information
 struct ens_ssvar_pt {
@@ -124,7 +129,6 @@ class PairDataEnsemble : public PairBase {
 
       void compute_pair_vals(const gsl_rng *);
 
-      void compute_stats();
       void compute_rhist();
       void compute_relp();
       void compute_phist();
@@ -284,8 +288,12 @@ class VxPairDataEnsemble {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void compute_crps_ign_pit(double, const NumArray &,
-                                 double &, double &, double &);
+extern void compute_crps_ign_pit(double, const NumArray &, double &,
+                           double &, double &);
+
+// Subset pairs for a specific climatology CDF bin
+extern PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &,
+                           const ThreshArray &, int i_bin);
 
 ////////////////////////////////////////////////////////////////////////
 

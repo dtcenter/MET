@@ -1893,6 +1893,7 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrENSInfo>::iterator it;
    int n_row, n_col, r, c;
    StatHdrColumns shc;
+   ECNTInfo ecnt_info;
 
    //
    // Setup the output table
@@ -1934,12 +1935,17 @@ void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
       c = 0;
 
       //
+      // Compute ECNT stats
+      //
+      ecnt_info.set(it->second.ens_pd);
+
+      //
       // ECNT output line
       //
       at.set_entry(r, c++, "ECNT:");
       write_case_cols(it->first, at, r, c);
-      write_ecnt_cols(&(it->second.ens_pd), at, r, c);
-      if(j.stat_out) write_ecnt_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+      write_ecnt_cols(ecnt_info, at, r, c);
+      if(j.stat_out) write_ecnt_cols(ecnt_info, j.stat_at, r, n_header_columns);
    } // end for it
 
    return;
@@ -2421,13 +2427,14 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       // ECNT output line
       //
       if(lt == stat_ecnt) {
-         it->second.ens_pd.compute_stats();
+         ECNTInfo ecnt_info;
+         ecnt_info.set(it->second.ens_pd);
          at.set_entry(r, c++, "ECNT:");
          write_case_cols(it->first, at, r, c);
-         write_ecnt_cols(&(it->second.ens_pd), at, r, c);
+         write_ecnt_cols(ecnt_info, at, r, c);
          if(j.stat_out) {
             write_header_cols(shc, j.stat_at, r);
-            write_ecnt_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+            write_ecnt_cols(ecnt_info, j.stat_at, r, n_header_columns);
          }
          // Increment row counter
          r++;
