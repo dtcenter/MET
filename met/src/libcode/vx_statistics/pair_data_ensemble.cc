@@ -20,6 +20,7 @@ using namespace std;
 #include <limits>
 
 #include "pair_data_ensemble.h"
+#include "ens_stats.h"
 #include "obs_error.h"
 
 #include "vx_data2d_factory.h"

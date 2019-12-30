@@ -17,7 +17,6 @@
 
 #include "pair_base.h"
 #include "obs_error.h"
-#include "met_stats.h"
 
 #include "vx_util.h"
 #include "vx_grid.h"
@@ -26,6 +25,12 @@
 #include "vx_gsl_prob.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+class SSVARInfo; // forward reference
+
+////////////////////////////////////////////////////////////////////////
 
 // Structures to store the spread/skill point information
 struct ens_ssvar_pt {
