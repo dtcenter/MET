@@ -171,7 +171,7 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_series(void) {
-    DataPlane dp;
+    DataPlane data_dp;
 
     // List the lengths of the series options
     mlog << Debug(1)
@@ -180,37 +180,18 @@ void process_series(void) {
          << "Length of data file list         = "
          << data_files.n_elements() << "\n";
 
-    // Determine the length of the series to be analyzed
-    // - Configuration data.field
-    // - Data file list
-    if(conf_info.get_n_data() > 1) {
-        series_type = SeriesType_Data_Conf;
-        n_series = conf_info.get_n_data();
-        mlog << Debug(1)
-             << "Series defined by the \"data.field\""
-             << "configuration entry "
-             << "of length " << n_series << ".\n";
-    }
-    else if(data_files.n_elements() > 1) {
-        series_type = SeriesType_Data_Files;
-        n_series = data_files.n_elements();
-        mlog << Debug(1)
-             << "Series defined by the data file list of length "
-             << n_series << ".\n";
-    }
-    else {
-        series_type = SeriesType_Data_Conf;
-        n_series = 1;
-        mlog << Debug(1)
-             << "The \"data.field\" configuration entry "
-             << "and the \"-data\" command line option "
-             << "all have length one.\n";
-    }
+    series_type = SeriesType_Data_Files;
+    n_series = data_files.n_elements();
+    mlog << Debug(1)
+          << "Series defined by the data file list of length "
+          << n_series << ".\n";
 
-    // Read series data files
+    // Process series variables
     for(int i_series = 0; i_series < n_series; i_series++) {
-        get_series_entry(i_series, conf_info.data_info[i_series],
-            data_files, dtype, found_data_files, dp, grid);
+        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+            get_series_entry(i_series, conf_info.data_info[i_var],
+                data_files, dtype, found_data_files, data_dp, grid);
+        }
     }
 
     return;
