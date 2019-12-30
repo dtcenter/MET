@@ -56,7 +56,7 @@ class MtdFloatFile : public MtdFileBase {
       float DataMin;
       float DataMax;
 
-      int Radius;   //  = -1 if not a convolved file
+      int Spatial_Radius;   //  = -1 if not a convolved file
 
    public:
 
@@ -77,7 +77,7 @@ class MtdFloatFile : public MtdFileBase {
 
       void set_data_minmax(double _data_min, double _data_max);
 
-      void set_radius(int);
+      void set_spatial_radius(int);
 
          //
          //  get stuff
@@ -88,7 +88,7 @@ class MtdFloatFile : public MtdFileBase {
 
       float operator()(int _x, int _y, int _t) const;
 
-      int radius() const;
+      int spatial_radius() const;
 
       const float * data() const;
 
@@ -114,7 +114,7 @@ class MtdFloatFile : public MtdFileBase {
 
       MtdFloatFile const_t_slice(int t) const;
 
-      MtdFloatFile convolve(const int r) const;
+      MtdFloatFile convolve(const int spatial_r) const;
 
       void calc_data_minmax();
 
@@ -128,7 +128,7 @@ class MtdFloatFile : public MtdFileBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MtdFloatFile::radius() const { return ( Radius ); }
+inline int MtdFloatFile::spatial_radius() const { return ( Spatial_Radius ); }
 
 inline float MtdFloatFile::data_min() const { return ( DataMin ); }
 inline float MtdFloatFile::data_max() const { return ( DataMax ); }
