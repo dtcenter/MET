@@ -129,7 +129,6 @@ class PairDataEnsemble : public PairBase {
 
       void compute_pair_vals(const gsl_rng *);
 
-      void compute_stats();
       void compute_rhist();
       void compute_relp();
       void compute_phist();
@@ -289,8 +288,12 @@ class VxPairDataEnsemble {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void compute_crps_ign_pit(double, const NumArray &,
-                                 double &, double &, double &);
+extern void compute_crps_ign_pit(double, const NumArray &, double &,
+                           double &, double &);
+
+// Subset pairs for a specific climatology CDF bin
+extern PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &,
+                           const ThreshArray &, int i_bin);
 
 ////////////////////////////////////////////////////////////////////////
 

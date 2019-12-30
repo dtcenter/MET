@@ -1731,6 +1731,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataEnsemble hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    NumArray f_ens;
+   ECNTInfo ecnt_info;
 
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
@@ -1815,13 +1816,13 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Compute ensemble statistics
       hira_pd.compute_pair_vals(rng_ptr);
-      hira_pd.compute_stats();
+      ecnt_info.set(hira_pd);
 
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
-         write_ecnt_row(shc, &hira_pd,
+         write_ecnt_row(shc, ecnt_info,
             conf_info.vx_opt[i_vx].output_flag[i_ecnt],
-            stat_at, i_stat_row,
+            0, 1, stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       }
 
