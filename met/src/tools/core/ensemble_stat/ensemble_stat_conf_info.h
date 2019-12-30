@@ -111,6 +111,8 @@ class EnsembleStatVxOpt {
 
       ThreshArray    othr_ta;            // Observation filetering thresholds
 
+      ClimoCDFInfo   cdf_info;           // Climo CDF info
+
       NumArray       ci_alpha;           // Alpha value for confidence intervals
 
       InterpInfo     interp_info;        // Interpolation (smoothing) information
@@ -146,17 +148,19 @@ class EnsembleStatVxOpt {
       int get_n_mask_area() const;
 
       int get_n_o_thresh()  const;
+      int get_n_cdf_bin()   const;
       int get_n_ci_alpha()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n_elements());        }
-inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp);        }
-inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n_elements());      }
-inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n_elements()); }
-inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n_elements());        }
-inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n_elements());       }
+inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
+inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
+inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());        }
+inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
+inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
+inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
+inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
 
 ////////////////////////////////////////////////////////////////////////
 
