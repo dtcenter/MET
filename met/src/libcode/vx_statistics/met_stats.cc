@@ -3068,28 +3068,6 @@ int min_int(const int *v_int, int n) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void dbl_to_str(double v, char *v_str, int length) {
-
-   dbl_to_str(v, v_str, length, default_precision);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void dbl_to_str(double v, char *v_str, int length, int precision) {
-   char fmt_str[32];
-
-   snprintf(fmt_str, sizeof(fmt_str), "%s%i%s", "%.", precision, "f");
-
-   if(is_bad_data(v)) snprintf(v_str, length, "%i", bad_data_int);
-   else               snprintf(v_str, length, fmt_str, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 // Compute standard deviation from sums of squares
 //
