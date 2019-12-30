@@ -1264,4 +1264,64 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute an unweighted mean of continuous ensemble statistics.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
+                       ECNTInfo &ecnt_mean) {
+   int i;
+   NumArray na;
+
+   // Initialize
+   ecnt_mean.clear();
+   if(n == 0) return;
+
+   // Store thresholds using the first array entry
+   ecnt_mean.othresh = ecnt_info[0].othresh;
+
+   // Store number of ensemble members using the first entry
+   ecnt_mean.n_ens = ecnt_info[0].n_ens;
+
+   // Compute the sum of the pairs
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].n_pair);
+   ecnt_mean.n_pair = na.sum();
+
+   // Compute unweighted mean for each statistic
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps);
+   ecnt_mean.crps = na.mean();
+   
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss);
+   ecnt_mean.crpss = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].ign);
+   ecnt_mean.ign = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me);
+   ecnt_mean.me = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].rmse);
+   ecnt_mean.rmse = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].spread);
+   ecnt_mean.spread = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me_oerr);
+   ecnt_mean.me_oerr = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].rmse_oerr);
+   ecnt_mean.rmse_oerr = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].spread_oerr);
+   ecnt_mean.spread_oerr = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].spread_plus_oerr);
+   ecnt_mean.spread_plus_oerr = na.mean();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 
