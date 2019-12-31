@@ -695,7 +695,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       
       var_count = var_count2 = to_count = 0;
       filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
-      for (int idx=0; idx < nobs; idx++) {
+      for (idx=0; idx < nobs; idx++) {
          if (var_idx_or_gc == obs_ids[idx]) {
             var_count2++;
             hdr_idx = obs_hids[idx];
