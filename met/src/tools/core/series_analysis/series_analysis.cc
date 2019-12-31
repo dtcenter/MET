@@ -115,7 +115,6 @@ static void set_log_file(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
-static StringArray parse_file_list(const StringArray &, const GrdFileType);
 static void parse_long_names();
 
 ////////////////////////////////////////////////////////////////////////
@@ -204,16 +203,16 @@ void process_command_line(int argc, char **argv) {
         << "Default Config File: " << default_config_file << "\n"
         << "User Config File: "    << config_file << "\n";
 
+   // Parse the forecast and observation file lists
+   fcst_files = parse_file_list(fcst_files);
+   obs_files  = parse_file_list(obs_files);
+
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
-
-   // Parse the forecast and observation file lists
-   fcst_files = parse_file_list(fcst_files, ftype);
-   obs_files  = parse_file_list(obs_files,  otype);
 
    // Get mtddf
    fcst_mtddf = get_mtddf(fcst_files, ftype);
@@ -2301,34 +2300,6 @@ void set_verbosity(const StringArray & a) {
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-StringArray parse_file_list(const StringArray & a, const GrdFileType type) {
-   int i;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-   StringArray list;
-
-   // Check for empty list
-   if(a.n() == 0) {
-      mlog << Error << "\nparse_file_list() -> "
-           << "empty list!\n\n";
-      exit(1);
-   }
-
-   // Attempt to read the first file as a gridded data file
-   mtddf = mtddf_factory.new_met_2d_data_file(a[0].c_str(), type);
-
-   // If the read was successful, store the list of gridded files.
-   // Otherwise, process entries as ASCII files.
-   if(mtddf)                            list.add(a);
-   else for(i=0; i<a.n(); i++) list = parse_ascii_file_list(a[0].c_str());
-
-   // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-
-   return(list);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,9 @@
 static const int t_offset_low   = -1;
 static const int t_offset_high  =  1;
 
+// static const int t_offset_low   = -3;
+// static const int t_offset_high  =  2;
+
 static const int time_radius    = t_offset_high - t_offset_low + 1;
 
 
@@ -64,6 +67,7 @@ struct DataHandle {
 
    int t;
 
+
       ///////////////
 
    int n_planes () const
@@ -96,6 +100,8 @@ struct DataHandle {
 
    bool * plane_loaded;
 
+   int  * plane_time;
+
 
    void set_size(int _nx, int _ny);
 
@@ -114,6 +120,8 @@ struct DataHandle {
         ok_sum_plane = 0;
 
         plane_loaded = 0;
+
+        plane_time   = 0;
 
    }
 
@@ -145,9 +153,52 @@ struct DataHandle {
 
       delete [] plane_loaded;  plane_loaded = 0;
 
+      delete [] plane_time;    plane_time   = 0;
+
       return;
 
    }
+
+
+   void dump(ostream & _out) const
+
+   {
+
+      int j;
+
+      _out.put('\n');
+
+      _out << "   DataHandle:\n";
+
+      _out << "   t = " << t << '\n';
+      _out << "   n_planes = " << (n_planes()) << '\n';
+
+      _out << "   plane_loaded = [";
+
+      for (j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
+
+      _out << " ]\n";
+
+      _out << "   plane_time = [";
+
+      for (j=0; j<time_radius; ++j)  {
+
+         _out << ' ';
+
+         if ( plane_time[j] < 0 )  _out << '.';
+         else                      _out << plane_time[j];
+
+      }
+
+      _out << " ]\n";
+
+      _out.flush();
+
+      return;
+
+   }
+
+
 
 };
 
@@ -181,7 +232,6 @@ int j, k, n;
 int x, y, t;
 int n_good;
 double value;
-bool some_ok = false;
 MtdFloatFile out;
 double min_conv_value, max_conv_value;
 double * conv_data = (double *) 0;
@@ -193,6 +243,7 @@ bool   * ok [time_radius];
 
 const int trp1 = 2*spatial_R + 1;
 const double scale = 1.0/(trp1*trp1);
+
 
 
 file_id = 1;   //  This is declared static in the netCDF library header file ncGroup.h, 
@@ -233,6 +284,8 @@ max_conv_value = -1.0e100;
 
 time_start = time(0);
 
+// cout << "\n\n  n = " << mtd_three_to_one(Nx, Ny, Nt, 88, 397, 0) << "\n\n";
+
 for (t=0; t<Nt; ++t)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
@@ -240,6 +293,8 @@ for (t=0; t<Nt; ++t)  {
    p = conv_data + n;
 
    load_handle(handle, *this, t);
+
+   // handle.dump(cout);
 
    for (k=0; k<time_radius; ++k)  {
 
@@ -255,11 +310,17 @@ for (t=0; t<Nt; ++t)  {
 
    for (j=0; j<Nxy; ++j)  {
 
+      // if ( (t == 0) && (j == 243846) )  {
+      // 
+      //    cerr << "ok\n";
+      // 
+      // }
+
       n_good = 0;
 
       for (k=0; k<time_radius; ++k)  {
 
-         if ( ok[k] )  ++n_good;
+         if ( handle.plane_loaded[k] && *(ok[k]) )  ++n_good;
 
       }
 
@@ -272,7 +333,7 @@ for (t=0; t<Nt; ++t)  {
 
          for (k=0; k<time_radius; ++k)  {
 
-            if ( ok[k] )  { value += (*ss[k]);  ++n_good; }
+            if ( handle.plane_loaded[k] && *(ok[k]) )  { value += (*ss[k]);  ++n_good; }
 
          }
 
@@ -422,6 +483,9 @@ plane_loaded = new bool [time_radius];
 
 for (j=0; j<time_radius; ++j)  plane_loaded[j] = false;
 
+plane_time = new int [time_radius];
+
+for (j=0; j<time_radius; ++j)  plane_time[j] = -1;
 
    //
    //  initialize planes
@@ -769,6 +833,8 @@ handle.t = t;
 
 for (index=0; index<time_radius; ++index)  new_loaded[index] = false;
 
+for (index=0; index<time_radius; ++index)  handle.plane_time[index] = -1;
+
 
 for (index=0; index<time_radius; ++index)  {
 
@@ -778,6 +844,8 @@ for (index=0; index<time_radius; ++index)  {
    if ( t_real > t_last  )  break;
 
    new_loaded[index] = true;
+
+   handle.plane_time[index] = t_real;
 
       //
 
