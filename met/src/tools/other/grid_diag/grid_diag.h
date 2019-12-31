@@ -28,6 +28,7 @@ using namespace std;
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <map>
 #include <ctype.h>
 #include <dirent.h>
 #include <iostream>
@@ -112,6 +113,9 @@ static SeriesType series_type = SeriesType_None;
 // Series length
 static int n_series = 0;
 
-#endif   //  __GRID_DIAG_H__
+// Variable histogram map
+map<ConcatString, vector<int> > var_hists;
+
+#endif  //  __GRID_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////

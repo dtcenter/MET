@@ -45,11 +45,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-
 static void process_series(void);
 
-static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
+static Met2dDataFile *get_mtddf(
+    const StringArray &, const GrdFileType);
 
+static void setup_var_hists(void);
+static void setup_nc_file(void);
 static void clean_up();
 
 static void usage();
@@ -164,8 +166,29 @@ void process_command_line(int argc, char **argv) {
     // Process masking regions
     conf_info.process_masks(grid);
 
+    // Setup variable histograms
+    setup_var_hists();
+
     // Process series
     process_series();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_var_hists(void) {
+
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        VarInfo* data_info = conf_info.data_info[i_var];
+        mlog << Debug(2) << "Initializing "
+             << data_info->magic_str() << " histogram\n"; 
+        var_hists[data_info->magic_str()] = vector<int>();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_nc_file(void) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////
