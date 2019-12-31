@@ -158,13 +158,11 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
     MET_HDFEOS=/met/external_libs/hdfeos \
     MET_FREETYPEINC=/usr/include/freetype2 MET_FREETYPELIB=/usr/lib \
     MET_CAIROINC=/usr/include/cairo MET_CAIROLIB=/usr/lib \
-    MET_PYTHON_CC='-I/usr/include/python2.7' MET_PYTHON_LD='-lpython2.7' > ${LOG_FILE} \
+    MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_install.log \
  && echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_test.log \
  && echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make test > ${LOG_FILE} 2>&1
-
-# For Python3
-# MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE}
+ 
