@@ -79,6 +79,7 @@ static void set_verbosity(const StringArray &);
 int main(int argc, char * argv []) {
    CommandLine cline;
    StringArray ens_file_list;
+   int i;
 
    // Parse the command line into tokens
    cline.set(argc, argv);
@@ -111,15 +112,11 @@ int main(int argc, char * argv []) {
    if(cline.n() == 0) {
       usage();
    }
-   // Process one remaining argument as a filename
-   else if(cline.n() == 1) {
-      ens_file_list = parse_ascii_file_list(cline[0].c_str());
-   }
-   // Process multiple remaining arguments as a list of filenames
+   // Process remaining arguments as input files
    else {
-      for(int i=0; i<(cline.n()); i++) {
-         ens_file_list.add(cline[i].c_str());
-      }
+      StringArray sa;
+      for(i=0; i<cline.n(); i++) sa.add(cline[i]);
+      ens_file_list = parse_file_list(sa);
    }
 
    // Set the expected number of ensemble members

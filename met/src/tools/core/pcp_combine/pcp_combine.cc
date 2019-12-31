@@ -441,44 +441,9 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "parsing the command line arguments as a list of "
            << "files.\n";
 
-      //
-      // If one input file was specified, check for an ascii file list.
-      //
-      if(cline.n() == 2) {
-         Met2dDataFileFactory mtddf_factory;
-         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-         config.read_string(parse_config_str(req_field_list[0].c_str()).c_str());
-         GrdFileType type = parse_conf_file_type(&config);
-
-         //
-         // Attempt to read the first file as a gridded data file.
-         // If the read was successful, store the file name.
-         // Otherwise, process as an ascii file list.
-         //
-         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0].c_str(),
-                                                        type))) {
-            file_list.add(cline[0]);
-         }
-         else {
-            mlog << Debug(1)
-                 << "Parsing input file names from ASCII file list: "
-                 << cline[0] << "\n";
-            file_list = parse_ascii_file_list(cline[0].c_str());
-         }
-
-         //
-         // Cleanup.
-         //
-         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-      }
-      //
-      // Otherwise, store list of multiple input files.
-      //
-      else {
-         for(i=0; i<(cline.n()-1); i++) {
-            file_list.add(cline[i]);
-         }
-      }
+      StringArray sa;
+      for(i=0; i<(cline.n()-1); i++) sa.add(cline[i]);
+      file_list = parse_file_list(sa);
    }
    //
    // If the -field command line option was not used, process remaining
