@@ -2,9 +2,18 @@ FROM centos:7
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
-# This Dockerfile compiles MET from source during "docker build" step
+# This Dockerfile checks out MET from GitHub and compiles the specified branch from source
 #
 ARG SOURCE_BRANCH
+
+# SOURCE_BRANCH is not defined when built via Docker Hub
+RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
+      echo "ERROR: SOURCE_BRANCH undefined! Rebuild with \"--build-arg SOURCE_BRANCH={branch name}\""; \
+      exit 1; \
+    else \
+      echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
+    fi
+
 ENV MET_GIT_NAME    ${SOURCE_BRANCH}
 ENV MET_GIT_URL     https://github.com/NCAR/MET
 ENV MET_DEVELOPMENT true
