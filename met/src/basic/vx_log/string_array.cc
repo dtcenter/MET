@@ -212,14 +212,13 @@ const std::string StringArray::operator[](int len) const
 
 {
 
-  if ( (len < 0) || (len >= n()) )  {
+if ( (len < 0) || (len >= n()) )  {
 
-    mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
+   mlog << Error << "\nStringArray::operator[](int) const -> range check error!\n\n";
 
    exit ( 1 );
 
 }
-
 
 
 return ( s[len] );
