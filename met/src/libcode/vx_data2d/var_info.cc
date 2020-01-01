@@ -376,6 +376,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    NumArray na;
    ConcatString s;
    bool f;
+   int n;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
@@ -417,6 +418,14 @@ void VarInfo::set_dict(Dictionary &dict) {
            << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
       exit(1);
    }
+
+   // Parse n_bins, if present
+   n = dict.lookup_int(conf_key_n_bins, false);
+   if(dict.last_lookup_status()) set_n_bins(n);
+
+   // Parse range, if present
+   na = dict.lookup_num_array(conf_key_range_flag, false);
+   if(dict.last_lookup_status()) set_range(na);
 
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);
