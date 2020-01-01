@@ -107,6 +107,9 @@ void VarInfo::assign(const VarInfo &v) {
    CensorThresh = v.censor_thresh();
    CensorVal    = v.censor_val();
 
+   nBins = v.n_bins();
+   Range = v.range();
+
    Regrid    = v.Regrid;
 
    return;
@@ -143,6 +146,9 @@ void VarInfo::clear() {
    CensorThresh.clear();
    CensorVal.clear();
 
+   nBins = 0;
+   Range.clear();
+
    Regrid.clear();
 
    return;
@@ -178,6 +184,8 @@ void VarInfo::dump(ostream &out) const {
        << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
        << "  CensorThresh = " << CensorThresh.get_str() << "\n"
        << "  CensorVal    = " << CensorVal.serialize() << "\n"
+       << "  nBins        = " << nBins << "\n"
+       << "  Range        = " << Range.serialize() << "\n"
        << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
 
    Level.dump(out);
