@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     process_command_line(argc, argv);
 
     // Close files and deallocate memory
-    clean_up();
+    // clean_up();
 
     return(0);
 }
@@ -166,6 +166,9 @@ void process_command_line(int argc, char **argv) {
     // Process masking regions
     conf_info.process_masks(grid);
 
+    // Setup netcdf output
+    setup_nc_file();
+
     // Setup variable histograms
     setup_var_hists();
 
@@ -189,6 +192,17 @@ void setup_var_hists(void) {
 
 void setup_nc_file(void) {
 
+    mlog << Debug(1) << out_file << "\n";
+
+    // Create NetCDF file
+    nc_out = open_ncfile(out_file.c_str(), true);
+
+    if(IS_INVALID_NC_P(nc_out)) {
+        mlog << Error << "\nsetup_nc_file() -> "
+             << "trouble opening output NetCDF file "
+             << out_file << "\n\n";
+        exit(1);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -212,6 +226,8 @@ void process_series(void) {
     // Process series variables
     for(int i_series = 0; i_series < n_series; i_series++) {
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+            mlog << Debug(2)
+                 << conf_info.data_info[i_var]->n_bins() << "\n";
             get_series_entry(i_series, conf_info.data_info[i_var],
                 data_files, dtype, found_data_files, data_dp, grid);
         }
