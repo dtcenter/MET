@@ -42,6 +42,8 @@ static const char * att_2d_cols [] = {
    "INTENSITY_75",
    "INTENSITY_90",
 
+   "INTENSITY_USER"
+
 };
 
 

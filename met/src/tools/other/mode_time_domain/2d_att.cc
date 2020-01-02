@@ -610,7 +610,10 @@ snprintf(junk, sizeof(junk), format, Ptile_90);
    //  custom intensity value
    //
 
-// TODO write custom intensity value
+snprintf(junk, sizeof(junk), format, Ptile_User);
+
+   table.set_entry(row, c++, junk);
+
    //
    //  done
    //

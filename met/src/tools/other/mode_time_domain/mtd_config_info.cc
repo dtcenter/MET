@@ -711,7 +711,6 @@ table.set_entry(row, c++, s.text());
 
 table.set_entry(row, c++, sec_to_hhmmss(fcst_info->lead()));
 
-
    //  fcst valid
 
 table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(fcst_info->valid()));
@@ -728,6 +727,14 @@ table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(obs_info->valid()));
 
 table.set_entry(row, c++, sec_to_hhmmss(delta_t_seconds));
 
+   //  fcst time convolution begin
+
+table.set_entry(row, c++, fcst_conv_time_beg);
+
+   //  fcst time convolution end
+
+table.set_entry(row, c++, fcst_conv_time_end);
+
    //  fcst radius
 
 table.set_entry(row, c++, fcst_conv_radius);
@@ -737,6 +744,14 @@ table.set_entry(row, c++, fcst_conv_radius);
 s = fcst_conv_thresh.get_str();
 
 table.set_entry(row, c++, s.text());
+
+   //  obs time convolution begin
+
+table.set_entry(row, c++, obs_conv_time_beg);
+
+   //  obs time convolution end
+
+table.set_entry(row, c++, obs_conv_time_end);
 
    //  obs radius
 

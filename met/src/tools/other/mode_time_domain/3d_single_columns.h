@@ -48,6 +48,8 @@ static const char * att_3d_single_cols [] = {
    "INTENSITY_75",
    "INTENSITY_90",
 
+   "INTENSITY_USER"
+
 };
 
 
