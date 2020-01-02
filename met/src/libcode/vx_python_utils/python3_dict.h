@@ -32,26 +32,50 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  convenience functions for looking things up in a python dictionary
-   //
+class Python3_Dict {
+
+   private:
+
+      void clear();
+
+      void init_from_scratch();
 
 
-extern  int           dict_lookup_int    (PyObject * dict, const char * key);
-extern  double        dict_lookup_double (PyObject * dict, const char * key);
-extern  ConcatString  dict_lookup_string (PyObject * dict, const char * key);
-extern  PyObject *    dict_lookup_dict   (PyObject * dict, const char * key);
+      Python3_Dict(const Python3_Dict &);
+      Python3_Dict & operator=(const Python3_Dict &);
+
+
+      PyObject * Object;   //  the dictionary, not allocated
+
+      int Size;   //  the size of the dictionary
+
+
+   public:
+
+      Python3_Dict();
+      Python3_Dict(PyObject *);
+     ~Python3_Dict();
+
+      void dump(std::ostream &, int depth) const;
+
+      void set(PyObject *);
+
+      int size() const;
+
+
+      int           lookup_int    (const char * key) const;
+      double        lookup_double (const char * key) const;
+      ConcatString  lookup_string (const char * key) const;
+
+      PyObject *    lookup_dict   (const char * key) const;
+
+};
 
 
 ////////////////////////////////////////////////////////////////////////
 
-   //
-   //  dumping dictionary contents to the screen
-   //
 
-extern void dump_dict(PyObject * obj, int depth);
-
-extern void dump_dict_value(PyObject * value, int depth);
+inline int Python3_Dict::size() const { return ( Size ); }
 
 
 ////////////////////////////////////////////////////////////////////////
