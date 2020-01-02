@@ -53,6 +53,14 @@ void update_pdf(
     double min,
     double delta,
     vector<int>& pdf,
+    const DataPlane&);
+
+////////////////////////////////////////////////////////////////////////
+
+void update_pdf(
+    double min,
+    double delta,
+    vector<int>& pdf,
     const DataPlane&,
     const MaskPlane&);
 

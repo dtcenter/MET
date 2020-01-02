@@ -204,16 +204,26 @@ void process_series(void) {
     series_type = SeriesType_Data_Files;
     n_series = data_files.n_elements();
     mlog << Debug(1)
-          << "Series defined by the data file list of length "
-          << n_series << ".\n";
+         << "Series defined by the data file list of length "
+         << n_series << ".\n";
 
     // Process series variables
     for(int i_series = 0; i_series < n_series; i_series++) {
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+
+            VarInfo* data_info = conf_info.data_info[i_var];
+
             mlog << Debug(2)
-                 << conf_info.data_info[i_var]->n_bins() << "\n";
-            get_series_entry(i_series, conf_info.data_info[i_var],
+                 << data_info->n_bins() << "\n";
+
+            get_series_entry(i_series, data_info,
                 data_files, dtype, found_data_files, data_dp, grid);
+
+            // Update partial sums
+            update_pdf(bin_mins[data_info->magic_str()][0],
+                bin_deltas[data_info->magic_str()],
+                histograms[data_info->magic_str()],
+                data_dp);
         }
     }
 

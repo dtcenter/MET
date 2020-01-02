@@ -61,6 +61,25 @@ void update_pdf(
     double min,
     double delta,
     vector<int>& pdf,
+    const DataPlane& dp) {
+
+    for(int i = 0; i < dp.nx(); i++) {
+        for(int j = 0; j < dp.ny(); j++) {
+            double value = dp.get(i, j);
+            int k = floor((value - min) / delta);
+            if(k < 0) k = 0;
+            if(k >= pdf.size()) k = pdf.size() - 1;
+            pdf[k]++;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void update_pdf(
+    double min,
+    double delta,
+    vector<int>& pdf,
     const DataPlane& dp,
     const MaskPlane& mp) {
 
