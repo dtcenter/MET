@@ -116,6 +116,10 @@ static int n_series = 0;
 
 // Variable histogram map
 map<ConcatString, vector<int> > var_hists;
+map<ConcatString, vector<double> > bin_mins;
+map<ConcatString, vector<double> > bin_maxs;
+map<ConcatString, vector<double> > bin_mids;
+map<ConcatString, double> bin_deltas;
 
 #endif  //  __GRID_DIAG_H__
 

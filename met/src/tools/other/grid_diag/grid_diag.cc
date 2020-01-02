@@ -185,6 +185,29 @@ void setup_var_hists(void) {
         mlog << Debug(2) << "Initializing "
              << data_info->magic_str() << " histogram\n"; 
         var_hists[data_info->magic_str()] = vector<int>();
+
+        NumArray range = data_info->range();
+        int n_bins = data_info->n_bins();
+        double min = range[0];
+        double max = range[1];
+        double delta = (max - min) / n_bins;
+
+        vector<double> bin_min;
+        vector<double> bin_max;
+        vector<double> bin_mid;
+        bin_min.clear();
+        bin_max.clear();
+        bin_mid.clear();
+        for(int k = 0; k < n_bins; k++) {
+            bin_min.push_back(min + delta * k);
+            bin_max.push_back(min + delta * (k + 1));
+            bin_mid.push_back(min + delta * (k + 0.5));
+        }
+
+        bin_mins[data_info->magic_str()] = bin_min;
+        bin_maxs[data_info->magic_str()] = bin_max;
+        bin_mids[data_info->magic_str()] = bin_mid;
+        bin_deltas[data_info->magic_str()] = delta;
     }
 }
 
