@@ -48,13 +48,15 @@ using namespace std;
 static void process_command_line(int, char **);
 static void process_series(void);
 
-static Met2dDataFile *get_mtddf(
-    const StringArray &, const GrdFileType);
-
 static void setup_histograms(void);
 static void setup_joint_histograms(void);
 static void setup_nc_file(void);
+static void write_histograms(void);
+static void write_joint_histograms(void);
 static void clean_up();
+
+static Met2dDataFile *get_mtddf(
+    const StringArray &, const GrdFileType);
 
 static void usage();
 static void set_data_files(const StringArray &);
@@ -85,6 +87,12 @@ int main(int argc, char *argv[]) {
 
     // Process series
     process_series();
+
+    // Write variable histograms
+    write_histograms();
+
+    // Write joint variable histograms
+    write_joint_histograms();
 
     // Close files and deallocate memory
     clean_up();
@@ -179,6 +187,37 @@ void process_command_line(int argc, char **argv) {
 
     // Process masking regions
     conf_info.process_masks(grid);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_series(void) {
+    DataPlane data_dp;
+
+    // List the lengths of the series options
+    mlog << Debug(1)
+         << "Length of configuration \"data.field\" = "
+         << conf_info.get_n_data() << "\n"
+         << "Length of data file list         = "
+         << data_files.n_elements() << "\n";
+
+    series_type = SeriesType_Data_Files;
+    n_series = data_files.n_elements();
+    mlog << Debug(1)
+          << "Series defined by the data file list of length "
+          << n_series << ".\n";
+
+    // Process series variables
+    for(int i_series = 0; i_series < n_series; i_series++) {
+        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+            mlog << Debug(2)
+                 << conf_info.data_info[i_var]->n_bins() << "\n";
+            get_series_entry(i_series, conf_info.data_info[i_var],
+                data_files, dtype, found_data_files, data_dp, grid);
+        }
+    }
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -355,33 +394,23 @@ void setup_nc_file(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_series(void) {
-    DataPlane data_dp;
+void write_histograms(void) {
 
-    // List the lengths of the series options
-    mlog << Debug(1)
-         << "Length of configuration \"data.field\" = "
-         << conf_info.get_n_data() << "\n"
-         << "Length of data file list         = "
-         << data_files.n_elements() << "\n";
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
-    series_type = SeriesType_Data_Files;
-    n_series = data_files.n_elements();
-    mlog << Debug(1)
-          << "Series defined by the data file list of length "
-          << n_series << ".\n";
+        VarInfo* data_info = conf_info.data_info[i_var];
+        NcVar hist_var = hist_vars[i_var];
 
-    // Process series variables
-    for(int i_series = 0; i_series < n_series; i_series++) {
-        for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-            mlog << Debug(2)
-                 << conf_info.data_info[i_var]->n_bins() << "\n";
-            get_series_entry(i_series, conf_info.data_info[i_var],
-                data_files, dtype, found_data_files, data_dp, grid);
-        }
+        int* hist = histograms[data_info->magic_str()].data(); 
+
+        hist_var.putVar(hist);
     }
+}
 
-    return;
+////////////////////////////////////////////////////////////////////////
+
+void write_joint_histograms(void) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////
