@@ -266,7 +266,7 @@ if ( (n < 0) || (n >= total_predef_fonts) )  {
 
 char junk[256];
 
-sprintf(junk, "%02d.afm", n);
+snprintf(junk, sizeof(junk), "%02d.afm", n);
 
 short_afm_name = junk;
 

@@ -107,6 +107,9 @@ void VarInfo::assign(const VarInfo &v) {
    CensorThresh = v.censor_thresh();
    CensorVal    = v.censor_val();
 
+   nBins = v.n_bins();
+   Range = v.range();
+
    Regrid    = v.Regrid;
 
    return;
@@ -143,6 +146,9 @@ void VarInfo::clear() {
    CensorThresh.clear();
    CensorVal.clear();
 
+   nBins = 0;
+   Range.clear();
+
    Regrid.clear();
 
    return;
@@ -178,6 +184,8 @@ void VarInfo::dump(ostream &out) const {
        << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
        << "  CensorThresh = " << CensorThresh.get_str() << "\n"
        << "  CensorVal    = " << CensorVal.serialize() << "\n"
+       << "  nBins        = " << nBins << "\n"
+       << "  Range        = " << Range.serialize() << "\n"
        << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
 
    Level.dump(out);
@@ -334,6 +342,20 @@ void VarInfo::set_censor_val(const NumArray &a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_n_bins(const int &n) {
+   nBins = n;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_range(const NumArray &a) {
+   Range = a;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_regrid(const RegridInfo &ri) {
    Regrid = ri;
    return;
@@ -362,6 +384,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    NumArray na;
    ConcatString s;
    bool f;
+   int n;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
@@ -376,8 +399,10 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s.c_str()));
 
    // Parse prob as a boolean, if present
-   f = dict.lookup_bool(conf_key_prob, false);
-   if(dict.last_lookup_status()) set_p_flag(f);
+   const DictionaryEntry * e = dict.lookup(conf_key_prob);
+   if(e) {
+      if(e->type() == BooleanType) set_p_flag(e->b_value());
+   }
 
    // Parse prob_as_scalar, if present
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);
@@ -403,6 +428,14 @@ void VarInfo::set_dict(Dictionary &dict) {
            << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
       exit(1);
    }
+
+   // Parse n_bins, if present
+   n = dict.lookup_int(conf_key_n_bins, false);
+   if(dict.last_lookup_status()) set_n_bins(n);
+
+   // Parse range, if present
+   na = dict.lookup_num_array(conf_key_range_flag, false);
+   if(dict.last_lookup_status()) set_range(na);
 
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);

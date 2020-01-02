@@ -166,8 +166,7 @@ void process_command_line(int argc, char **argv) {
     conf_info.process_config(ftype);
 
     // Search for files
-    data_files
-        = parse_file_list(data_files, ftype);
+    data_files = parse_file_list(data_files);
 
     return;
 }

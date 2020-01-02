@@ -113,13 +113,22 @@ climo_stdev = {
    file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
+//
+// May be set separately in each "obs.field" entry
+//
+climo_cdf = {
+   cdf_bins    = 4;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-obs_thresh     = [ NA, ==CDP25 ];
+obs_thresh     = [ NA ];
 obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;

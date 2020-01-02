@@ -227,8 +227,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // For python types read the first field to set the grid
-   if(ftype == FileType_Python_Numpy ||
-      ftype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(ftype)) {
       if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -236,8 +235,7 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(otype == FileType_Python_Numpy ||
-      otype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(otype)) {
       if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -2754,7 +2752,7 @@ void draw_tiles(PSfile *p, Box &dim,
          page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
 
          p->choose_font(28, 20.0);
-         sprintf(label, "%i", i+1);
+         snprintf(label, sizeof(label), "%i", i+1);
          p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
          // Draw outline in black

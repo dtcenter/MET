@@ -271,8 +271,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // For python types read the first field to set the grid
-   if(ftype == FileType_Python_Numpy ||
-      ftype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(ftype)) {
       if(!fcst_mtddf->data_plane(*conf_info.vx_opt[0].fcst_info, dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -280,8 +279,7 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(otype == FileType_Python_Numpy ||
-      otype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(otype)) {
       if(!obs_mtddf->data_plane(*conf_info.vx_opt[0].obs_info, dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -1924,7 +1922,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
    // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
+            pd_ptr->csd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {

@@ -196,6 +196,11 @@ extern void get_interp_points(const DataPlaneArray &dpa,
                       const double to_lvl, const int i_blw, const int i_abv,
                       NumArray &interp_points);
 
+extern bool     set_climo_flag(const NumArray &, const NumArray &);
+
+extern NumArray derive_climo_prob(const NumArray &, const NumArray &,
+                                  const SingleThresh &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   // __PAIR_BASE_H__

@@ -156,7 +156,7 @@ AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<
 AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python-config --ldflags'.])
 
 if test -n "$MET_PYTHON_CC"; then
-   CPPFLAGS="${CPPFLAGS} ${MET_PYTHON_CC}"
+   CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"
 fi
 
 if test -n "$MET_PYTHON_LD"; then
@@ -677,6 +677,26 @@ else
     AC_MSG_NOTICE([regrid_data_plane will not be compiled])
 fi
 
+# point2grid
+
+AC_ARG_ENABLE(point2grid,
+          [AS_HELP_STRING([--disable-point2grid], [Disable compilation of point2grid])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_POINT2GRID="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-point2grid) ;;
+   esac],
+  [ENABLE_POINT2GRID="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_POINT2GRID], [test "x$ENABLE_POINT2GRID" = "xyes"])
+
+if test "x$ENABLE_POINT2GRID" = "xyes"; then
+    AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
+    AC_MSG_NOTICE([point2grid will be compiled])
+else
+    AC_MSG_NOTICE([point2grid will not be compiled])
+fi
+
 # shift_data_plane
 
 AC_ARG_ENABLE(shift_data_plane,
@@ -958,12 +978,17 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
     AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
     AC_MSG_NOTICE([python embedding will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_python_utils ${MET_PYTHON_LD}"
+    PYTHON_LIBS="-lvx_data2d_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
     AC_MSG_NOTICE([python embedding will not be compiled])
     PYTHON_LIBS=
 fi
 AC_SUBST([PYTHON_LIBS])
+
+########################################################################
+
+
+
 
 ########################################################################
 
@@ -1145,6 +1170,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
                  src/libcode/vx_python_utils/Makefile
+                 src/libcode/vx_python2_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
@@ -1171,8 +1197,10 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/wwmca_tool/Makefile
                  src/tools/other/gsi_tools/Makefile
                  src/tools/other/regrid_data_plane/Makefile
+                 src/tools/other/point2grid/Makefile
                  src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
+                 src/tools/other/grid_diag/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile

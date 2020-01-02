@@ -12,7 +12,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "met_stats.h"
+#include "ens_stats.h"
 #include "pair_data_point.h"
+#include "pair_data_ensemble.h"
 
 #include "vx_util.h"
 
@@ -64,8 +66,9 @@ extern void   compute_i_mean_stdev(const NumArray &,
 ////////////////////////////////////////////////////////////////////////
 
 extern void compute_sl1l2_mean(const SL1L2Info *, int, SL1L2Info &);
-extern void compute_cnt_mean  (const CNTInfo *, int, CNTInfo &);
-extern void compute_pct_mean  (const PCTInfo *, int, PCTInfo &);
+extern void compute_cnt_mean  (const CNTInfo *,   int, CNTInfo &);
+extern void compute_pct_mean  (const PCTInfo *,   int, PCTInfo &);
+extern void compute_ecnt_mean (const ECNTInfo *,  int, ECNTInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 

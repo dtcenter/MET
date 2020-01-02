@@ -549,39 +549,6 @@ class PCTInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store Ensemble Spread/Skill Information
-//
-////////////////////////////////////////////////////////////////////////
-
-class SSVARInfo {
-
-   private:
-      void init_from_scratch();
-      void assign(const SSVARInfo &);
-
-   public:
-
-      SSVARInfo();
-      ~SSVARInfo();
-      SSVARInfo(const SSVARInfo &);
-      SSVARInfo & operator=(const SSVARInfo &);
-      SSVARInfo & operator+=(const SSVARInfo &);
-
-      int n_bin;
-      int bin_i;
-      int bin_n;
-
-      double var_min;
-      double var_max;
-      double var_mean;
-
-      SL1L2Info sl1l2_info;
-
-      void clear();
-};
-
-////////////////////////////////////////////////////////////////////////
-//
 // Class to store gradient statistics
 //
 ////////////////////////////////////////////////////////////////////////
@@ -687,15 +654,12 @@ class DMAPInfo {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern int    parse_message_type(const char *, char **&);
-extern int    parse_dbl_list(const char *, double *&);
-extern int    parse_int_list(const char *, int *&);
+extern int  parse_message_type(const char *, char **&);
+extern int  parse_dbl_list(const char *, double *&);
+extern int  parse_int_list(const char *, int *&);
 
-extern int    max_int(const int *, int);
-extern int    min_int(const int *, int);
-
-extern void   dbl_to_str(double, char *);
-extern void   dbl_to_str(double, char *, int);
+extern int  max_int(const int *, int);
+extern int  min_int(const int *, int);
 
 ////////////////////////////////////////////////////////////////////////
 //

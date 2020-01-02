@@ -1,0 +1,37 @@
+////////////////////////////////////////////////////////////////////////
+//
+// GridDiag test configuration file
+//
+////////////////////////////////////////////////////////////////////////
+
+//
+// Model
+//
+model = "GFS-FV3";
+
+//
+// Data fields
+//
+data = {
+    field = [
+        {
+          name = "PRMSL";
+          level = ["L0"];
+          n_bins = 100;
+          range = [95000, 105000]; // Pa
+        },
+        {
+          name = "TMP";
+          level = ["L0"];
+          n_bins = 100;
+          range = [270, 310]; // K
+        }
+    ];
+}
+
+mask = {
+    grid = "";
+    poly = "MET_BASE/poly/SAO.poly";
+}
+
+version = "V9.0";

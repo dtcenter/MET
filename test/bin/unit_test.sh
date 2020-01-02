@@ -65,6 +65,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_lidar2nc.xml \
           unit_airnow.xml \
           unit_python.xml \
+          unit_point2grid.xml \
           unit_perc_thresh.xml"
 
 # Run each unit test

@@ -283,6 +283,7 @@ struct RegridInfo {
 
    void         clear();
    void         validate(); // ensure that width and method are accordant
+   void         validate_point(); // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -607,6 +608,7 @@ static const char conf_key_shape[]             = "shape";
 static const char conf_key_gaussian_dx[]       = "gaussian_dx";
 static const char conf_key_gaussian_radius[]   = "gaussian_radius";
 static const char conf_key_eclv_points[]       = "eclv_points";
+static const char conf_key_var_name_map[]      = "var_name_map";
 
 //
 // Climatology parameter key names
@@ -787,6 +789,7 @@ static const char conf_key_shift_right[]           = "shift_right";
 //  MTD specific parameter key names
 //
 
+static const char conf_key_conv_time_window    [] = "conv_time_window";
 static const char conf_key_space_centroid_dist [] = "space_centroid_dist";
 static const char conf_key_time_centroid_delta [] = "time_centroid_delta";
 static const char conf_key_speed_delta         [] = "speed_delta";
@@ -928,6 +931,12 @@ static const char conf_key_write_pixel_age[] = "write_pixel_age";
 
 static const char conf_key_output_stats[] = "output_stats";
 static const char conf_key_block_size[]   = "block_size";
+
+//
+// Grid-Diagnostics specific parameter key names
+//
+
+static const char conf_key_n_bins[] = "n_bins";
 
 //
 // TC-Pairs, TC-RMW, and TC-Stat specific parameter key names

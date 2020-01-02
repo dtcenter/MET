@@ -107,7 +107,7 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    // Fi_Oj
    for(i=0; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
-         sprintf(col_str, "F%i_O%i", i+1, j+1);
+         snprintf(col_str, sizeof(col_str), "F%i_O%i", i+1, j+1);
          ct.set_entry(i, j, atoi(l.get_item(col_str)));
       }
    }
@@ -151,22 +151,22 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    for(i=0; i<n-1; i++) {
 
       // THRESH_i
-      sprintf(col_str, "THRESH_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "THRESH_%i", i+1);
       thresh[i] = atof(l.get_item(col_str));
 
       // OY_i
-      sprintf(col_str, "OY_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "OY_%i", i+1);
       oy = atoi(l.get_item(col_str));
       pct.set_entry(i, nx2_event_column, oy);
 
       // ON_i
-      sprintf(col_str, "ON_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "ON_%i", i+1);
       on = atoi(l.get_item(col_str));
       pct.set_entry(i, nx2_nonevent_column, on);
    }
 
    // THRESH_n
-   sprintf(col_str, "THRESH_%i", n);
+   snprintf(col_str, sizeof(col_str), "THRESH_%i", n);
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
@@ -376,7 +376,7 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
 
    // Parse out RANK_i
    for(i=0; i<r_data.n_rank; i++) {
-      sprintf(col_str, "RANK_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "RANK_%i", i+1);
       r_data.rhist_na.add(atoi(l.get_item(col_str)));
    }
 
@@ -397,7 +397,7 @@ void parse_phist_line(STATLine &l, PHISTData &p_data) {
 
    // Parse out BIN_i
    for(i=0; i<p_data.n_bin; i++) {
-      sprintf(col_str, "BIN_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "BIN_%i", i+1);
       p_data.phist_na.add(atoi(l.get_item(col_str)));
    }
 
@@ -417,7 +417,7 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
 
    // Parse out RELP_i
    for(i=0; i<r_data.n_ens; i++) {
-      sprintf(col_str, "RELP_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "RELP_%i", i+1);
       r_data.relp_na.add(atof(l.get_item(col_str)));
    }
 
@@ -448,7 +448,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    // Parse out ENS_i
    o_data.ens_na.clear();
    for(i=0; i<o_data.n_ens; i++) {
-      sprintf(col_str, "ENS_%i", i+1);
+      snprintf(col_str, sizeof(col_str), "ENS_%i", i+1);
       o_data.ens_na.add(atof(l.get_item(col_str)));
    }
 

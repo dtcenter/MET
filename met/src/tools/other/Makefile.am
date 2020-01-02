@@ -74,8 +74,14 @@ if ENABLE_REGRID_DATA_PLANE
   SUBDIRS += regrid_data_plane
 endif
 
+if ENABLE_POINT2GRID
+  SUBDIRS += point2grid
+endif
+
 if ENABLE_SHIFT_DATA_PLANE
   SUBDIRS += shift_data_plane
 endif
+
+SUBDIRS += grid_diag
 
 MAINTAINERCLEANFILES 	= Makefile.in

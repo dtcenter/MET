@@ -20,6 +20,9 @@
 #include "var_info_python.h"
 #include "vx_grid.h"
 
+#include "python3_dict.h"
+#include "python3_numpy.h"
+
 
 extern "C" {
 
@@ -31,7 +34,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool dataplane_from_numpy_array(PyObject * numpy_array, PyObject * atts_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo);
+extern bool dataplane_from_numpy_array(Python3_Numpy & np, const Python3_Dict & attrs, DataPlane & dp_out, Grid & grid_out, VarInfoPython & vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////

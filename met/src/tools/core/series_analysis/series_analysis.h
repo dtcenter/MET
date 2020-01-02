@@ -109,6 +109,8 @@ map<ConcatString, NcVarData> stat_data;
 
 // Grid variables
 static Grid grid;
+static int nxy = 0;
+static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;

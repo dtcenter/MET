@@ -34,11 +34,11 @@ static const char rotated_latlon_string [] = "Rotated LatLon";
 ////////////////////////////////////////////////////////////////////////
 
 
-static void get_lc_grid             (PyObject * dict, Grid & g);
-static void get_st_grid             (PyObject * dict, Grid & g);
-static void get_merc_grid           (PyObject * dict, Grid & g);
-static void get_latlon_grid         (PyObject * dict, Grid & g);
-static void get_rotated_latlon_grid (PyObject * dict, Grid & g);
+static void get_lc_grid             (const Python3_Dict & dict, Grid & g);
+static void get_st_grid             (const Python3_Dict & dict, Grid & g);
+static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
+static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
+static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
 
 static void set_string(const char * & dest, const ConcatString & src);
 
@@ -52,7 +52,7 @@ inline void toggle_sign(double & x) { x = -x;  return; }
 ////////////////////////////////////////////////////////////////////////
 
 
-void grid_from_python_dict(PyObject * dict, Grid & g)
+void grid_from_python_dict(const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -64,7 +64,7 @@ g.clear();
    //  get projection type
    //
 
-proj_type = dict_lookup_string(dict, "type");
+proj_type = dict.lookup_string("type");
 
      if ( proj_type ==             lc_string )  get_lc_grid             (dict, g);
 else if ( proj_type ==             st_string )  get_st_grid             (dict, g);
@@ -108,37 +108,37 @@ return;
    //  nx, ny                          (int)
    //
 
-void get_lc_grid     (PyObject * dict, Grid & g)
+void get_lc_grid     (const Python3_Dict & dict, Grid & g)
 
 {
 
 LambertData data;
 ConcatString s;
 
-s = dict_lookup_string(dict, "name");
+s = dict.lookup_string("name");
 
 set_string(data.name, s);
 
-s = dict_lookup_string(dict, "hemisphere");
+s = dict.lookup_string("hemisphere");
 
 data.hemisphere = s[0];
 
-data.scale_lat_1 = dict_lookup_double(dict, "scale_lat_1");
-data.scale_lat_2 = dict_lookup_double(dict, "scale_lat_2");
+data.scale_lat_1 = dict.lookup_double("scale_lat_1");
+data.scale_lat_2 = dict.lookup_double("scale_lat_2");
 
-data.lat_pin = dict_lookup_double(dict, "lat_pin");
-data.lon_pin = rescale_lon(dict_lookup_double(dict, "lon_pin"));
+data.lat_pin = dict.lookup_double("lat_pin");
+data.lon_pin = rescale_lon(dict.lookup_double("lon_pin"));
 
-data.x_pin = dict_lookup_double(dict, "x_pin");
-data.y_pin = dict_lookup_double(dict, "y_pin");
+data.x_pin = dict.lookup_double("x_pin");
+data.y_pin = dict.lookup_double("y_pin");
 
-data.lon_orient = rescale_lon(dict_lookup_double(dict, "lon_orient"));
+data.lon_orient = rescale_lon(dict.lookup_double("lon_orient"));
 
-data.d_km = dict_lookup_double(dict, "d_km");
-data.r_km = dict_lookup_double(dict, "r_km");
+data.d_km = dict.lookup_double("d_km");
+data.r_km = dict.lookup_double("r_km");
 
-data.nx = dict_lookup_int(dict, "nx");
-data.ny = dict_lookup_int(dict, "ny");
+data.nx = dict.lookup_int("nx");
+data.ny = dict.lookup_int("ny");
 
 data.so2_angle = 0.0;
 
@@ -183,36 +183,36 @@ return;
    //
 
 
-void get_st_grid     (PyObject * dict, Grid & g)
+void get_st_grid     (const Python3_Dict & dict, Grid & g)
 
 {
 
 StereographicData data;
 ConcatString s;
 
-s = dict_lookup_string(dict, "name");
+s = dict.lookup_string("name");
 
 set_string(data.name, s);
 
-s = dict_lookup_string(dict, "hemisphere");
+s = dict.lookup_string("hemisphere");
 
 data.hemisphere = s[0];
 
-data.scale_lat = dict_lookup_double(dict, "scale_lat");
+data.scale_lat = dict.lookup_double("scale_lat");
 
-data.lat_pin = dict_lookup_double(dict, "lat_pin");
-data.lon_pin = rescale_lon(dict_lookup_double(dict, "lon_pin"));
+data.lat_pin = dict.lookup_double("lat_pin");
+data.lon_pin = rescale_lon(dict.lookup_double("lon_pin"));
 
-data.x_pin = dict_lookup_double(dict, "x_pin");
-data.y_pin = dict_lookup_double(dict, "y_pin");
+data.x_pin = dict.lookup_double("x_pin");
+data.y_pin = dict.lookup_double("y_pin");
 
-data.lon_orient = rescale_lon(dict_lookup_double(dict, "lon_orient"));
+data.lon_orient = rescale_lon(dict.lookup_double("lon_orient"));
 
-data.d_km = dict_lookup_double(dict, "d_km");
-data.r_km = dict_lookup_double(dict, "r_km");
+data.d_km = dict.lookup_double("d_km");
+data.r_km = dict.lookup_double("r_km");
 
-data.nx = dict_lookup_int(dict, "nx");
-data.ny = dict_lookup_int(dict, "ny");
+data.nx = dict.lookup_int("nx");
+data.ny = dict.lookup_int("ny");
 
 
    ////////////////
@@ -253,22 +253,22 @@ return;
    //  nx, ny      (int)
    //
 
-void get_merc_grid   (PyObject * dict, Grid & g)
+void get_merc_grid   (const Python3_Dict & dict, Grid & g)
 
 {
 
 MercatorData data;
 ConcatString s;
 
-s = dict_lookup_string(dict, "name");
+s = dict.lookup_string("name");
 
 set_string(data.name, s);
 
-data.lat_ll = dict_lookup_double(dict, "lat_ll");
-data.lon_ll = rescale_lon(dict_lookup_double(dict, "lon_ll"));
+data.lat_ll = dict.lookup_double("lat_ll");
+data.lon_ll = rescale_lon(dict.lookup_double("lon_ll"));
 
-data.lat_ur = dict_lookup_double(dict, "lat_ur");
-data.lon_ur = rescale_lon(dict_lookup_double(dict, "lon_ur"));
+data.lat_ur = dict.lookup_double("lat_ur");
+data.lon_ur = rescale_lon(dict.lookup_double("lon_ur"));
 
    ////////////////
 
@@ -279,8 +279,8 @@ if ( ! west_longitude_positive )  {
 
 }
 
-data.nx = dict_lookup_int(dict, "nx");
-data.ny = dict_lookup_int(dict, "ny");
+data.nx = dict.lookup_int("nx");
+data.ny = dict.lookup_int("ny");
 
    //
    //  done
@@ -307,25 +307,25 @@ return;
    // Nlat, Nlon              (int)
    //
 
-void get_latlon_grid (PyObject * dict, Grid & g)
+void get_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 {
 
 LatLonData data;
 ConcatString s;
 
-s = dict_lookup_string(dict, "name");
+s = dict.lookup_string("name");
 
 set_string(data.name, s);
 
-data.lat_ll = dict_lookup_double(dict, "lat_ll");
-data.lon_ll = rescale_lon(dict_lookup_double(dict, "lon_ll"));
+data.lat_ll = dict.lookup_double("lat_ll");
+data.lon_ll = rescale_lon(dict.lookup_double("lon_ll"));
 
-data.delta_lat = dict_lookup_double(dict, "delta_lat");
-data.delta_lon = dict_lookup_double(dict, "delta_lon");
+data.delta_lat = dict.lookup_double("delta_lat");
+data.delta_lon = dict.lookup_double("delta_lon");
 
-data.Nlat = dict_lookup_int(dict, "Nlat");
-data.Nlon = dict_lookup_int(dict, "Nlon");
+data.Nlat = dict.lookup_int("Nlat");
+data.Nlon = dict.lookup_int("Nlon");
 
 if ( ! west_longitude_positive )  {
 
@@ -362,30 +362,30 @@ return;
    // aux_rotation                              (double)
    //
 
-void get_rotated_latlon_grid (PyObject * dict, Grid & g)
+void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 {
 
 RotatedLatLonData data;
 ConcatString s;
 
-s = dict_lookup_string(dict, "name");
+s = dict.lookup_string("name");
 
 set_string(data.name, s);
 
-data.rot_lat_ll = dict_lookup_double(dict, "rot_lat_ll");
-data.rot_lon_ll = rescale_lon(dict_lookup_double(dict, "rot_lon_ll"));
+data.rot_lat_ll = dict.lookup_double("rot_lat_ll");
+data.rot_lon_ll = rescale_lon(dict.lookup_double("rot_lon_ll"));
 
-data.delta_rot_lat = dict_lookup_double(dict, "delta_rot_lat");
-data.delta_rot_lon = dict_lookup_double(dict, "delta_rot_lon");
+data.delta_rot_lat = dict.lookup_double("delta_rot_lat");
+data.delta_rot_lon = dict.lookup_double("delta_rot_lon");
 
-data.Nlat = dict_lookup_int(dict, "Nlat");
-data.Nlon = dict_lookup_int(dict, "Nlon");
+data.Nlat = dict.lookup_int("Nlat");
+data.Nlon = dict.lookup_int("Nlon");
 
-data.true_lat_south_pole = dict_lookup_double(dict, "true_lat_south_pole");
-data.true_lon_south_pole = rescale_lon(dict_lookup_double(dict, "true_lon_south_pole"));
+data.true_lat_south_pole = dict.lookup_double("true_lat_south_pole");
+data.true_lon_south_pole = rescale_lon(dict.lookup_double("true_lon_south_pole"));
 
-data.aux_rotation = dict_lookup_double(dict, "aux_rotation");
+data.aux_rotation = dict.lookup_double("aux_rotation");
 
 if ( ! west_longitude_positive )  {
 
