@@ -52,7 +52,7 @@ void ShpFileHeader::set(unsigned char * buf)
 
 int    * i = (int *) buf;
 double * d = (double *) (buf + 36);
-
+int      j;
 
 handle_big_4    (buf);
 handle_big_4    (buf + 24);
@@ -68,8 +68,6 @@ shape_type     = i[8];
 file_length_bytes = 2*file_length_16;
 
 if ( is_big_endian() )  {
-
-   int j;
 
    for (j=0; j<8; ++j)  shuffle_8(d + j);
 

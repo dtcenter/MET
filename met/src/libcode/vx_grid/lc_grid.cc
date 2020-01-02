@@ -789,7 +789,8 @@ double lambert_segment_area(double u0, double v0, double u1, double v1, double c
 
 int i, j, k, n;
 double rom, denom, h, delta_u, delta_v;
-double trap, t[15], left, right, test, sum;
+double trap, t[15], left, right, sum;
+double test = 0.0;
 const double a = 0.0, b = 1.0;
 const double tol = 1.0e-6;
 

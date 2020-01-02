@@ -20,8 +20,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-
 #ifndef  __ENSEMBLE_STAT_H__
 #define  __ENSEMBLE_STAT_H__
 
@@ -176,6 +174,7 @@ static int          i_txt_row[n_txt];
 
 // Grid variables
 static Grid grid;
+static int nxy = 0;
 
 // Weight for each grid point
 static DataPlane wgt_dp;
@@ -188,7 +187,8 @@ static StatHdrColumns shc;
 
 // Arrays to store running sums and counts
 static NumArray count_na, min_na, max_na, sum_na, sum_sq_na;
-static NumArray *thresh_count_na = (NumArray *) 0;
+static NumArray *thresh_count_na = (NumArray *) 0; // [n_thresh]
+static NumArray **thresh_nbrhd_count_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

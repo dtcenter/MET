@@ -1816,7 +1816,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-width n] 
+[-width n]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1832,7 +1832,23 @@ hskip 0.5in}
 
 \end_inset
 
-[-sigma n] 
+[-gaussian_dx n] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-gaussian_radius n]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2071,16 +2087,30 @@ The
 \series default
 The 
 \series bold
--sigma
+-gaussian_dx
 \series default
- option overrides the default regridding sigma for Gaussian interpolation.
- Default is 1.476.
+ option overrides the default delta distance for Gaussian smoothing.
+ Default is 81.271.
 \end_layout
 
 \begin_layout Description
 
 \series medium
 9.
+ 
+\series default
+The 
+\series bold
+-gaussian_radius
+\series default
+ option overrides the default radius of influence for Gaussian interpolation.
+ Default is 120.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+10.
  
 \series default
 The 
@@ -2094,7 +2124,7 @@ The
 \begin_layout Description
 
 \series medium
-10.
+11.
  
 \series default
 The 
@@ -2109,7 +2139,7 @@ The
 \begin_layout Description
 
 \series medium
-11.
+12.
  
 \series default
 The 
@@ -2143,7 +2173,7 @@ AOD_Smoke
 \begin_layout Description
 
 \series medium
-12.
+13.
  
 \series default
 The 
@@ -2157,7 +2187,7 @@ The
 \begin_layout Description
 
 \series medium
-13.
+14.
  The 
 \series bold
 -log file
@@ -2176,7 +2206,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-14.
+15.
  The 
 \series bold
 -v level
@@ -2202,7 +2232,7 @@ level
 \begin_layout Description
 
 \series medium
-15.
+16.
 
 \series default
  The 

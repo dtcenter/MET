@@ -12,7 +12,6 @@ C*
 C*                                   Maximum number of BUFR levels
 C*
        PARAMETER ( MXR8VN = 10 )
-C       PARAMETER ( MXR8VN = 26 )
 C*                                   Maximum number of BUFR event sequences
 C*
        PARAMETER ( MXR8VT = 6 )

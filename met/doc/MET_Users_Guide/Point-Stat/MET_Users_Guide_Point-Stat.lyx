@@ -431,6 +431,38 @@ The forecast value at P is a weighted sum of the values in the interpolation
 \end_layout
 
 \begin_layout Standard
+When used for regridding, with the 
+\series bold
+regrid
+\series default
+ configuration option, or smoothing, with the 
+\series bold
+interp
+\series default
+ configuration option in grid-to-grid comparisons, the Gaussian method is
+ implemented as a 2-step process.
+ First, the data is regridded or smoothed using the maximum value interpolation
+ method described below, where the 
+\series bold
+width
+\series default
+ and 
+\series bold
+shape
+\series default
+ define the interpolation area.
+ Second, the Gaussian smoother, defined by the 
+\series bold
+gaussian_dx
+\series default
+ and 
+\series bold
+gaussian_radius
+\series default
+ configuration options, is applied.
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1958,6 +1990,18 @@ regrid         = { ...
 
 \series bold
 climo_mean     = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_cdf      = {}
 \end_layout
 
 \begin_layout LyX-Code

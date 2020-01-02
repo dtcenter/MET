@@ -51,6 +51,11 @@
 //   023    08/15/18  Halley Gotway  Add mask.llpnt type.
 //   024    04/01/19  Fillmore       Add FCST and OBS units.
 //   025    04/15/19  Halley Gotway  Add percentile thresholds.
+//   026    11/26/19  Halley Gotway  Add neighborhood probabilities.
+//   027    12/11/19  Halley Gotway  Reorganize logic to support the use
+//                    of python embedding.
+//   028    12/17/19  Halley Gotway  Apply climatology bins to ensemble
+//                    continuous statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -82,6 +87,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line  (int, char **);
+static void process_grid          (const Grid &);
 static void process_n_vld         ();
 static void process_ensemble      ();
 static void process_vx            ();
@@ -101,11 +107,15 @@ static void process_grid_scores   (int,
                const DataPlane *, const DataPlane *,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
-               const MaskPlane &, ObsErrorEntry *,
-               PairDataEnsemble &);
+               const DataPlane &, const MaskPlane &,
+               ObsErrorEntry *,   PairDataEnsemble &);
 
-static void clear_counts(const DataPlane &, int);
-static void track_counts(const DataPlane &, int);
+static void do_ecnt              (const EnsembleStatVxOpt &,
+                                  const SingleThresh &,
+                                  const PairDataEnsemble *);
+
+static void clear_counts();
+static void track_counts(int, const DataPlane &);
 
 static ConcatString get_ens_mn_var_name(int);
 
@@ -174,7 +184,6 @@ int main(int argc, char *argv[]) {
 
 void process_command_line(int argc, char **argv) {
    int i;
-   struct stat results;
    CommandLine cline;
    ConcatString default_config_file;
    Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
@@ -201,20 +210,20 @@ void process_command_line(int argc, char **argv) {
    //
    // add the options function calls
    //
-   cline.add(set_grid_obs, "-grid_obs", 1);
-   cline.add(set_point_obs, "-point_obs", 1);
-   cline.add(set_ens_mean, "-ens_mean", 1);
+   cline.add(set_grid_obs,      "-grid_obs", 1);
+   cline.add(set_point_obs,     "-point_obs", 1);
+   cline.add(set_ens_mean,      "-ens_mean", 1);
    cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end, "-obs_valid_end", 1);
-   cline.add(set_outdir, "-outdir", 1);
-   cline.add(set_logfile, "-log", 1);
-   cline.add(set_verbosity, "-v", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_outdir,        "-outdir", 1);
+   cline.add(set_logfile,       "-log", 1);
+   cline.add(set_verbosity,     "-v", 1);
+   cline.add(set_compress,      "-compress",  1);
 
    //
    // quietly support deprecated -ssvar_mean option
    //
-   cline.add(set_ens_mean, "-ssvar_mean", 1);
+   cline.add(set_ens_mean,      "-ssvar_mean", 1);
 
    //
    // parse the command line
@@ -234,7 +243,7 @@ void process_command_line(int argc, char **argv) {
       //
       if(is_integer(cline[0].c_str()) == 0) {
          ens_file_list = parse_ascii_file_list(cline[0].c_str());
-         n_ens = ens_file_list.n_elements();
+         n_ens = ens_file_list.n();
       }
       else {
          usage();
@@ -313,15 +322,19 @@ void process_command_line(int argc, char **argv) {
    // Store the input ensemble file type
    etype = ens_mtddf->file_type();
 
-   bool use_var_id = false;     // Use a variable index from var_name instead of GRIB code
+   // Use a variable index from var_name instead of GRIB code
+   bool use_var_id = false;
+
    // Determine the input observation file type
    if(point_obs_flag) {
       otype = FileType_Gb1;
-      if(point_obs_file_list.n_elements() > 0) {
-	use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
+      if(point_obs_file_list.n() > 0) {
+         use_var_id = is_using_var_id(point_obs_file_list[0].c_str());
       }
    }
-   else if(!grid_obs_flag) otype = FileType_None;
+   else if(!grid_obs_flag) {
+      otype = FileType_None;
+   }
    else {
 
       // Get the observation file type from config, if present
@@ -341,50 +354,48 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id);
-
-   // Determine the verification grid
-   grid = parse_vx_grid(conf_info.ens_info[0]->regrid(),
-                        &(ens_mtddf->grid()),
-                        (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
-
-   // Compute weight for each grid point
-   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
-
+   
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
    // Allocate arrays to store threshold counts
-   thresh_count_na = new NumArray [conf_info.get_max_n_thresh()];
+   thresh_count_na       = new NumArray   [conf_info.get_max_n_thresh()];
+   thresh_nbrhd_count_na = new NumArray * [conf_info.get_max_n_thresh()];
+
+   for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+      thresh_nbrhd_count_na[i] = new NumArray [conf_info.get_n_nbrhd()];
+   }
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
-        << ens_file_list.n_elements() << "]:\n";
-   for(i=0; i<ens_file_list.n_elements(); i++) {
+        << ens_file_list.n() << "]:\n";
+   for(i=0; i<ens_file_list.n(); i++) {
       mlog << "   " << ens_file_list[i]  << "\n";
    }
 
    // List the input gridded observations files
-   if(grid_obs_file_list.n_elements() > 0) {
+   if(grid_obs_file_list.n() > 0) {
       mlog << Debug(1) << "Gridded Observation Files["
-           << grid_obs_file_list.n_elements() << "]:\n" ;
-      for(i=0; i<grid_obs_file_list.n_elements(); i++) {
+           << grid_obs_file_list.n() << "]:\n" ;
+      for(i=0; i<grid_obs_file_list.n(); i++) {
          mlog << "   " << grid_obs_file_list[i] << "\n" ;
       }
    }
 
    // List the input point observations files
-   if(point_obs_file_list.n_elements() > 0) {
+   if(point_obs_file_list.n() > 0) {
       mlog << Debug(1) << "Point Observation Files["
-           << point_obs_file_list.n_elements() << "]:\n" ;
-      for(i=0; i<point_obs_file_list.n_elements(); i++) {
+           << point_obs_file_list.n() << "]:\n" ;
+      for(i=0; i<point_obs_file_list.n(); i++) {
          mlog << "   " << point_obs_file_list[i] << "\n" ;
       }
    }
 
-   // Check for missing ensemble files
-   for(i=0; i<ens_file_list.n_elements(); i++) {
+   // Check for missing non-python ensemble files
+   for(i=0; i<ens_file_list.n(); i++) {
 
-      if(stat(ens_file_list[i].c_str(), &results) != 0) {
+      if(!file_exists(ens_file_list[i].c_str()) &&
+         !is_python_grdfiletype(etype)) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble file: "
               << ens_file_list[i] << "\n\n";
@@ -409,7 +420,7 @@ void process_command_line(int argc, char **argv) {
    // Process ensemble mean information
    ens_mean_flag = false;
    bool need_ens_mean = (
-      conf_info.output_flag[i_ecnt] != STATOutputType_None ||
+      conf_info.output_flag[i_ecnt]  != STATOutputType_None ||
       conf_info.output_flag[i_orank] != STATOutputType_None ||
       conf_info.output_flag[i_ssvar] != STATOutputType_None);
 
@@ -421,7 +432,7 @@ void process_command_line(int argc, char **argv) {
               << "ignoring input -ens_mean file because no ensemble "
               << "mean is needed.\n\n";
       }
-      else if(stat(ens_mean_user.c_str(), &results)) {
+      else if(!file_exists(ens_mean_user.c_str())) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input ensemble mean file: "
               << ens_mean_user << "\n\n";
@@ -457,6 +468,74 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_grid(const Grid &fcst_grid) {
+   Grid obs_grid;
+
+   // Parse regridding logic
+   RegridInfo ri;
+   if(conf_info.get_n_ens_var() > 0) {
+      ri = conf_info.ens_info[0]->regrid();
+   }
+   else if(conf_info.get_n_vx() > 0) {
+      ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
+   }
+   else {
+      mlog << Error << "\nprocess_grid() -> "
+           << "at least one ensemble field or verification field must "
+           << "be provided!\n\n";
+      exit(1);
+   }
+
+   // Read gridded observation data, if necessary
+   if(ri.field == FieldType_Obs) {
+
+      if(!grid_obs_flag) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "attempting to regrid to the observation grid, but no "
+              << "gridded observations provided!\n\n";
+         exit(1); 
+      }
+
+      DataPlane dp;
+      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+      if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+                                 grid_obs_file_list[0].c_str(), otype))) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "trouble reading file \"" << grid_obs_file_list[0]
+              << "\"\n\n";
+         exit(1);
+      }
+
+      if(!mtddf->data_plane(*(conf_info.vx_opt[0].vx_pd.obs_info), dp)) {
+         mlog << Error << "\nprocess_grid() -> "
+              << "observation field \""
+              << conf_info.vx_opt[0].vx_pd.obs_info->magic_str()
+              << "\" not found in file \"" << grid_obs_file_list[0]
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Store the observation grid
+      obs_grid = mtddf->grid();
+
+      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   }
+   else {
+      obs_grid = fcst_grid;
+   }
+
+   // Determine the verification grid
+   grid = parse_vx_grid(ri, &fcst_grid, &obs_grid);
+   nxy  = grid.nx() * grid.ny();
+
+   // Compute weight for each grid point
+   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_n_vld() {
    int i, j, n_vld;
    DataPlane dp;
@@ -470,7 +549,7 @@ void process_n_vld() {
    for(i=0; i<conf_info.get_n_ens_var(); i++) {
 
       // Loop through the ensemble files
-      for(j=0, n_vld=0; j<ens_file_list.n_elements(); j++) {
+      for(j=0, n_vld=0; j<ens_file_list.n(); j++) {
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -509,7 +588,7 @@ void process_n_vld() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Loop through the ensemble files
-      for(j=0, n_vld=0; j<ens_file_list.n_elements(); j++) {
+      for(j=0, n_vld=0; j<ens_file_list.n(); j++) {
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -555,8 +634,7 @@ void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp,
-                    bool do_regrid) {
+                    VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -569,6 +647,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
    // Read the gridded data field
    if((found = mtddf->data_plane(*info, dp))) {
+
+      // Setup the verification grid, if necessary
+      if(nxy == 0) process_grid(mtddf->grid());
 
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {
@@ -621,6 +702,9 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    // Check for at least one field
    if((found = (n > 0))) {
 
+      // Setup the verification grid, if necessary
+      if(nxy == 0) process_grid(mtddf->grid());
+
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {
          mlog << Debug(1)
@@ -671,7 +755,7 @@ void process_ensemble() {
            << conf_info.ens_info[i]->magic_str() << "\n";
 
       // Loop through each of the input forecast files
-      for(j=0, reset=true; j<ens_file_list.n_elements(); j++) {
+      for(j=0, reset=true; j<ens_file_list.n(); j++) {
 
          // Skip bad data files
          if(!ens_file_vld[j]) continue;
@@ -686,12 +770,12 @@ void process_ensemble() {
 
          // Reset the running sums and counts
          if(reset) {
-            clear_counts(ens_dp, i);
+            clear_counts();
             reset = false;
          }
 
          // Apply current data to the running sums and counts
-         track_counts(ens_dp, i);
+         track_counts(i, ens_dp);
 
       } // end for j
 
@@ -700,7 +784,7 @@ void process_ensemble() {
 
       // Store the ensemble mean output file
       ens_mean_file =
-         out_nc_file_list[out_nc_file_list.n_elements() - 1];
+         out_nc_file_list[out_nc_file_list.n() - 1];
 
    } // end for i
 
@@ -719,8 +803,8 @@ void process_vx() {
 
    if(conf_info.get_n_vx() > 0) {
 
-      if(point_obs_file_list.n_elements() == 0 &&
-         grid_obs_file_list.n_elements()  == 0) {
+      if(point_obs_file_list.n() == 0 &&
+         grid_obs_file_list.n()  == 0) {
          mlog << Error << "\nprocess_vx() -> "
               << " when \"fcst.field\" is non-empty, you must use "
               << "\"-point_obs\" and/or \"-grid_obs\" to specify the "
@@ -775,7 +859,7 @@ void process_point_vx() {
    process_point_climo();
 
    // Process each point observation NetCDF file
-   for(i=0; i<point_obs_file_list.n_elements(); i++) {
+   for(i=0; i<point_obs_file_list.n(); i++) {
       process_point_obs(i);
    }
 
@@ -786,7 +870,7 @@ void process_point_vx() {
    }
 
    // Process each ensemble file
-   for(i=0, n_miss=0; i<ens_file_list.n_elements(); i++) {
+   for(i=0, n_miss=0; i<ens_file_list.n(); i++) {
 
       // If the current forecast file is valid, process it
       if(!ens_file_vld[i]) {
@@ -812,19 +896,24 @@ void process_point_vx() {
 
 void process_point_climo() {
    int i;
-   DataPlaneArray cmn_dpa;
+   DataPlaneArray cmn_dpa, csd_dpa;
 
    // Loop through each of the fields to be verified and extract
    // the climatology fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // Read climatology mean fields
+      // Read climatology data
       cmn_dpa = read_climo_data_plane_array(
                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, ens_valid_ut, grid);
+      csd_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       // Store climatology information
       conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_climo_sd_dpa(csd_dpa);
+
    } // end for i
 
    return;
@@ -906,15 +995,10 @@ void process_point_obs(int i_nc) {
         << " observations from " << (hdr_count)
         << " header messages.\n";
 
-
-   int var_name_len = get_nc_string_length(obs_in, obs_vars.obs_var, nc_var_obs_var);
-   int qty_len      = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
-                         (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
+   int qty_len = get_nc_string_length(obs_in, obs_vars.obs_qty_tbl_var,
+                   (use_arr_vars ? nc_var_obs_qty : nc_var_obs_qty_tbl));
 
    NcHeaderData header_data = get_nc_hdr_data(obs_vars);
-   int typ_len = header_data.typ_len;
-   int sid_len = header_data.sid_len;
-   int vld_len = header_data.vld_len;
 
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
 
@@ -961,7 +1045,6 @@ void process_point_obs(int i_nc) {
 
       // Process each observation in the file
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
-         int str_length;
          int hdr_idx;
          i_obs = i_start + i_offset;
 
@@ -1016,7 +1099,7 @@ void process_point_obs(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str.c_str());
 
-         if (use_var_id && obs_arr[1] < var_names.n_elements()) {
+         if (use_var_id && obs_arr[1] < var_names.n()) {
             var_name = var_names[obs_arr[1]];
          }
          else {
@@ -1028,9 +1111,11 @@ void process_point_obs(int i_nc) {
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str.c_str(),
-                                              hdr_sid_str.c_str(), hdr_ut, obs_qty_str.c_str(),
-                                              obs_arr, grid, var_name.c_str());
+            conf_info.vx_opt[j].vx_pd.add_point_obs(hdr_arr,
+                                         hdr_typ_arr, hdr_typ_str.c_str(),
+                                         hdr_sid_str.c_str(), hdr_ut,
+                                         obs_qty_str.c_str(), obs_arr,
+                                         grid, var_name.c_str());
          }
       }
    } // end for i_start
@@ -1209,7 +1294,7 @@ void process_point_scores() {
                pd_ptr->compute_pair_vals(conf_info.rng_ptr);
 
                // Process each filtering threshold
-               for(m=0; m<conf_info.vx_opt[i].othr_ta.n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].othr_ta.n(); m++) {
 
                   // Set the header column
                   shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
@@ -1217,18 +1302,10 @@ void process_point_scores() {
                   // Subset pairs using the current obs_thresh
                   pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
 
-                  // Compute ensemble statistics
-                  pd.compute_stats();
-
-                  // Write ECNT stats
+                  // Compute ECNT scores
                   if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
-
-                     if(pd.n_obs > 0) {
-                        write_ecnt_row(shc, &pd,
-                           conf_info.output_flag[i_ecnt],
-                           stat_at, i_stat_row,
-                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
-                     }
+                     do_ecnt(conf_info.vx_opt[i],
+                             conf_info.vx_opt[i].othr_ta[m], &pd);
                   }
 
                   // Write RHIST counts
@@ -1280,15 +1357,15 @@ void process_point_scores() {
 
                         // Add rows to the output AsciiTables for SSVAR
                         stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                         conf_info.vx_opt[i].ci_alpha.n_elements());
+                                         conf_info.vx_opt[i].ci_alpha.n());
 
                         if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                            txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                                    conf_info.vx_opt[i].ci_alpha.n_elements());
+                                                    conf_info.vx_opt[i].ci_alpha.n());
                         }
 
                         // Write the SSVAR data for each alpha value
-                        for(n=0; n<conf_info.vx_opt[i].ci_alpha.n_elements(); n++) {
+                        for(n=0; n<conf_info.vx_opt[i].ci_alpha.n(); n++) {
                            write_ssvar_row(shc, &pd, conf_info.vx_opt[i].ci_alpha[n],
                               conf_info.output_flag[i_ssvar],
                               stat_at, i_stat_row,
@@ -1332,7 +1409,7 @@ void process_grid_vx() {
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fraw_dp = (DataPlane *) 0;
    DataPlane  obs_dp, oraw_dp;
-   DataPlane emn_dp, cmn_dp;
+   DataPlane emn_dp, cmn_dp, csd_dp;
    PairDataEnsemble pd_all, pd;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
 
@@ -1361,14 +1438,11 @@ void process_grid_vx() {
       // Set the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
 
+      // Store the forecast variable units
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+
       // Set the forecast level name
       shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
-
-      // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
-
-      // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1423,7 +1497,7 @@ void process_grid_vx() {
       }
 
       // Loop through each of the input ensemble files
-      for(j=0, n_miss=0; j<ens_file_list.n_elements(); j++) {
+      for(j=0, n_miss=0; j<ens_file_list.n(); j++) {
 
          // Initialize
          fcst_dp[j].clear();
@@ -1449,10 +1523,14 @@ void process_grid_vx() {
       cmn_dp = read_climo_data_plane(
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                   i, ens_valid_ut, grid);
+      csd_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                  i, ens_valid_ut, grid);
 
       mlog << Debug(3)
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
-           << " climatology mean field(s) for forecast "
+           << " climatology mean field(s) and " << (csd_dp.nx() == 0 ? 0 : 1)
+           << " climatology standard deviation field(s) for forecast "
            << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
@@ -1463,7 +1541,7 @@ void process_grid_vx() {
                        "_orank.nc");
 
       // Read the observation file
-      for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
+      for(j=0, n_miss=0; j<grid_obs_file_list.n(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j].c_str(), otype,
                                 conf_info.vx_opt[i].vx_pd.obs_info,
@@ -1475,12 +1553,21 @@ void process_grid_vx() {
       }
 
       // Check if the observation field was found
-      if(n_miss == grid_obs_file_list.n_elements()) {
+      if(n_miss == grid_obs_file_list.n()) {
          mlog << Warning << "\nprocess_grid_vx() -> "
               << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
               << " not found in observation files.\n";
          continue;
       }
+
+      // Set the observation variable name
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+
+      // Store the observation variable units
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
+
+      // Set the observation level name
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -1579,7 +1666,7 @@ void process_grid_vx() {
          }
 
          // Looop through the ensemble members
-         for(k=0; k<ens_file_list.n_elements(); k++) {
+         for(k=0; k<ens_file_list.n(); k++) {
 
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
@@ -1622,7 +1709,7 @@ void process_grid_vx() {
             process_grid_scores(i,
                                 fcst_dp, fraw_dp,
                                 obs_dp, oraw_dp,
-                                emn_dp, cmn_dp,
+                                emn_dp, cmn_dp, csd_dp,
                                 mask_mp, oerr_ptr,
                                 pd_all);
 
@@ -1653,7 +1740,7 @@ void process_grid_vx() {
             }
 
             // Process each filtering threshold
-            for(l=0; l<conf_info.vx_opt[i].othr_ta.n_elements(); l++) {
+            for(l=0; l<conf_info.vx_opt[i].othr_ta.n(); l++) {
 
                // Set the header column
                shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
@@ -1661,20 +1748,12 @@ void process_grid_vx() {
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
-               // Compute ensemble statistics
-               pd.compute_stats();
-
                if(i == 0) setup_txt_files();
 
-               // Write ECNT stats
+               // Compute ECNT scores
                if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
-
-                  if(pd.n_obs > 0) {
-                     write_ecnt_row(shc, &pd,
-                        conf_info.output_flag[i_ecnt],
-                        stat_at, i_stat_row,
-                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
-                  }
+                  do_ecnt(conf_info.vx_opt[i],
+                          conf_info.vx_opt[i].othr_ta[l], &pd);
                }
 
                // Write RHIST counts
@@ -1728,15 +1807,15 @@ void process_grid_vx() {
 
                      // Add rows to the output AsciiTables for SSVAR
                      stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                      conf_info.vx_opt[i].ci_alpha.n_elements());
+                                      conf_info.vx_opt[i].ci_alpha.n());
 
                      if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                         txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                                 conf_info.vx_opt[i].ci_alpha.n_elements());
+                                                 conf_info.vx_opt[i].ci_alpha.n());
                      }
 
                      // Write the SSVAR data for each alpha value
-                     for(m=0; m<conf_info.vx_opt[i].ci_alpha.n_elements(); m++) {
+                     for(m=0; m<conf_info.vx_opt[i].ci_alpha.n(); m++) {
                         write_ssvar_row(shc, &pd, conf_info.vx_opt[i].ci_alpha[m],
                            conf_info.output_flag[i_ssvar],
                            stat_at, i_stat_row,
@@ -1769,10 +1848,10 @@ void process_grid_scores(int i_vx,
         const DataPlane *fcst_dp, const DataPlane *fraw_dp,
         const DataPlane &obs_dp,  const DataPlane &oraw_dp,
         const DataPlane &emn_dp,  const DataPlane &cmn_dp,
-        const MaskPlane &mask_mp, ObsErrorEntry *oerr_ptr,
-        PairDataEnsemble &pd) {
+        const DataPlane &csd_dp,  const MaskPlane &mask_mp,
+        ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double cmn;
+   double cmn, csd;
    ObsErrorEntry *e = (ObsErrorEntry *) 0;
 
    // Allocate memory in one big chunk based on grid size
@@ -1781,6 +1860,8 @@ void process_grid_scores(int i_vx,
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
                     cmn_dp.ny() == obs_dp.ny());
+   bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
+                    csd_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1791,12 +1872,12 @@ void process_grid_scores(int i_vx,
          if(is_bad_data(obs_dp(x, y)) ||
             !mask_mp.s_is_on(x, y)) continue;
 
-         // Get current climatology value
+         // Get current climatology values
          cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
+         csd = (csd_flag ? csd_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, oraw_dp(x, y),
-                    cmn, bad_data_double, wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cmn, csd, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {
@@ -1849,20 +1930,91 @@ void process_grid_scores(int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clear_counts(const DataPlane &dp, int i_vx) {
-   int i, j;
+void do_ecnt(const EnsembleStatVxOpt &vx_opt,
+             const SingleThresh &othresh,
+             const PairDataEnsemble *pd_ptr) {
+   int i, n_bin;
+   PairDataEnsemble pd;
+   ECNTInfo *ecnt_info = (ECNTInfo *) 0;
 
-   // Number of grid points
-   const int Nxy = dp.nx()*dp.ny();
+   // Check for valid pointer
+   if(!pd_ptr) return;
+
+   // Determine the number of climo CDF bins
+   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
+            pd_ptr->csd_na.n_valid() > 0 ?
+            vx_opt.get_n_cdf_bin() : 1);
+
+   // Allocate memory
+   ecnt_info = new ECNTInfo [n_bin];
+
+   // Process the climo CDF bins
+   for(i=0; i<n_bin; i++) {
+
+      // Apply climo CDF bins logic to subset pairs
+      if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
+                            vx_opt.cdf_info.cdf_ta, i);
+      else          pd = *pd_ptr;
+
+      // Store threshold
+      ecnt_info[i].othresh = othresh;
+
+      // Check for no matched pairs to process
+      if(pd.n_obs == 0) continue;
+
+      // Compute ensemble statistics
+      ecnt_info[i].set(pd);
+
+      // Write out ECNT
+      if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
+         vx_opt.output_flag[i_ecnt] != STATOutputType_None &&
+         ecnt_info[i].n_pair > 0) {
+         write_ecnt_row(shc, ecnt_info[i], vx_opt.output_flag[i_ecnt],
+                        i, n_bin, stat_at, i_stat_row,
+                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
+      }
+   } // end for i (n_bin)
+
+   // Write the mean of the climo CDF bins
+   if(n_bin > 1) {
+         
+      // Compute ECNT climo CDF bin means
+      if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
+         
+         ECNTInfo ecnt_mean;
+         compute_ecnt_mean(ecnt_info, n_bin, ecnt_mean);
+
+         if(ecnt_mean.n_pair > 0) {
+            write_ecnt_row(shc, ecnt_mean,
+                           vx_opt.output_flag[i_ecnt],
+                           -1, n_bin, stat_at, i_stat_row,
+                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
+         }
+      }
+   } // end if n_bin > 1
+
+   // Dealloate memory
+   if(ecnt_info) { delete [] ecnt_info; ecnt_info = (ECNTInfo *) 0; }
+
+   return;    
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_counts() {
+   int i, j, k;
 
    // Allocate memory in one big chunk based on grid size, if needed
-   count_na.extend(Nxy);
-   min_na.extend(Nxy);
-   max_na.extend(Nxy);
-   sum_na.extend(Nxy);
-   sum_sq_na.extend(Nxy);
+   count_na.extend(nxy);
+   min_na.extend(nxy);
+   max_na.extend(nxy);
+   sum_na.extend(nxy);
+   sum_sq_na.extend(nxy);
    for(i=0; i<conf_info.get_max_n_thresh(); i++) {
-      thresh_count_na[i].extend(Nxy);
+      thresh_count_na[i].extend(nxy);
+      for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+         thresh_nbrhd_count_na[i][j].extend(nxy);
+      }
    }
 
    // Erase existing values
@@ -1873,10 +2025,13 @@ void clear_counts(const DataPlane &dp, int i_vx) {
    sum_sq_na.erase();
    for(i=0; i<conf_info.get_max_n_thresh(); i++) {
       thresh_count_na[i].erase();
+      for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+         thresh_nbrhd_count_na[i][j].erase();
+      }
    }
 
    // Initialize arrays
-   for(i=0; i<Nxy; i++) {
+   for(i=0; i<nxy; i++) {
       count_na.add(0);
       min_na.add(bad_data_double);
       max_na.add(bad_data_double);
@@ -1884,6 +2039,9 @@ void clear_counts(const DataPlane &dp, int i_vx) {
       sum_sq_na.add(0.0);
       for(j=0; j<conf_info.get_max_n_thresh(); j++) {
          thresh_count_na[j].add(0);
+         for(k=0; k<conf_info.get_n_nbrhd(); k++) {
+            thresh_nbrhd_count_na[j][k].add(0);
+         }
       }
    }
 
@@ -1892,12 +2050,9 @@ void clear_counts(const DataPlane &dp, int i_vx) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(const DataPlane &dp, int i_vx) {
-   int i, j;
+void track_counts(int i_vx, const DataPlane &dp) {
+   int i, j, k;
    double v;
-
-   // Number of grid points
-   const int Nxy = dp.nx()*dp.ny();
 
    // Pointers to data buffers for faster access
    const double *Data = dp.data();
@@ -1907,11 +2062,12 @@ void track_counts(const DataPlane &dp, int i_vx) {
    double *SumBuf     = sum_na.buf();
    double *SumSqBuf   = sum_sq_na.buf();
 
-   const int Nthresh = conf_info.ens_ta[i_vx].n_elements();
+   // Ensemble thresholds
+   const int Nthresh = conf_info.ens_ta[i_vx].n();
    SingleThresh *ThreshBuf = conf_info.ens_ta[i_vx].buf();
 
    // Increment counts for each grid point
-   for(i=0; i<Nxy; i++) {
+   for(i=0; i<nxy; i++) {
 
       // Get current value
       v = *Data++;
@@ -1933,10 +2089,35 @@ void track_counts(const DataPlane &dp, int i_vx) {
          for(j=0; j<Nthresh; j++) {
             if(ThreshBuf[j].check(v)) thresh_count_na[j].inc(i, 1);
          }
-
       } // end else
 
    } // end for i
+
+   // Increment NMEP count anywhere fractional coverage > 0
+   if(conf_info.nc_info.do_nmep) {
+      DataPlane frac_dp;
+
+      // Loop over thresholds
+      for(i=0; i<Nthresh; i++) {
+
+         // Loop over neighborhood sizes
+         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+
+            // Compute fractional coverage
+            fractional_coverage(dp, frac_dp,
+               conf_info.nbrhd_prob.width[j],
+               conf_info.nbrhd_prob.shape,
+               ThreshBuf[i], conf_info.nbrhd_prob.vld_thresh); 
+
+            // Increment counts
+            const double *Frac = frac_dp.data();
+            for(k=0; k<nxy; k++) {
+               if(Frac[k] > 0) thresh_nbrhd_count_na[i][j].inc(k, 1);
+            } // end for k 
+
+         } // end for j
+      } // end for i
+   } // end if do_nmep
 
    return;
 }
@@ -2184,8 +2365,8 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
    // Append the timing information
    unix_to_mdyhms(ut, mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2iV",
-           yr, mon, day, hr, min, sec);
+   snprintf(tmp_str, sizeof(tmp_str), "%.4i%.2i%.2i_%.2i%.2i%.2iV",
+            yr, mon, day, hr, min, sec);
    str << "_" << tmp_str;
 
    // Append the suffix
@@ -2197,10 +2378,10 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_ens_nc(int i_ens, DataPlane &dp) {
-   int i, j;
+   int i, j, k, l;
    double t, v;
    char type_str[max_str_len];
-
+   DataPlane prob_dp, smooth_dp;
 
    // Arrays for storing ensemble data
    float *ens_mean  = (float *) 0;
@@ -2211,7 +2392,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
    float *ens_max   = (float *) 0;
    float *ens_range = (float *) 0;
    int   *ens_vld   = (int   *) 0;
-   float *ens_freq  = (float *) 0;
+   float *ens_prob  = (float *) 0;
 
    // Allocate memory for storing ensemble data
    ens_mean  = new float [grid.nx()*grid.ny()];
@@ -2222,13 +2403,13 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
    ens_max   = new float [grid.nx()*grid.ny()];
    ens_range = new float [grid.nx()*grid.ny()];
    ens_vld   = new int   [grid.nx()*grid.ny()];
-   ens_freq  = new float [grid.nx()*grid.ny()];
+   ens_prob  = new float [grid.nx()*grid.ny()];
 
    // Store the threshold for the ratio of valid data points
    t = conf_info.vld_data_thresh;
 
    // Store the data
-   for(i=0; i<count_na.n_elements(); i++) {
+   for(i=0; i<count_na.n(); i++) {
 
       // Valid data count
       ens_vld[i] = nint(count_na[i]);
@@ -2258,90 +2439,187 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
       }
    } // end for i
 
-   // Add the ensemble mean if requested
+   // Add the ensemble mean, if requested
    if(conf_info.nc_info.do_mean) {
       write_ens_var_float(i_ens, ens_mean, dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
-   // Add the ensemble standard deviation if requested
+   // Add the ensemble standard deviation, if requested
    if(conf_info.nc_info.do_stdev) {
       write_ens_var_float(i_ens, ens_stdev, dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
-   // Add the ensemble mean minus one standard deviation if requested
+   // Add the ensemble mean minus one standard deviation, if requested
    if(conf_info.nc_info.do_minus) {
       write_ens_var_float(i_ens, ens_minus, dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
-   // Add the ensemble mean plus one standard deviation if requested
+   // Add the ensemble mean plus one standard deviation, if requested
    if(conf_info.nc_info.do_plus) {
       write_ens_var_float(i_ens, ens_plus, dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
-   // Add the ensemble minimum value if requested
+   // Add the ensemble minimum value, if requested
    if(conf_info.nc_info.do_min) {
       write_ens_var_float(i_ens, ens_min, dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
-   // Add the ensemble maximum value if requested
+   // Add the ensemble maximum value, if requested
    if(conf_info.nc_info.do_max) {
       write_ens_var_float(i_ens, ens_max, dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
-   // Add the ensemble range if requested
+   // Add the ensemble range, if requested
    if(conf_info.nc_info.do_range) {
       write_ens_var_float(i_ens, ens_range, dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
-   // Add the ensemble valid data count if requested
+   // Add the ensemble valid data count, if requested
    if(conf_info.nc_info.do_vld) {
       write_ens_var_int(i_ens, ens_vld, dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
 
-   // Add the ensemble relative frequencies if requested
-   if(conf_info.nc_info.do_freq) {
+   // Add the ensemble relative frequencies and neighborhood probabilities, if requested
+   if(conf_info.nc_info.do_freq || conf_info.nc_info.do_nep) {
+
+      prob_dp.set_size(dp.nx(), dp.ny());
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_ta[i_ens].n_elements(); i++) {
+      for(i=0; i<conf_info.ens_ta[i_ens].n(); i++) {
 
-         snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s", conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str());
+         // Initialize
+         prob_dp.erase();
 
-         // Store the data
-         for(j=0; j<count_na.n_elements(); j++) {
+         // Output variable name
+         snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
+                  conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str());
+
+         // Compute the ensemble relative frequency 
+         for(j=0; j<count_na.n(); j++) {
 
             // Check for too much missing data
             if((double) (count_na[j]/n_ens_vld[i_ens]) < t) {
-               ens_freq[j] = bad_data_float;
+               ens_prob[j] = bad_data_float;
             }
             else {
-               ens_freq[j] = (float) (thresh_count_na[i][j]/count_na[j]);
+               ens_prob[j] = (float) (thresh_count_na[i][j]/count_na[j]);
             }
+
+            // Also store value in a DataPlane object
+            prob_dp.buf()[j] = ens_prob[j];
 
          } // end for j
 
          // Write the ensemble relative frequency
-         write_ens_var_float(i_ens, ens_freq, dp,
-                             type_str,
-                             "Ensemble Relative Frequency");
+         if(conf_info.nc_info.do_freq) {
+            write_ens_var_float(i_ens, ens_prob, dp,
+                                type_str,
+                                "Ensemble Relative Frequency");
+         }
 
+         // Write the neighborhood ensemble probability
+         if(conf_info.nc_info.do_nep) {
+
+            // Compute the mean neighborhood probability
+            for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+
+               smooth_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
+                              conf_info.nbrhd_prob.width[j],
+                              conf_info.nbrhd_prob.shape,
+                              conf_info.nbrhd_prob.vld_thresh, 0, 0);
+
+               for(k=0; k<count_na.n(); k++) {
+                  ens_prob[k] = (float) smooth_dp.buf()[k];
+               }
+
+               // Output variable name
+               snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
+                        conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str(),
+                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
+
+               write_ens_var_float(i_ens, ens_prob, dp,
+                                   type_str,
+                                   "Neighborhood Ensemble Probability");
+               
+            } // end for j
+         } // end if do_nep
       } // end for i
    } // end if
+
+   // Add the neighborhood maximum ensemble probabilities, if requested
+   if(conf_info.nc_info.do_nmep) {
+
+      prob_dp.set_size(dp.nx(), dp.ny());
+
+      // Loop through each threshold
+      for(i=0; i<conf_info.ens_ta[i_ens].n(); i++) {
+
+         // Loop through each neigbhorhood size
+         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+
+            // Initialize
+            prob_dp.erase();
+
+            // Compute the neighborhood maximum ensemble probability 
+            for(k=0; k<count_na.n(); k++) {
+
+               // Check for too much missing data
+               if((double) (count_na[k]/n_ens_vld[i_ens]) < t) {
+                  prob_dp.buf()[k] = bad_data_double;
+               }
+               else {
+                  prob_dp.buf()[k] = (double) (thresh_nbrhd_count_na[i][j][k]/count_na[k]);
+               }
+            } // end for k
+
+            // Apply requested NMEP smoothers
+            for(k=0; k<conf_info.nmep_smooth.n_interp; k++) {
+
+               smooth_dp = smooth_field(prob_dp,
+                              string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
+                              conf_info.nmep_smooth.width[k],
+                              conf_info.nmep_smooth.shape,
+                              conf_info.nmep_smooth.vld_thresh,
+                              conf_info.nmep_smooth.gaussian_dx,
+                              conf_info.nmep_smooth.gaussian_radius);
+
+               for(l=0; l<count_na.n(); l++) {
+                  ens_prob[l] = (float) smooth_dp.buf()[l];
+               }
+
+               // Output variable name
+               snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
+                        conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str(),
+                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
+                        conf_info.nmep_smooth.method[k].c_str(),
+                        conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
+
+               write_ens_var_float(i_ens, ens_prob, dp,
+                                   type_str,
+                                   "Neighborhood Maximum Ensemble Probability");
+
+            } // end for k 
+         } // end for j
+      } // end for i
+   } // end if do_nep
 
    // Deallocate and clean up
    if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) 0; }
@@ -2352,7 +2630,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
    if(ens_max)   { delete [] ens_max;   ens_max   = (float *) 0; }
    if(ens_range) { delete [] ens_range; ens_range = (float *) 0; }
    if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) 0; }
-   if(ens_freq)  { delete [] ens_freq;  ens_freq  = (float *) 0; }
+   if(ens_prob)  { delete [] ens_prob;  ens_prob  = (float *) 0; }
 
    return;
 }
@@ -2716,7 +2994,7 @@ void finish_txt_files() {
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
-   int i;
+   int i, j;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -2724,7 +3002,7 @@ void clean_up() {
    if(vx_flag) finish_txt_files();
 
    // List the output NetCDF files
-   for(i=0; i<out_nc_file_list.n_elements(); i++) {
+   for(i=0; i<out_nc_file_list.n(); i++) {
       mlog << Debug(1)
            << "Output file: " << out_nc_file_list[i] << "\n";
    }
@@ -2734,7 +3012,19 @@ void clean_up() {
       for(i=0; i<conf_info.get_max_n_thresh(); i++) {
          thresh_count_na[i].clear();
       }
-      delete [] thresh_count_na; thresh_count_na = (NumArray *) 0;
+      delete [] thresh_count_na;
+      thresh_count_na = (NumArray *) 0;
+   }
+   if(thresh_nbrhd_count_na) {
+      for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+            thresh_nbrhd_count_na[i][j].clear();
+         }
+         delete [] thresh_nbrhd_count_na[i];
+         thresh_nbrhd_count_na[i] = (NumArray *) 0;
+      }
+      delete [] thresh_nbrhd_count_na;
+      thresh_nbrhd_count_na = (NumArray **) 0;
    }
 
    return;
@@ -2864,7 +3154,8 @@ void set_verbosity(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+void set_compress(const StringArray & a)
+{
    compress_level = atoi(a[0].c_str());
 }
 

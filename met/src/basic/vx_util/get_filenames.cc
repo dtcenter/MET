@@ -30,6 +30,7 @@ using namespace std;
 
 #include "get_filenames.h"
 #include "string_fxns.h"
+#include "file_exists.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,7 +51,6 @@ for (j=0; j<N; ++j)  {
   a.add(get_filenames(string(search_dir_list[j]), prefix, suffix, check_regular));
 
 }
-
 
 return ( a );
 
@@ -116,7 +116,6 @@ if ( S_ISDIR(sbuf.st_mode) )  {
 
    }
 }
-
 
 return ( a );
 
@@ -201,35 +200,82 @@ return ( a );
 
 bool check_prefix_suffix(const char * path,
                          const char * prefix, const char * suffix)
+
 {
-   ConcatString regex;
-   bool keep = true;
+
+ConcatString regex;
+bool keep = true;
 
    //
    //  check the prefix
    //
 
-   if ( keep && prefix ) {
+if ( keep && prefix ) {
 
-      regex << cs_erase << "^" << prefix;
+   regex << cs_erase << "^" << prefix;
 
-      keep = check_reg_exp(regex.c_str(), path);
+   keep = check_reg_exp(regex.c_str(), path);
 
-   }
+}
 
    //
    //  check the suffix
    //
 
-   if ( keep && suffix ) {
+if ( keep && suffix ) {
 
-      regex << cs_erase << suffix << "$";
+   regex << cs_erase << suffix << "$";
 
-      keep = check_reg_exp(regex.c_str(), path);
+   keep = check_reg_exp(regex.c_str(), path);
 
-   }
+}
 
-   return(keep);
+return(keep);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+StringArray parse_file_list(const StringArray& in_list)
+
+{
+
+StringArray out_list;
+
+   //
+   //  check for an empty input list
+   //
+
+if ( in_list.n() == 0 )  {
+
+   mlog << Error << "\nparse_file_list() -> "
+        << "empty list!\n\n";
+
+   exit(1);
+
+}
+
+   //
+   //  assume a list of length one is an ascii file list
+   //
+
+if ( in_list.n() == 1 )  {
+
+   out_list = parse_ascii_file_list(in_list[0].c_str());
+
+}
+
+   //
+   //  if out_list is still empty, return the input file list
+   //
+
+if ( out_list.n() == 0 )  out_list = in_list;
+
+
+return(out_list);
+
 }
 
 
@@ -249,24 +295,56 @@ std::string file_name;
    //
 
 met_open(f_in, path);
-if(!f_in) {
+
+if ( !f_in )  {
+
    mlog << Error << "\nparse_ascii_file_list() -> "
         << "can't open the ASCII file list \"" << path
         << "\" for reading\n\n";
+
    exit(1);
+
 }
 
    //
    //  Read and store the file names
    //
 
-while(f_in >> file_name) a.add(file_name.c_str());
+int n_exist = 0;
+
+const int max_missing = 10;
+
+while(f_in >> file_name)  {
+
+   a.add(file_name.c_str());
+
+   //
+   //  Count how many files actually exist and
+   //  abort after too many missing files
+   //
+
+   if ( n_exist == 0 )  {
+
+      if ( a.n() >= max_missing )  break;
+
+      if ( file_exists(file_name.c_str()) )  n_exist++;
+
+   }
+
+}
+
+   //
+   //  If no files exist, return an empty list
+   //
+
+if ( n_exist == 0 )  a.clear();
 
    //
    //  done
    //
 
 f_in.close();
+
 
 return(a);
 

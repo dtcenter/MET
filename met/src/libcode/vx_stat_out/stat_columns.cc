@@ -79,6 +79,22 @@ void close_txt_file(ofstream *&out, const char *file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString append_climo_bin(const ConcatString &mask_name,
+                              int i_bin, int n_bin) {
+
+   if(n_bin == 1) return(mask_name);
+   
+   // Append the climo CDF bin number.
+   ConcatString cs;
+   cs << mask_name << "_BIN_";
+   if(i_bin == -1) cs << "MEAN";
+   else            cs << i_bin+1;
+   
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_header_row(const char **cols, int n_cols, int hdr_flag,
                       AsciiTable &at, int r, int c) {
    int i;
@@ -500,7 +516,7 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 ////////////////////////////////////////////////////////////////////////
 
 void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -523,7 +539,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_fho_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -539,7 +555,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -562,7 +578,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_ctc_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -578,7 +594,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -607,7 +623,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
       write_cts_cols(cts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -624,7 +640,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -647,7 +663,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    write_mctc_cols(mcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -663,7 +679,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -692,7 +708,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
       write_mcts_cols(mcts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -709,10 +725,11 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
+   ConcatString mask_name = shc.get_mask();
 
    // CNT line type
    shc.set_line_type(stat_cnt_str);
@@ -724,6 +741,10 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
 
    // Not Applicable
    shc.set_cov_thresh(na_str);
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
 
    // Write a line for each alpha value
    for(i=0; i<cnt_info.n_alpha; i++) {
@@ -738,7 +759,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
       write_cnt_cols(cnt_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -749,15 +770,19 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
       stat_row++;
    }
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                     bool txt_flag,
+                     STATOutputType out_type, int i_bin, int n_bin,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
+   ConcatString mask_name = shc.get_mask();
 
    // SL1L2 line type
    shc.set_line_type(stat_sl1l2_str);
@@ -771,6 +796,10 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -778,7 +807,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sl1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -788,15 +817,19 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
-                      bool txt_flag,
+                      STATOutputType out_type, int i_bin, int n_bin,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
+   ConcatString mask_name = shc.get_mask();
 
    // SAL1L2 line type
    shc.set_line_type(stat_sal1l2_str);
@@ -810,6 +843,10 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -817,7 +854,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sal1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -827,13 +864,16 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -856,7 +896,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_vl1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -872,7 +912,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
 
@@ -895,7 +935,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_val1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -912,7 +952,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 
 
 void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -935,7 +975,7 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
    write_vcnt_cols(vcnt_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -948,15 +988,14 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
 void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
+   ConcatString mask_name = shc.get_mask();
 
    // PCT line type
    shc.set_line_type(stat_pct_str);
@@ -972,6 +1011,10 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -979,7 +1022,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pct_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -989,17 +1032,21 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                    bool txt_flag,
+                    STATOutputType out_type, int i_bin, int n_bin,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row,
                     bool update_thresh) {
    int i;
+   ConcatString mask_name = shc.get_mask();
 
    // PSTD line type
    shc.set_line_type(stat_pstd_str);
@@ -1011,6 +1058,10 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
 
    // Write a line for each alpha value
    for(i=0; i<pct_info.n_alpha; i++) {
@@ -1025,7 +1076,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       write_pstd_cols(pct_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1036,17 +1087,20 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       stat_row++;
    }
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
+   ConcatString mask_name = shc.get_mask();
 
    // PJC line type
    shc.set_line_type(stat_pjc_str);
@@ -1062,6 +1116,10 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -1069,7 +1127,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pjc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1079,17 +1137,21 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                   bool txt_flag,
+                   STATOutputType out_type, int i_bin, int n_bin,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
-
+   ConcatString mask_name = shc.get_mask();
+ 
    // PRC line type
    shc.set_line_type(stat_prc_str);
 
@@ -1104,6 +1166,10 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Not Applicable
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
@@ -1111,7 +1177,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_prc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1121,13 +1187,73 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
+                    const NumArray &eclv_points,
+                    STATOutputType out_type, int i_bin, int n_bin,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   int i;
+   ConcatString mask_name = shc.get_mask();
+
+   // ECLV line type
+   shc.set_line_type(stat_eclv_str);
+
+   // Set the threshold columns, if requested.
+   shc.set_obs_thresh(pct_info.othresh);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
+   // Write ECLV line for each PCT row
+   for(i=0; i<pct_info.pct.nrows(); i++) {
+
+      // Update the forecast threshold
+      shc.set_fcst_thresh(pct_info.fthresh[i+1]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data for the 2x2 contingency table for this row
+      write_eclv_cols(pct_info.pct.ctc_by_row(i), eclv_points,
+                      stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(out_type == STATOutputType_Both) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+
+   } // end for i
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                    const NumArray &eclv_points, bool txt_flag,
+                    const NumArray &eclv_points, STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1151,7 +1277,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
                    stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1166,56 +1292,8 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                    const NumArray &eclv_points, bool txt_flag,
-                    AsciiTable &stat_at, int &stat_row,
-                    AsciiTable &txt_at, int &txt_row) {
-   int i;
-
-   // ECLV line type
-   shc.set_line_type(stat_eclv_str);
-
-   // Set the threshold columns, if requested.
-   shc.set_obs_thresh(pct_info.othresh);
-   shc.set_thresh_logic(SetLogic_None);
-   shc.set_cov_thresh(na_str);
-
-   // Not Applicable
-   shc.set_alpha(bad_data_double);
-
-   // Write ECLV line for each PCT row
-   for(i=0; i<pct_info.pct.nrows(); i++) {
-
-      // Update the forecast threshold
-      shc.set_fcst_thresh(pct_info.fthresh[i+1]);
-
-      // Write the header columns
-      write_header_cols(shc, stat_at, stat_row);
-
-      // Write the data for the 2x2 contingency table for this row
-      write_eclv_cols(pct_info.pct.ctc_by_row(i), eclv_points,
-                      stat_at, stat_row, n_header_columns);
-
-      // If requested, copy row to the text file
-      if(txt_flag) {
-         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
-
-         // Increment the text row counter
-         txt_row++;
-      }
-
-      // Increment the STAT row counter
-      stat_row++;
-
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
 
@@ -1240,7 +1318,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    write_nbrctc_cols(nbrcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1256,7 +1334,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1288,7 +1366,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1305,7 +1383,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
-                      bool txt_flag,
+                      STATOutputType out_type,
                       AsciiTable &stat_at, int &stat_row,
                       AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1335,7 +1413,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1352,7 +1430,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1373,7 +1451,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
    write_grad_cols(grad_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1389,7 +1467,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1412,7 +1490,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
    write_dmap_cols(dmap_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1428,7 +1506,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
@@ -1462,7 +1540,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
       write_mpr_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1479,7 +1557,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
-                   bool txt_flag,
+                   STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1505,7 +1583,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
       write_isc_cols(isc_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1520,18 +1598,18 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    bool txt_flag,
+    
+void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
+                    STATOutputType out_type, int i_bin, int n_bin,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
-
-   // Check for data to write.  Running Ensemble-Stat with skip_const
-   // set to true may result in no data.
-   if(pd_ptr->n_obs == 0) return;
+   ConcatString mask_name = shc.get_mask();
 
    // ECNT line type
    shc.set_line_type(stat_ecnt_str);
+
+   // Thresholds
+   shc.set_obs_thresh(ecnt_info.othresh);
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
@@ -1539,14 +1617,18 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
+   // Update the mask name, if needed.
+   ConcatString cs = append_climo_bin(mask_name, i_bin, n_bin);
+   shc.set_mask(cs.c_str());
+
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
    // Write the data columns
-   write_ecnt_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+   write_ecnt_cols(ecnt_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1556,13 +1638,16 @@ void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    // Increment the STAT row counter
    stat_row++;
 
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -1586,7 +1671,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_rhist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1602,7 +1687,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
@@ -1626,7 +1711,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_phist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1642,7 +1727,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     bool txt_flag,
+                     STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1670,7 +1755,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
       write_orank_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1687,7 +1772,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                     double alpha, bool txt_flag,
+                     double alpha, STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1714,7 +1799,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                        stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(txt_flag) {
+      if(out_type == STATOutputType_Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1732,7 +1817,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    bool txt_flag,
+                    STATOutputType out_type,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1756,7 +1841,7 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_relp_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(txt_flag) {
+   if(out_type == STATOutputType_Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -2942,7 +3027,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    BSS,         BSS_SMPL,    [THRESH] (for each threshold)
    //
    at.set_entry(r, c+0,  // Total count
-      pct_info.pct.n());
+      pct_info.total);
 
    at.set_entry(r, c+1,  // N_THRESH
       pct_info.pct.nrows() + 1);
@@ -2957,16 +3042,16 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
       pct_info.baser.v_ncu[alpha_i]);
 
    at.set_entry(r, c+5,  // RELIABILITY
-      pct_info.pct.reliability());
+      pct_info.reliability);
 
    at.set_entry(r, c+6,  // RESOLUTION
-      pct_info.pct.resolution());
+      pct_info.resolution);
 
    at.set_entry(r, c+7,  // UNCERTAINTY
-      pct_info.pct.uncertainty());
+      pct_info.uncertainty);
 
    at.set_entry(r, c+8,  // ROC_AUC
-      pct_info.pct.roc_auc());
+      pct_info.roc_auc);
 
    at.set_entry(r, c+9,  // BRIER
       pct_info.brier.v);
@@ -2990,7 +3075,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
       pct_info.bss);
 
    at.set_entry(r, c+16, // Brier Skill Score using sample climo
-      pct_info.pct.bss_smpl());
+      pct_info.bss_smpl);
 
    //
    // Write THRESH_i for each probability threshold
@@ -3515,7 +3600,7 @@ void write_isc_cols(const ISCInfo &isc_info, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
+void write_ecnt_cols(const ECNTInfo &ecnt_info,
                      AsciiTable &at, int r, int c) {
 
    //
@@ -3528,40 +3613,40 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    //    SPREAD_PLUS_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
-      pd_ptr->n_pair);
+      ecnt_info.n_pair);
 
    at.set_entry(r, c+1,  // Number of ensemble members
-      pd_ptr->n_ens);
+      ecnt_info.n_ens);
 
    at.set_entry(r, c+2,  // Continuous Ranked Probability Score
-      pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.crps);
 
    at.set_entry(r, c+3,  // Continuous Ranked Probability Skill Score
-      pd_ptr->crpss);
+      ecnt_info.crpss);
 
    at.set_entry(r, c+4,  // Ignorance Score
-      pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.ign);
 
    at.set_entry(r, c+5,  // ME for unperturbed ensemble mean
-      pd_ptr->me);
+      ecnt_info.me);
 
    at.set_entry(r, c+6,  // RMSE for unperturbed ensemble mean
-      pd_ptr->rmse);
+      ecnt_info.rmse);
 
    at.set_entry(r, c+7,  // Mean of unperturbed ensemble spread
-      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread);
 
    at.set_entry(r, c+8,  // ME for mean of perturbed members
-      pd_ptr->me_oerr);
+      ecnt_info.me_oerr);
 
    at.set_entry(r, c+9,  // RMSE for mean of perturbed members
-      pd_ptr->rmse_oerr);
+      ecnt_info.rmse_oerr);
 
    at.set_entry(r, c+10,  // Mean of perturbed ensemble spread
-      pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread_oerr);
 
    at.set_entry(r, c+11,  // Mean of unperturbed spread plus observation error
-      pd_ptr->spread_plus_oerr_na.wmean(pd_ptr->wgt_na));
+      ecnt_info.spread_plus_oerr);
 
    return;
 }

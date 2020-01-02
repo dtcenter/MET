@@ -777,9 +777,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   for (int k=0; k<dim_count; k++) {
     int dim_size = var->getDim(k).getSize();
     if (dim_size < a[k]) {
-      unixtime ut_ref;
       int sec_per_unit = 0;
-      unixtime ut_dim = a[k];
       if (dim_size < a[k]) {
         mlog << Error << "\n" << method_name
              << "offset (" << a[k] << ") at " << k
@@ -790,8 +788,8 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     }
   }
 
-  bool status;
-  double d;
+  bool status = false;
+  double d = bad_data_double;
   float add_offset = 0.f;
   float scale_factor = 1.f;
   NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
@@ -1000,9 +998,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     lengths[k] = 1;
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
-      unixtime ut_ref;
       int sec_per_unit = 0;
-      unixtime ut_dim = offsets[k];
       if (dim_size < offsets[k]) {
         mlog << Error << "\n" << method_name
              << "offset (" << offsets[k] << ") at " << k
@@ -1287,7 +1283,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
 
   //string grid_mapping_name = grid_mapping_name_att->getValues(att->as_string(0);
   ConcatString grid_mapping_name;
-  status = get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
+  get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
   if (grid_mapping_name_att) delete grid_mapping_name_att;
 
   // Handle each mapping type defined in the standard
@@ -2481,7 +2477,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   // the center of the earth rather than the regular map coordinate system.
 
   GoesImagerData data;
-  double double_data;
   NumArray double_datas;
   data.reset();
 
@@ -2493,7 +2488,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.inverse_flattening = get_att_value_double(inverse_flattening_att);
   data.lat_of_projection_origin = get_att_value_double(proj_origin_lat_att);
   data.lon_of_projection_origin = get_att_value_double(proj_origin_lon_att);
-  //data.sweep_angle_axisconst;
   data.nx = x_counts;
   data.ny = y_counts;
   data.dx_rad = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
@@ -2510,25 +2504,12 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.radius_ratio2 = pow((data.semi_major_axis/data.semi_minor_axis), 2.0);
   data.inv_radius_ratio2 = 1.0/data.radius_ratio2;
   data.H = data.perspective_point_height + data.semi_major_axis;
-  //data._xSubSatIdx;
-  //data._ySubSatIdx;
 
   data.x_values = new double[x_counts];
   data.y_values = new double[y_counts];
 
   memcpy(data.x_values, x_values, sizeof(data.x_values[0])*x_counts);
   memcpy(data.y_values, y_values, sizeof(data.y_values[0])*y_counts);
-
-  int index, buf_len;
-  double lat, lon;
-  double lat_rad, lon_rad;
-  double lat_min, lat_max, lon_min, lon_max;
-  int idx_lat_min, idx_lat_max, idx_lon_min, idx_lon_max;
-  double x_rad, cos_x, sin_x;
-  double y_rad, cos_y, sin_y;
-  double semi_major_axis_sqr = data.semi_major_axis * data.semi_major_axis;
-  double axis_ratio = semi_major_axis_sqr / (data.semi_minor_axis*data.semi_minor_axis);
-  double param_c = data.H * data.H - semi_major_axis_sqr;
 
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
   ConcatString scene_id;
@@ -2542,15 +2523,14 @@ void NcCfFile::get_grid_mapping_geostationary(
   // Note: Computing lat/lon was deferred because it took 1 minutes
 
   grid.set(data);
-  //data.dump();
 
   if (perspective_point_height_att) delete perspective_point_height_att;
-  if (semi_major_axis_att) delete semi_major_axis_att;
-  if (semi_minor_axis_att) delete semi_minor_axis_att;
-  if (inverse_flattening_att) delete inverse_flattening_att;
-  if (proj_origin_lat_att) delete proj_origin_lat_att;
-  if (proj_origin_lon_att) delete proj_origin_lon_att;
-  if (sweep_angle_axis_att) delete sweep_angle_axis_att;
+  if (semi_major_axis_att)          delete semi_major_axis_att;
+  if (semi_minor_axis_att)          delete semi_minor_axis_att;
+  if (inverse_flattening_att)       delete inverse_flattening_att;
+  if (proj_origin_lat_att)          delete proj_origin_lat_att;
+  if (proj_origin_lon_att)          delete proj_origin_lon_att;
+  if (sweep_angle_axis_att)         delete sweep_angle_axis_att;
 }
 
 

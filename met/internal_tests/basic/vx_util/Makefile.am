@@ -26,39 +26,47 @@ test_data_plane_SOURCES = test_data_plane.cc
 test_data_plane_CPPFLAGS = ${MET_CPPFLAGS}
 test_data_plane_LDFLAGS = -L. ${MET_LDFLAGS}
 test_data_plane_LDADD = -lvx_util \
-        -lvx_config \
-        -lvx_cal \
-        -lvx_util \
-        -lvx_math \
-        -lvx_log
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log \
+	-lgsl -lgslcblas
 
 test_add_rows_SOURCES = test_add_rows.cc
 test_add_rows_CPPFLAGS = ${MET_CPPFLAGS}
 test_add_rows_LDFLAGS = -L. ${MET_LDFLAGS}
 test_add_rows_LDADD = -lvx_util \
-        -lvx_config \
-        -lvx_cal \
-        -lvx_util \
-        -lvx_math \
-        -lvx_log 
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log \
+	-lgsl -lgslcblas
 
 test_table_float_SOURCES = test_table_float.cc
 test_table_float_CPPFLAGS = ${MET_CPPFLAGS}
 test_table_float_LDFLAGS = -L. ${MET_LDFLAGS}
 test_table_float_LDADD = -lvx_util \
-        -lvx_config \
-        -lvx_cal \
-        -lvx_util \
-        -lvx_math \
-        -lvx_log
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log \
+	-lgsl -lgslcblas
 
 test_ascii_header_SOURCES = test_ascii_header.cc
 test_ascii_header_CPPFLAGS = ${MET_CPPFLAGS}
 test_ascii_header_LDFLAGS = -L. ${MET_LDFLAGS}
 test_ascii_header_LDADD = -lvx_util \
-        -lvx_config \
-        -lvx_cal \
-        -lvx_util \
-        -lvx_math \
-        -lvx_log
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_math \
+	-lvx_log \
+	-lgsl -lgslcblas
  

@@ -255,9 +255,6 @@ if(ties_current != 0) {
    for(j=tie_rank_start; j<=tie_rank_end; j++) {
       reset_rank(rank, n, j, tie_rank_mean);
    }
-
-   // Reset ties_current to zero
-   ties_current = 0;
 }
 
 if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) 0; }

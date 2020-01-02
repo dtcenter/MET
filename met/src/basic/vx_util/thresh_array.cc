@@ -154,7 +154,7 @@ void ThreshArray::extend(int n) {
 bool ThreshArray::operator==(const ThreshArray &ta) const {
 
    // Check for the same length
-   if(Nelements != ta.n_elements()) return(false);
+   if(Nelements != ta.n()) return(false);
 
    // Check for equality of individual elements
    for(int i=0; i<Nelements; i++) {
@@ -228,11 +228,11 @@ void ThreshArray::add(const char *thresh_str) {
 void ThreshArray::add(const ThreshArray & a) {
    int j;
 
-   if(a.n_elements() == 0) return;
+   if(a.n() == 0) return;
 
-   extend(Nelements + a.n_elements());
+   extend(Nelements + a.n());
 
-   for(j=0; j<(a.n_elements()); j++) add(a[j]);
+   for(j=0; j<(a.n()); j++) add(a[j]);
 
    return;
 }
@@ -245,9 +245,9 @@ void ThreshArray::add_css(const char *text) {
 
    sa.parse_css(text);
 
-   extend(Nelements + sa.n_elements());
+   extend(Nelements + sa.n());
 
-   for(j=0; j<sa.n_elements(); j++) add(sa[j].c_str());
+   for(j=0; j<sa.n(); j++) add(sa[j].c_str());
 
    return;
 }
@@ -379,6 +379,12 @@ void ThreshArray::check_bin_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::check_bins(double v) const {
+   return(check_bins(v, bad_data_double, bad_data_double));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ThreshArray::check_bins(double v, double mn, double sd) const {
    int i, bin;
 
    // Check for bad data or no thresholds
@@ -388,7 +394,7 @@ int ThreshArray::check_bins(double v) const {
    if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
 
       for(i=0, bin=-1; i<Nelements; i++) {
-         if(t[i].check(v)) {
+         if(t[i].check(v, mn, sd)) {
             bin = i;
             break;
          }
@@ -399,7 +405,7 @@ int ThreshArray::check_bins(double v) const {
    else {
 
       for(i=Nelements-1, bin=-1; i>=0; i--) {
-         if(t[i].check(v)) {
+         if(t[i].check(v, mn, sd)) {
             bin = i+1;
             break;
          }
@@ -415,12 +421,18 @@ int ThreshArray::check_bins(double v) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool ThreshArray::check_dbl(double v) const {
+   return(check_dbl(v, bad_data_double, bad_data_double));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool ThreshArray::check_dbl(double v, double mn, double sd) const {
    int i;
 
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(i=0; i<Nelements; i++) if(!t[i].check(v)) return(false);
+   for(i=0; i<Nelements; i++) if(!t[i].check(v, mn, sd)) return(false);
 
    return(true);
 }
@@ -468,8 +480,8 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
       exit(1);
    }
 
-   if(farr->n_elements() != Nelements ||
-      oarr->n_elements() != Nelements) {
+   if(farr->n() != Nelements ||
+      oarr->n() != Nelements) {
       mlog << Error << "\nThreshArray::set_perc() -> "
            << "not enough thresholds provided!\n\n";
       exit(1);
@@ -496,6 +508,18 @@ void ThreshArray::multiply_by(const double x) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
+
+   if(Nelements == 0) return;
+
+   for(int i=0; i<Nelements; i++) t[i].get_simple_nodes(v);
+
+   return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // External utility for parsing probability thresholds.
 //
@@ -510,14 +534,14 @@ ThreshArray string_to_prob_thresh(const char *s) {
    ta.add_css(s);
 
    // Handle special case of a single threshold of type equality
-   if(ta.n_elements() == 1 && ta[0].get_type() == thresh_eq) {
+   if(ta.n() == 1 && ta[0].get_type() == thresh_eq) {
 
       // Store the threshold value
       v = ta[0].get_value();
 
       // Threshold value must be between 0 and 1
       if(v <= 0 || v >=1) {
-         mlog << Error << "\nThreshArray string_to_prob_thresh(const char *s) -> "
+         mlog << Error << "\nstring_to_prob_thresh() -> "
               << "threshold value (" << v
               << ") must be between 0 and 1.\n\n";
          exit(1);
@@ -578,7 +602,7 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
 bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    int i, n;
 
-   n = ta.n_elements();
+   n = ta.n();
 
    // Check for at least 3 thresholds beginning with 0 and ending with 1.
    if(n < 3 ||
@@ -631,11 +655,74 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Expand any percentile thresholds of type equality out to threshold
+// bins which span 0 to 100.
+//
+////////////////////////////////////////////////////////////////////////
+
+ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
+   ThreshArray ta_bins, ta_out;
+   ConcatString cs;
+   int i, j;
+
+   // Loop over and process each input threshold
+   for(i=0; i<ta_in.n(); i++) {
+
+      // Pass through non-equality thresholds thresholds to the output
+      if(ta_in[i].get_type()   != thresh_eq                || 
+         (ta_in[i].get_ptype() != perc_thresh_sample_fcst  &&
+          ta_in[i].get_ptype() != perc_thresh_sample_obs   &&
+          ta_in[i].get_ptype() != perc_thresh_sample_climo &&
+          ta_in[i].get_ptype() != perc_thresh_climo_dist)) {
+         ta_out.add(ta_in[i]);
+      }
+      // Expand single threshold to bins which span 0 to 100.
+      else {
+
+         // Store the threshold value
+         int pvalue = nint(ta_in[i].get_pvalue());
+         const char *ptype_str = perc_thresh_info[ta_in[i].get_ptype()].short_name;
+
+         // Threshold value must be between 0 and 100
+         if(pvalue <= 0 || pvalue >=100) {
+            mlog << Error << "\nprocess_perc_thresh_bins() -> "
+                 << "for percentile threshold (" << ta_in[i].get_str()
+                 << ") the percentile threshold value (" << pvalue
+                 << ") must be between 0 and 100.\n\n";
+            exit(1);
+         }
+
+         // Construct list of percentile thresholds
+         ta_bins.clear();
+         for(j=0; (j+1)*pvalue<100; j++) {
+            cs << cs_erase
+               << ">="  << ptype_str << j*pvalue
+               << "&&<" << ptype_str << (j+1)*pvalue;
+            ta_bins.add(cs.c_str());
+         }
+         cs << cs_erase
+            << ">="   << ptype_str << j*pvalue
+            << "&&<=" << ptype_str << "100";
+         ta_bins.add(cs.c_str());
+
+         mlog << Debug(3) << "Expanded continuous percentile threshold (" 
+              << ta_in[i].get_str() << ") to " << ta_bins.n()
+              << " percentile bins (" << ta_bins.get_str() << ").\n";
+
+         ta_out.add(ta_bins);
+      }
+   } // end for i
+
+   return(ta_out);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 ConcatString write_css(const ThreshArray &ta) {
    ConcatString css;
 
-   for(int i=0; i<ta.n_elements(); i++) {
+   for(int i=0; i<ta.n(); i++) {
       css << (i == 0 ? "" : ",") << ta[i].get_str();
    }
 

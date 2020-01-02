@@ -161,6 +161,9 @@ Ptile_50 = 0.0;
 Ptile_75 = 0.0;
 Ptile_90 = 0.0;
 
+Ptile_Value = 0;
+Ptile_User  = 0.0;
+
 return;
 
 }
@@ -216,6 +219,8 @@ Ptile_50 = a.Ptile_50;
 Ptile_75 = a.Ptile_75;
 Ptile_90 = a.Ptile_90;
 
+Ptile_Value = a.Ptile_Value;
+Ptile_User  = a.Ptile_User;
 
 return;
 
@@ -584,7 +589,7 @@ snprintf(junk, sizeof(junk), format, Centroid_Lat);
 
    table.set_entry(row, c++, junk);
 
-snprintf(junk, sizeof(junk), format, Centroid_Lon);
+snprintf(junk, sizeof(junk), format, -Centroid_Lon);
 
    table.set_entry(row, c++, junk);
 
@@ -669,6 +674,12 @@ snprintf(junk, sizeof(junk), format, Ptile_75);
 snprintf(junk, sizeof(junk), format, Ptile_90);
 
    table.set_entry(row, c++, junk);
+
+   //
+   //  custom intensity value
+   //
+
+// TODO write custom intensity value
 
    //
    //  done
@@ -1224,7 +1235,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model)
+SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, const int ptile_value)
 
 {
 
@@ -1303,15 +1314,22 @@ dist = 0.0;
 
 nt = a.Tmax - a.Tmin + 1;
 
-for (j=0; j<nt; ++j)  {
+for (j=0,x_old=0,y_old=0; j<nt; ++j)  {
 
    t = j + a.Tmin;
 
    mask.calc_2d_centroid_at_t(t, xbar_2d, ybar_2d);
 
-   if ( j == 0 )  { x_old = xbar_2d;  y_old = ybar_2d;  continue; }
+   if ( j == 0 )  {
 
-   dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
+       x_old = xbar_2d;
+       y_old = ybar_2d;
+
+   } else {
+ 
+      dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
+
+   }   //  else
 
 }
 
@@ -1358,6 +1376,10 @@ a.Ptile_25 = percentile_f(values, n, 0.25);
 a.Ptile_50 = percentile_f(values, n, 0.50);
 a.Ptile_75 = percentile_f(values, n, 0.75);
 a.Ptile_90 = percentile_f(values, n, 0.90);
+
+a.Ptile_Value = ptile_value;
+
+a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
 
 
    //

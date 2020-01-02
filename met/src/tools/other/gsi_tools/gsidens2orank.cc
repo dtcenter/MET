@@ -79,6 +79,7 @@ static void set_verbosity(const StringArray &);
 int main(int argc, char * argv []) {
    CommandLine cline;
    StringArray ens_file_list;
+   int i;
 
    // Parse the command line into tokens
    cline.set(argc, argv);
@@ -111,15 +112,11 @@ int main(int argc, char * argv []) {
    if(cline.n() == 0) {
       usage();
    }
-   // Process one remaining argument as a filename
-   else if(cline.n() == 1) {
-      ens_file_list = parse_ascii_file_list(cline[0].c_str());
-   }
-   // Process multiple remaining arguments as a list of filenames
+   // Process remaining arguments as input files
    else {
-      for(int i=0; i<(cline.n()); i++) {
-         ens_file_list.add(cline[i].c_str());
-      }
+      StringArray sa;
+      for(i=0; i<cline.n(); i++) sa.add(cline[i]);
+      ens_file_list = parse_file_list(sa);
    }
 
    // Set the expected number of ensemble members
@@ -265,11 +262,10 @@ void process_conv_data(ConvData &d, int i_mem) {
       conv_data.push_back(d);
 
       // Store the current observation info
-      // Store default weight value of 1
-      ens_pd.add_obs(d.sid.c_str(), d.lat, d.lon,
-                     bad_data_double, bad_data_double,
-                     d.obs_ut, d.prs, d.elv, d.obs, na_str,
-                     bad_data_double, bad_data_double);
+      ens_pd.add_point_obs(d.sid.c_str(), d.lat, d.lon,
+                bad_data_double, bad_data_double, d.obs_ut, d.prs,
+                d.elv, d.obs, na_str, bad_data_double, bad_data_double,
+                default_grid_weight);
 
       // Initialize ensemble members and mean to bad data
       for(i=0; i<n_ens; i++) ens_pd.add_ens(i, bad_data_double);
@@ -425,11 +421,10 @@ void process_rad_data(RadData &d, int i_mem) {
       rad_data.push_back(d);
 
       // Store the current observation info
-      // Store default weight value of 1
-      ens_pd.add_obs(na_str, d.lat, d.lon,
-                     bad_data_double, bad_data_double,
-                     d.obs_ut, bad_data_double, d.elv, d.obs, na_str,
-                     bad_data_double, bad_data_double);
+      ens_pd.add_point_obs(na_str, d.lat, d.lon,
+                bad_data_double, bad_data_double, d.obs_ut,
+                bad_data_double, d.elv, d.obs, na_str,
+                bad_data_double, bad_data_double, default_grid_weight);
 
       // Initialize ensemble members and mean to bad data
       for(i=0; i<n_ens; i++) ens_pd.add_ens(i, bad_data_double);
@@ -546,9 +541,8 @@ void write_orank() {
       exit(1);
    }
 
-   // Compute statistics
+   // Compute ensemble pair values
    ens_pd.compute_pair_vals(rng_ptr);
-   ens_pd.compute_stats();
 
    // Compute ensemble mean, if necessary
    if(ens_mean_filename.length() == 0) {

@@ -57,6 +57,7 @@ void ShpPolyRecord::set(unsigned char * buf)
 int j;
 int * i = (int *) buf;
 int bytes, offset;
+double * d;
 
 
 handle_little_4(i);
@@ -132,7 +133,7 @@ memcpy(points.buf(), buf + offset, bytes);
 
 if ( is_big_endian() )  {
 
-   double * d = (double *) (points.buf());
+   d = (double *) (points.buf());
 
    for (j=0; j<(2*n_points); ++j)  shuffle_8(d + j);
 

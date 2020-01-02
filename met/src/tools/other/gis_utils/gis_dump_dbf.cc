@@ -174,7 +174,7 @@ for (j=0; j<(h.n_records); ++j)  {
    //  done
    //
 
-close(fd);  fd = -1;
+close(fd);
 
 return ( 0 );
 

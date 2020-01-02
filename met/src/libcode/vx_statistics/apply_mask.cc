@@ -76,12 +76,12 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
          vx_grid = *ogrid;
       }
       // Search for a named grid
-      else if(sa.n_elements() == 1 && find_grid_by_name(info.name.c_str(), vx_grid)) {
+      else if(sa.n() == 1 && find_grid_by_name(info.name.c_str(), vx_grid)) {
          mlog << Debug(3)
               << "Use the grid named \"" << info.name << "\".\n";
       }
       // Parse grid definition
-      else if(sa.n_elements() > 1 && parse_grid_def(sa, vx_grid)) {
+      else if(sa.n() > 1 && parse_grid_def(sa, vx_grid)) {
          mlog << Debug(3)
               << "Use the grid defined by string \"" << info.name << "\".\n";
       }
@@ -269,7 +269,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    tokens = mask_poly_str.split(poly_str_delim);
    file_name = replace_path(tokens[0].c_str());
    file_name.ws_strip();
-   if(tokens.n_elements() > 1) config_str = tokens[1];
+   if(tokens.n() > 1) config_str = tokens[1];
 
    // If not a 2D data file, process as a lat/lon polyline file
    if(!is_2d_data_file(file_name, config_str)) {
@@ -372,7 +372,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str,
    tokens = mask_poly_str.split(poly_str_delim);
    file_name = replace_path(tokens[0].c_str());
    file_name.ws_strip();
-   if(tokens.n_elements() > 1) config_str = tokens[1];
+   if(tokens.n() > 1) config_str = tokens[1];
 
    // If not a 2D data file, process as a lat/lon polyline file
    if(!is_2d_data_file(file_name, config_str)) {
@@ -411,7 +411,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    config.read(replace_path(config_const_filename).c_str());
 
    // Parse the dictionary string
-   if(tokens.n_elements() > 1) {
+   if(tokens.n() > 1) {
       append_level = true;
       config.read_string(tokens[1].c_str());
    }
@@ -454,7 +454,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    mtddf->data_plane(*info, mask_dp);
 
    // Parse the threshold string
-   if(tokens.n_elements() > 2) {
+   if(tokens.n() > 2) {
       append_thresh = true;
       thresh_str = tokens[2];
    }

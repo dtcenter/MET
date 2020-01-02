@@ -506,8 +506,6 @@ for (j=0; j<Nentries; ++j)  {
    //  must be in-between
    //
 
-k = 0;
-
 for (j=0; j<(Nentries - 1); ++j)  {
 
    k = j + 1;

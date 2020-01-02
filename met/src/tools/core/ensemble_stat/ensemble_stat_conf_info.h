@@ -54,6 +54,8 @@ struct EnsembleStatNcOutInfo {
    bool do_range;
    bool do_vld;
    bool do_freq;
+   bool do_nep;
+   bool do_nmep;
    bool do_orank;
    bool do_weight;
 
@@ -109,6 +111,8 @@ class EnsembleStatVxOpt {
 
       ThreshArray    othr_ta;            // Observation filetering thresholds
 
+      ClimoCDFInfo   cdf_info;           // Climo CDF info
+
       NumArray       ci_alpha;           // Alpha value for confidence intervals
 
       InterpInfo     interp_info;        // Interpolation (smoothing) information
@@ -144,17 +148,19 @@ class EnsembleStatVxOpt {
       int get_n_mask_area() const;
 
       int get_n_o_thresh()  const;
+      int get_n_cdf_bin()   const;
       int get_n_ci_alpha()  const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n_elements());        }
-inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp);        }
-inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n_elements());      }
-inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n_elements()); }
-inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n_elements());        }
-inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n_elements());       }
+inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n());          }
+inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp); }
+inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n());        }
+inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n());   }
+inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n());          }
+inline int EnsembleStatVxOpt::get_n_cdf_bin()   const { return(cdf_info.n_bin);       }
+inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n());         }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -188,6 +194,10 @@ class EnsembleStatConfInfo {
       VarInfo **          ens_info;         // Array of pointers for ensemble [n_ens_var] (allocated)
       ThreshArray *       ens_ta;           // Array for ensemble thresholds [n_ens_var] (allocated)
       StringArray         ens_var_str;      // Array for ensemble variable name strings [n_ens_var]
+
+      NbrhdInfo           nbrhd_prob;       // Neighborhood probability definition
+      int                 n_nbrhd;          // Number of neighborhood sizes
+      InterpInfo          nmep_smooth;      // Neighborhood maximum smoothing information
 
       EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
 
@@ -229,6 +239,7 @@ class EnsembleStatConfInfo {
       // Dump out the counts
       int get_n_ens_var()    const;
       int get_max_n_thresh() const;
+      int get_n_nbrhd()      const;
       int get_n_vx()         const;
 
       // Compute the maximum number of output lines possible based
@@ -242,6 +253,7 @@ class EnsembleStatConfInfo {
 
 inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
 inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_n_nbrhd()      const { return(n_nbrhd);               }
 inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
 inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
 

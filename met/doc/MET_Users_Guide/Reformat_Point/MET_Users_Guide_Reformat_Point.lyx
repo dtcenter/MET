@@ -1411,10 +1411,9 @@ obs_bufr_var
  The variable name comes from BUFR file which includes BUFR table.
  The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for
  specific humidity, temperature, height, and the u and v components of winds.
- The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL,
- D_PBL, and D_CAPE for dewpoint, wind speed, relative humidity, mixing ratio,
- pressure reduced to MSL, planetary boundary layer, and convective available
- potential energy.
+ The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, and
+ D_PRMSL for dewpoint, wind speed, relative humidity, mixing ratio, and
+ pressure reduced to MSL.
  This connfiguration replaces 
 \series bold
 obs_grib_code
@@ -1512,18 +1511,6 @@ obs_bufr_map = [
 
 \series bold
 { key = 'D_PRMSL';  val = 'PRMSL'; },
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-{ key = 'D_PBL';    val = 'PBL';   },
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-{ key = 'D_CAPE';   val = 'CAPE';  }
 \end_layout
 
 \begin_layout LyX-Code

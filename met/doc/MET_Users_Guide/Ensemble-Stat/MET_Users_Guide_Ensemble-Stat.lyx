@@ -182,6 +182,26 @@ $5/10$=0.5
  be thought of as a probability of precipitation.
 \end_layout
 
+\begin_layout Standard
+The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble
+ probability (NMEP) methods are described in Schwartz and Sobash (2017).
+ They are an extension of the ensemble relative frequencies described above.
+ The NEP value is computed by averaging the relative frequency of the event
+ within the neighborhood over all ensemble members.
+ The NMEP value is computed as the fraction of ensemble members for which
+ the event is occurring somewhere within the surrounding neighborhood.
+ The NMEP output is typically smoothed using a Gaussian kernel filter.
+ The neighborhood sizes and smoothing options are set in the configuration
+ file.
+\end_layout
+
+\begin_layout Standard
+The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and
+ NMEP outputs to a NetCDF output file.
+ Probabilistic verification methods can then be applied to those fields
+ by evaluating them with the Grid-Stat and/or Point-Stat tools.
+\end_layout
+
 \begin_layout Subsection
 Ensemble statistics 
 \begin_inset CommandInset label
@@ -260,7 +280,9 @@ et al
 \series medium
 \emph default
 , 2004).
- 
+ The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT)
+ line type, along with other statistics quantifying the ensemble spread
+ and ensemble mean skill.
 \end_layout
 
 \begin_layout Subsection
@@ -903,6 +925,18 @@ climo_mean     = {}
 \begin_layout LyX-Code
 
 \series bold
+climo_stdev    = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_cdf      = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obs_window     = { beg = -5400; end =  5400; }
 \end_layout
 
@@ -1138,6 +1172,229 @@ field
  a threshold of >=5 can be used to compute the proportion of ensemble members
  predicting precipitation of at least 5mm at each grid point.
  
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+nbrhd_prob = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width      = [ 5 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape      = CIRCLE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+nbrhd_prob
+\series medium
+ dictionary defines the neighborhoods used to compute NEP and NMEP output.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The neighborhood 
+\series bold
+shape
+\series medium
+ is a 
+\series bold
+SQUARE
+\series medium
+ or 
+\series bold
+CIRCLE
+\series medium
+ centered on the current point, and the 
+\series bold
+width
+\series medium
+ array specifies the width of the square or diameter of the circle as an
+ odd integer.
+ The 
+\series bold
+vld_thresh
+\series medium
+ entry is a number between 0 and 1 specifying the required ratio of valid
+ data in the neighborhood for an output value to be computed.
+\end_layout
+
+\begin_layout Standard
+If 
+\series bold
+ensemble_flag.nep
+\series medium
+ is set to TRUE, NEP output is created for each combination of the categorical
+ threshold (
+\series bold
+cat_thresh
+\series medium
+) and neighborhood width specified.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+nmep_smooth = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh      = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape           = CIRCLE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_dx     = 81.27;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gaussian_radius = 120;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type = [
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         method = GAUSSIAN;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         width  = 1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Similar to the 
+\series bold
+interp
+\series medium
+ dictionary, the 
+\series bold
+nmep_smooth
+\series medium
+ dictionary includes a 
+\series bold
+type
+\series medium
+ array of dictionaries to define one or more methods for smoothing the NMEP
+ data.
+ Setting the interpolation method to nearest neighbor (
+\series bold
+NEAREST
+\series medium
+) effectively disables this smoothing step.
+\end_layout
+
+\begin_layout Standard
+If 
+\series bold
+ensemble_flag.nmep
+\series medium
+ is set to TRUE, NMEP output is created for each combination of the categorical
+ threshold (
+\series bold
+cat_thresh
+\series medium
+), neighborhood width (
+\series bold
+nbrhd_prob.width
+\series medium
+), and smoothing method (
+\series bold
+nmep_smooth.type
+\series medium
+) specified.
 \end_layout
 
 \begin_layout Standard
@@ -1774,6 +2031,18 @@ ensemble_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   nep       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   nmep      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    rank      = TRUE;
 \end_layout
 
@@ -1845,6 +2114,35 @@ cat_thresh
 \series default
 ) specified.
  This is an uncalibrated probability forecast.
+\end_layout
+
+\begin_layout Enumerate
+Neighborhood Ensemble Probability for each categorical threshold (
+\series bold
+cat_thresh
+\series default
+) and neighborhood width (
+\series bold
+nbrhd_prob.width
+\series default
+) specified.
+\end_layout
+
+\begin_layout Enumerate
+Neighborhood Maximum Ensemble Probability for each categorical threshold
+ (
+\series bold
+cat_thresh
+\series default
+), neighborhood width (
+\series bold
+nbrhd_prob.width
+\series default
+), and smoothing method (
+\series bold
+nmep_smooth.type
+\series default
+) specified.
 \end_layout
 
 \begin_layout Enumerate
@@ -2004,18 +2302,104 @@ name "subsec:ensemble_stat-output"
 \begin_layout Standard
 
 \series bold
+ensemble_stat
+\series default
+ can produce output in STAT, ASCII, and NetCDF formats.
+ The ASCII output duplicates the STAT output but has the data organized
+ by line type.
+ The output files are written to the default output directory or the directory
+ specified by the -outdir
+\series medium
+ 
+\series default
+command line
+\series medium
+ option.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output STAT file is named using the following naming convention: 
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat
+\series medium
+ where 
+\series default
+PREFIX
+\series medium
+ indicates the user-defined output prefix and 
+\series default
+YYYYMMDD_HHMMSSV
+\series medium
+ indicates the forecast valid time.
+ Note that
+\series default
+ the forecast lead time is not included in the output file names 
+\series medium
+since it would not be well-defined for time-lagged ensembles.
+ When verifying multiple lead times for the same valid time, users should
+ either write the output to separate directories or specify a output prefix
+ to ensure unqiue file names.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output ASCII files are named similarly: 
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt
+\series medium
+ where 
+\series default
+TYPE
+\series medium
+ is one of 
+\series default
+ecnt, rhist, phist, relp, orank, and ssvar
+\series medium
+ to indicate the line type it contains.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When fields are requested in the ens dictionary of the configuration file
+ or verificaiton against gridded fields is performed, 
+\series bold
+ensemble_stat
+\series medium
+ can produce output NetCDF files using the following naming convention:
+\end_layout
+
+\begin_layout Standard
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_
+\series medium
+TYPE.nc where TYPE is either ens or orank.
+ The orank 
+\series default
+NetCDF output file contains gridded fields of observation ranks when the
+ -grid_obs command line option is used.
+
+\series medium
+ The ens NetCDF output file contains ensemble products derived from the
+ fields requested in the ens dictionary of the configuration file.
+ 
+\series default
 The Ensemble-Stat tool can calculate any of the following fields from the
- input ensemble members:
+ input ensemble members, as specified in the ensemble_flag dictionary in
+ the configuration file:
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
 Ensemble Mean fields
-\end_layout
-
-\begin_layout Standard
-Ensemble Median and Mode fields
 \end_layout
 
 \begin_layout Standard
@@ -2063,46 +2447,59 @@ Ensemble Valid Data Count fields
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Ensemble Relative Frequency by threshold fields
+Ensemble Relative Frequency by threshold fields (e.g.
+ ensemble probabilities)
+\end_layout
+
+\begin_layout Standard
+Neighborhood Ensemble Probability and Neighborhood Maximum Ensemble Probability
+\end_layout
+
+\begin_layout Standard
+Rank for each Observation Value (if gridded observation field provided)
+\end_layout
+
+\begin_layout Standard
+When gridded or point observations are provided, using the -grid_obs and
+ -point_obs command line options, repsectively, the Ensemble-Stat tool can
+ compute the following statistics for the fields specified in the fcst and
+ obs dictionaries of the configuration file:
+\end_layout
+
+\begin_layout Standard
+Continuous Ensemble Statistics
+\end_layout
+
+\begin_layout Standard
+\noindent
+Ranked Histograms
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Ranked Histograms (if Observation Field Provided)
+Probability Integral Transform (PIT) Histograms
+\end_layout
+
+\begin_layout Standard
+Relative Position Histograms
 \end_layout
 
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Probability Integral Transform (PIT) Histograms (if Observation Field Provided)
+Spread/Skill Variance
 \end_layout
 
 \begin_layout Standard
-\paragraph_spacing single
-\noindent
-Spread/Skill variance (if Observation Field Provided)
+Ensemble Matched Pair information
 \end_layout
 
 \begin_layout Standard
 
-\series bold
-The Ensemble-Stat tool then writes:
-\end_layout
-
-\begin_layout Standard
-Gridded fields of Ensemble forecast values to a NetCDF file
-\end_layout
-
-\begin_layout Standard
-Gridded field of Observation Ranks to a NetCDF file (if Gridded Observations
- Provided)
-\end_layout
-
-\begin_layout Standard
-STAT file and optional ASCII files with Ranked Histograms, Probability Integral
- Transform (PIT) Histogram, Spread/Skill Information, and Ensemble Matched
- Pair Information (if Point Observations Provided)
+\series medium
+The format of the STAT and ASCII output of the Ensemble-Stat tool are described
+ below.
 \end_layout
 
 \begin_layout Standard

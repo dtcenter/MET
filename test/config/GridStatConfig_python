@@ -189,6 +189,7 @@ nc_pairs_flag = {
    raw          = TRUE;
    diff         = TRUE;
    climo        = FALSE;
+   climo_cdp    = FALSE;
    weight       = FALSE;
    nbrhd        = FALSE;
    fourier      = FALSE;

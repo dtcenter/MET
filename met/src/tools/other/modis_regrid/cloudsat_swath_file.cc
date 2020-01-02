@@ -493,8 +493,6 @@ Bytes = n;
 
 Nvalues = 0;
 
-bytes_per_sample = 0;
-
 switch ( Numbertype )  {
 
    case nt_char_8:

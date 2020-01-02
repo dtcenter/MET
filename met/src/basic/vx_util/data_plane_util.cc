@@ -95,15 +95,16 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const double gaussian_radius, const double gaussian_dx) {
-   double v;
+                  double t, const double gaussian_radius,
+                  const double gaussian_dx) {
+   double v = 0.0;
    int x, y;
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
-   // Check that grid template is at least 1 point
-   if(width == 1 || mthd == InterpMthd_Nearest) return;
+   // For nearest neighbor, no work to do.
+   if(width == 1 && mthd == InterpMthd_Nearest) return;
 
    // build the grid template
    GridTemplateFactory gtf;
@@ -137,13 +138,13 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // Unweighted Mean
+            case(InterpMthd_Gaussian): // For Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
             // Distance-weighted mean, area-weighted mean, least-squares
-            // fit, bilinear, and gaussian interpolation are omitted
-            // here since they are not options for gridded data.
+            // fit, and bilinear are omitted here since they are not
+            // options for gridded data.
 
             default:
                mlog << Error << "\nsmooth_field() -> "
@@ -159,11 +160,15 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       } // end for y
    } // end for x
-   
+
+   // Apply the Gaussian smoother 
    if (mthd == InterpMthd_Gaussian) {
-     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx);
+     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx, t);
    }
+
+   // Cleanup
    delete gt;
+
    return;
 }
 
@@ -196,7 +201,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, const GridTemplateFactory::GridTemplates shape,
         SingleThresh t, double vld_t) {
    GridPoint *gp = NULL;
-   int x, y, n_vld, n_thr;
+   int x, y;
+   int n_vld = 0;
+   int n_thr = 0;
    double v;
 
    // Check that width is set to 1 or greater
@@ -292,7 +299,8 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
         int wdth, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
-   int count_vld, count_thr;
+   int count_vld = 0;
+   int count_thr = 0;
    NumArray box_na;
 
    mlog << Debug(3)

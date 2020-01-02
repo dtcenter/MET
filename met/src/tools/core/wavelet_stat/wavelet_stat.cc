@@ -227,8 +227,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // For python types read the first field to set the grid
-   if(ftype == FileType_Python_Numpy ||
-      ftype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(ftype)) {
       if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -236,8 +235,7 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(otype == FileType_Python_Numpy ||
-      otype == FileType_Python_Xarray) {
+   if(is_python_grdfiletype(otype)) {
       if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -461,7 +459,7 @@ void process_scores() {
                shc.set_obs_thresh(conf_info.ocat_ta[i][k]);
 
                write_isc_row(shc, isc_info[j][k],
-                  conf_info.output_flag[i_isc] == STATOutputType_Both,
+                  conf_info.output_flag[i_isc],
                   stat_at, i_stat_row, isc_at, i_isc_row);
             } // end for k
          } // end if
@@ -483,7 +481,7 @@ void process_scores() {
             aggregate_isc_info(isc_info, i, j, isc_aggr);
 
             write_isc_row(shc, isc_aggr,
-               conf_info.output_flag[i_isc] == STATOutputType_Both,
+               conf_info.output_flag[i_isc],
                stat_at, i_stat_row, isc_at, i_isc_row);
          }
       }
@@ -2262,7 +2260,6 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    label = wavelettype_to_string(conf_info.wvlt_type);
    label << "(" << conf_info.wvlt_member << ")";
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label.c_str());
-   v_tab -= plot_text_sep;
 
    ps_out->showpage();
    n_page++;
@@ -2461,7 +2458,6 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    }
    ps_out->write_centered_text(1, 1, h_tab_d, v_tab, 0.0, 0.5,
                                label.c_str());
-   v_tab -= plot_text_sep;
 
    //
    // If we just filled in the bottom panel or this is the last scale
@@ -2756,7 +2752,7 @@ void draw_tiles(PSfile *p, Box &dim,
          page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
 
          p->choose_font(28, 20.0);
-         sprintf(label, "%i", i+1);
+         snprintf(label, sizeof(label), "%i", i+1);
          p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
 
          // Draw outline in black

@@ -99,7 +99,6 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    int i, j;
     StringArray sa;
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;

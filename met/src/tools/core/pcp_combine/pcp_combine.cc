@@ -441,44 +441,9 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "parsing the command line arguments as a list of "
            << "files.\n";
 
-      //
-      // If one input file was specified, check for an ascii file list.
-      //
-      if(cline.n() == 2) {
-         Met2dDataFileFactory mtddf_factory;
-         Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-         config.read_string(parse_config_str(req_field_list[0].c_str()).c_str());
-         GrdFileType type = parse_conf_file_type(&config);
-
-         //
-         // Attempt to read the first file as a gridded data file.
-         // If the read was successful, store the file name.
-         // Otherwise, process as an ascii file list.
-         //
-         if((mtddf = mtddf_factory.new_met_2d_data_file(cline[0].c_str(),
-                                                        type))) {
-            file_list.add(cline[0]);
-         }
-         else {
-            mlog << Debug(1)
-                 << "Parsing input file names from ASCII file list: "
-                 << cline[0] << "\n";
-            file_list = parse_ascii_file_list(cline[0].c_str());
-         }
-
-         //
-         // Cleanup.
-         //
-         if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-      }
-      //
-      // Otherwise, store list of multiple input files.
-      //
-      else {
-         for(i=0; i<(cline.n()-1); i++) {
-            file_list.add(cline[i]);
-         }
-      }
+      StringArray sa;
+      for(i=0; i<(cline.n()-1); i++) sa.add(cline[i]);
+      file_list = parse_file_list(sa);
    }
    //
    // If the -field command line option was not used, process remaining
@@ -849,10 +814,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
    } // end while
 
-   if( dp != 0 ) {
-      met_closedir(dp);
-      dp = 0;
-   }
+   if(dp) met_closedir(dp);
 
    return(i_rec);
 }
@@ -965,9 +927,16 @@ void do_derive_command() {
    DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
-   int i, j, n, nxy, nc_accum, nc_accum_sum;
+   int nc_accum, nc_accum_sum;
+   int i, j, n, nxy;
    ConcatString derive_list_css;
    double v;
+
+   //
+   // Initialize
+   //
+   nc_init_time = nc_valid_time = (unixtime) 0;
+   nc_accum = nc_accum_sum = nxy = 0;
 
    //
    // List of all requested field derivations.

@@ -2,9 +2,18 @@ FROM centos:7
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
-# This Dockerfile compiles MET from source during "docker build" step
+# This Dockerfile checks out MET from GitHub and compiles the specified branch from source
 #
 ARG SOURCE_BRANCH
+
+# SOURCE_BRANCH is not defined when built via Docker Hub
+RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
+      echo "ERROR: SOURCE_BRANCH undefined! Rebuild with \"--build-arg SOURCE_BRANCH={branch name}\""; \
+      exit 1; \
+    else \
+      echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
+    fi
+
 ENV MET_GIT_NAME    ${SOURCE_BRANCH}
 ENV MET_GIT_URL     https://github.com/NCAR/MET
 ENV MET_DEVELOPMENT true
@@ -40,9 +49,9 @@ RUN yum -y update \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
- && yum -y install python2 python2-pip python2-devel \
- && pip install --upgrade pip \
- && pip install xarray numpy
+ && yum -y install python3 python3-devel python3-pip \
+ && pip3 install --upgrade pip \
+ && python3 -m pip install numpy xarray
 
 #
 # Set working directory
@@ -149,10 +158,11 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
     MET_HDFEOS=/met/external_libs/hdfeos \
     MET_FREETYPEINC=/usr/include/freetype2 MET_FREETYPELIB=/usr/lib \
     MET_CAIROINC=/usr/include/cairo MET_CAIROLIB=/usr/lib \
-    MET_PYTHON_CC='-I/usr/include/python2.7' MET_PYTHON_LD='-lpython2.7' > ${LOG_FILE} \
+    MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_install.log \
  && echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_test.log \
  && echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make test > ${LOG_FILE} 2>&1
+ 
