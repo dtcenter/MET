@@ -192,7 +192,9 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_series(void) {
+
     DataPlane data_dp;
+    DataPlane joint_dp;
 
     // List the lengths of the series options
     mlog << Debug(1)
@@ -209,6 +211,7 @@ void process_series(void) {
 
     // Process series variables
     for(int i_series = 0; i_series < n_series; i_series++) {
+
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
             VarInfo* data_info = conf_info.data_info[i_var];
@@ -224,6 +227,27 @@ void process_series(void) {
                 bin_deltas[data_info->magic_str()],
                 histograms[data_info->magic_str()],
                 data_dp);
+
+            for(int j_var = i_var + 1;
+                j_var < conf_info.get_n_data(); j_var++) {
+
+                VarInfo* joint_info = conf_info.data_info[j_var];
+
+                get_series_entry(i_series, joint_info,
+                    data_files, dtype, found_data_files, joint_dp, grid);
+
+                ConcatString joint_str = data_info->magic_str();
+                joint_str.add("_");
+                joint_str.add(joint_info->magic_str());
+
+                // Update joint partial sums
+                update_joint_pdf(bin_mins[data_info->magic_str()][0],
+                    bin_mins[joint_info->magic_str()][0],
+                    bin_deltas[data_info->magic_str()],
+                    bin_deltas[joint_info->magic_str()],
+                    joint_histograms[joint_str],
+                    data_dp, joint_dp);
+            }
         }
     }
 

@@ -76,6 +76,19 @@ void update_pdf(
 
 ////////////////////////////////////////////////////////////////////////
 
+void update_joint_pdf(
+    double min_A,
+    double min_B,
+    double delta_A,
+    double delta_B,
+    vector<int>& pdf,
+    const DataPlane& dp_A,
+    const DataPlane& dp_B) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void update_pdf(
     double min,
     double delta,
