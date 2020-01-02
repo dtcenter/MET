@@ -77,6 +77,8 @@ void update_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void update_joint_pdf(
+    int n_A,
+    int n_B,
     double min_A,
     double min_B,
     double delta_A,
@@ -85,6 +87,20 @@ void update_joint_pdf(
     const DataPlane& dp_A,
     const DataPlane& dp_B) {
 
+    for(int i = 0; i < dp_A.nx(); i++) {
+        for(int j = 0; j < dp_A.ny(); j++) {
+            double value_A = dp_A.get(i, j);
+            int k_A = floor((value_A - min_A) / delta_A);
+            if(k_A < 0) k_A = 0;
+            if(k_A >= n_A) k_A = n_A - 1;
+            double value_B = dp_B.get(i, j);
+            int k_B = floor((value_B - min_B) / delta_B);
+            if(k_B < 0) k_B = 0;
+            if(k_B >= n_B) k_B = n_B - 1;
+            int k = k_A * n_B + k_B;
+            pdf[k]++;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

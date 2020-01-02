@@ -241,7 +241,10 @@ void process_series(void) {
                 joint_str.add(joint_info->magic_str());
 
                 // Update joint partial sums
-                update_joint_pdf(bin_mins[data_info->magic_str()][0],
+                update_joint_pdf(
+                    data_info->n_bins(),
+                    joint_info->n_bins(),
+                    bin_mins[data_info->magic_str()][0],
                     bin_mins[joint_info->magic_str()][0],
                     bin_deltas[data_info->magic_str()],
                     bin_deltas[joint_info->magic_str()],

@@ -58,6 +58,8 @@ void update_pdf(
 ////////////////////////////////////////////////////////////////////////
 
 void update_joint_pdf(
+    int n_A,
+    int n_B,
     double min_A,
     double min_B,
     double delta_A,
