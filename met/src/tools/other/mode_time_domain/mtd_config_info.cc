@@ -29,6 +29,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int default_inten_perc_value = 99;
+
 static const int default_min_volume = 2000;
 
 
@@ -104,15 +106,6 @@ void MtdConfigInfo::clear()
    fcst_vld_thresh = bad_data_double;
    obs_vld_thresh = bad_data_double;
 
-   fcst_area_thresh.clear();
-   obs_area_thresh.clear();
-
-   fcst_inten_perc_value = bad_data_int;
-   obs_inten_perc_value = bad_data_int;
-
-   fcst_inten_perc_thresh.clear();
-   obs_inten_perc_thresh.clear();
-
    fcst_merge_thresh.clear();
    obs_merge_thresh.clear();
 
@@ -138,8 +131,6 @@ void MtdConfigInfo::clear()
    start_time_delta_wt    = bad_data_double;
    end_time_delta_wt      = bad_data_double;
 
-   // inten_perc_value = bad_data_int;
-
    space_centroid_dist_if = (PiecewiseLinear *) 0;
    time_centroid_delta_if = (PiecewiseLinear *) 0;
    speed_delta_if         = (PiecewiseLinear *) 0;
@@ -158,6 +149,8 @@ void MtdConfigInfo::clear()
    nc_info.set_all_true();
 
    ct_stats_flag   = false;
+
+   inten_perc_value = default_inten_perc_value;
 
    min_volume = default_min_volume;
 
@@ -360,21 +353,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    // fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
    // obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
 
-      // Conf: fcst.area_thresh and obs.area_thresh
-
-   // fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
-   // obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
-
-      // Conf: fcst.inten_perc and obs.inten_perc
-
-   // fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
-   // obs_inten_perc_value  = obs_dict->lookup_int(conf_key_inten_perc_value);
-
-      // Conf: fcst.inten_perc_thresh and obs.inten_perc_thresh
-
-   // fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
-   // obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
-
       // Conf: fcst.merge_thresh and obs.merge_thresh
 
    // fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
@@ -447,15 +425,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    start_time_delta_wt    = dict->lookup_double(conf_key_start_time_delta);
    end_time_delta_wt      = dict->lookup_double(conf_key_end_time_delta);
 
-      // Check that intensity_percentile >= 0 and <= 100
-/*
-   if(inten_perc_value < 0 || inten_perc_value > 100) {
-      mlog << Error << "\nMtdConfigInfo::process_config() -> "
-           << "inten_perc_value (" << inten_perc_value
-           << ") must be set between 0 and 100.\n\n";
-      exit(1);
-   }
-*/
       // Check that the fuzzy engine weights are non-negative
 
    status =    (space_centroid_dist_wt >= 0.0)
@@ -552,6 +521,19 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: output_prefix
 
    output_prefix = conf.lookup_string(conf_key_output_prefix);
+
+      // Conf: inten_perc_value
+
+   inten_perc_value = conf.lookup_int(conf_key_inten_perc_value);
+   
+      // Check that intensity_percentile >= 0 and <= 100
+
+   if(inten_perc_value < 0 || inten_perc_value > 100) {
+      mlog << Error << "\nMtdConfigInfo::process_config() -> "
+           << "inten_perc_value (" << inten_perc_value
+           << ") must be set between 0 and 100.\n\n";
+      exit(1);
+   }
 
       // Conf: min_volume
 
