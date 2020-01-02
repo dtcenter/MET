@@ -72,11 +72,11 @@ int main(int argc, char *argv[]) {
     // Process the command line arguments
     process_command_line(argc, argv);
 
-    // Setup netcdf output
-    setup_nc_file();
-
     // Setup variable histograms
     setup_var_hists();
+
+    // Setup netcdf output
+    setup_nc_file();
 
     // Process series
     process_series();
@@ -209,7 +209,10 @@ void setup_nc_file(void) {
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         mlog << Debug(2) << i_var << "\n";
         VarInfo* data_info = conf_info.data_info[i_var];
+
         ConcatString dim_name = data_info->name();
+        dim_name.add("_");
+        dim_name.add(data_info->level_name());
         NcDim data_var_dim
             = add_dim(nc_out, dim_name, (long) data_info->n_bins());
         data_var_dims.push_back(data_var_dim);
