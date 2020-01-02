@@ -1200,6 +1200,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/point2grid/Makefile
                  src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
+                 src/tools/other/grid_diag/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile

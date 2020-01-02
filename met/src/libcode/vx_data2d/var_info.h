@@ -53,6 +53,9 @@ class VarInfo
       ThreshArray   CensorThresh; // Censoring thesholds
       NumArray      CensorVal;    // and replacement values
 
+      int           nBins;    // Number of pdf bins 
+      NumArray      Range;    // Range of pdf bins
+
       RegridInfo    Regrid;    // Regridding logic
 
       void init_from_scratch();
@@ -104,6 +107,9 @@ class VarInfo
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
 
+      int n_bins()     const;
+      NumArray range() const;
+
       RegridInfo   regrid()         const;
 
          //
@@ -139,6 +145,9 @@ class VarInfo
 
       void set_censor_thresh(const ThreshArray &);
       void set_censor_val(const NumArray &);
+
+      void set_n_bins(const int &);
+      void set_range(const NumArray &);
 
       void set_regrid(const RegridInfo &);
 
@@ -188,6 +197,9 @@ inline int          VarInfo::lead()           const { return(Lead);             
 
 inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
 inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
+
+inline int          VarInfo::n_bins()         const { return(nBins);            }
+inline NumArray     VarInfo::range()          const { return(Range);            }
 
 inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
 
