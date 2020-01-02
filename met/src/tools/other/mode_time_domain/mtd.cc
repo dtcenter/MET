@@ -27,12 +27,6 @@ static const char default_config_path          [] = "MET_BASE/config/MTDConfig_d
 
 static const char txt_2d_suffix                [] = "2d.txt";
 
-// static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
-// static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
-//
-// static const char txt_3d_single_cluster_suffix [] = "3d_sc.txt";
-// static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
-
 static const char txt_3d_single_simple_suffix  [] = "3d_single_simple.txt";
 static const char txt_3d_pair_simple_suffix    [] = "3d_pair_simple.txt";
 
@@ -350,7 +344,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
    mask = fcst_obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str());
+   att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str(), config.inten_perc_value);
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -371,7 +365,7 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
    mask = obs_obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str());
+   att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str(), config.inten_perc_value);
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -450,7 +444,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       fcst_raw.get_data_plane(t, raw_2d);
 
-      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
       att_2.set_fcst();
 
@@ -484,7 +478,7 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       obs_raw.get_data_plane(t, raw_2d);
 
-      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
       att_2.set_obs();
 
@@ -580,7 +574,7 @@ if ( have_pairs )  {
 
       mask = fcst_obj.select_cluster(a);   //  1-based
 
-      att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str());
+      att_3 = calc_3d_single_atts(mask, fcst_raw, config.model.c_str(), config.inten_perc_value);
 
       att_3.set_object_number(j + 1);   //  1-based
 
@@ -605,7 +599,7 @@ if ( have_pairs )  {
 
       mask = obs_obj.select_cluster(a);   //  1-based
 
-      att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str());
+      att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str(), config.inten_perc_value);
 
       // if ( att.Xvelocity > 20.0 )  mask.write("w.nc");
 
@@ -699,7 +693,7 @@ if ( have_pairs )  {
 
          fcst_raw.get_data_plane(t, raw_2d);
 
-         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
+         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
          att_2.set_fcst();
 
@@ -740,7 +734,7 @@ if ( have_pairs )  {
 
          obs_raw.get_data_plane(t, raw_2d);
 
-         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
+         att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
          att_2.set_obs();
 
@@ -1171,7 +1165,7 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
    select_mask = obj.select(j + 1);   //  1-based
 
-   att_3 = calc_3d_single_atts(select_mask, raw, config.model.c_str());
+   att_3 = calc_3d_single_atts(select_mask, raw, config.model.c_str(), config.inten_perc_value);
 
    att_3.set_object_number(j + 1);   //  1-based
 
@@ -1206,7 +1200,7 @@ for (j=0; j<(obj.n_objects()); ++j)  {
 
       raw.get_data_plane(t, raw_2d);
 
-      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1);
+      att_2 = calc_2d_single_atts(mask_2d, raw_2d, j + 1, config.inten_perc_value);
 
       att_2.set_fcst();
 
