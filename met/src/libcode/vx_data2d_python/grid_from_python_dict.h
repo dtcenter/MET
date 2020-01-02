@@ -17,6 +17,7 @@
 
 
 #include "vx_grid.h"
+#include "vx_python_utils.h"
 
 
 extern "C" {
@@ -29,7 +30,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void grid_from_python_dict(PyObject * dict, Grid & grid_out);
+extern void grid_from_python_dict(const Python3_Dict & dict, Grid & grid_out);
 
 
 ////////////////////////////////////////////////////////////////////////
