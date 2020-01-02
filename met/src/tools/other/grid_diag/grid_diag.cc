@@ -283,7 +283,7 @@ void setup_joint_histograms(void) {
             joint_histograms[joint_str] = vector<int>();
 
             init_joint_pdf(n_bins, n_joint_bins,
-                histograms[data_info->magic_str()]);
+                joint_histograms[joint_str]);
         }
     }
 }
@@ -411,6 +411,38 @@ void write_histograms(void) {
 
 void write_joint_histograms(void) {
 
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    int i_hist = 0;
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+
+        VarInfo* data_info = conf_info.data_info[i_var];
+
+        for(int j_var = i_var + 1;
+            j_var < conf_info.get_n_data(); j_var++) {
+
+            VarInfo* joint_info = conf_info.data_info[j_var];
+
+            ConcatString joint_str = data_info->magic_str();
+            joint_str.add("_");
+            joint_str.add(joint_info->magic_str());
+
+            int* hist = joint_histograms[joint_str].data(); 
+
+            offsets.clear();
+            counts.clear();
+            offsets.push_back(0);
+            offsets.push_back(0);
+            counts.push_back(data_info->n_bins());
+            counts.push_back(joint_info->n_bins());
+
+            NcVar hist_var = joint_hist_vars[i_hist];
+            hist_var.putVar(offsets, counts, hist);
+
+            i_hist++;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
