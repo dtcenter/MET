@@ -36,6 +36,7 @@ using namespace std;
 
 #include "grid_diag.h"
 #include "series_data.h"
+#include "series_pdf.h"
 
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
@@ -214,8 +215,9 @@ void setup_histograms(void) {
 
         // Initialize histograms
         mlog << Debug(2) << "Initializing "
-             << data_info->magic_str() << " histogram\n"; 
+             << data_info->magic_str() << " histogram\n";
         histograms[data_info->magic_str()] = vector<int>();
+        init_pdf(n_bins, histograms[data_info->magic_str()]);
     }
 }
 
@@ -226,18 +228,23 @@ void setup_joint_histograms(void) {
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
         VarInfo* data_info = conf_info.data_info[i_var];
+        int n_bins = data_info->n_bins();
 
         for(int j_var = i_var + 1;
             j_var < conf_info.get_n_data(); j_var++) {
 
             VarInfo* joint_info = conf_info.data_info[j_var];
+            int n_joint_bins = joint_info->n_bins();
 
             ConcatString joint_str = data_info->magic_str();
             joint_str.add("_");
             joint_str.add(joint_info->magic_str());
             mlog << Debug(2) << "Initializing "
-                 << joint_str << " joint histogram\n"; 
+                 << joint_str << " joint histogram\n";
             joint_histograms[joint_str] = vector<int>();
+
+            init_joint_pdf(n_bins, n_joint_bins,
+                histograms[data_info->magic_str()]);
         }
     }
 }
