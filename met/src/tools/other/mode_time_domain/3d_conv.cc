@@ -7,19 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int t_offset_low   = -1;
-static const int t_offset_high  =  1;
-
-// static const int t_offset_low   = -3;
-// static const int t_offset_high  =  2;
-
-static const int time_radius    = t_offset_high - t_offset_low + 1;
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -65,6 +52,8 @@ struct DataHandle {
 
    int nx, ny;
 
+   int time_radius;
+
    int t;
 
 
@@ -103,11 +92,13 @@ struct DataHandle {
    int  * plane_time;
 
 
-   void set_size(int _nx, int _ny);
+   void set_size(int _nx, int _ny, int _time_radius);
 
    DataHandle() {
 
       nx = ny = 0;
+
+      time_radius = 0;
 
       t = -1;
 
@@ -170,6 +161,9 @@ struct DataHandle {
 
       _out << "   DataHandle:\n";
 
+      _out << "   nx = " << nx << '\n';
+      _out << "   ny = " << ny << '\n';
+      _out << "   time_radius = " << time_radius << '\n';
       _out << "   t = " << t << '\n';
       _out << "   n_planes = " << (n_planes()) << '\n';
 
@@ -212,7 +206,7 @@ static void calc_sum_plane(const int nx, const int ny,
                            const double * data_plane_in, const bool * ok_plane_in, 
                                  double * sum_plane_out,       bool * ok_sum_plane_out);
 
-static void load_handle(DataHandle &, const MtdFloatFile & in, const int t);
+static void load_handle(DataHandle &, const MtdFloatFile & in, const int t, const int time_beg, const int time_end);
 
 
 static void set_false_plane(bool *, const int n);
@@ -224,7 +218,7 @@ static void   ok_handle_ppm(const bool * ok_plane, const int nx, const int ny, c
 ////////////////////////////////////////////////////////////////////////
 
 
-MtdFloatFile MtdFloatFile::convolve(const int spatial_R) const
+MtdFloatFile MtdFloatFile::convolve(const int spatial_R, const int time_beg, const int time_end) const
 
 {
 
@@ -237,13 +231,15 @@ double min_conv_value, max_conv_value;
 double * conv_data = (double *) 0;
 DataHandle handle;
 unixtime time_start, time_stop;
+
+const int time_radius = time_end - time_beg + 1;
+
 double * p = 0;
 double * ss [time_radius];
 bool   * ok [time_radius];
 
 const int trp1 = 2*spatial_R + 1;
 const double scale = 1.0/(trp1*trp1);
-
 
 
 file_id = 1;   //  This is declared static in the netCDF library header file ncGroup.h, 
@@ -263,13 +259,13 @@ const int Nxy = Nx*Ny;
    sum_plane_buf = new double [Nxy];
 ok_sum_plane_buf = new bool   [Nxy];
 
-handle.set_size(Nx, Ny);
+handle.set_size(Nx, Ny, time_radius);
 
 conv_data = new double [Nx*Ny*Nt];
 
 if ( !conv_data )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::convolve(const int) const: process() -> memory allocation error\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::convolve(const int, const int, const int) const: process() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -292,7 +288,7 @@ for (t=0; t<Nt; ++t)  {
 
    p = conv_data + n;
 
-   load_handle(handle, *this, t);
+   load_handle(handle, *this, t, time_beg, time_end);
 
    // handle.dump(cout);
 
@@ -390,6 +386,8 @@ out.set_filetype(mtd_file_conv);
 
 out.set_spatial_radius(spatial_R);
 
+out.set_time_window(time_beg, time_end);
+
 for (j=0; j<Nt; ++j)  {
 
    out.set_lead_time(j, lead_time(j));
@@ -441,7 +439,7 @@ return ( out );
 ////////////////////////////////////////////////////////////////////////
 
 
-void DataHandle::set_size(int _nx, int _ny)
+void DataHandle::set_size(int _nx, int _ny, int _time_radius)
 
 {
 
@@ -457,6 +455,8 @@ clear();
 
 nx = _nx;
 ny = _ny;
+
+time_radius = _time_radius;
 
 t = -1;
 
@@ -816,7 +816,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void load_handle(DataHandle & handle, const MtdFloatFile & in, const int t)
+void load_handle(DataHandle & handle, const MtdFloatFile & in, const int t, const int time_beg, const int time_end)
 
 {
 
@@ -826,6 +826,7 @@ const int t_last  = (in.nt() - 1);
 const int data_bytes = (in.nxy())*sizeof(double);
 const int   tf_bytes = (in.nxy())*sizeof(bool);
 const int nxy = in.nxy();
+const int time_radius = time_end - time_beg + 1;
 bool new_loaded[time_radius];
 
 
@@ -838,7 +839,7 @@ for (index=0; index<time_radius; ++index)  handle.plane_time[index] = -1;
 
 for (index=0; index<time_radius; ++index)  {
 
-   t_real = index + t + t_offset_low;
+   t_real = index + t + time_beg;
 
    if ( t_real < t_first )  continue;
    if ( t_real > t_last  )  break;

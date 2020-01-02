@@ -293,8 +293,8 @@ engine.calc.check();
    //  convolve
    //
 
- obs_conv =  obs_raw.convolve(config.obs_conv_radius);
-fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
+ obs_conv =  obs_raw.convolve(config.obs_conv_radius, config.obs_conv_time_beg, config.obs_conv_time_end);
+fcst_conv = fcst_raw.convolve(config.fcst_conv_radius, config.fcst_conv_time_beg, config.fcst_conv_time_end);
 
    //
    //  threshold
@@ -1135,7 +1135,7 @@ prefix = make_output_prefix(config, raw.start_valid_time());
    //  convolve
    //
 
-conv =  raw.convolve(config.fcst_conv_radius);
+conv =  raw.convolve(config.fcst_conv_radius, config.fcst_conv_time_beg, config.fcst_conv_time_end);
 
    //
    //  threshold
