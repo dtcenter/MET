@@ -227,18 +227,42 @@ void setup_nc_file(void) {
         exit(1);
     }
 
-    // Define histogram dimensions
-    mlog << Debug(2) << conf_info.get_n_data() << "\n";
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-        mlog << Debug(2) << i_var << "\n";
         VarInfo* data_info = conf_info.data_info[i_var];
 
-        ConcatString dim_name = data_info->name();
-        dim_name.add("_");
-        dim_name.add(data_info->level_name());
-        NcDim data_var_dim
-            = add_dim(nc_out, dim_name, (long) data_info->n_bins());
-        data_var_dims.push_back(data_var_dim);
+        // Set variable NetCDF name
+        ConcatString var_name = data_info->name();
+        var_name.add("_");
+        var_name.add(data_info->level_name());
+
+        // Define histogram dimensions
+        NcDim var_dim
+            = nc_out->addDim(var_name, (long) data_info->n_bins());
+        data_var_dims.push_back(var_dim);
+
+        // Define histogram bins
+        ConcatString var_min_name = var_name;
+        ConcatString var_max_name = var_name;
+        ConcatString var_mid_name = var_name;
+        var_min_name.add("_min");
+        var_max_name.add("_max");
+        var_mid_name.add("_mid");
+        NcVar var_min = nc_out->addVar(
+            var_min_name, ncFloat, var_dim);
+        NcVar var_max = nc_out->addVar(
+            var_max_name, ncFloat, var_dim);
+        NcVar var_mid = nc_out->addVar(
+            var_mid_name, ncFloat, var_dim);
+
+        // Add units
+        var_min.putAtt("units", data_info->units());
+        var_max.putAtt("units", data_info->units());
+        var_mid.putAtt("units", data_info->units());
+
+        // Write bin values
+        var_min.putVar(bin_mins[data_info->magic_str()].data());
+        var_max.putVar(bin_maxs[data_info->magic_str()].data());
+        var_mid.putVar(bin_mids[data_info->magic_str()].data());
     }
 }
 
