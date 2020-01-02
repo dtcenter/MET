@@ -72,8 +72,17 @@ int main(int argc, char *argv[]) {
     // Process the command line arguments
     process_command_line(argc, argv);
 
+    // Setup netcdf output
+    setup_nc_file();
+
+    // Setup variable histograms
+    setup_var_hists();
+
+    // Process series
+    process_series();
+
     // Close files and deallocate memory
-    // clean_up();
+    clean_up();
 
     return(0);
 }
@@ -165,15 +174,6 @@ void process_command_line(int argc, char **argv) {
 
     // Process masking regions
     conf_info.process_masks(grid);
-
-    // Setup netcdf output
-    setup_nc_file();
-
-    // Setup variable histograms
-    setup_var_hists();
-
-    // Process series
-    process_series();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -202,6 +202,17 @@ void setup_nc_file(void) {
              << "trouble opening output NetCDF file "
              << out_file << "\n\n";
         exit(1);
+    }
+
+    // Define histogram dimensions
+    mlog << Debug(2) << conf_info.get_n_data() << "\n";
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        mlog << Debug(2) << i_var << "\n";
+        VarInfo* data_info = conf_info.data_info[i_var];
+        ConcatString dim_name = data_info->name();
+        NcDim data_var_dim
+            = add_dim(nc_out, dim_name, (long) data_info->n_bins());
+        data_var_dims.push_back(data_var_dim);
     }
 }
 
