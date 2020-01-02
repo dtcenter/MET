@@ -92,6 +92,12 @@ class MtdConfigInfo {
       int              fcst_conv_radius;       // Convolution radius in grid squares
       int              obs_conv_radius;
 
+      int              fcst_conv_time_beg;     // Convolution time window begin offset
+      int              obs_conv_time_beg;
+
+      int              fcst_conv_time_end;     // Convolution time window end offset
+      int              obs_conv_time_end;
+
       SingleThresh     fcst_conv_thresh;       // Convolution threshold to define objects
       SingleThresh     obs_conv_thresh;
 

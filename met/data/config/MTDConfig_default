@@ -62,6 +62,7 @@ fcst = {
    censor_thresh     = [];
    censor_val        = [];
    conv_radius       = 60.0/grid_res; // in grid squares
+   conv_time_window  = { beg = -1; end = 1; };
    conv_thresh       = >=5.0;
 
 }

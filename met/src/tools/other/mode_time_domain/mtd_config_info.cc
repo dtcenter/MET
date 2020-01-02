@@ -92,8 +92,14 @@ void MtdConfigInfo::clear()
    fcst_conv_radius = bad_data_int;
    obs_conv_radius = bad_data_int;
 
+   fcst_conv_time_beg = bad_data_int;
+   obs_conv_time_beg = bad_data_int;
+
    fcst_conv_thresh.clear();
    obs_conv_thresh.clear();
+
+   fcst_conv_time_end = bad_data_int;
+   obs_conv_time_end = bad_data_int;
 
    fcst_vld_thresh = bad_data_double;
    obs_vld_thresh = bad_data_double;
@@ -333,6 +339,16 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << ") must be non-negative\n\n";
       exit(1);
    }
+
+      // Conf: fcst.conv_time_window
+
+   dict = fcst_dict->lookup_dictionary(conf_key_conv_time_window);
+   parse_conf_range_int(dict, fcst_conv_time_beg, fcst_conv_time_end);
+
+      // Conf: obs.conv_time_window
+
+   dict = obs_dict->lookup_dictionary(conf_key_conv_time_window);
+   parse_conf_range_int(dict, obs_conv_time_beg, obs_conv_time_end);
 
       // Conf: fcst.conv_thresh and obs.conv_thresh
 
