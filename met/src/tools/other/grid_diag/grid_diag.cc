@@ -168,7 +168,7 @@ void process_command_line(int argc, char **argv) {
         conf_info.conf.lookup_dictionary(conf_key_data));
 
     // Parse the data file lists
-    data_files = parse_file_list(data_files, dtype);
+    data_files = parse_file_list(data_files);
 
     // Get mtddf
     data_mtddf = get_mtddf(data_files, dtype);
