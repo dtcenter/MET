@@ -295,6 +295,55 @@ void setup_nc_file(void) {
         var_max.putVar(bin_maxs[data_info->magic_str()].data());
         var_mid.putVar(bin_mids[data_info->magic_str()].data());
     }
+
+    // Define histograms
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+
+        VarInfo* data_info = conf_info.data_info[i_var];
+
+        // Set variable NetCDF name
+        ConcatString var_name = data_info->name();
+        var_name.add("_");
+        var_name.add(data_info->level_name());
+
+        ConcatString hist_name("hist_");
+        hist_name.add(var_name);
+        NcDim var_dim = data_var_dims[i_var];
+        NcVar hist_var = nc_out->addVar(hist_name, ncInt, var_dim);
+        hist_vars.push_back(hist_var);
+    }
+
+    // Define joint histograms
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+
+        VarInfo* data_info = conf_info.data_info[i_var];
+
+        for(int j_var = i_var + 1;
+            j_var < conf_info.get_n_data(); j_var++) {
+
+            VarInfo* joint_info = conf_info.data_info[j_var];
+
+            ConcatString hist_name("hist_");
+            hist_name.add(data_info->name());
+            hist_name.add("_");
+            hist_name.add(data_info->level_name());
+            hist_name.add("_");
+            hist_name.add(joint_info->name());
+            hist_name.add("_");
+            hist_name.add(joint_info->level_name());
+
+            NcDim var_dim = data_var_dims[i_var];
+            NcDim joint_dim = data_var_dims[j_var];
+            vector<NcDim> dims;
+            dims.clear();
+            dims.push_back(var_dim);
+            dims.push_back(joint_dim);
+
+            NcVar hist_var
+                = nc_out->addVar(hist_name, ncInt, dims);
+            joint_hist_vars.push_back(hist_var);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

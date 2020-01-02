@@ -89,6 +89,8 @@ static GridDiagConfInfo conf_info;
 // Output NetCDF file
 static NcFile *nc_out = (NcFile *) 0;
 vector<NcDim> data_var_dims;
+vector<NcVar> hist_vars;
+vector<NcVar> joint_hist_vars;
 
 ////////////////////////////////////////////////////////////////////////
 //
