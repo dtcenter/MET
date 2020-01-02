@@ -115,7 +115,8 @@ static SeriesType series_type = SeriesType_None;
 static int n_series = 0;
 
 // Variable histogram map
-map<ConcatString, vector<int> > var_hists;
+map<ConcatString, vector<int> > histograms;
+map<ConcatString, vector<int> > joint_histograms;
 map<ConcatString, vector<double> > bin_mins;
 map<ConcatString, vector<double> > bin_maxs;
 map<ConcatString, vector<double> > bin_mids;

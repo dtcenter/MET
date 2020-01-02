@@ -50,7 +50,8 @@ static void process_series(void);
 static Met2dDataFile *get_mtddf(
     const StringArray &, const GrdFileType);
 
-static void setup_var_hists(void);
+static void setup_histograms(void);
+static void setup_joint_histograms(void);
 static void setup_nc_file(void);
 static void clean_up();
 
@@ -73,7 +74,10 @@ int main(int argc, char *argv[]) {
     process_command_line(argc, argv);
 
     // Setup variable histograms
-    setup_var_hists();
+    setup_histograms();
+
+    // Setup joint variable histograms
+    setup_joint_histograms();
 
     // Setup netcdf output
     setup_nc_file();
@@ -178,20 +182,19 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_var_hists(void) {
+void setup_histograms(void) {
 
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         VarInfo* data_info = conf_info.data_info[i_var];
-        mlog << Debug(2) << "Initializing "
-             << data_info->magic_str() << " histogram\n"; 
-        var_hists[data_info->magic_str()] = vector<int>();
 
+        // Find bin ranges
         NumArray range = data_info->range();
         int n_bins = data_info->n_bins();
         double min = range[0];
         double max = range[1];
         double delta = (max - min) / n_bins;
 
+        // Compute bin values
         vector<double> bin_min;
         vector<double> bin_max;
         vector<double> bin_mid;
@@ -208,6 +211,34 @@ void setup_var_hists(void) {
         bin_maxs[data_info->magic_str()] = bin_max;
         bin_mids[data_info->magic_str()] = bin_mid;
         bin_deltas[data_info->magic_str()] = delta;
+
+        // Initialize histograms
+        mlog << Debug(2) << "Initializing "
+             << data_info->magic_str() << " histogram\n"; 
+        histograms[data_info->magic_str()] = vector<int>();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_joint_histograms(void) {
+
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+
+        VarInfo* data_info = conf_info.data_info[i_var];
+
+        for(int j_var = i_var + 1;
+            j_var < conf_info.get_n_data(); j_var++) {
+
+            VarInfo* joint_info = conf_info.data_info[j_var];
+
+            ConcatString joint_str = data_info->magic_str();
+            joint_str.add("_");
+            joint_str.add(joint_info->magic_str());
+            mlog << Debug(2) << "Initializing "
+                 << joint_str << " joint histogram\n"; 
+            joint_histograms[joint_str] = vector<int>();
+        }
     }
 }
 
