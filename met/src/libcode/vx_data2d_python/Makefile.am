@@ -19,5 +19,5 @@ libvx_data2d_python_a_SOURCES = \
               data2d_python.h data2d_python.cc \
               var_info_python.h var_info_python.cc \
               global_python.h
-libvx_data2d_python_a_CPPFLAGS = ${MET_CPPFLAGS} -I../vx_python_utils ${MET_PYTHON_CC} $(MET_PYTHON_LD)
+libvx_data2d_python_a_CPPFLAGS = ${MET_CPPFLAGS} -I../vx_python2_utils ${MET_PYTHON_CC} $(MET_PYTHON_LD)
 

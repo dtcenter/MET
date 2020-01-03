@@ -22,4 +22,4 @@ libvx_python3_utils_a_SOURCES = \
               python3_script.h python3_script.cc \
               python3_numpy.h python3_numpy.cc \
               python3_util.h python3_util.cc
-libvx_python_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)
+libvx_python3_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)
