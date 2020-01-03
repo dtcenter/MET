@@ -268,7 +268,7 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 34 executables:
+  command line) will contain 35 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
@@ -290,6 +290,7 @@ sub-directory, or the MET Online Tutorial:
    - plot_data_plane
    - plot_mode_field
    - plot_point_obs
+   - point2grid
    - point_stat
    - regrid_data_plane
    - series_analysis
