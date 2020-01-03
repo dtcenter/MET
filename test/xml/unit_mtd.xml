@@ -70,6 +70,10 @@
     <exec>&MET_BIN;/mtd</exec>
     <env>
        <pair><name>OUTPUT_PREFIX</name> <value>SINGLE</value></pair>
+       <pair><name>FCST_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>FCST_CONV_TIME_END</name> <value>1</value></pair>
+       <pair><name>OBS_CONV_TIME_BEG</name> <value>-1</value></pair>
+       <pair><name>OBS_CONV_TIME_END</name> <value>1</value></pair>
     </env>
     <param> \
       -single  &DATA_DIR;/fcst_files/*.grb \
