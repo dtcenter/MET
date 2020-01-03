@@ -6345,8 +6345,8 @@ INTENSITY_NN
 \begin_inset Text
 
 \begin_layout Plain Layout
-The percentile of intensity chosen for use in the percentile intensity ratio
- (column 50; variable units)
+The percentile of intensity chosen for use in the PERCENTILE_INTENSITY_RATIO
+ column (variable units)
 \end_layout
 
 \end_inset
@@ -6898,9 +6898,9 @@ _RATIO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ratio of the nth percentile (column 37) of intensity of the two objects
- defined as the lesser of the forecast intensity divided by the observation
- intensity or its reciprocal (unitless)
+Ratio of the nth percentile (INTENSITY_NN column) of intensity of the two
+ objects defined as the lesser of the forecast intensity divided by the
+ observation intensity or its reciprocal (unitless)
 \end_layout
 
 \end_inset
