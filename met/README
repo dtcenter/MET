@@ -333,7 +333,7 @@ Version 9.0 BETA2 Release Notes:
 
 - What's New:
    - Major Enhancements: python version 3, python embedding overhaul
-   - New Tools: grid_diag, tc_gen
+   - New Tools: grid_diag, tc_gen, point2grid
 
 - Bugfixes:
    - Fix MET-TC bug in the computation of initialization hour and valid hour
@@ -371,9 +371,11 @@ Version 9.0 BETA2 Release Notes:
       - Make the amount of temporal smoothing a configurable option (#1084).
       - Add a user-specified object intensity percentile to the output (#1134).
    - Grid-Diag
-      - Initial release of new grid diagnostics tool (#1106).
+      - Initial release of the new grid diagnostics tool (#1106).
    - TC-Gen
-      - Initial release of new TC genesis tool (#1127).
+      - Initial release of the new TC genesis tool (#1127).
+   - Point2Grid 
+      - Initial release of the new point to grid tool (#1078).
 
 Version 9.0 BETA1 Release Notes:
 -------------------------------
