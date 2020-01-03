@@ -8,6 +8,13 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+OPT_PYTHON_LIBS = 
+
+if ENABLE_PYTHON
+OPT_PYTHON_LIBS += -lvx_python3_utils
+endif
+
+
 # The program
 
 bin_PROGRAMS    = madis2nc
@@ -39,7 +46,7 @@ madis2nc_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPT_PYTHON_LIBS)
 
 EXTRA_DIST = madis2nc.h \
 	madis2nc_conf_info.h

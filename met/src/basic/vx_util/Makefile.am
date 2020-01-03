@@ -8,6 +8,10 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+if ENABLE_PYTHON
+LDFLAGS += -lvx_python3_utils
+endif
+
 # The library
 
 noinst_LIBRARIES = libvx_util.a

@@ -8,6 +8,12 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+OPT_PYTHON_LIBS =
+
+if ENABLE_PYTHON
+OPT_PYTHON_LIBS += -lvx_python3_utils
+endif
+
 # The program
 
 bin_PROGRAMS  = pb2nc
@@ -48,7 +54,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
-	$(FLIBS)
+	$(FLIBS) $(OPT_PYTHON_LIBS)
 
 EXTRA_DIST = readpb.prm \
 	pb2nc_conf_info.h

@@ -47,6 +47,15 @@ extern PyObject * get_attribute(PyObject *, const char * attribute_name);
 ////////////////////////////////////////////////////////////////////////
 
 
+extern int          pyobject_as_int           (PyObject *);
+extern double       pyobject_as_double        (PyObject *);
+extern std::string  pyobject_as_string        (PyObject *);
+extern ConcatString pyobject_as_concat_string (PyObject *);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __MET_PYTHON3_UTIL_H__  */
 
 

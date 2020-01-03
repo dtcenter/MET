@@ -8,6 +8,9 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+CPPFLAGS += -I../../../src/basic/vx_math
+
+CPPFLAGS += -I../../../src/basic/vx_cal
 
 # The library
 
@@ -19,4 +22,4 @@ libvx_python3_utils_a_SOURCES = \
               python3_script.h python3_script.cc \
               python3_numpy.h python3_numpy.cc \
               python3_util.h python3_util.cc
-libvx_python_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)
+libvx_python_utils_a_CPPFLAGS = ${MET_CPPFLAGS} ${CPPFLAGS} ${MET_PYTHON_CC} $(MET_PYTHON_LD)

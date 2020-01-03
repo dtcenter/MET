@@ -21,6 +21,12 @@
 #include <string>
 #include <time.h>
 
+#include "config.h"
+
+#ifdef ENABLE_PYTHON
+#include "vx_python_utils.h"
+#endif   /*  ENABLE_PYTHON  */
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +53,15 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const string &var_name = "");
+
+////////////////////////
+#ifdef ENABLE_PYTHON
+
+  Observation(const Python3_List &);
+
+#endif   /*  ENABLE_PYTHON  */
+////////////////////////
+
 
   virtual ~Observation();
 
