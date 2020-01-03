@@ -161,6 +161,9 @@ Ptile_50 = 0.0;
 Ptile_75 = 0.0;
 Ptile_90 = 0.0;
 
+Ptile_Value = 0;
+Ptile_User  = 0.0;
+
 return;
 
 }
@@ -216,6 +219,8 @@ Ptile_50 = a.Ptile_50;
 Ptile_75 = a.Ptile_75;
 Ptile_90 = a.Ptile_90;
 
+Ptile_Value = a.Ptile_Value;
+Ptile_User  = a.Ptile_User;
 
 return;
 
@@ -667,6 +672,14 @@ snprintf(junk, sizeof(junk), format, Ptile_75);
    table.set_entry(row, c++, junk);
 
 snprintf(junk, sizeof(junk), format, Ptile_90);
+
+   table.set_entry(row, c++, junk);
+
+   //
+   //  custom intensity value
+   //
+
+snprintf(junk, sizeof(junk), format, Ptile_User);
 
    table.set_entry(row, c++, junk);
 
@@ -1224,7 +1237,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model)
+SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model, const int ptile_value)
 
 {
 
@@ -1365,6 +1378,10 @@ a.Ptile_25 = percentile_f(values, n, 0.25);
 a.Ptile_50 = percentile_f(values, n, 0.50);
 a.Ptile_75 = percentile_f(values, n, 0.75);
 a.Ptile_90 = percentile_f(values, n, 0.90);
+
+a.Ptile_Value = ptile_value;
+
+a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
 
 
    //

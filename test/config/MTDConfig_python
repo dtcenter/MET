@@ -55,16 +55,24 @@ grid_res = 4;
 
 file_type   = PYTHON_NUMPY;
 
+conv_time_window = { beg = -1; end = 1; };
+conv_radius      = 0.0;
+conv_thresh      = >0.0;
+
 fcst = {   
-   field       = { name = "${FCST_COMMAND}"; };
-   conv_radius = 0.0;
-   conv_thresh = >0.0;
+   field = { name = "${FCST_COMMAND}"; };
 }
 obs = {
-   field       = { name = "${OBS_COMMAND}"; };
-   conv_radius = 0.0;
-   conv_thresh = >0.0;
+   field = { name = "${OBS_COMMAND}"; };
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+   //
+   // Intensity percentile value to be written
+   //
+
+inten_perc_value = 99;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +81,6 @@ obs = {
    //
 
 min_volume = 0;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -187,7 +194,6 @@ interest_function = {
 
 }   //  interest functions
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
    //
@@ -195,7 +201,6 @@ interest_function = {
    //
 
 total_interest_thresh = 0.7;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -219,9 +224,7 @@ txt_output = {
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-
 
 output_prefix  = "${OUTPUT_PREFIX}";
 

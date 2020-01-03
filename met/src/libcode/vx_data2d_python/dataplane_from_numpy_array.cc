@@ -85,7 +85,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool dataplane_from_numpy_array(Python3_Numpy & np, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
+bool dataplane_from_numpy_array(Python3_Numpy & np, const Python3_Dict & attrs, DataPlane & dp_out, Grid & grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -192,7 +192,7 @@ ConcatString s;
 unixtime t;
 
 
-s = dict_lookup_string(attrs_dict, "init");
+s = attrs.lookup_string("init");
 
 t = timestring_to_unix(s.c_str());
 
@@ -200,7 +200,7 @@ dp_out.set_init(t);
 
      ////////////////////
 
-s = dict_lookup_string(attrs_dict, "valid");
+s = attrs.lookup_string("valid");
 
 t = timestring_to_unix(s.c_str());
 
@@ -208,7 +208,7 @@ dp_out.set_valid(t);
 
      ////////////////////
 
-s = dict_lookup_string(attrs_dict, "lead");
+s = attrs.lookup_string("lead");
 
 t = timestring_to_sec(s.c_str());
 
@@ -216,7 +216,7 @@ dp_out.set_lead(t);
 
      ////////////////////
 
-s = dict_lookup_string(attrs_dict, "accum");
+s = attrs.lookup_string("accum");
 
 t = timestring_to_sec(s.c_str());
 
@@ -224,25 +224,16 @@ dp_out.set_accum(t);
 
      ////////////////////
 
-PyObject * py_grid = dict_lookup_dict(attrs_dict, "grid");
+PyObject * py_grid = attrs.lookup_dict("grid");
 
-if ( ! py_grid )  {
-
-   mlog << Warning << "\ndataplane_from_numpy_array() -> "
-        << "trouble getting the \"grid\"\n\n";
-
-   return ( false );
-}
-
-
-grid_from_python_dict(py_grid, grid_out);
+grid_from_python_dict(Python3_Dict(py_grid), grid_out);
 
      ////////////////////
 
-vinfo.set_name(dict_lookup_string(attrs_dict, "name"));
-vinfo.set_long_name(dict_lookup_string(attrs_dict, "long_name").c_str());
-vinfo.set_level_name(dict_lookup_string(attrs_dict, "level").c_str());
-vinfo.set_units(dict_lookup_string(attrs_dict, "units").c_str());
+vinfo.set_name       (attrs.lookup_string("name"));
+vinfo.set_long_name  (attrs.lookup_string("long_name").c_str());
+vinfo.set_level_name (attrs.lookup_string("level").c_str());
+vinfo.set_units      (attrs.lookup_string("units").c_str());
 
      ////////////////////
 

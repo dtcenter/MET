@@ -9,8 +9,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_PYTHON_DICT_H__
-#define  __MET_PYTHON_DICT_H__
+#ifndef  __MET_PYTHON_LIST_H__
+#define  __MET_PYTHON_LIST_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-class Python3_Dict {
+class Python3_List {
 
    private:
 
@@ -41,33 +41,29 @@ class Python3_Dict {
       void init_from_scratch();
 
 
-      Python3_Dict(const Python3_Dict &);
-      Python3_Dict & operator=(const Python3_Dict &);
+      Python3_List(const Python3_List &);
+      Python3_List & operator=(const Python3_List &);
 
 
-      PyObject * Object;   //  the dictionary, not allocated
+      PyObject * Object;   //  the list, not allocated
 
-      int Size;   //  the size of the dictionary
+      int Size;   //  the size of the list
 
 
    public:
 
-      Python3_Dict();
-      Python3_Dict(PyObject *);
-     ~Python3_Dict();
+      Python3_List();
+      Python3_List(PyObject *);
+     ~Python3_List();
 
-      void dump(std::ostream &, int depth) const;
+      // void dump(std::ostream &, int depth) const;
 
       void set(PyObject *);
 
       int size() const;
 
 
-      int           lookup_int    (const char * key) const;
-      double        lookup_double (const char * key) const;
-      ConcatString  lookup_string (const char * key) const;
-
-      PyObject *    lookup_dict   (const char * key) const;
+      PyObject * operator[](int) const;
 
 };
 
@@ -75,13 +71,13 @@ class Python3_Dict {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Python3_Dict::size() const { return ( Size ); }
+inline int Python3_List::size() const { return ( Size ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_PYTHON_DICT_H__  */
+#endif   /*  __MET_PYTHON_LIST_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

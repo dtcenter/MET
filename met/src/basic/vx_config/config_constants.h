@@ -789,6 +789,7 @@ static const char conf_key_shift_right[]           = "shift_right";
 //  MTD specific parameter key names
 //
 
+static const char conf_key_conv_time_window    [] = "conv_time_window";
 static const char conf_key_space_centroid_dist [] = "space_centroid_dist";
 static const char conf_key_time_centroid_delta [] = "time_centroid_delta";
 static const char conf_key_speed_delta         [] = "speed_delta";
@@ -935,6 +936,7 @@ static const char conf_key_block_size[]   = "block_size";
 // MET-TC specific parameter key names
 //
 
+static const char conf_key_n_bins[]                   = "n_bins";
 static const char conf_key_storm_id[]                 = "storm_id";
 static const char conf_key_basin[]                    = "basin";
 static const char conf_key_cyclone[]                  = "cyclone";

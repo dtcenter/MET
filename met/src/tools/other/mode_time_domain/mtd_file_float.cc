@@ -122,6 +122,8 @@ DataMin = DataMax = 0;
 
 Spatial_Radius = -1;
 
+TimeBeg = TimeEnd = bad_data_int;
+
 
    //
    //  done
@@ -147,6 +149,10 @@ DataMin = f.DataMin;
 DataMax = f.DataMax;
 
 Spatial_Radius = f.Spatial_Radius;
+
+TimeBeg = f.TimeBeg;
+
+TimeEnd = f.TimeEnd;
 
 const int n = Nx*Ny*Nt;
 
@@ -186,6 +192,9 @@ if ( Spatial_Radius >= 0 )  {
 
 }
 
+out << prefix << "TimeBeg = " << TimeBeg << '\n';
+
+out << prefix << "TimeEnd = " << TimeEnd << '\n';
 
    //
    //  done
@@ -250,6 +259,30 @@ if ( spatial_r < 0 )  {
 }
 
 Spatial_Radius = spatial_r;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::set_time_window(int beg, int end)
+
+{
+
+if ( end < beg )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::set_time_window(int) -> bad values ... " << beg << " and " << end << "\n\n";
+
+   exit ( 1 );
+
+}
+
+TimeBeg = beg;
+
+TimeEnd = end;
 
 return;
 
@@ -480,6 +513,8 @@ out.set_data_minmax(0, ival);
 
 out.set_radius(Spatial_Radius);
 
+out.set_time_window(TimeBeg, TimeEnd);
+
 out.set_threshold(T);
 
 out.set_filetype(mtd_file_mask);
@@ -546,6 +581,8 @@ ival = ( got_some ? 1 : 0 );
 out.set_data_minmax(0, ival);
 
 out.set_radius(Spatial_Radius);
+
+out.set_time_window(TimeBeg, TimeEnd);
 
 out.set_threshold(-9999.0);
 
@@ -706,6 +743,11 @@ if ( Spatial_Radius >= 0 )  {
 
 }
 
+add_att(&f, time_beg_att_name, TimeBeg);
+
+add_att(&f, time_end_att_name, TimeEnd);
+
+
    //  Data
 
 add_var(&f, data_field_name, ncFloat, nt_dim, ny_dim, nx_dim);
@@ -817,6 +859,10 @@ f.DeltaT = 0;
 f.StartValidTime = StartValidTime + t*DeltaT;
 
 f.Spatial_Radius = Spatial_Radius;
+
+f.TimeBeg = TimeBeg;
+
+f.TimeEnd = TimeEnd;
 
 f.Data = new float [Nx*Ny];
 

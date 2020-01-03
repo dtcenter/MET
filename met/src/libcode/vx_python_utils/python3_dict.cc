@@ -26,18 +26,144 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-int dict_lookup_int(PyObject * dict, const char * key)
+static void dump_dict(std::ostream &, PyObject * obj, int depth);
+
+static void dump_dict_value(std::ostream &, PyObject * value, int depth);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class Python3_Dict
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Python3_Dict::Python3_Dict()
+
+{
+
+init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Python3_Dict::Python3_Dict(PyObject * _obj)
+
+{
+
+init_from_scratch();
+
+set(_obj);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Python3_Dict::~Python3_Dict()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Python3_Dict::Python3_Dict(const Python3_Dict &)
+
+{
+
+cerr << "\n\n  Python3_Dict::Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+
+exit ( 1 );
+
+// init_from_scratch();
+// 
+// assign(a);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Python3_Dict & Python3_Dict::operator=(const Python3_Dict &)
+
+{
+
+cerr << "\n\n  Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+
+exit ( 1 );
+
+// if ( this == &a )  return ( * this );
+// 
+// assign(a);
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::init_from_scratch()
+
+{
+
+Object = 0;
+
+clear();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::clear()
+
+{
+
+Object = 0;  //  don't deallocate
+
+Size = 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Python3_Dict::lookup_int(const char * key) const
 
 {
 
 int k;
 PyObject * a = 0;
 
-a = PyDict_GetItemString(dict, key);
+a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  dict_lookup_int(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -46,7 +172,7 @@ if ( ! a )  {
 
 if ( ! PyLong_Check(a) )  {
 
-   cerr << "\n\n  dict_lookup_int(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not an integer\n\n";
 
    exit ( 1 );
@@ -63,18 +189,18 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
-double dict_lookup_double(PyObject * dict, const char * key)
+double Python3_Dict::lookup_double(const char * key) const
 
 {
 
 double t;
 PyObject * a = 0;
 
-a = PyDict_GetItemString(dict, key);
+a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  dict_lookup_double(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -83,7 +209,7 @@ if ( ! a )  {
 
 if ( ! PyFloat_Check(a) )  {
 
-   cerr << "\n\n  dict_lookup_double(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not a floating point number\n\n";
 
    exit ( 1 );
@@ -100,18 +226,18 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString dict_lookup_string(PyObject * dict, const char * key)
+ConcatString Python3_Dict::lookup_string(const char * key) const
 
 {
 
 ConcatString s;
 PyObject * a = 0;
 
-a = PyDict_GetItemString(dict, key);
+a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  dict_lookup_string(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -120,7 +246,7 @@ if ( ! a )  {
 
 if ( ! PyUnicode_Check(a) )  {
 
-   cerr << "\n\n  dict_lookup_string(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not a character string\n\n";
 
    exit ( 1 );
@@ -137,17 +263,17 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
-PyObject * dict_lookup_dict(PyObject * dict, const char * key)
+PyObject * Python3_Dict::lookup_dict(const char * key) const
 
 {
 
 PyObject * a = 0;
 
-a = PyDict_GetItemString(dict, key);
+a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  dict_lookup_dict(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -156,7 +282,7 @@ if ( ! a )  {
 
 if ( ! PyDict_Check(a) )  {
 
-   cerr << "\n\n  dict_lookup_dict(PyObject * dict, const char * key) -> value for key \""
+   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not a python dictionary\n\n";
 
    exit ( 1 );
@@ -172,28 +298,64 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-void dump_dict(PyObject * obj, int depth)
+void Python3_Dict::dump(std::ostream & out, int depth) const
 
 {
 
-int j, n;
-// PyDictObject * dict = (PyDictObject *) obj;
-ConcatString tab;
+::dump_dict(out, Object, depth);
 
-for (j=0; j<depth; ++j)  tab << "|  ";
+return;
 
-   //
-   //  check that it's a dictionary
-   //
+}
 
-if ( ! PyDict_Check (obj) )  {
 
-   mlog << Error
-        << "\n\n  dump_dict() -> not a dictionary!\n\n";
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::set(PyObject * _obj)
+
+{
+
+clear();
+
+
+if ( ! PyDict_Check(_obj) )  {
+
+   cerr << "\n\n  Python3_Dict::set(PyObject *) object is not a dictionary!\n\n";
 
    exit ( 1 );
 
 }
+
+
+Size = PyDict_Size (_obj);
+
+Object = _obj;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dump_dict(std::ostream & out, PyObject * obj, int depth)
+
+{
+
+int j, n;
+ConcatString tab;
+
+for (j=0; j<depth; ++j)  tab << "|  ";
 
    //
    //   get the size of the array
@@ -201,7 +363,7 @@ if ( ! PyDict_Check (obj) )  {
 
 n = PyDict_Size (obj);
 
-cout << tab << "Dictionary size = " << n << "\n";
+out << tab << "Dictionary size = " << n << "\n";
 
 PyObject * key   = 0;
 PyObject * value = 0;
@@ -213,9 +375,9 @@ j = pos = 0;
 
 while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
-   cout << tab << "\n";
+   out << tab << "\n";
 
-   cout << tab << "Item # " << j << "\n";   //  want "j" here, not "pos"
+   out << tab << "Item # " << j << "\n";   //  want "j" here, not "pos"
 
    if ( ! PyUnicode_Check(key) )  {
 
@@ -226,13 +388,13 @@ while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
    }
 
-   cout << tab << "Key   = \"" << PyUnicode_AsUTF8(key) << "\"\n";
+   out << tab << "Key   = \"" << PyUnicode_AsUTF8(key) << "\"\n";
 
-   cout << tab << "Value: ";
+   out << tab << "Value: ";
 
-   dump_dict_value(value, depth + 1);
+   dump_dict_value(out, value, depth + 1);
 
-   // cout << '\n';
+   // out << '\n';
 
    ++j;
 
@@ -252,7 +414,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void dump_dict_value(PyObject * value, int depth)
+void dump_dict_value(std::ostream & out, PyObject * value, int depth)
 
 {
 
@@ -269,8 +431,8 @@ const char * const tab = "    ";
 
 if ( PyUnicode_Check(value) )  {
 
-   cout << '\"' << PyUnicode_AsUTF8(value) << '\"'
-        << tab << "(type: string)\n";
+   out << '\"' << PyUnicode_AsUTF8(value) << '\"'
+       << tab << "(type: string)\n";
 
    return;
 
@@ -281,8 +443,8 @@ if ( PyUnicode_Check(value) )  {
 
 if ( PyLong_Check(value) )  {
 
-   cout << PyLong_AsLong(value)
-        << tab << "(type: integer)\n";
+   out << PyLong_AsLong(value)
+       << tab << "(type: integer)\n";
 
    return;
 
@@ -294,8 +456,8 @@ if ( PyLong_Check(value) )  {
 
 if ( PyFloat_Check(value) )  {
 
-   cout << PyFloat_AsDouble(value)
-        << tab << "(type: floating point)\n";
+   out << PyFloat_AsDouble(value)
+       << tab << "(type: floating point)\n";
 
    return;
 
@@ -307,9 +469,9 @@ if ( PyFloat_Check(value) )  {
 
 if ( PyDict_Check(value) )  {
 
-   cout << "(dict) ... \n";
+   out << "(dict) ... \n";
 
-   dump_dict(value, depth);
+   dump_dict(out, value, depth);
 
    return;
 
@@ -322,8 +484,7 @@ if ( PyDict_Check(value) )  {
       //  nope
       //
 
-mlog << Error
-     << "\n\n  dump_dict_value() -> can't determine type for dict value!\n\n";
+cerr << "\n\n  Python3_Dict::dump_dict_value() -> can't determine type for dict value!\n\n";
 
 exit ( 1 );
 

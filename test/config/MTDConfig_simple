@@ -24,6 +24,11 @@ fcst = {
       level = "A01";
    };
 
+   conv_time_window  = {
+      beg = ${FCST_CONV_TIME_BEG};
+      end = ${FCST_CONV_TIME_END};
+   };
+
    conv_radius       = 2;
    conv_thresh       = >=0.5;
 
@@ -32,7 +37,20 @@ fcst = {
 obs = fcst;
 obs = {
    GRIB1_ptv = 129;
+
+   conv_time_window  = {
+      beg = ${OBS_CONV_TIME_BEG};
+      end = ${OBS_CONV_TIME_END};
+   };
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+   //
+   // Intensity percentile value to be written
+   //
+
+inten_perc_value = 99;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +67,6 @@ min_volume = 1000;
    //
 
 total_interest_thresh = 0.65;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

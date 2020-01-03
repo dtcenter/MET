@@ -92,7 +92,19 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_3d_single_cols; ++j)  {
 
-   table.set_entry(r, c++, att_3d_single_cols[j]);
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+    
+      table.set_entry(r, c++, att_3d_single_cols[j]);
+
+   }
 
 }
 
@@ -195,8 +207,20 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 }
 
 for (j=0; j<n_3d_single_cols; ++j)  {
+    
+   if ( strncmp(att_3d_single_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
 
-   table.set_entry(r, c++, att_3d_single_cols[j]);
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_3d_single_cols[j]);
+
+   }
 
 }
 
@@ -428,8 +452,20 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 }
 
 for (j=0; j<n_2d_cols; ++j)  {
+    
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
 
-   table.set_entry(r, c++, att_2d_cols[j]);
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_2d_cols[j]);
+
+   }
 
 }
 
@@ -615,7 +651,19 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 for (j=0; j<n_2d_cols; ++j)  {
 
-   table.set_entry(r, c++, att_2d_cols[j]);
+   if ( strncmp(att_2d_cols[j], "INTENSITY_USER", strlen("INTENSITY_USER")) == 0 )  {
+
+      ConcatString cs;
+      cs.format("INTENSITY_%d", config.inten_perc_value);
+
+      table.set_entry(r, c++, cs.c_str());
+
+   }
+   else {
+
+      table.set_entry(r, c++, att_2d_cols[j]);
+
+   }
 
 }
 
