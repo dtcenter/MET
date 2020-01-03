@@ -568,7 +568,7 @@ void usage() {
          << "file (optional).\n"
 
          << "\t\t\"-v level\" overrides the default level of logging ("
-         << mlog.verbosity_level() << ") (optional).\n"
+         << mlog.verbosity_level() << ") (optional).\n\n"
 
          << flush;
 
