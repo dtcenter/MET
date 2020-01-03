@@ -1,4 +1,0 @@
-python_numarray.cc:int values[max_tuple_data_dims];
-python_tuple.cc:if ( dim > max_tuple_data_dims )  {
-python_tuple.cc:        << "increase parameter \"max_tuple_data_dims\" to at least "
-python_tuple.h:static const int max_tuple_data_dims = 10;
