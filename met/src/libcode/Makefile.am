@@ -17,8 +17,8 @@
 ## MA 02110-1301, USA.
 
 SUBDIRS	= vx_grid \
-	vx_nc_util \
 	vx_data2d \
+	vx_nc_util \
 	vx_data2d_grib \
 	vx_data2d_nc_met \
 	vx_data2d_nccf \
