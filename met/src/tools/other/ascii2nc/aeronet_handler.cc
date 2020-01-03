@@ -72,6 +72,7 @@ const float AERONET_MISSING_VALUE = -999.;
 
 double angstrom_power_interplation(double value_1, double value_2, double level_1, double level_2, double target_level);
 
+
 ////////////////////////////////////////////////////////////////////////
 
 

@@ -81,6 +81,10 @@ using namespace netCDF;
 #include "wwsis_handler.h"
 #include "aeronet_handler.h"
 
+#ifdef ENABLE_PYTHON
+#include "python_handler.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 // Constants
@@ -137,7 +141,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+
+{
+
    CommandLine cline;
 
    //
@@ -202,8 +209,7 @@ int main(int argc, char *argv[]) {
    // the command line.  If one wasn't specified, we'll look in the
    // first file to guess the format.
    //
-   FileHandler *file_handler = create_file_handler(ascii_format,
-                                                   asfile_list[0]);
+   FileHandler *file_handler = create_file_handler(ascii_format, asfile_list[0]);
 
    if(file_handler == 0) return(0);
 
@@ -247,6 +253,7 @@ int main(int argc, char *argv[]) {
    if(!status) return(1);
 
    return(0);
+
 }
 
 ////////////////////////////////////////////////////////////////////////

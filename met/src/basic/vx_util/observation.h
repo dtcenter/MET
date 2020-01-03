@@ -57,7 +57,11 @@ public:
 ////////////////////////
 #ifdef ENABLE_PYTHON
 
+  Observation();
   Observation(const Python3_List &);
+
+  void set(const Python3_List &);
+  void set(PyObject *);
 
 #endif   /*  ENABLE_PYTHON  */
 ////////////////////////
