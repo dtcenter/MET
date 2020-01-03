@@ -11,7 +11,7 @@
 
 #include "string.h"
 
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 #include "check_endian.h"
 
 #include "data_plane.h"

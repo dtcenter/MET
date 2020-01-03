@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 
 #include "dataplane_from_numpy_array.h"
 #include "dataplane_from_xarray.h"

@@ -24,7 +24,7 @@
 #include "config.h"
 
 #ifdef ENABLE_PYTHON
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 #endif   /*  ENABLE_PYTHON  */
 
 

@@ -17,7 +17,7 @@
 
 
 #include "vx_grid.h"
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 
 
 extern "C" {

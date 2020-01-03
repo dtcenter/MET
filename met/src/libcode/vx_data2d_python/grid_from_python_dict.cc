@@ -13,7 +13,7 @@
 
 
 #include "vx_log.h"
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 
 #include "grid_from_python_dict.h"
 
