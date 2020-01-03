@@ -350,7 +350,7 @@ Version 9.0 BETA2 Release Notes:
    - Add MTD data coulumn for a user-specified intensity percentile value
      INTENSITY_*, where * is the user-specified percentile (#1134).
 
-- Build Process
+- Build Process:
    - Integrate Dockerfile into MET GitHub repository and automatically build
      the master_v8.1 and develop branches on DockerHub (#1123).
 
