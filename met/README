@@ -347,7 +347,7 @@ Version 9.0 BETA2 Release Notes:
 - Changes to Output Formats:
    - Add MTD header columns for FCST_CONV_TIME_BEG, FCST_CONV_TIME_END,
      OBS_CONV_TIME_BEG, and OBS_CONV_TIME_END (#1133).
-   - Add MTD data coulumn for a user-specified intensity percentile value
+   - Add MTD data column for a user-specified intensity percentile value
      INTENSITY_*, where * is the user-specified percentile (#1134).
 
 - Build Process:
@@ -360,8 +360,6 @@ Version 9.0 BETA2 Release Notes:
       - Enhance python embedding to support multiple input data types (#1056).
       - Print a warning message when a user specifies a config file entry as
         the wrong type (#1225).
-   - Regrid-Data-Plane
-      - Add support for processing smoke and dust from GOES-16 ADP data (#1194).
    - Ensemble-Stat, Series-Analysis, MTD
       - Add support to these tools for using python embedding (#1140).
    - Ensemble-Stat
@@ -382,8 +380,7 @@ Version 9.0 BETA1 Release Notes:
 -------------------------------
 
 - What's New:
-   - Major Enhancements: python version 3, python embedding overhaul, binned
-     climatologies
+   - Major Enhancements: binned climatologies
    - New Tools: tc_rmw
 
 - Bugfixes:
@@ -393,8 +390,6 @@ Version 9.0 BETA1 Release Notes:
    - Bugfix for MTD centroid longitude in degrees west, not east (#1214).
    - Bugfix for reporting the units for GRIB2 probabilities as "%" (#1212).
    
-- Changes to Output Formats:
-
 - Build Process
    - Document option to install MET into "exec" rather than "bin" (#1189).
    - Continued reduction of Fortify findings.
