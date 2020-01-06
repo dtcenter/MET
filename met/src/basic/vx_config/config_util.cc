@@ -1030,7 +1030,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
 
    // Parse to_grid as an integer
-   v = regrid_dict->lookup_int(conf_key_to_grid, false);
+   v = regrid_dict->lookup_int(conf_key_to_grid, false, false);
 
    // If integer lookup successful, convert to FieldType.
    if(regrid_dict->last_lookup_status()) {

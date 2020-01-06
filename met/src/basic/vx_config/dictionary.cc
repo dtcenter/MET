@@ -1466,7 +1466,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Dictionary::lookup_bool(const char * name, bool error_out)
+bool Dictionary::lookup_bool(const char * name,
+                             bool error_out,
+                             bool print_warning)
 
 {
 
@@ -1475,7 +1477,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == BooleanType)) )  {
+   is_correct_type = (Entry->type() == BooleanType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_bool() -> "
@@ -1510,7 +1514,9 @@ return ( Entry->b_value() );
 ////////////////////////////////////////////////////////////////////////
 
 
-int Dictionary::lookup_int(const char * name, bool error_out)
+int Dictionary::lookup_int(const char * name,
+                           bool error_out,
+                           bool print_warning)
 
 {
 
@@ -1519,7 +1525,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == IntegerType)) )  {
+   is_correct_type = (Entry->type() == IntegerType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_int() -> "
@@ -1554,7 +1562,9 @@ return ( Entry->i_value() );
 ////////////////////////////////////////////////////////////////////////
 
 
-double Dictionary::lookup_double(const char * name, bool error_out)
+double Dictionary::lookup_double(const char * name,
+                                 bool error_out,
+                                 bool print_warning)
 
 {
 
@@ -1578,8 +1588,10 @@ if ( Entry )  {
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == FloatType ||
-                             Entry->type() == IntegerType)) )  {
+   is_correct_type = (Entry->type() == FloatType ||
+                      Entry->type() == IntegerType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_double() -> "
@@ -1622,7 +1634,9 @@ return ( v );
 ////////////////////////////////////////////////////////////////////////
 
 
-NumArray Dictionary::lookup_num_array(const char * name, bool error_out)
+NumArray Dictionary::lookup_num_array(const char * name,
+                                      bool error_out,
+                                      bool print_warning)
 
 {
 
@@ -1632,17 +1646,14 @@ ConfigObjectType Type = no_config_object_type;
 bool is_correct_type = false;
 NumArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType   ||
-                                 Entry->type() == IntegerType ||
-                                 Entry->type() == FloatType   ||
-                                 Entry->type() == BooleanType);
-
 if ( Entry )  {
+    
+   is_correct_type = (Entry->type() == ArrayType   ||
+                      Entry->type() == IntegerType ||
+                      Entry->type() == FloatType   ||
+                      Entry->type() == BooleanType);
 
-   if ( !(is_correct_type = (Entry->type() == ArrayType   ||
-                             Entry->type() == IntegerType ||
-                             Entry->type() == FloatType   ||
-                             Entry->type() == BooleanType)) )  {
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_num_array() -> "
@@ -1747,12 +1758,14 @@ return ( array );
 ////////////////////////////////////////////////////////////////////////
 
 
-IntArray Dictionary::lookup_int_array(const char * name, bool error_out)
+IntArray Dictionary::lookup_int_array(const char * name,
+                                      bool error_out,
+                                      bool print_warning)
 
 {
 
 IntArray array;
-NumArray num_array = lookup_num_array(name, error_out);
+NumArray num_array = lookup_num_array(name, error_out, print_warning);
 
 for (int i=0; i<num_array.n_elements(); i++)
    array.add( nint(num_array[i]) );
@@ -1761,10 +1774,13 @@ return ( array );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString Dictionary::lookup_string(const char * name, bool error_out)
+ConcatString Dictionary::lookup_string(const char * name,
+                                       bool error_out,
+                                       bool print_warning)
 
 {
 
@@ -1773,7 +1789,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == StringType)) )  {
+   is_correct_type = (Entry->type() == StringType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_string() -> "
@@ -1810,7 +1828,9 @@ return ( *(Entry->string_value()) );
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray Dictionary::lookup_string_array(const char * name, bool error_out)
+StringArray Dictionary::lookup_string_array(const char * name,
+                                            bool error_out,
+                                            bool print_warning)
 
 {
 
@@ -1819,13 +1839,12 @@ const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 StringArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType ||
-                                 Entry->type() == StringType);
-
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == ArrayType ||
-                             Entry->type() == StringType)) )  {
+   is_correct_type = (Entry->type() == ArrayType ||
+                      Entry->type() == StringType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_string_array() -> "
@@ -1908,7 +1927,9 @@ return ( array );
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleThresh Dictionary::lookup_thresh(const char * name, bool error_out)
+SingleThresh Dictionary::lookup_thresh(const char * name,
+                                       bool error_out,
+                                       bool print_warning)
 
 {
 
@@ -1917,7 +1938,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == ThresholdType)) )  {
+   is_correct_type = (Entry->type() == ThresholdType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_thresh() -> "
@@ -1954,7 +1977,9 @@ return ( *(Entry->thresh_value()) );
 ////////////////////////////////////////////////////////////////////////
 
 
-ThreshArray Dictionary::lookup_thresh_array(const char * name, bool error_out)
+ThreshArray Dictionary::lookup_thresh_array(const char * name,
+                                            bool error_out,
+                                            bool print_warning)
 
 {
 
@@ -1965,8 +1990,10 @@ ThreshArray array;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == ArrayType ||
-                             Entry->type() == ThresholdType)) )  {
+   is_correct_type = (Entry->type() == ArrayType ||
+                      Entry->type() == ThresholdType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_thresh_array() -> "
@@ -2050,7 +2077,9 @@ return ( array );
 ////////////////////////////////////////////////////////////////////////
 
 
-Dictionary *Dictionary::lookup_dictionary(const char * name, bool error_out)
+Dictionary *Dictionary::lookup_dictionary(const char * name,
+                                          bool error_out,
+                                          bool print_warning)
 
 {
 
@@ -2059,7 +2088,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == DictionaryType)) )  {
+   is_correct_type = (Entry->type() == DictionaryType);
+ 
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_dictionary() -> "
@@ -2096,7 +2127,9 @@ return ( Entry->dict_value() );
 ////////////////////////////////////////////////////////////////////////
 
 
-Dictionary *Dictionary::lookup_array(const char * name, bool error_out)
+Dictionary *Dictionary::lookup_array(const char * name,
+                                     bool error_out,
+                                     bool print_warning)
 
 {
 
@@ -2105,7 +2138,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == ArrayType)) )  {
+   is_correct_type = (Entry->type() == ArrayType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_array() -> "
@@ -2144,7 +2179,9 @@ return ( Entry->array_value() );
 ////////////////////////////////////////////////////////////////////////
 
 
-int Dictionary::lookup_seconds(const char * name, bool error_out)
+int Dictionary::lookup_seconds(const char * name,
+                               bool error_out,
+                               bool print_warning)
 
 {
 
@@ -2155,7 +2192,7 @@ if ( LastLookupStatus )  {
    else               return ( timestring_to_sec( cs.c_str() ) );
 }
 
-return ( lookup_int(name, error_out) );
+return ( lookup_int(name, error_out, print_warning) );
 
 }
 
@@ -2163,11 +2200,13 @@ return ( lookup_int(name, error_out) );
 ////////////////////////////////////////////////////////////////////////
 
 
-IntArray Dictionary::lookup_seconds_array(const char * name, bool error_out)
+IntArray Dictionary::lookup_seconds_array(const char * name,          
+                                          bool error_out,
+                                          bool print_warning)
 
 {
 
-StringArray sa = lookup_string_array(name, error_out);
+StringArray sa = lookup_string_array(name, error_out, print_warning);
 IntArray ia;
 
 int j;
@@ -2181,11 +2220,13 @@ return ( ia );
 ////////////////////////////////////////////////////////////////////////
 
 
-unixtime Dictionary::lookup_unixtime(const char * name, bool error_out)
+unixtime Dictionary::lookup_unixtime(const char * name,
+                                     bool error_out,
+                                     bool print_warning)
 
 {
 
-ConcatString cs = lookup_string(name, error_out);
+ConcatString cs = lookup_string(name, error_out, print_warning);
 
 if ( cs.empty() )  return ( (unixtime) 0 );
  else               return ( timestring_to_unix( cs.c_str() ) );
@@ -2195,11 +2236,13 @@ if ( cs.empty() )  return ( (unixtime) 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-TimeArray Dictionary::lookup_unixtime_array(const char * name, bool error_out)
+TimeArray Dictionary::lookup_unixtime_array(const char * name,
+                                            bool error_out,
+                                            bool print_warning)
 
 {
 
-StringArray sa = lookup_string_array(name, error_out);
+StringArray sa = lookup_string_array(name, error_out, print_warning);
 TimeArray ta;
 
 int j;
@@ -2214,7 +2257,9 @@ return ( ta );
 ////////////////////////////////////////////////////////////////////////
 
 
-PiecewiseLinear *Dictionary::lookup_pwl(const char * name, bool error_out)
+PiecewiseLinear *Dictionary::lookup_pwl(const char * name,
+                                        bool error_out,
+                                        bool print_warning)
 
 {
 
@@ -2223,7 +2268,9 @@ bool is_correct_type = false;
 
 if ( Entry )  {
 
-   if ( !(is_correct_type = (Entry->type() == PwlFunctionType)) )  {
+   is_correct_type = (Entry->type() == PwlFunctionType);
+
+   if ( !is_correct_type && print_warning )  {
 
       mlog << Warning
            << "\nDictionary::lookup_pwl() -> "
