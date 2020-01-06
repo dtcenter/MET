@@ -562,11 +562,14 @@ int GenesisInfoArray::n_technique() const {
 
 int GenesisInfoArray::find_match(const GenesisInfo &g,
        const double rad, const int beg_sec, const int end_sec) const {
-   int i, i_match, cur_diff, min_diff;
-   double cur_dist, min_dist;
+   int i, cur_diff;
+   double cur_dist;
+   int    i_match  = bad_data_int;
+   int    min_diff = bad_data_int;
+   double min_dist = bad_data_double;
 
    // Loop over the array elements
-   for(i=0, i_match=bad_data_int; i<Genesis.size(); i++) {
+   for(i=0; i<Genesis.size(); i++) {
 
        // Check for a match
        if(Genesis[i].is_match(g, rad, beg_sec, end_sec,
@@ -574,8 +577,7 @@ int GenesisInfoArray::find_match(const GenesisInfo &g,
 
           // Set the first match or update the match for a smaller
           // distance or the same distance but closer in time.
-          if(is_bad_data(i_match) ||
-             cur_dist < min_dist  ||
+          if(is_bad_data(i_match) || cur_dist < min_dist  ||
              (is_eq(cur_dist, min_dist) && cur_diff < min_diff)) {
               i_match  = i;
               min_diff = cur_diff;

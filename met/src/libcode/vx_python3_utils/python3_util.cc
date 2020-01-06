@@ -90,7 +90,7 @@ int pyobject_as_int (PyObject * obj)
 
 {
 
-int k;
+int k = bad_data_int;
 
 
 if ( PyLong_Check(obj) )  {   //  long?
@@ -126,7 +126,7 @@ double pyobject_as_double (PyObject * obj)
 
 {
 
-double x;
+double x = bad_data_double;
 
 
 if ( PyLong_Check(obj) )  {   //  long?
