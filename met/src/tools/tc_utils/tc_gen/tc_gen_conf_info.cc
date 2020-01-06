@@ -176,7 +176,7 @@ void TCGenVxOpt::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
-   int i, j;
+   int i;
    Dictionary *dict2 = (Dictionary *) 0;
    ConcatString file_name;
    StringArray sa;

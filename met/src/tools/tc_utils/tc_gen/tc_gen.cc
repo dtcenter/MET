@@ -824,7 +824,7 @@ void set_genesis(const StringArray & a) {
    ConcatString cs;
 
    // Check for optional suffix sub-argument
-   for(int i=0; i<a.n(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       cs = a[i];
       if(cs.startswith("suffix")) {
@@ -863,7 +863,7 @@ void set_track(const StringArray & a) {
    ConcatString cs;
 
    // Check for optional suffix sub-argument
-   for(int i=0; i<a.n(); i++) {
+   for(i=0; i<a.n(); i++) {
 
       cs = a[i];
       if(cs.startswith("suffix")) {
