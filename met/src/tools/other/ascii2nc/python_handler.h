@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+#include "concat_string.h"
+#include "string_array.h"
+
 #include "file_handler.h"
 
 
@@ -32,11 +35,16 @@ class PythonHandler : public FileHandler
    public:
 
       PythonHandler(const string &program_name);
+      PythonHandler(const char * program_name, const char * ascii_filename);
       virtual ~PythonHandler();
 
       bool isFileType(LineDataFile &ascii_file) const;
   
-      static string getFormatString() { return "python_point"; }
+      static string getFormatString() { return ( "PYTHON" ); }
+
+      ConcatString user_script_filename;
+
+      StringArray user_script_args;
 
    protected:  
 
@@ -45,10 +53,10 @@ class PythonHandler : public FileHandler
 
       virtual bool _readObservations(LineDataFile &ascii_file);   //  this shouldn't be called
 
+      virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
+
       void load_python_obs(PyObject *);   //  python object is list of lists
 
-
-      void read_obs_from_script (const char * script_name, const char * variable_name);
 
       void read_obs_from_pickle (const char * pickle_name, const char * variable_name);
   
