@@ -57,7 +57,7 @@ public:
   void setSIDMask (StringArray &s);
   void setMessageTypeMap(map<ConcatString, ConcatString> m);
 
-  virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
+  bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
   bool writeNetcdfFile(const string &nc_filename);
 
   bool summarizeObs(const TimeSummaryInfo &summary_info);

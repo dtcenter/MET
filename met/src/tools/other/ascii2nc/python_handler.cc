@@ -25,24 +25,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const char python_wrapper [] = "a2nc_python.py";
-// static const char pickle_wrapper [] = "a2nc_pickle.py";
-static const char python_wrapper [] = "a2nc_python";
-static const char pickle_wrapper [] = "a2nc_pickle";
-
-
-static const char list_name [] = "point_data";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const char sq = '\'';   //  single quote
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class PythonHandler
    //
@@ -56,30 +38,6 @@ PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_n
 {
 
 
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-PythonHandler::PythonHandler(const char * program_name, const char * ascii_filename) : FileHandler(program_name)
-
-{
-
-int j;
-ConcatString s = ascii_filename;
-StringArray a = s.split(" ");
-
-user_script_filename = a[0];
-
-for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
-
-   user_script_args.add(a[j]);
-
-}
-
-return;
 
 }
 
@@ -179,89 +137,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PythonHandler::readAsciiFiles(const vector< ConcatString > &)
+void PythonHandler::read_obs_from_script (const char * script_name, const char * variable_name)
 
 {
 
-int j;
-ConcatString command;
-ConcatString short_user_name;
+Python3_Script script(script_name);
 
+PyObject * obj = script.lookup(variable_name);
 
-short_user_name = user_script_filename;
-
-short_user_name.chomp(".py");
-
-   //
-   //  start up the python interpreter
-   //
-
-Python3_Script script(python_wrapper);
-
-   //
-   //  set up a "new" sys.argv list
-   //     with the command-line arquments for
-   //     the user's script
-   //
-
-if ( user_script_args.n() > 0 )  {
-
-   command << cs_erase
-           << "sys.argv = [ ";
-
-   command << sq << short_user_name << sq << ", ";
-
-   for (j=0; j<(user_script_args.n()); ++j)  {
-
-      command << sq << user_script_args[j] << sq;
-
-      if ( j < (user_script_args.n() - 1) )  command << ',';
-
-      command << ' ';
-
-   }
-
-   command << ']';
-
-   // cout << "command = \"" << command << "\"\n" << flush;
-
-   script.run(command);
-
-}
-
-   //
-   //  import the user's script as a module
-   //
-
-PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
-
-   //
-   //  get the dictionary (ie, namespace)
-   //    for the module
-   //
-
-Python3_Dict md (m);
-
-   //
-   //  lookup the variable containing the
-   //    list of obs
-   //
-
-PyObject * obj = md.lookup_list(list_name);
-
-// cout << "obj = \"" << obj << "\"\n" << flush;
-
-   //
-   //  load the obs
-   //
 
 load_python_obs(obj);
 
-   //
-   //  done
-   //
 
-return ( true );
+return;
 
 }
 
