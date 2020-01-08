@@ -8,11 +8,9 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-OPT_PYTHON_LIBS =
 OPT_PYTHON_SOURCES =
 
 if ENABLE_PYTHON
-OPT_PYTHON_LIBS += -lvx_python3_utils
 OPT_PYTHON_SOURCES += python_handler.h python_handler.cc
 endif
 
@@ -39,8 +37,8 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	$(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_nc_util \
@@ -49,14 +47,14 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_pb_util \
-     -lvx_python3_utils \
 	-lvx_cal \
 	-lvx_util \
+	$(PYTHON_LIBS) \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(OPT_PYTHON_LIBS)
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 
 
