@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -103,7 +103,8 @@ enum ASCIIFormat {
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
    ASCIIFormat_Aeronet_v2,
-   ASCIIFormat_Aeronet_v3
+   ASCIIFormat_Aeronet_v3, 
+   ASCIIFormat_Python, 
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -258,8 +259,12 @@ int main(int argc, char *argv[])
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format,
-                                 const ConcatString &ascii_filename) {
+FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename)
+
+{
+
+PythonHandler * ph = 0;
+
    //
    // If the ASCII format was specified, just create the appropriate
    // object and return it.  If it wasn't specified, look in the
@@ -292,6 +297,14 @@ FileHandler *create_file_handler(const ASCIIFormat format,
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(3);
          return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_Python: {
+
+         ph = new PythonHandler(program_name, ascii_filename.text());
+
+         return ( (FileHandler *) ph );
+
       }
 
       default: {
@@ -501,6 +514,9 @@ void set_format(const StringArray & a) {
    }
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v3;
+   }
+   else if(PythonHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_Python;
    }
    else {
       mlog << Error << "\nset_format() -> "

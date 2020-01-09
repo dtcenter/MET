@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -284,6 +284,41 @@ if ( ! PyDict_Check(a) )  {
 
    cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not a python dictionary\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject * Python3_Dict::lookup_list(const char * key) const
+
+{
+
+PyObject * a = 0;
+
+a = PyDict_GetItemString(Object, key);
+
+if ( ! a )  {
+
+   cerr << "\n\n  Python3_Dict::lookup_list(const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyList_Check(a) )  {
+
+   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+        << key << "\" not a python list\n\n";
 
    exit ( 1 );
 
