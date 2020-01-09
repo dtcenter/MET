@@ -11,7 +11,6 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_log.h"
 #include "empty_string.h"
 
 #include "python3_numpy.h"
@@ -156,8 +155,7 @@ int Python3_Numpy::dim(int k) const
 
 if ( (k < 0) || (k >= N_Dims) )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
+   cerr << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -178,8 +176,7 @@ void Python3_Numpy::set_name(const char * _name)
 
 if ( empty(_name) )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
+   cerr << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -217,8 +214,7 @@ PyObject * obj = script.lookup(_name);
 
 if ( ! obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "variable named \"" << _name << "\" not found in script \""
         << script.filename() << "\"\n\n";
 
@@ -246,8 +242,7 @@ clear();
 
 if ( ! obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
+   cerr << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
 
    exit ( 1 );
 
@@ -294,8 +289,7 @@ Data_Obj = PyObject_GetAttrString (Object, "data");
 
 if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(PyObject *) -> buffer interface not supported\n\n";
+   cerr << "  buffer interface not supported\n\n";
 
    exit ( 1 );
 
@@ -311,8 +305,7 @@ if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
 if ( PyObject_GetBuffer(Data_Obj, &View, PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS) < 0 )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(PyObject *) -> failed to get buffer\n\n";
+   cout << "failed to get buffer\n\n" << flush;
 
    exit ( 1 );
 
@@ -321,6 +314,8 @@ if ( PyObject_GetBuffer(Data_Obj, &View, PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS) < 0 
 Buffer = View.buf;
 
 Item_Size = (long) (View.itemsize);
+
+// cout << "\n\n  item_size = " << item_size() << "\n\n" << flush;
 
    //
    //  loop through the elements of the list and print them out
@@ -373,8 +368,7 @@ PyObject * dtype_obj = get_attribute(Object, "dtype");
 
 if ( ! dtype_obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "can't get numpy dtype attribute!\n\n";
 
    exit ( 1 );
@@ -385,8 +379,7 @@ PyObject * dtype_str_obj = get_attribute(dtype_obj, "str");
 
 if ( ! dtype_str_obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "can't get numpy dtype attribute string!\n\n";
 
    exit ( 1 );

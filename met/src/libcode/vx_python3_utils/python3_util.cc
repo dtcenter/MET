@@ -11,7 +11,6 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "vx_log.h"
 #include "concat_string.h"
 #include "vx_math.h"
 
@@ -32,8 +31,7 @@ FILE * f   = 0;
 
 if ( (f = open_memstream(&buf, &len)) == NULL )  {
 
-   mlog << Error
-        << "\n\n  operator<<(ostream &, PyObject *) -> unable to open memory stream\n\n";
+   cerr << "\n\n  operator<<(ostream &, PyObject *) -> unable to open memory stream\n\n";
 
    exit ( 1 );
 
@@ -42,8 +40,7 @@ if ( (f = open_memstream(&buf, &len)) == NULL )  {
 
 if ( PyObject_Print(obj, f, Py_PRINT_RAW) < 0 )  {
 
-   mlog << Error
-        << "\n\n  operator<<(ostream &, PyObject *) -> PyObject_Print error\n\n";
+   cerr << "\n\n  operator<<(ostream &, PyObject *) -> PyObject_Print error\n\n";
 
    exit ( 1 );
 
@@ -110,8 +107,7 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_int (PyObject *) -> bad object type\n\n";
+   cerr << "\n\n  pyobject_as_int (PyObject *) -> bad object type\n\n";
 
    exit ( 1 );
 
@@ -147,8 +143,7 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_double (PyObject *) -> bad object type\n\n";
+   cerr << "\n\n  pyobject_as_double (PyObject *) -> bad object type\n\n";
 
    exit ( 1 );
 
@@ -175,8 +170,7 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_string (PyObject *) -> bad object type\n\n";
+   cerr << "\n\n  pyobject_as_string (PyObject *) -> bad object type\n\n";
 
    exit ( 1 );
 
@@ -202,8 +196,7 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_concat_string (PyObject *) -> bad object type\n\n";
+   cerr << "\n\n  pyobject_as_concat_string (PyObject *) -> bad object type\n\n";
 
    exit ( 1 );
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,7 +18,6 @@
 
 
 #include <iostream>
-
 
 extern "C" {
 
@@ -48,16 +47,16 @@ class PythonHandler : public FileHandler
 
       bool isFileType(LineDataFile &ascii_file) const;
   
-      static string getFormatString() { return ( "PYTHON" ); }
-
-      ConcatString user_script_filename;
-
-      StringArray user_script_args;
+      static string getFormatString() { return "PYTHON"; }
 
 
       bool use_pickle;
 
       ConcatString user_path_to_python;   //  if we're using pickle
+
+      ConcatString user_script_filename;
+
+      StringArray user_script_args;
 
    protected:  
 
@@ -75,7 +74,9 @@ class PythonHandler : public FileHandler
       void load_python_obs(PyObject *);   //  python object is list of lists
 
 
-      void read_obs_from_pickle (const char * pickle_name, const char * variable_name);
+      bool read_obs_from_script (const char * script_name, const char * variable_name);
+
+      bool read_obs_from_pickle (const char * pickle_name, const char * variable_name);
   
 };
 

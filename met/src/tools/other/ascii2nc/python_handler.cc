@@ -201,7 +201,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PythonHandler::readAsciiFiles(const vector< ConcatString > &)
+bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
 
 {
 
@@ -222,10 +222,10 @@ bool PythonHandler::do_straight()
 
 {
 
-int j;
 ConcatString command;
 ConcatString short_user_name;
 
+// PyObject * obj = script.lookup(variable_name);
 
 short_user_name = user_script_filename;
 
@@ -277,9 +277,6 @@ PyObject * obj = md.lookup_list(list_name);
 
 load_python_obs(obj);
 
-   //
-   //  done
-   //
 
 return ( true );
 

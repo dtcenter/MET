@@ -39,10 +39,10 @@ Python3_Script::Python3_Script()
 
 {
 
-mlog << Error
-     << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
+cerr << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
 
 exit ( 1 );
+
 
 }
 
@@ -108,7 +108,7 @@ path.chomp(".py");
 
 Module = PyImport_ImportModule (path.text());
 
-PyErr_Print();
+// PyErr_Print();
 
 if ( ! Module )  {
 
@@ -162,28 +162,13 @@ return ( var );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Python3_Script::run(const ConcatString & command) const
-
-{
-
-run(command.text());
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void Python3_Script::run(const char * command) const
 
 {
 
 if ( empty(command) )  {
 
-   mlog << Error
-        << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
+   cerr << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
 
    exit ( 1 );
 
@@ -191,8 +176,7 @@ if ( empty(command) )  {
 
 if ( PyRun_String(command, Py_file_input, Dict, Dict) < 0 )  {
 
-   mlog << Error
-        << "\n\n   Python3_Script::run(const char *) -> command \""
+   cerr << "\n\n   Python3_Script::run(const char *) -> command \""
         << command << "\" failed!\n\n";
 
    exit ( 1 );
@@ -231,7 +215,7 @@ command << "pickle.dump( "
         << "\", \"wb\" ) )";
 
 
-// cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
+cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
 
 // run(command);
 
@@ -266,7 +250,7 @@ command << variable
 
 // cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
 
-run(command);
+run(command.text());
 
 
 return;
@@ -309,7 +293,7 @@ command << ']';
 
 
 
-run(command);
+run(command.text());
 
    //
    //  done

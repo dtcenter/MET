@@ -34,8 +34,8 @@ class Python3_Script {
       void clear();
 
       Python3_Script(const Python3_Script &);
-      Python3_Script();
       Python3_Script & operator=(const Python3_Script &);
+      Python3_Script();
 
       PyObject * Module;   //  not allocated
 
@@ -74,7 +74,6 @@ class Python3_Script {
       PyObject * lookup(const char * name) const;
 
       void run(const char * command) const;   //  runs a command in the namespace of the script
-      void run(const ConcatString &) const;   //  runs a command in the namespace of the script
 
 
       void write_pickle (const char * variable_name, const char * pickle_filename) const;

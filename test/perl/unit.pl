@@ -84,7 +84,7 @@ for my $test (@tests){
   
   # if writing a command file, print the environment and command, then loop
   if( $cmd_only ){
-    print "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
+    print "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
     print "$cmd\n\n";
     next;
   }
@@ -129,7 +129,7 @@ for my $test (@tests){
 
   # build a list of environment variable exports for reporting
   my @envs;
-  push @envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
+  push @envs, "export $_=\"" . $test->{"env"}{$_} . "\"\n" for sort keys %{ $test->{"env"} };
 
   # if the log file is activated, print the test information
   if( $file_log ){

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2020
+// ** Copyright UCAR (c) 1992 - 2019
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,8 +76,7 @@ Python3_List::Python3_List(const Python3_List &)
 
 {
 
-mlog << Error
-     << "\n\n  Python3_List::Python3_List(const Python3_List &) -> should never be called!\n\n";
+cerr << "\n\n  Python3_List::Python3_List(const Python3_List &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -97,8 +96,7 @@ Python3_List & Python3_List::operator=(const Python3_List &)
 
 {
 
-mlog << Error
-     << "\n\n  Python3_List(const Python3_List &) -> should never be called!\n\n";
+cerr << "\n\n  Python3_List(const Python3_List &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -155,8 +153,7 @@ clear();
 
 if ( ! PyList_Check(_obj) )  {
 
-   mlog << Error
-        << "\n\n  Python3_List::set(PyObject *) object is not a dictionary!\n\n";
+   cerr << "\n\n  Python3_List::set(PyObject *) object is not a dictionary!\n\n";
 
    exit ( 1 );
 
@@ -183,8 +180,7 @@ PyObject * a = 0;
 
 if ( (n < 0) || (n >= Size) )  {
 
-   mlog << Error
-        << "\n\n  Python3_List::operator[](int) const -> range check error\n\n";
+   cerr << "\n\n  Python3_List::operator[](int) const -> range check error\n\n";
 
    exit ( 1 );
 
