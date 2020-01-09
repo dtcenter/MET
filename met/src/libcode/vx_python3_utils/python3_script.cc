@@ -39,7 +39,8 @@ Python3_Script::Python3_Script()
 
 {
 
-cerr << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -168,7 +169,8 @@ void Python3_Script::run(const char * command) const
 
 if ( empty(command) )  {
 
-   cerr << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
+   mlog << Error
+        << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
 
    exit ( 1 );
 
@@ -176,7 +178,8 @@ if ( empty(command) )  {
 
 if ( PyRun_String(command, Py_file_input, Dict, Dict) < 0 )  {
 
-   cerr << "\n\n   Python3_Script::run(const char *) -> command \""
+   mlog << Error
+        << "\n\n   Python3_Script::run(const char *) -> command \""
         << command << "\" failed!\n\n";
 
    exit ( 1 );

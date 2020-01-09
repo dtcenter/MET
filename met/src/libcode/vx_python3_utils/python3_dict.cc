@@ -84,7 +84,8 @@ Python3_Dict::Python3_Dict(const Python3_Dict &)
 
 {
 
-cerr << "\n\n  Python3_Dict::Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict::Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -104,7 +105,8 @@ Python3_Dict & Python3_Dict::operator=(const Python3_Dict &)
 
 {
 
-cerr << "\n\n  Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -163,7 +165,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -172,7 +175,8 @@ if ( ! a )  {
 
 if ( ! PyLong_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not an integer\n\n";
 
    exit ( 1 );
@@ -200,7 +204,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -209,7 +214,8 @@ if ( ! a )  {
 
 if ( ! PyFloat_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not a floating point number\n\n";
 
    exit ( 1 );
@@ -237,7 +243,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -246,7 +253,8 @@ if ( ! a )  {
 
 if ( ! PyUnicode_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not a character string\n\n";
 
    exit ( 1 );
@@ -273,7 +281,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -282,7 +291,8 @@ if ( ! a )  {
 
 if ( ! PyDict_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not a python dictionary\n\n";
 
    exit ( 1 );
@@ -308,7 +318,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_list(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_list(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -317,7 +328,8 @@ if ( ! a )  {
 
 if ( ! PyList_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not a python list\n\n";
 
    exit ( 1 );
@@ -356,7 +368,8 @@ clear();
 
 if ( ! PyDict_Check(_obj) )  {
 
-   cerr << "\n\n  Python3_Dict::set(PyObject *) object is not a dictionary!\n\n";
+   mlog << Error
+        << "\n\n  Python3_Dict::set(PyObject *) object is not a dictionary!\n\n";
 
    exit ( 1 );
 
@@ -519,7 +532,8 @@ if ( PyDict_Check(value) )  {
       //  nope
       //
 
-cerr << "\n\n  Python3_Dict::dump_dict_value() -> can't determine type for dict value!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict::dump_dict_value() -> can't determine type for dict value!\n\n";
 
 exit ( 1 );
 

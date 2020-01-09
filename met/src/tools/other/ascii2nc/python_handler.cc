@@ -322,7 +322,7 @@ for (j=0; j<N; ++j)  {
 };
 
 
-cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
+// cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
 
 // exit ( 1 );
 
@@ -350,7 +350,7 @@ script.read_pickle(list_name, pickle_output_filename);
 
 PyObject * obj = script.lookup(list_name);
 
-cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
+// cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
 
 if ( ! PyList_Check(obj) )  {
 
