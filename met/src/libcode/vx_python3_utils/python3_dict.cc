@@ -363,13 +363,38 @@ void Python3_Dict::set(PyObject * _obj)
 
 {
 
+     if ( PyDict_Check   (_obj) )  set_from_dict   (_obj);
+else if ( PyModule_Check (_obj) )  set_from_module (_obj);
+else {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::set(PyObject *) -> bad object type\n\n";
+
+   exit ( 1 );
+
+}
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::set_from_dict(PyObject * _obj)
+
+{
+
 clear();
 
 
 if ( ! PyDict_Check(_obj) )  {
 
    mlog << Error
-        << "\n\n  Python3_Dict::set(PyObject *) object is not a dictionary!\n\n";
+        << "\n\n  Python3_Dict::set_from_dict(PyObject *) object is not a python dictionary!\n\n";
 
    exit ( 1 );
 
@@ -379,6 +404,32 @@ if ( ! PyDict_Check(_obj) )  {
 Size = PyDict_Size (_obj);
 
 Object = _obj;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::set_from_module(PyObject * _obj)
+
+{
+
+clear();
+
+
+if ( ! PyModule_Check(_obj) )  {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::set_from_module(PyObject *) object is not a python module!\n\n";
+
+   exit ( 1 );
+
+}
+
+set_from_dict(PyModule_GetDict(_obj));
 
 return;
 

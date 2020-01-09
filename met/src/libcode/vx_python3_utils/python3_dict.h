@@ -47,6 +47,9 @@ class Python3_Dict {
 
       PyObject * Object;   //  the dictionary, not allocated
 
+      void set_from_dict   (PyObject *);
+      void set_from_module (PyObject *);
+
       int Size;   //  the size of the dictionary
 
 
@@ -58,7 +61,7 @@ class Python3_Dict {
 
       void dump(std::ostream &, int depth) const;
 
-      void set(PyObject *);
+      void set(PyObject *);   //  dict or module
 
       int size() const;
 
