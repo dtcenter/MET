@@ -11,6 +11,7 @@
 
 
 #include "concat_string.h"
+#include "string_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,10 @@ class Python3_Script {
          //
          //  do stuff
          //
+
+
+      void reset_argv(const char * script_name, const StringArray & args);
+
 
       PyObject * lookup(const char * name) const;
 

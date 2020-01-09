@@ -1124,6 +1124,7 @@ AC_CONFIG_FILES([Makefile
                  data/poly/Makefile
                  data/poly/HMT_masks/Makefile
                  data/poly/NCEP_masks/Makefile
+                 data/wrappers/Makefile
                  data/ps/Makefile
                  data/table_files/Makefile
                  data/tc_data/Makefile

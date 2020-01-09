@@ -16,25 +16,14 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data \
-     wrappers
+SUBDIRS =
 
-topdir = $(pkgdatadir)
+wrappersdir = $(pkgdatadir)/wrappers
 
-top_DATA = \
-	version.txt
+wrappers_DATA = \
+     point_write_pickle.py \
+     write_pickle.py 
 
-EXTRA_DIST = ${top_DATA} \
-	sample_fcst \
-	sample_obs \
-	python \
-	copyright_notice.txt
+EXTRA_DIST = ${wrappers_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in
+MAINTAINERCLEANFILES 	= Makefile.in 

@@ -19,6 +19,14 @@
 
 #include <iostream>
 
+
+extern "C" {
+
+#include "Python.h"
+
+}
+
+
 #include "concat_string.h"
 #include "string_array.h"
 
@@ -46,7 +54,13 @@ class PythonHandler : public FileHandler
 
       StringArray user_script_args;
 
+
+      bool use_pickle;
+
+      ConcatString user_path_to_python;   //  if we're using pickle
+
    protected:  
+
 
          // Read the observations from the given file and add them to the
          // _observations vector.
@@ -54,6 +68,9 @@ class PythonHandler : public FileHandler
       virtual bool _readObservations(LineDataFile &ascii_file);   //  this shouldn't be called
 
       virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
+
+      bool do_pickle   ();
+      bool do_straight ();   //  straight-up python, no pickle
 
       void load_python_obs(PyObject *);   //  python object is list of lists
 

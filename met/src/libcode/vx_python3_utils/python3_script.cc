@@ -21,6 +21,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char sq = '\'';   //  single quote
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class Python3_Script
    //
@@ -107,7 +113,7 @@ PyErr_Print();
 if ( ! Module )  {
 
    mlog << Error
-        << "\n\n  Python3_Script::Python3_Script(const char *) -> unable to run script \"" << path << "\"\n\n";
+        << "\n\n  Python3_Script::Python3_Script(const char *) -> unable to open script \"" << path << "\"\n\n";
 
    Py_Finalize();
 
@@ -260,8 +266,54 @@ command << variable
 
 // cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
 
-// run(command);
+run(command);
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Script::reset_argv(const char * script_name, const StringArray & args)
+
+{
+
+int j;
+ConcatString command;
+ConcatString module_name = script_name;
+const int N = args.n();
+
+
+module_name.chomp(".py");
+
+command = "sys.argv = [ ";
+
+command << sq << module_name << sq << ", ";
+
+for (j=0; j<N; ++j)  {
+
+   command << sq << args[j] << sq;
+
+   if ( j < (N - 1) )  command << ',';
+
+   command << ' ';
+
+}
+
+command << ']';
+
+// cout << "command = \"" << command << "\"\n" << flush;
+
+
+
+run(command);
+
+   //
+   //  done
+   //
 
 return;
 

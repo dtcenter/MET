@@ -14,6 +14,7 @@ using namespace std;
 
 
 #include <iostream>
+#include <stdlib.h>
 
 #include "vx_log.h"
 #include "vx_math.h"
@@ -30,8 +31,15 @@ using namespace std;
 static const char python_wrapper [] = "a2nc_python";
 static const char pickle_wrapper [] = "a2nc_pickle";
 
+static const char generic_pickle_wrapper [] = "generic_pickle";
+
+
+static const char write_pickle_wrapper [] = "point_write_pickle.py";   //  relative to wrappers_dir
+
 
 static const char list_name [] = "point_data";
+
+static const char pickle_output_filename [] = "out.pickle";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,7 +63,7 @@ PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_n
 
 {
 
-
+use_pickle = false;
 
 }
 
@@ -71,6 +79,7 @@ int j;
 ConcatString s = ascii_filename;
 StringArray a = s.split(" ");
 
+
 user_script_filename = a[0];
 
 for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
@@ -78,6 +87,19 @@ for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
    user_script_args.add(a[j]);
 
 }
+
+use_pickle = false;
+
+const char * c = getenv(user_python_path_env);
+
+if ( c )  {
+
+   use_pickle = true;
+
+   user_path_to_python = c;
+
+}
+
 
 return;
 
@@ -183,6 +205,23 @@ bool PythonHandler::readAsciiFiles(const vector< ConcatString > &)
 
 {
 
+bool status = false;
+
+if ( use_pickle )  status = do_pickle   ();
+else               status = do_straight ();
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool PythonHandler::do_straight()
+
+{
+
 int j;
 ConcatString command;
 ConcatString short_user_name;
@@ -206,26 +245,7 @@ Python3_Script script(python_wrapper);
 
 if ( user_script_args.n() > 0 )  {
 
-   command << cs_erase
-           << "sys.argv = [ ";
-
-   command << sq << short_user_name << sq << ", ";
-
-   for (j=0; j<(user_script_args.n()); ++j)  {
-
-      command << sq << user_script_args[j] << sq;
-
-      if ( j < (user_script_args.n() - 1) )  command << ',';
-
-      command << ' ';
-
-   }
-
-   command << ']';
-
-   // cout << "command = \"" << command << "\"\n" << flush;
-
-   script.run(command);
+   script.reset_argv(short_user_name.text(), user_script_args);
 
 }
 
@@ -243,7 +263,7 @@ PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
 Python3_Dict md (m);
 
    //
-   //  lookup the variable containing the
+   //  get the variable containing the
    //    list of obs
    //
 
@@ -254,6 +274,95 @@ PyObject * obj = md.lookup_list(list_name);
    //
    //  load the obs
    //
+
+load_python_obs(obj);
+
+   //
+   //  done
+   //
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  wrapper usage:  /path/to/python wrapper.py pickle_output_filename user_script_name [ user_script args ... ]
+   //
+
+bool PythonHandler::do_pickle()
+
+{
+
+int j;
+const int N = user_script_args.n();
+ConcatString command;
+int status;
+const char * mbb = getenv("MET_BUILD_BASE");
+
+
+if ( ! mbb )  {
+
+   mlog << Error
+        << "\n\n  PythonHandler::do_pickle() -> can't get environment variable "
+        << "MET_BUILD_BASE\n\n";
+
+}
+
+command << cs_erase
+        << user_path_to_python    << ' '
+        << mbb << '/' << wrappers_dir << '/' << write_pickle_wrapper << ' '
+        << pickle_output_filename << ' '
+        << user_script_filename;
+
+for (j=0; j<N; ++j)  {
+
+   command << ' ' << user_script_args[j];
+
+};
+
+
+cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
+
+// exit ( 1 );
+
+status = system(command.text());
+
+if ( status )  {
+
+   mlog << Error
+        << "\n\n  PythonHandler::do_pickle() -> command \"" << command.text() << "\" failed ... status = " << status << "\n\n";
+
+   exit ( 1 );
+
+
+}
+
+ConcatString generic;
+
+// generic << cs_erase << mbb << '/' << wrappers_dir << '/' << generic_pickle_wrapper << ".py";
+
+generic = generic_pickle_wrapper;
+
+Python3_Script script(generic.text());
+
+script.read_pickle(list_name, pickle_output_filename);
+
+PyObject * obj = script.lookup(list_name);
+
+cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
+
+if ( ! PyList_Check(obj) )  {
+
+   mlog << Error
+        << "\n\n  PythonHandler::do_pickle() -> pickle object is not a list!\n\n";
+
+   exit ( 1 );
+
+}
 
 load_python_obs(obj);
 

@@ -26,6 +26,14 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char user_python_path_env [] = "MET_PYTHON_EXE";
+
+static const char wrappers_dir         [] = "data/wrappers";     //  relative to MET_BUILD_BASE
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 static const int max_tuple_data_dims = 10;
 
 
