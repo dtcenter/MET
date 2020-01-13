@@ -10,59 +10,49 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
+   //
+   //  Warning:
+   //
+   //     This file is machine generated.
+   //
+   //     Do not edit by hand.
+   //
+   //
+   //     Created by enum_to_string from file "token.h"
+   //
+   //     on January 13, 2020   9:59 am MST
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <iostream>
-
-#include "vx_log.h"
-
-#include "python_tuple.h"
+#ifndef  __TOKENTYPE_TO_STRING_H__
+#define  __TOKENTYPE_TO_STRING_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_tuple_int_values(PyObject * tuple, int & dim, int * values)
-
-{
-
-dim = PyTuple_Size (tuple);
-
-
-if ( dim > max_tuple_data_dims )  {
-
-   mlog << Error
-        << "\n\n"
-        << "increase parameter \"max_tuple_data_dims\" to at least "
-        << dim << "\n\n";
-
-   exit ( 1 );
-
-}
-
-
-int j;
-PyObject * item = 0;
-
-for (j=0; j<dim; ++j)  {
-
-   item = PyTuple_GetItem (tuple, j);
-
-   values[j] = (int) PyLong_AsLong (item);
-
-}
-
-
-return;
-
-}
+#include "concat_string.h"
+#include "token.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+extern ConcatString tokentype_to_string(const TokenType);
+
+
+extern bool string_to_tokentype(const char *, TokenType &);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __TOKENTYPE_TO_STRING_H__  */
+
+
+////////////////////////////////////////////////////////////////////////
 
 

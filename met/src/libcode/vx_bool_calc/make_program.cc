@@ -262,7 +262,7 @@ int j, n, d;
 Token tok;
 
 
-d = 0;
+n = d = 0;
 
 
 for (j=0; j<(int) program.size(); ++j)  {

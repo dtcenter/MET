@@ -12,6 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_bool_calc.a
 libvx_bool_calc_a_SOURCES = \
+              tokentype_to_string.cc tokentype_to_string.h \
               make_program.cc make_program.h \
               bool_calc.cc bool_calc.h \
               token.cc token.h \

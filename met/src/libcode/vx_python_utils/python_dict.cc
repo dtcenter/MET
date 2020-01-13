@@ -44,7 +44,7 @@ if ( ! a )  {
 
 }
 
-if ( ! PyInt_Check(a) )  {
+if ( ! PyLong_Check(a) )  {
 
    cerr << "\n\n  dict_lookup_int(PyObject * dict, const char * key) -> value for key \""
         << key << "\" not an integer\n\n";
@@ -53,7 +53,7 @@ if ( ! PyInt_Check(a) )  {
 
 }
 
-k = (int) PyInt_AS_LONG(a);
+k = (int) PyLong_AS_LONG(a);
 
 return ( k );
 
@@ -118,7 +118,7 @@ if ( ! a )  {
 
 }
 
-if ( ! PyString_Check(a) )  {
+if ( ! PyUnicode_Check(a) )  {
 
    cerr << "\n\n  dict_lookup_string(PyObject * dict, const char * key) -> value for key \""
         << key << "\" not a character string\n\n";
@@ -127,7 +127,7 @@ if ( ! PyString_Check(a) )  {
 
 }
 
-s = PyString_AS_STRING(a);
+s = PyUnicode_AsUTF8(a);
 
 return ( s );
 
@@ -217,7 +217,7 @@ while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
    cout << tab << "Item # " << j << "\n";   //  want "j" here, not "pos"
 
-   if ( ! PyString_Check(key) )  {
+   if ( ! PyUnicode_Check(key) )  {
 
       mlog << Error
            << "\n\n  dump_dict() -> key is not a string!\n\n";
@@ -226,7 +226,7 @@ while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
    }
 
-   cout << tab << "Key   = \"" << PyString_AsString(key) << "\"\n";
+   cout << tab << "Key   = \"" << PyUnicode_AsUTF8(key) << "\"\n";
 
    cout << tab << "Value: ";
 
@@ -267,9 +267,9 @@ const char * const tab = "    ";
    //
 
 
-if ( PyString_Check(value) )  {
+if ( PyUnicode_Check(value) )  {
 
-   cout << '\"' << PyString_AsString(value) << '\"'
+   cout << '\"' << PyUnicode_AsUTF8(value) << '\"'
         << tab << "(type: string)\n";
 
    return;
@@ -279,9 +279,9 @@ if ( PyString_Check(value) )  {
    ////////////////////////////
 
 
-if ( PyInt_Check(value) )  {
+if ( PyLong_Check(value) )  {
 
-   cout << PyInt_AsLong(value)
+   cout << PyLong_AsLong(value)
         << tab << "(type: integer)\n";
 
    return;
