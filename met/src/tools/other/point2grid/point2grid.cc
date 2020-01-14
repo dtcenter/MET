@@ -535,8 +535,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    int idx, hdr_idx;
    int var_idx_or_gc;
    int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
-   ConcatString vname;
+   ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
+   DataPlane cnt_dp, mask_dp;
    NcVar var_obs_gc, var_obs_var;
 
    bool use_var_id = true;
@@ -619,6 +620,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    nx = to_grid.nx();
    ny = to_grid.ny();
    to_dp.set_size(nx, ny);
+   cnt_dp.set_size(nx, ny);
+   mask_dp.set_size(nx, ny);
 
    // Loop through the requested fields
    int obs_count_zero_to, obs_count_non_zero_to;
@@ -672,6 +675,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
      
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
+      cnt_dp.set_init(valid_time);
+      cnt_dp.set_valid(valid_time);
+      mask_dp.set_init(valid_time);
+      mask_dp.set_valid(valid_time);
       
       var_index_array.clear();
       // Select output variable name
@@ -688,7 +695,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          vname = conf_info.get_var_name(vinfo->name());
       }
       else {
-         vname = VarNameSA[i];
+         vname = conf_info.get_var_name(VarNameSA[i]);
       }
       mlog << Debug(4) << method_name
            << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
@@ -744,11 +751,15 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
          to_count = 0;
          to_dp.set_constant(bad_data_double);
+         cnt_dp.set_constant(0);
+         mask_dp.set_constant(0);
          for (int x_idx = 0; x_idx<nx; x_idx++) {
             for (int y_idx = 0; y_idx<ny; y_idx++) {
                offset = to_dp.two_to_one(x_idx,y_idx);
                cellArray = cellMapping[offset];
                if (0 < cellArray.n_elements()) {
+                  //cnt_dp.set(cellArray.n_elements(), x_idx, y_idx);
+                  //mask_dp.set(1, x_idx, y_idx);
                   valid_count = 0;
                   dataArray.clear();
                   for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
@@ -791,6 +802,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      if (is_eq(to_value, 0.)) obs_count_zero_to++;
                      else obs_count_non_zero_to++;
 
+                     cnt_dp.set(data_count, x_idx, y_idx);
+                     mask_dp.set(1, x_idx, y_idx);
                      to_dp.set(to_value, x_idx, y_idx);
                      if (1 < data_count) {
                         mlog << Debug(9) << method_name
@@ -811,6 +824,13 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      
+      vname_cnt = vname;
+      vname_cnt << "_cnt";
+      vname_mask = vname;
+      vname_mask << "_mask";
+      write_nc(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
+      write_nc(mask_dp, to_grid, vinfo, vname_mask.c_str());
       
       mlog << Debug(7) << method_name << " obs_count_zero_to: " << obs_count_zero_to
            << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
