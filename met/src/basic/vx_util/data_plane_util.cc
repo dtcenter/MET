@@ -95,8 +95,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
-                  double t, const double gaussian_radius,
-                  const double gaussian_dx) {
+                  double t, const GaussianInfo &gaussian) {
    double v = 0.0;
    int x, y;
 
@@ -163,7 +162,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    // Apply the Gaussian smoother 
    if (mthd == InterpMthd_Gaussian) {
-     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx, t);
+      interp_gaussian_dp(smooth_dp, gaussian, t);
    }
 
    // Cleanup
@@ -182,10 +181,10 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 DataPlane smooth_field(const DataPlane &dp,
                        InterpMthd mthd, int width,
                        const GridTemplateFactory::GridTemplates shape,
-                       double t, const double gaussian_radius, const double gaussian_dx) {
+                       double t, const GaussianInfo &gaussian) {
    DataPlane smooth_dp;
 
-   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian_radius, gaussian_dx);
+   smooth_field(dp, smooth_dp, mthd, width, shape, t, gaussian);
 
    return(smooth_dp);
 }
