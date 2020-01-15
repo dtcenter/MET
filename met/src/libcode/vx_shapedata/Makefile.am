@@ -19,6 +19,7 @@ libvx_shapedata_a_SOURCES = \
               set.cc set.h \
               interest.cc interest.h \
               mode_columns.h \
+              mode_field_info.cc mode_field_info.h \
               mode_conf_info.cc mode_conf_info.h \
               engine.cc engine.h \
               ihull.cc ihull.h \

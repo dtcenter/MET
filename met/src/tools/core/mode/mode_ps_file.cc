@@ -190,13 +190,13 @@ MetDataDir = ConfInfo->met_data_dir;
 
 ConcatString s;
 
- s = replace_path(ConfInfo->fcst_raw_pi.color_table.c_str());
+ s = replace_path(ConfInfo->Fcst->raw_pi.color_table.c_str());
 
 mlog << Debug(1) << "Loading forecast raw color table: " << s << "\n";
 
  FcstRawCtable.read(s.c_str());
 
- s = replace_path(ConfInfo->obs_raw_pi.color_table.c_str());
+ s = replace_path(ConfInfo->Obs->raw_pi.color_table.c_str());
 
 mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
 
@@ -208,7 +208,7 @@ mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
    // data_min and data_max values
    //
 
-if ( (ConfInfo->fcst_info->name() == ConfInfo->obs_info->name()) &&
+if ( (ConfInfo->Fcst->var_info->name() == ConfInfo->Obs->var_info->name()) &&
       is_eq( FcstRawCtable.data_min (bad_data_double), 0.0) &&
       is_eq( FcstRawCtable.data_max (bad_data_double), 1.0) &&
       is_eq(  ObsRawCtable.data_min (bad_data_double), 0.0) &&
@@ -249,11 +249,11 @@ if ( (ConfInfo->fcst_info->name() == ConfInfo->obs_info->name()) &&
    // config file, rescale the forecast colortable to the requested range
    //
 
-if ( !is_eq(ConfInfo->fcst_raw_pi.plot_min, 0.0) ||
-     !is_eq(ConfInfo->fcst_raw_pi.plot_max, 0.0) ) {
+if ( !is_eq(ConfInfo->Fcst->raw_pi.plot_min, 0.0) ||
+     !is_eq(ConfInfo->Fcst->raw_pi.plot_max, 0.0) ) {
 
-   FcstRawCtable.rescale(ConfInfo->fcst_raw_pi.plot_min,
-                         ConfInfo->fcst_raw_pi.plot_max,
+   FcstRawCtable.rescale(ConfInfo->Fcst->raw_pi.plot_min,
+                         ConfInfo->Fcst->raw_pi.plot_max,
                          bad_data_double);
 
 }
@@ -263,11 +263,11 @@ if ( !is_eq(ConfInfo->fcst_raw_pi.plot_min, 0.0) ||
    // config file, rescale the observation colortable to the requested range
    //
 
-if ( !is_eq(ConfInfo->obs_raw_pi.plot_min, 0.0) ||
-     !is_eq(ConfInfo->obs_raw_pi.plot_max, 0.0) ) {
+if ( !is_eq(ConfInfo->Obs->raw_pi.plot_min, 0.0) ||
+     !is_eq(ConfInfo->Obs->raw_pi.plot_max, 0.0) ) {
 
-   ObsRawCtable.rescale(ConfInfo->obs_raw_pi.plot_min,
-                        ConfInfo->obs_raw_pi.plot_max,
+   ObsRawCtable.rescale(ConfInfo->Obs->raw_pi.plot_min,
+                        ConfInfo->Obs->raw_pi.plot_max,
                         bad_data_double);
 }
 
@@ -541,15 +541,15 @@ void ModePsFile::make_plot()
 
 {
 
-const MergeType fcst_merge_flag = ConfInfo->fcst_merge_flag;
-const MergeType  obs_merge_flag = ConfInfo->obs_merge_flag;
+const MergeType fcst_merge_flag = ConfInfo->Fcst->merge_flag;
+const MergeType  obs_merge_flag = ConfInfo->Obs->merge_flag;
 ConcatString s;
 
 s << cs_erase
-  << "MODE: " << ConfInfo->fcst_info->name() << " at "
-  << ConfInfo->fcst_info->level_name() << " vs "
-  << ConfInfo->obs_info->name() << " at "
-  << ConfInfo->obs_info->level_name();
+  << "MODE: " << ConfInfo->Fcst->var_info->name() << " at "
+  << ConfInfo->Fcst->var_info->level_name() << " vs "
+  << ConfInfo->Obs->var_info->name() << " at "
+  << ConfInfo->Obs->var_info->level_name();
 
  plot_engine(*Engine, FOEng, s.c_str());
 
@@ -602,12 +602,12 @@ const double h_tab_cen = PageWidth/2.0;
 if ( fcst ) {
 
    merge_mask = *(eng.fcst_conv);
-   merge_mask.threshold(eng.conf_info.fcst_merge_thresh);
+   merge_mask.threshold(eng.conf_info.Fcst->merge_thresh);
 
 } else {
 
    merge_mask = *(eng.obs_conv);
-   merge_mask.threshold(eng.conf_info.obs_merge_thresh);
+   merge_mask.threshold(eng.conf_info.Obs->merge_thresh);
 
 }
 

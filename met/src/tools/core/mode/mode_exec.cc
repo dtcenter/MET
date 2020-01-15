@@ -225,29 +225,29 @@ void ModeExecutive::setup_fcst_obs_data()
 
       // Read the gridded data from the input forecast file
 
-   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), Fcst_sd.data)) )  {
+   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
       mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get forecast data \""
-           << engine.conf_info.fcst_info->magic_str()
+           << engine.conf_info.Fcst->var_info->magic_str()
            << "\" from file \"" << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read the gridded data from the input observation file
 
-   if ( !(obs_mtddf->data_plane(*(engine.conf_info.obs_info), Obs_sd.data)) )  {
+   if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
 
       mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get observation data \""
-           << engine.conf_info.obs_info->magic_str()
+           << engine.conf_info.Obs->var_info->magic_str()
            << "\" from file \"" << obs_file << "\"\n\n";
       exit(1);
    }
 
       // Determine the verification grid
 
-   grid = parse_vx_grid(engine.conf_info.fcst_info->regrid(),
+   grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
       // Store the grid
@@ -258,29 +258,29 @@ void ModeExecutive::setup_fcst_obs_data()
 
    if ( !(fcst_mtddf->grid() == grid) )  {
       mlog << Debug(1)
-           << "Regridding forecast " << engine.conf_info.fcst_info->magic_str()
+           << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
            << " to the verification grid.\n";
       Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
-                                engine.conf_info.fcst_info->regrid());
+                                engine.conf_info.Fcst->var_info->regrid());
    }
 
       // Regrid, if necessary
 
    if ( !(obs_mtddf->grid() == grid) )  {
       mlog << Debug(1)
-           << "Regridding observation " << engine.conf_info.obs_info->magic_str()
+           << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
            << " to the verification grid.\n";
       Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
-                               engine.conf_info.obs_info->regrid());
+                               engine.conf_info.Obs->var_info->regrid());
    }
 
       // Rescale probabilites from [0, 100] to [0, 1]
 
-   if ( engine.conf_info.fcst_info->p_flag() ) rescale_probability(Fcst_sd.data);
+   if ( engine.conf_info.Fcst->var_info->p_flag() ) rescale_probability(Fcst_sd.data);
 
       // Rescale probabilites from [0, 100] to [0, 1]
 
-   if ( engine.conf_info.obs_info->p_flag() ) rescale_probability(Obs_sd.data);
+   if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
 
       // Print a warning if the valid times do not match
 
@@ -290,32 +290,32 @@ void ModeExecutive::setup_fcst_obs_data()
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
-           << engine.conf_info.fcst_info->magic_str() << " versus "
-           << engine.conf_info.obs_info->magic_str() << ".\n\n";
+           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
 
       // Print a warning if the accumulation intervals do not match
 
-   if(engine.conf_info.fcst_info->level().type() == LevelType_Accum &&
-      engine.conf_info.obs_info->level().type()  == LevelType_Accum &&
+   if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
+      engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
       mlog << Warning << "\nsetup_fcst_obs_data() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
-           << engine.conf_info.fcst_info->magic_str() << " versus "
-           << engine.conf_info.obs_info->magic_str() << ".\n\n";
+           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
 
    mlog << Debug(1)
         << "Forecast Field: "
-        << engine.conf_info.fcst_info->name() << " at "
-        << engine.conf_info.fcst_info->level_name()
+        << engine.conf_info.Fcst->var_info->name() << " at "
+        << engine.conf_info.Fcst->var_info->level_name()
         << "\n"
         << "Observation Field: "
-        << engine.conf_info.obs_info->name() << " at "
-        << engine.conf_info.obs_info->level_name()
+        << engine.conf_info.Obs->var_info->name() << " at "
+        << engine.conf_info.Obs->var_info->level_name()
         << "\n";
 
       // Mask out the missing data between fields
@@ -376,8 +376,8 @@ T_index = t_index;
 conf.set_conv_radius_by_index  (R_index);
 conf.set_conv_thresh_by_index  (T_index);
 
-if ( conf.need_fcst_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
-if ( conf.need_obs_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);
+if ( conf.Fcst->need_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
+if ( conf.Obs->need_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);
 
    //
    //  Set up the engine with these raw fields
@@ -427,7 +427,7 @@ void ModeExecutive::do_match_merge()
 
    mlog << Debug(2)
         << "Performing merging ("
-        << mergetype_to_string(engine.conf_info.fcst_merge_flag)
+        << mergetype_to_string(engine.conf_info.Fcst->merge_flag)
         << ") in the forecast field.\n";
 
    // Do the forecast merging
@@ -436,7 +436,7 @@ void ModeExecutive::do_match_merge()
 
    mlog << Debug(2)
         << "Performing merging ("
-        << mergetype_to_string(engine.conf_info.obs_merge_flag)
+        << mergetype_to_string(engine.conf_info.Obs->merge_flag)
         << ") in the observation field.\n";
 
    // Do the observation merging
@@ -559,8 +559,8 @@ void ModeExecutive::compute_ct_stats()
          obs_mask  = *engine.obs_raw;
 
          // Apply the thresholds specified in the config file
-         fcst_mask.threshold(engine.conf_info.fcst_conv_thresh);
-         obs_mask.threshold(engine.conf_info.obs_conv_thresh);
+         fcst_mask.threshold(engine.conf_info.Fcst->conv_thresh);
+         obs_mask.threshold(engine.conf_info.Obs->conv_thresh);
       }
       // Object fields
       else if(i == 1) {
@@ -750,8 +750,8 @@ void ModeExecutive::write_obj_stats()
 
    out.close();
 
-   if(engine.conf_info.fcst_merge_flag == MergeType_Both ||
-      engine.conf_info.fcst_merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Fcst->merge_flag == MergeType_Both ||
+      engine.conf_info.Fcst->merge_flag == MergeType_Engine) {
 
       //
       // Create output stats file for forecast merging
@@ -782,8 +782,8 @@ void ModeExecutive::write_obj_stats()
       out.close();
    }
 
-   if(engine.conf_info.obs_merge_flag == MergeType_Both ||
-      engine.conf_info.obs_merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Obs->merge_flag == MergeType_Both ||
+      engine.conf_info.Obs->merge_flag == MergeType_Engine) {
 
       //
       // Create output stats file for observation merging
@@ -830,8 +830,8 @@ if ( info.all_false() )  return;
    int n, x, y;
    ConcatString out_file;
    ConcatString s;
-   const ConcatString fcst_thresh = engine.conf_info.fcst_conv_thresh.get_str(5);
-   const ConcatString  obs_thresh = engine.conf_info.obs_conv_thresh.get_str(5);
+   const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
+   const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
    float *fcst_raw_data      = (float *) 0;
    float *fcst_obj_raw_data  = (float *) 0;
@@ -964,8 +964,8 @@ if ( info.all_false() )  return;
    //  write the radius and threshold values
    //
 
-   if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.fcst_conv_radius)
-       || !put_nc_data(&obs_radius_var, &engine.conf_info.obs_conv_radius) )  {
+   if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.Fcst->conv_radius)
+       || !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
 
          mlog << Error
               << "write_obj_netcdf() -> "
@@ -990,14 +990,14 @@ if ( info.all_false() )  return;
       //  fcst and obs values for variable, level and units
       //
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->name().c_str(),       "fcst_variable", "fcst_variable_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->name().c_str(),         "obs_variable",  "obs_variable_length");
+   nc_add_string(f_out, engine.conf_info.Fcst->var_info->name().c_str(),       "fcst_variable", "fcst_variable_length");
+   nc_add_string(f_out, engine.conf_info.Obs->var_info->name().c_str(),         "obs_variable",  "obs_variable_length");
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->level_name().c_str(), "fcst_level",    "fcst_level_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->level_name().c_str(),   "obs_level",     "obs_level_length");
+   nc_add_string(f_out, engine.conf_info.Fcst->var_info->level_name().c_str(), "fcst_level",    "fcst_level_length");
+   nc_add_string(f_out, engine.conf_info.Obs->var_info->level_name().c_str(),   "obs_level",     "obs_level_length");
 
-   nc_add_string(f_out, engine.conf_info.fcst_info->units().c_str(),      "fcst_units",    "fcst_units_length");
-   nc_add_string(f_out, engine.conf_info.obs_info->units().c_str(),        "obs_units",     "obs_units_length");
+   nc_add_string(f_out, engine.conf_info.Fcst->var_info->units().c_str(),      "fcst_units",    "fcst_units_length");
+   nc_add_string(f_out, engine.conf_info.Obs->var_info->units().c_str(),        "obs_units",     "obs_units_length");
 
 
 

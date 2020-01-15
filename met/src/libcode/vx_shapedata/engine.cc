@@ -399,7 +399,7 @@ void ModeFuzzyEngine::do_fcst_convolution() {
 
    if(!need_fcst_conv) return;
 
-   r = conf_info.fcst_conv_radius;
+   r = conf_info.Fcst->conv_radius;
 
    *fcst_conv = *fcst_raw;
 
@@ -409,7 +409,7 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    //
    // Apply a circular convolution to the raw field
    //
-   if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.fcst_vld_thresh);
+   if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.Fcst->vld_thresh);
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
@@ -431,7 +431,7 @@ void ModeFuzzyEngine::do_obs_convolution() {
 
    if(!need_obs_conv) return;
 
-   r = conf_info.obs_conv_radius;
+   r = conf_info.Obs->conv_radius;
 
    *obs_conv = *obs_raw;
 
@@ -441,7 +441,7 @@ void ModeFuzzyEngine::do_obs_convolution() {
    //
    // Apply a circular convolution to the raw field
    //
-   if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.obs_vld_thresh);
+   if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.Obs->vld_thresh);
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
@@ -465,15 +465,15 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    *fcst_mask = *fcst_conv;
 
    *fcst_thresh = *fcst_raw;
-   fcst_thresh->threshold(conf_info.fcst_conv_thresh);
+   fcst_thresh->threshold(conf_info.Fcst->conv_thresh);
 
    //
    // Threshold the convolved field
    //
-   fcst_mask->threshold(conf_info.fcst_conv_thresh);
+   fcst_mask->threshold(conf_info.Fcst->conv_thresh);
 
    mlog << Debug(3) << "Applying convolution threshold "
-        << conf_info.fcst_conv_thresh.get_str()
+        << conf_info.Fcst->conv_thresh.get_str()
         << " resulted in " << fcst_mask->n_objects()
         << " simple forecast objects.\n";
 
@@ -498,15 +498,15 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    *obs_mask = *obs_conv;
 
    *obs_thresh = *obs_raw;
-   obs_thresh->threshold(conf_info.obs_conv_thresh);
+   obs_thresh->threshold(conf_info.Obs->conv_thresh);
 
    //
    // Threshold the convolved field
    //
-   obs_mask->threshold(conf_info.obs_conv_thresh);
+   obs_mask->threshold(conf_info.Obs->conv_thresh);
 
    mlog << Debug(3) << "Applying convolution threshold "
-        << conf_info.obs_conv_thresh.get_str()
+        << conf_info.Obs->conv_thresh.get_str()
         << " resulted in " << obs_mask->n_objects()
         << " simple observation objects.\n";
 
@@ -532,11 +532,11 @@ void ModeFuzzyEngine::do_fcst_filtering() {
    //
    // Apply object attribute filtering logic
    //
-   if(conf_info.fcst_filter_attr_map.size() > 0) {
+   if(conf_info.Fcst->filter_attr_map.size() > 0) {
 
-      fcst_mask->threshold_attr(conf_info.fcst_filter_attr_map,
-                                fcst_raw, conf_info.fcst_conv_thresh, grid,
-                                conf_info.fcst_info->is_precipitation());
+      fcst_mask->threshold_attr(conf_info.Fcst->filter_attr_map,
+                                fcst_raw, conf_info.Fcst->conv_thresh, grid,
+                                conf_info.Fcst->var_info->is_precipitation());
 
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  fcst_mask->n_objects()
@@ -567,11 +567,11 @@ void ModeFuzzyEngine::do_obs_filtering() {
    //
    // Apply object attribute filtering logic
    //
-   if(conf_info.obs_filter_attr_map.size() > 0) {
+   if(conf_info.Obs->filter_attr_map.size() > 0) {
 
-      obs_mask->threshold_attr(conf_info.obs_filter_attr_map,
-                               obs_raw, conf_info.obs_conv_thresh, grid,
-                               conf_info.obs_info->is_precipitation());
+      obs_mask->threshold_attr(conf_info.Obs->filter_attr_map,
+                               obs_raw, conf_info.Obs->conv_thresh, grid,
+                               conf_info.Obs->var_info->is_precipitation());
 
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  obs_mask->n_objects()
@@ -654,12 +654,12 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
    if(!need_fcst_merge) return;
 
-   if(conf_info.fcst_merge_flag == MergeType_Both ||
-      conf_info.fcst_merge_flag == MergeType_Thresh)
+   if(conf_info.Fcst->merge_flag == MergeType_Both ||
+      conf_info.Fcst->merge_flag == MergeType_Thresh)
       do_fcst_merge_thresh();
 
-   if(conf_info.fcst_merge_flag == MergeType_Both ||
-      conf_info.fcst_merge_flag == MergeType_Engine)
+   if(conf_info.Fcst->merge_flag == MergeType_Both ||
+      conf_info.Fcst->merge_flag == MergeType_Engine)
       do_fcst_merge_engine(default_config, merge_config);
 
    //
@@ -682,12 +682,12 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
    if(!need_obs_merge) return;
 
-   if(conf_info.obs_merge_flag == MergeType_Both ||
-      conf_info.obs_merge_flag == MergeType_Thresh)
+   if(conf_info.Obs->merge_flag == MergeType_Both ||
+      conf_info.Obs->merge_flag == MergeType_Thresh)
       do_obs_merge_thresh();
 
-   if(conf_info.obs_merge_flag == MergeType_Both ||
-      conf_info.obs_merge_flag == MergeType_Engine)
+   if(conf_info.Obs->merge_flag == MergeType_Both ||
+      conf_info.Obs->merge_flag == MergeType_Engine)
       do_obs_merge_engine(default_config, merge_config);
 
    //
@@ -788,7 +788,7 @@ void ModeFuzzyEngine::do_no_match() {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
-                         conf_info.fcst_info->is_precipitation());
+                         conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
@@ -798,7 +798,7 @@ void ModeFuzzyEngine::do_no_match() {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
-                        conf_info.obs_info->is_precipitation());
+                        conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -878,7 +878,7 @@ void ModeFuzzyEngine::do_match_merge() {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
-                         conf_info.fcst_info->is_precipitation());
+                         conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
@@ -888,7 +888,7 @@ void ModeFuzzyEngine::do_match_merge() {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
-                        conf_info.obs_info->is_precipitation());
+                        conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -1036,7 +1036,7 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
    //
    // Threshold the forecast merge field
    //
-   fcst_merge_mask.threshold(conf_info.fcst_merge_thresh);
+   fcst_merge_mask.threshold(conf_info.Fcst->merge_thresh);
 
    //
    // Split up the forecast merge field
@@ -1159,7 +1159,7 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
    //
    // Threshold the forecast merge field
    //
-   obs_merge_mask.threshold(conf_info.obs_merge_thresh);
+   obs_merge_mask.threshold(conf_info.Obs->merge_thresh);
 
    //
    // Split up the forecast merge field
@@ -1294,8 +1294,8 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    fcst_engine->ctable = ctable;
    if(default_config && merge_config) {
       fcst_engine->conf_info.read_config(default_config, merge_config);
-      fcst_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
-                                            conf_info.obs_info->file_type());
+      fcst_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
+                                            conf_info.Obs->var_info->file_type());
       path = replace_path(fcst_engine->conf_info.object_pi.color_table.c_str());
       fcst_engine->ctable.read(path.c_str());
    }
@@ -1303,20 +1303,20 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    //
    // Copy over fcst_info and obs_info
    //
-   *(fcst_engine->conf_info.fcst_info) = *(conf_info.fcst_info);
-   *(fcst_engine->conf_info.obs_info)  = *(conf_info.fcst_info);
+   *(fcst_engine->conf_info.Fcst->var_info) = *(conf_info.Fcst->var_info);
+   *(fcst_engine->conf_info.Obs->var_info)  = *(conf_info.Fcst->var_info);
 
    //
    // Copy over the forecast threshold values
    //
-   fcst_engine->conf_info.fcst_conv_thresh     = conf_info.fcst_conv_thresh;
-   fcst_engine->conf_info.obs_conv_thresh      = conf_info.fcst_conv_thresh;
+   fcst_engine->conf_info.Fcst->conv_thresh     = conf_info.Fcst->conv_thresh;
+   fcst_engine->conf_info.Obs->conv_thresh      = conf_info.Fcst->conv_thresh;
 
-   fcst_engine->conf_info.fcst_filter_attr_map = conf_info.fcst_filter_attr_map;
-   fcst_engine->conf_info.obs_filter_attr_map  = conf_info.fcst_filter_attr_map;
+   fcst_engine->conf_info.Fcst->filter_attr_map = conf_info.Fcst->filter_attr_map;
+   fcst_engine->conf_info.Obs->filter_attr_map  = conf_info.Fcst->filter_attr_map;
 
-   fcst_engine->conf_info.fcst_merge_thresh    = conf_info.fcst_merge_thresh;
-   fcst_engine->conf_info.obs_merge_thresh     = conf_info.fcst_merge_thresh;
+   fcst_engine->conf_info.Fcst->merge_thresh    = conf_info.Fcst->merge_thresh;
+   fcst_engine->conf_info.Obs->merge_thresh     = conf_info.Fcst->merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -1461,8 +1461,8 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    obs_engine->ctable = ctable;
    if(default_config && merge_config) {
       obs_engine->conf_info.read_config(default_config, merge_config);
-      obs_engine->conf_info.process_config(conf_info.fcst_info->file_type(),
-                                           conf_info.obs_info->file_type());
+      obs_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
+                                           conf_info.Obs->var_info->file_type());
       path = replace_path(obs_engine->conf_info.object_pi.color_table.c_str());
       obs_engine->ctable.read(path.c_str());
    }
@@ -1470,20 +1470,20 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    //
    // Copy over fcst_info and obs_info
    //
-   *(obs_engine->conf_info.fcst_info) = *(conf_info.obs_info);
-   *(obs_engine->conf_info.obs_info)  = *(conf_info.obs_info);
+   *(obs_engine->conf_info.Fcst->var_info) = *(conf_info.Obs->var_info);
+   *(obs_engine->conf_info.Obs->var_info)  = *(conf_info.Obs->var_info);
 
    //
    // Copy over the observation threshold values
    //
-   obs_engine->conf_info.fcst_conv_thresh     = conf_info.obs_conv_thresh;
-   obs_engine->conf_info.obs_conv_thresh      = conf_info.obs_conv_thresh;
+   obs_engine->conf_info.Fcst->conv_thresh     = conf_info.Obs->conv_thresh;
+   obs_engine->conf_info.Obs->conv_thresh      = conf_info.Obs->conv_thresh;
 
-   obs_engine->conf_info.fcst_filter_attr_map = conf_info.obs_filter_attr_map;
-   obs_engine->conf_info.obs_filter_attr_map  = conf_info.obs_filter_attr_map;
+   obs_engine->conf_info.Fcst->filter_attr_map = conf_info.Obs->filter_attr_map;
+   obs_engine->conf_info.Obs->filter_attr_map  = conf_info.Obs->filter_attr_map;
 
-   obs_engine->conf_info.fcst_merge_thresh    = conf_info.obs_merge_thresh;
-   obs_engine->conf_info.obs_merge_thresh     = conf_info.obs_merge_thresh;
+   obs_engine->conf_info.Fcst->merge_thresh    = conf_info.Obs->merge_thresh;
+   obs_engine->conf_info.Obs->merge_thresh     = conf_info.Obs->merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -1628,7 +1628,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
-                         conf_info.fcst_info->is_precipitation());
+                         conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
@@ -1638,7 +1638,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
-                        conf_info.obs_info->is_precipitation());
+                        conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -1803,7 +1803,7 @@ void ModeFuzzyEngine::do_match_only() {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
-                         conf_info.fcst_info->is_precipitation());
+                         conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
 
@@ -1813,7 +1813,7 @@ void ModeFuzzyEngine::do_match_only() {
       obs_shape[j] = select(*obs_split, j+1);
       obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
-                        conf_info.obs_info->is_precipitation());
+                        conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
    }
 
@@ -2052,13 +2052,13 @@ void ModeFuzzyEngine::do_cluster_features() {
       fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
       fcst_cluster[j].set(*fcst_raw, *fcst_thresh, fcst_clus_shape[j],
                        conf_info.inten_perc_value,
-                       conf_info.fcst_info->is_precipitation());
+                       conf_info.Fcst->var_info->is_precipitation());
       fcst_cluster[j].object_number = j+1;
 
       obs_clus_shape[j] = select(*obs_clus_split, j+1);
       obs_cluster[j].set(*obs_raw, *obs_thresh, obs_clus_shape[j],
                       conf_info.inten_perc_value,
-                      conf_info.obs_info->is_precipitation());
+                      conf_info.Obs->var_info->is_precipitation());
       obs_cluster[j].object_number = j+1;
    }
 
@@ -2791,42 +2791,42 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
 
    // Forecast convolution radius
    at.set_entry(row, c++,
-                eng.conf_info.fcst_conv_radius);
+                eng.conf_info.Fcst->conv_radius);
 
    // Forecast convolution threshold
    at.set_entry(row, c++,
-                eng.conf_info.fcst_conv_thresh.get_str());
+                eng.conf_info.Fcst->conv_thresh.get_str());
 
    // Observation convolution radius
    at.set_entry(row, c++,
-                eng.conf_info.obs_conv_radius);
+                eng.conf_info.Obs->conv_radius);
 
    // Observation convolution threshold
    at.set_entry(row, c++,
-                eng.conf_info.obs_conv_thresh.get_str());
+                eng.conf_info.Obs->conv_thresh.get_str());
 
    // Forecast Variable Name
-   s = check_hdr_str(eng.conf_info.fcst_info->name());
+   s = check_hdr_str(eng.conf_info.Fcst->var_info->name());
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   s = check_hdr_str(eng.conf_info.fcst_info->units(), true);
+   s = check_hdr_str(eng.conf_info.Fcst->var_info->units(), true);
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(eng.conf_info.fcst_info->level_name());
+   s = check_hdr_str(eng.conf_info.Fcst->var_info->level_name());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   s = check_hdr_str(eng.conf_info.obs_info->name());
+   s = check_hdr_str(eng.conf_info.Obs->var_info->name());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   s = check_hdr_str(eng.conf_info.obs_info->units(), true);
+   s = check_hdr_str(eng.conf_info.Obs->var_info->units(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(eng.conf_info.obs_info->level_name());
+   s = check_hdr_str(eng.conf_info.Obs->var_info->level_name());
    at.set_entry(row, c++, s.text());
 
    // Observation type

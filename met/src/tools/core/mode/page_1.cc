@@ -331,8 +331,8 @@ t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model.c_str());
 
 nextline();
 
-t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name().c_str());
-t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name().c_str());
+t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.Fcst->var_info->name().c_str());
+t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.Obs->var_info->name().c_str());
 
    //
    // Level Name
@@ -340,8 +340,8 @@ t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name().c_st
 
 nextline();
 
-t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_name().c_str());
-t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name().c_str());
+t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.Fcst->var_info->level_name().c_str());
+t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.Obs->var_info->level_name().c_str());
 
    //
    // Units
@@ -349,8 +349,8 @@ t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name(
 
 nextline();
 
-t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units().c_str());
-t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units().c_str());
+t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.Fcst->var_info->units().c_str());
+t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.Obs->var_info->units().c_str());
 
    //
    // Initialization Time
@@ -717,10 +717,10 @@ roman();
       //
       // Convolution Radius
       //
-      snprintf(junk, sizeof(junk), "%d", eng.conf_info.fcst_conv_radius);
+      snprintf(junk, sizeof(junk), "%d", eng.conf_info.Fcst->conv_radius);
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
 
-      snprintf(junk, sizeof(junk), "%d", eng.conf_info.obs_conv_radius);
+      snprintf(junk, sizeof(junk), "%d", eng.conf_info.Obs->conv_radius);
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
 
       ++r;
@@ -729,10 +729,10 @@ roman();
       //
       // Convolution Threshold
       //
-      thresh_str = eng.conf_info.fcst_conv_thresh.get_str(2);
+      thresh_str = eng.conf_info.Fcst->conv_thresh.get_str(2);
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
-      thresh_str = eng.conf_info.obs_conv_thresh.get_str(2);
+      thresh_str = eng.conf_info.Obs->conv_thresh.get_str(2);
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       ++r;
@@ -742,10 +742,10 @@ roman();
       // Object Filters
       //
 
-      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.fcst_filter_attr_map.size());
+      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.Fcst->filter_attr_map.size());
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
 
-      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.obs_filter_attr_map.size());
+      snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.Obs->filter_attr_map.size());
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
 
       ++r;
@@ -770,10 +770,10 @@ roman();
       // Merge Threshold
       //
 
-      thresh_str = eng.conf_info.fcst_merge_thresh.get_str(2);
+      thresh_str = eng.conf_info.Fcst->merge_thresh.get_str(2);
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
-      thresh_str = eng.conf_info.obs_merge_thresh.get_str(2);
+      thresh_str = eng.conf_info.Obs->merge_thresh.get_str(2);
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str.c_str());
 
       ++r;
@@ -789,15 +789,15 @@ roman();
       // Merging flag
       //
 
-           if(eng.conf_info.fcst_merge_flag == MergeType_Thresh) label = "thresh";
-      else if(eng.conf_info.fcst_merge_flag == MergeType_Engine) label = "engine";
-      else if(eng.conf_info.fcst_merge_flag == MergeType_Both)   label = "thresh/engine";
+           if(eng.conf_info.Fcst->merge_flag == MergeType_Thresh) label = "thresh";
+      else if(eng.conf_info.Fcst->merge_flag == MergeType_Engine) label = "engine";
+      else if(eng.conf_info.Fcst->merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                       label = "none";
       t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label.c_str());
 
-           if(eng.conf_info.obs_merge_flag == MergeType_Thresh) label = "thresh";
-      else if(eng.conf_info.obs_merge_flag == MergeType_Engine) label = "engine";
-      else if(eng.conf_info.obs_merge_flag == MergeType_Both)   label = "thresh/engine";
+           if(eng.conf_info.Obs->merge_flag == MergeType_Thresh) label = "thresh";
+      else if(eng.conf_info.Obs->merge_flag == MergeType_Engine) label = "engine";
+      else if(eng.conf_info.Obs->merge_flag == MergeType_Both)   label = "thresh/engine";
       else                                                      label = "none";
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label.c_str());
 

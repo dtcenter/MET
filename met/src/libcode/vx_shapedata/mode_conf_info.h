@@ -22,6 +22,8 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 
+#include "mode_field_info.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -59,17 +61,17 @@ struct ModeNcOutInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef map<ConcatString,ThreshArray>  FilterMap;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 class ModeConfInfo {
 
    private:
 
       void init_from_scratch();
+
+      int Field_Index;
+
+      int N_fields;    //  = 1 for traditional MODE
+                       //  > 1 for multivar MODE
+                       //  should always be at least 1
 
    public:
 
@@ -79,41 +81,56 @@ class ModeConfInfo {
 
       void clear();
 
+      void set_field_index(int);
+
+      int field_index() const;
+
+   /////////////////////////////////////////////////////////////////////
+
+
+      Mode_Field_Info * fcst_array;   //  allocated
+      Mode_Field_Info *  obs_array;   //  allocated
+
+      Mode_Field_Info * Fcst;         //  points to current field, not allocated
+      Mode_Field_Info *  Obs;         //  points to current field, not allocated
+
+
    /////////////////////////////////////////////////////////////////////
 
          //
          //  fcst member data
          //
+/*
+      int            fcst_conv_radius;         // Convolution radius in grid squares
+      double         fcst_vld_thresh;          // Minimum ratio of valid data points in the convolution area
 
-      int            fcst_conv_radius;       // Convolution radius in grid squares
-      double         fcst_vld_thresh;        // Minimum ratio of valid data points in the convolution area
+      VarInfo *      fcst_info;                // allocated
+      IntArray       fcst_conv_radius_array;   // List of convolution radii in grid squares
 
-      VarInfo *      fcst_info;              // allocated
-      IntArray       fcst_conv_radius_array; // List of convolution radii in grid squares
+      ThreshArray    fcst_conv_thresh_array;   // List of conv thresholds to use
+      ThreshArray    fcst_merge_thresh_array;  // Lower convolution threshold used for double merging method
+      SingleThresh   fcst_conv_thresh;         // Convolution threshold to define objects
+      SingleThresh   fcst_merge_thresh;        // Lower convolution threshold used for double merging method
 
-      ThreshArray    fcst_conv_thresh_array; // List of conv thresholds to use
-      ThreshArray    fcst_merge_thresh_array; // Lower convolution threshold used for double merging method
-      SingleThresh   fcst_conv_thresh;       // Convolution threshold to define objects
-      SingleThresh                   fcst_merge_thresh;      // Lower convolution threshold used for double merging method
+      MergeType      fcst_merge_flag;          // Define which merging methods should be employed
 
-      MergeType      fcst_merge_flag;        // Define which merging methods should be employed
-      PlotInfo       fcst_raw_pi;            // Raw forecast plotting info
+      PlotInfo       fcst_raw_pi;              // Raw forecast plotting info
 
          //
          //  fcst member functions
          //
 
       void           set_fcst_merge_thresh_by_index (int);
-      FilterMap      fcst_filter_attr_map; // Discard objects that don't meet these attribute thresholds
       int            n_fcst_merge_threshs () const;
       bool           need_fcst_merge_thresh () const;   //  mergetype is both or thresh
-
+      AttrFilterMap  fcst_filter_attr_map;              // Discard objects that don't meet these attribute thresholds
+*/
    /////////////////////////////////////////////////////////////////////
 
          //
          //  obs member data
          //
-
+/*
       int            obs_conv_radius;
       double         obs_vld_thresh;
 
@@ -126,6 +143,7 @@ class ModeConfInfo {
       SingleThresh   obs_merge_thresh;
 
       MergeType      obs_merge_flag;
+
       PlotInfo       obs_raw_pi;             // Raw observation plotting info
 
          //
@@ -133,10 +151,10 @@ class ModeConfInfo {
          //
 
       void           set_obs_merge_thresh_by_index  (int);
-      FilterMap      obs_filter_attr_map;
       int            n_obs_merge_threshs  () const;
       bool           need_obs_merge_thresh  () const;   //  mergetype is both or thresh
-
+      AttrFilterMap  obs_filter_attr_map;
+*/
    /////////////////////////////////////////////////////////////////////
 
          //
@@ -147,6 +165,8 @@ class ModeConfInfo {
 
       void read_config    (const char * default_filename, const char * user_filename);
       void process_config (GrdFileType ftype, GrdFileType otype);
+
+      void read_fields (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
 
          //
          //  weights
@@ -253,28 +273,33 @@ class ModeConfInfo {
 
       int get_compression_level();
 
+      void  set_fcst_merge_thresh_by_index (int);
+      void  set_obs_merge_thresh_by_index  (int);
+
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ModeConfInfo::n_conv_radii() const { return ( fcst_conv_radius_array.n_elements() ); }   //  should be the same as
-                                                                                                    //  obs_conv_radius_array.n_elements()
+inline int ModeConfInfo::n_conv_radii() const { return ( Fcst->conv_radius_array.n_elements() ); }   //  should be the same as
+                                                                                                     //  obs_conv_radius_array.n_elements()
 
 
-inline int ModeConfInfo::n_conv_threshs() const { return ( fcst_conv_thresh_array.n_elements() ); }   //  should be the same as
-                                                                                                      //  obs_conv_thresh_array.n_elements()
+inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_array.n_elements() ); }   //  should be the same as
+                                                                                                       //  obs_conv_thresh_array.n_elements()
 
 
-inline int ModeConfInfo::n_fcst_merge_threshs () const { return ( fcst_merge_thresh_array.n_elements() ); }
-inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs_merge_thresh_array.n_elements() ); }
+// inline int ModeConfInfo::n_fcst_merge_threshs () const { return ( fcst->merge_thresh_array.n_elements() ); }
+// inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs->merge_thresh_array.n_elements() ); }
 
 
-inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) ); }
-inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs_merge_flag == MergeType_Both) || ( obs_merge_flag == MergeType_Thresh) ); }
+// inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst->merge_flag == MergeType_Both) || (fcst->merge_flag == MergeType_Thresh) ); }
+// inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs->merge_flag == MergeType_Both) || ( obs->merge_flag == MergeType_Thresh) ); }
 
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
+
+inline int ModeConfInfo::field_index() const { return Field_Index; }
 
 
 ////////////////////////////////////////////////////////////////////////
