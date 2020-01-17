@@ -41,6 +41,7 @@ enum InterpMthd {
    InterpMthd_Lower_Right,
    InterpMthd_Lower_Left,
    InterpMthd_Gaussian,
+   InterpMthd_MaxGauss,
    InterpMthd_Geog_Match
 };
 
@@ -66,6 +67,7 @@ static const char interpmthd_upper_right_str[] = "UPPER_RIGHT";
 static const char interpmthd_lower_right_str[] = "LOWER_RIGHT";
 static const char interpmthd_lower_left_str[]  = "LOWER_LEFT";
 static const char interpmthd_gaussian_str[]    = "GAUSSIAN";
+static const char interpmthd_maxgauss_str[]    = "MAXGAUSS";
 static const char interpmthd_geog_match_str[]  = "GEOG_MATCH";
 
 ///////////////////////////////////////////////////////////////////////////////

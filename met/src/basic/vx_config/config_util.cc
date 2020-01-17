@@ -56,7 +56,8 @@ void RegridInfo::validate() {
 
    // Check for unsupported regridding options
    if(method == InterpMthd_Best ||
-      method == InterpMthd_Geog_Match) {
+      method == InterpMthd_Geog_Match ||
+      method == InterpMthd_Gaussian) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -73,7 +74,7 @@ void RegridInfo::validate() {
       method != InterpMthd_Lower_Right &&
       method != InterpMthd_Lower_Left &&
       method != InterpMthd_AW_Mean &&
-      method != InterpMthd_Gaussian) {
+      method != InterpMthd_MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
@@ -110,7 +111,7 @@ void RegridInfo::validate() {
    }
 
    // Check the Gaussian filter
-   if(method == InterpMthd_Gaussian) {
+   if(method == InterpMthd_MaxGauss) {
       if(gaussian_radius < gaussian_dx) {
          mlog << Error << "\n"
               << "The radius of influence (" << gaussian_radius
@@ -1102,7 +1103,8 @@ void InterpInfo::validate() {
          methodi  != InterpMthd_Upper_Right &&
          methodi  != InterpMthd_Lower_Right &&
          methodi  != InterpMthd_Lower_Left &&
-         methodi  != InterpMthd_Gaussian) {
+         methodi  != InterpMthd_Gaussian &&
+         methodi  != InterpMthd_MaxGauss) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
@@ -1137,8 +1139,9 @@ void InterpInfo::validate() {
       }
 
       // Check the Gaussian filter
-      if(methodi == InterpMthd_Gaussian) {
-         if (gaussian_radius < gaussian_dx) {
+      if(methodi == InterpMthd_Gaussian ||
+         methodi == InterpMthd_MaxGauss) {
+         if(gaussian_radius < gaussian_dx) {
             mlog << Error << "\n"
                  << "The radius of influence (" << gaussian_radius
                  << ") is less than the delta distance (" << gaussian_dx
@@ -2037,6 +2040,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
    else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
    else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
    else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
