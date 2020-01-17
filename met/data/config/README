@@ -395,7 +395,8 @@ obtype = "ANALYS";
 //         - UPPER_RIGHT for the upper right grid point (width = 1)
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
-//         - GAUSSIAN    for the Gaussian filtering
+//         - MAXGAUSS    to compute the maximum value in the neighborhood
+//                       and apply a Gaussian smoother to the result
 //
 //         The BEST and GEOG_MATCH interpolation options are not valid for
 //         regridding.
@@ -1226,13 +1227,14 @@ boot = {
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
 //         - GAUSSIAN    for the Gaussian kernel
+//         - MAXGAUSS    for the maximum value followed by a Gaussian smoother
 //         - GEOG_MATCH  for the nearest grid point where the land/sea mask
 //                          and geography criteria are satisfied.
 //
-//         The BUDGET, FORCE, and GAUSSIAN methods are not valid for
+//         The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
 //         interpolating to point locations. For grid-to-grid comparisons, the
 //         only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
-//         GAUSSIAN.
+//         GAUSSIAN, and MAXGAUSS.
 //
 interp = {
    field      = BOTH;
