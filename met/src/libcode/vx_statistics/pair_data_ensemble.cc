@@ -1491,6 +1491,11 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                        fcst_info->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
+            // Check for bad data
+            if(climo_mn_dpa.n_planes() > 0 && is_bad_data(cmn_v)) {
+               continue;
+            }
+
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
                (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
@@ -1511,6 +1516,11 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
+
+            // Check for bad data
+            if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
+               continue;
+            }
 
             // Compute weight for current point
             wgt_v = (wgt_dp == (DataPlane *) 0 ?

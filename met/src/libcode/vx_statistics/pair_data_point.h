@@ -162,6 +162,8 @@ class VxPairDataPoint {
       int ***rej_typ;            // Reject based on message type
       int ***rej_mask;           // Reject based on masking region
       int ***rej_fcst;           // Reject forecast bad data
+      int ***rej_cmn;            // Reject climo mean bad data
+      int ***rej_csd;            // Reject climo stdev bad data
       int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
