@@ -75,6 +75,7 @@ nmep_smooth = {
    type = [
       {
          method = GAUSSIAN;
+         width  = 1;
       }
    ];
 }
