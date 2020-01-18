@@ -66,6 +66,11 @@ fcst = {
       },
       {
         name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "BAD_CLIMO";
+      },
+      {
+        name         = "TMP";
         level        = [ "P500" ];
         message_type = [ "ADPUPA" ];
       },
@@ -128,6 +133,13 @@ climo_stdev = {
         desc         = "FAHRENHEIT";
         // Apply 1.8 scale factor to standard deviation for K to F conversion.
         convert(x)   = 1.8 * x;
+      },
+      {
+        name          = "TMP";
+        level         = [ "Z2" ];
+        // Set some values to bad data to make sure Point-Stat skips them.
+        censor_thresh = [ >5 ];
+        censor_val    = [ -9999 ];
       },
       {
         name         = "TMP";
