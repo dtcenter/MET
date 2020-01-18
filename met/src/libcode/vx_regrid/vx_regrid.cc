@@ -55,8 +55,8 @@ switch ( info.method )  {
       out = met_regrid_force (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Gaussian:
-      out = met_regrid_gaussian (in, from_grid, to_grid, info);
+   case InterpMthd_MaxGauss:
+      out = met_regrid_maxgauss (in, from_grid, to_grid, info);
       break;
 
    default:
@@ -274,7 +274,7 @@ return ( from_data );
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane met_regrid_gaussian (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+DataPlane met_regrid_maxgauss (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
 
 {
 

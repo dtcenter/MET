@@ -258,17 +258,17 @@
     </output>
   </test>
 
-  <test name="regrid_data_plane_HRRR_GAUSSIAN_5">
+  <test name="regrid_data_plane_HRRR_MAXGAUSS">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/met_nc/hrrr/HRRR_20190518_013_036_24h.nc \
       G211 \
-      &OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_GAUSSIAN.nc \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_MAXGAUSS.nc \
       -field 'name="MXUPHL_24"; level="A24";' \
-      -method GAUSSIAN -width 27 -gaussian_radius 120 -gaussian_dx 81.271 -v 1
+      -method MAXGAUSS -width 27 -gaussian_radius 120 -gaussian_dx 81.271 -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_GAUSSIAN.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_HRRR_MXUPHL_24_MAXGAUSS.nc</grid_nc>
     </output>
   </test>
 

@@ -138,7 +138,11 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // For Gaussian, compute the max
+            case(InterpMthd_Gaussian): // For Gaussian, pass the data through
+               v = dp.get(x, y);
+               break;
+
+            case(InterpMthd_MaxGauss): // For Max Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
@@ -162,8 +166,9 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    } // end for x
 
    // Apply the Gaussian smoother 
-   if (mthd == InterpMthd_Gaussian) {
-     interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx, t);
+   if(mthd == InterpMthd_Gaussian ||
+      mthd == InterpMthd_MaxGauss) {
+      interp_gaussian_dp(smooth_dp, gaussian_radius, gaussian_dx, t);
    }
 
    // Cleanup
