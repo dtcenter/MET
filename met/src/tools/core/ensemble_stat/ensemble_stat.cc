@@ -248,7 +248,6 @@ void process_command_line(int argc, char **argv) {
       else {
          usage();
       }
-
    }
    else {
 
@@ -278,6 +277,13 @@ void process_command_line(int argc, char **argv) {
             usage();
          }
       }
+   }
+
+   // Check for at least one valid input ensemble file
+   if(ens_file_list.n() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "no valid input ensemble member files specified!\n\n";
+      exit(1);
    }
 
    // Check that the end_ut >= beg_ut
