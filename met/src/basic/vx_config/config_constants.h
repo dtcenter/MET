@@ -14,6 +14,7 @@
 #include "GridTemplate.h"
 #include "int_array.h"
 #include "gsl_randist.h"
+#include "config_gaussian.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -246,19 +247,13 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   double      gaussian_dx;      // delta distance for Gaussian
-   double      gaussian_radius;  // radius of influence for Gaussian
+   GaussianInfo gaussian;  // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
 };
-
-// Chosen by Hazardous Weather Testbed.
-// Default radius and delta x for Gaussian interpolation and regridding options.
-static const double default_gaussian_dx = 81.271;
-static const double default_gaussian_radius = 120.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -274,8 +269,7 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-   double       gaussian_dx;      // delta distance for Gaussian
-   double       gaussian_radius;  // radius of influence for Gaussian
+   GaussianInfo gaussian;  // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
@@ -283,7 +277,7 @@ struct RegridInfo {
 
    void         clear();
    void         validate(); // ensure that width and method are accordant
-   void         validate_point(); // ensure that width and method are accordant
+   void         validate_point();   // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -608,6 +602,7 @@ static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 static const char conf_key_shape[]             = "shape";
 static const char conf_key_gaussian_dx[]       = "gaussian_dx";
 static const char conf_key_gaussian_radius[]   = "gaussian_radius";
+static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 

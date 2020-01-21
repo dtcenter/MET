@@ -21,6 +21,7 @@
 #include "config_constants.h"
 #include "config_file.h"
 #include "data_file_type.h"
+#include "config_gaussian.h"
 
 ////////////////////////////////////////////////////////////////////////
 
