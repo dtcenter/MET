@@ -1439,7 +1439,7 @@ int get_lon_count(NcFile *_nc) {
 
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
                              bool exit_if_error) {
-   NcVar var_data = get_nc_var(nc, var_name.c_str());
+   NcVar var_data = get_nc_var(nc, var_name.c_str(), false, false);
    if (IS_INVALID_NC(var_data)) {
        var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
    }
@@ -1769,7 +1769,8 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                      int shift_bits = 2;
                      if (is_dust_only) shift_bits += 2;
                      particle_qc = ((adp_qc_data[from_index] >> shift_bits) & 0x03);
-                     if (!qc_flags.has(particle_qc)) {
+                     int qc_for_flag = 3 - particle_qc; // high = 3, qc_flag for high = 0
+                     if (!qc_flags.has(qc_for_flag)) {
                         adp_qc_filtered_count++;
                         continue;
                      }
