@@ -53,6 +53,7 @@ fcst = {
 
 obs = {
    message_type = [ "AERONET_AOD_MEAN_010000" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [

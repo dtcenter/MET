@@ -864,6 +864,7 @@ void VxPairDataEnsemble::clear() {
    climo_mn_dpa.clear();
    climo_sd_dpa.clear();
 
+   sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
@@ -904,6 +905,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    fcst_ut        = vx_pd.fcst_ut;
    beg_ut         = vx_pd.beg_ut;
    end_ut         = vx_pd.end_ut;
+   sid_inc_filt   = vx_pd.sid_inc_filt;
    sid_exc_filt   = vx_pd.sid_exc_filt;
    obs_qty_filt   = vx_pd.obs_qty_filt;
    obs_error_info = vx_pd.obs_error_info;
@@ -1065,9 +1067,18 @@ void VxPairDataEnsemble::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_sid_exc_filt(const StringArray se) {
+void VxPairDataEnsemble::set_sid_inc_filt(const StringArray sa) {
 
-   sid_exc_filt = se;
+   sid_inc_filt = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_sid_exc_filt(const StringArray sa) {
+
+   sid_exc_filt = sa;
 
    return;
 }
@@ -1294,8 +1305,9 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // Create VarInfoGrib pointer
    VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
 
-   // Check the station ID exclusion list
-   if(sid_exc_filt.n() && sid_exc_filt.has(hdr_sid_str)) return;
+   // Check the station ID inclusion and exclusion lists
+   if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
+      (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) return;
 
    // Check whether the GRIB code for the observation matches
    // the specified code (rej_gc)

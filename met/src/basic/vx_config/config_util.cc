@@ -434,30 +434,30 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_sid_exc(Dictionary *dict) {
-   StringArray sa, cur, sid_exc_sa;
+StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
+   StringArray sa, cur, sid_sa;
    ConcatString mask_name;
    int i;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_sid_exc() -> "
+      mlog << Error << "\nparse_conf_sid_list() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   sa = dict->lookup_string_array(conf_key_sid_exc);
+   sa = dict->lookup_string_array(conf_key);
 
    // Parse station ID's to exclude from each entry
    for(i=0; i<sa.n(); i++) {
      parse_sid_mask(string(sa[i]), cur, mask_name);
-      sid_exc_sa.add(cur);
+      sid_sa.add(cur);
    }
 
-   mlog << Debug(4) << "parse_conf_sid_exc() -> "
-        << "Station ID exclusion list contains "
-        << sid_exc_sa.n() << " entries.\n";
+   mlog << Debug(4) << "parse_conf_sid_list() -> "
+        << "Station ID \"" << conf_key << "\" list contains "
+        << sid_sa.n() << " entries.\n";
 
-   return(sid_exc_sa);
+   return(sid_sa);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

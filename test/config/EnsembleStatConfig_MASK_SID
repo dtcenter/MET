@@ -87,6 +87,7 @@ nmep_smooth = {
 //
 fcst = {
    message_type = [ "ADPSFC" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [

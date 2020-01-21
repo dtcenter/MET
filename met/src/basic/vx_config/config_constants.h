@@ -519,6 +519,7 @@ static const char conf_key_GRIB_lvl_val1[]     = "GRIB_lvl_val1";
 static const char conf_key_GRIB_lvl_val2[]     = "GRIB_lvl_val2";
 static const char conf_key_GRIB_ens[]          = "GRIB_ens";
 static const char conf_key_message_type[]      = "message_type";
+static const char conf_key_sid_inc[]           = "sid_inc";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
 static const char conf_key_convert[]           = "convert";

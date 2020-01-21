@@ -55,6 +55,7 @@ fcst = {
 
 obs = {
    message_type = [ "MEDEDR", "MAXEDR" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [
