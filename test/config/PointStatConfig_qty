@@ -40,6 +40,7 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
+   sid_inc = [];
    sid_exc = [];
 
    field = [

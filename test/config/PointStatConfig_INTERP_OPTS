@@ -33,7 +33,7 @@ cat_thresh  = [ ];
 eclv_points = 0.05;
 
 fcst = {
-
+   sid_inc = [];
    sid_exc = [];
 
    field = [

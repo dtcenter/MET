@@ -971,6 +971,12 @@ interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 \begin_layout LyX-Code
 
 \series bold
+sid_inc        = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 sid_exc        = [];
 \end_layout
 

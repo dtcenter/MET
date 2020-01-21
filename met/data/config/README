@@ -807,6 +807,7 @@ fcst = {
 //       field = [
 //          {
 //            message_type = [ "ADPUPA" ];
+//            sid_inc      = [];
 //            sid_exc      = [];
 //            name         = "TMP";
 //            level        = [ "P250", "P500", "P700", "P850", "P1000" ];
@@ -814,6 +815,7 @@ fcst = {
 //          },
 //          {
 //            message_type = [ "ADPSFC" ];
+//            sid_inc      = [];
 //            sid_exc      = [ "KDEN", "KDET" ];
 //            name         = "TMP";
 //            level        = [ "Z2" ];
@@ -822,16 +824,22 @@ fcst = {
 //       ];
 //     }
 //
+//    - The "sid_inc" entry is an array of station ID groups indicating which
+//      station ID's should be included in the verification task. If specified,
+//      only those station ID's appearing in the list will be included.  Note
+//      that filtering by station ID may also be accomplished using the "mask.sid"
+//      option. However, when using the "sid_inc" option, statistics are reported
+//      separately for each masking region.
 //    - The "sid_exc" entry is an array of station ID groups indicating which
-//      station ID's should be excluded from the verification tasks. Each
-//      element is either the name of a single station ID or the full path to a
-//      station ID group file name. A station ID group file consists of a name
-//      for the group followed by a list of station ID's. All of the station
-//      ID's indicated will be placed into one long list of station ID's to be
-//      excluded.
-//    - As with "message_type" above, the "sid_exc" setting can be placed in the
-//      in the "field" array element to control which station ID's are excluded
-//      for each verification task.
+//      station ID's should be excluded from the verification task.
+//    - Each element in the "sid_inc" and "sid_exc" arrays is either the name of
+//      a single station ID or the full path to a station ID group file name.
+//      A station ID group file consists of a name for the group followed by a
+//      list of station ID's. All of the station ID's indicated will be concatenated
+//      into one long list of station ID's to be included or excluded.
+//    - As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
+//      placed in the in the "field" array element to control which station ID's
+//      are included or excluded for each verification task.
 //
 obs = fcst;
 

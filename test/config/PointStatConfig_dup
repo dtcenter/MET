@@ -41,6 +41,7 @@ eclv_points = 0.05;
 //
 fcst = {
    message_type = [ "ADPSFC" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [

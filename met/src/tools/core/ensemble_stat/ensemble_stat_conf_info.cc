@@ -818,8 +818,11 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc).c_str());
 
+   // Conf: sid_inc
+   vx_pd.set_sid_inc_filt(parse_conf_sid_list(&odict, conf_key_sid_inc));
+
    // Conf: sid_exc
-   vx_pd.set_sid_exc_filt(parse_conf_sid_exc(&odict));
+   vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
 
    // Conf: obs_qty
    vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
