@@ -310,7 +310,7 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
 extern NcVar    get_var(NcFile *, const char * var_name);   // exit if not exists
-extern NcVar get_nc_var(NcFile *, const char * var_name, bool as_error=false);   // continue even though not exists
+extern NcVar get_nc_var(NcFile *, const char * var_name, bool as_error=false, bool show_warning=true);   // continue even though not exists
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
 extern void   copy_nc_att(NcFile *, NcVar *, const ConcatString attr_name);
 extern void   copy_nc_att( NcVar *,  NcVar *, const ConcatString attr_name);
