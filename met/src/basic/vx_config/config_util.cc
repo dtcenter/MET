@@ -32,6 +32,12 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
+GaussianInfo::GaussianInfo() {
+   weights = (double *) 0;
+   clear();
+}
+///////////////////////////////////////////////////////////////////////////////
+
 void GaussianInfo::clear() {
    weight_sum = 0.0;
    if (0 < max_r && weights) {
@@ -61,6 +67,7 @@ void GaussianInfo::clear() {
 //}
 
 ///////////////////////////////////////////////////////////////////////////////
+
 int GaussianInfo::compute_max_r() {
    max_r = nint(radius / dx * trunc_factor);
    return max_r;

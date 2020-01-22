@@ -33,6 +33,7 @@ struct GaussianInfo {
    double   weight_sum;     // the sum of the weights
    double   *weights;       // 2D for gaussian weight (2*max_r+1) by (2*max_r+1)
 
+   GaussianInfo();
    void     clear();
    void     compute();
    int      compute_max_r();
