@@ -300,7 +300,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
-        int wdth, SingleThresh t, double vld_t) {
+        int width, SingleThresh t, double vld_t) {
    int i, j, k, n, x, y, x_ll, y_ll, y_ur, xx, yy, half_width;
    double v;
    int count_vld = 0;
@@ -311,10 +311,10 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
         << "Computing fractional coverage field using the "
         << t.get_str() << " threshold and the "
         << interpmthd_to_string(InterpMthd_Nbrhd)
-        << "(" << wdth*wdth << ") interpolation method.\n";
+        << "(" << width*width << ") interpolation method.\n";
 
    // Check that width is set to 1 or greater
-   if(wdth < 1) {
+   if(width < 1) {
       mlog << Error << "\nfractional_coverage_square() -> "
            << "width must be set to a value of 1 or greater.\n\n";
       exit(1);
@@ -325,10 +325,10 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
    frac_dp.set_constant(bad_data_double);
 
    // Compute the box half-width
-   half_width = (wdth - 1)/2;
+   half_width = (width - 1)/2;
 
    // Initialize the box
-   for(i=0; i<wdth*wdth; i++) box_na.add(bad_data_int);
+   for(i=0; i<width*width; i++) box_na.add(bad_data_int);
 
    // Compute the fractional coverage meeting the threshold criteria
    for(x=0; x<dp.nx(); x++) {
@@ -348,15 +348,15 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
             // Initialize counts
             count_vld = count_thr = 0;
 
-            for(i=0; i<wdth; i++) {
+            for(i=0; i<width; i++) {
 
                xx = x_ll + i;
 
-               for(j=0; j<wdth; j++) {
+               for(j=0; j<width; j++) {
 
                   yy = y_ll + j;
 
-                  n = DefaultTO.two_to_one(wdth, wdth, i, j);
+                  n = DefaultTO.two_to_one(width, width, i, j);
 
                   // Check for being off the grid
                   if(xx < 0 || xx >= dp.nx() ||
@@ -386,12 +386,12 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
          else {
 
             // Compute the row of the neighborhood box to be updated
-            j = (y - 1) % wdth;
+            j = (y - 1) % width;
 
-            for(i=0; i<wdth; i++) {
+            for(i=0; i<width; i++) {
 
                // Index into the box
-               n = DefaultTO.two_to_one(wdth, wdth, i, j);
+               n = DefaultTO.two_to_one(width, width, i, j);
 
                // Get x and y values to be checked
                xx = x_ll + i;
@@ -428,7 +428,7 @@ void fractional_coverage_square(const DataPlane &dp, DataPlane &frac_dp,
          } // end else
 
          // Check whether enough valid grid points were found
-         if((double) count_vld/(wdth*wdth) < vld_t ||
+         if((double) count_vld/(width*width) < vld_t ||
             count_vld == 0) {
             v = bad_data_double;
          }
