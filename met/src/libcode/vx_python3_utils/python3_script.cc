@@ -97,6 +97,16 @@ fflush(stderr);
    //   start up the python interpreter
    //
 
+wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
+
+ConcatString a;
+a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
+cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
+
+// exit ( 1 );
+Py_SetPath(Py_DecodeLocale(a.text(), 0));
+
+
 Py_Initialize();
 
    //
@@ -105,11 +115,13 @@ Py_Initialize();
 
 ConcatString path = _script_filename;
 
+
 path.chomp(".py");
 
 Module = PyImport_ImportModule (path.text());
 
 // PyErr_Print();
+
 
 if ( ! Module )  {
 
@@ -245,16 +257,27 @@ void Python3_Script::read_pickle(const char * variable, const char * pickle_file
 ConcatString command;
 
 command << variable 
-        << " = pickle.load( open( \""
+        << " = pickle.load(open(\""
         << pickle_filename
-        << "\", \"rb\" ) )";
+        << "\", \"rb\"))";
 
 
 
 // cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
 
+PyErr_Clear();
+
 run(command.text());
 
+if ( PyErr_Occurred() )  {
+
+   mlog << Error
+        << "\n\n  Python3_Script::read_pickle() -> command \""
+        << command << "\" failed!\n\n";
+
+   exit ( 1 );
+
+}
 
 return;
 

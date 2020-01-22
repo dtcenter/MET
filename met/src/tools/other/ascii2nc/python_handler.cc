@@ -26,18 +26,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-// static const char python_wrapper [] = "a2nc_python.py";
-// static const char pickle_wrapper [] = "a2nc_pickle.py";
-static const char python_wrapper [] = "a2nc_python";
-static const char pickle_wrapper [] = "a2nc_pickle";
-
+static const char generic_python_wrapper [] = "generic_python";
 static const char generic_pickle_wrapper [] = "generic_pickle";
 
+static const char write_pickle_wrapper   [] = "point_write_pickle.py";   //  relative to wrappers_dir
 
-static const char write_pickle_wrapper [] = "point_write_pickle.py";   //  relative to wrappers_dir
-
-
-static const char list_name [] = "point_data";
+static const char list_name              [] = "point_data";
 
 static const char pickle_output_filename [] = "out.pickle";
 
@@ -224,8 +218,19 @@ bool PythonHandler::do_straight()
 
 ConcatString command;
 ConcatString short_user_name;
+ConcatString path;
+const char * mbb = getenv ("MET_BUILD_BASE");
 
-// PyObject * obj = script.lookup(variable_name);
+
+// path << cs_erase
+//      << mbb << '/'
+//      << wrappers_dir << '/'
+//      << generic_python_wrapper;
+
+// path << ".py";
+
+
+path = generic_python_wrapper;
 
 short_user_name = user_script_filename;
 
@@ -235,7 +240,9 @@ short_user_name.chomp(".py");
    //  start up the python interpreter
    //
 
-Python3_Script script(python_wrapper);
+Python3_Script script(path.text());
+
+cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
 
    //
    //  set up a "new" sys.argv list
