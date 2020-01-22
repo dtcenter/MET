@@ -367,8 +367,8 @@ void ThreshArray::check_bin_thresh() const {
 
          mlog << Error << "\nThreshArray::check_bin_thresh() const -> "
               << "thresholds must be monotonically increasing and be of "
-              << "the same inequality type (lt, le, gt, or ge)."
-              << "\n\n";
+              << "the same inequality type (lt, le, gt, or ge): "
+              << get_str() << "\n\n";
          exit(1);
       }
    }
