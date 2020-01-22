@@ -22,7 +22,9 @@ wrappersdir = $(pkgdatadir)/wrappers
 
 wrappers_DATA = \
      point_write_pickle.py \
-     write_pickle.py 
+     write_pickle.py  \
+     generic_python.py \
+     generic_pickle.py
 
 EXTRA_DIST = ${wrappers_DATA}
 
