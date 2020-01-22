@@ -309,6 +309,7 @@ void VxPairDataPoint::clear() {
    fcst_dpa.clear();
    climo_mn_dpa.clear();
    climo_sd_dpa.clear();
+   sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
@@ -317,7 +318,7 @@ void VxPairDataPoint::clear() {
    end_ut      = (unixtime) 0;
 
    n_try       = 0;
-   rej_sid_exc = 0;
+   rej_sid     = 0;
    rej_gc      = 0;
    rej_vld     = 0;
    rej_obs     = 0;
@@ -366,6 +367,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    desc = vx_pd.desc;
 
+   sid_inc_filt = vx_pd.sid_inc_filt;
    sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
@@ -540,9 +542,18 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_exc_filt(const StringArray se) {
+void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
 
-   sid_exc_filt = se;
+   sid_inc_filt = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
+
+   sid_exc_filt = sa;
 
    return;
 }
@@ -773,9 +784,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Increment the number of tries count
    n_try++;
 
-   // Check the station ID exclusion list
-   if(sid_exc_filt.n() && sid_exc_filt.has(hdr_sid_str)) {
-      rej_sid_exc++;
+   // Check the station ID inclusion and exclusion lists
+   if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
+      (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) {
+      rej_sid++;
       return;
    }
 

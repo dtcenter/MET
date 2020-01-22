@@ -38,6 +38,7 @@ wind_thresh  = [ NA ];
 wind_logic   = UNION;
 eclv_points  = 0.05;
 message_type = [ "ADPUPA" ];
+sid_inc      = [];
 sid_exc      = [];
 
 //

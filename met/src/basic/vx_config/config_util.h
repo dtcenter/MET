@@ -21,6 +21,7 @@
 #include "config_constants.h"
 #include "config_file.h"
 #include "data_file_type.h"
+#include "config_gaussian.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +35,7 @@ extern map<STATLineType,StringArray>
 extern int             parse_conf_n_vx(Dictionary *dict);
 extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
 extern StringArray     parse_conf_message_type(Dictionary *dict, bool error_out = default_dictionary_error_out);
-extern StringArray     parse_conf_sid_exc(Dictionary *dict);
+extern StringArray     parse_conf_sid_list(Dictionary *dict, const char *);
 extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
 extern vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);

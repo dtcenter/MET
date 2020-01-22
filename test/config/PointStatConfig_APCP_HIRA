@@ -32,6 +32,7 @@ wind_logic  = UNION;
 eclv_points = 0.05;
 
 cat_thresh   = [ >0.254, >2.540 ];
+sid_inc      = [];
 sid_exc      = [];
 
 fcst = {

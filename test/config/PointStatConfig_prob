@@ -45,7 +45,7 @@ fcst = {
 }
 
 obs = {
-
+   sid_inc     = [];
    sid_exc     = [];
 
    field = [

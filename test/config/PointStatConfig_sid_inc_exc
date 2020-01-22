@@ -32,10 +32,10 @@ cnt_logic     = UNION;
 wind_thresh   = [ NA ];
 wind_logic    = UNION;
 eclv_points   = 0.05;
+sid_inc       = [];
+sid_exc       = [];
 
 fcst = {
-
-   sid_exc = [ ];
 
    field = [
       {
@@ -49,7 +49,15 @@ fcst = {
          name          = "VGRD";
          level         = "Z10";
          message_type  = "ADPSFC";
+         sid_inc       = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ];
+         desc          = "SID_INC";
+      },
+      {
+         name          = "VGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
          sid_exc       = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ];
+         desc          = "SID_EXC";
       }
    ];
 
