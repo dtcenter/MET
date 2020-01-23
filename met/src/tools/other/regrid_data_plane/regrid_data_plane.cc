@@ -261,7 +261,8 @@ void process_command_line(int argc, char **argv) {
       set_goes_interpolate_option();
    }
    RGInfo.validate();
-   if (RGInfo.method == InterpMthd_Gaussian) RGInfo.gaussian.compute();
+   if (RGInfo.method == InterpMthd_Gaussian || RGInfo.method == InterpMthd_MaxGauss)
+      RGInfo.gaussian.compute();
 
    return;
 }
