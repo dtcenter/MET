@@ -561,7 +561,6 @@ void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    d_dp.set_size(nx, ny);
    
    int index = 0;
-   double weights[g_nx][g_nx];
    for(idx_x=0; idx_x<g_nx; idx_x++) {
       for(idx_y=0; idx_y<g_nx; idx_y++) {
          g_dp.set(gaussian.weights[index++], idx_x, idx_y);
