@@ -546,32 +546,24 @@ void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    double weight_sum;
    int max_r = gaussian.max_r;
    int g_nx = max_r * 2 + 1;
-   
    int nx = dp.nx();
    int ny = dp.ny();
    DataPlane d_dp;
    DataPlane g_dp;
+   
+   if (max_r <= 0 || gaussian.weights == (double *)0) {
+      mlog << Error << "\ninterp_gaussian_dp() -> "
+           << "the gaussian weights were not computed (max_r: " << max_r << ").\n\n";
+      exit(1);
+   }
+   
    g_dp.set_size(g_nx, g_nx);
+   d_dp.set_size(nx, ny);
+   
    int index = 0;
    double weights[g_nx][g_nx];
-   d_dp.set_size(nx, ny);
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
-cout << " DEBUG HS g_nx: " << g_nx << " max_r: " << max_r << "\n";
    for(idx_x=0; idx_x<g_nx; idx_x++) {
       for(idx_y=0; idx_y<g_nx; idx_y++) {
-cout << " DEBUG HS idx_x: " << idx_x << " idx_y: " << idx_y << " index: " << index << "\n";
          g_dp.set(gaussian.weights[index++], idx_x, idx_y);
       } // end for y
    } // end for x
