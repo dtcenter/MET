@@ -29,13 +29,11 @@ GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char python_path_env [] = "PYTHONPATH";
-
 static const char * user_ppath = 0;
 
 static const char write_pickle [] = "../share/met/wrappers/write_pickle.py";
 
-static const char generic_read_pickle [] = "../share/met/wrappers/generic_pickle";
+static const char generic_read_pickle [] = "../share/met/wrappers/generic_pickle";   //  NO ".py" suffix
 
 static const char pickle_out_name [] = "out.pickle";
 
@@ -60,12 +58,6 @@ static bool pickle_dataplane(const char * script_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-static void run_string(const char *);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 bool python_dataplane(const char * script_name,
                       int script_argc, char ** script_argv,
                       const bool use_xarray, DataPlane & met_dp_out,
@@ -76,7 +68,7 @@ bool python_dataplane(const char * script_name,
 bool status = false;
 
 
-mlog << Debug(1) << "\n\n  in python_dataplane()\n\n";
+mlog << Debug(4) << "\n\n  in python_dataplane()\n\n";
 
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_pickle = true;
 
@@ -145,19 +137,14 @@ GP.initialize();
 
 if ( PyErr_Occurred() )  {
 
+   PyErr_Print();
+
    mlog << Warning << "\npython_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
    return ( false );
 
 }
-
-   //
-   //  read the PYTHONPATH environment variable
-   //
-
-ConcatString python_path;
-get_env("PYTHONPATH", python_path);
 
    //
    //  set the arguments
@@ -189,9 +176,11 @@ if ( do_reload )  {
 
 if ( PyErr_Occurred() )  {
 
+   PyErr_Print();
+
    mlog << Warning << "\npython_dataplane() -> "
-        << "an error occurred importing module \"" << python_path
-        << "/" << script_name << ".py\"\n\n";
+        << "an error occurred importing module \""
+        << script_name << "\"\n\n";
 
    return ( false );
 
@@ -200,8 +189,8 @@ if ( PyErr_Occurred() )  {
 if ( ! module_obj )  {
 
    mlog << Warning << "\npython_dataplane() -> "
-        << "error running python script \"" << python_path
-        << "/" << script_name << ".py\"\n\n";
+        << "error running python script \""
+        << script_name << "\"\n\n";
 
    return ( false );
 
@@ -230,8 +219,8 @@ if ( use_xarray )  {
    if ( ! data_array_obj )  {
 
       mlog << Warning << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << python_path
-           << "/" << script_name << ".py\"\n\n";
+           << "trouble reading data from \""
+           << script_name << "\"\n\n";
 
       return ( false );
    }
@@ -253,8 +242,8 @@ if ( use_xarray )  {
    if ( !numpy_array_obj || !attrs_dict_obj )  {
 
       mlog << Warning << "\npython_dataplane() -> "
-           << "trouble reading data from \"" << python_path
-           << "/" << script_name << ".py\"\n\n";
+           << "trouble reading data from \""
+           << script_name << "\"\n\n";
 
       return ( false );
    }
@@ -290,6 +279,7 @@ int j;
 int status;
 ConcatString command;
 ConcatString wrapper;
+ConcatString path;
 const char * mb = getenv ("MET_BASE");
 
 wrapper << mb << '/' << "share/met/wrappers/write_pickle.py";
@@ -325,12 +315,11 @@ if ( status )  {
    //
 
 /*
-ConcatString path;
 
 path << mb << '/' << generic_read_pickle;
 
 // Python3_Script script(path.text());
-Python3_Script script("ggeneric_pickle");
+Python3_Script script("generic_pickle");
 
 PyErr_Clear();
 
@@ -351,9 +340,12 @@ script.read_pickle  (pickle_var_name, pickle_out_name);
 
 if ( PyErr_Occurred() )  {
 
-    cout << "   read_pickle failed!\n\n" << flush;
+   PyErr_Print();
 
-    exit ( 1 );
+   mlog << Error
+        << "   read_pickle failed!\n\n" << flush;
+
+   exit ( 1 );
 
 }
 
@@ -363,9 +355,11 @@ PyObject * met_info = script.lookup(pickle_var_name);
 
 if ( PyErr_Occurred() )  {
 
-    cout << "   lookup failed!\n\n" << flush;
+   PyErr_Print();
 
-    exit ( 1 );
+   cout << "   lookup failed!\n\n" << flush;
+
+   exit ( 1 );
 
 }
 */
@@ -388,19 +382,14 @@ GP.initialize();
 
 if ( PyErr_Occurred() )  {
 
+   PyErr_Print();
+
    mlog << Warning << "\npython_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
    return ( false );
 
 }
-
-   //
-   //  read the PYTHONPATH environment variable
-   //
-
-ConcatString python_path;
-get_env("PYTHONPATH", python_path);
 
    //
    //  set the arguments
@@ -417,15 +406,24 @@ if ( script_argc > 0 )  {
 */
 
 
-run_string("import sys");
-run_string("import numpy");
-run_string("import pickle");
+// run_python_string("import sys");
+// run_python_string("import numpy");
+// run_python_string("import pickle");
+// if ( use_xarray )  run_python_string("import xarray");
+
 
    //
-   //  import the python script as a module
+   //  import the python wrapper script as a module
    //
 
-PyObject * module_obj = PyImport_ImportModule ("ggeneric_pickle");
+
+// path << mb << '/' << generic_read_pickle;
+
+path = get_short_name(generic_read_pickle);
+
+// cout << "\n\n  pickle_dataplane() -> path = \"" << path.text() << "\"\n\n" << flush;
+
+PyObject * module_obj = PyImport_ImportModule (path.text());
 
    //
    //  if needed, reload the module
@@ -437,14 +435,28 @@ if ( do_reload )  {
 
 }
 
+
+// command << cs_erase
+//         << "met_info = pickle.load(open(\""
+//         << pickle_out_name
+//         << "\", \"rb\"))";
+// 
+// cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
+// 
+// run_python_string(command.text());
+
 if ( PyErr_Occurred() )  {
 
+   PyErr_Print();
+
    mlog << Warning << "\npython_dataplane() -> "
-        << "an error occurred importing module\n\n";
+        << "an error occurred importing module "
+        << '\"' << path << "\"\n\n";
 
    return ( false );
 
 }
+
 
 if ( ! module_obj )  {
 
@@ -455,6 +467,7 @@ if ( ! module_obj )  {
 
 }
 
+
    //
    //  read the pickle file
    //
@@ -462,7 +475,7 @@ if ( ! module_obj )  {
 // command << cs_erase << "x = 5";
 // command << cs_erase << "met_info = pickle.load(open(\"out.pickle\", \"rb\"))";
 // 
-// run_string(command.text());
+// run_python_string(command.text());
 
    //
    //   get the namespace for the module (as a dictionary)
@@ -486,54 +499,48 @@ if ( ! PyDict_Check(data_obj) )  {
 
 }
 
-key_obj = PyUnicode_FromString ("attrs");
-
-PyObject * attrs = PyDict_GetItem (data_obj, key_obj);
-
-cout << "attrs = " << attrs << "\n" << flush;
-
-key_obj = PyUnicode_FromString ("met_data");
-
-PyObject * met_data = PyDict_GetItem (data_obj, key_obj);
-
-cout << "met_data = " << met_data << "\n" << flush;
 
 
 
+if ( use_xarray )  {
 
+   exit ( 1 );
 
+} else {
 
+   key_obj = PyUnicode_FromString (numpy_dict_name);
 
+   PyObject * attrs_dict_obj = PyDict_GetItem (data_obj, key_obj);
 
+   cout << "attrs = " << attrs_dict_obj << "\n" << flush;
 
+   key_obj = PyUnicode_FromString (numpy_array_name);
 
+   PyObject * numpy_array_obj = PyDict_GetItem (data_obj, key_obj);
 
+   cout << "met_data = " << numpy_array_obj << "\n" << flush;
 
+   Python3_Numpy np;
 
+   np.set(numpy_array_obj);
 
+   dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
 
-
-
-
-
-
-
-
-// cout << "met_info = " << met_info << "\n";
-
-
-exit ( 1 );
+}
 
 
 
 
-// if ( use_xarray )  {
-// 
-// 
-// } else {
-// 
-// 
-// }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -550,29 +557,6 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-void run_string(const char * s)
-
-{
-
-if ( PyRun_SimpleString(s) < 0 )  {
-
-   mlog << Error
-        << "\n\n   run -> command \""
-        << s << "\" failed!\n\n";
-
-   fflush(stdout);
-   fflush(stderr);
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
 
 
 

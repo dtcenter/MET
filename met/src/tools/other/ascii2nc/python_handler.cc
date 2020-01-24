@@ -242,7 +242,7 @@ short_user_name.chomp(".py");
 
 Python3_Script script(path.text());
 
-cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
+// cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
 
    //
    //  set up a "new" sys.argv list

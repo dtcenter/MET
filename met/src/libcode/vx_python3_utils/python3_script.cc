@@ -15,7 +15,10 @@ using namespace std;
 #include "vx_log.h"
 #include "empty_string.h"
 
+#include "python3_util.h"
 #include "python3_script.h"
+
+#include "global_python.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,17 +100,21 @@ fflush(stderr);
    //   start up the python interpreter
    //
 
-wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
+// wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
 
-ConcatString a;
-a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
-cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
+// ConcatString a;
+// a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
+// cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
 
 // exit ( 1 );
-Py_SetPath(Py_DecodeLocale(a.text(), 0));
+// Py_SetPath(Py_DecodeLocale(a.text(), 0));
 
 
-Py_Initialize();
+// Py_Initialize();
+// 
+// setup_python_path();
+
+GP.initialize();
 
    //
    //   import the python script as a module
@@ -230,7 +237,7 @@ command << "pickle.dump( "
         << "\", \"wb\" ) )";
 
 
-cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
+// cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
 
 // run(command);
 

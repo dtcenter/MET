@@ -311,7 +311,8 @@ if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
 if ( PyObject_GetBuffer(Data_Obj, &View, PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS) < 0 )  {
 
-   cout << "failed to get buffer\n\n" << flush;
+   mlog << Error
+        << "failed to get buffer\n\n";
 
    exit ( 1 );
 
@@ -337,7 +338,7 @@ long * pp = (long *)   (Buffer);
 
 for (j=0; j<N_Data; ++j)  {
 
-   cout << "j = " << j << " ... value = " << pp[j] << "\n";
+   // cout << "j = " << j << " ... value = " << pp[j] << "\n";
 
 }
 */
