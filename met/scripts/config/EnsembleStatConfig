@@ -121,6 +121,7 @@ fcst = {
          level = [ "A24" ];
          ens_ssvar_bin_size = 0.1;
          ens_phist_bin_size = 0.05;
+         rps_thresh = [ >0, >0.1, >0.25, >0.5, >1.0, >1.5, >2.0 ];
       }
    ];
 }
@@ -159,6 +160,12 @@ obs_error = {
 //
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
+
+//
+// Ranked Probability Score thresholds
+// May be set separately in each "fcst.field" entry
+//
+rps_thresh = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -252,6 +259,7 @@ interp = {
 //
 output_flag = {
    ecnt  = BOTH;
+   erps  = BOTH;
    rhist = BOTH;
    phist = BOTH;
    orank = BOTH;

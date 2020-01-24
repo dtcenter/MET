@@ -322,3 +322,166 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Code for class RPSInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+RPSInfo::RPSInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+RPSInfo::~RPSInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+RPSInfo::RPSInfo(const RPSInfo &c) {
+
+   init_from_scratch();
+
+   assign(c);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
+
+   if(this == &c) return(*this);
+
+   assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::clear() {
+
+   othresh.clear();
+   n_ens   = n_pair  = 0;
+   rps_rel = rps_res = rps_unc   = bad_data_double;
+   rps     = rpss    = rpss_smpl = bad_data_double;
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::assign(const RPSInfo &c) {
+
+   fthresh   = c.fthresh;
+   othresh   = c.othresh;
+
+   n_ens     = c.n_ens;
+   n_pair    = c.n_pair;
+
+   rps_rel   = c.rps_rel;
+   rps_res   = c.rps_res;
+   rps_unc   = c.rps_unc;
+
+   rps       = c.rps;
+   rpss      = c.rpss;
+   rpss_smpl = c.rpss_smpl;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::set(const PairDataEnsemble &pd) {
+   int i, j, k, n_event;
+   double p;
+   bool cmn_flag;
+   NumArray p_thresh, climo_prob;
+
+   // Store the dimensions
+   n_ens  = pd.n_ens;
+   n_pair = pd.n_pair;
+
+   // Check RPS threshold formatting: monotonically increasing
+   fthresh.check_bin_thresh();
+
+   // Flag to process climo
+   cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
+
+   // Setup probability thresholds, equally spaced by ensemble size
+   for(i=0; i<=n_ens; i++) p_thresh.add(i/n_ens);
+
+   // Setup forecast probabilistic contingency table
+   Nx2ContingencyTable fcst_pct;
+   fcst_pct.set_size(n_ens);
+   fcst_pct.set_thresholds(p_thresh.vals());
+
+   // Setup climatology probabilistic contingency table
+   Nx2ContingencyTable climo_pct;
+   climo_pct.set_size(n_ens);
+   climo_pct.set_thresholds(p_thresh.vals());
+
+   // Initialize
+   rps_rel = rps_res = rps_unc   = 0.0;
+   rps     = rpss    = rpss_smpl = 0.0;
+
+   // Loop over the fthresh entries and populate PCT tables for each
+   for(i=0; i<fthresh.n(); i++) {
+
+      // Initialize PCT counts
+      fcst_pct.zero_out();
+      climo_pct.zero_out();
+
+      // Derive climatological probabilities
+      if(cmn_flag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+                                                  fthresh[i]);
+
+      // Loop over the observations
+      for(j=0; j<pd.n_obs; j++) {
+
+         // Loop over ensemble members and count events
+         for(k=0, n_event=0; k<n_ens; k++) {
+            if(fthresh[i].check(pd.e_na[k][j])) n_event++;
+         }
+
+         // Update the forecast PCT counts
+         p = (double) n_event/n_ens;
+         if(fthresh[i].check(pd.o_na[j])) fcst_pct.inc_event(p);
+         else                             fcst_pct.inc_nonevent(p);
+
+         // Update the climatology PCT counts
+         if(cmn_flag) {
+            p = climo_prob[j];
+            if(fthresh[i].check(pd.o_na[j])) climo_pct.inc_event(p);
+            else                             climo_pct.inc_nonevent(p);
+         }
+      } // end for j
+
+      // Increment sums
+      rps_rel   += fcst_pct.reliability() / fthresh.n();
+      rps_res   += fcst_pct.resolution()  / fthresh.n();
+      rps_unc   += fcst_pct.uncertainty() / fthresh.n();
+      rps       += fcst_pct.brier_score() / fthresh.n();
+      rpss_smpl += fcst_pct.bss_smpl()    / fthresh.n();
+      if(cmn_flag) {
+         rpss   += (1.0 - (fcst_pct.brier_score() /
+                           climo_pct.brier_score())) / fthresh.n();
+      }
+      else {
+         rpss = bad_data_double;
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

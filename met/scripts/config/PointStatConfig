@@ -171,6 +171,7 @@ hira = {
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
+   rps_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,7 +195,8 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE;
+   ecnt   = NONE; // Only for HiRA
+   erps   = NONE; // Only for HiRA
    eclv   = BOTH;
    mpr    = BOTH;
 }

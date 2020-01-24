@@ -90,6 +90,7 @@
 //                    percentile thresholds.
 //   043    11/15/19  Halley Gotway  Apply climatology bins to
 //                    continuous and probabilistic statistics.
+//   044    01/24/20  Halley Gotway  Add HiRA ERPS output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1232,7 +1233,8 @@ void process_scores() {
             // Apply HiRA ensemble verification logic
             if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
                 conf_info.vx_opt[i].hira_info.flag             &&
-                conf_info.vx_opt[i].output_flag[i_ecnt] != STATOutputType_None) {
+               (conf_info.vx_opt[i].output_flag[i_ecnt] != STATOutputType_None ||
+                conf_info.vx_opt[i].output_flag[i_erps] != STATOutputType_None)) {
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
 
@@ -1733,7 +1735,6 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataEnsemble hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    NumArray f_ens;
-   ECNTInfo ecnt_info;
 
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
@@ -1816,17 +1817,43 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          continue;
       }
 
-      // Compute ensemble statistics
-      hira_pd.compute_pair_vals(rng_ptr);
-      ecnt_info.set(hira_pd);
-
       // Write out the ECNT line
       if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType_None) {
+
+         // Compute ensemble statistics
+         hira_pd.compute_pair_vals(rng_ptr);
+         ECNTInfo ecnt_info;
+         ecnt_info.set(hira_pd);
+
          write_ecnt_row(shc, ecnt_info,
             conf_info.vx_opt[i_vx].output_flag[i_ecnt],
             0, 1, stat_at, i_stat_row,
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
-      }
+      } // end if ECNT
+
+      // Write out the ERPS line
+      if(conf_info.vx_opt[i_vx].output_flag[i_erps] != STATOutputType_None) {
+
+         // Store RPS thresholds
+         RPSInfo rps_info;
+         rps_info.fthresh = conf_info.vx_opt[i_vx].hira_info.rps_ta;
+
+         // If rps_thresh is empty and climo data is available,
+         // use climo_cdf thresholds instead
+         if(rps_info.fthresh.n()    == 0 &&
+            hira_pd.cmn_na.n_valid() > 0 &&
+            hira_pd.csd_na.n_valid() > 0) {
+            rps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
+         }
+
+         // Compute ensemble RPS statistics
+         rps_info.set(hira_pd);
+
+         write_erps_row(shc, rps_info,
+                        conf_info.vx_opt[i_vx].output_flag[i_erps],
+                        stat_at, i_stat_row,
+                        txt_at[i_erps], i_txt_row[i_erps]);
+      } // end if ERPS
 
       if(gt) { delete gt; gt = 0; }
 

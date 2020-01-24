@@ -655,6 +655,8 @@ void EnsembleStatVxOpt::clear() {
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
+   rps_ta.clear();
+
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
    obs_perc = bad_data_int;
@@ -781,6 +783,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
    // Conf: phist_bin_size
    phist_bin_size = odict.lookup_double(conf_key_phist_bin);
+
+   // Conf: rps_thresh
+   rps_ta = fdict.lookup_thresh_array(conf_key_rps_thresh);
 
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&odict);
@@ -981,8 +986,9 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    switch(i_txt_row) {
 
       case(i_ecnt):
+      case(i_erps):
 
-         // Maximum number of ECNT  lines possible =
+         // Maximum number of ECNT and ERPS lines possible =
          //    Point Vx: Message Types * Masks * Interpolations *
          //                              Obs Thresholds * Climo Bins
          //     Grid Vx:                 Masks * Interpolations *

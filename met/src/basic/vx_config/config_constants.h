@@ -124,6 +124,7 @@ enum STATLineType {
    stat_isc,
    stat_wdir,
    stat_ecnt,
+   stat_erps,
    stat_rhist,
    stat_phist,
    stat_orank,
@@ -169,6 +170,7 @@ static const char stat_dmap_str[]   = "DMAP";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_ecnt_str[]   = "ECNT";
+static const char stat_erps_str[]    = "ERPS";
 static const char stat_rhist_str[]  = "RHIST";
 static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";
@@ -329,6 +331,7 @@ struct HiRAInfo {
    IntArray    width;      // Array for HiRA widths
    double      vld_thresh; // Proportion of valid data values
    ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
+   ThreshArray rps_ta;     // Ranked Probability Score thresholds
    GridTemplateFactory::GridTemplates shape; // Area shape
 
    HiRAInfo();
@@ -693,6 +696,7 @@ static const char conf_key_nmep_flag[]        = "nmep";
 static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
+static const char conf_key_rps_thresh[]       = "rps_thresh";
 static const char conf_key_obs_error[]        = "obs_error";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";

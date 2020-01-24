@@ -1646,6 +1646,49 @@ void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_erps_row(StatHdrColumns &shc, const RPSInfo &rps_info,
+                    STATOutputType out_type,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   ConcatString mask_name = shc.get_mask();
+
+   // ERPS line type
+   shc.set_line_type(stat_erps_str);
+
+   // Thresholds
+   shc.set_fcst_thresh(rps_info.fthresh);
+   shc.set_obs_thresh(rps_info.othresh);
+
+   // Not Applicable
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_erps_cols(rps_info, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(out_type == STATOutputType_Both) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   // Reset the mask name
+   shc.set_mask(mask_name.c_str());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
@@ -3647,6 +3690,45 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
 
    at.set_entry(r, c+11,  // Mean of unperturbed spread plus observation error
       ecnt_info.spread_plus_oerr);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_erps_cols(const RPSInfo &rps_info,
+                     AsciiTable &at, int r, int c) {
+
+   //
+   // Ensemble Continuous Statistics
+   // Dump out the ERPS line:
+   //    TOTAL,        N_ENS,
+   //    RPS_REL,      RPS_RES,    RPS_UNC,
+   //    RPS,          RPSS,       RPSS_SMPL
+   //
+   at.set_entry(r, c+0,  // Total Number of Pairs
+      rps_info.n_pair);
+
+   at.set_entry(r, c+1,  // Number of ensemble members
+      rps_info.n_ens);
+
+   at.set_entry(r, c+2,  // RPS Reliability
+      rps_info.rps_rel);
+
+   at.set_entry(r, c+3,  // RPS Resolution
+      rps_info.rps_res);
+
+   at.set_entry(r, c+4,  // RPS Uncertainty
+      rps_info.rps_unc);
+
+   at.set_entry(r, c+5,  // Ranked Probability Score
+      rps_info.rps);
+
+   at.set_entry(r, c+6,  // Ranked Probability Skill Score
+      rps_info.rpss);
+
+   at.set_entry(r, c+7,  // Ranked Probability Score using sample climo
+      rps_info.rpss_smpl);
 
    return;
 }

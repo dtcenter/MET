@@ -289,6 +289,12 @@ static const char * ecnt_columns [] = {
    "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR"
 };
 
+static const char * erps_columns [] = {
+   "TOTAL",       "N_ENS",       "RPS_REL",
+   "RPS_RES",     "RPS_UNC",     "RPS",
+   "RPSS",        "RPSS_SMPL"
+};
+
 static const char * rhist_columns [] = {
    "TOTAL",       "N_RANK",      "RANK_"
 };
@@ -370,18 +376,20 @@ static const char * job_ramp_mpr_columns [] = {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int max_stat_col       = 95;
+static const int max_stat_col           = 95;
 
 static const int n_header_columns       = sizeof(hdr_columns)/sizeof(*hdr_columns);
 static const int n_fho_columns          = sizeof(fho_columns)/sizeof(*fho_columns);
 static const int n_ctc_columns          = sizeof(ctc_columns)/sizeof(*ctc_columns);
 static const int n_ctp_columns          = sizeof(ctp_columns)/sizeof(*ctp_columns);
 static const int n_cfp_columns          = sizeof(cfp_columns)/sizeof(*cfp_columns);
+
 static const int n_cop_columns          = sizeof(cop_columns)/sizeof(*cop_columns);
 static const int n_cts_columns          = sizeof(cts_columns)/sizeof(*cts_columns);
 static const int n_mctc_columns         = sizeof(mctc_columns)/sizeof(*mctc_columns);
 static const int n_mcts_columns         = sizeof(mcts_columns)/sizeof(*mcts_columns);
 static const int n_cnt_columns          = sizeof(cnt_columns)/sizeof(*cnt_columns);
+
 static const int n_sl1l2_columns        = sizeof(sl1l2_columns)/sizeof(*sl1l2_columns);
 static const int n_sal1l2_columns       = sizeof(sal1l2_columns)/sizeof(*sal1l2_columns);
 static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_columns);
@@ -399,18 +407,19 @@ static const int n_nbrctc_columns       = sizeof(nbrctc_columns)/sizeof(*nbrctc_
 static const int n_nbrcts_columns       = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
 static const int n_nbrcnt_columns       = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
 static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
+
 static const int n_dmap_columns         = sizeof(dmap_columns)/sizeof(*dmap_columns);
-
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
-
 static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
 static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
 static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
+
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
-
 static const int n_ecnt_columns         = sizeof(ecnt_columns)/sizeof(*ecnt_columns);
+static const int n_erps_columns         = sizeof(erps_columns)/sizeof(*erps_columns);
+
 static const int n_rhist_columns        = sizeof(rhist_columns)/sizeof(*rhist_columns);
 static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_columns);
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
@@ -518,6 +527,8 @@ extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
                              int, int, AsciiTable &, int &, AsciiTable &, int &);
+extern void write_erps_row  (StatHdrColumns &, const RPSInfo &, STATOutputType,
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_phist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
@@ -584,6 +595,8 @@ extern void write_mpr_cols   (const PairDataPoint *, int,
 extern void write_isc_cols   (const ISCInfo &, int,
                               AsciiTable &, int, int);
 extern void write_ecnt_cols  (const ECNTInfo &,
+                              AsciiTable &, int, int);
+extern void write_erps_cols  (const RPSInfo &,
                               AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,
                               AsciiTable &, int, int);

@@ -83,7 +83,44 @@ class ECNTInfo {
 
       // Compute statistics
       void set(const PairDataEnsemble &);
-      
+
+      void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
+// Class to store Ranked Probability Score Statistics
+//
+////////////////////////////////////////////////////////////////////////
+
+class RPSInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const RPSInfo &);
+
+   public:
+
+      RPSInfo();
+      ~RPSInfo();
+      RPSInfo(const RPSInfo &);
+      RPSInfo & operator=(const RPSInfo &);
+
+      // RPS definition thresholds
+      ThreshArray fthresh;
+
+      // Observation filtering threshold
+      SingleThresh othresh;
+
+      // Number of ensemble members and pairs
+      int n_ens, n_pair;
+
+      double rps_rel, rps_res, rps_unc;
+      double rps, rpss, rpss_smpl;
+
+      // Compute statistics
+      void set(const PairDataEnsemble &);
+
       void clear();
 };
 
