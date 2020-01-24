@@ -68,6 +68,7 @@ obs = {
 // May be set separately in each "obs.field" entry
 //
 message_type   = [ "ADPSFC" ];
+sid_inc        = [];
 sid_exc        = [];
 obs_quality    = [];
 duplicate_flag = NONE;

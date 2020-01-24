@@ -198,12 +198,6 @@ else {
 
 file_name = sa[sa.n_elements() - 1];
 
-   //
-   //  Set the PYTHONPATH
-   //
-
-setenv("PYTHONPATH", path_name.c_str(), 1);
-
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
 bool use_xarray = false;

@@ -217,5 +217,107 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+void run_python_string(const char * s)
+
+{
+
+if ( PyRun_SimpleString(s) < 0 )  {
+
+   mlog << Error
+        << "\n\n   run -> command \""
+        << s << "\" failed!\n\n";
+
+   fflush(stdout);
+   fflush(stderr);
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void add_to_python_path(const char * directory_path)
+
+{
+
+wstring path = Py_GetPath();
+ConcatString a;
+wchar_t * wa = 0;
+
+a = directory_path;
+
+const int N = a.length();
+
+wa = new wchar_t [1 + N];
+
+mbstowcs(wa, a.text(), 1 + N);
+
+path.append(wa, N);
+
+Py_SetPath(wa);
+
+// wcout << "\n\n  add_to_python_path() -> path = " << Py_GetPath() << "\n\n" << flush;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void setup_python_path()
+
+{
+
+ConcatString a;
+
+   //
+   //  add PYTHONPATH
+   //
+
+const char * c = getenv("PYTHONPATH");
+
+if ( c )  {
+
+   a << c;
+
+   // cout << "\n\n  setup_python_path() -> a = " << a << "\n\n" << flush;
+
+}
+
+
+// a << ':' << "/d3/personal/randy/github/develop/MET/met/share/met/wrappers";
+
+   //
+   //  add MET python wrappers directory
+   //
+
+a << ':' << getenv("MET_BASE") << '/' << wrappers_dir;
+
+// cout << "\n\n  setup_python_path() -> a = " << a << "\n\n" << flush;
+
+add_to_python_path(a.text());
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 

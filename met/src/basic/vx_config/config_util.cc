@@ -32,6 +32,103 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
+GaussianInfo::GaussianInfo() {
+   weights = (double *) 0;
+   clear();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+void GaussianInfo::clear() {
+   weight_sum = 0.0;
+   if (0 < max_r && weights) {
+      delete weights;
+      weights = (double *)0;
+   }
+   max_r = weight_cnt = 0;
+   radius = dx = bad_data_double;
+   trunc_factor = default_trunc_factor;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//GaussianInfo & GaussianInfo::operator=(const GaussianInfo &other) {
+//   weight_sum = other.weight_sum;
+//   max_r = other.max_r;
+//   weight_cnt = other.weight_cnt;
+//   radius = other.radius;
+//   dx = other.dx;
+//   trunc_factor = other.trunc_factor;
+//   if (weights) delete weights;
+//   
+//   int g_nx = max_r * 2 + 1;
+//   weights = new double[g_nx*g_nx];
+//   for(int idx=0; idx<(g_nx*g_nx); idx++)
+//      weights[idx] = other.weights[idx];
+//}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int GaussianInfo::compute_max_r() {
+   max_r = nint(radius / dx * trunc_factor);
+   return max_r;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//
+// Compute the Gaussian filter
+// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
+//
+
+void GaussianInfo::compute() {
+   double weight, distance_sq;
+   const double g_sigma = radius / dx;
+   const double g_sigma_sq = g_sigma * g_sigma;
+   const double f_sigma_exp_divider = (2 * g_sigma_sq);
+   const double f_sigma_divider = (2 * M_PI * g_sigma_sq);
+   const double max_r_sq = pow((g_sigma * trunc_factor), 2);
+   
+   validate();
+   if (0 < max_r && weights) delete weights;
+   compute_max_r();
+   
+   int index = 0;
+   int g_nx = max_r * 2 + 1;
+   weight_cnt = 0;
+   weight_sum = 0.0;
+   weights = new double[g_nx*g_nx];
+   for(int idx_x=-max_r; idx_x<=max_r; idx_x++) {
+      for(int idx_y=-max_r; idx_y<=max_r; idx_y++) {
+         weight = 0.0;
+         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
+         if (distance_sq <= max_r_sq) {
+            weight_cnt++;
+            weight = exp(-(distance_sq) / f_sigma_exp_divider) / f_sigma_divider;
+            weight_sum += weight;
+         }
+         weights[index++] = weight;
+      } // end for y
+   } // end for x
+   mlog << Debug(7) << "GaussianInfo::compute() max_r: "  << max_r << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void GaussianInfo::validate() {
+   if (is_eq(radius, bad_data_double) || is_eq(radius, 0.)) {
+      mlog << Error << "\nGaussianInfo::validate() -> "
+           << "gaussian raduis is missing\n\n";
+      exit(1);
+   }
+   if (is_eq(dx, bad_data_double) || is_eq(dx, 0.)) {
+      mlog << Error << "\nGaussianInfo::validate() -> "
+           << "gaussian dx is missing\n\n";
+      exit(1);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void RegridInfo::clear() {
    enable = false;
    field = FieldType_None;
@@ -39,8 +136,7 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
-   gaussian_dx = bad_data_double;
-   gaussian_radius = bad_data_double;
+   gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -112,10 +208,10 @@ void RegridInfo::validate() {
 
    // Check the Gaussian filter
    if(method == InterpMthd_MaxGauss) {
-      if(gaussian_radius < gaussian_dx) {
+      if(gaussian.radius < gaussian.dx) {
          mlog << Error << "\n"
-              << "The radius of influence (" << gaussian_radius
-              << ") is less than the delta distance (" << gaussian_dx
+              << "The radius of influence (" << gaussian.radius
+              << ") is less than the delta distance (" << gaussian.dx
               << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
          exit(1);
       }
@@ -434,30 +530,30 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_sid_exc(Dictionary *dict) {
-   StringArray sa, cur, sid_exc_sa;
+StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
+   StringArray sa, cur, sid_sa;
    ConcatString mask_name;
    int i;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_sid_exc() -> "
+      mlog << Error << "\nparse_conf_sid_list() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   sa = dict->lookup_string_array(conf_key_sid_exc);
+   sa = dict->lookup_string_array(conf_key);
 
    // Parse station ID's to exclude from each entry
    for(i=0; i<sa.n(); i++) {
      parse_sid_mask(string(sa[i]), cur, mask_name);
-      sid_exc_sa.add(cur);
+      sid_sa.add(cur);
    }
 
-   mlog << Debug(4) << "parse_conf_sid_exc() -> "
-        << "Station ID exclusion list contains "
-        << sid_exc_sa.n() << " entries.\n";
+   mlog << Debug(4) << "parse_conf_sid_list() -> "
+        << "Station ID \"" << conf_key << "\" list contains "
+        << sid_sa.n() << " entries.\n";
 
-   return(sid_exc_sa);
+   return(sid_sa);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1066,9 +1162,12 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
 
    // Conf: gaussian dx and radius
    double conf_value = regrid_dict->lookup_double(conf_key_gaussian_dx, false);
-   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   info.gaussian.dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
    conf_value = regrid_dict->lookup_double(conf_key_gaussian_radius, false);
-   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
+   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
+   if (info.method == InterpMthd_Gaussian) info.gaussian.compute();
 
    info.validate();
 
@@ -1083,6 +1182,7 @@ void InterpInfo::clear() {
    n_interp = 0;
    method.clear();
    width.clear();
+   gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -1141,10 +1241,10 @@ void InterpInfo::validate() {
       // Check the Gaussian filter
       if(methodi == InterpMthd_Gaussian ||
          methodi == InterpMthd_MaxGauss) {
-         if(gaussian_radius < gaussian_dx) {
+         if (gaussian.radius < gaussian.dx) {
             mlog << Error << "\n"
-                 << "The radius of influence (" << gaussian_radius
-                 << ") is less than the delta distance (" << gaussian_dx
+                 << "The radius of influence (" << gaussian.radius
+                 << ") is less than the delta distance (" << gaussian.dx
                  << ") for regridding method \"" << method[i] << "\".\n\n";
             exit(1);
          }
@@ -1222,9 +1322,11 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
    // Conf: gaussian dx and radius
    double conf_value = interp_dict->lookup_double(conf_key_gaussian_dx, false);
-   info.gaussian_dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
+   info.gaussian.dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
    conf_value = interp_dict->lookup_double(conf_key_gaussian_radius, false);
-   info.gaussian_radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   conf_value = interp_dict->lookup_double(conf_key_trunc_factor, false);
+   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
@@ -1288,6 +1390,8 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
             info.width.add(width);
 
          } // end for k
+         
+         if (method == InterpMthd_Gaussian) info.gaussian.compute();
       } // end for j
    } // end for i
 

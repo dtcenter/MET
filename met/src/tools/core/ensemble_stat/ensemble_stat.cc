@@ -252,7 +252,6 @@ void process_command_line(int argc, char **argv) {
       else {
          usage();
       }
-
    }
    else {
 
@@ -282,6 +281,13 @@ void process_command_line(int argc, char **argv) {
             usage();
          }
       }
+   }
+
+   // Check for at least one valid input ensemble file
+   if(ens_file_list.n() == 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "no valid input ensemble member files specified!\n\n";
+      exit(1);
    }
 
    // Check that the end_ut >= beg_ut
@@ -1626,8 +1632,7 @@ void process_grid_vx() {
          ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
          InterpMthd   mthd       = string_to_interpmthd(mthd_str.c_str());
          int          wdth       = conf_info.vx_opt[i].interp_info.width[j];
-         double       gaussian_dx     = conf_info.vx_opt[i].interp_info.gaussian_dx;
-         double       gaussian_radius = conf_info.vx_opt[i].interp_info.gaussian_radius;
+         GaussianInfo gaussian   = conf_info.vx_opt[i].interp_info.gaussian;
          double       vld_thresh = conf_info.vx_opt[i].interp_info.vld_thresh;
          GridTemplateFactory::GridTemplates shape = conf_info.vx_opt[i].interp_info.shape;
          FieldType    field      = conf_info.vx_opt[i].interp_info.field;
@@ -1652,13 +1657,13 @@ void process_grid_vx() {
          if(ens_mean_flag &&
             (field == FieldType_Fcst || field == FieldType_Both)) {
             emn_dp = smooth_field(emn_dp, mthd, wdth, shape,
-                                  vld_thresh, gaussian_radius, gaussian_dx);
+                                  vld_thresh, gaussian);
          }
 
          // Smooth the observation field, if requested
          if(field == FieldType_Obs || field == FieldType_Both) {
             obs_dp = smooth_field(obs_dp, mthd, wdth, shape,
-                                  vld_thresh, gaussian_radius, gaussian_dx);
+                                  vld_thresh, gaussian);
          }
 
          // Store a copy of the unperturbed observation field
@@ -1681,7 +1686,7 @@ void process_grid_vx() {
             // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
                fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape,
-                                         vld_thresh, gaussian_radius, gaussian_dx);
+                                         vld_thresh, gaussian);
             }
 
             // Store a copy of the unperturbed ensemble field
@@ -2588,13 +2593,14 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
          // Write the neighborhood ensemble probability
          if(conf_info.nc_info.do_nep) {
 
+            GaussianInfo info;
             // Compute the mean neighborhood probability
             for(j=0; j<conf_info.get_n_nbrhd(); j++) {
 
                smooth_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
                               conf_info.nbrhd_prob.width[j],
                               conf_info.nbrhd_prob.shape,
-                              conf_info.nbrhd_prob.vld_thresh, 0, 0);
+                              conf_info.nbrhd_prob.vld_thresh, info);
 
                for(k=0; k<count_na.n(); k++) {
                   ens_prob[k] = (float) smooth_dp.buf()[k];
@@ -2649,8 +2655,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                               conf_info.nmep_smooth.width[k],
                               conf_info.nmep_smooth.shape,
                               conf_info.nmep_smooth.vld_thresh,
-                              conf_info.nmep_smooth.gaussian_dx,
-                              conf_info.nmep_smooth.gaussian_radius);
+                              conf_info.nmep_smooth.gaussian);
 
                for(l=0; l<count_na.n(); l++) {
                   ens_prob[l] = (float) smooth_dp.buf()[l];

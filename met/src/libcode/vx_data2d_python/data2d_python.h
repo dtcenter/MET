@@ -73,7 +73,7 @@ class MetPythonDataFile : public Met2dDataFile {
 
       bool data_ok       (int x, int y) const;
 
-      void data_minmax(double & data_min, double & data_max) const;
+      void data_minmax   (double & data_min, double & data_max) const;
 
          //
          //  do stuff
@@ -84,13 +84,13 @@ class MetPythonDataFile : public Met2dDataFile {
       void close();
 
 
-      void dump(ostream &, int depth = 0) const;
+      void dump (ostream &, int depth = 0) const;
 
       bool data_plane(VarInfo &, DataPlane &);
 
-      int data_plane_array(VarInfo &, DataPlaneArray &);
+      int  data_plane_array(VarInfo &, DataPlaneArray &);
 
-      int index(VarInfo &);
+      int  index(VarInfo &);
 
       bool data_plane(DataPlane &);
 

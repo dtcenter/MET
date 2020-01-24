@@ -26,6 +26,12 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "python3_util.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class GlobalPython {
 
    public:
@@ -53,9 +59,12 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
+   setup_python_path();   //  this must be called before Py_Initialize()
+
    Py_Initialize();
 
    is_initialized = true;
+
 
 }
 

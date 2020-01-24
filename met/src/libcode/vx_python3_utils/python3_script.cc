@@ -15,7 +15,10 @@ using namespace std;
 #include "vx_log.h"
 #include "empty_string.h"
 
+#include "python3_util.h"
 #include "python3_script.h"
+
+#include "global_python.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,7 +100,21 @@ fflush(stderr);
    //   start up the python interpreter
    //
 
-Py_Initialize();
+// wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
+
+// ConcatString a;
+// a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
+// cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
+
+// exit ( 1 );
+// Py_SetPath(Py_DecodeLocale(a.text(), 0));
+
+
+// Py_Initialize();
+// 
+// setup_python_path();
+
+GP.initialize();
 
    //
    //   import the python script as a module
@@ -105,11 +122,13 @@ Py_Initialize();
 
 ConcatString path = _script_filename;
 
+
 path.chomp(".py");
 
 Module = PyImport_ImportModule (path.text());
 
 // PyErr_Print();
+
 
 if ( ! Module )  {
 
@@ -218,7 +237,7 @@ command << "pickle.dump( "
         << "\", \"wb\" ) )";
 
 
-cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
+// cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
 
 // run(command);
 
@@ -245,16 +264,27 @@ void Python3_Script::read_pickle(const char * variable, const char * pickle_file
 ConcatString command;
 
 command << variable 
-        << " = pickle.load( open( \""
+        << " = pickle.load(open(\""
         << pickle_filename
-        << "\", \"rb\" ) )";
+        << "\", \"rb\"))";
 
 
 
 // cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
 
+PyErr_Clear();
+
 run(command.text());
 
+if ( PyErr_Occurred() )  {
+
+   mlog << Error
+        << "\n\n  Python3_Script::read_pickle() -> command \""
+        << command << "\" failed!\n\n";
+
+   exit ( 1 );
+
+}
 
 return;
 

@@ -2686,7 +2686,7 @@ NcVar get_var(NcFile *nc, const char *var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar get_nc_var(NcFile *nc, const char *var_name, bool as_error) {
+NcVar get_nc_var(NcFile *nc, const char *var_name, bool as_error, bool show_warning) {
    string new_var_name = var_name;
    replace_comma_to_underscore(&new_var_name);
 
@@ -2701,7 +2701,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool as_error) {
       if (as_error) {
          mlog << Error << log_message;
       }
-      else {
+      else if (show_warning) {
          mlog << Warning << log_message;
       }
    }
