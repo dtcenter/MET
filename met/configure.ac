@@ -223,6 +223,14 @@ if test -n "$MET_BUFRLIB"; then
    LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
 
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbufr_v11.3.0_4_64 or -lbufr, etc.  If it is -lbufr, you don't have to specify it.])
+
+AC_SUBST([BUFRLIB_NAME])
+AM_CONDITIONAL([BUFRLIB_NAME_SET], [test ! -z "$BUFRLIB_NAME"])
+
+
 #
 # Look for the HDF library
 #

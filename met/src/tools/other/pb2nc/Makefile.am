@@ -8,6 +8,15 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+# Check for BUFRLIB_NAME
+
+if BUFRLIB_NAME_SET
+BLIB_NAME = ${BUFRLIB_NAME}
+else
+BLIB_NAME = -lbufr
+endif
+
+
 # The program
 
 bin_PROGRAMS  = pb2nc
@@ -48,7 +57,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
 	$(FLIBS)
 
 EXTRA_DIST = readpb.prm \
