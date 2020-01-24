@@ -133,6 +133,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   erps   = NONE;
    eclv   = STAT;
    mpr    = BOTH;
 }

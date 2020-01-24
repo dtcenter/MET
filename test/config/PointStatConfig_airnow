@@ -29,6 +29,7 @@ regrid = {
    width      = 1;
    vld_thresh = 0.5;
    shape      = SQUARE;
+   rps_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,6 +221,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   erps   = NONE;
    eclv   = NONE;
    mpr    = STAT;
 }

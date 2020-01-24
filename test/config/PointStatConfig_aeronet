@@ -165,6 +165,8 @@ hira = {
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
+   shape      = SQUARE;
+   rps_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +191,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
+   erps   = NONE;
    eclv   = NONE;
    mpr    = STAT;
 }
