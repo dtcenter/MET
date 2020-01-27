@@ -47,10 +47,6 @@ class RMWAnalysisConfInfo {
 
         // Timing information
         unixtime  InitBeg, InitEnd;
-        TimeArray InitInc;
-        TimeArray InitExc;
-        NumArray  InitHour;
-        NumArray  LeadReq;
         unixtime  ValidBeg, ValidEnd;
 
         // Polyline masking regions
