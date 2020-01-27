@@ -31,9 +31,9 @@ GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath = 0;
 
-static const char write_pickle [] = "../share/met/wrappers/write_pickle.py";
+static const char write_pickle [] = "MET_BASE/wrappers/write_pickle.py";
 
-static const char generic_read_pickle [] = "../share/met/wrappers/generic_pickle";   //  NO ".py" suffix
+static const char generic_read_pickle [] = "MET_BASE/wrappers/generic_pickle";   //  NO ".py" suffix
 
 static const char pickle_out_name [] = "out.pickle";
 
@@ -278,17 +278,13 @@ bool pickle_dataplane(const char * user_script_name,
 int j;
 int status;
 ConcatString command;
-ConcatString wrapper;
 ConcatString path;
-const char * mb = getenv ("MET_BASE");
-
-wrapper << mb << '/' << "share/met/wrappers/write_pickle.py";
 
    //  wrapper usage:  /path/to/python write_pickle.py pickle_output_filename <user_python_script>.py <args>
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
-        << mb << '/' << write_pickle     << ' '    //  write_pickle.py
+        << replace_path(write_pickle)    << ' '    //  write_pickle.py
         << pickle_out_name               << ' '    //  pickle output filename
         << user_script_name;                       //  user's script name
 
