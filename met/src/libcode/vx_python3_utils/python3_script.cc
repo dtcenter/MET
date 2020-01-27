@@ -12,9 +12,19 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include "vx_log.h"
 #include "empty_string.h"
 
+#include "python3_util.h"
 #include "python3_script.h"
+
+#include "global_python.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char sq = '\'';   //  single quote
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,7 +42,8 @@ Python3_Script::Python3_Script()
 
 {
 
-cerr << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -89,7 +100,21 @@ fflush(stderr);
    //   start up the python interpreter
    //
 
-Py_Initialize();
+// wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
+
+// ConcatString a;
+// a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
+// cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
+
+// exit ( 1 );
+// Py_SetPath(Py_DecodeLocale(a.text(), 0));
+
+
+// Py_Initialize();
+// 
+// setup_python_path();
+
+GP.initialize();
 
    //
    //   import the python script as a module
@@ -97,15 +122,18 @@ Py_Initialize();
 
 ConcatString path = _script_filename;
 
+
 path.chomp(".py");
 
 Module = PyImport_ImportModule (path.text());
 
 // PyErr_Print();
 
+
 if ( ! Module )  {
 
-   cerr << "\n\n  Python3_Script::Python3_Script(const char *) -> unable to run script \"" << path << "\"\n\n";
+   mlog << Error
+        << "\n\n  Python3_Script::Python3_Script(const char *) -> unable to open script \"" << path << "\"\n\n";
 
    Py_Finalize();
 
@@ -160,7 +188,8 @@ void Python3_Script::run(const char * command) const
 
 if ( empty(command) )  {
 
-   cerr << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
+   mlog << Error
+        << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
 
    exit ( 1 );
 
@@ -168,7 +197,8 @@ if ( empty(command) )  {
 
 if ( PyRun_String(command, Py_file_input, Dict, Dict) < 0 )  {
 
-   cerr << "\n\n   Python3_Script::run(const char *) -> command \""
+   mlog << Error
+        << "\n\n   Python3_Script::run(const char *) -> command \""
         << command << "\" failed!\n\n";
 
    exit ( 1 );
@@ -207,7 +237,7 @@ command << "pickle.dump( "
         << "\", \"wb\" ) )";
 
 
-cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
+// cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
 
 // run(command);
 
@@ -234,16 +264,73 @@ void Python3_Script::read_pickle(const char * variable, const char * pickle_file
 ConcatString command;
 
 command << variable 
-        << " = pickle.load( open( \""
+        << " = pickle.load(open(\""
         << pickle_filename
-        << "\", \"rb\" ) )";
+        << "\", \"rb\"))";
 
 
 
-cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
+// cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
 
-// run(command);
+PyErr_Clear();
 
+run(command.text());
+
+if ( PyErr_Occurred() )  {
+
+   mlog << Error
+        << "\n\n  Python3_Script::read_pickle() -> command \""
+        << command << "\" failed!\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Script::reset_argv(const char * script_name, const StringArray & args)
+
+{
+
+int j;
+ConcatString command;
+ConcatString module_name = script_name;
+const int N = args.n();
+
+
+module_name.chomp(".py");
+
+command = "sys.argv = [ ";
+
+command << sq << module_name << sq << ", ";
+
+for (j=0; j<N; ++j)  {
+
+   command << sq << args[j] << sq;
+
+   if ( j < (N - 1) )  command << ',';
+
+   command << ' ';
+
+}
+
+command << ']';
+
+// cout << "command = \"" << command << "\"\n" << flush;
+
+
+
+run(command.text());
+
+   //
+   //  done
+   //
 
 return;
 

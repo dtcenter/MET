@@ -45,7 +45,7 @@ message_type_group_map = [
 ];
 
 fcst = {
-
+   sid_inc = [];
    sid_exc = [];
 
    message_type = [ "ADPSFC", "SFCSHP", "USERSF" ];

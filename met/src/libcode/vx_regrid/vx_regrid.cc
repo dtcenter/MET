@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -55,8 +55,8 @@ switch ( info.method )  {
       out = met_regrid_force (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Gaussian:
-      out = met_regrid_gaussian (in, from_grid, to_grid, info);
+   case InterpMthd_MaxGauss:
+      out = met_regrid_maxgauss (in, from_grid, to_grid, info);
       break;
 
    default:
@@ -274,7 +274,7 @@ return ( from_data );
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane met_regrid_gaussian (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+DataPlane met_regrid_maxgauss (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
 
 {
 
@@ -326,8 +326,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
 }   //  for xt
 
-interp_gaussian_dp(to_data, info.gaussian_radius, info.gaussian_dx,
-                   info.vld_thresh);
+interp_gaussian_dp(to_data, info.gaussian, info.vld_thresh);
 
 return ( to_data );
 

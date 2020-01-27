@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -84,7 +84,8 @@ Python3_Dict::Python3_Dict(const Python3_Dict &)
 
 {
 
-cerr << "\n\n  Python3_Dict::Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict::Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -104,7 +105,8 @@ Python3_Dict & Python3_Dict::operator=(const Python3_Dict &)
 
 {
 
-cerr << "\n\n  Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict(const Python3_Dict &) -> should never be called!\n\n";
 
 exit ( 1 );
 
@@ -163,7 +165,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -172,7 +175,8 @@ if ( ! a )  {
 
 if ( ! PyLong_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_int(const char *) -> value for key \""
         << key << "\" not an integer\n\n";
 
    exit ( 1 );
@@ -200,7 +204,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -209,7 +214,8 @@ if ( ! a )  {
 
 if ( ! PyFloat_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_double(const char * key) -> value for key \""
         << key << "\" not a floating point number\n\n";
 
    exit ( 1 );
@@ -237,7 +243,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -246,7 +253,8 @@ if ( ! a )  {
 
 if ( ! PyUnicode_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_string(const char * key) -> value for key \""
         << key << "\" not a character string\n\n";
 
    exit ( 1 );
@@ -273,7 +281,8 @@ a = PyDict_GetItemString(Object, key);
 
 if ( ! a )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not found\n\n";
 
    exit ( 1 );
@@ -282,8 +291,46 @@ if ( ! a )  {
 
 if ( ! PyDict_Check(a) )  {
 
-   cerr << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
         << key << "\" not a python dictionary\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject * Python3_Dict::lookup_list(const char * key) const
+
+{
+
+PyObject * a = 0;
+
+a = PyDict_GetItemString(Object, key);
+
+if ( ! a )  {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_list(const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyList_Check(a) )  {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::lookup_dict(const char * key) -> value for key \""
+        << key << "\" not a python list\n\n";
 
    exit ( 1 );
 
@@ -316,12 +363,38 @@ void Python3_Dict::set(PyObject * _obj)
 
 {
 
+     if ( PyDict_Check   (_obj) )  set_from_dict   (_obj);
+else if ( PyModule_Check (_obj) )  set_from_module (_obj);
+else {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::set(PyObject *) -> bad object type\n\n";
+
+   exit ( 1 );
+
+}
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::set_from_dict(PyObject * _obj)
+
+{
+
 clear();
 
 
 if ( ! PyDict_Check(_obj) )  {
 
-   cerr << "\n\n  Python3_Dict::set(PyObject *) object is not a dictionary!\n\n";
+   mlog << Error
+        << "\n\n  Python3_Dict::set_from_dict(PyObject *) object is not a python dictionary!\n\n";
 
    exit ( 1 );
 
@@ -331,6 +404,32 @@ if ( ! PyDict_Check(_obj) )  {
 Size = PyDict_Size (_obj);
 
 Object = _obj;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Python3_Dict::set_from_module(PyObject * _obj)
+
+{
+
+clear();
+
+
+if ( ! PyModule_Check(_obj) )  {
+
+   mlog << Error
+        << "\n\n  Python3_Dict::set_from_module(PyObject *) object is not a python module!\n\n";
+
+   exit ( 1 );
+
+}
+
+set_from_dict(PyModule_GetDict(_obj));
 
 return;
 
@@ -484,7 +583,8 @@ if ( PyDict_Check(value) )  {
       //  nope
       //
 
-cerr << "\n\n  Python3_Dict::dump_dict_value() -> can't determine type for dict value!\n\n";
+mlog << Error
+     << "\n\n  Python3_Dict::dump_dict_value() -> can't determine type for dict value!\n\n";
 
 exit ( 1 );
 

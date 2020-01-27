@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -118,9 +118,9 @@ class DataLine {
 
       virtual int read_fwf_line(LineDataFile *, const int *wdth, int n_wdth);
 
-      virtual int is_ok() const;
+      virtual bool is_ok() const;
 
-      virtual int is_header() const;
+      virtual bool is_header() const;
 
       virtual void set_delimiter(const char *delimiter);
 

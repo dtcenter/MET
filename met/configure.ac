@@ -223,6 +223,14 @@ if test -n "$MET_BUFRLIB"; then
    LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
 
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbufr_v11.3.0_4_64 or -lbufr, etc.  If it is -lbufr, you don't have to specify it.])
+
+AC_SUBST([BUFRLIB_NAME])
+AM_CONDITIONAL([BUFRLIB_NAME_SET], [test ! -z "$BUFRLIB_NAME"])
+
+
 #
 # Look for the HDF library
 #
@@ -1124,6 +1132,7 @@ AC_CONFIG_FILES([Makefile
                  data/poly/Makefile
                  data/poly/HMT_masks/Makefile
                  data/poly/NCEP_masks/Makefile
+                 data/wrappers/Makefile
                  data/ps/Makefile
                  data/table_files/Makefile
                  data/tc_data/Makefile
@@ -1169,8 +1178,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_regrid/Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
-                 src/libcode/vx_python_utils/Makefile
-                 src/libcode/vx_python2_utils/Makefile
+                 src/libcode/vx_python3_utils/Makefile
                  src/libcode/vx_data2d_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
@@ -1204,9 +1212,10 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
-                 src/tools/tc_utils/tc_rmw/Makefile
+                 src/tools/tc_utils/tc_stat/Makefile
+                 src/tools/tc_utils/tc_gen/Makefile
                  src/tools/tc_utils/rmw_analysis/Makefile
-                 src/tools/tc_utils/tc_stat/Makefile])
+                 src/tools/tc_utils/tc_rmw/Makefile])
 
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile

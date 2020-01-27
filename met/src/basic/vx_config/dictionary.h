@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,12 +30,6 @@
 #include "pwl.h"
 #include "icode.h"
 #include "idstack.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const bool default_dictionary_error_out = true;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -174,7 +168,9 @@ inline const IcodeVector * DictionaryEntry::icv() const { return ( v ); }
 
 static const int dictionary_alloc_inc = 100;
 
-static const bool default_dict_error_out = true;
+static const bool default_dictionary_error_out = true;
+
+static const bool default_dictionary_print_warning = true;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,27 +252,59 @@ class Dictionary {
          //  convenience functions
          //
 
-      bool         lookup_bool           (const char * name, bool error_out = default_dictionary_error_out);
-      int          lookup_int            (const char * name, bool error_out = default_dictionary_error_out);
-      double       lookup_double         (const char * name, bool error_out = default_dictionary_error_out);
-      NumArray     lookup_num_array      (const char * name, bool error_out = default_dictionary_error_out);
-      IntArray     lookup_int_array      (const char * name, bool error_out = default_dictionary_error_out);
-      ConcatString lookup_string         (const char * name, bool error_out = default_dictionary_error_out);
-      StringArray  lookup_string_array   (const char * name, bool error_out = default_dictionary_error_out);
-      SingleThresh lookup_thresh         (const char * name, bool error_out = default_dictionary_error_out);
-      ThreshArray  lookup_thresh_array   (const char * name, bool error_out = default_dictionary_error_out);
-      int          lookup_seconds        (const char * name, bool error_out = default_dictionary_error_out);
-      IntArray     lookup_seconds_array  (const char * name, bool error_out = default_dictionary_error_out);
-      unixtime     lookup_unixtime       (const char * name, bool error_out = default_dictionary_error_out);
-      TimeArray    lookup_unixtime_array (const char * name, bool error_out = default_dictionary_error_out);
+      bool         lookup_bool           (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      int          lookup_int            (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      double       lookup_double         (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      NumArray     lookup_num_array      (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      IntArray     lookup_int_array      (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      ConcatString lookup_string         (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      StringArray  lookup_string_array   (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      SingleThresh lookup_thresh         (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      ThreshArray  lookup_thresh_array   (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      int          lookup_seconds        (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      IntArray     lookup_seconds_array  (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      unixtime     lookup_unixtime       (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
+      TimeArray    lookup_unixtime_array (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning);
 
          //
          //  return value not allocated
          //
 
-      Dictionary *      lookup_dictionary (const char * name, bool error_out = default_dictionary_error_out);
-      Dictionary *      lookup_array      (const char * name, bool error_out = default_dictionary_error_out);
-      PiecewiseLinear * lookup_pwl        (const char * name, bool error_out = default_dictionary_error_out);
+      Dictionary *      lookup_dictionary (const char * name,
+                                           bool error_out = default_dictionary_error_out,
+                                           bool print_warning = default_dictionary_print_warning);
+      Dictionary *      lookup_array      (const char * name,
+                                           bool error_out = default_dictionary_error_out,
+                                           bool print_warning = default_dictionary_print_warning);
+      PiecewiseLinear * lookup_pwl        (const char * name,
+                                           bool error_out = default_dictionary_error_out,
+                                           bool print_warning = default_dictionary_print_warning);
 };
 
 

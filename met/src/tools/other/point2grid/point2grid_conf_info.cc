@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,7 +81,6 @@ void PointToGridConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void PointToGridConfInfo::process_config() {
-   int i;
    ConcatString s;
    StringArray sa;
    Dictionary *dict = (Dictionary *) 0;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -122,6 +122,7 @@ class VxPairDataPoint {
 
       //////////////////////////////////////////////////////////////////
 
+      StringArray sid_inc_filt;  // Station ID inclusion list
       StringArray sid_exc_filt;  // Station ID exclusion list
       StringArray obs_qty_filt;  // Observation quality markers
 
@@ -149,7 +150,7 @@ class VxPairDataPoint {
 
       //  Counts for observation rejection reason codes
       int n_try;                 // Number of observations processed
-      int rej_sid_exc;           // Reject based on SID exclusion list
+      int rej_sid;               // Reject based on SID inclusion and exclusion lists
       int rej_gc;                // Reject based on GRIB code
       int rej_vld;               // Reject based on valid time
       int rej_obs;               // Reject observation bad data
@@ -162,6 +163,8 @@ class VxPairDataPoint {
       int ***rej_typ;            // Reject based on message type
       int ***rej_mask;           // Reject based on masking region
       int ***rej_fcst;           // Reject forecast bad data
+      int ***rej_cmn;            // Reject climo mean bad data
+      int ***rej_csd;            // Reject climo stdev bad data
       int ***rej_dup;            // Reject based on duplicates logic
 
       //////////////////////////////////////////////////////////////////
@@ -184,6 +187,7 @@ class VxPairDataPoint {
       void set_beg_ut(const unixtime);
       void set_end_ut(const unixtime);
 
+      void set_sid_inc_filt(const StringArray);
       void set_sid_exc_filt(const StringArray);
       void set_obs_qty_filt(const StringArray);
 

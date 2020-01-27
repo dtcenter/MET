@@ -55,15 +55,17 @@ grid_res = 4;
 
 file_type   = PYTHON_NUMPY;
 
-conv_radius      = 0.0;
-conv_time_window = { beg = -1; end = 1; };
-conv_thresh      = >0.0;
-
 fcst = {   
-   field = { name = "${FCST_COMMAND}"; };
+   field            = { name = "${FCST_COMMAND}"; };
+   conv_time_window = { beg = -1; end = 1; };
+   conv_radius      = 0.0;
+   conv_thresh      = >0.0;
 }
 obs = {
-   field = { name = "${OBS_COMMAND}"; };
+   field            = { name = "${OBS_COMMAND}"; };
+   conv_time_window = { beg = -1; end = 1; };
+   conv_radius      = 0.0;
+   conv_thresh      = >0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

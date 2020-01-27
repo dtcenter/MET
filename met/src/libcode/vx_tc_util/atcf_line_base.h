@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,7 +27,7 @@
 
 enum ATCFLineType {
    ATCFLineType_Track,    // Track and intensity line type (numeric)
-
+   ATCFLineType_GenTrack, // Genesis Track and intensity line type (numeric)
    ATCFLineType_ProbTR,   // Track probability (TR)
    ATCFLineType_ProbIN,   // Intensity probability (IN)
    ATCFLineType_ProbRIRW, // Rapid intensification probability (RI)
@@ -75,13 +75,13 @@ class ATCFLineBase : public DataLine {
 
       int read_line(LineDataFile *);   //  virtual from base class
 
-      int is_header() const;           //  virtual from base class
+      bool is_header() const;          //  virtual from base class
 
          //
          // set values
          //
 
-      void set_technique(const ConcatString &);
+      void set_technique (const ConcatString &);
       void set_best_track(const bool);
       void set_oper_track(const bool);
 
@@ -126,7 +126,7 @@ inline bool ATCFLineBase::is_oper_track() const                { return(IsOperTr
 extern unixtime parse_time           (const char *);
 extern double   parse_lat            (const char *);
 extern double   parse_lon            (const char *);
-extern int      parse_int            (const char *);
+extern int      parse_int            (const char *, const int bad_data=bad_data_int);
 extern int      parse_int_check_zero (const char *);
 
 extern ConcatString define_storm_id(unixtime, unixtime, unixtime,

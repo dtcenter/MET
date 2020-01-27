@@ -16,6 +16,7 @@ libvx_nc_util_a_SOURCES = \
               nc_utils.cc nc_utils.h \
               write_netcdf.cc write_netcdf.h \
               grid_output.cc grid_output.h \
+              load_dland.cc load_dland.h \
               nc_constants.h \
               vx_nc_util.h
 libvx_nc_util_a_CPPFLAGS = ${MET_CPPFLAGS}

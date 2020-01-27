@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1245,6 +1245,20 @@ int ConcatString::comparecase(size_t pos, size_t len, std::string str)
    std::string lower_str = str;
    transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
    return lower_s.compare(pos, len, lower_str);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ConcatString::comparecase(const char * str)
+
+{
+  std::string lower_s = *s;
+  transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+  std::string lower_str = str;
+  transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
+  return lower_s.compare(lower_str);
 }
 
 

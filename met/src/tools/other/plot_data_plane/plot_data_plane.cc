@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -102,6 +102,10 @@ int main(int argc, char * argv[]) {
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
+
+   std::ios::sync_with_stdio(true);
+
+   // cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
 
    //
    // set the default color table

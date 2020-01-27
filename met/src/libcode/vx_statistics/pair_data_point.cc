@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -280,6 +280,8 @@ void VxPairDataPoint::init_from_scratch() {
    rej_typ      = (int ***) 0;
    rej_mask     = (int ***) 0;
    rej_fcst     = (int ***) 0;
+   rej_cmn      = (int ***) 0;
+   rej_csd      = (int ***) 0;
    rej_dup      = (int ***) 0;
 
    n_msg_typ    = 0;
@@ -307,6 +309,7 @@ void VxPairDataPoint::clear() {
    fcst_dpa.clear();
    climo_mn_dpa.clear();
    climo_sd_dpa.clear();
+   sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
@@ -315,7 +318,7 @@ void VxPairDataPoint::clear() {
    end_ut      = (unixtime) 0;
 
    n_try       = 0;
-   rej_sid_exc = 0;
+   rej_sid     = 0;
    rej_gc      = 0;
    rej_vld     = 0;
    rej_obs     = 0;
@@ -331,6 +334,8 @@ void VxPairDataPoint::clear() {
             rej_typ[i][j][k]  = 0;
             rej_mask[i][j][k] = 0;
             rej_fcst[i][j][k] = 0;
+            rej_cmn[i][j][k]  = 0;
+            rej_csd[i][j][k]  = 0;
             rej_dup[i][j][k]  = 0;
          }
       }
@@ -362,6 +367,7 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    desc = vx_pd.desc;
 
+   sid_inc_filt = vx_pd.sid_inc_filt;
    sid_exc_filt = vx_pd.sid_exc_filt;
    obs_qty_filt = vx_pd.obs_qty_filt;
 
@@ -369,11 +375,13 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    beg_ut   = vx_pd.beg_ut;
    end_ut   = vx_pd.end_ut;
 
-   n_try       = vx_pd.n_try;
-   rej_typ     = vx_pd.rej_typ;
-   rej_mask    = vx_pd.rej_mask;
-   rej_fcst    = vx_pd.rej_fcst;
-   rej_dup     = vx_pd.rej_dup;
+   n_try    = vx_pd.n_try;
+   rej_typ  = vx_pd.rej_typ;
+   rej_mask = vx_pd.rej_mask;
+   rej_fcst = vx_pd.rej_fcst;
+   rej_cmn  = vx_pd.rej_cmn;
+   rej_csd  = vx_pd.rej_csd;
+   rej_dup  = vx_pd.rej_dup;
 
    interp_thresh = vx_pd.interp_thresh;
 
@@ -391,6 +399,8 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
             rej_typ[i][j][k]  = vx_pd.rej_typ[i][j][k];
             rej_mask[i][j][k] = vx_pd.rej_mask[i][j][k];
             rej_fcst[i][j][k] = vx_pd.rej_fcst[i][j][k];
+            rej_cmn[i][j][k]  = vx_pd.rej_cmn[i][j][k];
+            rej_csd[i][j][k]  = vx_pd.rej_csd[i][j][k];
             rej_dup[i][j][k]  = vx_pd.rej_dup[i][j][k];
          }
       }
@@ -532,9 +542,18 @@ void VxPairDataPoint::set_end_ut(const unixtime ut) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_sid_exc_filt(const StringArray se) {
+void VxPairDataPoint::set_sid_inc_filt(const StringArray sa) {
 
-   sid_exc_filt = se;
+   sid_inc_filt = sa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_sid_exc_filt(const StringArray sa) {
+
+   sid_exc_filt = sa;
 
    return;
 }
@@ -563,6 +582,8 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
    rej_typ  = new int **           [n_msg_typ];
    rej_mask = new int **           [n_msg_typ];
    rej_fcst = new int **           [n_msg_typ];
+   rej_cmn  = new int **           [n_msg_typ];
+   rej_csd  = new int **           [n_msg_typ];
    rej_dup  = new int **           [n_msg_typ];
 
    for(i=0; i<n_msg_typ; i++) {
@@ -570,6 +591,8 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
       rej_typ[i]  = new int *           [n_mask];
       rej_mask[i] = new int *           [n_mask];
       rej_fcst[i] = new int *           [n_mask];
+      rej_cmn[i]  = new int *           [n_mask];
+      rej_csd[i]  = new int *           [n_mask];
       rej_dup[i]  = new int *           [n_mask];
 
       for(j=0; j<n_mask; j++) {
@@ -577,13 +600,17 @@ void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
          rej_typ[i][j]  = new int           [n_interp];
          rej_mask[i][j] = new int           [n_interp];
          rej_fcst[i][j] = new int           [n_interp];
+         rej_cmn[i][j]  = new int           [n_interp];
+         rej_csd[i][j]  = new int           [n_interp];
          rej_dup[i][j]  = new int           [n_interp];
 
          for(k=0; k<n_interp; k++) {
-            rej_typ[i][j][k]  = 0;
-            rej_mask[i][j][k] = 0;
-            rej_fcst[i][j][k] = 0;
-            rej_dup[i][j][k]  = 0;
+            rej_typ[i][j][k]   = 0;
+            rej_mask[i][j][k]  = 0;
+            rej_fcst[i][j][k]  = 0;
+            rej_cmn[i][j][k] = 0;
+            rej_csd[i][j][k] = 0;
+            rej_dup[i][j][k]   = 0;
          } // end for k
       } // end for j
    } // end for i
@@ -757,9 +784,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Increment the number of tries count
    n_try++;
 
-   // Check the station ID exclusion list
-   if(sid_exc_filt.n() && sid_exc_filt.has(hdr_sid_str)) {
-      rej_sid_exc++;
+   // Check the station ID inclusion and exclusion lists
+   if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
+      (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) {
+      rej_sid++;
       return;
    }
 
@@ -1042,6 +1070,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                        fcst_info->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
+            // Check for bad data
+            if(climo_mn_dpa.n_planes() > 0 && is_bad_data(cmn_v)) {
+               inc_count(rej_cmn, i, j, k);
+               continue;
+            }
+
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
                (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
@@ -1062,6 +1096,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                        interp_thresh, spfh_flag,
                        fcst_info->level().type(),
                        to_lvl, csd_lvl_blw, csd_lvl_abv);
+
+            // Check for bad data
+            if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
+               inc_count(rej_csd, i, j, k);
+               continue;
+            }
 
             // Compute weight for current point
             wgt_v = (wgt_dp == (DataPlane *) 0 ?

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,12 @@
 #include <cstdio>
 #include <string>
 #include <time.h>
+
+#include "config.h"
+
+#ifdef ENABLE_PYTHON
+#include "vx_python3_utils.h"
+#endif   /*  ENABLE_PYTHON  */
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,6 +53,19 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const string &var_name = "");
+
+////////////////////////
+#ifdef ENABLE_PYTHON
+
+  Observation();
+  Observation(const Python3_List &);
+
+  void set(const Python3_List &);
+  void set(PyObject *);
+
+#endif   /*  ENABLE_PYTHON  */
+////////////////////////
+
 
   virtual ~Observation();
 

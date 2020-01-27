@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -42,6 +42,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       case(InterpMthd_Lower_Right): out = interpmthd_lower_right_str; break;
       case(InterpMthd_Lower_Left):  out = interpmthd_lower_left_str;  break;
       case(InterpMthd_Gaussian):    out = interpmthd_gaussian_str;    break;
+      case(InterpMthd_MaxGauss):    out = interpmthd_maxgauss_str;    break;
       case(InterpMthd_Geog_Match):  out = interpmthd_geog_match_str;  break;
 
       case(InterpMthd_None):
@@ -74,6 +75,7 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_lower_right_str) == 0) m = InterpMthd_Lower_Right;
    else if(strcmp(mthd_str, interpmthd_lower_left_str)  == 0) m = InterpMthd_Lower_Left;
    else if(strcmp(mthd_str, interpmthd_gaussian_str  )  == 0) m = InterpMthd_Gaussian;
+   else if(strcmp(mthd_str, interpmthd_maxgauss_str  )  == 0) m = InterpMthd_MaxGauss;
    else if(strcmp(mthd_str, interpmthd_geog_match_str)  == 0) m = InterpMthd_Geog_Match;
    else                                                       m = InterpMthd_None;
 

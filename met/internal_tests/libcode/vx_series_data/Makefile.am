@@ -26,8 +26,9 @@ test_series_data_LDADD = -lvx_config \
 	-lvx_math \
 	-lvx_log \
 	-lvx_config \
+	-lvx_gsl_prob \
 	-lvx_math \
 	-lvx_log \
 	-lvx_cal \
 	-lvx_util \
-	-lm -lnetcdf_c++4 -lnetcdf
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

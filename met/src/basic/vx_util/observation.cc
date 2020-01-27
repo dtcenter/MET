@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,9 +12,10 @@
 
 using namespace std;
 
+#include "vx_log.h"
+#include "vx_math.h"
 
 #include "observation.h"
-#include "vx_math.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,123 @@ Observation::Observation(const string &header_type, const string &station_id,
 }
 
 
+////////////////////////////////////////////////////////////////////////
+#ifdef ENABLE_PYTHON
+
+Observation::Observation()
+
+{
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Observation::Observation(const Python3_List & list)
+
+{
+
+set(list);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Observation::set(PyObject * obj)
+
+{
+
+Python3_List list(obj);
+
+set(list);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Observation::set(const Python3_List & list)
+
+{
+
+PyObject * a = 0;
+ConcatString c;
+
+      ////////////////////////
+
+_headerType  = pyobject_as_string(list[0]);
+
+      ////////////////////////
+
+_stationId   = pyobject_as_string(list[1]);
+
+      ////////////////////////
+
+c = pyobject_as_concat_string(list[2]);
+
+if ( ! is_yyyymmdd_hhmmss(c.text()) )  {
+
+   mlog << Error
+        << "\n\n  Observation::Observation(const Python3_List) -> bad time string: \""
+        << c << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+_validTime   = yyyymmdd_hhmmss_to_unix(c.text());
+
+      ////////////////////////
+
+_latitude    = pyobject_as_double(list[3]);
+
+      ////////////////////////
+
+_longitude   = pyobject_as_double(list[4]);
+
+      ////////////////////////
+
+_elevation   = pyobject_as_double(list[5]);
+
+      //////////////////////// 
+
+a = list[6];
+
+     if ( PyLong_Check    (a) )   varCode = PyLong_AsLong(a);
+else if ( PyUnicode_Check (a) )  _varName = pyobject_as_string(a);
+
+      //////////////////////// 
+
+_pressureLevel = pyobject_as_double(list[7]);
+
+      //////////////////////// 
+
+_height = pyobject_as_double(list[8]);
+
+      //////////////////////// 
+
+_qualityFlag = pyobject_as_string(list[9]);
+
+      //////////////////////// 
+
+_value = pyobject_as_double(list[10]);
+
+      //////////////////////// 
+
+
+hdrIndex = -1;   // 
+
+
+}
+
+#endif   /*  ENABLE_PYTHON  */
 ////////////////////////////////////////////////////////////////////////
 
 

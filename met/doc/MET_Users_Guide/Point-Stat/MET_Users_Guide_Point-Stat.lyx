@@ -2081,6 +2081,12 @@ rank_corr_flag = TRUE;
 \begin_layout LyX-Code
 
 \series bold
+sid_inc        = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 sid_exc        = [];
 \end_layout
 

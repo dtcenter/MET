@@ -32,7 +32,7 @@ wind_logic  = UNION;
 eclv_points = 0.05;
 
 fcst = {
-
+   sid_inc = [];
    sid_exc = [];
 
    name         = "TMP";

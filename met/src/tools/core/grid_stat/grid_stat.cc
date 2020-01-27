@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -761,7 +761,7 @@ void process_scores() {
             interp->field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
                          interp->width[j], interp->shape, interp->vld_thresh,
-                         interp->gaussian_radius, interp->gaussian_dx);
+                         interp->gaussian);
          }
          // Do not smooth the forecast field
          else {
@@ -773,7 +773,7 @@ void process_scores() {
             interp->field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
                          interp->width[j], interp->shape, interp->vld_thresh,
-                         interp->gaussian_radius, interp->gaussian_dx);
+                         interp->gaussian);
          }
          // Do not smooth the observation field
          else {
@@ -961,7 +961,7 @@ void process_scores() {
                   interp->field == FieldType_Both) {
                   smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
                                interp->width[j], interp->shape, interp->vld_thresh,
-                               interp->gaussian_radius, interp->gaussian_dx);
+                               interp->gaussian);
                }
                // Do not smooth the forecast field
                else {
@@ -975,7 +975,7 @@ void process_scores() {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
                                interp->shape, interp->vld_thresh,
-                               interp->gaussian_radius, interp->gaussian_dx);
+                               interp->gaussian);
                }
                // Do not smooth the observation field
                else {

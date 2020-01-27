@@ -38,6 +38,7 @@ config_DATA = \
 	TCRMWConfig_default \
 	RMWAnalysisConfig_default \
 	TCStatConfig_default \
+	TCGenConfig_default \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \

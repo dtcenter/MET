@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,7 +18,7 @@ using namespace std;
 #include <cmath>
 
 #include "data2d_python.h"
-#include "vx_python_utils.h"
+#include "vx_python3_utils.h"
 #include "data2d_utils.h"
 #include "grdfiletype_to_string.h"
 
@@ -197,12 +197,6 @@ else {
 }
 
 file_name = sa[sa.n_elements() - 1];
-
-   //
-   //  Set the PYTHONPATH
-   //
-
-setenv("PYTHONPATH", path_name.c_str(), 1);
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 

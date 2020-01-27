@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,7 @@
 #include "data_plane.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
+#include "config_gaussian.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -76,8 +77,8 @@ extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int 
 // GridTemplate version takes center x/y
 extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
 extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
-extern void     interp_gaussian_dp(DataPlane &, const double gaussian_radius, const double gaussian_dx, double t);
-extern double   interp_gaussian  (const DataPlane &, const DataPlane &g_dp, double obs_x, double obs_y, int max_r, double t);
+extern void     interp_gaussian_dp(DataPlane &, const GaussianInfo &, double t);
+extern double   interp_gaussian  (const DataPlane &, const DataPlane &, double obs_x, double obs_y, int max_r, double t);
 
 extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 

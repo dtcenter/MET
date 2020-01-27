@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -47,6 +47,9 @@ class Python3_Dict {
 
       PyObject * Object;   //  the dictionary, not allocated
 
+      void set_from_dict   (PyObject *);
+      void set_from_module (PyObject *);
+
       int Size;   //  the size of the dictionary
 
 
@@ -58,7 +61,7 @@ class Python3_Dict {
 
       void dump(std::ostream &, int depth) const;
 
-      void set(PyObject *);
+      void set(PyObject *);   //  dict or module
 
       int size() const;
 
@@ -68,6 +71,7 @@ class Python3_Dict {
       ConcatString  lookup_string (const char * key) const;
 
       PyObject *    lookup_dict   (const char * key) const;
+      PyObject *    lookup_list   (const char * key) const;
 
 };
 

@@ -84,8 +84,8 @@ nmep_smooth = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-
    message_type = [ "ADPSFC" ];
+   sid_inc      = [];
    sid_exc      = [];
 
    field = [

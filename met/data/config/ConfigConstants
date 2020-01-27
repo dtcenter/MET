@@ -86,7 +86,8 @@ MIN            = 18;
 MAX            = 19;
 AW_MEAN        = 20;
 GAUSSIAN       = 21;
-GEOG_MATCH     = 22;
+MAXGAUSS       = 22;
+GEOG_MATCH     = 23;
 
 // Interpolation types
 NONE           = 1;

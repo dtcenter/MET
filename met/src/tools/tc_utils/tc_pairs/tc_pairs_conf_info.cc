@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -67,6 +67,8 @@ void TCPairsConfInfo::clear() {
    Cyclone.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
    InitHour.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitMaskName.clear();

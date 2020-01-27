@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -130,6 +130,7 @@ class TrackInfo {
       int                  init_hour()        const;
       unixtime             valid_min()        const;
       unixtime             valid_max()        const;
+      int                  duration()         const;
       int                  valid_inc()        const;
       int                  n_points()         const;
 
@@ -226,6 +227,7 @@ class TrackInfoArray {
 
       const TrackInfo & operator[](int) const;
       int n_tracks() const;
+      int n() const;
 
          //
          //  do stuff
@@ -241,6 +243,7 @@ class TrackInfoArray {
 ////////////////////////////////////////////////////////////////////////
 
 inline int TrackInfoArray::n_tracks() const { return(NTracks); }
+inline int TrackInfoArray::n()        const { return(NTracks); }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,6 +71,7 @@ static int format_version;
 const float AERONET_MISSING_VALUE = -999.;
 
 double angstrom_power_interplation(double value_1, double value_2, double level_1, double level_2, double target_level);
+
 
 ////////////////////////////////////////////////////////////////////////
 

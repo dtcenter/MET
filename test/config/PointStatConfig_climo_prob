@@ -63,6 +63,7 @@ fcst = {
 }
 
 obs = {
+   sid_inc      = [];
    sid_exc      = [];
    message_type = [ "ADPSFC" ];
 

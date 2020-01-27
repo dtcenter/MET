@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -368,6 +368,13 @@ void TrackInfo::set_storm_id() {
 
 ////////////////////////////////////////////////////////////////////////
 
+int TrackInfo::duration() const {
+   return(MaxValidTime == 0 || MinValidTime == 0 ? bad_data_int :
+          MaxValidTime - MinValidTime);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -675,7 +682,7 @@ ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
    s << prefix << serialize() << ", Tracks:\n";
 
    for(i=0; i<NTracks; i++)
-      s << Track[i].serialize_r(i+1, indent_depth+1);
+      s << Track[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return(s);
 

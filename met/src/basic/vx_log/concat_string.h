@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -185,6 +185,7 @@ class ConcatString {
       int find(int c);
       int compare(size_t pos, size_t len, std::string str);
       int comparecase(size_t pos, size_t len, std::string str);
+      int comparecase(const char *);
 };
 
 

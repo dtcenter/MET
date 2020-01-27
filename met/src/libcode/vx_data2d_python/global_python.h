@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,6 +21,12 @@ extern "C" {
 #include "Python.h"
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "python3_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,9 +59,12 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
+   setup_python_path();   //  this must be called before Py_Initialize()
+
    Py_Initialize();
 
    is_initialized = true;
+
 
 }
 

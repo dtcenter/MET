@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0 BETA1 (November 21, 2019)
+Model Evaluation Tools version 9.0 BETA2 (January 3, 2019)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -268,7 +268,7 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 31 executables:
+  command line) will contain 35 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
@@ -276,6 +276,7 @@ sub-directory, or the MET Online Tutorial:
    - gis_dump_dbf
    - gis_dump_shp
    - gis_dump_shx
+   - grid_diag
    - gsid2mpr
    - gsidens2orank
    - lidar2nc
@@ -289,6 +290,7 @@ sub-directory, or the MET Online Tutorial:
    - plot_data_plane
    - plot_mode_field
    - plot_point_obs
+   - point2grid
    - point_stat
    - regrid_data_plane
    - series_analysis
@@ -297,6 +299,8 @@ sub-directory, or the MET Online Tutorial:
    - tc_dland
    - tc_pairs
    - tc_stat
+   - tc_gen
+   - tc_rmw
    - wavelet_stat
    - wwmca_plot
    - wwmca_regrid
@@ -325,12 +329,58 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
 
+Version 9.0 BETA2 Release Notes:
+-------------------------------
+
+- What's New:
+   - Major Enhancements: python version 3, python embedding overhaul
+   - New Tools: grid_diag, tc_gen, point2grid
+
+- Bugfixes:
+   - Fix MET-TC bug in the computation of initialization hour and valid hour
+     (#1227).
+   - Fix MODE bug in the computation of the aspect ratio of objects with an
+     area of 1 (#1215).
+   - Fix bug in the parsing of file lists and make this logic consistent across
+     Series-Analysis, Ensemble-Stat, MTD, and TC-RMW (#1226).
+   
+- Changes to Output Formats:
+   - Add MTD header columns for FCST_CONV_TIME_BEG, FCST_CONV_TIME_END,
+     OBS_CONV_TIME_BEG, and OBS_CONV_TIME_END (#1133).
+   - Add MTD data column for a user-specified intensity percentile value
+     INTENSITY_*, where * is the user-specified percentile (#1134).
+
+- Build Process:
+   - Integrate Dockerfile into MET GitHub repository and automatically build
+     the master_v8.1 and develop branches on DockerHub (#1123).
+
+- Enhancements to Existing Tools:
+   - Common Libraries
+      - Switch python embedding from python 2 to python 3 (#1080).
+      - Enhance python embedding to support multiple input data types (#1056).
+      - Print a warning message when a user specifies a config file entry as
+        the wrong type (#1225).
+   - Ensemble-Stat, Series-Analysis, MTD
+      - Add support to these tools for using python embedding (#1140).
+   - Ensemble-Stat
+      - Add the computation of neighborhood probability forecasts (#1089).
+      - Apply binned climatology logic using the climo_cdf config file option
+        to the computation of ECNT statistics (#1224).
+   - MTD
+      - Make the amount of temporal smoothing a configurable option (#1084).
+      - Add a user-specified object intensity percentile to the output (#1134).
+   - Grid-Diag
+      - Initial release of the new grid diagnostics tool (#1106).
+   - TC-Gen
+      - Initial release of the new TC genesis tool (#1127).
+   - Point2Grid 
+      - Initial release of the new point to grid tool (#1078).
+
 Version 9.0 BETA1 Release Notes:
 -------------------------------
 
 - What's New:
-   - Major Enhancements: python version 3, python embedding overhaul, binned
-     climatologies
+   - Major Enhancements: binned climatologies
    - New Tools: tc_rmw
 
 - Bugfixes:
@@ -340,8 +390,6 @@ Version 9.0 BETA1 Release Notes:
    - Bugfix for MTD centroid longitude in degrees west, not east (#1214).
    - Bugfix for reporting the units for GRIB2 probabilities as "%" (#1212).
    
-- Changes to Output Formats:
-
 - Build Process
    - Document option to install MET into "exec" rather than "bin" (#1189).
    - Continued reduction of Fortify findings.
@@ -349,7 +397,6 @@ Version 9.0 BETA1 Release Notes:
 
 - Enhancements to Existing Tools:
    - Common Libraries
-      - Switch python embedding from python 2 to python 3 (#1080).
       - Report AW_MEAN regridding width at 1, not NA (#1186).
       - Add support for climatological distribution percentile thresholds,
         such as >CDP50, (#1138).

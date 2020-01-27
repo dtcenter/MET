@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -191,8 +191,9 @@ void process_command_line(int argc, char **argv) {
    RGInfo.field      = FieldType_None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
-   RGInfo.gaussian_dx     = default_gaussian_dx;
-   RGInfo.gaussian_radius = default_gaussian_radius;
+   RGInfo.gaussian.dx     = default_gaussian_dx;
+   RGInfo.gaussian.radius = default_gaussian_radius;
+   RGInfo.gaussian.trunc_factor = default_trunc_factor;
    RGInfo.vld_thresh = DefaultVldThresh;
    RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
 
@@ -260,6 +261,8 @@ void process_command_line(int argc, char **argv) {
       set_goes_interpolate_option();
    }
    RGInfo.validate();
+   if (RGInfo.method == InterpMthd_Gaussian || RGInfo.method == InterpMthd_MaxGauss)
+      RGInfo.gaussian.compute();
 
    return;
 }
@@ -1466,10 +1469,10 @@ void usage() {
         << "width (" << RGInfo.width << ") (optional).\n"
 
         << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian_dx << ". Ignored if not Gaussian method (optional).\n"
+        << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian_radius << ". Ignored if not Gaussian method (optional).\n"
+        << " The default is " << RGInfo.gaussian.radius << ". Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
@@ -1509,7 +1512,7 @@ void set_method(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_gaussian_dx(const StringArray &a) {
-   RGInfo.gaussian_dx = atof(a[0].c_str());
+   RGInfo.gaussian.dx = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1521,7 +1524,7 @@ void set_width(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_gaussian_radius(const StringArray &a) {
-   RGInfo.gaussian_radius = atof(a[0].c_str());
+   RGInfo.gaussian.radius = atof(a[0].c_str());
 }
 
 

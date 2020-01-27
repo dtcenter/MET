@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,13 +18,14 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
+//#include "interp_mthd.h"
 #include "interp_util.h"
-#include "interp_mthd.h"
 #include "GridTemplate.h"
 #include "RectangularTemplate.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -538,46 +539,33 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 
 ////////////////////////////////////////////////////////////////////////
 
-const double trunc_factor = 3.5;
-
-void interp_gaussian_dp(DataPlane &dp, const double radius,
-                        const double dx, double t) {
+void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    int idx_x, idx_y;
    int weight_cnt;
    double value;
    double weight_sum;
-   double weight, distance_sq;
-   const double g_sigma = radius / dx;
-   const double g_sigma_sq = g_sigma * g_sigma;
-   const double f_sigma_exp_divider = (2 * g_sigma_sq);
-   const double f_sigma_divider = (2 * M_PI * g_sigma_sq);
-   const double max_distance_sq = pow((g_sigma * trunc_factor), 2);
-   
-   int max_r = nint(g_sigma * trunc_factor);
+   int max_r = gaussian.max_r;
    int g_nx = max_r * 2 + 1;
-   
    int nx = dp.nx();
    int ny = dp.ny();
    DataPlane d_dp;
    DataPlane g_dp;
    
-   weight_cnt = 0;
-   weight_sum = 0.0;
+   if (max_r <= 0 || gaussian.weights == (double *)0) {
+      mlog << Error << "\ninterp_gaussian_dp() -> "
+           << "the gaussian weights were not computed (max_r: " << max_r << ").\n\n";
+      exit(1);
+   }
+   
    g_dp.set_size(g_nx, g_nx);
-   for(idx_x=-max_r; idx_x<=max_r; idx_x++) {
-      for(idx_y=-max_r; idx_y<=max_r; idx_y++) {
-         weight = 0.0;
-         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
-         if (distance_sq <= max_distance_sq) {
-            weight_cnt++;
-            weight = exp(-(distance_sq) / f_sigma_exp_divider) / f_sigma_divider;
-            weight_sum += weight;
-         }
-         g_dp.set(weight, idx_x+max_r, idx_y+max_r);
+   d_dp.set_size(nx, ny);
+   
+   int index = 0;
+   for(idx_x=0; idx_x<g_nx; idx_x++) {
+      for(idx_y=0; idx_y<g_nx; idx_y++) {
+         g_dp.set(gaussian.weights[index++], idx_x, idx_y);
       } // end for y
    } // end for x
-
-   d_dp.set_size(nx, ny);
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
          d_dp.set(dp.get(idx_x, idx_y), idx_x, idx_y);
@@ -585,43 +573,39 @@ void interp_gaussian_dp(DataPlane &dp, const double radius,
    } // end for x
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
-         value = interp_gaussian(d_dp, g_dp, (double)idx_x, (double)idx_y, max_r, t);
+         value = interp_gaussian(d_dp, g_dp, (double)idx_x,
+                                 (double)idx_y, max_r, t);
          dp.set(value, idx_x, idx_y);
       } // end for y
    } // end for x
 
+   mlog << Debug(5) << "interp_gaussian_dp() "
+        << "weight_sum: " << gaussian.weight_sum
+        << " weight_cnt: " << gaussian.weight_cnt
+        << " nx: " << nx << ", ny: " << ny << " max_r: " << max_r
+        << "\n";
 }
 
-
-////////////////////////////////////////////////////////////////////////
-//
-// Compute the Gaussian filter
-// g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
-//
 ////////////////////////////////////////////////////////////////////////
 
 double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
                        double obs_x, double obs_y, int max_r, double t) {
-
    int count, count_vld;
-   int ix, iy;
-   int nx, ny, g_nx;
    double value, gaussian_value, gaussian_weight, weight_sum;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
-
-   nx = dp.nx();
-   ny = dp.ny();
-   g_nx = g_dp.nx();
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int g_nx = g_dp.nx();
 
    count = count_vld = 0;
    gaussian_value = weight_sum = 0.0;
    for(int x_idx=0; x_idx<g_nx; x_idx++) {
-      ix = x - max_r + x_idx;
+      int ix = x - max_r + x_idx;
       if (0 > ix || ix >= nx) continue;
       for(int y_idx=0; y_idx<g_nx; y_idx++) {
-         iy = y - max_r + y_idx;
+         int iy = y - max_r + y_idx;
          if (0 > iy || iy >= ny) continue;
 
          gaussian_weight = g_dp.get(x_idx, y_idx);
@@ -636,7 +620,7 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    }
 
    // Check whether enough valid grid points were found
-   if((double) count_vld/count < t || count_vld == 0) {
+   if(0 == count || (double)count_vld/count < t || count_vld == 0) {
       gaussian_value = bad_data_double;
    }
    else {

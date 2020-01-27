@@ -22,6 +22,7 @@ libvx_tc_util_a_SOURCES = \
               prob_info_array.h prob_info_array.cc \
               prob_rirw_info.h prob_rirw_info.cc \
               prob_rirw_pair_info.h prob_rirw_pair_info.cc \
+              genesis_info.cc genesis_info.h \
               tc_hdr_columns.cc tc_hdr_columns.h \
               tc_columns.cc tc_columns.h \
               tc_stat_line.cc tc_stat_line.h \

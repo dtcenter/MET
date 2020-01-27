@@ -11,6 +11,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "vx_log.h"
 #include "empty_string.h"
 
 #include "python3_numpy.h"
@@ -155,7 +156,8 @@ int Python3_Numpy::dim(int k) const
 
 if ( (k < 0) || (k >= N_Dims) )  {
 
-   cerr << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
+   mlog << Error
+        << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -176,7 +178,8 @@ void Python3_Numpy::set_name(const char * _name)
 
 if ( empty(_name) )  {
 
-   cerr << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
+   mlog << Error
+        << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -214,7 +217,8 @@ PyObject * obj = script.lookup(_name);
 
 if ( ! obj )  {
 
-   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error
+        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "variable named \"" << _name << "\" not found in script \""
         << script.filename() << "\"\n\n";
 
@@ -242,7 +246,8 @@ clear();
 
 if ( ! obj )  {
 
-   cerr << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
+   mlog << Error
+        << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
 
    exit ( 1 );
 
@@ -289,7 +294,8 @@ Data_Obj = PyObject_GetAttrString (Object, "data");
 
 if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
-   cerr << "  buffer interface not supported\n\n";
+   mlog << Error
+        << "  buffer interface not supported\n\n";
 
    exit ( 1 );
 
@@ -305,7 +311,8 @@ if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
 if ( PyObject_GetBuffer(Data_Obj, &View, PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS) < 0 )  {
 
-   cout << "failed to get buffer\n\n" << flush;
+   mlog << Error
+        << "failed to get buffer\n\n";
 
    exit ( 1 );
 
@@ -331,7 +338,7 @@ long * pp = (long *)   (Buffer);
 
 for (j=0; j<N_Data; ++j)  {
 
-   cout << "j = " << j << " ... value = " << pp[j] << "\n";
+   // cout << "j = " << j << " ... value = " << pp[j] << "\n";
 
 }
 */
@@ -368,7 +375,8 @@ PyObject * dtype_obj = get_attribute(Object, "dtype");
 
 if ( ! dtype_obj )  {
 
-   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error
+        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "can't get numpy dtype attribute!\n\n";
 
    exit ( 1 );
@@ -379,7 +387,8 @@ PyObject * dtype_str_obj = get_attribute(dtype_obj, "str");
 
 if ( ! dtype_str_obj )  {
 
-   cerr << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error
+        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
         << "can't get numpy dtype attribute string!\n\n";
 
    exit ( 1 );

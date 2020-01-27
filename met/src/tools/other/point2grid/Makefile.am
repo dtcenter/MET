@@ -11,7 +11,8 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS = point2grid
-point2grid_SOURCES = point2grid.cc point2grid_conf_info.cc
+point2grid_SOURCES = point2grid.cc \
+	point2grid_conf_info.h point2grid_conf_info.cc
 point2grid_CPPFLAGS = ${MET_CPPFLAGS}
 point2grid_LDFLAGS = ${MET_LDFLAGS}
 point2grid_LDADD = -lvx_statistics \
