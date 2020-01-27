@@ -72,6 +72,20 @@ void RMWAnalysisConfInfo::clear() {
     ValidGridMask.clear();
     ValidAreaMask.clear();
 
+    // Clear data_info
+    if(data_info) {
+        for(int i = 0; i < n_data; i++) {
+            if(data_info[i]) {
+                data_info[i] = (VarInfo*) 0;
+            }
+        }
+        delete data_info;
+        data_info = (VarInfo**) 0;
+    }
+
+    // Reset field count
+    n_data = 0;
+
     return;
 }
 
@@ -141,6 +155,48 @@ void RMWAnalysisConfInfo::process_config() {
              << "Valid Point Masking File: " << poly_file << "\n";
         parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
                         ValidAreaMask, ValidMaskName);
+    }
+
+    // Determine number of fields (name/level)
+    n_data = parse_conf_n_vx(fdict);
+
+    mlog << Debug(2) << "n_data:" << n_data << "\n";
+
+    // Check for empty data settings
+    if(n_data == 0) {
+        mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
+             << "data may not be empty.\n\n";
+        exit(1);
+    }
+
+    // Allocate space based on number of fields
+    data_info = new VarInfo*[n_data];
+
+    // Initialize pointers
+    for(int i = 0; i < n_data; i++) {
+        data_info[i] = (VarInfo*) 0;
+    }
+
+    // Parse data field information
+    for(int i = 0; i < n_data; i++) {
+
+        // Allocate new VarInfo objects
+        data_info[i] = info_factory.new_var_info(ftype);
+
+        // Get current dictionary
+        Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
+
+        // Set current dictionary
+        data_info[i]->set_dict(i_fdict);
+
+        mlog << Debug(2) << data_info[i]->magic_str() << "\n";
+
+        // Dump contents of current VarInfo
+        if(mlog.verbosity_level() >=5) {
+            mlog << Debug(5) << "Parsed data field "
+            << i + 1 << ":\n";
+            data_info[i]->dump(cout);
+        }
     }
 
     return;
