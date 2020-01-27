@@ -556,6 +556,32 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void write_tc_heights(
+    NcFile* nc_out, const TcrmwGrid& grid,
+    set<string> pressure_level_strings,
+    set<float> pressure_levels,
+    const double* surface_pressure,
+    const double* relative_humidity) {
+
+    double* height;
+
+    height = new double[
+        grid.range_n() * grid.azimuth_n()];
+
+    for (set<string>::iterator k = pressure_level_strings.begin();
+        k != pressure_level_strings.end(); ++k) {
+
+        for(int ir = 0; ir < grid.range_n(); ir++) {
+            for(int ia = 0; ia < grid.azimuth_n(); ia++) {
+            }
+        }
+    }
+
+    delete[] height;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 extern void write_tc_pressure_level_data(
     NcFile* nc_out, const TcrmwGrid& grid,
     map<string, int> pressure_level_indices, const string& level_str,
