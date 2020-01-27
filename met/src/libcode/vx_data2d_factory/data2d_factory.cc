@@ -71,7 +71,6 @@ MetPythonDataFile * p = 0;
               << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
 #endif
-         mlog << Debug(2) << "new MetGrib2DataFile\n";
          break;
 
       case FileType_NcMet:
