@@ -110,7 +110,10 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 
 void RMWAnalysisConfInfo::process_config() {
 
+    VarInfoFactory info_factory;
+    Dictionary *fdict = (Dictionary *) 0;
     ConcatString poly_file;
+    GrdFileType ftype;
 
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);
