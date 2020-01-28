@@ -35,7 +35,7 @@ static const char write_pickle [] = "../share/met/wrappers/write_pickle.py";
 
 static const char generic_read_pickle [] = "../share/met/wrappers/generic_pickle";   //  NO ".py" suffix
 
-static const char pickle_out_name [] = "out.pickle";
+static const char pickle_base_name [] = "out.pickle";
 
 static const char pickle_var_name [] = "met_info";
 
@@ -280,16 +280,26 @@ int status;
 ConcatString command;
 ConcatString wrapper;
 ConcatString path;
+ConcatString pickle_path;
 const char * mb = getenv ("MET_BASE");
 
 wrapper << mb << '/' << "share/met/wrappers/write_pickle.py";
 
+path << cs_erase
+     << "MET_TMP_DIR" << '/'
+     << pickle_base_name;
+
+pickle_path = make_temp_file_name(path.text(), 0);
+
+cout << "\n\n  pickle_path = \"" << pickle_path << "\"\n\n" << flush;
+
    //  wrapper usage:  /path/to/python write_pickle.py pickle_output_filename <user_python_script>.py <args>
+
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
         << mb << '/' << write_pickle     << ' '    //  write_pickle.py
-        << pickle_out_name               << ' '    //  pickle output filename
+        << pickle_path                   << ' '    //  pickle output filename
         << user_script_name;                       //  user's script name
 
 for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
@@ -336,7 +346,7 @@ PyErr_Clear();
 
 PyErr_Clear();
 
-script.read_pickle  (pickle_var_name, pickle_out_name);
+script.read_pickle  (pickle_var_name, pickle_path);
 
 if ( PyErr_Occurred() )  {
 
@@ -438,7 +448,7 @@ if ( do_reload )  {
 
 // command << cs_erase
 //         << "met_info = pickle.load(open(\""
-//         << pickle_out_name
+//         << pickle_path
 //         << "\", \"rb\"))";
 // 
 // cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
