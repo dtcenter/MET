@@ -31,13 +31,15 @@ GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath = 0;
 
-static const char write_pickle [] = "MET_BASE/wrappers/write_pickle.py";
+static const char write_pickle        [] = "MET_BASE/wrappers/write_pickle.py";
 
-static const char generic_read_pickle [] = "MET_BASE/wrappers/generic_pickle";   //  NO ".py" suffix
+static const char generic_read_pickle [] = "generic_pickle";   //  NO ".py" suffix
 
-static const char pickle_out_name [] = "out.pickle";
+static const char pickle_base_name    [] = "out.pickle";
 
-static const char pickle_var_name [] = "met_info";
+static const char pickle_var_name     [] = "met_info";
+
+static const char pickle_file_var_name [] = "pickle_filename";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -279,13 +281,31 @@ int j;
 int status;
 ConcatString command;
 ConcatString path;
+ConcatString pickle_path;
+const char * tmp_dir = 0;
+Wchar_Argv wa;
+
+
+tmp_dir = getenv ("MET_TMP_DIR");
+
+if ( ! tmp_dir )   tmp_dir = "/tmp";
+
+
+path << cs_erase
+     << tmp_dir << '/'
+     << pickle_base_name;
+
+pickle_path = make_temp_file_name(path.text(), 0);
+
+// cout << "\n\n  pickle_path = \"" << pickle_path << "\"\n\n" << flush;
 
    //  wrapper usage:  /path/to/python write_pickle.py pickle_output_filename <user_python_script>.py <args>
+
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
         << replace_path(write_pickle)    << ' '    //  write_pickle.py
-        << pickle_out_name               << ' '    //  pickle output filename
+        << pickle_path                   << ' '    //  pickle output filename
         << user_script_name;                       //  user's script name
 
 for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
@@ -305,62 +325,6 @@ if ( status )  {
    exit ( 1 );
 
 }
-
-   //
-   //  now we've got the pickle file, so just read it
-   //
-
-/*
-
-path << mb << '/' << generic_read_pickle;
-
-// Python3_Script script(path.text());
-Python3_Script script("generic_pickle");
-
-PyErr_Clear();
-
-// script.run("import pickle");
-// script.run("import numpy");
-
-// if ( PyErr_Occurred() )  {
-// 
-//     cout << "   import numpy failed!\n\n" << flush;
-// 
-//     exit ( 1 );
-// 
-// }
-
-PyErr_Clear();
-
-script.read_pickle  (pickle_var_name, pickle_out_name);
-
-if ( PyErr_Occurred() )  {
-
-   PyErr_Print();
-
-   mlog << Error
-        << "   read_pickle failed!\n\n" << flush;
-
-   exit ( 1 );
-
-}
-
-PyErr_Clear();
-
-PyObject * met_info = script.lookup(pickle_var_name);
-
-if ( PyErr_Occurred() )  {
-
-   PyErr_Print();
-
-   cout << "   lookup failed!\n\n" << flush;
-
-   exit ( 1 );
-
-}
-*/
-
-
 
 
    //
@@ -391,15 +355,19 @@ if ( PyErr_Occurred() )  {
    //  set the arguments
    //
 
-/*
-if ( script_argc > 0 )  {
+StringArray a;
 
-   // PySys_SetArgv (script_argc, script_argv);
+a.add(generic_read_pickle);
 
-   PySys_SetArgv (wa.wargc(), wa.wargv());
+a.add(pickle_path);
 
-}
-*/
+// a.dump(cout, 1);
+// 
+// cout.flush();
+
+wa.set(a);
+
+PySys_SetArgv (wa.wargc(), wa.wargv());
 
 
 // run_python_string("import sys");
@@ -434,7 +402,7 @@ if ( do_reload )  {
 
 // command << cs_erase
 //         << "met_info = pickle.load(open(\""
-//         << pickle_out_name
+//         << pickle_path
 //         << "\", \"rb\"))";
 // 
 // cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
@@ -489,7 +457,8 @@ PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
 if ( ! PyDict_Check(data_obj) )  {
 
-   cout << "\n\n  bad data object\n\n" << flush;
+   mlog << Error
+        << "\n\n   pickle_dataplane() -> bad dict object\n\n";
 
    exit ( 1 );
 
@@ -508,13 +477,13 @@ if ( use_xarray )  {
 
    PyObject * attrs_dict_obj = PyDict_GetItem (data_obj, key_obj);
 
-   cout << "attrs = " << attrs_dict_obj << "\n" << flush;
+   // cout << "attrs = " << attrs_dict_obj << "\n" << flush;
 
    key_obj = PyUnicode_FromString (numpy_array_name);
 
    PyObject * numpy_array_obj = PyDict_GetItem (data_obj, key_obj);
 
-   cout << "met_data = " << numpy_array_obj << "\n" << flush;
+   // cout << "met_data = " << numpy_array_obj << "\n" << flush;
 
    Python3_Numpy np;
 
