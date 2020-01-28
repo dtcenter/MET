@@ -1562,7 +1562,7 @@ void process_grid_vx() {
       if(n_miss == grid_obs_file_list.n()) {
          mlog << Warning << "\nprocess_grid_vx() -> "
               << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
-              << " not found in observation files.\n";
+              << " not found in observation files.\n\n";
          continue;
       }
 
@@ -1635,7 +1635,7 @@ void process_grid_vx() {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
                  << mthd_str << " smoothing option not supported for "
-                 << "gridded observations.\n";
+                 << "gridded observations.\n\n";
             continue;
          }
 
