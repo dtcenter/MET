@@ -29,7 +29,7 @@ using namespace std;
 static const char generic_python_wrapper [] = "generic_python";
 static const char generic_pickle_wrapper [] = "generic_pickle";
 
-static const char write_pickle_wrapper   [] = "point_write_pickle.py";   //  relative to wrappers_dir
+static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
 
 static const char list_name              [] = "point_data";
 
@@ -219,7 +219,6 @@ bool PythonHandler::do_straight()
 ConcatString command;
 ConcatString short_user_name;
 ConcatString path;
-const char * mbb = getenv ("MET_BUILD_BASE");
 
 
 // path << cs_erase
@@ -305,20 +304,11 @@ int j;
 const int N = user_script_args.n();
 ConcatString command;
 int status;
-const char * mbb = getenv("MET_BUILD_BASE");
 
-
-if ( ! mbb )  {
-
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> can't get environment variable "
-        << "MET_BUILD_BASE\n\n";
-
-}
 
 command << cs_erase
         << user_path_to_python    << ' '
-        << mbb << '/' << wrappers_dir << '/' << write_pickle_wrapper << ' '
+        << replace_path(write_pickle_wrapper) << ' '
         << pickle_output_filename << ' '
         << user_script_filename;
 
