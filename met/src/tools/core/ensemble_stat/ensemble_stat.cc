@@ -1753,7 +1753,8 @@ void process_grid_vx() {
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
-               if(i == 0) setup_txt_files();
+               // Create output text files as requested in the config file
+               setup_txt_files();
 
                // Compute ECNT scores
                if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
