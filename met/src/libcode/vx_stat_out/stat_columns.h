@@ -527,7 +527,7 @@ extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
                              int, int, AsciiTable &, int &, AsciiTable &, int &);
-extern void write_erps_row  (StatHdrColumns &, const RPSInfo &, STATOutputType,
+extern void write_erps_row  (StatHdrColumns &, const ERPSInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -596,7 +596,7 @@ extern void write_isc_cols   (const ISCInfo &, int,
                               AsciiTable &, int, int);
 extern void write_ecnt_cols  (const ECNTInfo &,
                               AsciiTable &, int, int);
-extern void write_erps_cols  (const RPSInfo &,
+extern void write_erps_cols  (const ERPSInfo &,
                               AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,
                               AsciiTable &, int, int);
