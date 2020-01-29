@@ -229,6 +229,7 @@ AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbu
 
 AC_SUBST([BUFRLIB_NAME])
 AM_CONDITIONAL([BUFRLIB_NAME_SET], [test ! -z "$BUFRLIB_NAME"])
+AC_MSG_NOTICE([BUFRLIB_NAME will be set])
 
 
 #
@@ -957,12 +958,19 @@ AC_ARG_ENABLE(grib2,
 )
 
 AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
+AM_CONDITIONAL([GRIB2CLIB_NAME_SET], [test ! -z "$GRIB2CLIB_NAME"])
 
 if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
     AC_MSG_NOTICE([GRIB2 utilites will be compiled])
     CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
-    GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+    AC_SUBST([GRIB2CLIB_NAME])
+    AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
+    if test -z "$GRIB2CLIB_NAME"; then
+       GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+    else
+       GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
+    fi
 else
     AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
     GRIB2_LIBS=
