@@ -119,7 +119,7 @@ static void track_counts(int, const DataPlane &);
 
 static ConcatString get_ens_mn_var_name(int);
 
-static void setup_nc_file   (unixtime, int, const char *);
+static void setup_nc_file   (unixtime, const char *);
 static void setup_txt_files ();
 static void setup_table     (AsciiTable &);
 
@@ -752,6 +752,7 @@ void process_ensemble() {
    int i, j;
    bool reset;
    DataPlane ens_dp;
+   unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
    for(i=0; i<conf_info.get_n_ens_var(); i++) {
@@ -771,8 +772,9 @@ void process_ensemble() {
                             conf_info.ens_info[i], ens_dp, true)) continue;
 
          // Create a NetCDF file to store the ensemble output
-         if(nc_out == (NcFile *) 0)
-            setup_nc_file(ens_dp.valid(), ens_dp.lead(), "_ens.nc");
+         if(nc_out == (NcFile *) 0) {
+            setup_nc_file(ens_dp.valid(), "_ens.nc");
+         }
 
          // Reset the running sums and counts
          if(reset) {
@@ -783,9 +785,15 @@ void process_ensemble() {
          // Apply current data to the running sums and counts
          track_counts(i, ens_dp);
 
+         // Keep track of the maximum initialization time
+         if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
+            max_init_ut = ens_dp.init();
+         }
+
       } // end for j
 
       // Write out the ensemble information to a NetCDF file
+      ens_dp.set_init(max_init_ut);
       write_ens_nc(i, ens_dp);
 
       // Store the ensemble mean output file
@@ -1218,7 +1226,7 @@ void process_point_scores() {
    setup_txt_files();
 
    // Store the forecast lead time
-   shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
+   shc.set_fcst_lead_sec(nint(ens_lead_na.min()));
 
    // Store the forecast valid time
    shc.set_fcst_valid_beg(ens_valid_ut);
@@ -1432,7 +1440,7 @@ void process_grid_vx() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
+      shc.set_fcst_lead_sec(nint(ens_lead_na.min()));
 
       // Set the forecast valid time
       shc.set_fcst_valid_beg(ens_valid_ut);
@@ -1543,8 +1551,7 @@ void process_grid_vx() {
       // the verification matched pairs
       if(conf_info.nc_info.do_orank &&
          nc_out == (NcFile *) 0)
-         setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
-                       "_orank.nc");
+         setup_nc_file(fcst_dp[j].valid(), "_orank.nc");
 
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n(); j++) {
@@ -2145,7 +2152,7 @@ ConcatString get_ens_mn_var_name(int i_vx) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
+void setup_nc_file(unixtime valid_ut, const char *suffix) {
    ConcatString out_nc_file;
 
    // Create output NetCDF file name
