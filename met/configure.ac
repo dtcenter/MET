@@ -118,6 +118,7 @@ fi
 AC_ARG_VAR([MET_GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
 AC_ARG_VAR([MET_GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CLIB must also be defined and MET_GRIB2C will be ignored.])
 AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CINC must also be defined and MET_GRIB2C will be ignored.])
+AC_ARG_VAR([GRIB2CLIB_NAME], [Name of grib2c library to link with. For example, -lgrib2c_v1.6.0 or -lgrib2c, etc.  If it is -lgrib2c, you don't have to specify it.])
 
 # Ensure that both or neither are specified.
 
