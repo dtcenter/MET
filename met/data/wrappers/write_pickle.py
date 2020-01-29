@@ -10,21 +10,22 @@
 ################################################
 
 
+import os
 import sys
 import pickle
 
 pickle_filename = sys.argv[1];
 
-print('old args')
-print(sys.argv)
-
 pyembed_module_name = sys.argv[2].replace('.py','')
 sys.argv = sys.argv[2:]
 
-print('new args')
-print(sys.argv)
+user_dir  = os.path.dirname(pyembed_module_name)
+user_base = os.path.basename(pyembed_module_name)
 
-met_in = __import__(pyembed_module_name)
+if len(user_dir) != 0:
+   sys.path.append(user_dir)
+
+met_in = __import__(user_base)
 
 met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
 

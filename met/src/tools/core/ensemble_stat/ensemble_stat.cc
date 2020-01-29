@@ -1572,7 +1572,7 @@ void process_grid_vx() {
       if(n_miss == grid_obs_file_list.n()) {
          mlog << Warning << "\nprocess_grid_vx() -> "
               << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
-              << " not found in observation files.\n";
+              << " not found in observation files.\n\n";
          continue;
       }
 
@@ -1645,7 +1645,7 @@ void process_grid_vx() {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
                  << mthd_str << " smoothing option not supported for "
-                 << "gridded observations.\n";
+                 << "gridded observations.\n\n";
             continue;
          }
 
@@ -1763,7 +1763,8 @@ void process_grid_vx() {
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
-               if(i == 0) setup_txt_files();
+               // Create output text files as requested in the config file
+               setup_txt_files();
 
                // Compute ECNT scores
                if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {

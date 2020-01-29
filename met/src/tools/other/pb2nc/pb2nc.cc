@@ -370,7 +370,7 @@ static float  derive_grib_code(int, float *, float *, double,
 //void interpolate_pbl_data(int pbl_level, float *pbl_data);
 static int    combine_tqz_and_uv(map<float, float*>,
                                  map<float, float*>, map<float, float*> &);
-static int    interpolate_by_pressure(int length, float *pres_data, float *data_var);
+static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
 
 
@@ -388,6 +388,7 @@ static void   set_compress(const StringArray &);
 
 static void   display_bufr_variables(const StringArray &, const StringArray &,
                                      const StringArray &, const StringArray &);
+static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -598,7 +599,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    openpb_(blk_file, &file_id);
    dump_tbl_(blk_file, &file_id, tbl_filename.c_str(), &len);
    closepb_(&file_id);
-   close(file_id);
+   //close(file_id);
    // Delete the temporary blocked file
    remove_temp_file((string)blk_file);
    return tbl_filename;
@@ -1115,13 +1116,7 @@ void process_pbfile(int i_pb) {
       }
 
       // Null terminate the message type string
-      if (is_prepbufr) hdr_typ[6] = '\0';
-      else             hdr_typ[mxr8nm] = '\0';
-      // Change the trailing blank space to a null
-      for (i=mxr8nm-1; i>0; i--) {
-         if (' ' != hdr_typ[i]) break;
-         hdr_typ[i] = '\0';
-      }
+      cleanup_hdr_typ(hdr_typ, is_prepbufr);
 
       // If the message type is not listed in the configuration
       // file and it is not the case that all message types should be
@@ -2020,7 +2015,7 @@ void process_pbfile_metadata(int i_pb) {
    // Block the PrepBufr file and open it for reading.
    pblock(file_name.c_str(), blk_file.c_str(), block);
 
-   unit = dump_unit + i_pb + 5;
+   unit = dump_unit + i_pb + file_unit;
    ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
    get_variable_info(tbl_filename.c_str());
    if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
@@ -2070,7 +2065,6 @@ void process_pbfile_metadata(int i_pb) {
 
    // Initialize counts
    i_ret = i_msg = 0;
-
    StringArray headers;
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);
@@ -2114,6 +2108,7 @@ void process_pbfile_metadata(int i_pb) {
 
       // Get the next PrepBufr message
       ireadns_(&unit, hdr_typ, &i_date);
+      cleanup_hdr_typ(hdr_typ);
 
       if (0 == i_read) {
          // Checks the variables for header
@@ -2288,47 +2283,51 @@ void process_pbfile_metadata(int i_pb) {
       int var_count = unchecked_var_list.n_elements();
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
          int nlev2, buf_nlev;
-         int var_name_len;
-         ConcatString var_name;
-         var_name = unchecked_var_list[vIdx];
-         var_name_len = var_name.length();
+         bool has_valid_data;
+         ConcatString var_name = unchecked_var_list[vIdx];
+         int var_name_len = var_name.length();
 
          readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &tmp_nlev_max_req);
          if (0 >= nlev2) continue;
-
+         
          // Search through the vertical levels
          buf_nlev = nlev2;
          if (nlev2 > mxr8lv) buf_nlev = mxr8lv;
+         has_valid_data = false;
+         int count = 0;
          for(lv=0; lv<buf_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
-               if (!tmp_bufr_obs_name_arr.has(var_name) && !bufr_hdr_name_arr.has(var_name)) {
-                  tmp_bufr_obs_name_arr.add(var_name);
-               }
+               has_valid_data = true;
                if (do_all_vars) {
-                  int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
                   if (0 == count) {
                      mlog << Debug(5) << " found valid data: " << var_name
-                          << " (" << bufr_obs[lv][0] << ")\n";
+                          << " (" << bufr_obs[lv][0] << ") at level index "
+                          << lv << "\n";
                   }
                   count++;
-                  if (COUNT_THRESHOLD < count) {
-                     unchecked_var_list.shift_down(vIdx, 1);
-                  }
-                  else {
-                     variableCountMap[var_name] = count;
-                  }
-               }
-               else {
-                  StringArray typeArray;
-                  if (0 < variableTypeMap.count(var_name)) typeArray = variableTypeMap[var_name];
-                  if (!typeArray.has(hdr_typ)) {
-                     typeArray.add(hdr_typ);
-                     variableTypeMap[var_name] = typeArray;
-                  }
+                  if (COUNT_THRESHOLD < count) break;
                }
             }
-            break;
+            //break;
          }  //end for lv
+         
+         if (has_valid_data) {
+            if (!tmp_bufr_obs_name_arr.has(var_name) && !bufr_hdr_name_arr.has(var_name)) {
+               tmp_bufr_obs_name_arr.add(var_name);
+            }
+            if (do_all_vars) {
+               if (COUNT_THRESHOLD < count) unchecked_var_list.shift_down(vIdx, 1);
+               variableCountMap[var_name] = count;
+            }
+            else {
+               StringArray typeArray;
+               if (0 < variableTypeMap.count(var_name)) typeArray = variableTypeMap[var_name];
+               if (!typeArray.has(hdr_typ)) {
+                  typeArray.add(hdr_typ);
+                  variableTypeMap[var_name] = typeArray;
+               }
+            }
+         }
       }  // end for vIdx
    } // end for
    if(showed_progress && mlog.verbosity_level() > 0) cout << "\n";
@@ -2386,7 +2385,7 @@ void write_netcdf_hdr_data() {
       if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
       nc_out_data.processed_hdr_cnt = pb_hdr_count;
-      nc_out_data.deflate_level = compress_level;
+      nc_out_data.deflate_level = deflate_level;
       nc_out_data.observations = observations;
       nc_out_data.summary_obs = summary_obs;
       nc_out_data.summary_info = conf_info.getSummaryInfo();
@@ -2545,7 +2544,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       if (do_summary) {
          int var_index = obs_arr[1];
          string var_name = bufr_obs_name_arr[var_index];
-         TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
+         conf_info.getSummaryInfo();
          summary_obs->addObservation(
                hdr_typ.text(),
                hdr_sid.text(),
@@ -2841,7 +2840,9 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       mlog << Debug(1) << line_buf;
    }
 
-   mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements() << ") :\n";
+   mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements()
+        << ")  Name: Description                       Types:\n";
+
    for(i=0; i<obs_arr.n_elements(); i++) {
       if (all_vars.has(obs_arr[i], index)) {
          description = all_descs[index];
@@ -2850,15 +2851,16 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
          description = "";
       }
       if (0 < variableTypeMap.count(obs_arr[i])) {
+         ConcatString message_types;
          StringArray typeArray = variableTypeMap[obs_arr[i]];
+         
          int type_cnt = typeArray.n_elements();
-         char message_types[(BUFR_DESCRIPTION_LEN+1)*(type_cnt+1)];
-         message_types[0] = '\0';
          for (int ii=0; ii<type_cnt; ii++) {
-            if (strlen(message_types) < (sizeof(message_types) - 1)) snprintf(message_types, sizeof(message_types), "%s ", message_types);
-            snprintf(message_types, sizeof(message_types), "%s%s", message_types, typeArray[ii].c_str());
+            if (message_types.nonempty()) message_types.add(" ");
+            message_types.add(typeArray[ii]);
          }
-         line_buf.format("   %8s: %-48s\t\ttypes: %s\n", obs_arr[i].c_str(), description.c_str(), message_types);
+         line_buf.format("  %6s: %-55s\t%s\n", obs_arr[i].c_str(),
+               description.c_str(), message_types.c_str());
       }
       else {
          line_buf.format("   %8s: %s\n", obs_arr[i].c_str(), description.c_str());
@@ -3013,7 +3015,6 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int pbl_level = 0;
    int tq_count = 0;
    int uv_count = 0;
-   int pbl_diff_count = 0;
    static const char *method_name = "compute_pbl() ";
 
    hpbl = bad_data_float;
@@ -3084,7 +3085,7 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
    static const char *method_name = "interpolate_by_pressure() ";
 
    idx_start = -1;
-   idx_end = length;
+   //idx_end = length;
    skip_missing = false;
    count_interpolated = 0;
    for (idx=0; idx<length; idx++) {
@@ -3145,6 +3146,20 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
            ratio_pres = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
            cur_pqtzuv[index] = prev_value + (next_value - prev_value) * ratio_pres;
          }
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
+   if (is_prepbufr) hdr_typ[6] = '\0';
+   else             hdr_typ[mxr8nm] = '\0';
+   // Change the trailing blank space to a null
+   for (int i=0; i<mxr8nm; i++) {
+      if (' ' == hdr_typ[i]) {
+         hdr_typ[i] = '\0';
+         break;
       }
    }
 }

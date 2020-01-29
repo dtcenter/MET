@@ -81,7 +81,6 @@ void PointToGridConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void PointToGridConfInfo::process_config() {
-   int i;
    ConcatString s;
    StringArray sa;
    Dictionary *dict = (Dictionary *) 0;
