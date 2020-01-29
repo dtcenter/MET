@@ -2025,30 +2025,30 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 void do_erps(const EnsembleStatVxOpt &vx_opt,
              const SingleThresh &othresh,
              const PairDataEnsemble *pd_ptr) {    
-   RPSInfo rps_info;
+   ERPSInfo erps_info;
 
    // Check for valid pointer
    if(!pd_ptr) return;
 
    // Store observation filering threshold
-   rps_info.othresh = othresh;
-   rps_info.fthresh = vx_opt.rps_ta;
+   erps_info.othresh = othresh;
+   erps_info.fthresh = vx_opt.rps_ta;
 
    // If rps_thresh is empty and climo data is available, use climo_cdf
    // thresholds instead
-   if(rps_info.fthresh.n()    == 0 &&
+   if(erps_info.fthresh.n()    == 0 &&
       pd_ptr->cmn_na.n_valid() > 0 &&
       pd_ptr->csd_na.n_valid() > 0) {
-      rps_info.fthresh = vx_opt.cdf_info.cdf_ta;
+      erps_info.fthresh = vx_opt.cdf_info.cdf_ta;
    }  
 
    // Compute ensemble RPS statistics
-   rps_info.set(*pd_ptr);
+   erps_info.set(*pd_ptr);
 
    // Write out ERPS
    if(vx_opt.output_flag[i_erps] != STATOutputType_None &&
-      rps_info.n_pair > 0) {
-      write_erps_row(shc, rps_info, vx_opt.output_flag[i_erps],
+      erps_info.n_pair > 0) {
+      write_erps_row(shc, erps_info, vx_opt.output_flag[i_erps],
                      stat_at, i_stat_row,
                      txt_at[i_erps], i_txt_row[i_erps]);
    }

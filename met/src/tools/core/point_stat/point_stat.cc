@@ -1834,22 +1834,22 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       // Write out the ERPS line
       if(conf_info.vx_opt[i_vx].output_flag[i_erps] != STATOutputType_None) {
 
-         // Store RPS thresholds
-         RPSInfo rps_info;
-         rps_info.fthresh = conf_info.vx_opt[i_vx].hira_info.rps_ta;
+         // Store ensemble RPS thresholds
+         ERPSInfo erps_info;
+         erps_info.fthresh = conf_info.vx_opt[i_vx].hira_info.rps_ta;
 
          // If rps_thresh is empty and climo data is available,
          // use climo_cdf thresholds instead
-         if(rps_info.fthresh.n()    == 0 &&
+         if(erps_info.fthresh.n()    == 0 &&
             hira_pd.cmn_na.n_valid() > 0 &&
             hira_pd.csd_na.n_valid() > 0) {
-            rps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
+            erps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
          }
 
          // Compute ensemble RPS statistics
-         rps_info.set(hira_pd);
+         erps_info.set(hira_pd);
 
-         write_erps_row(shc, rps_info,
+         write_erps_row(shc, erps_info,
                         conf_info.vx_opt[i_vx].output_flag[i_erps],
                         stat_at, i_stat_row,
                         txt_at[i_erps], i_txt_row[i_erps]);
