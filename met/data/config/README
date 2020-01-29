@@ -2875,7 +2875,7 @@ output_stats = {
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
 //                     PCT, NBRCNT, NBRCTC, GRAD,
-//                     ISC, RHIST, PHIST, RELP, SSVAR
+//                     ISC, ECNT, ERPS, RHIST, PHIST, RELP, SSVAR
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -2890,7 +2890,8 @@ output_stats = {
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
+//          -line_type ORANK,         -out_line_type ECNT, ERPS, RHIST, PHIST,
+//                                                   RELP, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
