@@ -323,23 +323,23 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for class RPSInfo
+// Code for class ERPSInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-RPSInfo::RPSInfo() {
+ERPSInfo::ERPSInfo() {
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-RPSInfo::~RPSInfo() {
+ERPSInfo::~ERPSInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-RPSInfo::RPSInfo(const RPSInfo &c) {
+ERPSInfo::ERPSInfo(const ERPSInfo &c) {
 
    init_from_scratch();
 
@@ -348,7 +348,7 @@ RPSInfo::RPSInfo(const RPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
+ERPSInfo & ERPSInfo::operator=(const ERPSInfo &c) {
 
    if(this == &c) return(*this);
 
@@ -359,7 +359,53 @@ RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::init_from_scratch() {
+ERPSInfo & ERPSInfo::operator+=(const ERPSInfo &c) {
+   ERPSInfo r_info;
+
+   if(n_ens != c.n_ens) {
+      mlog << Error << "\nERPSInfo::operator+=() -> "
+           << "the ensemble size must remain constant (" << n_ens
+           << " != " << c.n_ens << ")!\n\n";
+      exit(1);
+   }
+
+   r_info.fthresh = fthresh;
+   r_info.othresh = othresh;
+   r_info.n_ens   = n_ens;
+   r_info.n_pair  = n_pair + c.n_pair;
+
+   if(r_info.n_pair > 0) {
+
+      // Aggregate RPS as a weighted average
+      r_info.rps = (rps*n_pair + c.rps*c.n_pair) / r_info.n_pair;
+
+      // Compute RPSS with external climatology
+      if(!is_bad_data(rpscl) && !is_bad_data(c.rpscl)) {
+         r_info.rpscl = (rpscl*n_pair + c.rpscl*c.n_pair) / r_info.n_pair;
+         r_info.rpss  = (!is_eq(rpscl, 0.0) ?
+                         1.0 - (r_info.rps / r_info.rpscl) :
+                         bad_data_double);
+      }
+      else {
+         r_info.rpscl = bad_data_double;
+         r_info.rpss  = bad_data_double;
+      }
+
+      // The RPS components cannot be aggregated as a weighted average
+      r_info.rps_rel   = bad_data_double;
+      r_info.rps_res   = bad_data_double;
+      r_info.rps_unc   = bad_data_double;
+      r_info.rpss_smpl = bad_data_double;
+   }
+
+   assign(r_info);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ERPSInfo::init_from_scratch() {
 
    clear();
 
@@ -368,19 +414,20 @@ void RPSInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::clear() {
+void ERPSInfo::clear() {
 
    othresh.clear();
-   n_ens   = n_pair  = 0;
-   rps_rel = rps_res = rps_unc   = bad_data_double;
-   rps     = rpss    = rpss_smpl = bad_data_double;
+   n_ens     = n_pair  = 0;
+   rps_rel   = rps_res = rps_unc = bad_data_double;
+   rps       = rpscl   = rpss    = bad_data_double;
+   rpss_smpl = bad_data_double;
    
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::assign(const RPSInfo &c) {
+void ERPSInfo::assign(const ERPSInfo &c) {
 
    fthresh   = c.fthresh;
    othresh   = c.othresh;
@@ -393,7 +440,9 @@ void RPSInfo::assign(const RPSInfo &c) {
    rps_unc   = c.rps_unc;
 
    rps       = c.rps;
+   rpscl     = c.rpscl;
    rpss      = c.rpss;
+
    rpss_smpl = c.rpss_smpl;
 
    return;
@@ -401,7 +450,7 @@ void RPSInfo::assign(const RPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::set(const PairDataEnsemble &pd) {
+void ERPSInfo::set(const PairDataEnsemble &pd) {
    int i, j, k, n_event;
    double p;
    bool cmn_flag;
@@ -418,7 +467,7 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
 
    // Setup probability thresholds, equally spaced by ensemble size
-   for(i=0; i<=n_ens; i++) p_thresh.add(i/n_ens);
+   for(i=0; i<=n_ens; i++) p_thresh.add((double) i/n_ens);
 
    // Setup forecast probabilistic contingency table
    Nx2ContingencyTable fcst_pct;
@@ -431,8 +480,8 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    climo_pct.set_thresholds(p_thresh.vals());
 
    // Initialize
-   rps_rel = rps_res = rps_unc   = 0.0;
-   rps     = rpss    = rpss_smpl = 0.0;
+   rps_rel = rps_res = rps_unc = 0.0;
+   rps     = rpscl   = 0.0;
 
    // Loop over the fthresh entries and populate PCT tables for each
    for(i=0; i<fthresh.n(); i++) {
@@ -471,15 +520,19 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
       rps_res   += fcst_pct.resolution()  / fthresh.n();
       rps_unc   += fcst_pct.uncertainty() / fthresh.n();
       rps       += fcst_pct.brier_score() / fthresh.n();
-      rpss_smpl += fcst_pct.bss_smpl()    / fthresh.n();
-      if(cmn_flag) {
-         rpss   += (1.0 - (fcst_pct.brier_score() /
-                           climo_pct.brier_score())) / fthresh.n();
-      }
-      else {
-         rpss = bad_data_double;
-      }
+      if(cmn_flag) rpscl += climo_pct.brier_score() / fthresh.n();
+
    } // end for i
+   
+   // Compute RPSS with sample climatology
+   rpss_smpl = (!is_eq(rps_unc, 0.0) ?
+               (rps_res - rps_rel) / rps_unc :
+               bad_data_double);
+
+   // Compute RPSS with external climatology
+   rpss      = (cmn_flag && !is_eq(rpscl, 0.0) ?
+                1.0 - (rps / rpscl) :
+                bad_data_double);
 
    return;
 }

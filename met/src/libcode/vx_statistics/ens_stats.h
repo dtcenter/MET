@@ -93,18 +93,19 @@ class ECNTInfo {
 //
 ////////////////////////////////////////////////////////////////////////
 
-class RPSInfo {
+class ERPSInfo {
 
    private:
       void init_from_scratch();
-      void assign(const RPSInfo &);
+      void assign(const ERPSInfo &);
 
    public:
 
-      RPSInfo();
-      ~RPSInfo();
-      RPSInfo(const RPSInfo &);
-      RPSInfo & operator=(const RPSInfo &);
+      ERPSInfo();
+      ~ERPSInfo();
+      ERPSInfo(const ERPSInfo &);
+      ERPSInfo & operator=(const ERPSInfo &);
+      ERPSInfo & operator+=(const ERPSInfo &);
 
       // RPS definition thresholds
       ThreshArray fthresh;
@@ -116,7 +117,8 @@ class RPSInfo {
       int n_ens, n_pair;
 
       double rps_rel, rps_res, rps_unc;
-      double rps, rpss, rpss_smpl;
+      double rps, rpscl, rpss;
+      double rpss_smpl;
 
       // Compute statistics
       void set(const PairDataEnsemble &);
