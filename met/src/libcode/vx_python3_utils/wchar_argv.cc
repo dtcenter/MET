@@ -24,6 +24,7 @@ using namespace std;
 #include <cmath>
 
 #include "wchar_argv.h"
+#include "concat_string.h"
 
 #include "vx_log.h"
 
@@ -138,6 +139,71 @@ if ( W_Buf )  { delete [] W_Buf;  W_Buf = 0; }
 
 Argc = 0;
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Wchar_Argv::set(const StringArray & a)
+
+{
+
+int j, k, N;
+int len;
+char * s = 0;
+char ** av = 0;
+ConcatString c;
+
+
+len = 0;
+
+for (j=0; j<(a.n()); ++j)  {
+
+   len += a.length(j);
+
+}
+
+N = len + a.n();
+
+s = new char [N];
+
+av = new char * [a.n()];
+
+memset(s, 0, N);
+
+k = 0;
+
+for (j=0; j<(a.n()); ++j)  {
+
+   av[j] = s + k;
+
+   c = a[j].c_str();
+
+   len = c.length();
+
+   strncpy(s + k, c.text(), len);
+
+   k += (len + 1);
+
+}
+
+
+
+set(a.n(), av);
+
+
+
+   //
+   //  done
+   //
+
+if ( s )  { delete [] s;  s = 0; }
+
+if ( av )  { delete [] av;  av = 0; }
 
 return;
 

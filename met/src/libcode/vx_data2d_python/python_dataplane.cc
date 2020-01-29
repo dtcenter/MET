@@ -29,15 +29,15 @@ GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * user_ppath = 0;
+static const char * user_ppath            = 0;
 
-static const char write_pickle        [] = "MET_BASE/wrappers/write_pickle.py";
+static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle.py";
 
-static const char generic_read_pickle [] = "generic_pickle";   //  NO ".py" suffix
+static const char generic_read_pickle  [] = "generic_pickle";   //  NO ".py" suffix
 
-static const char pickle_base_name    [] = "out.pickle";
+static const char pickle_base_name     [] = "out.pickle";
 
-static const char pickle_var_name     [] = "met_info";
+static const char pickle_var_name      [] = "met_info";
 
 static const char pickle_file_var_name [] = "pickle_filename";
 
@@ -60,8 +60,8 @@ static bool pickle_dataplane(const char * script_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-bool python_dataplane(const char * script_name,
-                      int script_argc, char ** script_argv,
+bool python_dataplane(const char * user_script_name,
+                      int user_script_argc, char ** user_script_argv,
                       const bool use_xarray, DataPlane & met_dp_out,
                       Grid & met_grid_out, VarInfoPython &vinfo)
 
@@ -74,19 +74,17 @@ mlog << Debug(4) << "\n\n  in python_dataplane()\n\n";
 
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_pickle = true;
 
-status = pickle_dataplane(script_name,
-                          script_argc, script_argv,
-                          use_xarray, met_dp_out,
-                          met_grid_out, vinfo);
-
+   status = pickle_dataplane(user_script_name,
+                             user_script_argc, user_script_argv,
+                             use_xarray, met_dp_out,
+                             met_grid_out, vinfo);
 
 } else {
 
-status = straight_python_dataplane(script_name,
-                                   script_argc, script_argv,
-                                   use_xarray, met_dp_out,
-                                   met_grid_out, vinfo);
-
+   status = straight_python_dataplane(user_script_name,
+                                      user_script_argc, user_script_argv,
+                                      use_xarray, met_dp_out,
+                                      met_grid_out, vinfo);
 
 }
 
@@ -100,8 +98,8 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool straight_python_dataplane(const char * script_name,
-                              int script_argc, char ** script_argv,
+bool straight_python_dataplane(const char * user_script_name,
+                              int user_script_argc, char ** user_script_argv,
                               const bool use_xarray, DataPlane & met_dp_out,
                               Grid & met_grid_out, VarInfoPython &vinfo)
 
@@ -112,16 +110,20 @@ PyObject * module_dict_obj = 0;
 PyObject * key_obj         = 0;
 PyObject * numpy_array_obj = 0;
 PyObject * attrs_dict_obj  = 0;
-// bool do_pickle = false;
-// char * user_ppath = 0;
-// 
-// 
-// if ( (user_ppath = getenv(user_python_path_env)) != 0 )  do_pickle = true;
+char user_dir  [PATH_MAX];
+char user_base [PATH_MAX];
+bool need_user_path = false;
 
+
+// cout << "\n\n  straight_python_dataplane() -> user_script_name = \"" << user_script_name << "\"\n\n" << flush;
+
+split_path(user_script_name, user_dir, user_base);
+
+if ( (strcmp(user_dir, ".") != 0) && (strcmp(user_dir, "/") != 0) )  need_user_path = true;
 
 Wchar_Argv wa;
 
-wa.set(script_argc, script_argv);
+wa.set(user_script_argc, user_script_argv);
 
 
    //
@@ -152,9 +154,26 @@ if ( PyErr_Occurred() )  {
    //  set the arguments
    //
 
-if ( script_argc > 0 )  {
+run_python_string("import os");
+run_python_string("import sys");
 
-   // PySys_SetArgv (script_argc, script_argv);
+ConcatString command;
+
+command << cs_erase
+        << "sys.path.append(\""
+        << user_dir
+        << "\")";
+
+// cout << "\n\n  straight() -> command = \"" << command << "\"\n\n" << flush;
+
+run_python_string(command.text());
+
+// run_python_string("print (sys.path)");
+
+
+if ( user_script_argc > 0 )  {
+
+   // PySys_SetArgv (user_script_argc, user_script_argv);
 
    PySys_SetArgv (wa.wargc(), wa.wargv());
 
@@ -164,7 +183,8 @@ if ( script_argc > 0 )  {
    //  import the python script as a module
    //
 
-module_obj = PyImport_ImportModule (script_name);
+// module_obj = PyImport_ImportModule (user_script_name);
+module_obj = PyImport_ImportModule (user_base);
 
    //
    //  if needed, reload the module
@@ -182,7 +202,7 @@ if ( PyErr_Occurred() )  {
 
    mlog << Warning << "\npython_dataplane() -> "
         << "an error occurred importing module \""
-        << script_name << "\"\n\n";
+        << user_script_name << "\"\n\n";
 
    return ( false );
 
@@ -192,7 +212,7 @@ if ( ! module_obj )  {
 
    mlog << Warning << "\npython_dataplane() -> "
         << "error running python script \""
-        << script_name << "\"\n\n";
+        << user_script_name << "\"\n\n";
 
    return ( false );
 
@@ -222,7 +242,7 @@ if ( use_xarray )  {
 
       mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \""
-           << script_name << "\"\n\n";
+           << user_script_name << "\"\n\n";
 
       return ( false );
    }
@@ -245,7 +265,7 @@ if ( use_xarray )  {
 
       mlog << Warning << "\npython_dataplane() -> "
            << "trouble reading data from \""
-           << script_name << "\"\n\n";
+           << user_script_name << "\"\n\n";
 
       return ( false );
    }
@@ -284,6 +304,9 @@ ConcatString path;
 ConcatString pickle_path;
 const char * tmp_dir = 0;
 Wchar_Argv wa;
+
+
+cout << "\n\n  user script = \"" << user_script_name << "\"\n\n" << flush;
 
 
 tmp_dir = getenv ("MET_TMP_DIR");

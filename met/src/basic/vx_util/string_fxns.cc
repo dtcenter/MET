@@ -19,6 +19,8 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
+#include <limits.h>
 #include <cmath>
 #include <regex.h>
 
@@ -391,5 +393,42 @@ int parse_thresh_index(const char *col_name) {
 
    return(i);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void split_path(const char * path_in, char * dir_out, char * base_out)
+
+{
+
+char path2[ PATH_MAX ];
+char * c = 0;
+
+   //
+   //  dirname and base name change the input path, 
+   //    so we need to make copies
+   //
+
+strncpy(path2, path_in, PATH_MAX);
+
+c = dirname(path2);
+
+strncpy(dir_out, c, PATH_MAX);
+
+
+strncpy(path2, path_in, PATH_MAX);
+
+c = basename(path2);
+
+strncpy(base_out, c, PATH_MAX);
+
+
+
+
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
