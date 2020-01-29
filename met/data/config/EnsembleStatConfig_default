@@ -152,6 +152,12 @@ message_type_group_map = [
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
+//
+// Ranked Probability Score thresholds
+// May be set separately in each "fcst.field" entry
+//
+rps_thresh = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -242,6 +248,7 @@ interp = {
 //
 output_flag = {
    ecnt  = NONE;
+   erps  = NONE;
    rhist = NONE;
    phist = NONE;
    orank = NONE;

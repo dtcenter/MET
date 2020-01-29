@@ -1419,16 +1419,16 @@ topo_mask = {
 // neighborhood verification but for point observations. The HiRA logic
 // interprets the forecast values surrounding each point observation as an
 // ensemble forecast. These ensemble values are processed in two ways. First,
-// the ensemble continuous statistics (ECNT) line type is computed directly
-// from the ensemble values. Second, for each categorical threshold specified,
-// a fractional coverage value is computed as the ratio of the nearby forecast
-// values that meet the threshold criteria. Point-Stat evaluates those
-// fractional coverage values as if they were a probability forecast. When
-// applying HiRA, users should enable the matched pair (MPR), probabilistic
-// (PCT, PSTD, PJC, or PRC), or continuous ensemble statistics (ECNT) line type
-// in the output_flag dictionary. The number of probabilistic HiRA output lines
-// is determined by the number of categorical forecast thresholds and HiRA
-// neighborhood widths chosen.
+// the ensemble continuous statistics (ECNT) and ensemble ranked probability
+// score (ERPS) line types are computed directly from the ensemble values.
+// Second, for each categorical threshold specified, a fractional coverage value
+// is computed as the ratio of the nearby forecast values that meet the
+// threshold criteria. Point-Stat evaluates those fractional coverage values as
+// if they were a probability forecast. When applying HiRA, users should enable
+// the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), or ensemble
+// statistics (ECNT or EPRS) line types in the output_flag dictionary. The
+// number of probabilistic HiRA output lines is determined by the number of
+// categorical forecast thresholds and HiRA neighborhood widths chosen.
 // This dictionary may include the following entries:
 //
 //    -  The "flag" entry is a boolean which toggles "hira"
@@ -1446,12 +1446,17 @@ topo_mask = {
 //    - The "shape" entry defines the shape of the neighborhood.
 //      Valid values are "SQUARE" or "CIRCLE"
 //
+//    - The "rps_thresh" entry defines the thresholds to be used in computing
+//      the ranked probability score. If left empty but climatology data is
+//      provided, the climo_cdf thresholds will be used instead.
+//
 hira = {
    flag       = FALSE;
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
    shape      = SQUARE;
+   rps_thresh = [];
 }
 
 //
@@ -1489,6 +1494,8 @@ output_flag = {
    nbrcts = NONE;  // Neighborhood Contingency Table Statistics
    nbrcnt = NONE;  // Neighborhood Continuous Statistics
    isc    = NONE;  // Intensity-Scale
+   ecnt   = NONE;  // Ensemble Continuous Statistics
+   erps   = NONE;  // Ensemble Ranked Probability Score Statistics
    rhist  = NONE;  // Rank Histogram
    phist  = NONE;  // Probability Integral Transform Histogram
    orank  = NONE;  // Observation Rank
@@ -1847,10 +1854,15 @@ nmep_smooth = {
 // is defined as the ceiling of 1.0 / ens_phist_bin_size. For example, a bin
 // size of 0.05 results in 20 PHIST bins.
 //
+// The "rps_thresh" entry is an array of thresholds to be applied in the
+// computation of the ensemble Ranked Probability Score.  If left empty, but
+// climatology data is provided, the climo_cdf thresholds will be used instead.
+//
 fcst = {
    message_type = [ "ADPUPA" ];
    ens_ssvar_bin_size = 1;
    ens_phist_bin_size = 0.05;
+   rps_thresh = [];
 
    field = [
       {
@@ -2863,7 +2875,7 @@ output_stats = {
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
 //                     PCT, NBRCNT, NBRCTC, GRAD,
-//                     ISC, RHIST, PHIST, RELP, SSVAR
+//                     ISC, ECNT, ERPS, RHIST, PHIST, RELP, SSVAR
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -2878,7 +2890,8 @@ output_stats = {
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
+//          -line_type ORANK,         -out_line_type ECNT, ERPS, RHIST, PHIST,
+//                                                   RELP, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,

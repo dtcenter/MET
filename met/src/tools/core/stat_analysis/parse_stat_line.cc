@@ -28,6 +28,7 @@
 //   008    06/09/17  Halley Gotway   Add RELP line type.
 //   009    10/09/17  Halley Gotway   Add GRAD line type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
+//   011    01/24/20  Halley Gotway   Add ERPS line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -359,6 +360,34 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.spread_oerr = atof(l.get_item("SPREAD_OERR"));
 
    e_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_erps_line(STATLine &l, ERPSInfo &r_info) {
+
+   r_info.fthresh.add_css(l.get_item("FCST_THRESH", false));
+   r_info.othresh.set(l.get_item("OBS_THRESH", false));
+
+   r_info.n_ens     = atof(l.get_item("N_ENS"));
+   r_info.n_pair    = atoi(l.get_item("TOTAL"));
+
+   r_info.rps_rel   = atof(l.get_item("RPS_REL"));
+   r_info.rps_res   = atof(l.get_item("RPS_RES"));
+   r_info.rps_unc   = atof(l.get_item("RPS_UNC"));
+
+   r_info.rps       = atof(l.get_item("RPS"));
+   r_info.rpss      = atof(l.get_item("RPSS"));
+   r_info.rpss_smpl = atof(l.get_item("RPSS_SMPL"));
+
+   if(!is_bad_data(r_info.rpss)) {
+      r_info.rpscl = r_info.rps / (1.0 - r_info.rpss);
+   }
+   else {
+      r_info.rpscl = bad_data_double;
+   }
 
    return;
 }
