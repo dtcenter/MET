@@ -1846,6 +1846,15 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             erps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
          }
 
+         // Check for no thresholds
+         if(erps_info.fthresh.n() == 0) {
+            mlog << Debug(3) << "Skipping HiRA ERPS output since no "
+                 << "\"" << conf_key_rps_thresh << "\" thresholds are "
+                 << "defined in the \"" << conf_key_hira
+                 << "\" dictionary.\n";
+            break;
+         }
+
          // Compute ensemble RPS statistics
          erps_info.set(hira_pd);
 
