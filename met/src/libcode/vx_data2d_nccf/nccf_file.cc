@@ -2984,14 +2984,15 @@ bool NcCfFile::get_grid_from_dimensions()
 ////////////////////////////////////////////////////////////////////////
 
 
-void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) {
+void parse_cf_time_string(const char *str, unixtime &ref_ut,
+                          int &sec_per_unit) {
 
    // Initialize
    ref_ut = sec_per_unit = 0;
 
    // Check for expected time string format:
    //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
-   if(!check_reg_exp(nc_time_unit_exp , str)) {
+   if(!check_reg_exp(nc_time_unit_exp, str)) {
       mlog << Warning << "\nparse_cf_time_string() -> "
            << "unexpected NetCDF CF convention time unit \""
            << str << "\"\n\n";
@@ -3007,10 +3008,19 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
       tok.set_ignore_case(true);
 
       // Determine the time step
-           if(tok.has("seconds")) sec_per_unit = 1;
-      else if(tok.has("minutes")) sec_per_unit = 60;
-      else if(tok.has("hours"))   sec_per_unit = 3600;
-      else if(tok.has("days"))    sec_per_unit = 86400;
+           if(tok.has("second")  ||
+              tok.has("seconds") ||
+              tok.has("s"))      sec_per_unit = 1;
+      else if(tok.has("minute")  ||
+              tok.has("minutes") ||
+              tok.has("min"))    sec_per_unit = 60;
+      else if(tok.has("hour")    ||
+              tok.has("hours")   ||
+              tok.has("hr")      ||
+              tok.has("h"))      sec_per_unit = 3600;
+      else if(tok.has("day")     ||
+              tok.has("days")    ||
+              tok.has("d"))      sec_per_unit = 86400;
       else {
          mlog << Warning << "\nparse_cf_time_string() -> "
               << "Unsupported time step in the CF convention time unit \""
@@ -3024,7 +3034,7 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
       if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
       else                     hms.parse_delim("00:00:00", ":");
       ref_ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
-			      atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
+                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
                               hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
                               hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
    }
@@ -3039,4 +3049,3 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
 
 
 ////////////////////////////////////////////////////////////////////////
-
