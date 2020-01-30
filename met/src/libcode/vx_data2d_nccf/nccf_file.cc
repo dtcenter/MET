@@ -1734,7 +1734,6 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
       continue;
     }
 
-    //const char *dim_units = units_att->getValues(att->as_string(0);
     ConcatString dim_units;
     if (!get_att_value_chars(units_att, dim_units)) {
       if (units_att) delete units_att;
