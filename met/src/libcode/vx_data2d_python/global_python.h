@@ -59,8 +59,6 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
-   setup_python_path();   //  this must be called before Py_Initialize()
-
    Py_Initialize();
 
    is_initialized = true;
@@ -106,5 +104,4 @@ extern GlobalPython GP;
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

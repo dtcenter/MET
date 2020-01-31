@@ -76,14 +76,10 @@ Python3_List::Python3_List(const Python3_List &)
 
 {
 
-mlog << Error
-     << "\n\n  Python3_List::Python3_List(const Python3_List &) -> should never be called!\n\n";
+mlog << Error << "\nPython3_List::Python3_List(const Python3_List &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
-
-// init_from_scratch();
-// 
-// assign(a);
 
 return;
 
@@ -97,14 +93,10 @@ Python3_List & Python3_List::operator=(const Python3_List &)
 
 {
 
-mlog << Error
-     << "\n\n  Python3_List(const Python3_List &) -> should never be called!\n\n";
+mlog << Error << "\nPython3_List(const Python3_List &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
-
-// if ( this == &a )  return ( * this );
-// 
-// assign(a);
 
 return ( * this );
 
@@ -155,8 +147,8 @@ clear();
 
 if ( ! PyList_Check(_obj) )  {
 
-   mlog << Error
-        << "\n\n  Python3_List::set(PyObject *) object is not a dictionary!\n\n";
+   mlog << Error << "\nPython3_List::set(PyObject *) -> "
+        << "object is not a dictionary!\n\n";
 
    exit ( 1 );
 
@@ -183,8 +175,8 @@ PyObject * a = 0;
 
 if ( (n < 0) || (n >= Size) )  {
 
-   mlog << Error
-        << "\n\n  Python3_List::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\nPython3_List::operator[](int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -208,8 +200,4 @@ return ( a );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 

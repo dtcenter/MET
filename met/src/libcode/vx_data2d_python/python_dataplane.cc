@@ -114,9 +114,6 @@ char user_dir  [PATH_MAX];
 char user_base [PATH_MAX];
 bool need_user_path = false;
 
-
-// cout << "\n\n  straight_python_dataplane() -> user_script_name = \"" << user_script_name << "\"\n\n" << flush;
-
 split_path(user_script_name, user_dir, user_base);
 
 if ( (strcmp(user_dir, ".") != 0) && (strcmp(user_dir, "/") != 0) )  need_user_path = true;
@@ -124,7 +121,6 @@ if ( (strcmp(user_dir, ".") != 0) && (strcmp(user_dir, "/") != 0) )  need_user_p
 Wchar_Argv wa;
 
 wa.set(user_script_argc, user_script_argv);
-
 
    //
    //  if the global python object has already been initialized,
@@ -164,16 +160,9 @@ command << cs_erase
         << user_dir
         << "\")";
 
-// cout << "\n\n  straight() -> command = \"" << command << "\"\n\n" << flush;
-
 run_python_string(command.text());
 
-// run_python_string("print (sys.path)");
-
-
 if ( user_script_argc > 0 )  {
-
-   // PySys_SetArgv (user_script_argc, user_script_argv);
 
    PySys_SetArgv (wa.wargc(), wa.wargv());
 
@@ -183,7 +172,6 @@ if ( user_script_argc > 0 )  {
    //  import the python script as a module
    //
 
-// module_obj = PyImport_ImportModule (user_script_name);
 module_obj = PyImport_ImportModule (user_base);
 
    //
@@ -232,7 +220,7 @@ if ( use_xarray )  {
 
    PyObject * data_array_obj = 0;
 
-      //   look up the data array variable name from the dictionary
+      //  look up the data array variable name from the dictionary
 
    key_obj = PyUnicode_FromString (xarray_dataarray_name);
 
@@ -251,7 +239,7 @@ if ( use_xarray )  {
 
 } else {    //  numpy array & dict
 
-      //   look up the data array variable name from the dictionary
+      //  look up the data array variable name from the dictionary
 
    key_obj = PyUnicode_FromString (numpy_array_name);
 
@@ -306,8 +294,8 @@ const char * tmp_dir = 0;
 Wchar_Argv wa;
 
 
-cout << "\n\n  user script = \"" << user_script_name << "\"\n\n" << flush;
-
+mlog << Debug(4) << "Running user's python script: "
+     << user_script_name << "\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 
@@ -319,11 +307,6 @@ path << cs_erase
      << pickle_base_name;
 
 pickle_path = make_temp_file_name(path.text(), 0);
-
-// cout << "\n\n  pickle_path = \"" << pickle_path << "\"\n\n" << flush;
-
-   //  wrapper usage:  /path/to/python write_pickle.py pickle_output_filename <user_python_script>.py <args>
-
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
@@ -348,7 +331,6 @@ if ( status )  {
    exit ( 1 );
 
 }
-
 
    //
    //  if the global python object has already been initialized,
@@ -384,31 +366,29 @@ a.add(generic_read_pickle);
 
 a.add(pickle_path);
 
-// a.dump(cout, 1);
-// 
-// cout.flush();
-
 wa.set(a);
 
 PySys_SetArgv (wa.wargc(), wa.wargv());
 
+   //
+   //  add the wrappers directory to the path
+   //
 
-// run_python_string("import sys");
-// run_python_string("import numpy");
-// run_python_string("import pickle");
-// if ( use_xarray )  run_python_string("import xarray");
+run_python_string("import os");
+run_python_string("import sys");
 
+command << cs_erase
+        << "sys.path.append(\""
+        << replace_path(wrappers_dir)
+        << "\")";
+
+run_python_string(command.text());
 
    //
    //  import the python wrapper script as a module
    //
 
-
-// path << mb << '/' << generic_read_pickle;
-
 path = get_short_name(generic_read_pickle);
-
-// cout << "\n\n  pickle_dataplane() -> path = \"" << path.text() << "\"\n\n" << flush;
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
@@ -421,16 +401,6 @@ if ( do_reload )  {
    module_obj = PyImport_ReloadModule (module_obj);
 
 }
-
-
-// command << cs_erase
-//         << "met_info = pickle.load(open(\""
-//         << pickle_path
-//         << "\", \"rb\"))";
-// 
-// cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
-// 
-// run_python_string(command.text());
 
 if ( PyErr_Occurred() )  {
 
@@ -454,15 +424,9 @@ if ( ! module_obj )  {
 
 }
 
-
    //
    //  read the pickle file
    //
-
-// command << cs_erase << "x = 5";
-// command << cs_erase << "met_info = pickle.load(open(\"out.pickle\", \"rb\"))";
-// 
-// run_python_string(command.text());
 
    //
    //   get the namespace for the module (as a dictionary)
@@ -470,25 +434,18 @@ if ( ! module_obj )  {
 
 PyObject * module_dict_obj = PyModule_GetDict (module_obj);
 
-// cout << "module_dict_obj = " << module_dict_obj << "\n" << flush;
-
 PyObject * key_obj = PyUnicode_FromString ("met_info");
 
 PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-// cout << "data_obj = " << data_obj << "\n" << flush;
-
 if ( ! PyDict_Check(data_obj) )  {
 
-   mlog << Error
-        << "\n\n   pickle_dataplane() -> bad dict object\n\n";
+   mlog << Error << "\npickle_dataplane() -> "
+        << "bad dict object\n\n";
 
    exit ( 1 );
 
 }
-
-
-
 
 if ( use_xarray )  {
 
@@ -500,13 +457,9 @@ if ( use_xarray )  {
 
    PyObject * attrs_dict_obj = PyDict_GetItem (data_obj, key_obj);
 
-   // cout << "attrs = " << attrs_dict_obj << "\n" << flush;
-
    key_obj = PyUnicode_FromString (numpy_array_name);
 
    PyObject * numpy_array_obj = PyDict_GetItem (data_obj, key_obj);
-
-   // cout << "met_data = " << numpy_array_obj << "\n" << flush;
 
    Python3_Numpy np;
 
@@ -515,22 +468,6 @@ if ( use_xarray )  {
    dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    //
    //  done
@@ -541,10 +478,5 @@ return ( true );
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 

@@ -42,8 +42,8 @@ Python3_Script::Python3_Script()
 
 {
 
-mlog << Error
-     << "\n\n  Python3_Script::Python3_Script() -> should never be called!\n\n";
+mlog << Error << "\nPython3_Script::Python3_Script() -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -100,20 +100,6 @@ fflush(stderr);
    //   start up the python interpreter
    //
 
-// wcout << "getpath = \"" << Py_GetPath() << "\"\n\n" << flush;
-
-// ConcatString a;
-// a << ".:/usr/local/anaconda3-20190923/lib/python37.zip:/usr/local/anaconda3-20190923/lib/python3.7:/usr/local/anaconda3-20190923/lib/python3.7/lib-dynload:" << getenv("MET_BUILD_BASE") << '/' << "data/wrappers";
-// cout << "\n\n  a = \"" << a << "\"\n\n" << flush;
-
-// exit ( 1 );
-// Py_SetPath(Py_DecodeLocale(a.text(), 0));
-
-
-// Py_Initialize();
-// 
-// setup_python_path();
-
 GP.initialize();
 
    //
@@ -127,13 +113,10 @@ path.chomp(".py");
 
 Module = PyImport_ImportModule (path.text());
 
-// PyErr_Print();
-
-
 if ( ! Module )  {
 
-   mlog << Error
-        << "\n\n  Python3_Script::Python3_Script(const char *) -> unable to open script \"" << path << "\"\n\n";
+   mlog << Error << "\nPython3_Script::Python3_Script(const char *) -> "
+        << "unable to open script \"" << path << "\"\n\n";
 
    Py_Finalize();
 
@@ -148,10 +131,6 @@ Script_Filename = path;
    //
 
 Dict = PyModule_GetDict (Module);
-
-
-
-
 
    //
    //  done
@@ -188,8 +167,8 @@ void Python3_Script::run(const char * command) const
 
 if ( empty(command) )  {
 
-   mlog << Error
-        << "\n\n   Python3_Script::run(const char *) -> empty command!\n\n";
+   mlog << Error << "\nPython3_Script::run(const char *) -> "
+        << "empty command!\n\n";
 
    exit ( 1 );
 
@@ -197,50 +176,15 @@ if ( empty(command) )  {
 
 if ( PyRun_String(command, Py_file_input, Dict, Dict) < 0 )  {
 
-   mlog << Error
-        << "\n\n   Python3_Script::run(const char *) -> command \""
-        << command << "\" failed!\n\n";
+   mlog << Error << "\nPython3_Script::run(const char *) -> "
+        << "command \"" << command << "\" failed!\n\n";
 
    exit ( 1 );
 
 }
 
-
 fflush(stdout);
 fflush(stderr);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  example: 
-   //
-   //       pickle.dump( data, open( "save.p", "wb" ) )
-   //
-
-
-void Python3_Script::write_pickle(const char * variable, const char * pickle_filename) const
-
-{
-
-ConcatString command;
-
-command << "pickle.dump( "
-        << variable
-        << ", open( \""
-        << pickle_filename
-        << "\", \"wb\" ) )";
-
-
-// cout << "\n\n  write_pickle() -> command = \"" << command << "\"\n\n";
-
-// run(command);
-
 
 return;
 
@@ -268,19 +212,14 @@ command << variable
         << pickle_filename
         << "\", \"rb\"))";
 
-
-
-// cout << "\n\n  read_pickle() -> command = \"" << command << "\"\n\n";
-
 PyErr_Clear();
 
 run(command.text());
 
 if ( PyErr_Occurred() )  {
 
-   mlog << Error
-        << "\n\n  Python3_Script::read_pickle() -> command \""
-        << command << "\" failed!\n\n";
+   mlog << Error << "\nPython3_Script::read_pickle() -> "
+        << "command \"" << command << "\" failed!\n\n";
 
    exit ( 1 );
 
@@ -322,10 +261,6 @@ for (j=0; j<N; ++j)  {
 
 command << ']';
 
-// cout << "command = \"" << command << "\"\n" << flush;
-
-
-
 run(command.text());
 
    //
@@ -338,7 +273,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 

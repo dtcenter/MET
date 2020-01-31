@@ -68,17 +68,10 @@ Wchar_Argv::Wchar_Argv(const Wchar_Argv & w)
 
 {
 
-mlog << Error
-     << "\n\n  Wchar_Argv::Wchar_Argv(const Wchar_Argv &) -> should never be called!n\n";
+mlog << Error << "\nWchar_Argv::Wchar_Argv(const Wchar_Argv &) -> "
+     << "should never be called!n\n";
 
 exit ( 1 );
-
-   ///////////////////////////
-
-init_from_scratch();
-
-// assign(w);
-
 
 return;
 
@@ -92,17 +85,10 @@ Wchar_Argv & Wchar_Argv::operator=(const Wchar_Argv & w)
 
 {
 
-mlog << Error
-     << "\n\n  Wchar_Argv::operator=(const Wchar_Argv &) -> should never be called!n\n";
+mlog << Error << "\nWchar_Argv::operator=(const Wchar_Argv &) -> "
+     << "should never be called!n\n";
 
 exit ( 1 );
-
-   ///////////////////////////
-
-if ( this == &w )  return ( * this );
-
-// assign(w);
-
 
 return ( * this );
 
@@ -191,11 +177,7 @@ for (j=0; j<(a.n()); ++j)  {
 
 }
 
-
-
 set(a.n(), av);
-
-
 
    //
    //  done
@@ -274,8 +256,8 @@ for (j=0; j<Argc; ++j)  {
 
    if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
-      mlog << Error
-           << "\n\n  Wchar_Argv::set() -> mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
+      mlog << Error << "\nWchar_Argv::set() -> "
+           << "mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
 
       exit ( 1 );
 
@@ -284,7 +266,6 @@ for (j=0; j<Argc; ++j)  {
    k += (len[j] + 1);
 
 }
-
 
    //
    //  set up the array of pointers into the wchar buffer
@@ -305,8 +286,6 @@ for (j=0; j<Argc; ++j)  {
 
 }
 
-
-
    //
    //  done
    //
@@ -319,8 +298,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 

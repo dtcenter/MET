@@ -73,9 +73,8 @@ else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g
 else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
 else {
 
-   mlog << Error
-        << "\ngrid_from_python_dict() -> bad projection type: \""
-        << proj_type << "\"\n\n";
+   mlog << Error << "\ngrid_from_python_dict() -> "
+        << "bad projection type: \"" << proj_type << "\"\n\n";
 
    exit ( 1 );
 
@@ -436,6 +435,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 

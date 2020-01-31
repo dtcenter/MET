@@ -170,17 +170,12 @@ else if ( dtype == ">f8"  )   load_numpy <double>    (np.buffer(), Nx, Ny,    bi
 
 else  {
 
-   mlog << Error
-        << "\n\n   dataplane_from_numpy_array() -> unsupported numpy data type \"" 
-        << dtype << "\"\n\n";
+   mlog << Error << "\ndataplane_from_numpy_array() -> "
+        << "unsupported numpy data type \""  << dtype << "\"\n\n";
 
    exit ( 1 );
 
 }
-
-
-
-
 
    //
    //  get timestamp info from the attributes dictionary
@@ -247,6 +242,4 @@ return ( true );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 

@@ -32,8 +32,8 @@ FILE * f   = 0;
 
 if ( (f = open_memstream(&buf, &len)) == NULL )  {
 
-   mlog << Error
-        << "\n\n  operator<<(ostream &, PyObject *) -> unable to open memory stream\n\n";
+   mlog << Error << "\noperator<<(ostream &, PyObject *) -> "
+        << "unable to open memory stream\n\n";
 
    exit ( 1 );
 
@@ -42,8 +42,8 @@ if ( (f = open_memstream(&buf, &len)) == NULL )  {
 
 if ( PyObject_Print(obj, f, Py_PRINT_RAW) < 0 )  {
 
-   mlog << Error
-        << "\n\n  operator<<(ostream &, PyObject *) -> PyObject_Print error\n\n";
+   mlog << Error << "\noperator<<(ostream &, PyObject *) -> "
+        << "PyObject_Print error\n\n";
 
    exit ( 1 );
 
@@ -110,8 +110,8 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_int (PyObject *) -> bad object type\n\n";
+   mlog << Error << "\npyobject_as_int (PyObject *) -> "
+        << "bad object type\n\n";
 
    exit ( 1 );
 
@@ -147,8 +147,8 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_double (PyObject *) -> bad object type\n\n";
+   mlog << Error << "\npyobject_as_double (PyObject *) -> "
+        << "bad object type\n\n";
 
    exit ( 1 );
 
@@ -175,8 +175,8 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_string (PyObject *) -> bad object type\n\n";
+   mlog << Error << "\npyobject_as_string (PyObject *) -> "
+        << "bad object type\n\n";
 
    exit ( 1 );
 
@@ -202,8 +202,8 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 } else {
 
-   mlog << Error
-        << "\n\n  pyobject_as_concat_string (PyObject *) -> bad object type\n\n";
+   mlog << Error << "\npyobject_as_concat_string(PyObject *) -> "
+        << "bad object type\n\n";
 
    exit ( 1 );
 
@@ -223,9 +223,8 @@ void run_python_string(const char * s)
 
 if ( PyRun_SimpleString(s) < 0 )  {
 
-   mlog << Error
-        << "\n\n   run -> command \""
-        << s << "\" failed!\n\n";
+   mlog << Error << "\nrun_python_string() -> "
+        << "command \"" << s << "\" failed!\n\n";
 
    fflush(stdout);
    fflush(stderr);
@@ -240,84 +239,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-void add_to_python_path(const char * directory_path)
-
-{
-
-wstring path = Py_GetPath();
-ConcatString a;
-wchar_t * wa = 0;
-
-a = directory_path;
-
-const int N = a.length();
-
-wa = new wchar_t [1 + N];
-
-mbstowcs(wa, a.text(), 1 + N);
-
-path.append(wa, N);
-
-Py_SetPath(wa);
-
-// wcout << "\n\n  add_to_python_path() -> path = " << Py_GetPath() << "\n\n" << flush;
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void setup_python_path()
-
-{
-
-ConcatString a;
-
-   //
-   //  add PYTHONPATH
-   //
-
-const char * c = getenv("PYTHONPATH");
-
-if ( c )  {
-
-   a << c;
-
-   // cout << "\n\n  setup_python_path() -> a = " << a << "\n\n" << flush;
-
-}
-
-
-// a << ':' << "/d3/personal/randy/github/develop/MET/met/share/met/wrappers";
-
-   //
-   //  add MET python wrappers directory
-   //
-
-a << ':' << getenv("MET_BASE") << '/' << wrappers_dir;
-
-// cout << "\n\n  setup_python_path() -> a = " << a << "\n\n" << flush;
-
-add_to_python_path(a.text());
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
 
