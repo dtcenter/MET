@@ -49,6 +49,7 @@ export MET_HDFINC=${MET_DST}/hdf4/include/hdf
 export MET_HDFLIB=${MET_DST}/hdf4/lib
 export MET_HDFEOS=${MET_DST}/hdfeos
 export MET_BUFR=${MET_DST}
+export MET_GRIB2C=${MET_DST}
 export MET_GSLINC=/usr/include/gsl
 export MET_GSLLIB=/usr/lib
 export MET_CAIROINC=/usr/include/cairo
