@@ -42,30 +42,37 @@ SCRIPTS=`dirname $0`
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
-export MET_NETCDF=/usr/local/netcdf
-export MET_HDF5=/usr/local/hdf5
-export MET_HDFINC=/usr/local/hdf4/include/hdf
-export MET_HDFLIB=/usr/local/hdf4/lib
-export MET_HDFEOS=/usr/local/hdfeos
-export MET_BUFR=/usr/local
-export MET_GSL=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0
-export MET_GRIB2C=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0
+export MET_DST=/usr/local
+export MET_NETCDF=${MET_DST}/netcdf
+export MET_HDF5=${MET_DST}/hdf5
+export MET_HDFINC=${MET_DST}/hdf4/include/hdf
+export MET_HDFLIB=${MET_DST}/hdf4/lib
+export MET_HDFEOS=${MET_DST}/hdfeos
+export MET_BUFR=${MET_DST}
+export MET_GSLINC=/usr/include/gsl
+export MET_GSLLIB=/usr/lib
 export MET_CAIROINC=/usr/include/cairo
 export MET_CAIROLIB=/usr/lib
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
-export MET_PYTHON_CC="-I/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/include/python3.7m"
-export MET_PYTHON_LD="-L/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
-export PYTHONHOME=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3
-export LD_LIBRARY_PATH=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib
+
+# For Python 3 in met-9.0
+export MET_PYTHON=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.7m"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
+
+# Set LDFLAGS to include -rpath settings when compiling MET
+export LDFLAGS="-Wl,--disable-new-dtags"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_PYTHON}/lib"
 
 # Variables required to run MET
 export MET_FONT_DIR=/d3/projects/MET/MET_test_data/unit_test/fonts
 
 # This is a cron script -- create the shell environment for this job
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\
-             /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin"
-
+             /usr/bin/X11:/opt/bin:${MET_NETCDF}/bin"             
+             
 # Run scan and check for bad return status
 ${SCRIPTS}/run_fortify_sca.sh develop > ${LOGFILE}
 if [[ $? -ne 0 ]]
