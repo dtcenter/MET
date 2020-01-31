@@ -15,16 +15,16 @@ model = "GFS-FV3";
 data = {
     field = [
         {
-          name = "PRMSL";
+          name = "APCP";
           level = ["L0"];
-          n_bins = 100;
-          range = [95000, 105000]; // Pa
+          n_bins = 55;
+          range = [0, 55]; // kg/m^2
         },
         {
-          name = "TMP";
+          name = "PWAT";
           level = ["L0"];
-          n_bins = 100;
-          range = [270, 310]; // K
+          n_bins = 35;
+          range = [35, 70]; // kg/m^2
         }
     ];
 }
