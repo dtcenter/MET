@@ -27,6 +27,7 @@ extern "C" {
 
 
 #include "python3_util.h"
+#include "concat_string.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,6 +64,20 @@ if ( ! is_initialized )  {
 
    is_initialized = true;
 
+   //
+   //  add wrappers directory to the path
+   //
+
+   run_python_string("import sys");
+
+   ConcatString command;
+
+   command << cs_erase
+           << "sys.path.append(\""
+           << replace_path(wrappers_dir)
+           << "\")";
+
+   run_python_string(command.text());
 
 }
 
