@@ -9,7 +9,7 @@
 #
 ################################################
 
-
+import os
 import sys
 import pickle
 
@@ -18,23 +18,14 @@ pickle_filename = sys.argv[1];
 print('old args')
 print(sys.argv)
 
-pyembed_module_name = sys.argv[2].replace('.py','')
+pyembed_module_dir  = os.path.dirname(sys.argv[2])
+pyembed_module_name = os.path.basename(sys.argv[2]).replace('.py','')
 sys.argv = sys.argv[2:]
 
 print('new args')
 print(sys.argv)
 
+sys.path.append(pyembed_module_dir)
 met_in = __import__(pyembed_module_name)
 
-#met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
-#
-#print(met_info)
-#
-#pickle.dump( met_info, open( pickle_filename, "wb" ) )
-
-
 pickle.dump( met_in.point_data, open( pickle_filename, "wb" ) )
-
-
-
-
