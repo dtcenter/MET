@@ -130,8 +130,8 @@ bool PythonHandler::_readObservations(LineDataFile &ascii_file)
 
 {
 
-mlog << Error
-     << "\n\n  bool PythonHandler::_readObservations(LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nbool PythonHandler::_readObservations(LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -150,8 +150,8 @@ void PythonHandler::load_python_obs(PyObject * obj)
 
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::load_python_obs(PyObject *) -> given object not a list!\n\n";
+   mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
+        << "given object not a list!\n\n";
 
    exit ( 1 );
 
@@ -168,8 +168,8 @@ for (j=0; j<(list.size()); ++j)  {
 
    if ( ! PyList_Check(obj) )  {
 
-      mlog << Error
-           << "\n\n  PythonHandler::load_python_obs(PyObject *) -> non-list object found in main list!\n\n";
+      mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
+           << "non-list object found in main list!\n\n";
 
       exit ( 1 );
 
@@ -180,8 +180,6 @@ for (j=0; j<(list.size()); ++j)  {
    _addObservations(obs);
 
 }   //  for j
-
-
 
    //
    //  done
@@ -220,18 +218,14 @@ ConcatString command;
 ConcatString short_user_name;
 ConcatString path;
 
-
-// path << cs_erase
-//      << mbb << '/'
-//      << wrappers_dir << '/'
-//      << generic_python_wrapper;
-
-// path << ".py";
-
-
 path = generic_python_wrapper;
 
-short_user_name = user_script_filename;
+char user_dir  [PATH_MAX];
+char user_base [PATH_MAX];
+
+split_path(user_script_filename.text(), user_dir, user_base);
+
+short_user_name = user_base;
 
 short_user_name.chomp(".py");
 
@@ -241,8 +235,6 @@ short_user_name.chomp(".py");
 
 Python3_Script script(path.text());
 
-// cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
-
    //
    //  set up a "new" sys.argv list
    //     with the command-line arquments for
@@ -251,7 +243,7 @@ Python3_Script script(path.text());
 
 if ( user_script_args.n() > 0 )  {
 
-   script.reset_argv(short_user_name.text(), user_script_args);
+   script.reset_argv(user_script_filename.text(), user_script_args);
 
 }
 
@@ -287,8 +279,6 @@ Python3_Dict md (m);
 
 PyObject * obj = md.lookup_list(list_name);
 
-// cout << "obj = \"" << obj << "\"\n" << flush;
-
    //
    //  load the obs
    //
@@ -317,7 +307,6 @@ const int N = user_script_args.n();
 ConcatString command;
 int status;
 
-
 command << cs_erase
         << user_path_to_python    << ' '
         << replace_path(write_pickle_wrapper) << ' '
@@ -330,17 +319,13 @@ for (j=0; j<N; ++j)  {
 
 };
 
-
-// cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
-
-// exit ( 1 );
-
 status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> command \"" << command.text() << "\" failed ... status = " << status << "\n\n";
+   mlog << Error << "\nPythonHandler::do_pickle() -> "
+        << "command \"" << command.text() << "\" failed ... status = "
+        << status << "\n\n";
 
    exit ( 1 );
 
@@ -357,12 +342,10 @@ script.read_pickle(list_name, pickle_output_filename);
 
 PyObject * obj = script.lookup(list_name);
 
-// cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
-
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> pickle object is not a list!\n\n";
+   mlog << Error << "\nPythonHandler::do_pickle() -> "
+        << "pickle object is not a list!\n\n";
 
    exit ( 1 );
 
