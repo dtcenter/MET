@@ -25,7 +25,7 @@ if len(sys.argv) == 3:
     except NameError:
         print("Can't find the input file")
 else:
-    print("Must specify exactly one input file and a name for the data.")
+    print("ERROR: Must specify exactly one input file and a name for the data.")
     sys.exit(1)
 
 ###########################################
