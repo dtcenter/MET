@@ -27,9 +27,9 @@ using namespace std;
 
 
 static const char generic_python_wrapper [] = "generic_python";
-static const char generic_pickle_wrapper [] = "generic_pickle";
 
 static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
+static const char load_pickle_wrapper    [] = "load_pickle";
 
 static const char list_name              [] = "point_data";
 
@@ -347,13 +347,11 @@ if ( status )  {
 
 }
 
-ConcatString generic;
+ConcatString wrapper;
 
-// generic << cs_erase << mbb << '/' << wrappers_dir << '/' << generic_pickle_wrapper << ".py";
+wrapper = load_pickle_wrapper;
 
-generic = generic_pickle_wrapper;
-
-Python3_Script script(generic.text());
+Python3_Script script(wrapper.text());
 
 script.read_pickle(list_name, pickle_output_filename);
 

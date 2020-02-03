@@ -33,7 +33,7 @@ static const char * user_ppath            = 0;
 
 static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle.py";
 
-static const char generic_read_pickle  [] = "generic_pickle";   //  NO ".py" suffix
+static const char load_pickle          [] = "load_pickle";   //  NO ".py" suffix
 
 static const char pickle_base_name     [] = "out.pickle";
 
@@ -362,7 +362,7 @@ if ( PyErr_Occurred() )  {
 
 StringArray a;
 
-a.add(generic_read_pickle);
+a.add(load_pickle);
 
 a.add(pickle_path);
 
@@ -388,7 +388,7 @@ run_python_string(command.text());
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(generic_read_pickle);
+path = get_short_name(load_pickle);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
