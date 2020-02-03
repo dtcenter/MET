@@ -261,6 +261,18 @@ if ( user_script_args.n() > 0 )  {
 
 PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
 
+if ( PyErr_Occurred() )  {
+
+   PyErr_Print();
+
+   mlog << Warning << "\nPythonHandler::do_straight() -> "
+        << "an error occurred importing module "
+        << '\"' << short_user_name.text() << "\"\n\n";
+
+   return ( false );
+
+}
+
    //
    //  get the dictionary (ie, namespace)
    //    for the module
