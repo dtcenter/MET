@@ -61,6 +61,10 @@ export MET_PYTHON=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.7m"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
 
+# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
+export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__"
+export CXXFLAGS=${CFLAGS}
+
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
