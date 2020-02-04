@@ -111,6 +111,9 @@ char user_dir  [PATH_MAX];
 char user_base [PATH_MAX];
 bool need_user_path = false;
 
+mlog << Debug(3) << "Running user's python script ("
+     << user_script_name << ").\n";
+
 split_path(user_script_name, user_dir, user_base);
 
 if ( (strcmp(user_dir, ".") != 0) && (strcmp(user_dir, "/") != 0) )  need_user_path = true;
@@ -290,8 +293,9 @@ ConcatString pickle_path;
 const char * tmp_dir = 0;
 Wchar_Argv wa;
 
-mlog << Debug(4) << "Running user's python script: "
-     << user_script_name << "\n";
+mlog << Debug(3) << "Calling " << user_ppath
+     << " to run user's python script (" << user_script_name
+     << ").\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 
@@ -319,9 +323,8 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error
-        << "\n\n  pickle_dataplane() -> command \""
-        << command.text() << "\" failed ... status = "
+   mlog << Error << "\npickle_dataplane() -> "
+        << "command \"" << command.text() << "\" failed ... status = "
         << status << "\n\n";
 
    exit ( 1 );
@@ -351,6 +354,9 @@ if ( PyErr_Occurred() )  {
    return ( false );
 
 }
+
+mlog << Debug(3) << "Reading temporary pickle file: "
+     << pickle_path << "\n";
 
    //
    //  set the arguments
@@ -434,7 +440,7 @@ PyObject * key_obj = PyUnicode_FromString ("met_info");
 
 PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-if ( ! PyDict_Check(data_obj) )  {
+if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 
    mlog << Error << "\npickle_dataplane() -> "
         << "bad dict object\n\n";

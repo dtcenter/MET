@@ -206,6 +206,9 @@ void Python3_Script::read_pickle(const char * variable, const char * pickle_file
 
 {
 
+mlog << Debug(3) << "Reading temporary pickle file: "
+     << pickle_filename << "\n";
+
 ConcatString command;
 
 command << variable 

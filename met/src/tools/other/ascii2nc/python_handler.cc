@@ -223,6 +223,9 @@ path = generic_python_wrapper;
 char user_dir  [PATH_MAX];
 char user_base [PATH_MAX];
 
+mlog << Debug(3) << "Running user's python script ("
+     << user_script_filename << ").\n";
+
 split_path(user_script_filename.text(), user_dir, user_base);
 
 short_user_name = user_base;
@@ -310,8 +313,9 @@ ConcatString pickle_path;
 const char * tmp_dir = 0;
 int status;
 
-mlog << Debug(4) << "Running user's python script: "
-     << user_script_filename << "\n";
+mlog << Debug(3) << "Calling " << user_path_to_python
+     << " to run user's python script (" << user_script_filename
+     << ").\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 
@@ -344,7 +348,6 @@ if ( status )  {
         << status << "\n\n";
 
    exit ( 1 );
-
 
 }
 
