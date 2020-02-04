@@ -6,6 +6,8 @@ import sys
 
 ###########################################
 
+print('Python Script:\t', sys.argv[0])
+
    ##
    ##  input file specified on the command line
    ##  load the data into the numpy array
@@ -16,7 +18,7 @@ if len(sys.argv) == 2:
     input_file = os.path.expandvars(sys.argv[1])
     try:
         # Print some output to verify that this script ran
-        print("Input File:  " + repr(input_file))
+        print("Input File:\t" + repr(input_file))
         # TODO: make this work
         #point_data = pd.read_csv(input_file, header=None, delim_whitespace=True).values.tolist()
         
@@ -28,8 +30,8 @@ if len(sys.argv) == 2:
                       [ 'ADPUPA', '72365', '20070331_120000',   35.03, -106.62, 1618.0,  7, 826.0,  1724, 'NA', 1724    ], 
                       [ 'ADPUPA', '72365', '20070331_120000',   35.03, -106.62, 1618.0, 11, 826.0,  1724, 'NA', 274.55  ]]
         
-        print("Data Length: " + repr(len(point_data)))
-        print("Data Type:   " + repr(type(point_data)))
+        print("Data Length:\t" + repr(len(point_data)))
+        print("Data Type:\t" + repr(type(point_data)))
     except NameError:
         print("Can't find the input file")
 else:
