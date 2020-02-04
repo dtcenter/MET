@@ -19,7 +19,7 @@ if len(sys.argv) == 2:
     try:
         # Print some output to verify that this script ran
         print("Input File:\t" + repr(input_file))
-        point_data = pd.read_csv(input_file, header=None, delim_whitespace=True,
+        point_data = pd.read_csv(input_file, header=None, delim_whitespace=True, keep_default_na=False,
                           names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
                           dtype={'typ':'str','sid':'str','var':'str','qc':'str'}).values.tolist()
         print("Data Length:\t" + repr(len(point_data)))
