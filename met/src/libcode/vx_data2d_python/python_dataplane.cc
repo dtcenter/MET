@@ -373,20 +373,6 @@ wa.set(a);
 PySys_SetArgv (wa.wargc(), wa.wargv());
 
    //
-   //  add the wrappers directory to the path
-   //
-
-run_python_string("import os");
-run_python_string("import sys");
-
-command << cs_erase
-        << "sys.path.append(\""
-        << replace_path(wrappers_dir)
-        << "\")";
-
-run_python_string(command.text());
-
-   //
    //  import the python wrapper script as a module
    //
 
@@ -416,7 +402,6 @@ if ( PyErr_Occurred() )  {
 
 }
 
-
 if ( ! module_obj )  {
 
    mlog << Warning << "\npython_dataplane() -> "
@@ -436,7 +421,7 @@ if ( ! module_obj )  {
 
 PyObject * module_dict_obj = PyModule_GetDict (module_obj);
 
-PyObject * key_obj = PyUnicode_FromString ("met_info");
+PyObject * key_obj = PyUnicode_FromString (pickle_var_name);
 
 PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
