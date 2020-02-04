@@ -69,9 +69,6 @@ bool python_dataplane(const char * user_script_name,
 
 bool status = false;
 
-
-mlog << Debug(4) << "\n\n  in python_dataplane()\n\n";
-
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_pickle = true;
 
    status = pickle_dataplane(user_script_name,

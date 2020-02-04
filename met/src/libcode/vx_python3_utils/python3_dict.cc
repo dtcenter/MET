@@ -475,8 +475,6 @@ while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
    dump_dict_value(out, value, depth + 1);
 
-   // out << '\n';
-
    ++j;
 
 }

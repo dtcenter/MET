@@ -98,7 +98,7 @@ int nrows, ncols, Nx, Ny;
 
 if ( np.n_dims() != 2 )  {
 
-   cerr << "\n\n  dataplane_from_numpy_array() -> "
+   mlog << Error << "\ndataplane_from_numpy_array() -> "
         << "numpy array is not 2-dimensional! ... "
         << "(dim = " << (np.n_dims()) << ")\n\n";
 
