@@ -13,7 +13,7 @@ import pickle
 
 print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
-print('Writing Temp:\t',  sys.argv[1])
+print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1];
 
