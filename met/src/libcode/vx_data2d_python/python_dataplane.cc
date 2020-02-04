@@ -35,7 +35,7 @@ static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle.py";
 
 static const char generic_pickle       [] = "generic_pickle";   //  NO ".py" suffix
 
-static const char pickle_base_name     [] = "out.pickle";
+static const char pickle_base_name     [] = "tmp_met_pickle";
 
 static const char pickle_var_name      [] = "met_info";
 
@@ -293,14 +293,12 @@ ConcatString pickle_path;
 const char * tmp_dir = 0;
 Wchar_Argv wa;
 
-
 mlog << Debug(4) << "Running user's python script: "
      << user_script_name << "\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 
-if ( ! tmp_dir )   tmp_dir = "/tmp";
-
+if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
@@ -326,7 +324,8 @@ if ( status )  {
 
    mlog << Error
         << "\n\n  pickle_dataplane() -> command \""
-        << command.text() << "\" failed!\n\n";
+        << command.text() << "\" failed ... status = "
+        << status << "\n\n";
 
    exit ( 1 );
 
@@ -468,6 +467,12 @@ if ( use_xarray )  {
    dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
 
 }
+
+   //
+   //  cleanup
+   //
+
+remove_temp_file(pickle_path);
 
    //
    //  done

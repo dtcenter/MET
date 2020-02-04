@@ -33,7 +33,7 @@ static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pic
 
 static const char list_name              [] = "point_data";
 
-static const char pickle_output_filename [] = "out.pickle";
+static const char pickle_base_name       [] = "tmp_ascii2nc_pickle";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -305,13 +305,29 @@ bool PythonHandler::do_pickle()
 int j;
 const int N = user_script_args.n();
 ConcatString command;
+ConcatString path;
+ConcatString pickle_path;
+const char * tmp_dir = 0;
 int status;
 
+mlog << Debug(4) << "Running user's python script: "
+     << user_script_filename << "\n";
+
+tmp_dir = getenv ("MET_TMP_DIR");
+
+if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
+
+path << cs_erase
+     << tmp_dir << '/'
+     << pickle_base_name;
+
+pickle_path = make_temp_file_name(path.text(), 0);
+
 command << cs_erase
-        << user_path_to_python    << ' '
-        << replace_path(write_pickle_wrapper) << ' '
-        << pickle_output_filename << ' '
-        << user_script_filename;
+        << user_path_to_python                << ' '    //  user's path to python             
+        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
+        << pickle_path                        << ' '    //  pickle output filename
+        << user_script_filename;                        //  user's script name
 
 for (j=0; j<N; ++j)  {
 
@@ -338,7 +354,7 @@ wrapper = generic_pickle_wrapper;
 
 Python3_Script script(wrapper.text());
 
-script.read_pickle(list_name, pickle_output_filename);
+script.read_pickle(list_name, pickle_path.text());
 
 PyObject * obj = script.lookup(list_name);
 
@@ -352,6 +368,12 @@ if ( ! PyList_Check(obj) )  {
 }
 
 load_python_obs(obj);
+
+   //
+   //  cleanup
+   //
+
+remove_temp_file(pickle_path);
 
    //
    //  done
