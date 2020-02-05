@@ -58,9 +58,9 @@ export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib
 
 # For Python 3 in met-9.0
-export MET_PYTHON=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3
+export MET_PYTHON="/var/autofs/mnt/linux-amd64/debian/stretch/local/met-python3"
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.7m"
-export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.7m -lcrypt -lpthread -ldl -lutil -lm"
 
 # -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
 export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__"
