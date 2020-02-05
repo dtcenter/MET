@@ -113,7 +113,7 @@ void RMWAnalysisConfInfo::process_config() {
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;
     ConcatString poly_file;
-    GrdFileType ftype;
+    GrdFileType ftype = FileType_NcCF;
 
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);
@@ -159,6 +159,9 @@ void RMWAnalysisConfInfo::process_config() {
         parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
                         ValidAreaMask, ValidMaskName);
     }
+
+    // Conf: data.field
+    fdict = Conf.lookup_array(conf_key_data_field);
 
     // Determine number of fields (name/level)
     n_data = parse_conf_n_vx(fdict);
