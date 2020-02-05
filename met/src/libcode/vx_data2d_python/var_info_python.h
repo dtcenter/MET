@@ -87,3 +87,4 @@ inline bool VarInfoPython::is_wind_direction()    const { return ( false ); }
 #endif  // __VAR_INFO_PYTHON_H__
 
 ///////////////////////////////////////////////////////////////////////////////
+

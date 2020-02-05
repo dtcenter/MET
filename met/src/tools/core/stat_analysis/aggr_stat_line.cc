@@ -32,6 +32,7 @@
 //   012    03/01/18  Halley Gotway   Update summary job type.
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
 //   014    04/01/19  Fillmore        Add FCST and OBS units.
+//   015    01/24/20  Halley Gotway   Add aggregate ERPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2509,7 +2510,6 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
 void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
                      map<ConcatString, AggrENSInfo> &m,
                      int &n_in, int &n_out) {
-
    STATLine line;
    AggrENSInfo aggr;
    ECNTData cur;
@@ -2532,7 +2532,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
 
          if(line.type() != stat_ecnt) {
             mlog << Error << "\naggr_ecnt_lines() -> "
-                 << "should only encounter ranked histogram "
+                 << "should only encounter ensemble continuous statistics "
                  << "(ECNT) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
@@ -2640,6 +2640,98 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
       }
 
    } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_erps_lines(LineDataFile &f, STATAnalysisJob &j,
+                    map<ConcatString, AggrERPSInfo> &m,
+                    int &n_in, int &n_out) {
+   STATLine line;
+   AggrERPSInfo aggr;
+   ERPSInfo cur;
+   ConcatString key;
+   double rps_fcst, rps_climo, v;
+   map<ConcatString, AggrERPSInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         //
+         // Check for expected line type
+         //
+         if(line.type() != stat_erps) {
+            mlog << Error << "\naggr_erps_lines() -> "
+                 << "should only encounter ensemble ranked probability "
+                 << "score (ERPS) line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current ERPS line
+         //
+         parse_erps_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.erps_info = cur;
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+
+            //
+            // Check for N_ENS remaining constant
+            //
+            if(m[key].erps_info.n_ens == 0) {
+               m[key].erps_info.n_ens = cur.n_ens;
+            }
+            else if(m[key].erps_info.n_ens != cur.n_ens) {
+               mlog << Error << "\naggr_erps_lines() -> "
+                    << "the \"N_ENS\" column must remain constant ("
+                    << m[key].erps_info.n_ens << " != " << cur.n_ens
+                    << ").  Try setting \"-column_eq N_ENS n\".\n\n";
+               throw(1);
+            }
+
+            //
+            // Aggregate the GRAD partial sums
+            //
+            m[key].erps_info += cur;
+
+         } // end else
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
 
    return;
 }

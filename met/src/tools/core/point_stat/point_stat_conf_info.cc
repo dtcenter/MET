@@ -1171,7 +1171,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          break;
 
       case(i_ecnt):
-         // Number of HiRA ECNT lines =
+      case(i_erps):
+         // Number of HiRA ECNT and ERPS lines =
          //    Message Types * Masks * Interpolations * HiRA widths *
          //    Alphas
          if(hira_info.flag) {

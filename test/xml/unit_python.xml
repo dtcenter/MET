@@ -2,9 +2,11 @@
 <!DOCTYPE met_test [
   <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+  <!ENTITY MET_PYTHON_EXE "/usr/local/python3/bin/python3">
 
   <!ENTITY CONFIG_DIR      "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PYTHON "&INPUT_DIR;/python">
@@ -251,6 +253,51 @@
     <output>
       <stat>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/python/ensemble_stat_PYTHON_20050807_120000V_ens.nc</grid_nc>
+    </output>
+  </test>
+  
+  <!-- Invokes Python script to read point data  -->
+  <test name="python_ascii2nc">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      &OUTPUT_DIR;/python/ascii2nc_python.nc \
+      -format python
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_python.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to read point data  -->
+  <test name="python_ascii2nc_pickle">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <env>
+       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      &OUTPUT_DIR;/python/ascii2nc_pickle.nc \
+      -format python
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/python/ascii2nc_pickle.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to read NUMPY text data -->
+  <test name="python_numpy_plot_data_plane_pickle">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter.ps \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled plot_data_plane" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter.ps</ps>
     </output>
   </test>
 

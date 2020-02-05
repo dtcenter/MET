@@ -22,6 +22,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "string_array.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class Wchar_Argv {
 
    private:
@@ -53,6 +59,8 @@ class Wchar_Argv {
 
       void set(int _argc, char ** _argv);
 
+      void set(const StringArray &);
+
          //
          //  get stuff
          //
@@ -83,5 +91,4 @@ inline wchar_t ** Wchar_Argv::wargv() const { return ( W_Argv ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

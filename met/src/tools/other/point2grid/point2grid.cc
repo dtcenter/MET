@@ -1096,7 +1096,6 @@ void write_nc_int(const DataPlane &dp, const Grid &grid,
 void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
-   double dmin, dmax;
    ConcatString vname;
    unixtime valid_time = 0;
    int global_attr_count;
@@ -1163,14 +1162,12 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
-         fr_dp.data_range(dmin, dmax);
-         mlog << Debug(2)
-              << "Range of input data (" << FieldSA[i] << ") is "
-              << dmin << " to " << dmax << ".\n";
-         to_dp.data_range(dmin, dmax);
-         mlog << Debug(2)
-              << "Range of regridded data (" << FieldSA[i] << ") is "
-              << dmin << " to " << dmax << ".\n";
+         double fr_dmin, fr_dmax, to_dmin, to_dmax;
+         fr_dp.data_range(fr_dmin, fr_dmax);
+         to_dp.data_range(to_dmin, to_dmax);
+         mlog << Debug(2) << "Range of data (" << FieldSA[i] << ")\n"
+              << "\tinput: " << fr_dmin << " to " << fr_dmax
+              << "\tregridded: " << to_dmin << " to " << to_dmax << ".\n";
       }
 
       // Select output variable name
@@ -1811,9 +1808,8 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                    << " for " << GET_NC_NAME(var_adp) << ") but does not exist.\n";
       }
    }
-   mlog << Debug(5) << method_name << " is_dust: "  << is_dust_only
-        << ", is_smoke: " << is_smoke_only
-        << "\n";
+   mlog << Debug(5) << method_name << " is_dust: " << is_dust_only
+        << ", is_smoke: " << is_smoke_only << "\n";
 
    //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
@@ -1841,6 +1837,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int absent_count = 0;
    int censored_count = 0;
    int missing_count = 0;
+   int to_cell_count = 0;
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
@@ -1929,9 +1926,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   if (0 == data_count % 2)
                      to_value = (to_value + dataArray[(data_count/2)+1])/2;
                }
-               else to_value = dataArray.sum() / data_count;
+               else to_value = dataArray.sum() / data_count;    // UW_Mean
 
                to_dp.set(to_value, xIdx, yIdx);
+               to_cell_count++;
                mlog << Debug(9) << method_name
                     <<   "max: " << dataArray.max()
                     << ", min: " << dataArray.min()
@@ -1949,13 +1947,17 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
-   mlog << Debug(4) << method_name << " Count: missing: "
-        << missing_count << ", non_missing: " << non_missing_count
-        << ",  Filtered: by QC: " << qc_filtered_count
+   mlog << Debug(4) << method_name << " Count: actual: " << to_cell_count
+        << ", missing: " << missing_count << ", non_missing: " << non_missing_count
+        << "\n\tFiltered: by QC: " << qc_filtered_count
         << ", by adp QC: " << adp_qc_filtered_count
         << ", by absent: " << absent_count
+        << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
         << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
         << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
+
+   if (to_cell_count == 0)
+      mlog << Warning << method_name << " No valid data\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

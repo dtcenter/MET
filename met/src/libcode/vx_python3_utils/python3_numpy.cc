@@ -156,8 +156,8 @@ int Python3_Numpy::dim(int k) const
 
 if ( (k < 0) || (k >= N_Dims) )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::dim(int) -> range check error!\n\n";
+   mlog << Error << "\nPython3_Numpy::dim(int) -> "
+        << "range check error!\n\n";
 
    exit ( 1 );
 
@@ -178,8 +178,8 @@ void Python3_Numpy::set_name(const char * _name)
 
 if ( empty(_name) )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set_name(const char *) -> empty string!\n\n";
+   mlog << Error << "\nPython3_Numpy::set_name(const char *) -> "
+        << "empty string!\n\n";
 
    exit ( 1 );
 
@@ -217,8 +217,7 @@ PyObject * obj = script.lookup(_name);
 
 if ( ! obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error << "\nPython3_Numpy::set(Python3_Script &, const char *) -> "
         << "variable named \"" << _name << "\" not found in script \""
         << script.filename() << "\"\n\n";
 
@@ -246,8 +245,8 @@ clear();
 
 if ( ! obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(PyObject *) -> null object!\n\n";
+   mlog << Error << "\nPython3_Numpy::set(PyObject *) -> "
+        << "null object!\n\n";
 
    exit ( 1 );
 
@@ -286,21 +285,14 @@ for (j=0; j<N_Dims; ++j)  N_Data *= Dim[j];
 
 Data_Obj = PyObject_GetAttrString (Object, "data");
 
-// PyTypeObject * type = (PyTypeObject *) PyObject_Type (Data_Obj);
-
-// (void) PyObject_Print((PyObject *) type, stdout, Py_PRINT_RAW);
-
-
-
 if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
-   mlog << Error
-        << "  buffer interface not supported\n\n";
+   mlog << Error << "\nPython3_Numpy::set(PyObject *)-> "
+        << "buffer interface not supported\n\n";
 
    exit ( 1 );
 
 }
-
 
    //
    //  PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS
@@ -311,7 +303,7 @@ if ( !PyObject_CheckBuffer(Data_Obj) )  {
 
 if ( PyObject_GetBuffer(Data_Obj, &View, PyBUF_SIMPLE | PyBUF_C_CONTIGUOUS) < 0 )  {
 
-   mlog << Error
+   mlog << Error << "\nPython3_Numpy::set(PyObject *)-> "
         << "failed to get buffer\n\n";
 
    exit ( 1 );
@@ -322,61 +314,15 @@ Buffer = View.buf;
 
 Item_Size = (long) (View.itemsize);
 
-// cout << "\n\n  item_size = " << item_size() << "\n\n" << flush;
-
-   //
-   //  loop through the elements of the list and print them out
-   //
-   //    ... seems to be row-major order
-   //
-
-// pp = (const long *) (Buffer);
-// pp = (double *)     (Buffer);
-
-/*
-long * pp = (long *)   (Buffer);
-
-for (j=0; j<N_Data; ++j)  {
-
-   // cout << "j = " << j << " ... value = " << pp[j] << "\n";
-
-}
-*/
-
-// cout << "\n\n  data type = " << (View.typestr) << "\n\n";
-
-
-
-
    //
    //  get the data type
    //
-
-/*
-ConcatString command;
-ConcatString a;
-
-command << junk_var_name << " = " << Name << ".dtype.str";
-
-Script->run(command);
-
-PyObject * dtype_obj = Script->lookup(junk_var_name);
-
-// cout << "\n\n  dtype = \"" << dtype_obj << "\"\n\n";
-
-// cout << "\n\n  Unicode = " << PyUnicode_Check(dtype_obj) << "\n\n";
-
-Dtype = PyUnicode_AsUTF8(dtype_obj);
-*/
-// cout << "\n\n   Dtype = \"" << Dtype << "\"\n\n";
-
 
 PyObject * dtype_obj = get_attribute(Object, "dtype");
 
 if ( ! dtype_obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error << "\nPython3_Numpy::set(PyObject *) -> "
         << "can't get numpy dtype attribute!\n\n";
 
    exit ( 1 );
@@ -387,8 +333,7 @@ PyObject * dtype_str_obj = get_attribute(dtype_obj, "str");
 
 if ( ! dtype_str_obj )  {
 
-   mlog << Error
-        << "\n\n  Python3_Numpy::set(Python3_Script &, const char *) -> "
+   mlog << Error << "\nPython3_Numpy::set(PyObject *) -> "
         << "can't get numpy dtype attribute string!\n\n";
 
    exit ( 1 );
@@ -396,8 +341,6 @@ if ( ! dtype_str_obj )  {
 }
 
 Dtype = PyUnicode_AsUTF8(dtype_str_obj);
-
-
 
    //
    //  done
@@ -409,8 +352,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 

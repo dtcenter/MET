@@ -28,7 +28,7 @@ extern "C" {
 
 static const char user_python_path_env [] = "MET_PYTHON_EXE";
 
-static const char wrappers_dir         [] = "../share/met/wrappers";     //  relative to MET_BASE
+static const char wrappers_dir         [] = "MET_BASE/wrappers";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -67,11 +67,6 @@ extern ConcatString pyobject_as_concat_string (PyObject *);
 extern void run_python_string(const char *);
 
 
-extern void add_to_python_path(const char * directory_path);
-
-extern void setup_python_path();
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -79,5 +74,4 @@ extern void setup_python_path();
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

@@ -322,3 +322,219 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Code for class ERPSInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+ERPSInfo::ERPSInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ERPSInfo::~ERPSInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ERPSInfo::ERPSInfo(const ERPSInfo &c) {
+
+   init_from_scratch();
+
+   assign(c);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ERPSInfo & ERPSInfo::operator=(const ERPSInfo &c) {
+
+   if(this == &c) return(*this);
+
+   assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ERPSInfo & ERPSInfo::operator+=(const ERPSInfo &c) {
+   ERPSInfo r_info;
+
+   if(n_ens != c.n_ens) {
+      mlog << Error << "\nERPSInfo::operator+=() -> "
+           << "the ensemble size must remain constant (" << n_ens
+           << " != " << c.n_ens << ")!\n\n";
+      exit(1);
+   }
+
+   r_info.fthresh = fthresh;
+   r_info.othresh = othresh;
+   r_info.n_ens   = n_ens;
+   r_info.n_pair  = n_pair + c.n_pair;
+
+   if(r_info.n_pair > 0) {
+
+      // Aggregate RPS as a weighted average
+      r_info.rps = (rps*n_pair + c.rps*c.n_pair) / r_info.n_pair;
+
+      // Compute RPSS with external climatology
+      if(!is_bad_data(rpscl) && !is_bad_data(c.rpscl)) {
+         r_info.rpscl = (rpscl*n_pair + c.rpscl*c.n_pair) / r_info.n_pair;
+         r_info.rpss  = (!is_eq(rpscl, 0.0) ?
+                         1.0 - (r_info.rps / r_info.rpscl) :
+                         bad_data_double);
+      }
+      else {
+         r_info.rpscl = bad_data_double;
+         r_info.rpss  = bad_data_double;
+      }
+
+      // The RPS components cannot be aggregated as a weighted average
+      r_info.rps_rel   = bad_data_double;
+      r_info.rps_res   = bad_data_double;
+      r_info.rps_unc   = bad_data_double;
+      r_info.rpss_smpl = bad_data_double;
+   }
+
+   assign(r_info);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ERPSInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ERPSInfo::clear() {
+
+   othresh.clear();
+   n_ens     = n_pair  = 0;
+   rps_rel   = rps_res = rps_unc = bad_data_double;
+   rps       = rpscl   = rpss    = bad_data_double;
+   rpss_smpl = bad_data_double;
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ERPSInfo::assign(const ERPSInfo &c) {
+
+   fthresh   = c.fthresh;
+   othresh   = c.othresh;
+
+   n_ens     = c.n_ens;
+   n_pair    = c.n_pair;
+
+   rps_rel   = c.rps_rel;
+   rps_res   = c.rps_res;
+   rps_unc   = c.rps_unc;
+
+   rps       = c.rps;
+   rpscl     = c.rpscl;
+   rpss      = c.rpss;
+
+   rpss_smpl = c.rpss_smpl;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ERPSInfo::set(const PairDataEnsemble &pd) {
+   int i, j, k, n_event;
+   double p;
+   bool cmn_flag;
+   NumArray p_thresh, climo_prob;
+
+   // Store the dimensions
+   n_ens  = pd.n_ens;
+   n_pair = pd.n_pair;
+
+   // Check RPS threshold formatting: monotonically increasing
+   fthresh.check_bin_thresh();
+
+   // Flag to process climo
+   cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
+
+   // Setup probability thresholds, equally spaced by ensemble size
+   for(i=0; i<=n_ens; i++) p_thresh.add((double) i/n_ens);
+
+   // Setup forecast probabilistic contingency table
+   Nx2ContingencyTable fcst_pct;
+   fcst_pct.set_size(n_ens);
+   fcst_pct.set_thresholds(p_thresh.vals());
+
+   // Setup climatology probabilistic contingency table
+   Nx2ContingencyTable climo_pct;
+   climo_pct.set_size(n_ens);
+   climo_pct.set_thresholds(p_thresh.vals());
+
+   // Initialize
+   rps_rel = rps_res = rps_unc = 0.0;
+   rps     = rpscl   = 0.0;
+
+   // Loop over the fthresh entries and populate PCT tables for each
+   for(i=0; i<fthresh.n(); i++) {
+
+      // Initialize PCT counts
+      fcst_pct.zero_out();
+      climo_pct.zero_out();
+
+      // Derive climatological probabilities
+      if(cmn_flag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+                                                  fthresh[i]);
+
+      // Loop over the observations
+      for(j=0; j<pd.n_obs; j++) {
+
+         // Loop over ensemble members and count events
+         for(k=0, n_event=0; k<n_ens; k++) {
+            if(fthresh[i].check(pd.e_na[k][j])) n_event++;
+         }
+
+         // Update the forecast PCT counts
+         p = (double) n_event/n_ens;
+         if(fthresh[i].check(pd.o_na[j])) fcst_pct.inc_event(p);
+         else                             fcst_pct.inc_nonevent(p);
+
+         // Update the climatology PCT counts
+         if(cmn_flag) {
+            p = climo_prob[j];
+            if(fthresh[i].check(pd.o_na[j])) climo_pct.inc_event(p);
+            else                             climo_pct.inc_nonevent(p);
+         }
+      } // end for j
+
+      // Increment sums
+      rps_rel   += fcst_pct.reliability() / fthresh.n();
+      rps_res   += fcst_pct.resolution()  / fthresh.n();
+      rps_unc   += fcst_pct.uncertainty() / fthresh.n();
+      rps       += fcst_pct.brier_score() / fthresh.n();
+      if(cmn_flag) rpscl += climo_pct.brier_score() / fthresh.n();
+
+   } // end for i
+   
+   // Compute RPSS with sample climatology
+   rpss_smpl = (!is_eq(rps_unc, 0.0) ?
+               (rps_res - rps_rel) / rps_unc :
+               bad_data_double);
+
+   // Compute RPSS with external climatology
+   rpss      = (cmn_flag && !is_eq(rpscl, 0.0) ?
+                1.0 - (rps / rpscl) :
+                bad_data_double);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

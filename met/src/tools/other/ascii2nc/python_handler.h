@@ -47,7 +47,7 @@ class PythonHandler : public FileHandler
 
       bool isFileType(LineDataFile &ascii_file) const;
   
-      static string getFormatString() { return "PYTHON"; }
+      static string getFormatString() { return "python"; }
 
 
       bool use_pickle;

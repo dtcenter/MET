@@ -153,7 +153,7 @@ bool MetPythonDataFile::open(const char * cur_command)
 
 close();
 
-ConcatString full_path, path_name, file_name;
+ConcatString full_path, file_name;
 int i, file_argc;
 char **file_argv = (char **) 0; // allocated
 StringArray sa;
@@ -187,16 +187,7 @@ if ( file_argc > 0 )  {
 
 full_path = sa[0];
 
-sa = full_path.split("/");
-
-if ( sa.n_elements() <= 1 )  {
-   path_name = ".";
-}
-else {
-   for ( i=0; i<sa.n_elements()-1; i++ )  path_name << "/" << sa[i];
-}
-
-file_name = sa[sa.n_elements() - 1];
+file_name = full_path;
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
@@ -500,3 +491,4 @@ return ( 0 );
 
 
 ////////////////////////////////////////////////////////////////////////
+

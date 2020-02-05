@@ -17,7 +17,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern ConcatString make_temp_file_name(const char *, const char *);
+extern ConcatString make_temp_file_name(const char * prefix, const char * suffix);
 
 extern void         remove_temp_file(const ConcatString);
 

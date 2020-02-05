@@ -1,20 +1,9 @@
+##
+##  When MET_PYTHON_EXE is not defined, this script initializes
+##  MET's python runtime environment.
+##
 
-
-################################################
-
-
+import os
 import sys
-
-
-################################################
-
-
-print('old args start')
-print(sys.argv)
-print('old args finish')
-
-
-################################################
-
-
-
+import numpy as np
+import pickle

@@ -112,4 +112,3 @@ inline GrdFileType MetPythonDataFile::file_type ()                const { return
 
 ////////////////////////////////////////////////////////////////////////
 
-

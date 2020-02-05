@@ -29,11 +29,11 @@ using namespace std;
 static const char generic_python_wrapper [] = "generic_python";
 static const char generic_pickle_wrapper [] = "generic_pickle";
 
-static const char write_pickle_wrapper   [] = "point_write_pickle.py";   //  relative to wrappers_dir
+static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
 
 static const char list_name              [] = "point_data";
 
-static const char pickle_output_filename [] = "out.pickle";
+static const char pickle_base_name       [] = "tmp_ascii2nc_pickle";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -130,8 +130,8 @@ bool PythonHandler::_readObservations(LineDataFile &ascii_file)
 
 {
 
-mlog << Error
-     << "\n\n  bool PythonHandler::_readObservations(LineDataFile &) -> should never be called!\n\n";
+mlog << Error << "\nbool PythonHandler::_readObservations(LineDataFile &) -> "
+     << "should never be called!\n\n";
 
 exit ( 1 );
 
@@ -150,8 +150,8 @@ void PythonHandler::load_python_obs(PyObject * obj)
 
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::load_python_obs(PyObject *) -> given object not a list!\n\n";
+   mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
+        << "given object not a list!\n\n";
 
    exit ( 1 );
 
@@ -168,8 +168,8 @@ for (j=0; j<(list.size()); ++j)  {
 
    if ( ! PyList_Check(obj) )  {
 
-      mlog << Error
-           << "\n\n  PythonHandler::load_python_obs(PyObject *) -> non-list object found in main list!\n\n";
+      mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
+           << "non-list object found in main list!\n\n";
 
       exit ( 1 );
 
@@ -180,8 +180,6 @@ for (j=0; j<(list.size()); ++j)  {
    _addObservations(obs);
 
 }   //  for j
-
-
 
    //
    //  done
@@ -219,20 +217,18 @@ bool PythonHandler::do_straight()
 ConcatString command;
 ConcatString short_user_name;
 ConcatString path;
-const char * mbb = getenv ("MET_BUILD_BASE");
-
-
-// path << cs_erase
-//      << mbb << '/'
-//      << wrappers_dir << '/'
-//      << generic_python_wrapper;
-
-// path << ".py";
-
 
 path = generic_python_wrapper;
 
-short_user_name = user_script_filename;
+char user_dir  [PATH_MAX];
+char user_base [PATH_MAX];
+
+mlog << Debug(3) << "Running user's python script ("
+     << user_script_filename << ").\n";
+
+split_path(user_script_filename.text(), user_dir, user_base);
+
+short_user_name = user_base;
 
 short_user_name.chomp(".py");
 
@@ -242,8 +238,6 @@ short_user_name.chomp(".py");
 
 Python3_Script script(path.text());
 
-// cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
-
    //
    //  set up a "new" sys.argv list
    //     with the command-line arquments for
@@ -252,7 +246,7 @@ Python3_Script script(path.text());
 
 if ( user_script_args.n() > 0 )  {
 
-   script.reset_argv(short_user_name.text(), user_script_args);
+   script.reset_argv(user_script_filename.text(), user_script_args);
 
 }
 
@@ -261,6 +255,18 @@ if ( user_script_args.n() > 0 )  {
    //
 
 PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
+
+if ( PyErr_Occurred() )  {
+
+   PyErr_Print();
+
+   mlog << Warning << "\nPythonHandler::do_straight() -> "
+        << "an error occurred importing module "
+        << '\"' << short_user_name.text() << "\"\n\n";
+
+   return ( false );
+
+}
 
    //
    //  get the dictionary (ie, namespace)
@@ -275,8 +281,6 @@ Python3_Dict md (m);
    //
 
 PyObject * obj = md.lookup_list(list_name);
-
-// cout << "obj = \"" << obj << "\"\n" << flush;
 
    //
    //  load the obs
@@ -304,23 +308,30 @@ bool PythonHandler::do_pickle()
 int j;
 const int N = user_script_args.n();
 ConcatString command;
+ConcatString path;
+ConcatString pickle_path;
+const char * tmp_dir = 0;
 int status;
-const char * mbb = getenv("MET_BUILD_BASE");
 
+mlog << Debug(3) << "Calling " << user_path_to_python
+     << " to run user's python script (" << user_script_filename
+     << ").\n";
 
-if ( ! mbb )  {
+tmp_dir = getenv ("MET_TMP_DIR");
 
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> can't get environment variable "
-        << "MET_BUILD_BASE\n\n";
+if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
-}
+path << cs_erase
+     << tmp_dir << '/'
+     << pickle_base_name;
+
+pickle_path = make_temp_file_name(path.text(), 0);
 
 command << cs_erase
-        << user_path_to_python    << ' '
-        << mbb << '/' << wrappers_dir << '/' << write_pickle_wrapper << ' '
-        << pickle_output_filename << ' '
-        << user_script_filename;
+        << user_path_to_python                << ' '    //  user's path to python             
+        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
+        << pickle_path                        << ' '    //  pickle output filename
+        << user_script_filename;                        //  user's script name
 
 for (j=0; j<N; ++j)  {
 
@@ -328,47 +339,44 @@ for (j=0; j<N; ++j)  {
 
 };
 
-
-// cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
-
-// exit ( 1 );
-
 status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> command \"" << command.text() << "\" failed ... status = " << status << "\n\n";
+   mlog << Error << "\nPythonHandler::do_pickle() -> "
+        << "command \"" << command.text() << "\" failed ... status = "
+        << status << "\n\n";
 
    exit ( 1 );
 
-
 }
 
-ConcatString generic;
+ConcatString wrapper;
 
-// generic << cs_erase << mbb << '/' << wrappers_dir << '/' << generic_pickle_wrapper << ".py";
+wrapper = generic_pickle_wrapper;
 
-generic = generic_pickle_wrapper;
+Python3_Script script(wrapper.text());
 
-Python3_Script script(generic.text());
-
-script.read_pickle(list_name, pickle_output_filename);
+script.read_pickle(list_name, pickle_path.text());
 
 PyObject * obj = script.lookup(list_name);
 
-// cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
-
 if ( ! PyList_Check(obj) )  {
 
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> pickle object is not a list!\n\n";
+   mlog << Error << "\nPythonHandler::do_pickle() -> "
+        << "pickle object is not a list!\n\n";
 
    exit ( 1 );
 
 }
 
 load_python_obs(obj);
+
+   //
+   //  cleanup
+   //
+
+remove_temp_file(pickle_path);
 
    //
    //  done

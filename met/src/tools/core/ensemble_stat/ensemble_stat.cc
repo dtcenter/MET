@@ -56,6 +56,7 @@
 //                    of python embedding.
 //   028    12/17/19  Halley Gotway  Apply climatology bins to ensemble
 //                    continuous statistics.
+//   029    01/21/20  Halley Gotway  Add ERPS output line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,13 +114,16 @@ static void process_grid_scores   (int,
 static void do_ecnt              (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
+static void do_erps              (const EnsembleStatVxOpt &,
+                                  const SingleThresh &,
+                                  const PairDataEnsemble *);
 
 static void clear_counts();
 static void track_counts(int, const DataPlane &);
 
 static ConcatString get_ens_mn_var_name(int);
 
-static void setup_nc_file   (unixtime, int, const char *);
+static void setup_nc_file   (unixtime, const char *);
 static void setup_txt_files ();
 static void setup_table     (AsciiTable &);
 
@@ -752,6 +756,7 @@ void process_ensemble() {
    int i, j;
    bool reset;
    DataPlane ens_dp;
+   unixtime max_init_ut = bad_data_ll;
 
    // Loop through each of the ensemble fields to be processed
    for(i=0; i<conf_info.get_n_ens_var(); i++) {
@@ -771,8 +776,9 @@ void process_ensemble() {
                             conf_info.ens_info[i], ens_dp, true)) continue;
 
          // Create a NetCDF file to store the ensemble output
-         if(nc_out == (NcFile *) 0)
-            setup_nc_file(ens_dp.valid(), ens_dp.lead(), "_ens.nc");
+         if(nc_out == (NcFile *) 0) {
+            setup_nc_file(ens_dp.valid(), "_ens.nc");
+         }
 
          // Reset the running sums and counts
          if(reset) {
@@ -783,9 +789,15 @@ void process_ensemble() {
          // Apply current data to the running sums and counts
          track_counts(i, ens_dp);
 
+         // Keep track of the maximum initialization time
+         if(is_bad_data(max_init_ut) || ens_dp.init() > max_init_ut) {
+            max_init_ut = ens_dp.init();
+         }
+
       } // end for j
 
       // Write out the ensemble information to a NetCDF file
+      ens_dp.set_init(max_init_ut);
       write_ens_nc(i, ens_dp);
 
       // Store the ensemble mean output file
@@ -1218,7 +1230,7 @@ void process_point_scores() {
    setup_txt_files();
 
    // Store the forecast lead time
-   shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
+   shc.set_fcst_lead_sec(nint(ens_lead_na.min()));
 
    // Store the forecast valid time
    shc.set_fcst_valid_beg(ens_valid_ut);
@@ -1311,6 +1323,12 @@ void process_point_scores() {
                   // Compute ECNT scores
                   if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
                      do_ecnt(conf_info.vx_opt[i],
+                             conf_info.vx_opt[i].othr_ta[m], &pd);
+                  }
+
+                  // Compute RPS scores
+                  if(conf_info.output_flag[i_erps] != STATOutputType_None) {
+                     do_erps(conf_info.vx_opt[i],
                              conf_info.vx_opt[i].othr_ta[m], &pd);
                   }
 
@@ -1432,7 +1450,7 @@ void process_grid_vx() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(nint(ens_lead_na.mode()));
+      shc.set_fcst_lead_sec(nint(ens_lead_na.min()));
 
       // Set the forecast valid time
       shc.set_fcst_valid_beg(ens_valid_ut);
@@ -1543,8 +1561,7 @@ void process_grid_vx() {
       // the verification matched pairs
       if(conf_info.nc_info.do_orank &&
          nc_out == (NcFile *) 0)
-         setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
-                       "_orank.nc");
+         setup_nc_file(fcst_dp[j].valid(), "_orank.nc");
 
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n(); j++) {
@@ -1562,7 +1579,7 @@ void process_grid_vx() {
       if(n_miss == grid_obs_file_list.n()) {
          mlog << Warning << "\nprocess_grid_vx() -> "
               << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
-              << " not found in observation files.\n";
+              << " not found in observation files.\n\n";
          continue;
       }
 
@@ -1635,7 +1652,7 @@ void process_grid_vx() {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
                  << mthd_str << " smoothing option not supported for "
-                 << "gridded observations.\n";
+                 << "gridded observations.\n\n";
             continue;
          }
 
@@ -1753,11 +1770,18 @@ void process_grid_vx() {
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
-               if(i == 0) setup_txt_files();
+               // Create output text files as requested in the config file
+               setup_txt_files();
 
                // Compute ECNT scores
                if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
                   do_ecnt(conf_info.vx_opt[i],
+                          conf_info.vx_opt[i].othr_ta[l], &pd);
+               }
+
+               // Compute RPS scores
+               if(conf_info.output_flag[i_erps] != STATOutputType_None) {
+                  do_erps(conf_info.vx_opt[i],
                           conf_info.vx_opt[i].othr_ta[l], &pd);
                }
 
@@ -2006,6 +2030,42 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
+void do_erps(const EnsembleStatVxOpt &vx_opt,
+             const SingleThresh &othresh,
+             const PairDataEnsemble *pd_ptr) {    
+   ERPSInfo erps_info;
+
+   // Check for valid pointer
+   if(!pd_ptr) return;
+
+   // Store observation filering threshold
+   erps_info.othresh = othresh;
+   erps_info.fthresh = vx_opt.rps_ta;
+
+   // If rps_thresh is empty and climo data is available, use climo_cdf
+   // thresholds instead
+   if(erps_info.fthresh.n()    == 0 &&
+      pd_ptr->cmn_na.n_valid() > 0 &&
+      pd_ptr->csd_na.n_valid() > 0) {
+      erps_info.fthresh = vx_opt.cdf_info.cdf_ta;
+   }  
+
+   // Compute ensemble RPS statistics
+   erps_info.set(*pd_ptr);
+
+   // Write out ERPS
+   if(vx_opt.output_flag[i_erps] != STATOutputType_None &&
+      erps_info.n_pair > 0) {
+      write_erps_row(shc, erps_info, vx_opt.output_flag[i_erps],
+                     stat_at, i_stat_row,
+                     txt_at[i_erps], i_txt_row[i_erps]);
+   }
+
+   return;    
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void clear_counts() {
    int i, j, k;
 
@@ -2144,7 +2204,7 @@ ConcatString get_ens_mn_var_name(int i_vx) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
+void setup_nc_file(unixtime valid_ut, const char *suffix) {
    ConcatString out_nc_file;
 
    // Create output NetCDF file name

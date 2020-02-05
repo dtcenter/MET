@@ -41,6 +41,7 @@
 //   013    09-21-15  Prestopnik     Add Aeronet observations.
 //   014    07-23-18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   015    03-20-19  Fillmore       Add aeronetv2 and aeronetv3 options.
+//   016    01-30-20  Bullock        Add python option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -263,7 +264,9 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
 
 {
 
+#ifdef ENABLE_PYTHON
 PythonHandler * ph = 0;
+#endif
 
    //
    // If the ASCII format was specified, just create the appropriate
@@ -298,14 +301,12 @@ PythonHandler * ph = 0;
          handler->setFormatVersion(3);
          return((FileHandler *) handler);
       }
-
+#ifdef ENABLE_PYTHON
       case ASCIIFormat_Python: {
-
          ph = new PythonHandler(program_name, ascii_filename.text());
-
-         return ( (FileHandler *) ph );
-
+         return((FileHandler *) ph);
       }
+#endif
 
       default: {
         return(determine_ascii_format(ascii_filename));
@@ -444,8 +445,14 @@ void usage() {
         << SurfradHandler::getFormatString() << "\", \""
         << WwsisHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString_v2() << "\", or \""
-        << AeronetHandler::getFormatString_v3() << "\" (optional).\n"
+        << AeronetHandler::getFormatString_v2() << "\", \""
+        << AeronetHandler::getFormatString_v3() << "\"";
+
+   #ifdef ENABLE_PYTHON
+   cout << ", \"" << PythonHandler::getFormatString() << "\"";
+   #endif
+
+   cout << " (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -515,9 +522,11 @@ void set_format(const StringArray & a) {
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v3;
    }
+#ifdef ENABLE_PYTHON
    else if(PythonHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat_Python;
    }
+#endif
    else {
       mlog << Error << "\nset_format() -> "
            << "unsupported ASCII observation format \""
