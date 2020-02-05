@@ -87,10 +87,6 @@ extern void write_tc_data_rev(NcFile*, const TcrmwGrid&,
 extern void write_tc_azi_mean_data(NcFile*, const TcrmwGrid&,
     const int&, const NcVar&, const double*);
 
-extern void compute_tc_heights(NcFile*, const TcrmwGrid&,
-    set<string>, set<float>, map<float, int>,
-    const double*, const double*, const double*);
-
 extern void write_tc_pressure_level_data(NcFile*, const TcrmwGrid&,
     map<string, int>, const string&,
     const int&, const NcVar&, const double*);

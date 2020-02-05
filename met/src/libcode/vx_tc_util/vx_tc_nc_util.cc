@@ -556,47 +556,6 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void compute_tc_heights(
-    NcFile* nc_out, const TcrmwGrid& grid,
-    set<string> pressure_level_strings,
-    set<float> pressure_levels,
-    map<float, int> pressure_level_indices,
-    const double* surface_pressure,
-    const double* temperature,
-    const double* relative_humidity) {
-
-    double* height_field = new double[
-        grid.range_n() * grid.azimuth_n()];
-
-    int nlev = pressure_level_strings.size();
-    double* pressure = new double[nlev];
-    double* tmp = new double[nlev];
-    double* rh = new double[nlev];
-    double* height = new double[nlev];
-
-    for(int ir = 0; ir < grid.range_n(); ir++) {
-        for(int ia = 0; ia < grid.azimuth_n(); ia++) {
-            for (int k = 0; k < nlev; k++) {
-                int j = ir * grid.azimuth_n()+ ia;
-                double ps = surface_pressure[j];
-                int i = ir * grid.azimuth_n() * nlev + ia * nlev + k;
-                tmp[k] = temperature[i];
-                rh[k] = relative_humidity[i];
-                height_from_pressure(nlev, surface_pressure,
-                    temperature, pressure, height);
-            }
-        }
-    }
-
-    delete[] height_field;
-    delete[] height;
-    delete[] pressure;
-    delete[] tmp;
-    delete[] rh;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 extern void write_tc_pressure_level_data(
     NcFile* nc_out, const TcrmwGrid& grid,
     map<string, int> pressure_level_indices, const string& level_str,
