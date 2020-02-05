@@ -10,6 +10,22 @@
 //
 
 //
+// Data
+//
+data = {
+    field = [
+      {
+        name = "PRMSL";
+        level = [ "L0" ];
+      },
+      {
+        name = "PRMSL";
+        level = [ "P" ];
+      }
+    ];
+}
+
+//
 // Model
 //
 model = "";
