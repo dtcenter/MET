@@ -438,6 +438,62 @@ StringArray ConcatString::split(const char * delim) const
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString ConcatString::dirname() const
+{
+   ConcatString c;
+
+   // Delete trailing slash, if present
+   c = *this;
+   c.chomp("/");
+
+   // Find last forward slash in the string
+   size_t start = 0;
+   size_t end   = c.s->find_last_of("/");
+
+   // No forward slashes found
+   if (end == string::npos)  {
+      c = ".";
+   }
+   // Copy up to the last forward slash
+   else  {
+      c = c.s->substr(start, end-start);
+   }
+
+   return(c);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString ConcatString::basename() const
+{
+   ConcatString c;
+
+   // Delete trailing slash, if present
+   c = *this;
+   c.chomp("/");
+   
+   // Find last forward slash in the string
+   size_t start = c.s->find_last_of("/");
+   size_t end   = c.s->length();
+
+   // No forward slashes found
+   if (start == string::npos)  {
+      c = c.s->c_str();
+   }
+   // Copy from the last forward slash to the end
+   else  {
+      c = c.s->substr(start+1, end-start);
+   }
+
+   return(c);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ConcatString::ws_strip()
 {
    // This will work with the standard "C" locale.
@@ -495,10 +551,14 @@ int ConcatString::format(const char *fmt, ...)
 }
 
 
+////////////////////////////////////////////////////////////////////////
+
+
 void ConcatString::replace_char(int i, char c)
 {
   s->replace(i, 1, 1, c);
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -107,16 +107,14 @@ PyObject * module_dict_obj = 0;
 PyObject * key_obj         = 0;
 PyObject * numpy_array_obj = 0;
 PyObject * attrs_dict_obj  = 0;
-char user_dir  [PATH_MAX];
-char user_base [PATH_MAX];
-bool need_user_path = false;
+ConcatString cs, user_dir, user_base;
 
 mlog << Debug(3) << "Running user's python script ("
      << user_script_name << ").\n";
 
-split_path(user_script_name, user_dir, user_base);
-
-if ( (strcmp(user_dir, ".") != 0) && (strcmp(user_dir, "/") != 0) )  need_user_path = true;
+cs        = user_script_name;
+user_dir  = cs.dirname();
+user_base = cs.basename();
 
 Wchar_Argv wa;
 
@@ -172,7 +170,7 @@ if ( user_script_argc > 0 )  {
    //  import the python script as a module
    //
 
-module_obj = PyImport_ImportModule (user_base);
+module_obj = PyImport_ImportModule (user_base.c_str());
 
    //
    //  if needed, reload the module

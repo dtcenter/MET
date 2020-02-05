@@ -226,23 +226,16 @@ bool PythonHandler::do_straight()
 
 {
 
-ConcatString command;
-ConcatString short_user_name;
-ConcatString path;
+ConcatString command, path, user_base;
 
 path = generic_python_wrapper;
-
-char user_dir  [PATH_MAX];
-char user_base [PATH_MAX];
 
 mlog << Debug(3) << "Running user's python script ("
      << user_script_filename << ").\n";
 
-split_path(user_script_filename.text(), user_dir, user_base);
+user_base = user_script_filename.basename();
 
-short_user_name = user_base;
-
-short_user_name.chomp(".py");
+user_base.chomp(".py");
 
    //
    //  start up the python interpreter
@@ -266,7 +259,7 @@ if ( user_script_args.n() > 0 )  {
    //  import the user's script as a module
    //
 
-PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
+PyObject * m = PyImport_Import(PyUnicode_FromString(user_base.text()));
 
 if ( PyErr_Occurred() )  {
 
@@ -274,7 +267,7 @@ if ( PyErr_Occurred() )  {
 
    mlog << Warning << "\nPythonHandler::do_straight() -> "
         << "an error occurred importing module "
-        << '\"' << short_user_name.text() << "\"\n\n";
+        << '\"' << user_base.text() << "\"\n\n";
 
    return ( false );
 

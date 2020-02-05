@@ -164,6 +164,10 @@ class ConcatString {
 
       StringArray split(const char * delim) const;
 
+      ConcatString dirname() const;
+
+      ConcatString basename() const;
+
       void set_repeat(char, int count);
 
       void erase();
@@ -186,6 +190,7 @@ class ConcatString {
       int compare(size_t pos, size_t len, std::string str);
       int comparecase(size_t pos, size_t len, std::string str);
       int comparecase(const char *);
+
 };
 
 

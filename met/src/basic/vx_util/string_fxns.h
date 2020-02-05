@@ -60,9 +60,6 @@ extern ConcatString str_trim(const ConcatString str);
 extern int parse_thresh_index(const char *str);
 
 
-extern void split_path(const char * path_in, char * dir_out, char * base_out);
-
-
 ////////////////////////////////////////////////////////////////////////
 
 

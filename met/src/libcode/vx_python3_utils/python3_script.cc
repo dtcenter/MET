@@ -242,23 +242,20 @@ void Python3_Script::reset_argv(const char * script_name, const StringArray & ar
 {
 
 int j;
-ConcatString command;
+ConcatString cs, command;
 const int N = args.n();
 
   //
   //  add the script directory to the system path
   //
 
-char user_dir  [PATH_MAX];
-char user_base [PATH_MAX];
-
-split_path(script_name, user_dir, user_base);
+cs = script_name;
 
 run_python_string("import sys");
 
 command << cs_erase
         << "sys.path.append(\""
-        << user_dir
+        << cs.dirname().c_str()
         << "\")";
 
 run_python_string(command.text());
