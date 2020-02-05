@@ -35,14 +35,22 @@ storm_id = "";
 cyclone = "";
 
 //
-// Model initialization time
+// Initialization model time window
 //
-// init_time = "";
+init_beg = "";
+init_end = "";
 
 //
-// Lead times in hours
+// Valid model time window
 //
-// lead_time = [];
+valid_beg = "";
+valid_end = "";
+
+//
+// lat/lon polylines defining masking regions
+//
+init_mask  = "";
+valid_mask = "";
 
 //
 // Indicate a version number for the contents of this configuration file.
