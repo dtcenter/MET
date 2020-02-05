@@ -1,18 +1,17 @@
-
-
 ##
-##  usage generic_pickle pickle_filename
+##  When MET_PYTHON_EXE is defined, this script initializes the Python
+##  environment for reading the temporary pickle file back into MET.
 ##
 
 import sys
 import numpy as np
 import pickle
 
-pickle_filename = sys.argv[1];
+#
+#  If an argument was provided, load it as a pickle file.
+#
 
-#print ('pickle_filename = ' + pickle_filename)
-
-met_info = pickle.load(open(pickle_filename, "rb"))
-
-
-
+if len(sys.argv) > 1:
+    print('Python Script:\t', sys.argv[0])
+    print('Load Pickle:\t', sys.argv[1])
+    met_info = pickle.load(open(sys.argv[1], "rb"))

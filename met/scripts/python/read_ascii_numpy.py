@@ -6,6 +6,8 @@ import sys
 
 ###########################################
 
+print('Python Script:\t', sys.argv[0])
+
    ##
    ##  input file specified on the command line
    ##  load the data into the numpy array
@@ -17,15 +19,15 @@ if len(sys.argv) == 3:
     data_name  = sys.argv[2]
     try:
         # Print some output to verify that this script ran
-        print("Input File: " + repr(input_file))
-        print("Data Name : " + repr(data_name))
+        print("Input File:\t" + repr(input_file))
+        print("Data Name:\t" + repr(data_name))
         met_data = np.loadtxt(input_file)
-        print("Data Shape: " + repr(met_data.shape))
-        print("Data Type:  " + repr(met_data.dtype))
+        print("Data Shape:\t" + repr(met_data.shape))
+        print("Data Type:\t" + repr(met_data.dtype))
     except NameError:
         print("Can't find the input file")
 else:
-    print("Must specify exactly one input file and a name for the data.")
+    print("ERROR: read_ascii_numpy.py -> Must specify exactly one input file and a name for the data.")
     sys.exit(1)
 
 ###########################################
@@ -72,4 +74,4 @@ attrs = {
 
 }
 
-print("Attributes: " + repr(attrs))
+print("Attributes:\t" + repr(attrs))

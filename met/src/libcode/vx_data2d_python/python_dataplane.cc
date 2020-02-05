@@ -33,9 +33,9 @@ static const char * user_ppath            = 0;
 
 static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle.py";
 
-static const char generic_read_pickle  [] = "generic_pickle";   //  NO ".py" suffix
+static const char generic_pickle       [] = "generic_pickle";   //  NO ".py" suffix
 
-static const char pickle_base_name     [] = "out.pickle";
+static const char pickle_base_name     [] = "tmp_met_pickle";
 
 static const char pickle_var_name      [] = "met_info";
 
@@ -68,9 +68,6 @@ bool python_dataplane(const char * user_script_name,
 {
 
 bool status = false;
-
-
-mlog << Debug(4) << "\n\n  in python_dataplane()\n\n";
 
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_pickle = true;
 
@@ -113,6 +110,9 @@ PyObject * attrs_dict_obj  = 0;
 char user_dir  [PATH_MAX];
 char user_base [PATH_MAX];
 bool need_user_path = false;
+
+mlog << Debug(3) << "Running user's python script ("
+     << user_script_name << ").\n";
 
 split_path(user_script_name, user_dir, user_base);
 
@@ -293,14 +293,13 @@ ConcatString pickle_path;
 const char * tmp_dir = 0;
 Wchar_Argv wa;
 
-
-mlog << Debug(4) << "Running user's python script: "
-     << user_script_name << "\n";
+mlog << Debug(3) << "Calling " << user_ppath
+     << " to run user's python script (" << user_script_name
+     << ").\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 
-if ( ! tmp_dir )   tmp_dir = "/tmp";
-
+if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
@@ -324,9 +323,9 @@ status = system(command.text());
 
 if ( status )  {
 
-   mlog << Error
-        << "\n\n  pickle_dataplane() -> command \""
-        << command.text() << "\" failed!\n\n";
+   mlog << Error << "\npickle_dataplane() -> "
+        << "command \"" << command.text() << "\" failed ... status = "
+        << status << "\n\n";
 
    exit ( 1 );
 
@@ -356,13 +355,16 @@ if ( PyErr_Occurred() )  {
 
 }
 
+mlog << Debug(3) << "Reading temporary pickle file: "
+     << pickle_path << "\n";
+
    //
    //  set the arguments
    //
 
 StringArray a;
 
-a.add(generic_read_pickle);
+a.add(generic_pickle);
 
 a.add(pickle_path);
 
@@ -371,24 +373,10 @@ wa.set(a);
 PySys_SetArgv (wa.wargc(), wa.wargv());
 
    //
-   //  add the wrappers directory to the path
-   //
-
-run_python_string("import os");
-run_python_string("import sys");
-
-command << cs_erase
-        << "sys.path.append(\""
-        << replace_path(wrappers_dir)
-        << "\")";
-
-run_python_string(command.text());
-
-   //
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(generic_read_pickle);
+path = get_short_name(generic_pickle);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
@@ -414,7 +402,6 @@ if ( PyErr_Occurred() )  {
 
 }
 
-
 if ( ! module_obj )  {
 
    mlog << Warning << "\npython_dataplane() -> "
@@ -434,11 +421,11 @@ if ( ! module_obj )  {
 
 PyObject * module_dict_obj = PyModule_GetDict (module_obj);
 
-PyObject * key_obj = PyUnicode_FromString ("met_info");
+PyObject * key_obj = PyUnicode_FromString (pickle_var_name);
 
 PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-if ( ! PyDict_Check(data_obj) )  {
+if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 
    mlog << Error << "\npickle_dataplane() -> "
         << "bad dict object\n\n";
@@ -468,6 +455,12 @@ if ( use_xarray )  {
    dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
 
 }
+
+   //
+   //  cleanup
+   //
+
+remove_temp_file(pickle_path);
 
    //
    //  done

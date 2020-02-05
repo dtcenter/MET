@@ -14,6 +14,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "empty_string.h"
+#include "string_fxns.h"
 
 #include "python3_util.h"
 #include "python3_script.h"
@@ -205,6 +206,9 @@ void Python3_Script::read_pickle(const char * variable, const char * pickle_file
 
 {
 
+mlog << Debug(3) << "Reading temporary pickle file: "
+     << pickle_filename << "\n";
+
 ConcatString command;
 
 command << variable 
@@ -239,15 +243,33 @@ void Python3_Script::reset_argv(const char * script_name, const StringArray & ar
 
 int j;
 ConcatString command;
-ConcatString module_name = script_name;
 const int N = args.n();
 
+  //
+  //  add the script directory to the system path
+  //
 
-module_name.chomp(".py");
+char user_dir  [PATH_MAX];
+char user_base [PATH_MAX];
+
+split_path(script_name, user_dir, user_base);
+
+run_python_string("import sys");
+
+command << cs_erase
+        << "sys.path.append(\""
+        << user_dir
+        << "\")";
+
+run_python_string(command.text());
+
+  //
+  //  set argv
+  //
 
 command = "sys.argv = [ ";
 
-command << sq << module_name << sq << ", ";
+command << sq << script_name << sq << ", ";
 
 for (j=0; j<N; ++j)  {
 

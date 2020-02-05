@@ -1,5 +1,3 @@
-
-
 ################################################
 #
 #    Adapted from a script provided by George McCabe
@@ -13,6 +11,10 @@
 import os
 import sys
 import pickle
+
+print('Python Script:\t', sys.argv[0])
+print('User Command:\t',  sys.argv[2:])
+print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1];
 
@@ -32,7 +34,3 @@ met_info = { 'attrs': met_in.attrs, 'met_data': met_in.met_data }
 print(met_info)
 
 pickle.dump( met_info, open( pickle_filename, "wb" ) )
-
-
-
-

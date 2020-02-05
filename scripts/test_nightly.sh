@@ -42,11 +42,11 @@ SCRIPTS=`dirname $0`
 # Variables required to build MET
 export MET_DEVELOPMENT=true
 export MET_DST=/usr/local
-export MET_NETCDF=${MET_DST}/netcdf
-export MET_HDF5=${MET_DST}/hdf5
-export MET_HDFINC=${MET_DST}/hdf4/include/hdf
-export MET_HDFLIB=${MET_DST}/hdf4/lib
-export MET_HDFEOS=${MET_DST}/hdfeos
+export MET_NETCDF=${MET_DST}/netcdf-4.7.0/gcc-6.3.0
+export MET_HDF5=${MET_DST}/hdf5-1.8.20
+export MET_HDFINC=${MET_DST}/hdf4-4.2.13/include/hdf
+export MET_HDFLIB=${MET_DST}/hdf4-4.2.13/lib
+export MET_HDFEOS=${MET_DST}/hdf-eos2-19v1
 export MET_BUFR=${MET_DST}
 export MET_GRIB2C=${MET_DST}
 export MET_GSLINC=/usr/include/gsl
@@ -60,6 +60,10 @@ export MET_FREETYPELIB=/usr/lib
 export MET_PYTHON=/d3/projects/MET/MET_releases/external_libs/gnu_6.3.0/python-3.7.3
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.7m"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.7m -lcrypt -lpthread -ldl  -lutil -lm  -Xlinker -export-dynamic"
+
+# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
+export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__"
+export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"

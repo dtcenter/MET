@@ -154,7 +154,6 @@ bool MetPythonDataFile::open(const char * cur_command)
 close();
 
 ConcatString full_path, file_name;
-// ConcatString path_name;
 int i, file_argc;
 char **file_argv = (char **) 0; // allocated
 StringArray sa;
