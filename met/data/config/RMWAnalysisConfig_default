@@ -32,7 +32,7 @@ storm_id = "";
 //
 // Cyclone number
 //
-cyclone = -1;
+cyclone = "";
 
 //
 // Model initialization time
@@ -48,4 +48,4 @@ cyclone = -1;
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V8.1";
+version = "V9.0";
