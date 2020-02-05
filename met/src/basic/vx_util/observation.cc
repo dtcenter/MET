@@ -14,6 +14,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_math.h"
+#include "vx_util.h"
 
 #include "observation.h"
 
@@ -100,7 +101,6 @@ void Observation::set(const Python3_List & list)
 
 {
 
-PyObject * a = 0;
 ConcatString c;
 
       ////////////////////////
@@ -117,9 +117,8 @@ c = pyobject_as_concat_string(list[2]);
 
 if ( ! is_yyyymmdd_hhmmss(c.text()) )  {
 
-   mlog << Error
-        << "\n\n  Observation::Observation(const Python3_List) -> bad time string: \""
-        << c << "\"\n\n";
+   mlog << Error << "\nObservation::Observation(const Python3_List) -> "
+        << "bad time string: \"" << c << "\"\n\n";
 
    exit ( 1 );
 
@@ -141,10 +140,20 @@ _elevation   = pyobject_as_double(list[5]);
 
       //////////////////////// 
 
-a = list[6];
+c            = pyobject_as_string(list[6]);
 
-     if ( PyLong_Check    (a) )   varCode = PyLong_AsLong(a);
-else if ( PyUnicode_Check (a) )  _varName = pyobject_as_string(a);
+if ( is_number(c.text()) )  {
+
+    varCode = atoi(c.text());
+   _varName = varCode;
+
+}
+else  {
+
+    varCode = bad_data_int;
+   _varName = c;
+
+}
 
       //////////////////////// 
 

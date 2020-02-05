@@ -162,6 +162,12 @@ PyObject * a = 0;
 Python3_List list(obj);
 Observation obs;
 
+   //
+   //  initialize use_var_id to false
+   //
+
+use_var_id = false;
+
 for (j=0; j<(list.size()); ++j)  {
 
    a = list[j];
@@ -176,6 +182,12 @@ for (j=0; j<(list.size()); ++j)  {
    }
 
    obs.set(a);
+
+   //
+   //  reset use_var_id to true when varCode has bad data
+   //
+
+   if ( is_bad_data (obs.getVarCode()) )  use_var_id = true;
 
    _addObservations(obs);
 
