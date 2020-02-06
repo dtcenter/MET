@@ -293,7 +293,7 @@ Version 9.0 BETA3 Release Notes:
         'gaussian_radius' options while MAXGAUSS computes the maximum over the
         neighborhood prior to applying the Gaussian filter (#1234).
    - ASCII2NC
-      - Enhance ascii2nc to read points observation via python embedding with
+      - Enhance ascii2nc to read point observations via python embedding with
         the new '-format python' command line option (#1122).
    - PB2NC
       - Remove non-printable characters that are included in the output of the
