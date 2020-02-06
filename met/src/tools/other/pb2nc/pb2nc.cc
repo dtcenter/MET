@@ -1311,11 +1311,21 @@ void process_pbfile(int i_pb) {
                obs_arr[2] = pbl_p;
                obs_arr[3] = pbl_h;
                obs_arr[4] = pbl_value - prev_hdr_elv; // observation value
-               mlog << Debug(7) << " hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
-                    << "   lat: " << prev_hdr_lat << ", lon: " << prev_hdr_lon
-                    << ", elv: " << prev_hdr_elv << " valid_time: "
-                    << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
-                    << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
+               if (obs_arr[4] < 0) {
+                  mlog << Warning << " The computed PBL ius less than 0. Reset to 0. pbl_value="
+                       << pbl_value     << ", adjusted PBL: " << obs_arr[4]
+                       << " by elevation " << prev_hdr_elv
+                       << " valid_time: " << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
+                       << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;                       
+                  obs_arr[4] = 0;
+               }
+               else {
+                  mlog << Debug(7) << " hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
+                       << "   lat: " << prev_hdr_lat << ", lon: " << prev_hdr_lon
+                       << ", elv: " << prev_hdr_elv << " valid_time: "
+                       << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
+                       << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
+               }
                if (obs_arr[4] > MAX_PBL) obs_arr[4] = MAX_PBL;
 
                addObservation(obs_arr, (string)prev_hdr_typ, (string)prev_hdr_sid, prev_hdr_vld_ut,
