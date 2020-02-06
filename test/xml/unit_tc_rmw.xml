@@ -4,7 +4,6 @@
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
-
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
