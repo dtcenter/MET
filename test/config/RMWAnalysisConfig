@@ -1,0 +1,70 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Default RMW Analysis configuration file
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Data
+//
+data = {
+    field = [
+      {
+        name = "PRMSL";
+      },
+      {
+        name = "TMP";
+      }
+    ];
+}
+
+level = [ "" ];
+
+//
+// Model
+//
+model = "";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Storm name
+//
+storm_name = "";
+
+//
+// Storm identifier
+//
+storm_id = "";
+
+//
+// Cyclone number
+//
+cyclone = "";
+
+//
+// Initialization model time window
+//
+init_beg = "";
+init_end = "";
+
+//
+// Valid model time window
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// lat/lon polylines defining masking regions
+//
+init_mask  = "";
+valid_mask = "";
+
+//
+// Indicate a version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V9.0";
