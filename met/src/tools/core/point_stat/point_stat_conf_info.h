@@ -46,7 +46,7 @@ static const int i_pjc       = 12;
 static const int i_prc       = 13;
 static const int i_ecnt      = 14;
 
-static const int i_erps      = 15;
+static const int i_rps       = 15;
 static const int i_eclv      = 16;
 static const int i_mpr       = 17;
 static const int i_vcnt      = 18;
@@ -74,7 +74,7 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_prc,    //  13
    stat_ecnt,   //  14
 
-   stat_erps,   //  14
+   stat_rps,    //  14
    stat_eclv,   //  15
    stat_mpr,    //  16
    stat_vcnt,   //  17

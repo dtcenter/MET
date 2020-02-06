@@ -197,7 +197,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE; // Only for HiRA
-   erps   = NONE; // Only for HiRA
+   rps    = NONE; // Only for HiRA
    eclv   = BOTH;
    mpr    = BOTH;
 }

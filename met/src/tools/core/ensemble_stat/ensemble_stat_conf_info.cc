@@ -989,9 +989,9 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    switch(i_txt_row) {
 
       case(i_ecnt):
-      case(i_erps):
+      case(i_rps):
 
-         // Maximum number of ECNT and ERPS lines possible =
+         // Maximum number of ECNT and RPS lines possible =
          //    Point Vx: Message Types * Masks * Interpolations *
          //                              Obs Thresholds * Climo Bins
          //     Grid Vx:                 Masks * Interpolations *

@@ -229,7 +229,7 @@ interp = {
 //
 output_flag = {
    ecnt  = STAT;
-   erps  = NONE;
+   rps   = NONE;
    rhist = NONE;
    phist = NONE;
    orank = NONE;

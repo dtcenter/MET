@@ -257,7 +257,7 @@ Version 9.0 BETA3 Release Notes:
 
 - What's New:
    - Major Enhancements: python embedding with pickle files and in ascii2nc,
-     new ERPS line type
+     new RPS line type
    - New Tools: None
 
 - Bugfixes:
@@ -269,7 +269,7 @@ Version 9.0 BETA3 Release Notes:
    - Fix bug in processing CF Compliant NetCDF valid time stamps (#1238).   
 
 - Changes to Output Formats:
-   - Add new ensemble Ranked Probability Score (ERPS) line type to the output of
+   - Add new ensemble Ranked Probability Score (RPS) line type to the output of
      Ensemble-Stat and Point-Stat (for HiRA) (#681).
 
 - Build Process:

@@ -93,19 +93,19 @@ class ECNTInfo {
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ERPSInfo {
+class RPSInfo {
 
    private:
       void init_from_scratch();
-      void assign(const ERPSInfo &);
+      void assign(const RPSInfo &);
 
    public:
 
-      ERPSInfo();
-      ~ERPSInfo();
-      ERPSInfo(const ERPSInfo &);
-      ERPSInfo & operator=(const ERPSInfo &);
-      ERPSInfo & operator+=(const ERPSInfo &);
+      RPSInfo();
+      ~RPSInfo();
+      RPSInfo(const RPSInfo &);
+      RPSInfo & operator=(const RPSInfo &);
+      RPSInfo & operator+=(const RPSInfo &);
 
       // RPS definition thresholds
       ThreshArray fthresh;
@@ -113,8 +113,12 @@ class ERPSInfo {
       // Observation filtering threshold
       SingleThresh othresh;
 
-      // Number of ensemble members and pairs
-      int n_ens, n_pair;
+      // Number of pairs
+      int n_pair;
+
+      // Number of probability bins for the Nx2 PCT tables.
+      // For ensembles, this is the number of ensemble members.
+      int n_prob;
 
       double rps_rel, rps_res, rps_unc;
       double rps, rpscl, rpss;

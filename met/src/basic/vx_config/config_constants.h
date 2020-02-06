@@ -125,7 +125,7 @@ enum STATLineType {
    stat_isc,
    stat_wdir,
    stat_ecnt,
-   stat_erps,
+   stat_rps,
    stat_rhist,
    stat_phist,
    stat_orank,
@@ -171,7 +171,7 @@ static const char stat_dmap_str[]   = "DMAP";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_ecnt_str[]   = "ECNT";
-static const char stat_erps_str[]    = "ERPS";
+static const char stat_rps_str[]    = "RPS";
 static const char stat_rhist_str[]  = "RHIST";
 static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";

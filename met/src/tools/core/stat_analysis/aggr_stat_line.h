@@ -28,7 +28,7 @@
 //   009    03/01/18  Halley Gotway   Update summary job type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
 //   011    04/01/19  Fillmore        Add FCST and OBS units.
-//   012    01/24/20  Halley Gotway   Add aggregate ERPS lines.
+//   012    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -154,9 +154,9 @@ struct AggrENSInfo {
    NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
 };
 
-struct AggrERPSInfo {
+struct AggrRPSInfo {
    StatHdrInfo hdr;
-   ERPSInfo erps_info;
+   RPSInfo rps_info;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -251,9 +251,9 @@ extern void aggr_ecnt_lines(
                map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
-extern void aggr_erps_lines(
+extern void aggr_rps_lines(
                LineDataFile &, STATAnalysisJob &,
-               map<ConcatString, AggrERPSInfo> &,
+               map<ConcatString, AggrRPSInfo> &,
                int &, int &);
 
 extern void aggr_rhist_lines(

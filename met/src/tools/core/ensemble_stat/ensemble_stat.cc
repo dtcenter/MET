@@ -56,7 +56,7 @@
 //                    of python embedding.
 //   028    12/17/19  Halley Gotway  Apply climatology bins to ensemble
 //                    continuous statistics.
-//   029    01/21/20  Halley Gotway  Add ERPS output line type.
+//   029    01/21/20  Halley Gotway  Add RPS output line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +114,7 @@ static void process_grid_scores   (int,
 static void do_ecnt              (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
-static void do_erps              (const EnsembleStatVxOpt &,
+static void do_rps               (const EnsembleStatVxOpt &,
                                   const SingleThresh &,
                                   const PairDataEnsemble *);
 
@@ -1327,9 +1327,9 @@ void process_point_scores() {
                   }
 
                   // Compute RPS scores
-                  if(conf_info.output_flag[i_erps] != STATOutputType_None) {
-                     do_erps(conf_info.vx_opt[i],
-                             conf_info.vx_opt[i].othr_ta[m], &pd);
+                  if(conf_info.output_flag[i_rps] != STATOutputType_None) {
+                     do_rps(conf_info.vx_opt[i],
+                            conf_info.vx_opt[i].othr_ta[m], &pd);
                   }
 
                   // Write RHIST counts
@@ -1780,8 +1780,8 @@ void process_grid_vx() {
                }
 
                // Compute RPS scores
-               if(conf_info.output_flag[i_erps] != STATOutputType_None) {
-                  do_erps(conf_info.vx_opt[i],
+               if(conf_info.output_flag[i_rps] != STATOutputType_None) {
+                  do_rps(conf_info.vx_opt[i],
                           conf_info.vx_opt[i].othr_ta[l], &pd);
                }
 
@@ -2030,35 +2030,35 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_erps(const EnsembleStatVxOpt &vx_opt,
-             const SingleThresh &othresh,
-             const PairDataEnsemble *pd_ptr) {    
-   ERPSInfo erps_info;
+void do_rps(const EnsembleStatVxOpt &vx_opt,
+            const SingleThresh &othresh,
+            const PairDataEnsemble *pd_ptr) {    
+   RPSInfo rps_info;
 
    // Check for valid pointer
    if(!pd_ptr) return;
 
    // Store observation filering threshold
-   erps_info.othresh = othresh;
-   erps_info.fthresh = vx_opt.rps_ta;
+   rps_info.othresh = othresh;
+   rps_info.fthresh = vx_opt.rps_ta;
 
    // If rps_thresh is empty and climo data is available, use climo_cdf
    // thresholds instead
-   if(erps_info.fthresh.n()    == 0 &&
+   if(rps_info.fthresh.n()    == 0 &&
       pd_ptr->cmn_na.n_valid() > 0 &&
       pd_ptr->csd_na.n_valid() > 0) {
-      erps_info.fthresh = vx_opt.cdf_info.cdf_ta;
+      rps_info.fthresh = vx_opt.cdf_info.cdf_ta;
    }  
 
    // Compute ensemble RPS statistics
-   erps_info.set(*pd_ptr);
+   rps_info.set(*pd_ptr);
 
-   // Write out ERPS
-   if(vx_opt.output_flag[i_erps] != STATOutputType_None &&
-      erps_info.n_pair > 0) {
-      write_erps_row(shc, erps_info, vx_opt.output_flag[i_erps],
-                     stat_at, i_stat_row,
-                     txt_at[i_erps], i_txt_row[i_erps]);
+   // Write out RPS
+   if(vx_opt.output_flag[i_rps] != STATOutputType_None &&
+      rps_info.n_pair > 0) {
+      write_rps_row(shc, rps_info, vx_opt.output_flag[i_rps],
+                    stat_at, i_stat_row,
+                    txt_at[i_rps], i_txt_row[i_rps]);
    }
 
    return;    
