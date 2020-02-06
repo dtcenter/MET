@@ -1310,7 +1310,7 @@ void process_pbfile(int i_pb) {
                obs_arr[1] = pbl_code;
                obs_arr[2] = pbl_p;
                obs_arr[3] = pbl_h;
-               obs_arr[4] = pbl_value - hdr_elv; // observation value
+               obs_arr[4] = pbl_value - prev_hdr_elv; // observation value
                mlog << Debug(7) << " hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
                     << "   lat: " << prev_hdr_lat << ", lon: " << prev_hdr_lon
                     << ", elv: " << prev_hdr_elv << " valid_time: "
@@ -2913,6 +2913,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          else {
             first_pres = it_uv->first;
             prev_pqtzuv = pqtzuv_tq;
+            cur_pqtzuv  = pqtzuv_uv;
             next_pqtzuv = ++it_tq->second;
          }
          interpolate_pqtzuv(prev_pqtzuv, cur_pqtzuv, next_pqtzuv);
