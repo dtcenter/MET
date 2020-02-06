@@ -460,6 +460,15 @@ void ERPSInfo::set(const PairDataEnsemble &pd) {
    n_ens  = pd.n_ens;
    n_pair = pd.n_pair;
 
+   // Check that thresholds are actually defined
+   if(fthresh.n() == 0) {
+      mlog << Error << "\nERPSInfo::set(const PairDataEnsemble &) -> "
+           << "no thresholds provided to compute the ERPS line type! "
+           << "Specify thresholds using the \"" << conf_key_rps_thresh
+           << "\" configuration file option.\n\n";
+      exit(1);
+   }
+
    // Check RPS threshold formatting: monotonically increasing
    fthresh.check_bin_thresh();
 

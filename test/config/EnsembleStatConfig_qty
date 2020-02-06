@@ -184,7 +184,7 @@ interp = {
 //
 output_flag = {
    ecnt  = BOTH;
-   erps  = BOTH;
+   erps  = NONE;
    rhist = BOTH;
    phist = BOTH;
    orank = BOTH;
