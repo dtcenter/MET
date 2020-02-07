@@ -42,6 +42,7 @@ libvx_config_a_SOURCES += \
               object_types.h \
               scanner_stuff.h \
               config_constants.h \
+              config_gaussian.h \
               my_config_scanner.cc \
               vx_config.h
 libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
