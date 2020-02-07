@@ -107,6 +107,10 @@ class RPSInfo {
       RPSInfo & operator=(const RPSInfo &);
       RPSInfo & operator+=(const RPSInfo &);
 
+      // Set forecast thresholds using rps_thresh or climo_cdf thresholds
+      void set_rps_thresh(const ThreshArray &);
+      void set_cdp_thresh(const ThreshArray &);
+
       // RPS definition thresholds
       ThreshArray fthresh;
 

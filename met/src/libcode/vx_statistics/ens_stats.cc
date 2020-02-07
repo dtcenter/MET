@@ -451,6 +451,33 @@ void RPSInfo::assign(const RPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void RPSInfo::set_rps_thresh(const ThreshArray &ta) {
+   fthresh = ta;
+}
+    
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
+   SingleThresh st;
+   fthresh.clear();
+
+   for(int i=0; i<ta.n(); i++) {
+
+      // Skip 0.0 and 1.0
+      if(is_eq(ta[i].get_value(), 0.0) ||
+         is_eq(ta[i].get_value(), 1.0)) continue;
+
+      // Add CDP thresholds
+      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
+
+      fthresh.add(st);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void RPSInfo::set(const PairDataEnsemble &pd) {
    int i, j, k, n_event;
    double p;
@@ -509,20 +536,29 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
 
          // Loop over ensemble members and count events
          for(k=0, n_event=0; k<n_prob; k++) {
-            if(fthresh[i].check(pd.e_na[k][j])) n_event++;
+            if(fthresh[i].check(pd.e_na[k][j], pd.cmn_na[j], pd.csd_na[j])) n_event++;
          }
 
          // Update the forecast PCT counts
          p = (double) n_event/n_prob;
-         if(fthresh[i].check(pd.o_na[j])) fcst_pct.inc_event(p);
-         else                             fcst_pct.inc_nonevent(p);
+         if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+            fcst_pct.inc_event(p);
+         }
+         else {
+            fcst_pct.inc_nonevent(p);
+         }
 
          // Update the climatology PCT counts
          if(cmn_flag) {
             p = climo_prob[j];
-            if(fthresh[i].check(pd.o_na[j])) climo_pct.inc_event(p);
-            else                             climo_pct.inc_nonevent(p);
+            if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+               climo_pct.inc_event(p);
+            }
+            else {
+               climo_pct.inc_nonevent(p);
+            }
          }
+
       } // end for j
 
       // Increment sums
