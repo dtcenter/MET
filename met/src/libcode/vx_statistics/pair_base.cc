@@ -1006,10 +1006,14 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
    n_mn = mn_na.n_valid();
    n_sd = sd_na.n_valid();
 
+   // For CDP threshold types, the climo_prob is constant.
+   if(othresh.get_ptype() == perc_thresh_climo_dist) {
+      climo_prob.add_const(othresh.get_pvalue()/100.0, n_mn);
+   }
    // If both mean and standard deviation were provided, use them to
    // derive normal climatological probabilities for the current event
    // threshold
-   if(n_mn > 0 && n_sd > 0) {
+   else if(n_mn > 0 && n_sd > 0) {
 
       mlog << Debug(2)
            << "Deriving normal approximation of climatological "
