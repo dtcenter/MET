@@ -2040,7 +2040,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // Store observation filering threshold
    rps_info.othresh = othresh;
-   rps_info.fthresh = vx_opt.rps_ta;
+   rps_info.set_rps_thresh(vx_opt.rps_ta);
 
    // If rps_thresh is empty and climo data is available, use climo_cdf
    // thresholds instead
@@ -2048,7 +2048,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
       pd_ptr->cmn_na.n_valid()   > 0 &&
       pd_ptr->csd_na.n_valid()   > 0 &&
       vx_opt.cdf_info.cdf_ta.n() > 0) {
-      rps_info.fthresh = vx_opt.cdf_info.cdf_ta;
+      rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    }  
 
    // Compute ensemble RPS statistics

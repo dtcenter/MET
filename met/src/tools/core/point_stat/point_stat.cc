@@ -1836,7 +1836,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Store ensemble RPS thresholds
          RPSInfo rps_info;
-         rps_info.fthresh = conf_info.vx_opt[i_vx].hira_info.rps_ta;
+         rps_info.set_rps_thresh(conf_info.vx_opt[i_vx].hira_info.rps_ta);
 
          // If rps_thresh is empty and climo data is available,
          // use climo_cdf thresholds instead
@@ -1844,7 +1844,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             hira_pd.cmn_na.n_valid()                   > 0 &&
             hira_pd.csd_na.n_valid()                   > 0 &&
             conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
-            rps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
+            rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
          }
 
          // Check for no thresholds
