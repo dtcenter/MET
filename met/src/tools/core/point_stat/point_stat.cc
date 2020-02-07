@@ -1840,9 +1840,10 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
          // If rps_thresh is empty and climo data is available,
          // use climo_cdf thresholds instead
-         if(rps_info.fthresh.n()    == 0 &&
-            hira_pd.cmn_na.n_valid() > 0 &&
-            hira_pd.csd_na.n_valid() > 0) {
+         if(rps_info.fthresh.n()                      == 0 &&
+            hira_pd.cmn_na.n_valid()                   > 0 &&
+            hira_pd.csd_na.n_valid()                   > 0 &&
+            conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
             rps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
          }
 

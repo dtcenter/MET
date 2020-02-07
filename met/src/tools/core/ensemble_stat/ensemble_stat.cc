@@ -1782,7 +1782,7 @@ void process_grid_vx() {
                // Compute RPS scores
                if(conf_info.output_flag[i_rps] != STATOutputType_None) {
                   do_rps(conf_info.vx_opt[i],
-                          conf_info.vx_opt[i].othr_ta[l], &pd);
+                         conf_info.vx_opt[i].othr_ta[l], &pd);
                }
 
                // Write RHIST counts
@@ -2044,9 +2044,10 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // If rps_thresh is empty and climo data is available, use climo_cdf
    // thresholds instead
-   if(rps_info.fthresh.n()    == 0 &&
-      pd_ptr->cmn_na.n_valid() > 0 &&
-      pd_ptr->csd_na.n_valid() > 0) {
+   if(rps_info.fthresh.n()      == 0 &&
+      pd_ptr->cmn_na.n_valid()   > 0 &&
+      pd_ptr->csd_na.n_valid()   > 0 &&
+      vx_opt.cdf_info.cdf_ta.n() > 0) {
       rps_info.fthresh = vx_opt.cdf_info.cdf_ta;
    }  
 
