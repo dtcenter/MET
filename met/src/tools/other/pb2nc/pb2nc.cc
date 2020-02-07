@@ -1585,7 +1585,7 @@ void process_pbfile(int i_pb) {
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
             }
             if (!(has_tq || has_uv)) {
-               mlog << Log(5) << method_name << " PBL: excluded " << lv
+               mlog << Debug(5) << method_name << " PBL: excluded " << lv
                     << "-th level record:" << " T=" << tmp_pqtzuv[2]
                     << ", U=" << tmp_pqtzuv[4] << ", V=" << tmp_pqtzuv[5]
                     << ", Q=" << tmp_pqtzuv[0] << ", Z=" << tmp_pqtzuv[3]
