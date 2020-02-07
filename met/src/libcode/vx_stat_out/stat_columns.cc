@@ -1656,7 +1656,7 @@ void write_rps_row(StatHdrColumns &shc, const RPSInfo &rps_info,
    shc.set_line_type(stat_rps_str);
 
    // Thresholds
-   shc.set_fcst_thresh(rps_info.fthresh);
+   shc.set_fcst_thresh(process_rps_cdp_thresh(rps_info.fthresh));
    shc.set_obs_thresh(rps_info.othresh);
 
    // Not Applicable

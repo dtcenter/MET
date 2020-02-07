@@ -719,6 +719,46 @@ ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
+   bool status = true;
+   double step = bad_data_double;
+   SingleThresh st;
+   ThreshArray ta_out;
+
+   // Check for evenly-spaced CDP thresholds
+   for(int i=0; i<ta.n(); i++) {
+
+      // Check for the CDP threshold type
+      if(ta[i].get_ptype() != perc_thresh_climo_dist) {
+         status = false;
+         break;
+      }
+
+      // Check for even spacing
+      if(i > 0) {
+         if(is_bad_data(step)) {
+            step = ta[i].get_pvalue() - ta[i-1].get_pvalue();
+         }
+         else if(!is_eq(step, ta[i].get_pvalue() - ta[i-1].get_pvalue())) {
+            status = false;
+            break;
+         }
+      }
+   }
+
+   if(status) {
+      st.set(step, thresh_eq, perc_thresh_climo_dist);
+      ta_out.add(st);
+   }
+   else {
+      ta_out = ta;
+   }
+
+   return(ta_out);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString write_css(const ThreshArray &ta) {
    ConcatString css;
 
