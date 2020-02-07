@@ -210,7 +210,7 @@ interp = {
 //
 output_flag = {
    ecnt  = STAT;
-   rps   = NONE;
+   rps   = STAT;
    rhist = STAT;
    phist = STAT;
    orank = STAT;
