@@ -796,16 +796,16 @@ The Point-Stat tool has been enhanced to include the High Resolution Assessment
  The HiRA logic interprets the forecast values surrounding each point observatio
 n as an ensemble forecast.
  These ensemble values are processed in two ways.
- First, the ensemble continuous statistics (ECNT) line type is computed
- directly from the ensemble values.
+ First, the ensemble continuous statistics (ECNT) and the ranked probability
+ score (RPS) line types are computed directly from the ensemble values.
  Second, for each categorical threshold specified, a fractional coverage
  value is computed as the ratio of the nearby forecast values that meet
  the threshold criteria.
  Point-Stat evaluates those fractional coverage values as if they were a
  probability forecast.
  When applying HiRA, users should enable the matched pair (MPR), probabilistic
- (PCT, PSTD, PJC, or PRC), or continuous ensemble statistics (ECNT) line
- type in the output_flag dictionary.
+ (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked
+ probability score (RPS) line types in the output_flag dictionary.
  The number of probabilistic HiRA output lines is determined by the number
  of categorical forecast thresholds and HiRA neighborhood widths chosen.
 \end_layout
@@ -813,7 +813,7 @@ n as an ensemble forecast.
 \begin_layout Standard
 The HiRA framework provides a unique method for evaluating models in the
  neighborhood of point observations, allowing for some spatial and temporal
- uncertainty in the forecast and / or the observations.
+ uncertainty in the forecast and/or the observations.
  Additionally, the HiRA framework can be used to compare deterministic forecasts
  to ensemble forecasts.
  In MET, the neighborhood is a circle or square centered on the grid point
@@ -2506,6 +2506,142 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+hira = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width      = [ 2, 3, 4, 5 ]
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   cov_thresh = [ ==0.25 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape      = SQUARE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   rps_thresh = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+hira
+\series default
+ dictionary that is very similar to the 
+\series bold
+interp
+\series default
+ and 
+\series bold
+nbrhd
+\series default
+ entries.
+ It specifies information for applying the High Resolution Assessment (HiRA)
+ verification logic described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:PS_HiRA_framework"
+
+\end_inset
+
+.
+ The 
+\series bold
+flag
+\series default
+ entry is a boolean which toggles HiRA on (
+\series bold
+TRUE
+\series default
+) and off (
+\series bold
+FALSE
+\series default
+).
+ The 
+\series bold
+width
+\series default
+ and 
+\series bold
+shape
+\series default
+ entries define the neighborhood size and shape, respectively.
+ Since HiRA applies to point observations, the width may be even or odd.
+ The 
+\series bold
+vld_thresh
+\series default
+ entry is the required ratio of valid data within the neighborhood to compute
+ an output value.
+ The 
+\series bold
+cov_thresh
+\series default
+ entry is an array of probabilistic thresholds used to populate the Nx2
+ probabilistic contingency table written to the PCT output line and used
+ for computing probabilistic statistics.
+ The 
+\series bold
+rps_thresh
+\series default
+ entry defines the thresholds to be used in computing the ranked probability
+ score in the RPS output line type.
+ If left empty but climatology data is provided, the
+\series bold
+ climo_cdf
+\series default
+ thresholds will be used instead of 
+\series bold
+rps_thresh
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
@@ -2603,6 +2739,14 @@ vcnt   = BOTH;
 
 \series bold
    ecnt   = BOTH;
+\series default
+  // Only for HiRA
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   rps    = BOTH;
 \series default
   // Only for HiRA
 \end_layout
@@ -2818,13 +2962,24 @@ PRC
 \series bold
 ECNT
 \series medium
- for Ensemble Continuous Statistics is only computed for HiRA methodology
+ for Ensemble Continuous Statistics is only computed for the HiRA methodology
 \end_layout
 
 \begin_layout Description
 
 \series medium
 17.
+ 
+\series bold
+RPS
+\series medium
+ for Ranked Probabilty Score is only computed for the HiRA methodology
+\end_layout
+
+\begin_layout Description
+
+\series medium
+18.
  
 \series bold
 ECLV
@@ -2835,7 +2990,7 @@ ECLV
 \begin_layout Description
 
 \series medium
-18.
+19.
  
 \series bold
 MPR
@@ -2940,8 +3095,8 @@ TYPE
 \series medium
  is one of 
 \series bold
-mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, eclv, sl1l2, sal1l2,
- vl1l2
+mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv,
+ sl1l2, sal1l2, vl1l2
 \series default
 , 
 \series bold
@@ -2969,6 +3124,20 @@ line type is described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "table_ES_header_info_es_out_ECNT"
+
+\end_inset
+
+.
+ 
+\series medium
+The 
+\series bold
+RPS 
+\series default
+line type is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_RPS"
 
 \end_inset
 

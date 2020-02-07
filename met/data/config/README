@@ -1431,8 +1431,8 @@ topo_mask = {
 // forecast thresholds and HiRA neighborhood widths chosen.
 // This dictionary may include the following entries:
 //
-//    -  The "flag" entry is a boolean which toggles "hira"
-//       on (TRUE) and off (FALSE).
+//    - The "flag" entry is a boolean which toggles "hira"
+//      on (TRUE) and off (FALSE).
 //
 //    - The "width" entry specifies the neighborhood size. Since HiRA applies
 //      to point observations, the width may be even or odd.
