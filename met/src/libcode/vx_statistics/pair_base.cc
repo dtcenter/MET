@@ -847,7 +847,8 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 ////////////////////////////////////////////////////////////////////////
 
 double compute_interp(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y, const double obs_v,
+                      const double obs_x, const double obs_y,
+                      const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
                       const double thresh,
@@ -859,14 +860,14 @@ double compute_interp(const DataPlaneArray &dpa,
    // Check for no data
    if(dpa.n_planes() == 0) return(bad_data_double);
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
                                method, width, shape, thresh, cat_thresh);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
                                   method, width, shape, thresh, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
