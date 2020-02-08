@@ -1260,7 +1260,7 @@ void process_scores() {
                // Process percentile thresholds
                conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
 
-               // Appy HiRA verification and write probabilistic output
+               // Apply HiRA verification and write probabilistic output
                do_hira_prob(i, pd_ptr);
 
             } // end HiRA for probabilities
@@ -1878,6 +1878,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    double f_cov, cmn_cov;
+   NumArray cmn_cov_na;
    SingleThresh cat_thresh;
    PCTInfo pct_info;
 
@@ -1902,6 +1903,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // Initialize
          hira_pd.clear();
          pct_info.clear();
+         cmn_cov_na.erase();
 
          // Loop through matched pairs and replace the forecast value
          // with the HiRA fractional coverage.
@@ -1914,6 +1916,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                       pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                        InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                        conf_info.vx_opt[i_vx].hira_info.shape,
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -1932,6 +1935,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
                cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                            pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                             InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                             conf_info.vx_opt[i_vx].hira_info.shape,
                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -1940,9 +1944,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
                // Check for bad data
                if(is_bad_data(cmn_cov)) continue;
-            }
-            else {
-               cmn_cov = bad_data_double;
+               else                     cmn_cov_na.add(cmn_cov);
             }
 
             // Store the fractional coverage pair
@@ -1951,7 +1953,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
-               cmn_cov, pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
+               pd_ptr->cmn_na[k], pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
 
          } // end for k
 
@@ -1982,7 +1984,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Compute the probabilistic counts and statistics
          compute_pctinfo(hira_pd, conf_info.vx_opt[i_vx].output_flag[i_pstd],
-                         pct_info);
+                         pct_info, &cmn_cov_na);
 
          // Set the contents of the output threshold columns
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);
