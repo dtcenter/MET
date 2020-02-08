@@ -1026,44 +1026,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
 
-            // For surface verification, apply land/sea and topo masks
-            if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-               (msg_typ_sfc.has(hdr_typ_str))) {
-
-               bool is_land = msg_typ_lnd.has(hdr_typ_str);
-
-               // Check for a single forecast DataPlane
-               if(fcst_dpa.n_planes() != 1) {
-                  mlog << Error << "\nVxPairDataPoint::add_point_obs() -> "
-                       << "unexpected number of forecast levels ("
-                       << fcst_dpa.n_planes()
-                       << ") for surface verification! Set \"land_mask.flag\" and "
-                       << "\"topo_mask.flag\" to false to disable this check.\n\n";
-                  exit(1);
-               }
-
-               fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
-                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape, interp_thresh, sfc_info,
-                           is_land);
-            }
-            // Otherwise, compute interpolated value
-            else {
-               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
-                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape,
-                           interp_thresh, spfh_flag,
-                           fcst_info->level().type(),
-                           to_lvl, f_lvl_blw, f_lvl_abv);
-            }
-
-            if(is_bad_data(fcst_v)) {
-               inc_count(rej_fcst, i, j, k);
-               continue;
-            }
-
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
+                       bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                        pd[0][0][k].interp_shape,
                        interp_thresh, spfh_flag,
@@ -1091,6 +1056,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
+                       bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd,  pd[0][0][k].interp_wdth,
                        pd[0][0][k].interp_shape,
                        interp_thresh, spfh_flag,
@@ -1100,6 +1066,42 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             // Check for bad data
             if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
                inc_count(rej_csd, i, j, k);
+               continue;
+            }
+
+            // For surface verification, apply land/sea and topo masks
+            if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
+               (msg_typ_sfc.has(hdr_typ_str))) {
+
+               bool is_land = msg_typ_lnd.has(hdr_typ_str);
+
+               // Check for a single forecast DataPlane
+               if(fcst_dpa.n_planes() != 1) {
+                  mlog << Error << "\nVxPairDataPoint::add_point_obs() -> "
+                       << "unexpected number of forecast levels ("
+                       << fcst_dpa.n_planes()
+                       << ") for surface verification! Set \"land_mask.flag\" and "
+                       << "\"topo_mask.flag\" to false to disable this check.\n\n";
+                  exit(1);
+               }
+
+               fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
+                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                           pd[0][0][k].interp_shape, interp_thresh, sfc_info,
+                           is_land);
+            }
+            // Otherwise, compute interpolated value
+            else {
+               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, cmn_v, csd_v,
+                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                           pd[0][0][k].interp_shape,
+                           interp_thresh, spfh_flag,
+                           fcst_info->level().type(),
+                           to_lvl, f_lvl_blw, f_lvl_abv);
+            }
+
+            if(is_bad_data(fcst_v)) {
+               inc_count(rej_fcst, i, j, k);
                continue;
             }
 
