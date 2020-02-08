@@ -709,8 +709,8 @@ void compute_i_mctsinfo(const PairDataPoint &pd, int skip,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_pctinfo(const PairDataPoint &pd,
-                     bool pstd_flag, PCTInfo &pct_info) {
+void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
+                     PCTInfo &pct_info, const NumArray *cprob_in) {
    int i, n_thresh, n_pair;
    NumArray p_thresh, climo_prob;
    bool cmn_flag;
@@ -727,11 +727,14 @@ void compute_pctinfo(const PairDataPoint &pd,
    n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
+   cmn_flag = (cprob_in || set_climo_flag(pd.f_na, pd.cmn_na));
 
-   // Derive climatological probabilities
-   if(cmn_flag) climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
-                                               pct_info.othresh);
+   // Use input climatological probabilities or derive them
+   if(cmn_flag) {
+      if(cprob_in) climo_prob = *cprob_in;
+      else         climo_prob = derive_climo_prob(pd.cmn_na, pd.csd_na,
+                                                  pct_info.othresh);
+   }
 
    //
    // Store the probability threshold values
@@ -761,7 +764,7 @@ void compute_pctinfo(const PairDataPoint &pd,
       //
       // Check the observation thresholds and increment accordingly
       //
-      if(pct_info.othresh.check(pd.o_na[i])) {
+      if(pct_info.othresh.check(pd.o_na[i], pd.cmn_na[i], pd.csd_na[i])) {
          pct_info.pct.inc_event(pd.f_na[i]);
          if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
