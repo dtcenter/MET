@@ -727,7 +727,8 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cmn_flag = (cprob_in || set_climo_flag(pd.f_na, pd.cmn_na));
+   cmn_flag = (set_climo_flag(pd.f_na, pd.cmn_na) ||
+               (cprob_in && cprob_in->n() > 0));
 
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
