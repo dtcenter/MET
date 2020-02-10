@@ -5122,11 +5122,7 @@ Max_Top
 \begin_inset Float table
 wide false
 sideways false
-status open
-
-\begin_layout Plain Layout
-
-\end_layout
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -5669,6 +5665,549 @@ Horizontal_Averaging
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Point2Grid tool
+\end_layout
+
+\begin_layout Standard
+The Point2Grid tool takes point observations from a NetCDF output file from
+ one of the four previously mentioned MET tools (ascii2nc, madis2nc, pb2nc,
+ lidar2nc) and creates a gridded NetCDF gridded file.
+ Future development will include support for reading input files not produced
+ from MET tools.
+\end_layout
+
+\begin_layout Subsection
+point2grid usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the Point2Grid tool is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series default
+ point2grid
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+input_filename
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+to_grid
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+output_filename
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-field string
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-config file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-qc flags]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-method type]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-gaussian_dx n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-gaussian_radius n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-obs_thresh n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-vld_thresh n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-name list]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-compress level]
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Required arguments for point2grid
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+input_filename
+\series medium
+ argument indicates the name of the input NetCDF file to be processed.
+ Currently, only NetCDF files produced from the ascii2nc, madis2nc, pb2nc,
+ and lidar2nc are supported.
+ Support for additional file types will be added in future releases.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The to_grid argument defines the output grid as: (1) a named grid, (2)
+ the path to a gridded data file, or (3) an explicit grid specification
+ string.
+\end_layout
+
+\begin_layout Description
+3.
+ The output_filename argument is the name of the output NetCDF file to be
+ written.
+\end_layout
+
+\begin_layout Description
+4.
+ The -field string argument is a string that defines the data to be regridded.
+ It may be used multiple times.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Optional arguments for point2grid
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The -config file option uses the specified configuration file to generate
+ gridded data.
+\end_layout
+
+\begin_layout Description
+6.
+ The -qc flags option specifies a comma-separated list of quality control
+ (QC) flags, for example 
+\begin_inset Quotes eld
+\end_inset
+
+0,1
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This should only be applied if grid_mapping is set to 
+\begin_inset Quotes eld
+\end_inset
+
+goes_imager_projection
+\begin_inset Quotes erd
+\end_inset
+
+ and the QC variable exists.
+\end_layout
+
+\begin_layout Description
+7.
+ The -method type option specifies the regridding method.
+ The default method is UW_MEAN.
+\end_layout
+
+\begin_layout Description
+8.
+ The -gaussian_dx n option defines the 
+\series medium
+distance interval for Gaussian smoothing.
+ 8.
+ 
+\series default
+The default is 81.271 km.
+\end_layout
+
+\begin_layout Description
+9.
+ The -gaussain_radius n option defines the
+\series medium
+ 
+\series default
+radius of influence for Gaussian interpolation.
+ The default is 120.
+\end_layout
+
+\begin_layout Description
+10.
+ The -obs_thresh n option sets the observation value to compute the probability
+ of occurrence.
+ The default is set to disabled.
+ This option is relevant when calculating practically perfect forecasts.
+\end_layout
+
+\begin_layout Description
+11.
+ The -vld_thresh n option sets the required ratio of valid data for regridding.
+ The default is 0.5.
+\end_layout
+
+\begin_layout Description
+12.
+ The -name list option specifies a comma-separated list of output variable
+ names for reach field specified.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+13.
+ The 
+\series bold
+-log file 
+\series medium
+option directs output and errors to the specified log file.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+14.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of 
+\series default
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+
+\series medium
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+15.
+ 
+\series default
+The 
+\series bold
+-compress level
+\series default
+ option indicates the desired level of compression (deflate level) for NetCDF
+ variables.
+ Tha valid level is between 0 and 9.
+ The value of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 0 from the configuration file or the
+ environment variable MET_NC_COMPRESS.
+ Setting the compression level to 0 will make no compression for the NetCDF
+ output.
+ Lower number is for fast compression and higher number is for better compressio
+n.
+\end_layout
+
+\begin_layout Subsection
+point2grid output
+\end_layout
+
+\begin_layout Standard
+The point2grid tool will output a gridded NetCDF file containing the following:
+ 
+\end_layout
+
+\begin_layout Standard
+1.
+ Latitude
+\end_layout
+
+\begin_layout Standard
+2.
+ Longitude
+\end_layout
+
+\begin_layout Standard
+3.
+ The variable specified in the -field string regridded to the grid defined
+ in the to_grid argument.
+ 
+\end_layout
+
+\begin_layout Standard
+4.
+ The count field which represents the number of point observations that
+ were included calculating the value of the variable at that grid cell.
+\end_layout
+
+\begin_layout Standard
+5.
+ The mask field which is a binary field representing the presence or lack
+ thereof of point observations at that grid cell.
+ A value of 
+\begin_inset Quotes eld
+\end_inset
+
+1
+\begin_inset Quotes erd
+\end_inset
+
+ indicates that there was at least one point observation within the bounds
+ of that grid cell and a value of 
+\begin_inset Quotes eld
+\end_inset
+
+0
+\begin_inset Quotes erd
+\end_inset
+
+ indicates the lack of point observations at that grid cell.
+\end_layout
+
+\begin_layout Standard
+6.
+ The probability field which is the probability of the event defined by
+ the line option -obs_thresh n occurring.
+ Ranges from 0 to 1.
+ 
+\end_layout
+
+\begin_layout Standard
+7.
+ The probability mask field which is a binary field that represents [ask
+ Howard for clarification]
 \end_layout
 
 \end_body
