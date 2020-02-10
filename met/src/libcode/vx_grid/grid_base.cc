@@ -152,8 +152,8 @@ mlog << Debug(grid_debug_level)
      << "  lon_ll: " << lon_ll << "\n"
      << "  lat_ur: " << lat_ur << "\n"
      << "  lon_ur: " << lon_ur << "\n"
-     << "      ny: " << ny << "\n"
-     << "      nx: " << nx << "\n\n";
+     << "      nx: " << nx << "\n"
+     << "      ny: " << ny << "\n\n";
 
 }
 
