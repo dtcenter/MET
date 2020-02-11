@@ -179,7 +179,8 @@ extern void find_vert_lvl(const DataPlaneArray &, const double,
                           int &, int &);
 
 extern double compute_interp(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y, const double obs_v,
+                      const double obs_x, const double obs_y,
+                      const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
                       const double thresh,

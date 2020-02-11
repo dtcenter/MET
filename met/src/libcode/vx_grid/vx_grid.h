@@ -27,6 +27,7 @@
 #include "lc_grid.h"
 #include "latlon_grid.h"
 #include "merc_grid.h"
+#include "gaussian_grid.h"
 #include "tcrmw_grid.h"
 
 #include "find_grid_by_name.h"

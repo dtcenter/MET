@@ -82,7 +82,8 @@ extern double   interp_gaussian  (const DataPlane &, const DataPlane &, double o
 
 extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 
-extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *, const MaskPlane *mp = 0);
+extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
+                                double cmn, double csd, const MaskPlane *mp = 0);
 extern double   interp_bilin   (const DataPlane &, double obs_x, double obs_y, const MaskPlane *mp = 0);
 extern double   interp_xy      (const DataPlane &, int x, int y, const MaskPlane *mp = 0);
 
@@ -110,6 +111,13 @@ extern MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y, double obs_v,
+                                  const InterpMthd mthd, const int width,
+                                  const GridTemplateFactory::GridTemplates shape,
+                                  double interp_thresh, const SingleThresh *cat_thresh = 0);
+
+extern double compute_horz_interp(const DataPlane &dp,
+                                  double obs_x, double obs_y,
+                                  double obs_v, double cmn, double csd,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
                                   double interp_thresh, const SingleThresh *cat_thresh = 0);

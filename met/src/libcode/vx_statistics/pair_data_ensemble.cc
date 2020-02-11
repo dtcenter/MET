@@ -1497,6 +1497,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
+                       bad_data_double, bad_data_double,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                        pd[0][0][k].interp_shape,
                        interp_thresh, spfh_flag,
@@ -1523,6 +1524,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
+                        bad_data_double, bad_data_double,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                         pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
@@ -1590,6 +1592,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                            pd[i][j][k].x_na[l],
                            pd[i][j][k].y_na[l],
                            pd[i][j][k].o_na[l],
+                           pd[i][j][k].cmn_na[l],
+                           pd[i][j][k].csd_na[l],
                            pd[0][0][k].interp_mthd,
                            pd[0][0][k].interp_wdth,
                            pd[0][0][k].interp_shape,

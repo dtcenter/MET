@@ -127,10 +127,17 @@
       <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_val1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_rps.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V_vcnt.txt</stat>
     </output>
   </test>
-
+  
   <test name="climatology_STAT_ANALYSIS_WMO_1.5DEG_AGG_STAT">
     <exec>&MET_BIN;/stat_analysis</exec>
     <env>
@@ -138,7 +145,7 @@
     </env>
     <param> \
       -lookin &OUTPUT_DIR;/climatology/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
-      -job aggregate_stat -line_type MPR -out_line_type CTC -fcst_lev P850 -by FCST_VAR -out_thresh '>CDP90' \
+      -job aggregate_stat -line_type MPR -out_line_type CTC -fcst_lev P850 -interp_mthd NEAREST -by FCST_VAR -out_thresh '>CDP90' \
       -out_stat &OUTPUT_DIR;/stat_analysis_WMO_1.5DEG_MPR_to_CTC_out.stat
     </param>
     <output>

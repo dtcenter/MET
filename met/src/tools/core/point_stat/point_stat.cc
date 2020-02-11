@@ -90,7 +90,7 @@
 //                    percentile thresholds.
 //   043    11/15/19  Halley Gotway  Apply climatology bins to
 //                    continuous and probabilistic statistics.
-//   044    01/24/20  Halley Gotway  Add HiRA ERPS output.
+//   044    01/24/20  Halley Gotway  Add HiRA RPS output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1234,7 +1234,7 @@ void process_scores() {
             if(!conf_info.vx_opt[i].vx_pd.fcst_info->is_prob() &&
                 conf_info.vx_opt[i].hira_info.flag             &&
                (conf_info.vx_opt[i].output_flag[i_ecnt] != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_erps] != STATOutputType_None)) {
+                conf_info.vx_opt[i].output_flag[i_rps]  != STATOutputType_None)) {
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][0];
 
@@ -1260,7 +1260,7 @@ void process_scores() {
                // Process percentile thresholds
                conf_info.vx_opt[i].set_perc_thresh(pd_ptr);
 
-               // Appy HiRA verification and write probabilistic output
+               // Apply HiRA verification and write probabilistic output
                do_hira_prob(i, pd_ptr);
 
             } // end HiRA for probabilities
@@ -1831,24 +1831,25 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             txt_at[i_ecnt], i_txt_row[i_ecnt]);
       } // end if ECNT
 
-      // Write out the ERPS line
-      if(conf_info.vx_opt[i_vx].output_flag[i_erps] != STATOutputType_None) {
+      // Write out the RPS line
+      if(conf_info.vx_opt[i_vx].output_flag[i_rps] != STATOutputType_None) {
 
          // Store ensemble RPS thresholds
-         ERPSInfo erps_info;
-         erps_info.fthresh = conf_info.vx_opt[i_vx].hira_info.rps_ta;
+         RPSInfo rps_info;
+         rps_info.set_rps_thresh(conf_info.vx_opt[i_vx].hira_info.rps_ta);
 
          // If rps_thresh is empty and climo data is available,
          // use climo_cdf thresholds instead
-         if(erps_info.fthresh.n()    == 0 &&
-            hira_pd.cmn_na.n_valid() > 0 &&
-            hira_pd.csd_na.n_valid() > 0) {
-            erps_info.fthresh = conf_info.vx_opt[i_vx].cdf_info.cdf_ta;
+         if(rps_info.fthresh.n()                      == 0 &&
+            hira_pd.cmn_na.n_valid()                   > 0 &&
+            hira_pd.csd_na.n_valid()                   > 0 &&
+            conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
+            rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
          }
 
          // Check for no thresholds
-         if(erps_info.fthresh.n() == 0) {
-            mlog << Debug(3) << "Skipping HiRA ERPS output since no "
+         if(rps_info.fthresh.n() == 0) {
+            mlog << Debug(3) << "Skipping HiRA RPS output since no "
                  << "\"" << conf_key_rps_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
                  << "\" dictionary.\n";
@@ -1856,13 +1857,13 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          }
 
          // Compute ensemble RPS statistics
-         erps_info.set(hira_pd);
+         rps_info.set(hira_pd);
 
-         write_erps_row(shc, erps_info,
-                        conf_info.vx_opt[i_vx].output_flag[i_erps],
-                        stat_at, i_stat_row,
-                        txt_at[i_erps], i_txt_row[i_erps]);
-      } // end if ERPS
+         write_rps_row(shc, rps_info,
+                       conf_info.vx_opt[i_vx].output_flag[i_rps],
+                       stat_at, i_stat_row,
+                       txt_at[i_rps], i_txt_row[i_rps]);
+      } // end if RPS
 
       if(gt) { delete gt; gt = 0; }
 
@@ -1877,6 +1878,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    double f_cov, cmn_cov;
+   NumArray cmn_cov_na;
    SingleThresh cat_thresh;
    PCTInfo pct_info;
 
@@ -1901,6 +1903,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // Initialize
          hira_pd.clear();
          pct_info.clear();
+         cmn_cov_na.erase();
 
          // Loop through matched pairs and replace the forecast value
          // with the HiRA fractional coverage.
@@ -1913,6 +1916,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                       pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                        InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                        conf_info.vx_opt[i_vx].hira_info.shape,
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -1931,6 +1935,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
                cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                            pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                             InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                             conf_info.vx_opt[i_vx].hira_info.shape,
                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -1939,9 +1944,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
                // Check for bad data
                if(is_bad_data(cmn_cov)) continue;
-            }
-            else {
-               cmn_cov = bad_data_double;
+               else                     cmn_cov_na.add(cmn_cov);
             }
 
             // Store the fractional coverage pair
@@ -1950,7 +1953,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
-               cmn_cov, pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
+               pd_ptr->cmn_na[k], pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
 
          } // end for k
 
@@ -1981,7 +1984,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Compute the probabilistic counts and statistics
          compute_pctinfo(hira_pd, conf_info.vx_opt[i_vx].output_flag[i_pstd],
-                         pct_info);
+                         pct_info, &cmn_cov_na);
 
          // Set the contents of the output threshold columns
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);

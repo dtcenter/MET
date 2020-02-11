@@ -130,7 +130,7 @@ static const int strl_len       = 16;
 static const int hdr_arr_len    = 3;
 // Observation values length
 static const int obs_arr_len    = 5;
-static const int COUNT_THRESHOLD = 10;
+static const int COUNT_THRESHOLD = 5;
 
 // File unit number for opening the PrepBufr file
 static const int file_unit      = 11;
@@ -169,8 +169,9 @@ static float static_dummy_201[MAX_CAPE_LEVEL+1];
 #define ROG             287.04
 #define MAX_PBL         5000
 #define MAX_PBL_LEVEL   100
+#define PBL_DEBUG_LEVEL 8
 static bool ignore_Q_PBL = true;
-static bool ignore_Z_PBL = false;
+static bool ignore_Z_PBL = true;
 static float pbl_data_pres[MAX_PBL_LEVEL];  // mb
 static float pbl_data_temp[MAX_PBL_LEVEL];  // Kelvin
 static float pbl_data_spfh[MAX_PBL_LEVEL];  // ? / 1,000,000
@@ -285,7 +286,6 @@ static StringArray bufr_hdr_name_arr;   // available header name list
 static StringArray bufr_obs_name_arr;   // available obs. name list
 static IntArray filtered_times;
 static StringArray prepbufr_core_vars;
-static map<ConcatString, int> variableCountMap;
 static map<ConcatString, StringArray> variableTypeMap;
 
 static bool do_summary;
@@ -350,6 +350,11 @@ static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 
 static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
                           map<float, float*> pqtzuv_map_uv);
+static void   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
+                         const float pbl_p, const float pbl_h, const float pbl_qm,
+                         const float hdr_lat, const float hdr_lon,
+                         const float hdr_elv, const time_t hdr_vld_ut, 
+                         const ConcatString &hdr_typ, const ConcatString &hdr_sid);
 
 static int    get_event_index(int, int, int);
 static int    get_event_index_temp(int, int, int);
@@ -615,7 +620,7 @@ bool is_prepbufr_file(StringArray *events) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_variable_info(const char* tbl_filename) {
-   static const char *method_name = "get_variable_info()";
+   static const char *method_name = "  get_variable_info()";
 
    FILE * fp;
    char * line = NULL;
@@ -666,8 +671,8 @@ void get_variable_info(const char* tbl_filename) {
             }
             var_desc[idx] = '\0';
          }
-         mlog << Debug(10) << "   " << method_name << " sec. 1 var name: ["
-              << var_name << "]\tdesc: [" << var_desc << "]\n";
+         mlog << Debug(10) << method_name << " sec. 1 var: ["
+              << var_name << "] \tdesc: [" << var_desc << "]\n";
          tableB_vars.add(var_name);
          tableB_descs.add(var_desc);
       }
@@ -693,8 +698,8 @@ void get_variable_info(const char* tbl_filename) {
             }
             var_desc[idx] = '\0';
          }
-         mlog << Debug(10) << "   " << method_name << " event name: ["
-              << var_name << "]\tdesc: [" << var_desc << "]\n";
+         mlog << Debug(10) << method_name << " event: ["
+              << var_name << "] \tdesc: [" << var_desc << "]\n";
          event_names.add(var_name);
          event_members.add(var_desc);
       }
@@ -727,8 +732,8 @@ void get_variable_info(const char* tbl_filename) {
             }
             var_names.add(var_name);
             var_units.add(var_unit_str);
-            mlog << Debug(10) << "   " << method_name << " sec. 3 var name: ["
-                 << var_name << "]\tdesc: [" << var_desc << "]\n";
+            mlog << Debug(10) << method_name << " sec. 3 var: ["
+                 << var_name << "] \tdesc: [" << var_desc << "]\n";
          }
       }
 
@@ -969,6 +974,7 @@ void process_pbfile(int i_pb) {
    float pbl_p, pbl_h;
    float pbl_qm = bad_data_float;
 
+   bool has_pbl_data;
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
 
@@ -1305,22 +1311,13 @@ void process_pbfile(int i_pb) {
                   && is_eq(prev_hdr_elv, hdr_elv)
                   && 0 == strcmp(prev_hdr_typ, hdr_typ)
                   && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
-            if (!is_same_header) {
+            has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
+            if (!is_same_header && has_pbl_data) {
                float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
-               obs_arr[1] = pbl_code;
-               obs_arr[2] = pbl_p;
-               obs_arr[3] = pbl_h;
-               obs_arr[4] = pbl_value - hdr_elv; // observation value
-               mlog << Debug(7) << " hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
-                    << "   lat: " << prev_hdr_lat << ", lon: " << prev_hdr_lon
-                    << ", elv: " << prev_hdr_elv << " valid_time: "
-                    << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
-                    << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
-               if (obs_arr[4] > MAX_PBL) obs_arr[4] = MAX_PBL;
-
-               addObservation(obs_arr, (string)prev_hdr_typ, (string)prev_hdr_sid, prev_hdr_vld_ut,
-                              prev_hdr_lat, prev_hdr_lon, prev_hdr_elv, pbl_qm,
-                              OBS_BUFFER_SIZE);
+               
+               insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                          prev_hdr_lat, prev_hdr_lon, prev_hdr_elv, prev_hdr_vld_ut,
+                          prev_hdr_typ, prev_hdr_sid);
 
                std::map<float,float*>::iterator it;
                for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
@@ -1574,14 +1571,26 @@ void process_pbfile(int i_pb) {
 
             for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
+            bool has_tq = false;
+            bool has_uv = false;
             if (!is_eq(tmp_pqtzuv[4],bad_data_float) &&
                 !is_eq(tmp_pqtzuv[5],bad_data_float)) {
+               has_uv = true;
                pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
             }
-            else if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
+            if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
                      (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL) &&
                      (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
+               has_tq = true;
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
+            }
+            if (!(has_tq || has_uv)) {
+               mlog << Debug(5) << method_name << " PBL: excluded " << lv
+                    << "-th level record:" << " T=" << tmp_pqtzuv[2]
+                    << ", U=" << tmp_pqtzuv[4] << ", V=" << tmp_pqtzuv[5]
+                    << ", Q=" << tmp_pqtzuv[0] << ", Z=" << tmp_pqtzuv[3]
+                    << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                    << " " << hdr_typ << " " << hdr_sid << "\n";
             }
          }
       } // end for lv
@@ -1718,8 +1727,7 @@ void process_pbfile(int i_pb) {
             isMgKg = false;
             isMilliBar = false;
             if (var_names.has(var_name, var_index)) {
-               //mlog << Debug(7) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
-            if ("DEG C" == var_units[var_index]) {
+               if ("DEG C" == var_units[var_index]) {
                   isDegC = true;
                }
                else if ("MB" == var_units[var_index]) {
@@ -1730,7 +1738,8 @@ void process_pbfile(int i_pb) {
                }
             }
 
-            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs,
+                       (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
             if (0 >= nlev2) continue;
 
             buf_nlev = nlev2;
@@ -1840,21 +1849,12 @@ void process_pbfile(int i_pb) {
       }
    } // end for i_read
 
-   if (cal_pbl) {
+   has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
+   if (cal_pbl && has_pbl_data) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
-      obs_arr[1] = pbl_code;
-      obs_arr[2] = pbl_p;
-      obs_arr[3] = pbl_h;
-      obs_arr[4] = pbl_value - hdr_elv; // observation value
-      mlog << Debug(7) << "hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
-           << "   lat: " << prev_hdr_lat << ", lon: " << prev_hdr_lon
-           << ", elv: " << prev_hdr_elv << " valid_time: "
-           << unix_to_yyyymmdd_hhmmss(prev_hdr_vld_ut)
-           << " " << prev_hdr_typ << " " << prev_hdr_sid << "\n\n" ;
-      if (obs_arr[4] > MAX_PBL) obs_arr[4] = MAX_PBL;
-
-      addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                     hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
+      insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                 hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
+      
       //insert_pbl();
       std::map<float,float*>::iterator it;
       for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
@@ -2308,7 +2308,7 @@ void process_pbfile_metadata(int i_pb) {
                   if (COUNT_THRESHOLD < count) break;
                }
             }
-            //break;
+            break;
          }  //end for lv
          
          if (has_valid_data) {
@@ -2316,8 +2316,8 @@ void process_pbfile_metadata(int i_pb) {
                tmp_bufr_obs_name_arr.add(var_name);
             }
             if (do_all_vars) {
-               if (COUNT_THRESHOLD < count) unchecked_var_list.shift_down(vIdx, 1);
-               variableCountMap[var_name] = count;
+               if (var_name == unchecked_var_list[vIdx])
+                  unchecked_var_list.shift_down(vIdx, 1);
             }
             else {
                StringArray typeArray;
@@ -2873,6 +2873,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
 
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
+   int offset;
    int tq_count = 0;
    int uv_count = 0;
    int common_count = 0;
@@ -2881,12 +2882,56 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    tq_count = pqtzuv_map_tq.size();
    uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
-      NumArray common_pres_array;
+      IntArray common_levels, tq_levels;
       float first_pres, prev_pres, cur_pres;
       float *pqtzuv_tq, *pqtzuv_uv;
       float *cur_pqtzuv = (float *) 0;
       float *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
       std::map<float,float*>::iterator it_tq, it_uv;
+      ConcatString buf;
+      StringArray log_array;
+
+      for (std::map<float,float*>::iterator it=pqtzuv_map_tq.begin();
+           it!=pqtzuv_map_tq.end(); ++it) {
+         tq_levels.add(int(it->first));
+      }
+      for (std::map<float,float*>::iterator it=pqtzuv_map_uv.begin();
+           it!=pqtzuv_map_uv.end(); ++it) {
+         if (tq_levels.has(int(it->first))) common_levels.add(int(it->first));
+      }
+
+      if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
+         for (std::map<float,float*>::iterator it=pqtzuv_map_tq.begin();
+              it!=pqtzuv_map_tq.end(); ++it) {
+            float *pqtzuv = it->second;
+            buf.clear();
+            for (int idx=0; idx<mxr8vt; idx++) {
+               buf << " " << pqtzuv[idx];
+            }
+            log_array.add(buf.c_str());
+         }
+         offset = 0;
+         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "TQZ record: "
+                 << offset++ << "\t" << log_array[idx] << "\n";
+         }
+         log_array.clear();
+         for (std::map<float,float*>::iterator it=pqtzuv_map_uv.begin();
+              it!=pqtzuv_map_uv.end(); ++it) {
+            float *pqtzuv = it->second;
+            buf.clear();
+            for (int idx=0; idx<mxr8vt; idx++) {
+               buf << " " << pqtzuv[idx];
+            }
+            log_array.add(buf.c_str());
+         }
+         offset = 0;
+         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << " UV record: "
+                 << offset++ << "\t" << log_array[idx] << "\n";
+         }
+         log_array.clear();
+      }
 
       first_pres = bad_data_float;
       it_tq = pqtzuv_map_tq.begin();
@@ -2913,6 +2958,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          else {
             first_pres = it_uv->first;
             prev_pqtzuv = pqtzuv_tq;
+            cur_pqtzuv  = pqtzuv_uv;
             next_pqtzuv = ++it_tq->second;
          }
          interpolate_pqtzuv(prev_pqtzuv, cur_pqtzuv, next_pqtzuv);
@@ -2932,7 +2978,6 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          if (0 < pqtzuv_map_uv.count(cur_pres)) {
             common_count++;
             pqtzuv_uv = (float *)pqtzuv_map_uv[cur_pres];
-            common_pres_array.add(cur_pres);
             for (int idx=1; idx<mxr8vt; idx++) {
                if (is_eq(cur_pqtzuv[idx], bad_data_float)) {
                   cur_pqtzuv[idx] = pqtzuv_uv[idx];
@@ -2980,24 +3025,31 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          prev_pres = cur_pres;
          prev_pqtzuv = cur_pqtzuv;
       }
-   }
 
-   if(mlog.verbosity_level() >= 7) {
-      for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
-            it!=pqtzuv_map_merged.end(); ++it) {
-         float *pqtzuv = it->second;
-         ostringstream buf;
-         buf << method_name << "TQZ and UV merged ";
-         for (int idx=0; idx<mxr8vt; idx++) {
-           buf << "  " << pqtzuv[idx];
+      if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
+         for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
+               it!=pqtzuv_map_merged.end(); ++it) {
+            float *pqtzuv = it->second;
+            buf.clear();
+            for (int idx=0; idx<mxr8vt; idx++) {
+              buf << " " << pqtzuv[idx];
+            }
+            bool has_tq = (0 < (pqtzuv_map_tq.count(it->first)));
+            bool has_uv = (0 < (pqtzuv_map_uv.count(it->first)));
+            if (has_tq || has_uv) {
+               buf << "\t(";
+               if (has_tq) buf << " tqz";
+               if (has_uv) buf << " uv";
+               buf << " )";
+            }
+            log_array.add(buf.c_str());
          }
-         if (0 < (pqtzuv_map_tq.count(it->first) + pqtzuv_map_tq.count(it->first))) {
-            buf << "   (";
-            if (0 < pqtzuv_map_tq.count(it->first)) buf << " tqz";
-            if (0 < pqtzuv_map_uv.count(it->first)) buf << " uv";
-            buf << " )";
+         offset = 0;
+         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    merged: "
+                 << offset++ << "\t" << log_array[idx] << "\n";
          }
-         mlog << Debug(7) << buf.str() << "\n";
+         log_array.clear();
       }
    }
 
@@ -3015,6 +3067,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int pbl_level = 0;
    int tq_count = 0;
    int uv_count = 0;
+   std::map<float,float*>::iterator it;
    static const char *method_name = "compute_pbl() ";
 
    hpbl = bad_data_float;
@@ -3024,33 +3077,82 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
         << tq_count << "  UV: " << uv_count << "\n";
    if (tq_count > 0 || uv_count > 0) {
       int hgt_cnt, spfh_cnt;
+      IntArray selected_levels;
 
       map<float, float*> pqtzuv_map_merged;
-      pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged);
-      mlog << Debug(7) << method_name << "pbl_level= " << pbl_level << "\n";
+      pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv,
+                                     pqtzuv_map_merged);
+      mlog << Debug(7) << method_name << "pbl_level= " << pbl_level
+           << " from TQ (" << tq_count << ") and UV (" << uv_count
+           << ")\n";
 
       // Order all observations by pressure from bottom to top
       index = pbl_level - 1;
-      if (index >= MAX_PBL_LEVEL) index = MAX_PBL_LEVEL - 1;
       hgt_cnt = spfh_cnt = 0;
-      for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
-            it!=pqtzuv_map_merged.end(); ++it) {
-         float *pqtzuv = it->second;
+      for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
          if (index < 0) {
             mlog << Error << method_name  << "negative index: " << index << "\n";
             break;
          }
 
-         pbl_data_pres[index] = pqtzuv[0];
-         pbl_data_spfh[index] = pqtzuv[1];
-         pbl_data_temp[index] = pqtzuv[2];
-         pbl_data_hgt[index]  = pqtzuv[3];
-         pbl_data_ugrd[index] = pqtzuv[4];
-         pbl_data_vgrd[index] = pqtzuv[5];
-         if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
-         if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
+         if (index < MAX_PBL_LEVEL) {
+            float *pqtzuv = it->second;
+            pbl_data_pres[index] = pqtzuv[0];
+            pbl_data_spfh[index] = pqtzuv[1];
+            pbl_data_temp[index] = pqtzuv[2];
+            pbl_data_hgt[index]  = pqtzuv[3];
+            pbl_data_ugrd[index] = pqtzuv[4];
+            pbl_data_vgrd[index] = pqtzuv[5];
+            if (!is_eq(pbl_data_spfh[index], bad_data_float)) spfh_cnt++;
+            if (!is_eq(pbl_data_hgt[index], bad_data_float)) hgt_cnt++;
+            selected_levels.add(int(it->first));
+         }
 
          index--;
+      }
+      if (index != -1) {
+         mlog << Error << method_name  << "Missing some levels (" << index << ")\n";
+      }
+
+      if (pbl_level > MAX_PBL_LEVEL) {
+         it = pqtzuv_map_tq.begin();
+         // Find vertical levels with both data
+         float highest_pressure = bad_data_float;
+         for (; it!=pqtzuv_map_tq.end(); ++it) {
+            if (pqtzuv_map_uv.count(it->first) > 0) {
+               highest_pressure = it->first;
+               break;
+            }
+         }
+         if (!is_eq(highest_pressure, bad_data_float)) {
+            index = MAX_PBL_LEVEL - 1;
+            for (; it!=pqtzuv_map_tq.end(); ++it) {
+               int pres_level = int(it->first);
+               if (selected_levels.has(pres_level)) break;
+               
+               float *pqtzuv = it->second;
+               pbl_data_pres[index] = pqtzuv[0];
+               pbl_data_spfh[index] = pqtzuv[1];
+               pbl_data_temp[index] = pqtzuv[2];
+               pbl_data_hgt[index]  = pqtzuv[3];
+               pbl_data_ugrd[index] = pqtzuv[4];
+               pbl_data_vgrd[index] = pqtzuv[5];
+               mlog << Debug(5) << method_name << "Force to add "
+                    << pres_level << " into " << index << "\n";
+               index--;
+            }
+         }
+      }
+      else {
+         // Clear buffer
+         for (int idx=pbl_level; idx<MAX_PBL_LEVEL; idx++) {
+            pbl_data_pres[idx] = bad_data_float;
+            pbl_data_temp[idx] = bad_data_float;
+            pbl_data_spfh[idx] = bad_data_float;
+             pbl_data_hgt[idx] = bad_data_float;
+            pbl_data_ugrd[idx] = bad_data_float;
+            pbl_data_vgrd[idx] = bad_data_float;
+         }
       }
 
       if (hgt_cnt < pbl_level) {
@@ -3064,16 +3166,81 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
 
       if ((spfh_cnt>0) && (pbl_level>0)) {
          mzbl = pbl_level;
-         mlog << Debug(7) << method_name << "mzbl: " << mzbl
+         mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "mzbl: " << mzbl
               << "  missing count: Q: " << (pbl_level - spfh_cnt)
               << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
+         if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
+            ConcatString buf;
+            StringArray log_array;
+            int vlevels = pbl_level;
+            if (vlevels >= MAX_PBL_LEVEL) vlevels = MAX_PBL_LEVEL;
+            for (int idx=0; idx<vlevels; idx++) {
+               buf.clear();
+               buf << " " << pbl_data_pres[idx];
+               buf << " " << pbl_data_temp[idx];
+               buf << " " << pbl_data_spfh[idx];
+               buf << " " <<  pbl_data_hgt[idx];
+               buf << " " << pbl_data_ugrd[idx];
+               buf << " " << pbl_data_vgrd[idx];
+               log_array.add(buf.c_str());
+            }
+            int offset = 0;
+            for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+               mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    input to calpbl_: "
+                    << offset++ << "\t" << log_array[idx] << "\n";
+            }
+            log_array.clear();
+         }
 
          //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
          calpbl_(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
                  pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
+         if (is_eq(hpbl, bad_data_float))
+            mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
+                 << tq_count << " UV records: " << uv_count << " merged records: "
+                 << pqtzuv_map_merged.size() << "\n";
       }
    }
    return hpbl;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
+                const float pbl_p, const float pbl_h, const float pbl_qm,
+                const float hdr_lat, const float hdr_lon,
+                const float hdr_elv, const time_t hdr_vld_ut, 
+                const ConcatString &hdr_typ, const ConcatString &hdr_sid) {
+   ConcatString hdr_info;
+   hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+            << " " << hdr_typ << " " << hdr_sid;
+   if (is_eq(pbl_value, bad_data_float)) {
+      mlog << Warning << "Failed to compute PBL " << hdr_info << "\n\n";
+   }
+   else if (pbl_value < hdr_elv) {
+      mlog << Warning << "Not saved because the computed PBL (" << pbl_value
+           << ") is less than the station elevation (" << hdr_elv
+           << "). " << hdr_info << "\n\n";
+      obs_arr[4] = 0;
+   }
+   else {
+      obs_arr[1] = pbl_code;
+      obs_arr[2] = pbl_p;
+      obs_arr[3] = pbl_h;
+      obs_arr[4] = pbl_value - hdr_elv; // observation value
+      mlog << Debug(7) << " hpbl: " << pbl_value << ", obs_arr[4]: " << obs_arr[4]
+           << "   lat: " << hdr_lat << ", lon: " << hdr_lon
+           << ", elv: " << hdr_elv << " " << hdr_info << "\n\n";
+      if (obs_arr[4] > MAX_PBL) {
+         mlog << Warning << " Computed PBL (" << obs_arr[4] << " from "
+              << pbl_value << ") is too high, Reset to " << MAX_PBL
+              << "  " << hdr_info<< "\n\n";
+         obs_arr[4] = MAX_PBL;
+      }
+
+      addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                     hdr_lat, hdr_lon, hdr_elv, pbl_qm, OBS_BUFFER_SIZE);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

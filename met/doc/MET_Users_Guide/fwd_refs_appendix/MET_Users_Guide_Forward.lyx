@@ -604,187 +604,22 @@ IMPORTANT!
 \end_layout
 
 \begin_layout Standard
-USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
+Copyright 2020, UCAR/NCAR, NOAA, and CSU/CIRA Licensed under the Apache
+ License, Version 2.0 (the "License"); You may not use this file except in
+ compliance with the License.
+ You may obtain a copy of the License at
 \end_layout
 
 \begin_layout Standard
-1.
- 
-\series bold
-License
-\series default
-.
- Subject to these terms and conditions, University Corporation for Atmospheric
- Research (UCAR) grants you a non-exclusive, royalty-free license to use,
- create derivative works, publish, distribute, disseminate, transfer, modify,
- revise and copy the Model Evaluation Tools (MET) software, in both object
- and source code (the 
-\begin_inset Quotes eld
-\end_inset
-
-Software
-\begin_inset Quotes erd
-\end_inset
-
-).
-\begin_inset Newline newline
-\end_inset
-
-
+http://www.apache.org/licenses/LICENSE-2.0
 \end_layout
 
 \begin_layout Standard
-You shall not sell, license or transfer for a fee the Software, or any work
- that in any manner contains the Software.
-\end_layout
-
-\begin_layout Description
-2.
- 
-\series bold
-Disclaimer of Warranty on Software.
-
-\series default
- Use of the Software is at your sole risk.
- The Software is provided "AS IS" and without warranty of any kind and UCAR
- EXPRESSLY DISCLAIMS ALL WARRANTIES AND/OR CONDITIONS OF ANY KIND, EXPRESS
- OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OR CONDITIONS
- OF TITLE, NON-INFRINGEMENT OF A THIRD PARTY'S INTELLECTUAL PROPERTY, MERCHANTAB
-ILITY OR SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
- THE PARTIES EXPRESSLY DISCLAIM THAT THE UNIFORM COMPUTER INFORMATION TRANSACTIO
-NS ACT (UCITA) APPLIES TO OR GOVERNS THIS AGREEMENT.
- No oral or written information or advice given by UCAR or a UCAR authorized
- representative shall create a warranty or in any way increase the scope
- of this warranty.
- Should the Software prove defective, you (and neither UCAR nor any UCAR
- representative) assume the cost of all necessary correction.
- 
-\end_layout
-
-\begin_layout Description
-3.
- 
-\series bold
-Limitation of Liability.
-
-\series default
- UNDER NO CIRCUMSTANCES, INCLUDING NEGLIGENCE, SHALL UCAR BE LIABLE FOR
- ANY DIRECT, INCIDENTAL, SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES INCLUDING
- LOST REVENUE, PROFIT OR DATA, WHETHER IN AN ACTION IN CONTRACT OR TORT
- ARISING OUT OF OR RELATING TO THE USE OF OR INABILITY TO USE THE SOFTWARE,
- EVEN IF UCAR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- 
-\end_layout
-
-\begin_layout Description
-4.
- 
-\series bold
-Compliance with Law.
-
-\series default
- All Software and any technical data delivered under this Agreement are
- subject to U.S.
- export control laws and may be subject to export or import regulations
- in other countries.
- You agree to comply strictly with all applicable laws and regulations in
- connection with use and distribution of the Software, including export
- control laws, and you acknowledge that you have responsibility to obtain
- any required license to export, re-export, or import as may be required.
-\end_layout
-
-\begin_layout Description
-5.
- 
-\series bold
-No Endorsement/No Support
-\series default
-.
- The names UCAR/NCAR, National Center for Atmospheric Research and the Universit
-y Corporation for Atmospheric Research may not be used in any advertising
- or publicity to endorse or promote any products or commercial entity unless
- specific written permission is obtained from UCAR.
- The Software is provided without any support or maintenance, and without
- any obligation to provide you with modifications, improvements, enhancements,
- or updates of the Software.
-\end_layout
-
-\begin_layout Description
-6.
- 
-\series bold
-Controlling Law and Severability
-\series default
-.
- This Agreement shall be governed by the laws of the United States and the
- State of Colorado.
- If for any reason a court of competent jurisdiction finds any provision,
- or portion thereof, to be unenforceable, the remainder of this Agreement
- shall continue in full force and effect.
- This Agreement shall not be governed by the United Nations Convention on
- Contracts for the International Sale of Goods, the application of which
- is hereby expressly excluded.
-\end_layout
-
-\begin_layout Description
-7.
- 
-\series bold
-Termination.
-
-\series default
- Your rights under this Agreement will terminate automatically without notice
- from UCAR if you fail to comply with any term(s) of this Agreement.
- You may terminate this Agreement at any time by destroying the Software
- and any related documentation and any complete or partial copies thereof.
- Upon termination, all rights granted under this Agreement shall terminate.
- The following provisions shall survive termination: Sections 2, 3, 6 and
- 9.
- 
-\end_layout
-
-\begin_layout Description
-8.
- 
-\series bold
-Complete Agreement
-\series default
-.
- This Agreement constitutes the entire agreement between the parties with
- respect to the use of the Software and supersedes all prior or contemporaneous
- understandings regarding such subject matter.
- No amendment to or modification of this Agreement will be binding unless
- in writing and signed by UCAR.
-\end_layout
-
-\begin_layout Description
-9.
- 
-\series bold
-Notices and Additional Terms.
-
-\series default
- Copyright in Software is held by UCAR.
- You must include, with each copy of the Software and associated documentation,
- a copy of this Agreement and the following notice:
-\end_layout
-
-\begin_layout Subparagraph
-
-\series medium
-\begin_inset Quotes eld
-\end_inset
-
-The source of this material is the Research Applications Laboratory at the
- National Center for Atmospheric Research, a program of the University Corporati
-on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
- the National Science Foundation; ©2007-2018 University Corporation for
- Atmospheric Research.
- All Rights Reserved." 
-\begin_inset Newline newline
-\end_inset
-
-
+Unless required by applicable law or agreed to in writing, software distributed
+ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and limitations
+ under the License.
 \end_layout
 
 \begin_layout Standard
@@ -838,16 +673,16 @@ The citation for this User's Guide should be:
 \end_layout
 
 \begin_layout Standard
-K.
- Newman, T.
+T.
  Jensen, Brown, B., R.
  Bullock, T.
- Fowler, 2018, and J.
- Halley Gotway:
+ Fowler, J.
+ Halley Gotway, K.
+ Newman, 2020:
 \begin_inset Newline newline
 \end_inset
 
-The Model Evaluation Tools v8.1 (METv8.1) User’s Guide.
+The Model Evaluation Tools v9.0 (METv9.0) User’s Guide.
  Developmental Testbed Center.
 \begin_inset Newline newline
 \end_inset
@@ -856,12 +691,12 @@ Available at:
 \begin_inset Newline newline
 \end_inset
 
-https://dtcenter.org/community-code/model-evaluation-tools-met/documentation/MET_
-Users_Guide_v8.1.pdf
+https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_U
+sers_Guide_v9.0.pdf
 \begin_inset Newline newline
 \end_inset
 
-437 pp.
+453 pp.
 \end_layout
 
 \begin_layout Chapter*

@@ -260,7 +260,7 @@ interp = {
 //
 output_flag = {
    ecnt  = BOTH;
-   erps  = BOTH;
+   rps   = BOTH;
    rhist = BOTH;
    phist = BOTH;
    orank = BOTH;

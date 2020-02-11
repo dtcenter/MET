@@ -59,6 +59,7 @@ using namespace std;
 #include "parse_stat_line.h"
 #include "aggr_stat_line.h"
 #include "stat_analysis_job.h"
+#include "ens_stats.h"
 
 ////////////////////////////////////////////////////////////////////////
 

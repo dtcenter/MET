@@ -323,23 +323,23 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for class ERPSInfo
+// Code for class RPSInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ERPSInfo::ERPSInfo() {
+RPSInfo::RPSInfo() {
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ERPSInfo::~ERPSInfo() {
+RPSInfo::~RPSInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ERPSInfo::ERPSInfo(const ERPSInfo &c) {
+RPSInfo::RPSInfo(const RPSInfo &c) {
 
    init_from_scratch();
 
@@ -348,7 +348,7 @@ ERPSInfo::ERPSInfo(const ERPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ERPSInfo & ERPSInfo::operator=(const ERPSInfo &c) {
+RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
 
    if(this == &c) return(*this);
 
@@ -359,20 +359,21 @@ ERPSInfo & ERPSInfo::operator=(const ERPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ERPSInfo & ERPSInfo::operator+=(const ERPSInfo &c) {
-   ERPSInfo r_info;
+RPSInfo & RPSInfo::operator+=(const RPSInfo &c) {
+   RPSInfo r_info;
 
-   if(n_ens != c.n_ens) {
-      mlog << Error << "\nERPSInfo::operator+=() -> "
-           << "the ensemble size must remain constant (" << n_ens
-           << " != " << c.n_ens << ")!\n\n";
+   if(n_prob != c.n_prob) {
+      mlog << Error << "\nRPSInfo::operator+=() -> "
+           << "the number of probability bins (\"N_PROB\") "
+           << "must remain constant (" << n_prob << " != "
+           << c.n_prob << ")!\n\n";
       exit(1);
    }
 
    r_info.fthresh = fthresh;
    r_info.othresh = othresh;
-   r_info.n_ens   = n_ens;
    r_info.n_pair  = n_pair + c.n_pair;
+   r_info.n_prob  = n_prob;
 
    if(r_info.n_pair > 0) {
 
@@ -405,7 +406,7 @@ ERPSInfo & ERPSInfo::operator+=(const ERPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ERPSInfo::init_from_scratch() {
+void RPSInfo::init_from_scratch() {
 
    clear();
 
@@ -414,10 +415,10 @@ void ERPSInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ERPSInfo::clear() {
+void RPSInfo::clear() {
 
    othresh.clear();
-   n_ens     = n_pair  = 0;
+   n_pair    = n_prob  = 0;
    rps_rel   = rps_res = rps_unc = bad_data_double;
    rps       = rpscl   = rpss    = bad_data_double;
    rpss_smpl = bad_data_double;
@@ -427,13 +428,13 @@ void ERPSInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ERPSInfo::assign(const ERPSInfo &c) {
+void RPSInfo::assign(const RPSInfo &c) {
 
    fthresh   = c.fthresh;
    othresh   = c.othresh;
 
-   n_ens     = c.n_ens;
    n_pair    = c.n_pair;
+   n_prob    = c.n_prob;
 
    rps_rel   = c.rps_rel;
    rps_res   = c.rps_res;
@@ -450,15 +451,51 @@ void ERPSInfo::assign(const ERPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ERPSInfo::set(const PairDataEnsemble &pd) {
+void RPSInfo::set_rps_thresh(const ThreshArray &ta) {
+   fthresh = ta;
+}
+    
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
+   SingleThresh st;
+   fthresh.clear();
+
+   for(int i=0; i<ta.n(); i++) {
+
+      // Skip 0.0 and 1.0
+      if(is_eq(ta[i].get_value(), 0.0) ||
+         is_eq(ta[i].get_value(), 1.0)) continue;
+
+      // Add CDP thresholds
+      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
+
+      fthresh.add(st);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::set(const PairDataEnsemble &pd) {
    int i, j, k, n_event;
    double p;
    bool cmn_flag;
    NumArray p_thresh, climo_prob;
 
    // Store the dimensions
-   n_ens  = pd.n_ens;
    n_pair = pd.n_pair;
+   n_prob = pd.n_ens;
+
+   // Check that thresholds are actually defined
+   if(fthresh.n() == 0) {
+      mlog << Error << "\nRPSInfo::set(const PairDataEnsemble &) -> "
+           << "no thresholds provided to compute the RPS line type! "
+           << "Specify thresholds using the \"" << conf_key_rps_thresh
+           << "\" configuration file option.\n\n";
+      exit(1);
+   }
 
    // Check RPS threshold formatting: monotonically increasing
    fthresh.check_bin_thresh();
@@ -467,16 +504,16 @@ void ERPSInfo::set(const PairDataEnsemble &pd) {
    cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
 
    // Setup probability thresholds, equally spaced by ensemble size
-   for(i=0; i<=n_ens; i++) p_thresh.add((double) i/n_ens);
+   for(i=0; i<=n_prob; i++) p_thresh.add((double) i/n_prob);
 
    // Setup forecast probabilistic contingency table
    Nx2ContingencyTable fcst_pct;
-   fcst_pct.set_size(n_ens);
+   fcst_pct.set_size(n_prob);
    fcst_pct.set_thresholds(p_thresh.vals());
 
    // Setup climatology probabilistic contingency table
    Nx2ContingencyTable climo_pct;
-   climo_pct.set_size(n_ens);
+   climo_pct.set_size(n_prob);
    climo_pct.set_thresholds(p_thresh.vals());
 
    // Initialize
@@ -498,21 +535,30 @@ void ERPSInfo::set(const PairDataEnsemble &pd) {
       for(j=0; j<pd.n_obs; j++) {
 
          // Loop over ensemble members and count events
-         for(k=0, n_event=0; k<n_ens; k++) {
-            if(fthresh[i].check(pd.e_na[k][j])) n_event++;
+         for(k=0, n_event=0; k<n_prob; k++) {
+            if(fthresh[i].check(pd.e_na[k][j], pd.cmn_na[j], pd.csd_na[j])) n_event++;
          }
 
          // Update the forecast PCT counts
-         p = (double) n_event/n_ens;
-         if(fthresh[i].check(pd.o_na[j])) fcst_pct.inc_event(p);
-         else                             fcst_pct.inc_nonevent(p);
+         p = (double) n_event/n_prob;
+         if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+            fcst_pct.inc_event(p);
+         }
+         else {
+            fcst_pct.inc_nonevent(p);
+         }
 
          // Update the climatology PCT counts
          if(cmn_flag) {
             p = climo_prob[j];
-            if(fthresh[i].check(pd.o_na[j])) climo_pct.inc_event(p);
-            else                             climo_pct.inc_nonevent(p);
+            if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+               climo_pct.inc_event(p);
+            }
+            else {
+               climo_pct.inc_nonevent(p);
+            }
          }
+
       } // end for j
 
       // Increment sums

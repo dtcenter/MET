@@ -32,7 +32,7 @@
 //   012    03/01/18  Halley Gotway   Update summary job type.
 //   013    04/25/18  Halley Gotway   Add ECNT line type.
 //   014    04/01/19  Fillmore        Add FCST and OBS units.
-//   015    01/24/20  Halley Gotway   Add aggregate ERPS lines.
+//   015    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2646,15 +2646,15 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_erps_lines(LineDataFile &f, STATAnalysisJob &job,
-                    map<ConcatString, AggrERPSInfo> &m,
+void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
+                    map<ConcatString, AggrRPSInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
-   AggrERPSInfo aggr;
-   ERPSInfo cur;
+   AggrRPSInfo aggr;
+   RPSInfo cur;
    ConcatString key;
    double rps_fcst, rps_climo, v;
-   map<ConcatString, AggrERPSInfo>::iterator it;
+   map<ConcatString, AggrRPSInfo>::iterator it;
 
    //
    // Process the STAT lines
@@ -2672,18 +2672,18 @@ void aggr_erps_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Check for expected line type
          //
-         if(line.type() != stat_erps) {
-            mlog << Error << "\naggr_erps_lines() -> "
-                 << "should only encounter ensemble ranked probability "
-                 << "score (ERPS) line types.\n"
+         if(line.type() != stat_rps) {
+            mlog << Error << "\naggr_rps_lines() -> "
+                 << "should only encounter ranked probability score "
+                 << "(RPS) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
             throw(1);
          }
 
          //
-         // Parse the current ERPS line
+         // Parse the current RPS line
          //
-         parse_erps_line(line, cur);
+         parse_rps_line(line, cur);
 
          //
          // Build the map key for the current line
@@ -2694,7 +2694,7 @@ void aggr_erps_lines(LineDataFile &f, STATAnalysisJob &job,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.erps_info = cur;
+            aggr.rps_info = cur;
             aggr.hdr.clear();
             m[key] = aggr;
          }
@@ -2704,23 +2704,23 @@ void aggr_erps_lines(LineDataFile &f, STATAnalysisJob &job,
          else {
 
             //
-            // Check for N_ENS remaining constant
+            // Check for N_PROB remaining constant
             //
-            if(m[key].erps_info.n_ens == 0) {
-               m[key].erps_info.n_ens = cur.n_ens;
+            if(m[key].rps_info.n_prob == 0) {
+               m[key].rps_info.n_prob = cur.n_prob;
             }
-            else if(m[key].erps_info.n_ens != cur.n_ens) {
-               mlog << Error << "\naggr_erps_lines() -> "
-                    << "the \"N_ENS\" column must remain constant ("
-                    << m[key].erps_info.n_ens << " != " << cur.n_ens
-                    << ").  Try setting \"-column_eq N_ENS n\".\n\n";
+            else if(m[key].rps_info.n_prob != cur.n_prob) {
+               mlog << Error << "\naggr_rps_lines() -> "
+                    << "the \"N_PROB\" column must remain constant ("
+                    << m[key].rps_info.n_prob << " != " << cur.n_prob
+                    << ").  Try setting \"-column_eq N_PROB n\".\n\n";
                throw(1);
             }
 
             //
             // Aggregate the GRAD partial sums
             //
-            m[key].erps_info += cur;
+            m[key].rps_info += cur;
 
          } // end else
 

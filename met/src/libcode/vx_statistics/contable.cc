@@ -197,8 +197,6 @@ void ContingencyTable::dump(ostream & out, int depth) const
 int r, c;
 Indent prefix(depth);
 ConcatString junk;
-ConcatString j2;
-
 
 out << prefix << "Name  = ";
 
@@ -214,9 +212,7 @@ if ( E->empty() )  { out.flush();  return; }
 
 for (r=0; r<Nrows; ++r)  {
 
-   comma_string(row_total(r), j2);
-
-   junk.format("Sum for row %2d is %12s", r, j2.c_str());
+   junk.format("Sum for row %2d is %12d", r, row_total(r));
 
    out << prefix << junk << "\n";
 
@@ -228,9 +224,7 @@ out << prefix << "\n";
 
 for (c=0; c<Ncols; ++c)  {
 
-   comma_string(col_total(c), j2);
-
-   junk.format("Sum for col %2d is %12s", c, j2.c_str());
+   junk.format("Sum for col %2d is %12d", c, col_total(c));
 
    out << prefix << junk << "\n";
 
@@ -240,9 +234,7 @@ for (c=0; c<Ncols; ++c)  {
 
 out << prefix << "\n";
 
-comma_string(total(), junk);
-
-out << prefix << "Table Total = " << junk << "\n";
+out << prefix << "Table Total = " << total() << "\n";
 
 out << prefix << "\n";
 
@@ -396,7 +388,7 @@ for (r=0; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
-      comma_string((*E)[n], junk);
+      junk << cs_erase << (*E)[n];
 
       k = junk.length();
 

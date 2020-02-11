@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0 BETA3 (February 6, 2020)
+Model Evaluation Tools version 9.0 BETA3 (February 7, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -257,7 +257,7 @@ Version 9.0 BETA3 Release Notes:
 
 - What's New:
    - Major Enhancements: python embedding with pickle files and in ascii2nc,
-     new ERPS line type
+     new RPS line type
    - New Tools: None
 
 - Bugfixes:
@@ -269,7 +269,7 @@ Version 9.0 BETA3 Release Notes:
    - Fix bug in processing CF Compliant NetCDF valid time stamps (#1238).   
 
 - Changes to Output Formats:
-   - Add new ensemble Ranked Probability Score (ERPS) line type to the output of
+   - Add new ensemble Ranked Probability Score (RPS) line type to the output of
      Ensemble-Stat and Point-Stat (for HiRA) (#681).
 
 - Build Process:
@@ -293,7 +293,7 @@ Version 9.0 BETA3 Release Notes:
         'gaussian_radius' options while MAXGAUSS computes the maximum over the
         neighborhood prior to applying the Gaussian filter (#1234).
    - ASCII2NC
-      - Enhance ascii2nc to read points observation via python embedding with
+      - Enhance ascii2nc to read point observations via python embedding with
         the new '-format python' command line option (#1122).
    - PB2NC
       - Remove non-printable characters that are included in the output of the

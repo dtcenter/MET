@@ -28,7 +28,7 @@
 
 // Indices for the output flag types in the configuration file
 static const int i_ecnt     = 0;
-static const int i_erps     = 1;
+static const int i_rps      = 1;
 static const int i_rhist    = 2;
 static const int i_phist    = 3;
 static const int i_orank    = 4;
@@ -38,7 +38,7 @@ static const int n_txt      = 7;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_ecnt,  stat_erps,  stat_rhist, stat_phist,
+   stat_ecnt,  stat_rps,   stat_rhist, stat_phist,
    stat_orank, stat_ssvar, stat_relp
 };
 

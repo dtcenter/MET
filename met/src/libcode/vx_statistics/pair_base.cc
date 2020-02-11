@@ -847,7 +847,8 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 ////////////////////////////////////////////////////////////////////////
 
 double compute_interp(const DataPlaneArray &dpa,
-                      const double obs_x, const double obs_y, const double obs_v,
+                      const double obs_x, const double obs_y,
+                      const double obs_v, const double cmn, const double csd,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
                       const double thresh,
@@ -859,14 +860,14 @@ double compute_interp(const DataPlaneArray &dpa,
    // Check for no data
    if(dpa.n_planes() == 0) return(bad_data_double);
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
                                method, width, shape, thresh, cat_thresh);
 
    if(i_blw == i_abv) {
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
                                   method, width, shape, thresh, cat_thresh);
 
       // Check for bad data prior to vertical interpolation
@@ -1006,10 +1007,14 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
    n_mn = mn_na.n_valid();
    n_sd = sd_na.n_valid();
 
+   // For CDP threshold types, the climo_prob is constant.
+   if(othresh.get_ptype() == perc_thresh_climo_dist) {
+      climo_prob.add_const(othresh.get_pvalue()/100.0, n_mn);
+   }
    // If both mean and standard deviation were provided, use them to
    // derive normal climatological probabilities for the current event
    // threshold
-   if(n_mn > 0 && n_sd > 0) {
+   else if(n_mn > 0 && n_sd > 0) {
 
       mlog << Debug(2)
            << "Deriving normal approximation of climatological "

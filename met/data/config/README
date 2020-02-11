@@ -368,6 +368,7 @@ obtype = "ANALYS";
 //         - stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 //         - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 //         - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+//         - gaussian lon_zero Nx Ny
 //
 //    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid data points. When regridding, compute
@@ -1419,20 +1420,20 @@ topo_mask = {
 // neighborhood verification but for point observations. The HiRA logic
 // interprets the forecast values surrounding each point observation as an
 // ensemble forecast. These ensemble values are processed in two ways. First,
-// the ensemble continuous statistics (ECNT) and ensemble ranked probability
-// score (ERPS) line types are computed directly from the ensemble values.
-// Second, for each categorical threshold specified, a fractional coverage value
-// is computed as the ratio of the nearby forecast values that meet the
-// threshold criteria. Point-Stat evaluates those fractional coverage values as
-// if they were a probability forecast. When applying HiRA, users should enable
-// the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), or ensemble
-// statistics (ECNT or EPRS) line types in the output_flag dictionary. The
-// number of probabilistic HiRA output lines is determined by the number of
-// categorical forecast thresholds and HiRA neighborhood widths chosen.
+// the ensemble continuous statistics (ECNT) and ranked probability score (RPS)
+// line types are computed directly from the ensemble values. Second, for each
+// categorical threshold specified, a fractional coverage value is computed as
+// the ratio of the nearby forecast values that meet the threshold criteria.
+// Point-Stat evaluates those fractional coverage values as if they were a
+// probability forecast. When applying HiRA, users should enable the matched
+// pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), or ensemble statistics
+// (ECNT or PRS) line types in the output_flag dictionary. The number of
+// probabilistic HiRA output lines is determined by the number of categorical
+// forecast thresholds and HiRA neighborhood widths chosen.
 // This dictionary may include the following entries:
 //
-//    -  The "flag" entry is a boolean which toggles "hira"
-//       on (TRUE) and off (FALSE).
+//    - The "flag" entry is a boolean which toggles "hira"
+//      on (TRUE) and off (FALSE).
 //
 //    - The "width" entry specifies the neighborhood size. Since HiRA applies
 //      to point observations, the width may be even or odd.
@@ -1495,7 +1496,7 @@ output_flag = {
    nbrcnt = NONE;  // Neighborhood Continuous Statistics
    isc    = NONE;  // Intensity-Scale
    ecnt   = NONE;  // Ensemble Continuous Statistics
-   erps   = NONE;  // Ensemble Ranked Probability Score Statistics
+   rps    = NONE;  // Ranked Probability Score Statistics
    rhist  = NONE;  // Rank Histogram
    phist  = NONE;  // Probability Integral Transform Histogram
    orank  = NONE;  // Observation Rank
@@ -1855,8 +1856,8 @@ nmep_smooth = {
 // size of 0.05 results in 20 PHIST bins.
 //
 // The "rps_thresh" entry is an array of thresholds to be applied in the
-// computation of the ensemble Ranked Probability Score.  If left empty, but
-// climatology data is provided, the climo_cdf thresholds will be used instead.
+// computation of the ranked probability score.  If left empty, but climatology
+// data is provided, the climo_cdf thresholds will be used instead.
 //
 fcst = {
    message_type = [ "ADPUPA" ];
@@ -2875,7 +2876,7 @@ output_stats = {
 //          -line_type FHO, CTC, MCTC,
 //                     SL1L2, SAL1L2, VL1L2, VAL1L2,
 //                     PCT, NBRCNT, NBRCTC, GRAD,
-//                     ISC, ECNT, ERPS, RHIST, PHIST, RELP, SSVAR
+//                     ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 //          Required Args: -line_type
 //
 //       "aggregate_stat"
@@ -2890,7 +2891,7 @@ output_stats = {
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
 //          -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
 //          -line_type NBRCTC,        -out_line_type NBRCTS
-//          -line_type ORANK,         -out_line_type ECNT, ERPS, RHIST, PHIST,
+//          -line_type ORANK,         -out_line_type ECNT, RPS, RHIST, PHIST,
 //                                                   RELP, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
@@ -3250,6 +3251,8 @@ wavelet = {
 //    - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 //
 //    - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
+//
+//    - gaussian lon_zero Nx Ny
 //
 to_grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
 

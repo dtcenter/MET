@@ -268,7 +268,12 @@ The relative position (RELP) is a count of the number of times each ensemble
 \begin_layout Standard
 
 \series medium
-The continuous ranked probability score (CRPS) is the average the distance
+The ranked probability score (RPS) is included in the Ranked Probability
+ Score (RPS) line type.
+ It is the mean of the Brier scores computed from ensemble probabilities
+ derived for each RPS threshold (rps_thresh) specified in the configuration
+ file.
+ The continuous ranked probability score (CRPS) is the average the distance
  between the forecast (ensemble) cumulative distribution function and the
  observation cumulative distribution function.
  It is an analog of the Brier score, but for continuous forecast and observation
@@ -1507,6 +1512,12 @@ ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 \end_layout
 
+\begin_layout LyX-Code
+
+\series bold
+rps_thresh         = [];
+\end_layout
+
 \begin_layout Standard
 
 \series medium
@@ -1598,6 +1609,33 @@ ens_phist_bin_size
  specify the width of the categorical bins used to accumulate frequencies
  for spread-skill-variance or probability integral transform statistics,
  respectively.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+rps_thresh
+\series default
+ entry is an array of thresholds to be applied in the computation of the
+ RPS line type.
+ Since these thresholds can change for each variable, they can be specified
+ separately for each 
+\series bold
+fcst.field
+\series default
+ entry.
+ If left empty but climatology data is provided, the 
+\series bold
+climo_cdf
+\series default
+ thresholds will be used instead.
+ If not climatology data is provide, and the RPS output line type is requested,
+ then the 
+\series bold
+rps_thresh
+\series default
+ array must be defined.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1835,6 +1873,12 @@ output_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   rps   = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    rhist = NONE;
 \end_layout
 
@@ -1905,6 +1949,17 @@ ECNT
 2.
  
 \series bold
+RPS
+\series medium
+ for Ranked Probability Score Statistics
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ 
+\series bold
 RHIST
 \series medium
  for Ranked Histogram Counts
@@ -1913,7 +1968,7 @@ RHIST
 \begin_layout Description
 
 \series medium
-3.
+4.
 
 \series bold
  PHIST
@@ -1924,7 +1979,7 @@ RHIST
 \begin_layout Description
 
 \series medium
-4.
+5.
  
 \series bold
 ORANK
@@ -1935,7 +1990,7 @@ ORANK
 \begin_layout Description
 
 \series medium
-5.
+6.
  
 \series bold
 SSVAR
@@ -1946,7 +2001,7 @@ SSVAR
 \begin_layout Description
 
 \series medium
-6.
+7.
  
 \series bold
 RELP
@@ -2367,7 +2422,7 @@ TYPE
 \series medium
  is one of 
 \series default
-ecnt, rhist, phist, relp, orank, and ssvar
+ecnt, rps, rhist, phist, relp, orank, and ssvar
 \series medium
  to indicate the line type it contains.
 \end_layout
@@ -3810,6 +3865,380 @@ SPREAD_PLUS_OERR
 \begin_layout Plain Layout
 The square root of the sum of unperturbed ensemble variance and the observation
  error variance
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Format information for RPS (Ranked Probability Score) output line type.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_RPS"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+RPS OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+ECNT Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ECNT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ensemble Continuous Statistics line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Count of observations
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+N_PROB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of probability thresholds (i.e.
+ number of ensemble members in Ensemble-Stat)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS_REL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS Reliability, mean of the reliabilities for each RPS threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS_RES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS Resolution, mean of the resolutions for each RPS threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS_UNC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS Uncertainty, mean of the uncertainties for each RPS threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ranked Probability Score, mean of the Brier Scores for each RPS threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPSS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ranked Probability Skill Score relative to external climatology
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RPSS_SMPL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ranked Probability Skill Score relative to sample climatology
 \end_layout
 
 \end_inset

@@ -28,7 +28,7 @@
 //   008    06/09/17  Halley Gotway   Add RELP line type.
 //   009    10/09/17  Halley Gotway   Add GRAD line type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
-//   011    01/24/20  Halley Gotway   Add ERPS line type.
+//   011    01/24/20  Halley Gotway   Add RPS line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -366,13 +366,13 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_erps_line(STATLine &l, ERPSInfo &r_info) {
+void parse_rps_line(STATLine &l, RPSInfo &r_info) {
 
    r_info.fthresh.add_css(l.get_item("FCST_THRESH", false));
    r_info.othresh.set(l.get_item("OBS_THRESH", false));
 
-   r_info.n_ens     = atof(l.get_item("N_ENS"));
    r_info.n_pair    = atoi(l.get_item("TOTAL"));
+   r_info.n_prob    = atof(l.get_item("N_PROB"));
 
    r_info.rps_rel   = atof(l.get_item("RPS_REL"));
    r_info.rps_res   = atof(l.get_item("RPS_RES"));

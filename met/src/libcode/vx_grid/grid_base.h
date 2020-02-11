@@ -272,6 +272,7 @@ extern bool is_eq(const StereographicData *, const StereographicData *);
 extern bool is_eq(const LatLonData *,        const LatLonData *);
 extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
+extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 
 

@@ -289,8 +289,8 @@ static const char * ecnt_columns [] = {
    "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR"
 };
 
-static const char * erps_columns [] = {
-   "TOTAL",       "N_ENS",       "RPS_REL",
+static const char * rps_columns [] = {
+   "TOTAL",       "N_PROB",      "RPS_REL",
    "RPS_RES",     "RPS_UNC",     "RPS",
    "RPSS",        "RPSS_SMPL"
 };
@@ -418,7 +418,7 @@ static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_w
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
 static const int n_ecnt_columns         = sizeof(ecnt_columns)/sizeof(*ecnt_columns);
-static const int n_erps_columns         = sizeof(erps_columns)/sizeof(*erps_columns);
+static const int n_rps_columns          = sizeof(rps_columns)/sizeof(*rps_columns);
 
 static const int n_rhist_columns        = sizeof(rhist_columns)/sizeof(*rhist_columns);
 static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_columns);
@@ -527,7 +527,7 @@ extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
                              int, int, AsciiTable &, int &, AsciiTable &, int &);
-extern void write_erps_row  (StatHdrColumns &, const ERPSInfo &, STATOutputType,
+extern void write_rps_row   (StatHdrColumns &, const RPSInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -596,7 +596,7 @@ extern void write_isc_cols   (const ISCInfo &, int,
                               AsciiTable &, int, int);
 extern void write_ecnt_cols  (const ECNTInfo &,
                               AsciiTable &, int, int);
-extern void write_erps_cols  (const ERPSInfo &,
+extern void write_rps_cols   (const RPSInfo &,
                               AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,
                               AsciiTable &, int, int);

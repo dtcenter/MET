@@ -37,7 +37,7 @@
 //   016    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   017    03/01/18  Halley Gotway   Update summary job type.
 //   018    04/04/19  Fillmore        Added FCST and OBS units.
-//   019    01/24/20  Halley Gotway   Add aggregate ERPS lines.
+//   019    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -395,7 +395,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrGRADInfo>  grad_map;
    map<ConcatString, AggrISCInfo>   isc_map;
    map<ConcatString, AggrENSInfo>   ens_map;
-   map<ConcatString, AggrERPSInfo>  erps_map;
+   map<ConcatString, AggrRPSInfo>   rps_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
 
    //
@@ -423,7 +423,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
       lt != stat_grad   && lt != stat_ecnt   &&
-      lt != stat_erps   && lt != stat_rhist  &&
+      lt != stat_rps    && lt != stat_rhist  &&
       lt != stat_phist  && lt != stat_relp   &&
       lt != stat_ssvar  && lt != stat_isc) {
       mlog << Error << "\ndo_job_aggr() -> "
@@ -431,7 +431,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
-           << "\tECNT, ERPS, RHIST, PHIST, RELP, SSVAR\n\n";
+           << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR\n\n";
       throw(1);
    }
 
@@ -508,11 +508,11 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
-   // Sum the ERPS line types
+   // Sum the RPS line types
    //
-   else if(lt == stat_erps) {
-      aggr_erps_lines(f, job, erps_map, n_in, n_out);
-      write_job_aggr_erps(job, lt, erps_map, out_at);
+   else if(lt == stat_rps) {
+      aggr_rps_lines(f, job, rps_map, n_in, n_out);
+      write_job_aggr_rps(job, lt, rps_map, out_at);
    }
 
    //
@@ -724,21 +724,21 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the observation rank line types:
-   //    ORANK -> ECNT, ERPS, RHIST, PHIST, RELP, SSVAR
+   //    ORANK -> ECNT, RPS, RHIST, PHIST, RELP, SSVAR
    //
    else if(in_lt == stat_orank &&
-           (out_lt == stat_ecnt  || out_lt == stat_erps  ||
+           (out_lt == stat_ecnt  || out_lt == stat_rps   ||
             out_lt == stat_rhist || out_lt == stat_phist ||
             out_lt == stat_relp  || out_lt == stat_ssvar)) {
 
       //
-      // Check forecast thresholds for ERPS
+      // Check forecast thresholds for RPS
       //
-      if(out_lt == stat_erps) {
+      if(out_lt == stat_rps) {
 
          if(job.out_fcst_thresh.n() == 0) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
-                 << "when \"-out_line_type\" is set to ERPS, the "
+                 << "when \"-out_line_type\" is set to RPS, the "
                  << "\"-out_fcst_thresh\" option must be used to specify "
                  << "monotonically increasing thresholds of interet.\n\n";
             throw(1);
@@ -1978,27 +1978,27 @@ void write_job_aggr_ecnt(STATAnalysisJob &job, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_job_aggr_erps(STATAnalysisJob &job, STATLineType lt,
-                         map<ConcatString, AggrERPSInfo> &m,
-                         AsciiTable &at) {
-   map<ConcatString, AggrERPSInfo>::iterator it;
+void write_job_aggr_rps(STATAnalysisJob &job, STATLineType lt,
+                        map<ConcatString, AggrRPSInfo> &m,
+                        AsciiTable &at) {
+   map<ConcatString, AggrRPSInfo>::iterator it;
    int n_row, n_col, r, c;
    StatHdrColumns shc;
-   ERPSInfo erps_info;
+   RPSInfo rps_info;
 
    //
    // Setup the output table
    //
    n_row  = 1 + m.size();
    n_col  = 1 + job.by_column.n();
-   n_col += n_erps_columns;
+   n_col += n_rps_columns;
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-   write_header_row(erps_columns,  n_erps_columns,  0, at, 0, c);
+   write_header_row(rps_columns,  n_rps_columns,  0, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -2026,12 +2026,12 @@ void write_job_aggr_erps(STATAnalysisJob &job, STATLineType lt,
       c = 0;
 
       //
-      // ERPS output line
+      // RPS output line
       //
-      at.set_entry(r, c++, "ERPS:");
+      at.set_entry(r, c++, "RPS:");
       write_case_cols(it->first, at, r, c);
-      write_erps_cols(it->second.erps_info, at, r, c);
-      if(job.stat_out) write_erps_cols(it->second.erps_info, job.stat_at, r, n_header_columns);
+      write_rps_cols(it->second.rps_info, at, r, c);
+      if(job.stat_out) write_rps_cols(it->second.rps_info, job.stat_at, r, n_header_columns);
    } // end for it
 
    return;
@@ -2447,9 +2447,9 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       n_row  = 1 + m.size();
       n_col += n_ecnt_columns;
    }
-   if(lt == stat_erps) {
+   if(lt == stat_rps) {
       n_row  = 1 + m.size();
-      n_col += n_erps_columns;
+      n_col += n_rps_columns;
    }
    else if(lt == stat_rhist) {
       n_row  = 1 + m.size();
@@ -2474,7 +2474,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
    //
    c = 1 + job.by_column.n();
         if(lt == stat_ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
-   else if(lt == stat_erps)  write_header_row(erps_columns, n_erps_columns, 0, at, 0, c);
+   else if(lt == stat_rps)   write_header_row(rps_columns, n_rps_columns, 0, at, 0, c);
    else if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
    else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
    else if(lt == stat_relp)  write_relp_header_row (0, n, at, 0, c);
@@ -2484,7 +2484,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
    // Setup the output STAT file
    //
         if(lt == stat_ecnt)  job.setup_stat_file(n_row, 0);
-   else if(lt == stat_erps)  job.setup_stat_file(n_row, 0);
+   else if(lt == stat_rps)   job.setup_stat_file(n_row, 0);
    else if(lt == stat_rhist) job.setup_stat_file(n_row, n);
    else if(lt == stat_phist) job.setup_stat_file(n_row, n);
    else if(lt == stat_relp)  job.setup_stat_file(n_row, n);
@@ -2532,19 +2532,20 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       }
 
       //
-      // ERPS output line
+      // RPS output line
       //
-      else if(lt == stat_erps) {
-         ERPSInfo erps_info;
-         erps_info.fthresh = job.out_fcst_thresh;
-         erps_info.set(it->second.ens_pd);
-         at.set_entry(r, c++, "ERPS:");
+
+      else if(lt == stat_rps) {
+         RPSInfo rps_info;
+         rps_info.fthresh = job.out_fcst_thresh;
+         rps_info.set(it->second.ens_pd);
+         at.set_entry(r, c++, "RPS:");
          write_case_cols(it->first, at, r, c);
-         write_erps_cols(erps_info, at, r, c);
+         write_rps_cols(rps_info, at, r, c);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
             write_header_cols(shc, job.stat_at, r);
-            write_erps_cols(erps_info, job.stat_at, r, n_header_columns);
+            write_rps_cols(rps_info, job.stat_at, r, n_header_columns);
          }
          // Increment row counter
          r++;

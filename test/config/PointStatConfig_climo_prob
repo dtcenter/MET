@@ -210,7 +210,7 @@ output_flag = {
    pjc    = BOTH;
    prc    = BOTH;
    ecnt   = NONE;
-   erps   = NONE;
+   rps    = NONE;
    eclv   = BOTH;
    mpr    = BOTH;
 }

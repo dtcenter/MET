@@ -165,7 +165,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    ecnt   = NONE;
-   erps   = NONE;
+   rps    = NONE;
    eclv   = NONE;
    mpr    = BOTH;
 }
