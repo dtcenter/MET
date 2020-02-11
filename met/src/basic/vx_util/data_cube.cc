@@ -118,6 +118,15 @@ void DataCube::set(double value, int i, int j, int k) {
 
 void DataCube::set_constant(double value) {
 
+    for (int i = 0; i < Nx; i++) {
+        for (int j = 0; j < Ny; j++) {
+            for (int k = 0; k < Nz; k++) {
+                set(value, i, j, k);
+            }
+        }
+    }
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
