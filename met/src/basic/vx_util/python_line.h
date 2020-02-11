@@ -26,7 +26,25 @@ extern "C" {
 }
 
 
+#include "data_line.h"
 #include "parse_stat_line.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class PyLineDataFile : public LineDataFile {
+
+   protected:
+
+   public:
+
+      PyLineDataFile();
+     ~PyLineDataFile();
+
+
+
+};
 
 
 ////////////////////////////////////////////////////////////////////////
