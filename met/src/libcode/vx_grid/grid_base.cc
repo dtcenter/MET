@@ -1171,6 +1171,7 @@ else if ( i1.st  && i2.st  )  return ( is_eq(i1.st,  i2.st ) );
 else if ( i1.ll  && i2.ll  )  return ( is_eq(i1.ll,  i2.ll ) );
 else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
+else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 
 return ( false );
@@ -1315,6 +1316,27 @@ if ( m1->nx           == m2->nx                  &&
      is_eq  (m1->lat_ur, m2->lat_ur,  loose_tol) &&
      is_eq  (rescale_lon(m1->lon_ur),
              rescale_lon(m2->lon_ur), loose_tol) )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const GaussianData * g1, const GaussianData * g2)
+
+{
+
+if ( !g1 || !g2 )  return ( false );
+
+bool status = false;
+
+if ( is_eq  (rescale_lon(g1->lon_zero),
+             rescale_lon(g2->lon_zero), loose_tol) &&
+     g1->nx  == g2->nx                             &&
+     g1->ny  == g2->ny )  status = true;
 
 return ( status );
 
