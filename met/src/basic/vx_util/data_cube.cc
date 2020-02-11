@@ -64,29 +64,59 @@ DataCube& DataCube::operator=(const DataCube& d) {
 
 void DataCube::clear() {
 
+    Data.clear();
+
+    Nx = 0;
+    Ny = 0;
+    Nz = 0;
+    Nxyz = 0;
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::erase() {
 
+    Data.resize(Nxyz);
+    Data.assign(Nxyz, 0);
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::set_size(int nx, int ny, int nz) {
 
+    Nx = nx;
+    Ny = ny;
+    Nz = nz;
+    Nxyz = nx * ny * nz;
+
+    Data.resize(Nxyz);
+    Data.assign(Nxyz, 0);
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::set(double f, int i, int j, int k) {
+void DataCube::set(double value, int i, int j, int k) {
 
+    /*  note when i = Nx - 1, j = Ny - 1, k = Nz - 1
+     *  n = Ny * Nz * (Nx - 1) + Nz * (Ny - 1) + Nz - 1
+     *    = Nx * Ny * Nz - 1
+     */
+    int n = Ny * Nz * i + Nz * j + k;
+
+    Data[n] = value;
+
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::set_constant(double f) {
+void DataCube::set_constant(double value) {
 
 }
 
@@ -95,6 +125,7 @@ void DataCube::set_constant(double f) {
 double DataCube::get(int i, int j, int k) const {
 
     int n = Ny * Nz * i + Nz * j + k;
+
     return Data[n];
 }
 

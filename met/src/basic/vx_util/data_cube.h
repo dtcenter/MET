@@ -28,17 +28,14 @@ class DataCube {
         // Destructor
         ~DataCube();
 
-        // Assignment operator
-        DataCube& operator=(const DataCube&);
-
         void clear();
 
         void erase();
 
         // Set methods
         void set_size(int nx, int ny, int nz);
-        void set(double f, int i, int j, int k);
-        void set_constant(double f);
+        void set(double value, int i, int j, int k);
+        void set_constant(double value);
 
         // Get methods
         int nx() const;
@@ -46,7 +43,12 @@ class DataCube {
         int nz() const;
 
         double get(int i, int j, int k) const;
+
+        // Index operator
         double operator()(int i, int j, int k) const;
+
+        // Assignment operator
+        DataCube& operator=(const DataCube&);
 
     private:
 
