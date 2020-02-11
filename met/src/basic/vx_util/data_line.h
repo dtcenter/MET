@@ -50,7 +50,7 @@ class DataLine {
       friend ostream & operator<<(ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
-   private:
+   protected:
 
       //void extend_char  (int);
       //void extend_int   (int);
@@ -76,6 +76,8 @@ class DataLine {
       void init_from_scratch();
       void assign(const DataLine &);
       int N_items;
+
+      virtual bool read_single_text_line(LineDataFile *);   //  reads a line of text into Line
 
 
    public:

@@ -73,6 +73,7 @@ using namespace netCDF;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "global_python.h"
 
 #include "ascii2nc_conf_info.h"
 #include "file_handler.h"
@@ -141,11 +142,15 @@ static void set_mask_sid(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
+static void setup_wrapper_path();
+
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[])
 
 {
+
+setup_wrapper_path();
 
    CommandLine cline;
 
@@ -624,6 +629,35 @@ void set_verbosity(const StringArray & a) {
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void setup_wrapper_path()
+
+{
+
+ConcatString command;
+
+
+GP.initialize();
+
+run_python_string("import sys");
+
+command << cs_erase
+        << "sys.path.append(\""
+        << replace_path(wrappers_dir)
+        << "\")";
+
+cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
+
+run_python_string(command.text());
+
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

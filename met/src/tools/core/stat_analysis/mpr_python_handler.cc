@@ -15,6 +15,7 @@ using namespace std;
 
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
 
 #include "vx_log.h"
 #include "vx_math.h"
@@ -39,25 +40,126 @@ static const char pickle_output_filename [] = "out.pickle";
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //     from parse_stat_line.h:
+   //
+   // // Matched Pair (MPR) data structure
+   // struct MPRData {
+   //    ConcatString fcst_var;
+   //    ConcatString obs_var;
+   //    int total, index;
+   //    ConcatString obs_sid, obs_qc;
+   //    double obs_lat, obs_lon, obs_lvl, obs_elv;
+   //    double fcst, obs, climo_mean, climo_stdev, climo_cdf;
+   // };
+   //
+
+
+static const int n_mpr = 15;   //  how many "things" in an mpr struct
+                               //    hope I counted right
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 static const char sq = '\'';   //  single quote
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
+static void get_cs     (PyObject * in, ConcatString & out);
+
+static void get_int    (PyObject * in, int & out);
+
+static void get_double (PyObject * in, double & out);
+
+static bool is_na      (PyObject *);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
-   //  Code for class PythonHandler
+   //  Code for misc functions
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_name)
+void mpr_populate(PyObject * list_in, MPRData & mpr_out)
 
 {
 
-use_pickle = false;
+   //
+   //  make sure the given python object is a list
+   //
+
+if ( ! PyList_Check(list_in) )  {
+
+   mlog << Error
+        << "\n\n   mpr_populate(PyObject * list_in, MPRData & mpr_out) -> python object is not a list!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  make sure the list is the correct size
+   //
+
+const int N = (int) PyList_Size(list_in);
+
+if ( N != n_mpr )  {
+
+   mlog << Error
+        << "\n\n   mpr_populate(PyObject * list_in, MPRData & mpr_out) -> bad list size ... (" << N << ")\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  Grab the elements of the list one at a time
+   //    and populate the MPRData struct
+   //
+   //  Note that we always have to be prepared
+   //    for some element to be the "NA" string,
+   //    even when we were expecting some other
+   //    data type such as int or double
+   //
+
+int j = 0;
+
+
+get_cs     (PyList_GetItem(list_in, j++), mpr_out.fcst_var);
+get_cs     (PyList_GetItem(list_in, j++), mpr_out.obs_var);
+
+get_int    (PyList_GetItem(list_in, j++), mpr_out.total);
+get_int    (PyList_GetItem(list_in, j++), mpr_out.index);
+   
+get_cs     (PyList_GetItem(list_in, j++), mpr_out.obs_sid);
+get_cs     (PyList_GetItem(list_in, j++), mpr_out.obs_qc);
+
+get_double (PyList_GetItem(list_in, j++), mpr_out.obs_lat);
+get_double (PyList_GetItem(list_in, j++), mpr_out.obs_lon);
+get_double (PyList_GetItem(list_in, j++), mpr_out.obs_lvl);
+get_double (PyList_GetItem(list_in, j++), mpr_out.obs_elv);
+
+get_double (PyList_GetItem(list_in, j++), mpr_out.fcst);
+get_double (PyList_GetItem(list_in, j++), mpr_out.obs);
+get_double (PyList_GetItem(list_in, j++), mpr_out.climo_mean);
+get_double (PyList_GetItem(list_in, j++), mpr_out.climo_stdev);
+get_double (PyList_GetItem(list_in, j++), mpr_out.climo_cdf);
+
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
@@ -65,34 +167,59 @@ use_pickle = false;
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::PythonHandler(const char * program_name, const char * ascii_filename) : FileHandler(program_name)
+void get_cs(PyObject * in, ConcatString & out)
 
 {
 
-int j;
-ConcatString s = ascii_filename;
-StringArray a = s.split(" ");
+   //
+   //  ok if the string is "NA", no separate check needed
+   //
 
+out = pyobject_as_concat_string (in);
 
-user_script_filename = a[0];
-
-for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
-
-   user_script_args.add(a[j]);
+return;
 
 }
 
-use_pickle = false;
 
-const char * c = getenv(user_python_path_env);
+////////////////////////////////////////////////////////////////////////
 
-if ( c )  {
 
-   use_pickle = true;
+void get_int    (PyObject * in, int & out)
 
-   user_path_to_python = c;
+{
+
+if ( is_na(in) )  {
+
+   out = bad_data_int;
+
+   return;
 
 }
+
+out = pyobject_as_int(in);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void get_double (PyObject * in, double & out)
+
+{
+
+if ( is_na(in) )  {
+
+   out = bad_data_double;
+
+   return;
+
+}
+
+out = pyobject_as_double(in);
 
 
 return;
@@ -103,91 +230,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-PythonHandler::~PythonHandler()
+   //
+   //  check that is a string and that the string contents are "NA"
+   //
+
+
+bool is_na (PyObject * obj)
 
 {
 
+if ( ! PyUnicode_Check(obj) )  return ( false );
 
-}
+   //
+   //  now we know it's a string, the value had better be "NA"
+   //
 
+ConcatString s = pyobject_as_concat_string(obj);
 
-////////////////////////////////////////////////////////////////////////
+if ( strcmp(s.text(), na_string.c_str()) == 0 )  return ( true );
 
-
-bool PythonHandler::isFileType(LineDataFile &ascii_file) const
-
-{
-
-return ( false );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool PythonHandler::_readObservations(LineDataFile &ascii_file)
-
-{
+   //
+   //  if it's a string but not NA, then error out
+   //
 
 mlog << Error
-     << "\n\n  bool PythonHandler::_readObservations(LineDataFile &) -> should never be called!\n\n";
+     << "\n\n  is_na (PyObject *) -> bad string value ... \"" << s.text() << "\"\n\n";
 
 exit ( 1 );
 
-
-return ( false );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void PythonHandler::load_python_obs(PyObject * obj)
-
-{
-
-if ( ! PyList_Check(obj) )  {
-
-   mlog << Error
-        << "\n\n  PythonHandler::load_python_obs(PyObject *) -> given object not a list!\n\n";
-
-   exit ( 1 );
-
-}
-
-int j;
-PyObject * a = 0;
-Python3_List list(obj);
-Observation obs;
-
-for (j=0; j<(list.size()); ++j)  {
-
-   a = list[j];
-
-   if ( ! PyList_Check(obj) )  {
-
-      mlog << Error
-           << "\n\n  PythonHandler::load_python_obs(PyObject *) -> non-list object found in main list!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   obs.set(a);
-
-   _addObservations(obs);
-
-}   //  for j
-
-
-
    //
    //  done
    //
 
-return;
+return ( false );   //  control flow should never get here
 
 }
 
@@ -195,180 +270,5 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
-
-{
-
-bool status = false;
-
-if ( use_pickle )  status = do_pickle   ();
-else               status = do_straight ();
-
-return ( status );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool PythonHandler::do_straight()
-
-{
-
-ConcatString command;
-ConcatString short_user_name;
-ConcatString path;
-
-
-// path << cs_erase
-//      << mbb << '/'
-//      << wrappers_dir << '/'
-//      << generic_python_wrapper;
-
-// path << ".py";
-
-
-path = generic_python_wrapper;
-
-short_user_name = user_script_filename;
-
-short_user_name.chomp(".py");
-
-   //
-   //  start up the python interpreter
-   //
-
-Python3_Script script(path.text());
-
-// cout << "\n\n  do_straight() -> python_wrapper = \"" << script.filename() << "\"\n\n" << flush;
-
-   //
-   //  set up a "new" sys.argv list
-   //     with the command-line arquments for
-   //     the user's script
-   //
-
-if ( user_script_args.n() > 0 )  {
-
-   script.reset_argv(short_user_name.text(), user_script_args);
-
-}
-
-   //
-   //  import the user's script as a module
-   //
-
-PyObject * m = PyImport_Import(PyUnicode_FromString(short_user_name.text()));
-
-   //
-   //  get the dictionary (ie, namespace)
-   //    for the module
-   //
-
-Python3_Dict md (m);
-
-   //
-   //  get the variable containing the
-   //    list of obs
-   //
-
-PyObject * obj = md.lookup_list(list_name);
-
-// cout << "obj = \"" << obj << "\"\n" << flush;
-
-   //
-   //  load the obs
-   //
-
-load_python_obs(obj);
-
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  wrapper usage:  /path/to/python wrapper.py pickle_output_filename user_script_name [ user_script args ... ]
-   //
-
-bool PythonHandler::do_pickle()
-
-{
-
-int j;
-const int N = user_script_args.n();
-ConcatString command;
-int status;
-
-
-command << cs_erase
-        << user_path_to_python    << ' '
-        << replace_path(write_pickle_wrapper) << ' '
-        << pickle_output_filename << ' '
-        << user_script_filename;
-
-for (j=0; j<N; ++j)  {
-
-   command << ' ' << user_script_args[j];
-
-};
-
-
-// cout << "\n\n  PythonHandler::do_pickle() -> command = \"" << command << "\"\n\n" << flush;
-
-// exit ( 1 );
-
-status = system(command.text());
-
-if ( status )  {
-
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> command \"" << command.text() << "\" failed ... status = " << status << "\n\n";
-
-   exit ( 1 );
-
-
-}
-
-ConcatString generic;
-
-// generic << cs_erase << mbb << '/' << wrappers_dir << '/' << generic_pickle_wrapper << ".py";
-
-generic = generic_pickle_wrapper;
-
-Python3_Script script(generic.text());
-
-script.read_pickle(list_name, pickle_output_filename);
-
-PyObject * obj = script.lookup(list_name);
-
-// cout << "\n\n  PythonHandler::do_pickle() -> obj = " << obj << "\n\n" << flush;
-
-if ( ! PyList_Check(obj) )  {
-
-   mlog << Error
-        << "\n\n  PythonHandler::do_pickle() -> pickle object is not a list!\n\n";
-
-   exit ( 1 );
-
-}
-
-load_python_obs(obj);
-
-   //
-   //  done
-   //
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
 
 

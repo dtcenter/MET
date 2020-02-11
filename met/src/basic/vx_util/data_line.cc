@@ -376,36 +376,20 @@ int DataLine::read_line(LineDataFile * ldf)
 
 clear();
 
-ifstream & f = *(ldf->in);
-
-if ( !f )  return ( 0 );
-
-File = ldf;
-
-char c;
 size_t pos, count;
+
+
+pos = 0;
+count = 0;
 
 
    //
    //  get a line from the file
    //
 
-pos = 0;
-count = 0;
 
-while ( f.get(c) )  {
+if ( ! read_single_text_line(ldf) )  { clear();  return ( 0 ); }
 
-   if ( !f )  { clear();  return ( 0 ); }
-
-   //extend_char(pos + 5);   //  better safe than sorry
-
-   if ( c == '\n' )  { break; }
-
-   Line += c;
-
-}
-
-if ( !f )  { clear();  return ( 0 ); }
 
    //
    //  parse the line with strtok
@@ -582,6 +566,40 @@ void DataLine::set_delimiter(const char *delimiter)
 
 {
   Delimiter.assign(delimiter);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool DataLine::read_single_text_line(LineDataFile * ldf)
+
+{
+
+ifstream & f = *(ldf->in);
+
+if ( !f )  return ( false );
+
+File = ldf;
+
+char c;
+
+
+while ( f.get(c) )  {
+
+   if ( !f )  return ( false );
+
+   if ( c == '\n' )  { break; }
+
+   Line += c;
+
+}
+
+if ( !f )  return ( false );
+
+
+return ( true );
+
 }
 
 
