@@ -45,6 +45,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                file_linecount.cc file_linecount.h \
                filename_suffix.cc filename_suffix.h \
                data_plane.cc data_plane.h \
+               data_cube.cc data_cube.h \
                data_plane_util.cc data_plane_util.h \
                interp_mthd.cc interp_mthd.h \
                interp_util.cc interp_util.h \

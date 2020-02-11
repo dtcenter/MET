@@ -1,0 +1,126 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2020
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+////////////////////////////////////////////////////////////////////////
+//
+//    Filename:  data_cube.cc
+//
+//    Description:
+//        Contains the definition of the DataCube class.
+//
+//    Mod    Date      Name           Description
+//    ----   ----      ----           -----------
+//    000    02-11-20  Fillmore       Initial definition
+//
+////////////////////////////////////////////////////////////////////////
+
+using namespace std;
+
+#include "data_cube.h"
+
+#include "vx_log.h"
+#include "vx_math.h"
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube::DataCube() {
+
+    init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube::DataCube(const DataCube& d) {
+
+    init_from_scratch();
+
+    assign(d);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube::~DataCube() {
+
+    clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube& DataCube::operator=(const DataCube& d) {
+
+    if(this == &d) return(*this);
+
+    assign(d);
+
+    return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::clear() {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::erase() {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::set_size(int nx, int ny, int nz) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::set(double f, int i, int j, int k) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::set_constant(double f) {
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double DataCube::get(int i, int j, int k) const {
+
+    int n = Ny * Nz * i + Nz * j + k;
+    return Data[n];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::init_from_scratch() {
+
+    Nx = 0;
+    Ny = 0;
+    Nz = 0;
+    Nxyz = 0;
+
+    clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::assign(const DataCube& d) {
+
+    clear();
+
+    set_size(d.nx(), d.ny(), d.nz());
+
+    Data = d.Data;
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
