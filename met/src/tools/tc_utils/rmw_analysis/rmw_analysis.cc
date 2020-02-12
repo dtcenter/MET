@@ -272,8 +272,14 @@ void process_files() {
             NcVar var = get_nc_var(nc_out, data_names[i_var].c_str());
 
             for(int i_track = 0; i_track < n_track_point; i_track++) {
-                start_2d[2] = i_track;
-                start_3d[3] = i_track;
+                if (data_n_dims[i_var] == 2) {
+                    start_2d[2] = i_track;
+                    var.getVar(start_2d, count_2d, data_2d.data());
+                }
+                if (data_n_dims[i_var] == 3) {
+                    start_3d[2] = i_track;
+                    var.getVar(start_3d, count_3d, data_3d.data());
+                }
             }
         }
     }
