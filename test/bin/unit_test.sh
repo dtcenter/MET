@@ -66,7 +66,10 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_airnow.xml \
           unit_python.xml \
           unit_point2grid.xml \
-          unit_perc_thresh.xml"
+          unit_perc_thresh.xml \
+          unit_gaussian.xml \
+          unit_grid_diag.xml \
+          unit_quality_filter.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
