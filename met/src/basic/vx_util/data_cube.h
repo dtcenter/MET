@@ -23,6 +23,7 @@ class DataCube {
 
         // Constructors
         DataCube();
+
         DataCube(const DataCube&);
 
         // Destructor
@@ -34,7 +35,9 @@ class DataCube {
 
         // Set methods
         void set_size(int nx, int ny, int nz);
+
         void set(double value, int i, int j, int k);
+
         void set_constant(double value);
 
         // Get sizes
@@ -42,11 +45,17 @@ class DataCube {
         int ny() const;
         int nz() const;
 
+        bool shape_equal(const DataCube&);
+
+        void check_shape_equal(const DataCube&);
+
         // Index get
         double get(int i, int j, int k) const;
 
         // Arithmetic methods
         void assign(const DataCube&);
+
+        void increment(void);
 
         void add_assign(const DataCube&);
 
@@ -79,6 +88,7 @@ class DataCube {
 };
 
 #endif  /*  __DATA_CUBE_H__  */
+
 
 ////////////////////////////////////////////////////////////////////////
 

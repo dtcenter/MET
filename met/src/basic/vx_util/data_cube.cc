@@ -35,11 +35,11 @@ DataCube::DataCube() {
 
 ////////////////////////////////////////////////////////////////////////
 
-DataCube::DataCube(const DataCube& d) {
+DataCube::DataCube(const DataCube& other) {
 
     init_from_scratch();
 
-    assign(d);
+    assign(other);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,8 +107,36 @@ void DataCube::set(double value, int i, int j, int k) {
 
 void DataCube::set_constant(double value) {
 
+    if (Data.empty()) {
+        mlog << Error << "\nDataCube::set_constant-> "
+             << "data array is empty.\n\n";
+        exit(1);
+    }
+
     for (int n = 0; n < Nxyz; n++) {
         Data[n] = value;
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool DataCube::shape_equal(const DataCube& other) {
+
+    return (Nx == other.Nx) && (Ny == other.Ny) && (Nz == other.Nz);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::check_shape_equal(const DataCube& other) {
+
+    if (!(this->shape_equal(other))) {
+        mlog << Error << "\nDataCube::check_shape_equal-> "
+             << "(" << Nx << ", " << Ny << ", " << Nz << ") != ("
+             << other.Nx << ", " << other.Ny << ", " << other.Nz << ")"
+             << "\n\n";
+        exit(1);
     }
 
     return;
@@ -125,23 +153,23 @@ double DataCube::get(int i, int j, int k) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::assign(const DataCube& d) {
+void DataCube::assign(const DataCube& other) {
 
     clear();
 
-    set_size(d.nx(), d.ny(), d.nz());
+    set_size(other.Nx, other.Ny, other.Nz);
 
-    Data = d.Data;
+    Data = other.Data;
 
     return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::add_assign(const DataCube& d) {
+void DataCube::increment(void) {
 
     for (int n = 0; n < Nxyz; n++) {
-        Data[n] += d.Data[n];
+        Data[n]++;
     }
 
     return;
@@ -149,10 +177,10 @@ void DataCube::add_assign(const DataCube& d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::subtract_assign(const DataCube& d) {
+void DataCube::add_assign(const DataCube& other) {
 
     for (int n = 0; n < Nxyz; n++) {
-        Data[n] -= d.Data[n];
+        Data[n] += other.Data[n];
     }
 
     return;
@@ -160,10 +188,10 @@ void DataCube::subtract_assign(const DataCube& d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::multiply_assign(const DataCube& d) {
+void DataCube::subtract_assign(const DataCube& other) {
 
     for (int n = 0; n < Nxyz; n++) {
-        Data[n] *= d.Data[n];
+        Data[n] -= other.Data[n];
     }
 
     return;
@@ -171,10 +199,21 @@ void DataCube::multiply_assign(const DataCube& d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::divide_assign(const DataCube& d) {
+void DataCube::multiply_assign(const DataCube& other) {
 
     for (int n = 0; n < Nxyz; n++) {
-        Data[n] /= d.Data[n];
+        Data[n] *= other.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::divide_assign(const DataCube& other) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] /= other.Data[n];
     }
 
     return;
@@ -189,11 +228,11 @@ double DataCube::operator()(int i, int j, int k) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-DataCube& DataCube::operator=(const DataCube& d) {
+DataCube& DataCube::operator=(const DataCube& other) {
 
-    if (this == &d) return *this;
+    if (this == &other) return *this;
 
-    assign(d);
+    assign(other);
 
     return *this;
 }
