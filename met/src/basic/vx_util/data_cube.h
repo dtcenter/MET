@@ -72,10 +72,16 @@ class DataCube {
         // Index operator
         double operator()(int i, int j, int k) const;
 
-        // Assignment operator
+        // Arithmetic operators
         DataCube& operator=(const DataCube&);
 
-        // Arithmetic operators
+        DataCube& operator+=(const DataCube&);
+
+        DataCube& operator-=(const DataCube&);
+
+        DataCube& operator*=(const DataCube&);
+
+        DataCube& operator/=(const DataCube&);
 
     private:
 

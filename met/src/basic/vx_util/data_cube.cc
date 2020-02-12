@@ -273,6 +273,42 @@ DataCube& DataCube::operator=(const DataCube& other) {
 
 ////////////////////////////////////////////////////////////////////////
 
+DataCube& DataCube::operator+=(const DataCube& other) {
+
+    add_assign(other);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube& DataCube::operator-=(const DataCube& other) {
+
+    subtract_assign(other);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube& DataCube::operator*=(const DataCube& other) {
+
+    multiply_assign(other);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube& DataCube::operator/=(const DataCube& other) {
+
+    divide_assign(other);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void DataCube::init_from_scratch() {
 
     Nx = 0;
