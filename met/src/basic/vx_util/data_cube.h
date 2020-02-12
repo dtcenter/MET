@@ -52,9 +52,10 @@ class DataCube {
         // Index get
         double get(int i, int j, int k) const;
 
-        // Arithmetic methods
+        // Assignment
         void assign(const DataCube&);
 
+        // Arithmetic methods
         void increment(void);
 
         void add_assign(const DataCube&);
@@ -72,9 +73,10 @@ class DataCube {
         // Index operator
         double operator()(int i, int j, int k) const;
 
-        // Arithmetic operators
+        // Assignment operator
         DataCube& operator=(const DataCube&);
 
+        // Arithmetic operators
         DataCube& operator+=(const DataCube&);
 
         DataCube& operator-=(const DataCube&);
@@ -88,7 +90,7 @@ class DataCube {
         int Nx;
         int Ny;
         int Nz;
-        int Nxyz; // Nx * Ny *Nz
+        int Nxyz; // Nx * Ny * Nz
 
         std::vector<double> Data;
 
