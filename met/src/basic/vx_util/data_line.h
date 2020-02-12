@@ -41,6 +41,11 @@ static const char dataline_default_delim[]      = " \t";
 class LineDataFile;  //  forward reference
 
 
+#ifdef WITH_PYTHON
+class PyLineDataFile;   //  forward reference
+#endif
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -77,7 +82,11 @@ class DataLine {
       void assign(const DataLine &);
       int N_items;
 
-      virtual bool read_single_text_line(LineDataFile *);   //  reads a line of text into Line
+      bool read_single_text_line(LineDataFile *);   //  reads a line of text into Line
+
+#ifdef WITH_PYTHON
+      bool read_py_single_text_line(PyLineDataFile *);
+#endif
 
 
    public:
@@ -166,7 +175,7 @@ class LineDataFile {
    public:
 
       LineDataFile();
-     ~LineDataFile();
+      virtual ~LineDataFile();
 
       ifstream * in;
 

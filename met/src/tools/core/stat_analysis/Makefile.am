@@ -12,7 +12,6 @@ OPT_PYTHON_SOURCES =
 
 if ENABLE_PYTHON
 LDFLAGS += -lvx_python3_utils
-OPT_PYTHON_SOURCES += mpr_python_handler.h mpr_python_handler.cc
 endif
 
 # The program
@@ -48,6 +47,7 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
+	-lvx_statistics \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = stat_analysis.h \

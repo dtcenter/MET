@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MPR_PYTHON_HANDLER_H__
-#define  __MPR_PYTHON_HANDLER_H__
+#ifndef  __PYTHON_LINE_H__
+#define  __PYTHON_LINE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -20,14 +20,10 @@
 #include <iostream>
 
 extern "C" {
-
 #include "Python.h"
-
 }
 
-
 #include "data_line.h"
-#include "parse_stat_line.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,6 +39,11 @@ class PyLineDataFile : public LineDataFile {
      ~PyLineDataFile();
 
 
+      int index;   //  index into the list
+
+      int N;   //  # of elements in list
+
+      PyObject * main_list;   //  not allocated
 
 };
 
@@ -50,17 +51,7 @@ class PyLineDataFile : public LineDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  populates a single MPRData struct from a python list record
-   //
-
-extern void mpr_populate(PyObject * list_in, MPRData & mpr_out);   
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   /*  __MPR_PYTHON_HANDLER_H__  */
+#endif   /*  __PYTHON_LINE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

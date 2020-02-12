@@ -52,6 +52,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
+#include "ens_stats.h"
 
 ////////////////////////////////////////////////////////////////////////
 

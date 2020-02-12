@@ -30,6 +30,10 @@ using namespace std;
 #include "data_line.h"
 #include "vx_log.h"
 
+#ifdef WITH_PYTHON
+#include "python_line.h"
+#endif  /*  WITH_PYTHON  */
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -576,6 +580,22 @@ bool DataLine::read_single_text_line(LineDataFile * ldf)
 
 {
 
+////////////////////////////////////////////////////
+#ifdef  WITH_PYTHON
+
+   PyLineDataFile * pldf = dynamic_cast<PyLineDataFile *>(ldf);
+
+   if ( pldf )  {
+
+      const bool status = read_py_single_text_line(pldf);
+
+      return ( status );
+
+   }
+
+#endif   /*  WITH_PYTHON  */
+////////////////////////////////////////////////////
+
 ifstream & f = *(ldf->in);
 
 if ( !f )  return ( false );
@@ -602,6 +622,24 @@ return ( true );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+#ifdef  WITH_PYTHON
+
+bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
+
+{
+
+
+
+
+return ( true );
+
+}
+
+#endif   /*  WITH_PYTHON  */
 
 ////////////////////////////////////////////////////////////////////////
 
