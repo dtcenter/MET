@@ -2133,8 +2133,8 @@ void usage() {
         << "\t[-method type]\n"
         //<< "\t[-width n]\n"
         //<< "\t[-shape type]\n"
-        << "\t[-gaussan_dx n]\n"
-        << "\t[-gaussan_radius n]\n"
+        << "\t[-gaussian_dx n]\n"
+        << "\t[-gaussian_radius n]\n"
         << "\t[-obs_thresh n]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
@@ -2164,18 +2164,17 @@ void usage() {
         << "\t\t\"-adp adp_file_name\" specifies a ADP data input for AOD dataset (ignored if the input is not AOD from GOES16/17).\n"
 
         << "\t\t\"-method type\" overrides the default regridding "
-        << "method (" << interpmthd_to_string(RGInfo.method)
-        << ") (optional).\n"
+        << "method (default: " << interpmthd_to_string(RGInfo.method)
+        << ", optional). Allows one more \"-method GAUSSIAN\" which applied only to the probabililty variable.\n"
 
-        //<< "\t\t\"-width n\" overrides the default regridding "
-        //<< "width (" << RGInfo.width << ") (optional).\n"
+        << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"
 
-        //<< "\t\t\"-shape type\" overrides the default interpolation shape ("
-        //<< gtf.enum2String(RGInfo.shape) << ") "
-        //<<  "(optional).\n"
+        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
+        << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-obs_thresh n\" sets observation value to compute the probibility"
-        << " (optional, default: disabled).\n"
+        << "\t\t\"-obs_thresh n\" sets observation value to compute the probability."
+        << " The default is disabled (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
