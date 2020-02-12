@@ -8,6 +8,10 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+if ENABLE_PYTHON
+LDFLAGS += -lvx_python3_utils
+endif
+
 # Test programs
 
 noinst_PROGRAMS = test_read \
@@ -23,7 +27,11 @@ test_read_LDADD = -lvx_tc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lgsl -lgslcblas -lvx_color
+
+if ENABLE_PYTHON
+test_read_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
+endif
 
 test_read_prob_SOURCES = test_read_prob.cc
 test_read_prob_CPPFLAGS = ${MET_CPPFLAGS}
@@ -35,5 +43,8 @@ test_read_prob_LDADD = -lvx_tc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lgsl -lgslcblas -lvx_color
 
+if ENABLE_PYTHON
+test_read_prob_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
+endif
