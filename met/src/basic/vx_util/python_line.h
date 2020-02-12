@@ -33,15 +33,31 @@ class PyLineDataFile : public LineDataFile {
 
    protected:
 
+      ConcatString UserScriptPath;
+
+      void do_straight ();   //  straight-up python, no pickle
+      void do_pickle   ();   //  pickle
+
+      ConcatString make_header_line () const;
+      ConcatString make_data_line   ();
+
    public:
 
       PyLineDataFile();
      ~PyLineDataFile();
 
 
+      bool open(const char * user_script_path);
+
+      void close();
+
+
+
+      bool first_call;
+
       int index;   //  index into the list
 
-      int N;   //  # of elements in list
+      int N;       //  # of elements in list
 
       PyObject * main_list;   //  not allocated
 

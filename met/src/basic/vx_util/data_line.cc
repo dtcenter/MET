@@ -633,6 +633,9 @@ bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
 {
 
 
+cerr << "\n\n  DataLine::read_py_single_text_line(PyLineDataFile * pldf) not yet implemented!\n\n" << flush;
+
+exit ( 1 );
 
 
 return ( true );
