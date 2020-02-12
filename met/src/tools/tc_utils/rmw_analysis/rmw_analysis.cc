@@ -189,7 +189,7 @@ void setup() {
         data_names.push_back(conf_info.data_info[i_var]->name().string());
         NcVar var = get_nc_var(
             nc_out, conf_info.data_info[i_var]->name().c_str());
-        int n_dim = get_dim_count(&var);
+        int n_dim = get_dim_count(&var) - 1;
         data_n_dims.push_back(n_dim);
         ConcatString s;
         get_att_value_string(&var, "long_name", s);
@@ -270,19 +270,35 @@ void process_files() {
 
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
             NcVar var = get_nc_var(nc_out, data_names[i_var].c_str());
+            mlog << Debug(2) << "Processing "
+                 << data_names[i_var] << "\n";
 
             for(int i_track = 0; i_track < n_track_point; i_track++) {
                 if (data_n_dims[i_var] == 2) {
                     start_2d[2] = i_track;
+                    mlog << Debug(4) << data_names[i_var] << i_track << "\n";
                     var.getVar(start_2d, count_2d, data_2d.data());
+
+                    // Update partial sums
+                    data_counts[i_var].increment();
+                    data_means[i_var].add_assign(data_2d);
+                    data_mins[i_var].min_assign(data_2d);
+                    data_maxs[i_var].max_assign(data_2d);
                 }
                 if (data_n_dims[i_var] == 3) {
-                    start_3d[2] = i_track;
+                    mlog << Debug(4) << data_names[i_var] << i_track << "\n";
+                    start_3d[3] = i_track;
                     var.getVar(start_3d, count_3d, data_3d.data());
+
+                    // Update partial sums
+                    data_counts[i_var].increment();
+                    data_means[i_var].add_assign(data_3d);
+                    data_mins[i_var].min_assign(data_3d);
+                    data_maxs[i_var].max_assign(data_3d);
                 }
-            }
-        }
-    }
+            } // end loop over track points
+        } // end loop over variables
+    } // end loop over files
 }
 
 ////////////////////////////////////////////////////////////////////////
