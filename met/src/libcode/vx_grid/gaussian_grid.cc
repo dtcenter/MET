@@ -283,7 +283,7 @@ if ( (iy < 0) || (iy >= Ny) )  {
 
 lat = Latitudes[iy];
 
-lon = Lon_Zero - ix*Delta_Lon;
+lon = Lon_Zero + ix*Delta_Lon;
 
 return;
 
