@@ -22,16 +22,16 @@ using namespace std;
 #include <unistd.h>
 
 #include "rmw_analysis.h"
+#include "rmw_analysis_utils.h"
 
-#include "vx_grid.h"
-#include "vx_regrid.h"
-#include "vx_tc_util.h"
+// #include "vx_grid.h"
+// #include "vx_regrid.h"
+// #include "vx_tc_util.h"
 #include "vx_nc_util.h"
-#include "vx_data2d_nc_met.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
-#include "met_file.h"
+// #include "met_file.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,6 +42,7 @@ static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
+static void setup();
 static void process_files();
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,12 @@ int main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
+
+    // Set up
+    setup();
+
+    // Process files
+    process_files();
 
     return(0);
 }
@@ -143,6 +150,54 @@ void set_logfile(const StringArray& a) {
 
 void set_verbosity(const StringArray& a) {
     mlog.set_verbosity_level(atoi(a[0].c_str()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup() {
+
+    // Open first data file
+    nc_out = open_ncfile(data_files[0].c_str());
+    mlog << Debug(1) << "Reading dimensions from"
+         << data_files[0] << "\n";
+
+    // Get dimension sizes
+    get_dim(nc_out, "range", n_range, true);
+    range_dim = get_nc_dim(nc_out, "range");
+
+    get_dim(nc_out, "azimuth", n_azimuth, true);
+    azimuth_dim = get_nc_dim(nc_out, "azimuth");
+
+    if (get_dim(nc_out, "height", n_level)) {
+        mlog << Debug(1) << "Found height vertical dimension.\n";
+        level_dim = get_nc_dim(nc_out, "height");
+        level_name = "height";
+    } else if (get_dim(nc_out, "pressure", n_level)) {
+        mlog << Debug(1) << "Found pressure vertical dimension.\n";
+        level_dim = get_nc_dim(nc_out, "pressure");
+        level_name = "pressure";
+    } else {
+        mlog << Error << "No vertical dimension found.\n";
+        exit(1);
+    }
+
+    mlog << Debug(2)
+         << "(n_range, n_azimuth, n_level) = ("
+         << n_range << ", " << n_azimuth << ", " << n_level << ")\n"; 
+
+    // Read variable information
+    for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+        data_names.push_back(conf_info.data_info[i_var]->name().string());
+        NcVar var = get_nc_var(
+            nc_out, conf_info.data_info[i_var]->name().c_str());
+        int n_dim = get_dim_count(&var);
+        data_n_dims.push_back(n_dim);
+        ConcatString s;
+        get_att_value_string(&var, "long_name", s);
+        data_long_names.push_back(s.string());
+        get_att_value_string(&var, "units", s);
+        data_units.push_back(s.string());
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -112,9 +112,8 @@ vector<double> track_lon;
 vector<double> track_rmw;
 
 // Variable information
-static vector<int>    data_n_dims;
-static vector<NcVar>  data_vars;
 static vector<string> data_names;
+static vector<int>    data_n_dims;
 static vector<string> data_long_names;
 static vector<string> data_units;
 
