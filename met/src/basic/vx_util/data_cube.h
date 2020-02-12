@@ -65,6 +65,10 @@ class DataCube {
 
         void divide_assign(const DataCube&);
 
+        void min_assign(const DataCube&);
+
+        void max_assign(const DataCube&);
+
         // Index operator
         double operator()(int i, int j, int k) const;
 

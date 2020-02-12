@@ -179,6 +179,8 @@ void DataCube::increment(void) {
 
 void DataCube::add_assign(const DataCube& other) {
 
+    this->check_shape_equal(other);
+
     for (int n = 0; n < Nxyz; n++) {
         Data[n] += other.Data[n];
     }
@@ -189,6 +191,8 @@ void DataCube::add_assign(const DataCube& other) {
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::subtract_assign(const DataCube& other) {
+
+    this->check_shape_equal(other);
 
     for (int n = 0; n < Nxyz; n++) {
         Data[n] -= other.Data[n];
@@ -201,6 +205,8 @@ void DataCube::subtract_assign(const DataCube& other) {
 
 void DataCube::multiply_assign(const DataCube& other) {
 
+    this->check_shape_equal(other);
+
     for (int n = 0; n < Nxyz; n++) {
         Data[n] *= other.Data[n];
     }
@@ -212,8 +218,36 @@ void DataCube::multiply_assign(const DataCube& other) {
 
 void DataCube::divide_assign(const DataCube& other) {
 
+    this->check_shape_equal(other);
+
     for (int n = 0; n < Nxyz; n++) {
         Data[n] /= other.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::min_assign(const DataCube& other) {
+
+    this->check_shape_equal(other);
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = min(Data[n], other.Data[n]);
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::max_assign(const DataCube& other) {
+
+    this->check_shape_equal(other);
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = max(Data[n], other.Data[n]);
     }
 
     return;
