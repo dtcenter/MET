@@ -231,6 +231,52 @@ void setup() {
 
 void process_files() {
 
+    // Size data cubes
+    DataCube data_2d;
+    DataCube data_3d;
+
+    data_2d.set_size(n_range, n_azimuth, 1);
+    data_3d.set_size(n_range, n_azimuth, n_level);
+
+    // Set up array track point slices
+    vector<size_t> start_2d;
+    vector<size_t> count_2d;
+    vector<size_t> start_3d;
+    vector<size_t> count_3d;
+    start_2d.push_back(0);
+    start_2d.push_back(0);
+    start_2d.push_back(0);
+    count_2d.push_back(n_range);
+    count_2d.push_back(n_azimuth);
+    count_2d.push_back(1);
+    start_3d.push_back(0);
+    start_3d.push_back(0);
+    start_3d.push_back(0);
+    start_3d.push_back(0);
+    count_3d.push_back(n_range);
+    count_3d.push_back(n_azimuth);
+    count_3d.push_back(n_level);
+    count_3d.push_back(1);
+
+    for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
+        mlog << Debug(1) << "Processing "
+             << data_files[i_file] << "\n";
+        nc_out = open_ncfile(data_files[i_file].c_str());
+
+        get_dim(nc_out, "track_point", n_track_point, true);
+        track_point_dim = get_nc_dim(nc_out, "track_point");
+        mlog << Debug(1) << "Number of track points "
+             << n_track_point << "\n";
+
+        for(int i_var = 0; i_var < data_names.size(); i_var++) {
+            NcVar var = get_nc_var(nc_out, data_names[i_var].c_str());
+
+            for(int i_track = 0; i_track < n_track_point; i_track++) {
+                start_2d[2] = i_track;
+                start_3d[3] = i_track;
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
