@@ -982,6 +982,13 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       data.lat_ll       = ((double)gfld->igdtmpl[11] / 1000000.0);
       data.lon_ll       = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
 
+      //  check for thinned lat/lon grid
+      if( data.Nlon == -1 ){
+         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+              << "Thinned Lat/Lon grids are not supported for GRIB version 2.\n\n";
+         exit(1);
+      }
+      
       //  latitudinal increment.  If not given, compute from lat1 and lat2
       if( ResCompFlag & 16 ) {
          data.delta_lat = (double)gfld->igdtmpl[17] / 1000000.0;

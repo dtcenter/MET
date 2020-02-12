@@ -224,6 +224,16 @@ data.Nlat = char2_to_int(gds.ny);
    // Number of points in the Longitudinal (x) direction
 data.Nlon = char2_to_int(gds.nx);
 
+   // Check for thinned lat/lon grids
+if ( data.Nlon == 65535 )  {
+
+   mlog << Error << "\ngds_to_latlon() -> "
+        << "Thinned Lat/Lon grids are not supported for GRIB version 1.\n\n";
+
+   exit ( 1 );
+
+}
+
    // Latitudinal increment.  If not given, compute from lat1 and lat2
 if ( all_bits_set(gds.grid_type.latlon_grid.dj, 2) )  {
 
@@ -270,8 +280,8 @@ void gds_to_rotated_latlon(const Section2_Header & gds, RotatedLatLonData & data
 
 {
 
-mlog << Error
-     << "gds_to_rotated_latlon() -> Rotated Lat/Lon grids are not supported in Grib Version 1.\n\n";
+mlog << Error << "\ngds_to_rotated_latlon() -> "
+     << "Rotated Lat/Lon grids are not supported in GRIB version 1.\n\n";
 
 exit ( 1 );
 
