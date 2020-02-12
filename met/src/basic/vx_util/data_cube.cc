@@ -11,7 +11,7 @@
 //    Filename:  data_cube.cc
 //
 //    Description:
-//        Contains the definition of the DataCube class.
+//        Definition of the DataCube class.
 //
 //    Mod    Date      Name           Description
 //    ----   ----      ----           -----------
@@ -47,17 +47,6 @@ DataCube::DataCube(const DataCube& d) {
 DataCube::~DataCube() {
 
     clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-DataCube& DataCube::operator=(const DataCube& d) {
-
-    if(this == &d) return(*this);
-
-    assign(d);
-
-    return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,12 +107,8 @@ void DataCube::set(double value, int i, int j, int k) {
 
 void DataCube::set_constant(double value) {
 
-    for (int i = 0; i < Nx; i++) {
-        for (int j = 0; j < Ny; j++) {
-            for (int k = 0; k < Nz; k++) {
-                set(value, i, j, k);
-            }
-        }
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = value;
     }
 
     return;
@@ -140,18 +125,6 @@ double DataCube::get(int i, int j, int k) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DataCube::init_from_scratch() {
-
-    Nx = 0;
-    Ny = 0;
-    Nz = 0;
-    Nxyz = 0;
-
-    clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void DataCube::assign(const DataCube& d) {
 
     clear();
@@ -161,6 +134,80 @@ void DataCube::assign(const DataCube& d) {
     Data = d.Data;
 
     return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::add_assign(const DataCube& d) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] += d.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::subtract_assign(const DataCube& d) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] -= d.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::multiply_assign(const DataCube& d) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] *= d.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::divide_assign(const DataCube& d) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] /= d.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double DataCube::operator()(int i, int j, int k) const {
+
+    return get(i, j, k);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataCube& DataCube::operator=(const DataCube& d) {
+
+    if (this == &d) return *this;
+
+    assign(d);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::init_from_scratch() {
+
+    Nx = 0;
+    Ny = 0;
+    Nz = 0;
+    Nxyz = 0;
+
+    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////

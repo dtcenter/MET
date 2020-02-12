@@ -37,18 +37,32 @@ class DataCube {
         void set(double value, int i, int j, int k);
         void set_constant(double value);
 
-        // Get methods
+        // Get sizes
         int nx() const;
         int ny() const;
         int nz() const;
 
+        // Index get
         double get(int i, int j, int k) const;
+
+        // Arithmetic methods
+        void assign(const DataCube&);
+
+        void add_assign(const DataCube&);
+
+        void subtract_assign(const DataCube&);
+
+        void multiply_assign(const DataCube&);
+
+        void divide_assign(const DataCube&);
 
         // Index operator
         double operator()(int i, int j, int k) const;
 
         // Assignment operator
         DataCube& operator=(const DataCube&);
+
+        // Arithmetic operators
 
     private:
 
@@ -59,11 +73,9 @@ class DataCube {
 
         std::vector<double> Data;
 
-        void init_from_scratch();
-
-        void assign(const DataCube&);
-
         const double* data() const;
+
+        void init_from_scratch();
 };
 
 #endif  /*  __DATA_CUBE_H__  */
@@ -74,10 +86,8 @@ inline int DataCube::nx() const { return Nx; }
 inline int DataCube::ny() const { return Ny; }
 inline int DataCube::nz() const { return Nz; }
 
-inline double DataCube::operator()(int i, int j, int k) const
-    { return get(i, j, k); }
-
-inline const double* DataCube::data() const
-    { return Data.data(); }
+inline const double* DataCube::data() const {
+    return Data.data();
+}
 
 ////////////////////////////////////////////////////////////////////////
