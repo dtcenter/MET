@@ -85,6 +85,8 @@ class DataCube {
 
         DataCube& operator/=(const DataCube&);
 
+        double* data();
+
     private:
 
         int Nx;
@@ -93,8 +95,6 @@ class DataCube {
         int Nxyz; // Nx * Ny * Nz
 
         std::vector<double> Data;
-
-        const double* data() const;
 
         void init_from_scratch();
 };
@@ -108,8 +108,6 @@ inline int DataCube::nx() const { return Nx; }
 inline int DataCube::ny() const { return Ny; }
 inline int DataCube::nz() const { return Nz; }
 
-inline const double* DataCube::data() const {
-    return Data.data();
-}
+inline double* DataCube::data() { return Data.data(); }
 
 ////////////////////////////////////////////////////////////////////////
