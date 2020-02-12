@@ -43,9 +43,6 @@ using namespace netCDF;
 
 #include "rmw_analysis_conf_info.h"
 
-#include "vx_data2d_factory.h"
-#include "vx_tc_util.h"
-#include "vx_grid.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,12 +68,62 @@ static const char* default_out_dir = ".";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray          data_files;
-static ConcatString         config_file;
-static RMWAnalysisConfInfo  conf_info;
+static StringArray         data_files;
+static ConcatString        config_file;
+static RMWAnalysisConfInfo conf_info;
 
 // Optional arguments
 static ConcatString out_dir;
+
+// Output file
+ConcatString out_file;
+
+// NetCDF file information
+static NcFile* nc_out = (NcFile*) 0;
+
+// Grid dimension information
+static NcDim range_dim;
+static NcDim azimuth_dim;
+static NcDim level_dim;
+static NcDim track_point_dim;
+
+static string range_name;
+static string range_units;
+static string azimuth_name;
+static string azimuth_units;
+static string level_name;
+static string level_units;
+
+static NcVar valid_time_var;
+
+// Grid data
+static int n_range;
+static int n_azimuth;
+static int n_level;
+static int n_track_point;
+
+vector<double> range_coord;
+vector<double> azimuth_coord;
+vector<double> level_coord;
+
+vector<unixtime> track_valid_time;
+vector<double> track_lat;
+vector<double> track_lon;
+vector<double> track_rmw;
+
+// Variable information
+static vector<int>    data_n_dims;
+static vector<NcVar>  data_vars;
+static vector<string> data_names;
+static vector<string> data_long_names;
+static vector<string> data_units;
+
+// Variable data
+static vector<DataCube> data_counts;
+static vector<DataCube> data_means;
+static vector<DataCube> data_stdevs;
+static vector<DataCube> data_mins;
+static vector<DataCube> data_maxs;
 
 #endif  //  __RMW_ANALYSIS_H__
 
