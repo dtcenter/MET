@@ -44,6 +44,8 @@ static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup();
 static void process_files();
+static void normalize_stats();
+static void write_stats();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -60,6 +62,10 @@ int main(int argc, char *argv[]) {
 
     // Process files
     process_files();
+
+    normalize_stats();
+
+    write_stats();
 
     return(0);
 }
@@ -307,6 +313,32 @@ void process_files() {
             } // end loop over track points
         } // end loop over variables
     } // end loop over files
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void normalize_stats() {
+
+    for(int i_var = 0; i_var < data_names.size(); i_var++) {
+
+        // Normalize
+        data_means[i_var].divide_assign(data_counts[i_var]);
+        data_stdevs[i_var].divide_assign(data_counts[i_var]);
+
+        // Compute standard deviation
+        DataCube data_mean_sq = data_means[i_var];
+        data_mean_sq.square();
+        data_stdevs[i_var].subtract_assign(data_mean_sq);
+        data_stdevs[i_var].square_root();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_stats() {
+
+    for(int i_var = 0; i_var < data_names.size(); i_var++) {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
