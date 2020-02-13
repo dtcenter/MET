@@ -70,6 +70,10 @@ class DataCube {
 
         void max_assign(const DataCube&);
 
+        void square();
+
+        void square_root();
+
         // Index operator
         double operator()(int i, int j, int k) const;
 

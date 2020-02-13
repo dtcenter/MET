@@ -255,6 +255,28 @@ void DataCube::max_assign(const DataCube& other) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void DataCube::square() {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = Data[n] * Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::square_root() {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = sqrt(Data[n]);
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double DataCube::operator()(int i, int j, int k) const {
 
     return get(i, j, k);
