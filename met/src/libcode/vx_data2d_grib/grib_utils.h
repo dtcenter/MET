@@ -30,6 +30,8 @@ extern void gds_to_order(const Section2_Header & gds, int & xdir, int & ydir, in
 
 extern void instantiate_grid(GribFile &, int rec_num, Grid & out);
 
+extern double decode_lat_lon(const unsigned char *, int);
+
 ////////////////////////////////////////////////////////////////////////
 
 

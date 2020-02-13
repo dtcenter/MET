@@ -974,6 +974,13 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       ScanMode    = gfld->igdtmpl[18];
       ResCompFlag = gfld->igdtmpl[13];
 
+      //  check if ydir is set wrong in the scan mode and fix it
+      if ( ( (ScanMode & 64) && gfld->igdtmpl[11] > gfld->igdtmpl[14] ) ||
+           (!(ScanMode & 64) && gfld->igdtmpl[11] < gfld->igdtmpl[14] ) ) {
+         //  toggle the 6-th bit
+         ScanMode ^= (1u << 6);
+      }
+
       //  build a LatLonData struct with the projection information
       LatLonData data;
       data.name         = latlon_proj_type;

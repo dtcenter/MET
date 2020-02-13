@@ -48,8 +48,6 @@ static void gds_to_gaussian       (const Section2_Header & gds, GaussianData &);
 
 static void scan_flag_to_order(const unsigned char scan_flag, int & xdir, int & ydir, int & order);
 
-static double decode_lat_lon(const unsigned char *, int);
-
 static bool all_bits_set(const unsigned char *, int);
 
 
@@ -211,8 +209,8 @@ data.name = latlon_proj_type;
    //
 
    // Latitude of the bottom left corner
-if ( ydir == 1 )  data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3);
-else              data.lat_ll = decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3);
+data.lat_ll = min(decode_lat_lon(gds.grid_type.latlon_grid.lat1, 3),
+                  decode_lat_lon(gds.grid_type.latlon_grid.lat2, 3));
 
    // Longitude of the bottom left corner
 if ( xdir == 0 )  data.lon_ll = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.latlon_grid.lon1, 3));
