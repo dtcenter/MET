@@ -47,7 +47,6 @@ stat_analysis_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_summary \
-	-lvx_statistics \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = stat_analysis.h \

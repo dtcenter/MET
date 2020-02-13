@@ -41,7 +41,7 @@ mode_analysis_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas 
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 if ENABLE_PYTHON
 mode_analysis_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)

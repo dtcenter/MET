@@ -19,7 +19,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_math.h"
-#include "stat_columns.h"
+#include "stat_column_defs.h"
 #include "util_constants.h"
 #include "vx_python3_utils.h"
 #include "python3_util.h"

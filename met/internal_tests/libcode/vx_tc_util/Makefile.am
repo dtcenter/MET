@@ -27,7 +27,7 @@ test_read_LDADD = -lvx_tc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas -lvx_color
+	-lgsl -lgslcblas
 
 if ENABLE_PYTHON
 test_read_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
@@ -43,7 +43,7 @@ test_read_prob_LDADD = -lvx_tc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas -lvx_color
+	-lgsl -lgslcblas
 
 if ENABLE_PYTHON
 test_read_prob_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)

@@ -37,7 +37,7 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
-	$(FLIBS) -lvx_color
+	$(FLIBS)
 
 EXTRA_DIST = tc_rmw_conf_info.h \
 	tc_rmw.h
