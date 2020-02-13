@@ -29,6 +29,18 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Makes it look to the MET code as if the python data
+   //
+   //    is just a plain ascii text file, returning a 
+   //
+   //    single data line at a time.
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class PyLineDataFile : public LineDataFile {
 
    protected:
@@ -55,11 +67,14 @@ class PyLineDataFile : public LineDataFile {
 
       bool first_call;
 
-      int index;   //  index into the list
+      int index;   //  list index of last line returned by next_line()
 
       int N;       //  # of elements in list
 
       PyObject * main_list;   //  not allocated
+
+
+      bool next_line(ConcatString & s_out);
 
 };
 

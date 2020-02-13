@@ -633,10 +633,14 @@ bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
 {
 
 
-cerr << "\n\n  DataLine::read_py_single_text_line(PyLineDataFile * pldf) not yet implemented!\n\n" << flush;
+bool status = false;
+ConcatString s;
 
-exit ( 1 );
+status = pldf->next_line(s);
 
+if ( ! status )  return ( false );
+
+Line = s.text();
 
 return ( true );
 

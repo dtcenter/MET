@@ -378,6 +378,45 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+bool PyLineDataFile::next_line(ConcatString & s_out)
+
+{
+
+   //
+   //  first call?
+   //
+   //  if so, return header line
+   //
+
+if ( first_call )  {
+
+   s_out = make_header_line();
+
+   first_call = false;
+
+   return ( true );
+
+}
+
+   //
+   //  nope, return data line
+   //
+
+++index;
+
+if ( index >= N )  return ( false );
+
+s_out = make_data_line();
+
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
