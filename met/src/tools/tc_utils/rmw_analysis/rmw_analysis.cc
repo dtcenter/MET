@@ -233,7 +233,9 @@ void process_files() {
 
     // Size data cubes
     DataCube data_2d;
+    DataCube data_2d_sq;
     DataCube data_3d;
+    DataCube data_3d_sq;
 
     data_2d.set_size(n_range, n_azimuth, 1);
     data_3d.set_size(n_range, n_azimuth, n_level);
@@ -280,8 +282,11 @@ void process_files() {
                     var.getVar(start_2d, count_2d, data_2d.data());
 
                     // Update partial sums
+                    data_2d_sq = data_2d;
+                    data_2d_sq.square();
                     data_counts[i_var].increment();
                     data_means[i_var].add_assign(data_2d);
+                    data_stdevs[i_var].add_assign(data_2d_sq);
                     data_mins[i_var].min_assign(data_2d);
                     data_maxs[i_var].max_assign(data_2d);
                 }
@@ -291,8 +296,11 @@ void process_files() {
                     var.getVar(start_3d, count_3d, data_3d.data());
 
                     // Update partial sums
+                    data_3d_sq = data_3d;
+                    data_3d_sq.square();
                     data_counts[i_var].increment();
                     data_means[i_var].add_assign(data_3d);
+                    data_stdevs[i_var].add_assign(data_3d_sq);
                     data_mins[i_var].min_assign(data_3d);
                     data_maxs[i_var].max_assign(data_3d);
                 }
