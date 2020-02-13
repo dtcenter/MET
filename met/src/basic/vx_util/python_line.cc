@@ -24,6 +24,7 @@ using namespace std;
 #include "vx_python3_utils.h"
 #include "python3_util.h"
 #include "global_python.h"
+#include "temp_file.h"
 
 #include "python_line.h"
 
@@ -49,9 +50,9 @@ static const char generic_pickle_wrapper [] = "generic_pickle";
 
 static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
 
-static const char list_name              [] = "point_data";
+static const char list_name              [] = "mpr_data";
 
-static const char pickle_output_filename [] = "out.pickle";
+static const char pickle_base_name       [] = "tmp_mpr_pickle";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -115,6 +116,10 @@ main_list = 0;   //  don't delete
 
 UserScriptPath.clear();
 
+UserScriptArgs.clear();
+
+UserPathToPython.clear();
+
 
 return;
 
@@ -124,7 +129,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PyLineDataFile::open(const char * user_script_path)
+bool PyLineDataFile::open(const char * user_script_path, const StringArray & user_script_args)
 
 {
 
@@ -134,8 +139,40 @@ first_call = true;
 
 UserScriptPath = user_script_path;
 
-if ( getenv (user_python_path_env) )  do_pickle   ();
-else                                  do_straight ();
+UserScriptArgs = user_script_args;
+
+const char * c = getenv (user_python_path_env);
+
+if ( c )  {
+
+   UserPathToPython = c;
+
+   do_pickle();
+
+} else {
+
+   do_straight ();
+
+}
+
+   //
+   //   check that the python object we got is actually a list
+   //
+
+if ( ! PyList_Check(main_list) )  {
+
+   mlog << Error << "\nPyLineDataFile::open() -> "
+        << "pickle object is not a list!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //   how many things in the list?
+   //
+
+N = PyList_Size(main_list);
 
    //
    //  done
@@ -196,7 +233,15 @@ ConcatString a;
 PyObject * sublist = 0;
 
 
+   //
+   //  grab the next item in the main list
+   //
+
 sublist = PyList_GetItem(main_list, index);
+
+   //
+   //  check that this item is itself a list
+   //
 
 if ( ! PyList_Check(sublist) )  {
 
@@ -208,6 +253,10 @@ if ( ! PyList_Check(sublist) )  {
 }
 
 j = 0;   //  index into the sublist from the user
+
+      //
+      //  construct the ascii text data line
+      //
 
    //
    //  version
@@ -350,9 +399,75 @@ void PyLineDataFile::do_straight()
 
 {
 
-cerr << "\n\n  PyLineDataFile::do_straight() -> not yet implemented!\n\n" << flush;
+ConcatString command, path, user_base;
 
-exit ( 1 );
+path = generic_python_wrapper;
+
+mlog << Debug(3) 
+     << "PyLineDataFile::do_straight() -> "
+     << "Running user's python script ("
+     << UserScriptPath << ").\n";
+
+user_base = UserScriptPath.basename();
+
+user_base.chomp(".py");
+
+   //
+   //  start up the python interpreter
+   //
+
+Python3_Script script(path.text());
+
+   //
+   //  set up a "new" sys.argv list
+   //     with the command-line arquments for
+   //     the user's script
+   //
+
+if ( UserScriptArgs.n() > 0 )  {
+
+   script.reset_argv(UserScriptPath.text(), UserScriptArgs);
+
+}
+
+   //
+   //  import the user's script as a module
+   //
+
+PyObject * m = PyImport_Import(PyUnicode_FromString(user_base.text()));
+
+if ( PyErr_Occurred() )  {
+
+   PyErr_Print();
+
+   mlog << Error
+        << "\nPyLineDataFile::do_straight() -> "
+        << "an error occurred importing module "
+        << '\"' << user_base.text() << "\"\n\n";
+
+   exit ( 1 );
+
+   return;
+
+}
+
+   //
+   //  get the dictionary (ie, namespace)
+   //    for the module
+   //
+
+Python3_Dict md (m);
+
+   //
+   //  get the variable containing the
+   //    list of obs
+   //
+
+main_list = md.lookup_list(list_name);
+
+   //
+   //  done
+   //
 
 return;
 
@@ -366,9 +481,71 @@ void PyLineDataFile::do_pickle()
 
 {
 
-cerr << "\n\n  PyLineDataFile::do_pickle() -> not yet implemented!\n\n" << flush;
+int j;
+const int N = UserScriptArgs.n();
+ConcatString command;
+ConcatString path;
+ConcatString pickle_path;
+const char * tmp_dir = 0;
+int status;
 
-exit ( 1 );
+mlog << Debug(3) << "Calling " << UserPathToPython
+     << " to run user's python script (" << UserScriptPath
+     << ").\n";
+
+tmp_dir = getenv ("MET_TMP_DIR");
+
+if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
+
+path << cs_erase
+     << tmp_dir << '/'
+     << pickle_base_name;
+
+pickle_path = make_temp_file_name(path.text(), 0);
+
+command << cs_erase
+        << UserPathToPython                   << ' '    //  user's path to python
+        << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
+        << pickle_path                        << ' '    //  pickle output filename
+        << UserScriptPath;                              //  user's script name
+
+for (j=0; j<N; ++j)  {
+
+   command << ' ' << UserScriptArgs[j];
+
+};
+
+status = system(command.text());
+
+if ( status )  {
+
+   mlog << Error << "\nPyLineDataFile::do_pickle() -> "
+        << "command \"" << command.text() << "\" failed ... status = "
+        << status << "\n\n";
+
+   exit ( 1 );
+
+}
+
+ConcatString wrapper;
+
+wrapper = generic_pickle_wrapper;
+
+Python3_Script script(wrapper.text());
+
+script.read_pickle(list_name, pickle_path.text());
+
+main_list = script.lookup(list_name);
+
+   //
+   //  cleanup
+   //
+
+remove_temp_file(pickle_path);
+
+   //
+   //  done
+   //
 
 return;
 

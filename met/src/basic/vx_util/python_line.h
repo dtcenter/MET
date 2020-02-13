@@ -47,6 +47,10 @@ class PyLineDataFile : public LineDataFile {
 
       ConcatString UserScriptPath;
 
+      StringArray UserScriptArgs;
+
+      ConcatString UserPathToPython;
+
       void do_straight ();   //  straight-up python, no pickle
       void do_pickle   ();   //  pickle
 
@@ -59,7 +63,7 @@ class PyLineDataFile : public LineDataFile {
      ~PyLineDataFile();
 
 
-      bool open(const char * user_script_path);
+      bool open(const char * user_script_path, const StringArray & user_script_args);
 
       void close();
 

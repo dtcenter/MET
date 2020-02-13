@@ -31,5 +31,9 @@ test_pressure_levels_LDADD = -lvx_tc_util \
 	-lnetcdf_c++4 -lgsl -lgslcblas
 
 if ENABLE_PYTHON
-test_pressure_levels_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
+test_pressure_levels_LDADD += $(MET_PYTHON_LD)
+test_pressure_levels_LDADD += -lvx_data2d_python -lvx_python3_utils
+test_pressure_levels_LDADD += -lvx_data2d_python -lvx_python3_utils
+test_pressure_levels_LDADD += -lvx_grid -lvx_util -lvx_config
+test_pressure_levels_LDADD += -lvx_data2d -lvx_gsl_prob -lvx_util -lvx_math -lvx_cal -lvx_config
 endif

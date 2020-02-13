@@ -92,5 +92,8 @@ test_ascii_header_LDADD = -lvx_util \
 	-lgsl -lgslcblas
  
 if ENABLE_PYTHON
-test_ascii_header_LDADD += -lvx_python3_utils -lvx_math $(MET_PYTHON_LD)
+test_ascii_header_LDADD += $(MET_PYTHON_LD) -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils -lvx_math 
+test_ascii_header_LDADD += -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils
+test_ascii_header_LDADD += -lvx_math -lvx_grid -lvx_util -lvx_data2d -lvx_config -lvx_gsl_prob -lvx_cal -lvx_math -lvx_util
 endif
+

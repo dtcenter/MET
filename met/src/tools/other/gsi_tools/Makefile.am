@@ -9,13 +9,13 @@ MAINTAINERCLEANFILES	= Makefile.in
 include ${top_srcdir}/Make-include
 
 if ENABLE_PYTHON
-LDFLAGS += -lvx_python3_utils
+LDFLAGS += -lvx_data2d_python -lvx_python3_utils
 endif
 
 # The programs
 
 bin_PROGRAMS    = gsid2mpr \
-		gsidens2orank
+	gsidens2orank
 
 gsid2mpr_SOURCES = gsid2mpr.h \
 	gsi_record.h \
@@ -56,7 +56,7 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lm -lgsl -lgslcblas
 
 if ENABLE_PYTHON
-gsid2mpr_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
+gsid2mpr_LDADD += $(MET_PYTHON_LD) -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils 
 endif
 
 gsidens2orank_SOURCES = gsidens2orank.h \
@@ -98,5 +98,5 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lm -lgsl -lgslcblas
 
 if ENABLE_PYTHON
-gsidens2orank_LDADD += -lvx_python3_utils $(MET_PYTHON_LD)
+gsidens2orank_LDADD += $(MET_PYTHON_LD) -lvx_data2d_python -lvx_python3_utils -lvx_data2d_python -lvx_python3_utils 
 endif
