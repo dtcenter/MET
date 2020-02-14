@@ -39,6 +39,7 @@
 //   010    07/26/18  Halley Gotway  Support masks from gen_vx_mask.
 //   011    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
+//   012    02/13/20  Bullock        Add support for python embedding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -533,6 +534,8 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
    LineDataFile f;
    STATLine line;
 
+   // TODO: check for and handle python commands here!
+
    if(!(f.open(filename))) {
       mlog << Error << "\nprocess_stat_file() -> "
            << "unable to open input stat file \""
@@ -675,9 +678,10 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-config config_file] | [JOB COMMAND LINE]\n\n"
 
-        << "\twhere\t\"-lookin path\" specifies a STAT file or "
-        << "top-level directory containing STAT files.  It allows the "
-        << "use of wildcards (at least one required).\n"
+        << "\twhere\t\"-lookin path\" specifies one or more STAT or "
+        << "_LINE_TYPE.txt files, a top-level directory containing STAT "
+        << "files, or a python command to run.  It allows the use of "
+        << "wildcards and must be used at least once.\n"
 
         << "\t\t\"-out file\" specifies a file to which output should "
         << "be written rather than the screen (optional).\n"
