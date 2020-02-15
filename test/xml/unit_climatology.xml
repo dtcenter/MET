@@ -280,37 +280,13 @@
       </pair>
     </env>
     <param> \
-      -fcst   &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F003.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F006.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F009.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F015.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F018.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F021.grib2 \
+        -fcst &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
               &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F027.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F030.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F033.grib2 \
               &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F036.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F039.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F042.grib2 \
-              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F045.grib2 \
               &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F048.grib2 \
-      -obs    &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0000_003.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_0600_003.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_003.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1800_003.grb2 \
+        -obs  &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
               &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_003.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0600_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0600_003.grb2 \
               &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_003.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1800_000.grb2 \
-              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1800_003.grb2 \
               &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120411_0000_000.grb2 \
       -paired \
       -out    &OUTPUT_DIR;/climatology/series_analysis_GFS_CLIMO_1.0DEG.nc \
