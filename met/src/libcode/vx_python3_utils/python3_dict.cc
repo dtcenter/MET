@@ -298,12 +298,15 @@ PyObject * Python3_Dict::lookup_list(const char * key) const
 
 PyObject * a = 0;
 
+
 a = PyDict_GetItemString(Object, key);
+
 
 if ( ! a )  {
 
    mlog << Error << "\nPython3_Dict::lookup_list(const char * key) -> "
         << "value for key \"" << key << "\" not found\n\n";
+
 
    exit ( 1 );
 

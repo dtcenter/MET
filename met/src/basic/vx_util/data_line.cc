@@ -116,6 +116,8 @@ Delimiter.assign(dataline_default_delim);
 
 File = (LineDataFile *) 0;
 
+IsHeader = false;
+
 return;
 
 }
@@ -182,7 +184,7 @@ void DataLine::dump(ostream & out, int depth) const
 {
 
 int j;
-//char junk[256];
+char junk[256];
 Indent prefix(depth);
 
 
@@ -195,33 +197,42 @@ out << prefix << "\n";
 
 if ( N_items == 0 )  { out.flush();  return; }
 
-std::ostringstream sstream;
-sstream.width(2);
+// std::ostringstream sstream;
+// sstream.width(2);
 
 for (j=0; j<N_items; ++j)  {
 
-   //snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
+   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
-   sstream << "Item[" << j << "]       = \"";
-   out << prefix << sstream.str() << Line.substr(j) << "\"\n";
+   out << prefix << junk << Items[j] << "\"\n";
 
-   if ( (j%5) == 4 )  out << prefix << "\n";
+   // sstream << "Item[" << j << "]       = \"";
+   // out << prefix << sstream.str() << Line.substr(j) << "\"\n";
+
+   if ( (j%5) == 4 )  out << prefix << '\n';
+
+   out.flush();
 
 }
 
 out << prefix << "\n";
 
 
-sstream.str("");
-sstream.clear();
+// sstream.str("");
+// sstream.clear();
 
 for (j=0; j<N_items; ++j)  {
 
-   //snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
-   sstream << "Offset[" << j << "]     = ";
-   out << prefix << sstream.str() << Offset[j] << "\n";
+   snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
 
-   if ( (j%5) == 4 )  out << prefix << "\n";
+   out << prefix << junk << Offset[j] << '\n';
+
+   // sstream << "Offset[" << j << "]     = ";
+   // out << prefix << sstream.str() << Offset[j] << "\n";
+
+   if ( (j%5) == 4 )  out << prefix << '\n';
+
+   out.flush();
 
 }
 
@@ -558,7 +569,8 @@ bool DataLine::is_header() const
 
 {
 
-return ( false );
+// return ( false );
+return ( IsHeader );
 
 }
 
@@ -632,6 +644,7 @@ bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
 
 {
 
+// cout << "\n  in DataLine::read_py_single_text_line()\n\n" << flush;
 
 bool status = false;
 ConcatString s;
@@ -641,6 +654,8 @@ status = pldf->next_line(s);
 if ( ! status )  return ( false );
 
 Line = s.text();
+
+// cout << "\n  DataLine::read_py_single_text_line() ... Line = \"" << Line << "\"\n\n" << flush;
 
 return ( true );
 
@@ -850,17 +865,25 @@ int LineDataFile::operator>>(DataLine & a)
 
 {
 
+int j;
 int status;
 
 do {
 
    status = a.read_line(this);
 
+   // cout << "\n  LineDataFile::operator>>(DataLine &) -> status = " << status << "\n" << flush;
+
    if ( !status ) return ( 0 );
 
    ++Last_Line_Number;
 
    if ( a.is_header() ) set_header(a);
+
+   // cout << "  LineDataFile::operator>>(DataLine &) -> a.is_header() = " << (a.is_header()) << "\n" << flush;
+   // cout << "  LineDataFile::operator>>(DataLine &) -> a.is_ok()     = " << (a.is_ok()) << "\n" << flush;
+   // cout << "  LineDataFile::operator>>(DataLine &) -> a.n_items()   = " << (a.n_items()) << "\n\n" << flush;
+   // for (j=0; j<(a.n_items()); ++j)  cout << " ... " << (a[j]) << '\n' << flush;
 
 } while ( !(a.is_ok()) );
 

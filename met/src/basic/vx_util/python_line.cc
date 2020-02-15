@@ -32,27 +32,16 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  user-supplied columns are
-   //
-   //     "FCST_VALID"
-   //      "OBS_VALID"
-   //
-   //  plus the mpr_columns from stat_columns.h
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 static const char generic_python_wrapper [] = "generic_python";
 static const char generic_pickle_wrapper [] = "generic_pickle";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
+static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/mpr_write_pickle.py";
 
 static const char list_name              [] = "mpr_data";
 
 static const char pickle_base_name       [] = "tmp_mpr_pickle";
+
+static const char line_type              [] = "MPR";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,6 +70,8 @@ static bool is_na      (PyObject *);
 PyLineDataFile::PyLineDataFile()
 
 {
+
+script = 0;
 
 close();
 
@@ -120,6 +111,8 @@ UserScriptArgs.clear();
 
 UserPathToPython.clear();
 
+if ( script ) { delete script;  script = 0; }
+
 
 return;
 
@@ -142,6 +135,8 @@ UserScriptPath = user_script_path;
 UserScriptArgs = user_script_args;
 
 const char * c = getenv (user_python_path_env);
+
+GP.initialize();
 
 if ( c )  {
 
@@ -190,10 +185,41 @@ ConcatString PyLineDataFile::make_header_line() const
 
 {
 
-int j;
-bool last = false;
+// int j;
+// bool last = false;
 ConcatString line;
 
+
+line << "VERSION"        << ' ';
+line << "MODEL"          << ' ';
+line << "DESC"           << ' ';
+line << "FCST_LEAD"      << ' ';
+line << "FCST_VALID_BEG" << ' ';
+line << "FCST_VALID_END" << ' ';
+line << "OBS_LEAD"       << ' ';
+line << "OBS_VALID_BEG"  << ' ';
+line << "OBS_VALID_END"  << ' ';
+line << "FCST_VAR"       << ' ';
+line << "FCST_UNITS"     << ' ';
+line << "FCST_LEV"       << ' ';
+line << "OBS_VAR"        << ' ';
+line << "OBS_UNITS"      << ' ';
+line << "OBS_LEV"        << ' ';
+line << "OBTYPE"         << ' ';
+line << "VX_MASK"        << ' ';
+line << "INTERP_MTHD"    << ' ';
+line << "INTERP_PNTS"    << ' ';
+line << "FCST_THRESH"    << ' ';
+line << "OBS_THRESH"     << ' ';
+line << "COV_THRESH"     << ' ';
+line << "ALPHA"          << ' ';
+line << "LINE_TYPE";
+
+      ///////////////
+
+
+
+/*
 line << "VERSION"    << ' ';
 line << "FCST_VALID" << ' ';
 line << "OBS_VALID"  << ' ';
@@ -208,7 +234,11 @@ for (j=0; j<n_mpr_columns; ++j)  {
 
 }
 
+line << ' ' << "LINE_TYPE";
+*/
 
+
+// cout << "\n   PyLineDataFile::make_header_line()  -> line = \"" << line << "\"\n\n" << flush;
 
    //
    //  done
@@ -239,6 +269,15 @@ PyObject * sublist = 0;
 
 sublist = PyList_GetItem(main_list, index);
 
+if ( ! sublist )  {
+
+   mlog << Error
+        << "\n\n  PyLineDataFile::make_data_line() -> nul sublist pointer!\n\n";
+
+   exit ( 1 );
+
+}
+
    //
    //  check that this item is itself a list
    //
@@ -248,15 +287,15 @@ if ( ! PyList_Check(sublist) )  {
    mlog << Error
         << "\n\n  PyLineDataFile::make_data_line() -> python object is not a list!\n\n";
 
+   // cout << "sublist   = " << sublist   << "\n" << flush;
+   // cout << "main_list = " << main_list << "\n" << flush;
+
    exit ( 1 );
 
 }
 
-j = 0;   //  index into the sublist from the user
+const int N = PyList_Size(sublist);
 
-      //
-      //  construct the ascii text data line
-      //
 
    //
    //  version
@@ -265,122 +304,18 @@ j = 0;   //  index into the sublist from the user
 line << met_version;
 
    //
-   //  fcst and obs valid time
+   //  the rest
    //
 
-get_cs     (PyList_GetItem(sublist, j++), a);   //  fcst valid
+for (j=0; j<N; ++j)  {
 
-line << ' ' << a;
+   get_cs(PyList_GetItem(sublist, j), a);
 
-get_cs     (PyList_GetItem(sublist, j++), a);   //  obs valid
+   line << ' ' << a;
 
-line << ' ' << a;
+}
 
-   //
-   //  total
-   //
-
-get_int    (PyList_GetItem(sublist, j++), k);
-
-line << ' ' << k;
- 
-   //
-   //  index
-   //
-
-get_int    (PyList_GetItem(sublist, j++), k);
-
-line << ' ' << k;
-
-   //
-   //  obs_sid
-   //
-
-get_cs     (PyList_GetItem(sublist, j++), a);
-
-line << ' ' << a;
-
-   //
-   //  obs_lat
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  obs_lon
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  obs_lvl
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  obs_elev
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  fcst
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  obs
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  obs_qc
-   //
-
-get_cs     (PyList_GetItem(sublist, j++), a);
-
-line << ' ' << a;
-
-   //
-   //  climo_mean
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  climo_stdev
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-   //
-   //  climo_cdf
-   //
-
-get_double (PyList_GetItem(sublist, j++), v);
-
-line << ' ' << v;
-
-
+// cout << "PyLineDataFile::make_data_line() -> line = \"" << line << "\"\n" << flush;
 
 
    //
@@ -399,6 +334,8 @@ void PyLineDataFile::do_straight()
 
 {
 
+// cout << "\n\n  in PyLineDataFile::do_straight()\n\n" << flush;
+
 ConcatString command, path, user_base;
 
 path = generic_python_wrapper;
@@ -416,7 +353,7 @@ user_base.chomp(".py");
    //  start up the python interpreter
    //
 
-Python3_Script script(path.text());
+script = new Python3_Script (path.text());
 
    //
    //  set up a "new" sys.argv list
@@ -426,7 +363,7 @@ Python3_Script script(path.text());
 
 if ( UserScriptArgs.n() > 0 )  {
 
-   script.reset_argv(UserScriptPath.text(), UserScriptArgs);
+   script->reset_argv(UserScriptPath.text(), UserScriptArgs);
 
 }
 
@@ -481,6 +418,8 @@ void PyLineDataFile::do_pickle()
 
 {
 
+// cout << "\n\n  in PyLineDataFile::do_pickle()\n\n" << flush;
+
 int j;
 const int N = UserScriptArgs.n();
 ConcatString command;
@@ -531,11 +470,20 @@ ConcatString wrapper;
 
 wrapper = generic_pickle_wrapper;
 
-Python3_Script script(wrapper.text());
+script = new Python3_Script (wrapper.text());
 
-script.read_pickle(list_name, pickle_path.text());
+script->read_pickle(list_name, pickle_path.text());
 
-main_list = script.lookup(list_name);
+main_list = script->lookup(list_name);
+
+if ( ! main_list )  {
+
+   mlog << Error
+        << "\n\n  PyLineDataFile::do_pickle() -> nul main list pointer!\n\n";
+
+   exit ( 1 );
+
+}
 
    //
    //  cleanup
@@ -590,6 +538,28 @@ return ( true );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+/*
+int PyLineDataFile::operator>>(DataLine & d)
+
+{
+
+bool status = d.read_py_single_text_line(this);
+
+cout << d << flush;
+
+++Last_Line_Number;
+
+if ( index == 0 ) set_header(d);
+
+cout << "  in PyLineDataFile::operator>>(DataLine &) ... status = " << status << "\n" << flush;
+
+return ( status ? 1 : 0 );
+
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -683,15 +653,6 @@ if ( ! PyUnicode_Check(obj) )  return ( false );
 ConcatString s = pyobject_as_concat_string(obj);
 
 if ( strcmp(s.text(), na_string.c_str()) == 0 )  return ( true );
-
-   //
-   //  if it's a string but not NA, then error out
-   //
-
-mlog << Error
-     << "\n\n  is_na (PyObject *) -> bad string value ... \"" << s.text() << "\"\n\n";
-
-exit ( 1 );
 
    //
    //  done
