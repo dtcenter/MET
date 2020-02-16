@@ -39,7 +39,6 @@
 //   010    07/26/18  Halley Gotway  Support masks from gen_vx_mask.
 //   011    10/14/19  Halley Gotway  Add support for climo distribution
 //                    percentile thresholds.
-//   012    02/13/20  Bullock        Add support for python embedding.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,6 +61,24 @@ using namespace std;
 #include "stat_analysis_job.h"
 #include "ens_stats.h"
 
+#ifdef WITH_PYTHON
+#include "python_line.h"
+#endif
+
+////////////////////////////////////////////////////////////////////////
+
+static int using_python = false;
+
+#ifdef WITH_PYTHON
+
+// static ConcatString user_script_path = "/d3/personal/randy/github/develop/stat_analysis_test/test.py";
+static ConcatString user_script_path;
+static StringArray  user_script_args;
+
+static const char * python_target_string = "python";
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////
 
 static void parse_command_line(int &argc, char **argv);
@@ -74,8 +91,12 @@ static void set_logfile(const StringArray &);
 static void set_verbosity_level(const StringArray &);
 static void set_config_file(const StringArray &);
 static void process_search_dirs();
-static void process_stat_file(const char *, const STATAnalysisJob &,
-                              int &, int &);
+static void process_stat_file(const char *, const STATAnalysisJob &, int &, int &);
+
+#ifdef WITH_PYTHON
+static void process_python(const STATAnalysisJob &);
+#endif
+
 static void process_job(const char *, int);
 static void clean_up();
 
@@ -86,6 +107,9 @@ static void set_config(const char *);
 static void set_search_dir(const char *);
 static void set_out_file(const char *);
 static void set_verbosity(int);
+
+static void open_temps();
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -161,7 +185,19 @@ int main(int argc, char * argv []) {
       //
       // Process the STAT files found in the search directories.
       //
-      process_search_dirs();
+
+#ifdef WITH_PYTHON
+      if ( using_python )  {
+
+         process_python(default_job);
+
+      } else {
+#endif
+         process_search_dirs();
+
+#ifdef WITH_PYTHON
+      }
+#endif
 
       //
       // If a config file was specified, process the jobs.
@@ -270,7 +306,7 @@ void parse_command_line(int &argc, char **argv) {
    //
    // Check for at least one search file or directory
    //
-   if(search_dirs.n_elements() == 0) {
+   if(!using_python && (search_dirs.n_elements() == 0)) {
       mlog << Error << "\nparse_command_line() -> "
            << "no STAT search files or directories specified!\n\n";
 
@@ -463,32 +499,8 @@ void process_search_dirs() {
    // Open up the temp file for storing the intermediate STAT line data
    //
 
-   //
-   // If the tmp_dir has not already been set on the command line,
-   // use the config file setting or default setting.
-   //
-   if(tmp_dir.length() == 0) {
-      if(config_file.length() != 0) tmp_dir = parse_conf_tmp_dir(&conf);
-      else                          tmp_dir = default_tmp_dir;
-   }
+   open_temps();
 
-   //
-   // Build the temp file name
-   //
-   tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
-   tmp_path = make_temp_file_name(tmp_file.c_str(), NULL);
-
-   //
-   // Open the temp file
-   //
-   tmp_out.open(tmp_path.c_str());
-   if(!tmp_out) {
-      mlog << Error << "\nprocess_search_dirs() -> "
-           << "can't open the temporary file \"" << tmp_path
-           << "\" for writing!\n\n";
-
-      throw(1);
-   }
 
    //
    // Go through each input file
@@ -529,12 +541,10 @@ void process_search_dirs() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_stat_file(const char *filename, const STATAnalysisJob &j,
-                       int &n_read, int &n_keep) {
-   LineDataFile f;
-   STATLine line;
+void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_read, int &n_keep) {
 
-   // TODO: check for and handle python commands here!
+   STATLine line;
+   LineDataFile f;
 
    if(!(f.open(filename))) {
       mlog << Error << "\nprocess_stat_file() -> "
@@ -543,6 +553,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
 
       throw(1);
    }
+
 
    while(f >> line) {
 
@@ -556,7 +567,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
       //
       // Pass header lines through to the output
       //
-      if(line.is_header() || j.is_keeper(line)) {
+      if(line.is_header() || job.is_keeper(line)) {
 
          if(!line.is_header()) n_keep++;
 
@@ -568,6 +579,82 @@ void process_stat_file(const char *filename, const STATAnalysisJob &j,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+#ifdef WITH_PYTHON
+
+void process_python(const STATAnalysisJob & job)
+
+{
+
+// cout << "  in process_python():\n";
+// cout << "  user_script_path = \"" << user_script_path << "\"\n";
+// user_script_args.dump(cout, 1);
+// cout.flush();
+
+int j = 0;
+STATLine line;
+LineDataFile * f = 0;
+PyLineDataFile * pldf = 0;
+
+pldf = new PyLineDataFile;
+
+if ( ! pldf->open(user_script_path.c_str(), user_script_args) )  {
+
+   mlog << Error << "\nprocess_python() -> "
+        << "unable to open user script file \""
+        << user_script_path << "\"\n\n";
+
+   throw(1);
+
+}
+
+f = pldf;
+
+open_temps();
+
+while((*f) >> line) {
+
+   // if ( (++j) < 3)  {
+   //   cout << "stat_analysis dump:\n" << flush;
+   //   line.DataLine::dump(cout, 1);
+   //   // line.dump(cout, 1);
+   //   cout.flush();
+   // }
+
+      //
+      // Continue if the line is not a valid STAT line.
+      //
+
+   if(line.type() == no_stat_line_type) continue;
+
+   // if(!line.is_header()) n_read++;
+
+      //
+      // Pass header lines through to the output
+      //
+
+   if(line.is_header() || job.is_keeper(line)) {
+
+      // if(!line.is_header()) n_keep++;
+
+      tmp_out << line;
+   }
+
+}   // while
+
+   //
+   //  done
+   //
+
+f->close();
+
+return;
+
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -711,9 +798,38 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_lookin_path(const StringArray & a) {
-   for(int i = 0; i < a.n_elements(); i++)
+void set_lookin_path(const StringArray & a)
+
+{
+
+int i;
+
+#ifdef WITH_PYTHON
+
+if ( strcmp(a[0].c_str(), python_target_string) == 0 )  {
+
+   using_python = true;
+
+   user_script_path = a[1].c_str();
+
+   for (i=2; i<(a.n_elements()); ++i)  {
+
+      user_script_args.add(a[i].c_str());
+
+   }
+
+} else {
+
+#endif
+
+   for(i = 0; i < a.n_elements(); i++)
       set_search_dir(a[i].c_str());
+
+
+#ifdef WITH_PYTHON
+}
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -761,5 +877,45 @@ void set_verbosity_level(const StringArray & a) {
 void set_config_file(const StringArray & a) {
    set_config(a[0].c_str());
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void open_temps()
+
+{
+
+   //
+   // If the tmp_dir has not already been set on the command line,
+   // use the config file setting or default setting.
+   //
+   if(tmp_dir.length() == 0) {
+      if(config_file.length() != 0) tmp_dir = parse_conf_tmp_dir(&conf);
+      else                          tmp_dir = default_tmp_dir;
+   }
+
+   //
+   // Build the temp file name
+   //
+   tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
+   tmp_path = make_temp_file_name(tmp_file.c_str(), NULL);
+
+   //
+   // Open the temp file
+   //
+   tmp_out.open(tmp_path.c_str());
+   if(!tmp_out) {
+      mlog << Error << "\nopen_temps() -> "
+           << "can't open the temporary file \"" << tmp_path
+           << "\" for writing!\n\n";
+
+      throw(1);
+   }
+
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////

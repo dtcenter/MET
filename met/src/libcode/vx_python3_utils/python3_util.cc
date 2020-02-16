@@ -205,6 +205,8 @@ if ( PyUnicode_Check(obj) )  {   //  string?
    mlog << Error << "\npyobject_as_concat_string(PyObject *) -> "
         << "bad object type\n\n";
 
+      cout << "\n\n  pyobject_as_concat_string: obj = " << obj << "\n\n" << flush;
+
    exit ( 1 );
 
 }

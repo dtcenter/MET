@@ -23,6 +23,7 @@ extern "C" {
 #include "Python.h"
 }
 
+#include "vx_python3_utils.h"
 #include "data_line.h"
 
 
@@ -68,6 +69,8 @@ class PyLineDataFile : public LineDataFile {
       void close();
 
 
+      Python3_Script * script;
+
 
       bool first_call;
 
@@ -77,6 +80,9 @@ class PyLineDataFile : public LineDataFile {
 
       PyObject * main_list;   //  not allocated
 
+      // int operator>>(DataLine &);   //  virtual from base class
+
+      bool is_header() const;   //  virtual from base class
 
       bool next_line(ConcatString & s_out);
 
