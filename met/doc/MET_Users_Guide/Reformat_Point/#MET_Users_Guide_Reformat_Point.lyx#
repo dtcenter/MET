@@ -6036,18 +6036,17 @@ goes_imager_projection
 \begin_layout Description
 7.
  The -adp option specifies the Aerosol Detect Products (ADP) input data
- for Aersol Optical Depth (AOD) dataset (must be from GOES16/17 otherwise
- this option is ignored).
+ for Aersol Optical Depth (AOD) dataset (must be from GOES16/17
 \end_layout
 
 \begin_layout Description
-8.
+7.
  The -method type option specifies the regridding method.
  The default method is UW_MEAN.
 \end_layout
 
 \begin_layout Description
-9.
+8.
  The -gaussian_dx n option defines the 
 \series medium
 distance interval for Gaussian smoothing.
@@ -6058,7 +6057,7 @@ The default is 81.271 km.
 \end_layout
 
 \begin_layout Description
-10.
+9.
  The -gaussain_radius n option defines the
 \series medium
  
@@ -6068,7 +6067,7 @@ radius of influence for Gaussian interpolation.
 \end_layout
 
 \begin_layout Description
-11.
+10.
  The -obs_thresh n option sets the observation value to compute the probability
  of occurrence.
  The default is set to disabled.
@@ -6076,13 +6075,13 @@ radius of influence for Gaussian interpolation.
 \end_layout
 
 \begin_layout Description
-12.
+11.
  The -vld_thresh n option sets the required ratio of valid data for regridding.
  The default is 0.5.
 \end_layout
 
 \begin_layout Description
-13.
+12.
  The -name list option specifies a comma-separated list of output variable
  names for reach field specified.
  
@@ -6091,7 +6090,7 @@ radius of influence for Gaussian interpolation.
 \begin_layout Description
 
 \series medium
-14.
+13.
  The 
 \series bold
 -log file 
@@ -6111,7 +6110,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-15.
+14.
  The 
 \series bold
 -v level
@@ -6137,7 +6136,7 @@ level
 \begin_layout Description
 
 \series medium
-16.
+15.
  
 \series default
 The 
@@ -6229,42 +6228,8 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 
 \begin_layout Standard
 7.
- The probability mask field which is a binary field that represents whether
- or not there is probability data at that grid point.
- Can be either 
-\begin_inset Quotes eld
-\end_inset
-
-0
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
- with 
-\begin_inset Quotes eld
-\end_inset
-
-0
-\begin_inset Quotes erd
-\end_inset
-
- meaning the probability value does not exist and a value of 
-\begin_inset Quotes eld
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
- meaniung that the probability value does exist.
- 
+ The probability mask field which is a binary field that represents [ask
+ Howard for clarification]
 \end_layout
 
 \end_body

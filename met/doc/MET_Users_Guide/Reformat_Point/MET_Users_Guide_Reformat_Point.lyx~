@@ -6231,39 +6231,8 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 7.
  The probability mask field which is a binary field that represents whether
  or not there is probability data at that grid point.
- Can be either 
-\begin_inset Quotes eld
-\end_inset
-
-0
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
- with 
-\begin_inset Quotes eld
-\end_inset
-
-0
-\begin_inset Quotes erd
-\end_inset
-
- meaning the probability value does not exist and a value of 
-\begin_inset Quotes eld
-\end_inset
-
-1
-\begin_inset Quotes erd
-\end_inset
-
- meaniung that the probability value does exist.
+ Can be either 0 or 1 with 0 meaning the probability value does not exist
+ and a value of 1 meaniung that the probability value does exist.
  
 \end_layout
 
