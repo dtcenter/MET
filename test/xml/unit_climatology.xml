@@ -262,8 +262,7 @@
       <stat>&OUTPUT_DIR;/climatology/stat_analysis_MPR_to_PSTD.stat</stat>
     </output>
   </test>
-<!-- JHG: 20200215 comment out this call because it has failed in the NB 3 times in a row
-          for some reason, this command keeps getting killed.
+
   <test name="climatology_SERIES_ANALYSIS">
     <exec>&MET_BIN;/series_analysis</exec>
     <env>
@@ -298,7 +297,7 @@
       <grid_nc>&OUTPUT_DIR;/climatology/series_analysis_GFS_CLIMO_1.0DEG.nc</grid_nc>
     </output>
   </test>
--->
+
   <test name="climatology_ENSEMBLE_STAT">
     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
