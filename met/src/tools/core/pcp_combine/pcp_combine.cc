@@ -903,8 +903,11 @@ void do_sub_command() {
    // Update value for each grid point.
    //
    for(i=0, nxy=grid1.nx()*grid1.ny(); i<nxy; i++) {
-      if(!is_bad_data( diff.data()[i]) &&
-         !is_bad_data(minus.data()[i])) {
+      if(is_bad_data( diff.data()[i]) ||
+         is_bad_data(minus.data()[i])) {
+         diff.buf()[i] = bad_data_double;
+      }
+      else {
          diff.buf()[i] -= minus.data()[i];
       }
    }

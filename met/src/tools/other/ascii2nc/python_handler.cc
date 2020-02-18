@@ -230,7 +230,8 @@ ConcatString command, path, user_base;
 
 path = generic_python_wrapper;
 
-mlog << Debug(3) << "Running user's python script ("
+mlog << Debug(3) 
+     << "Running user's python script ("
      << user_script_filename << ").\n";
 
 user_base = user_script_filename.basename();

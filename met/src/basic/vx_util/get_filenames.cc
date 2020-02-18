@@ -36,6 +36,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const char python_str [] = "python";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 StringArray get_filenames(const StringArray & search_dir_list,
                           const char * prefix, const char * suffix,
                           bool check_regular)
@@ -45,10 +51,37 @@ StringArray get_filenames(const StringArray & search_dir_list,
 int j;
 const int N = search_dir_list.n_elements();
 StringArray a;
+ConcatString cs, py_str(python_str);
 
 for (j=0; j<N; ++j)  {
 
-  a.add(get_filenames(string(search_dir_list[j]), prefix, suffix, check_regular));
+   // Check for python embedding commands
+   if ( py_str.comparecase(search_dir_list[j].c_str()) == 0 ) {
+
+      cs << cs_erase << python_str;
+      j++;
+
+      // Append the python script and any arguments
+      while ( j < N )  {
+
+         // Look for the next python command
+         if ( py_str.comparecase(search_dir_list[j].c_str()) == 0 )  {
+            j--;
+            break;
+         }
+         cs << " " << search_dir_list[j];
+         j++;
+      }
+
+      // Add full python command to the list
+      a.add(cs);
+
+   }
+   else {
+
+      a.add(get_filenames(string(search_dir_list[j]), prefix, suffix, check_regular));
+
+   }
 
 }
 

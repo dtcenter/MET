@@ -8,6 +8,10 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+if ENABLE_PYTHON
+LDFLAGS += -lvx_python3_utils
+endif
+
 # Test programs
 
 noinst_PROGRAMS = test_pressure_levels
@@ -25,3 +29,11 @@ test_pressure_levels_LDADD = -lvx_tc_util \
 	-lvx_math \
 	-lvx_log \
 	-lnetcdf_c++4 -lgsl -lgslcblas
+
+if ENABLE_PYTHON
+test_pressure_levels_LDADD += $(MET_PYTHON_LD)
+test_pressure_levels_LDADD += -lvx_data2d_python -lvx_python3_utils
+test_pressure_levels_LDADD += -lvx_data2d_python -lvx_python3_utils
+test_pressure_levels_LDADD += -lvx_grid -lvx_util -lvx_config
+test_pressure_levels_LDADD += -lvx_data2d -lvx_gsl_prob -lvx_util -lvx_math -lvx_cal -lvx_config
+endif

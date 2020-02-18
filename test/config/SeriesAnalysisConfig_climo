@@ -111,7 +111,7 @@ mask = {
 // Number of grid points to be processed concurrently.  Set smaller to use
 // less memory but increase the number of passes through the data.
 //
-block_size = 87000;
+block_size = 150000;
 
 //
 // Ratio of valid matched pairs to compute statistics for a grid point

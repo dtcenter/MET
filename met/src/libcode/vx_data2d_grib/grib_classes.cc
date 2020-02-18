@@ -492,6 +492,17 @@ int xdir, ydir, order;
 
 gds_to_order(*gds, xdir, ydir, order);
 
+   //
+   //  For latlon grids, set ydir by comparing lat1 and lat2 since the
+   //  order flag can be wrong.
+   //
+
+if ( gds->type == 0 )  {
+   if ( decode_lat_lon(gds->grid_type.latlon_grid.lat1, 3) >
+        decode_lat_lon(gds->grid_type.latlon_grid.lat2, 3) ) ydir = 0;
+   else                                                      ydir = 1;
+}
+
 TO.set(xdir, ydir, order);
 
 return;

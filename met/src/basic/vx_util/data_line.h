@@ -41,6 +41,11 @@ static const char dataline_default_delim[]      = " \t";
 class LineDataFile;  //  forward reference
 
 
+#ifdef WITH_PYTHON
+class PyLineDataFile;   //  forward reference
+#endif
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -50,7 +55,7 @@ class DataLine {
       friend ostream & operator<<(ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
-   private:
+   protected:
 
       //void extend_char  (int);
       //void extend_int   (int);
@@ -70,12 +75,22 @@ class DataLine {
 
       LineDataFile * File;  //  not allocated
 
+      bool IsHeader;
+
    
    protected:
    
       void init_from_scratch();
       void assign(const DataLine &);
       int N_items;
+
+   public:
+
+      bool read_single_text_line(LineDataFile *);   //  reads a line of text into Line
+
+#ifdef WITH_PYTHON
+      bool read_py_single_text_line(PyLineDataFile *);
+#endif
 
 
    public:
@@ -122,6 +137,8 @@ class DataLine {
 
       virtual bool is_header() const;
 
+      virtual void set_is_header(bool = true);
+
       virtual void set_delimiter(const char *delimiter);
 
 };
@@ -138,13 +155,15 @@ inline  const char *  DataLine::get_line     () const { return ( Line.c_str() );
 
 inline  const char *  DataLine::get_delimiter() const { return ( Delimiter.c_str() ); }
 
+inline  void          DataLine::set_is_header(bool __tf__) { IsHeader = __tf__;  return; }
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
 class LineDataFile {
 
-   private:
+   protected:
 
       void init_from_scratch();
 
@@ -164,7 +183,7 @@ class LineDataFile {
    public:
 
       LineDataFile();
-     ~LineDataFile();
+      virtual ~LineDataFile();
 
       ifstream * in;
 
@@ -176,7 +195,7 @@ class LineDataFile {
 
       int ok() const;
 
-      int operator>>(DataLine &);
+      virtual int operator>>(DataLine &);
 
       int read_fwf_line(DataLine &, const int *wdth, int n_wdth);
 

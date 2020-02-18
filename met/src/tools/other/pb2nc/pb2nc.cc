@@ -170,8 +170,9 @@ static float static_dummy_201[MAX_CAPE_LEVEL+1];
 #define MAX_PBL         5000
 #define MAX_PBL_LEVEL   100
 #define PBL_DEBUG_LEVEL 8
-static bool ignore_Q_PBL = true;
-static bool ignore_Z_PBL = true;
+static bool IGNORE_Q_PBL = true;
+static bool IGNORE_Z_PBL = true;
+static bool USE_LOG_INTERPOLATION = false;
 static float pbl_data_pres[MAX_PBL_LEVEL];  // mb
 static float pbl_data_temp[MAX_PBL_LEVEL];  // Kelvin
 static float pbl_data_spfh[MAX_PBL_LEVEL];  // ? / 1,000,000
@@ -348,14 +349,6 @@ static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       const float hdr_lat, const float hdr_lon, const float hdr_elv,
       const float quality_mark, const int buf_size);
 
-static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
-                          map<float, float*> pqtzuv_map_uv);
-static void   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
-                         const float pbl_p, const float pbl_h, const float pbl_qm,
-                         const float hdr_lat, const float hdr_lon,
-                         const float hdr_elv, const time_t hdr_vld_ut, 
-                         const ConcatString &hdr_typ, const ConcatString &hdr_sid);
-
 static int    get_event_index(int, int, int);
 static int    get_event_index_temp(int, int, int);
 static void   dbl2str(double *, ConcatString&);
@@ -370,14 +363,31 @@ static bool   keep_instrument_type(int);
 static bool   keep_bufr_obs_index(int);
 static bool   keep_level_category(int);
 
-static float  derive_grib_code(int, float *, float *, double,
-                               float&);
-//void interpolate_pbl_data(int pbl_level, float *pbl_data);
+static float  derive_grib_code(int, float *, float *, double, float&);
+
 static int    combine_tqz_and_uv(map<float, float*>,
                                  map<float, float*>, map<float, float*> &);
+static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
+                          map<float, float*> pqtzuv_map_uv);
+static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
+static void   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_code,
+                         const float pbl_p, const float pbl_h, const float pbl_qm,
+                         const float hdr_lat, const float hdr_lon,
+                         const float hdr_elv, const time_t hdr_vld_ut,
+                         const ConcatString &hdr_typ, const ConcatString &hdr_sid);
 static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
-
+static void   log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
+                                map<float, float*> pqtzuv_map_uv,
+                                map<float, float*> &pqtzuv_map_merged,
+                                const char *method_name);
+static void   log_pbl_input(int pbl_level, const char *method_name);
+static void   log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
+                             map<float, float*> pqtzuv_map_uv,
+                             const char *method_name);
+static void   merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
+                            map<float, float*> pqtzuv_map_aux,
+                            map<float, float*> &pqtzuv_map_merged);
 
 static void   usage();
 static void   set_pbfile(const StringArray &);
@@ -992,7 +1002,6 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = -9999;
       strncpy(prev_hdr_typ, not_assigned, sizeof(not_assigned));
       strncpy(prev_hdr_sid, not_assigned, sizeof(not_assigned));
    }
@@ -1304,32 +1313,6 @@ void process_pbfile(int i_pb) {
 
       if (cal_pbl) {
          pbl_level = 0;
-         if (i_read > 0) {
-            is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
-                  && is_eq(prev_hdr_lat, hdr_lat)
-                  && is_eq(prev_hdr_lon, hdr_lon)
-                  && is_eq(prev_hdr_elv, hdr_elv)
-                  && 0 == strcmp(prev_hdr_typ, hdr_typ)
-                  && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
-            has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
-            if (!is_same_header && has_pbl_data) {
-               float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
-               
-               insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
-                          prev_hdr_lat, prev_hdr_lon, prev_hdr_elv, prev_hdr_vld_ut,
-                          prev_hdr_typ, prev_hdr_sid);
-
-               std::map<float,float*>::iterator it;
-               for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
-                  delete it->second;
-               }
-               for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
-                  delete it->second;
-               }
-               pqtzuv_map_tq.clear();
-               pqtzuv_map_uv.clear();
-            }
-         }
       }
 
       // Search through the vertical levels
@@ -1579,8 +1562,8 @@ void process_pbfile(int i_pb) {
                pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
             }
             if (!is_eq(tmp_pqtzuv[2],bad_data_float) &&
-                     (!is_eq(tmp_pqtzuv[1],bad_data_float) || ignore_Q_PBL) &&
-                     (!is_eq(tmp_pqtzuv[3],bad_data_float) || ignore_Z_PBL)) {
+                     (!is_eq(tmp_pqtzuv[1],bad_data_float) || IGNORE_Q_PBL) &&
+                     (!is_eq(tmp_pqtzuv[3],bad_data_float) || IGNORE_Z_PBL)) {
                has_tq = true;
                pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
             }
@@ -1822,7 +1805,31 @@ void process_pbfile(int i_pb) {
       }
 
       if (cal_pbl) {
-         is_same_header = false;
+         pbl_level = 0;
+         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
+               && is_eq(prev_hdr_lat, hdr_lat)
+               && is_eq(prev_hdr_lon, hdr_lon)
+               && is_eq(prev_hdr_elv, hdr_elv)
+               && 0 == strcmp(prev_hdr_typ, hdr_typ)
+               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
+         has_pbl_data = (pqtzuv_map_tq.size() > 0 && pqtzuv_map_uv.size() > 0);
+         if (is_same_header && has_pbl_data) {
+            float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
+            
+            insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                       hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
+         
+            std::map<float,float*>::iterator it;
+            for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
+               delete it->second;
+            }
+            for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
+               delete it->second;
+            }
+            pqtzuv_map_tq.clear();
+            pqtzuv_map_uv.clear();
+         }
+         //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
@@ -2657,6 +2664,20 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
+   if (is_prepbufr) hdr_typ[6] = '\0';
+   else             hdr_typ[mxr8nm] = '\0';
+   // Change the trailing blank space to a null
+   for (int i=0; i<mxr8nm; i++) {
+      if (' ' == hdr_typ[i]) {
+         hdr_typ[i] = '\0';
+         break;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void dbl2str(double *d, ConcatString & str) {
    const char *fmt_str = "%s";
 
@@ -2871,185 +2892,103 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
 
 ////////////////////////////////////////////////////////////////////////
 
+void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
+   int start_idx = (copy_all ? 0 : 1);
+   for (int index = start_idx; index < mxr8vt; index++) {
+      if (copy_all || !is_eq(from_pqtzuv[index], bad_data_float))
+         to_pqtzuv[index] = from_pqtzuv[index];
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
    int offset;
-   int tq_count = 0;
-   int uv_count = 0;
    int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
-
-   tq_count = pqtzuv_map_tq.size();
-   uv_count = pqtzuv_map_uv.size();
+   int tq_count = pqtzuv_map_tq.size();
+   int uv_count = pqtzuv_map_uv.size();
    if (tq_count > 0 && uv_count > 0) {
       IntArray common_levels, tq_levels;
-      float first_pres, prev_pres, cur_pres;
       float *pqtzuv_tq, *pqtzuv_uv;
-      float *cur_pqtzuv = (float *) 0;
-      float *first_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
-      std::map<float,float*>::iterator it_tq, it_uv;
-      ConcatString buf;
-      StringArray log_array;
+      float *pqtzuv_merged = (float *) 0;
+      float *next_pqtzuv, *prev_pqtzuv;
+      std::map<float,float*>::iterator it, it_tq, it_uv;
 
-      for (std::map<float,float*>::iterator it=pqtzuv_map_tq.begin();
-           it!=pqtzuv_map_tq.end(); ++it) {
+      // Gets pressure levels for TQZ records
+      for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
          tq_levels.add(int(it->first));
       }
-      for (std::map<float,float*>::iterator it=pqtzuv_map_uv.begin();
-           it!=pqtzuv_map_uv.end(); ++it) {
-         if (tq_levels.has(int(it->first))) common_levels.add(int(it->first));
+      // Gets pressure levels for common records
+      for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
+         if (tq_levels.has(int(it->first))) {
+            common_levels.add(int(it->first));
+         }
       }
 
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-         for (std::map<float,float*>::iterator it=pqtzuv_map_tq.begin();
-              it!=pqtzuv_map_tq.end(); ++it) {
-            float *pqtzuv = it->second;
-            buf.clear();
-            for (int idx=0; idx<mxr8vt; idx++) {
-               buf << " " << pqtzuv[idx];
-            }
-            log_array.add(buf.c_str());
-         }
-         offset = 0;
-         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
-            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "TQZ record: "
-                 << offset++ << "\t" << log_array[idx] << "\n";
-         }
-         log_array.clear();
-         for (std::map<float,float*>::iterator it=pqtzuv_map_uv.begin();
-              it!=pqtzuv_map_uv.end(); ++it) {
-            float *pqtzuv = it->second;
-            buf.clear();
-            for (int idx=0; idx<mxr8vt; idx++) {
-               buf << " " << pqtzuv[idx];
-            }
-            log_array.add(buf.c_str());
-         }
-         offset = 0;
-         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
-            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << " UV record: "
-                 << offset++ << "\t" << log_array[idx] << "\n";
-         }
-         log_array.clear();
+         log_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv, method_name);
       }
 
-      first_pres = bad_data_float;
+      // Select first record by 1) merging two records with the same pressure
+      // level or 2) interpolate
+      next_pqtzuv = (float *)0;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
       pqtzuv_uv = (float *)it_uv->second;;
-      if (it_tq->first == it_uv->first) {
-         first_pres = it_tq->first;
-         for (int idx=1; idx<mxr8vt; idx++) {
-            if (is_eq(pqtzuv_tq[idx], bad_data_float)) {
-               pqtzuv_tq[idx] = pqtzuv_uv[idx];
+      pqtzuv_merged = new float[mxr8vt];
+      if (common_levels.has(int(it_tq->first)) 
+            || common_levels.has(int(it_uv->first))) {
+         // Found the records with the same precsure level
+         if (it_tq->first != it_uv->first) {
+            if (common_levels.has(int(it_uv->first))) {
+               pqtzuv_uv = pqtzuv_map_uv[it_uv->first];
+            }
+            else if (common_levels.has(int(it_tq->first))) {
+               pqtzuv_tq = pqtzuv_map_tq[it_tq->first];
             }
          }
-         pqtzuv_map_merged[first_pres] = pqtzuv_tq;
-         first_pqtzuv = pqtzuv_tq;
+         copy_pqtzuv(pqtzuv_merged, pqtzuv_tq);
+         copy_pqtzuv(pqtzuv_merged, pqtzuv_uv, false);
       }
       else {
          if (it_tq->first > it_uv->first) {
-            first_pres = it_tq->first;
+            //Interpolate UV into TQZ
             prev_pqtzuv = pqtzuv_uv;
-            cur_pqtzuv  = pqtzuv_tq;
-            next_pqtzuv = ++it_uv->second;
-         }
-         else {
-            first_pres = it_uv->first;
-            prev_pqtzuv = pqtzuv_tq;
-            cur_pqtzuv  = pqtzuv_uv;
-            next_pqtzuv = ++it_tq->second;
-         }
-         interpolate_pqtzuv(prev_pqtzuv, cur_pqtzuv, next_pqtzuv);
-         pqtzuv_map_merged[first_pres] = cur_pqtzuv;
-         first_pqtzuv = cur_pqtzuv;
-      }
-
-      prev_pres = first_pres;
-      prev_pqtzuv = first_pqtzuv;
-      it_uv = pqtzuv_map_uv.begin();
-      for (it_tq=pqtzuv_map_tq.begin(); it_tq!=pqtzuv_map_tq.end(); ++it_tq) {
-         cur_pres = (float)it_tq->first;
-         // Skip the record with missing values
-         if (prev_pres > cur_pres) continue;
-
-         cur_pqtzuv = (float *)it_tq->second;
-         if (0 < pqtzuv_map_uv.count(cur_pres)) {
-            common_count++;
-            pqtzuv_uv = (float *)pqtzuv_map_uv[cur_pres];
-            for (int idx=1; idx<mxr8vt; idx++) {
-               if (is_eq(cur_pqtzuv[idx], bad_data_float)) {
-                  cur_pqtzuv[idx] = pqtzuv_uv[idx];
-               }
-            }
-         }
-         else {
-            // Advance UV record if necessary
-            if (it_uv->first < cur_pres) {
-               for (; it_uv!=pqtzuv_map_uv.end(); ++it_uv) {
-                  if (it_uv->first > cur_pres) break;
-               }
-               //Stop if no more UV records
-               if (it_uv->first < cur_pres) break;
+            copy_pqtzuv(pqtzuv_merged, pqtzuv_tq);
+            while (it_tq->first > it_uv->first && it_uv != pqtzuv_map_uv.end()) {
+               prev_pqtzuv = (float *)it_uv->second;
+               ++it_uv;
             }
             next_pqtzuv = it_uv->second;
-            interpolate_pqtzuv(prev_pqtzuv, cur_pqtzuv, next_pqtzuv);
          }
-         pqtzuv_map_merged[cur_pres] = cur_pqtzuv;
-         prev_pres = cur_pres;
-         prev_pqtzuv = cur_pqtzuv;
-      }
-
-      prev_pres = first_pres;
-      prev_pqtzuv = first_pqtzuv;
-      it_tq = pqtzuv_map_tq.begin();
-      for (it_uv=pqtzuv_map_uv.begin(); it_uv!=pqtzuv_map_uv.end(); ++it_uv) {
-         cur_pres = (float)it_uv->first;
-         // Skip the record with missing values
-         if (prev_pres > cur_pres) continue;
-         if (0 < pqtzuv_map_merged.count(cur_pres)) continue;
-
-         cur_pqtzuv = (float *)it_uv->second;
-         // Advance UV record if necessary
-         if (it_tq->first < cur_pres) {
-            for (; it_tq!=pqtzuv_map_tq.end(); ++it_tq) {
-               if (it_tq->first > cur_pres) break;
+         else {
+            //Interpolate TQZ into UV
+            prev_pqtzuv = pqtzuv_tq;
+            copy_pqtzuv(pqtzuv_merged, pqtzuv_uv);
+            while (it_tq->first < it_uv->first && it_tq != pqtzuv_map_tq.end()) {
+               prev_pqtzuv = (float *)it_tq->second;
+               ++it_tq;
             }
-            //Stop if no more TQZ records
-            if (it_tq->first < cur_pres) break;
+            next_pqtzuv = it_tq->second;
          }
-         next_pqtzuv = it_tq->second;
-         interpolate_pqtzuv(prev_pqtzuv, cur_pqtzuv, next_pqtzuv);
-         pqtzuv_map_merged[cur_pres] = cur_pqtzuv;
-         prev_pres = cur_pres;
-         prev_pqtzuv = cur_pqtzuv;
+         interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
+      }
+      float first_pres = (pqtzuv_merged == 0 ? bad_data_float : pqtzuv_merged[0]);
+      pqtzuv_map_merged[first_pres] = pqtzuv_merged;
+      mlog << Debug(9) << method_name << "Added " << first_pres << " to merged records\n";
+
+      if (pqtzuv_merged != 0) {
+         //Merge UV into TQZ records
+         merge_records(pqtzuv_merged, pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged);
+         //Merge TQZ into UV records
+         merge_records(pqtzuv_merged, pqtzuv_map_uv, pqtzuv_map_tq, pqtzuv_map_merged);
       }
 
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-         for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
-               it!=pqtzuv_map_merged.end(); ++it) {
-            float *pqtzuv = it->second;
-            buf.clear();
-            for (int idx=0; idx<mxr8vt; idx++) {
-              buf << " " << pqtzuv[idx];
-            }
-            bool has_tq = (0 < (pqtzuv_map_tq.count(it->first)));
-            bool has_uv = (0 < (pqtzuv_map_uv.count(it->first)));
-            if (has_tq || has_uv) {
-               buf << "\t(";
-               if (has_tq) buf << " tqz";
-               if (has_uv) buf << " uv";
-               buf << " )";
-            }
-            log_array.add(buf.c_str());
-         }
-         offset = 0;
-         for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
-            mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    merged: "
-                 << offset++ << "\t" << log_array[idx] << "\n";
-         }
-         log_array.clear();
+         log_merged_tqz_uv(pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged, method_name);
       }
    }
 
@@ -3064,15 +3003,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int mzbl;        //       -      TOP OF MODEL DOMAIN (LEVEL NUMBER - INTEGER)
    float hpbl;      //       M      ATMOSPHERIC BOUNDARY-LAYER DEPTH
    int index;
-   int pbl_level = 0;
-   int tq_count = 0;
-   int uv_count = 0;
+   int pbl_level;
+   int tq_count = pqtzuv_map_tq.size();
+   int uv_count = pqtzuv_map_uv.size();
    std::map<float,float*>::iterator it;
    static const char *method_name = "compute_pbl() ";
 
    hpbl = bad_data_float;
-   tq_count = pqtzuv_map_tq.size();
-   uv_count = pqtzuv_map_uv.size();
    mlog << Debug(7) << method_name << "is called: TQZ: "
         << tq_count << "  UV: " << uv_count << "\n";
    if (tq_count > 0 || uv_count > 0) {
@@ -3130,7 +3067,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                int pres_level = int(it->first);
                if (selected_levels.has(pres_level)) break;
                
-               float *pqtzuv = it->second;
+               float *pqtzuv = pqtzuv_map_merged[it->first];
                pbl_data_pres[index] = pqtzuv[0];
                pbl_data_spfh[index] = pqtzuv[1];
                pbl_data_temp[index] = pqtzuv[2];
@@ -3170,26 +3107,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
               << "  missing count: Q: " << (pbl_level - spfh_cnt)
               << ", Z: " << (pbl_level - hgt_cnt) << "\n\n";
          if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
-            ConcatString buf;
-            StringArray log_array;
-            int vlevels = pbl_level;
-            if (vlevels >= MAX_PBL_LEVEL) vlevels = MAX_PBL_LEVEL;
-            for (int idx=0; idx<vlevels; idx++) {
-               buf.clear();
-               buf << " " << pbl_data_pres[idx];
-               buf << " " << pbl_data_temp[idx];
-               buf << " " << pbl_data_spfh[idx];
-               buf << " " <<  pbl_data_hgt[idx];
-               buf << " " << pbl_data_ugrd[idx];
-               buf << " " << pbl_data_vgrd[idx];
-               log_array.add(buf.c_str());
-            }
-            int offset = 0;
-            for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
-               mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    input to calpbl_: "
-                    << offset++ << "\t" << log_array[idx] << "\n";
-            }
-            log_array.clear();
+            log_pbl_input(pbl_level, method_name);
          }
 
          //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
@@ -3263,9 +3181,9 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
          if (skip_missing) {
             idx_end = idx;
             if (idx_start >= 0) {
-               mlog << Debug(7) << method_name << "between pres["
-                    << idx_start <<"] and pres[" << idx_end <<"] ("
-                    << var_data[idx_start] << " and " << var_data[idx_end] << ")\n";
+               mlog << Debug(7) << method_name << " index between "
+                    << idx_start <<" and " << idx_end <<", data between "
+                    << var_data[idx_start] << " and " << var_data[idx_end] << "\n";
                float data_diff = var_data[idx_end] - var_data[idx_start];
                for (idx2 = idx_start+1; idx2<idx_end; idx2++) {
                   float pres_ratio = (pres_data[idx2] - pres_data[idx_start])
@@ -3295,40 +3213,210 @@ int interpolate_by_pressure(int length, float *pres_data, float *var_data) {
 void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzuv) {
    static const char *method_name = "interpolate_pqtzuv() ";
 
-   for (int index=1; index < mxr8vt; index++) {
-      if (is_eq(cur_pqtzuv[index], bad_data_float)) {
-         float prev_value, next_value, ratio_pres;
-         prev_value = prev_pqtzuv[index];
-         next_value = next_pqtzuv[index];
-         if (is_eq(prev_value, bad_data_float) || is_eq(next_value, bad_data_float)) {
-            if ((!ignore_Q_PBL && index==1) || (!ignore_Z_PBL && index==3)) {
-               mlog << Warning << method_name << "   Missing value for "
-                    << (is_eq(prev_value, bad_data_float) ? "previous" : "next")
-                    << " data for index " << index << " at pressure "
-                    << (is_eq(prev_value, bad_data_float) ? prev_pqtzuv[0] : next_pqtzuv[0])
-                    << "\n";
+   if ((prev_pqtzuv[0] == cur_pqtzuv[0]) || (next_pqtzuv[0] == cur_pqtzuv[0])) {
+      mlog << Error << method_name 
+              << "  Can't interpolate because of same pressure levels. prev: "
+              << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
+              << ", next: " <<  prev_pqtzuv[0] << "\n";
+   }
+   else {
+      float p_ratio = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
+      float p_ratio_log = (log(cur_pqtzuv[0]) - log(prev_pqtzuv[0]))
+            / (log(next_pqtzuv[0]) - log(prev_pqtzuv[0]));
+      for (int index=1; index < mxr8vt; index++) {
+         if (is_eq(cur_pqtzuv[index], bad_data_float)) {
+            float prev_value, next_value, ratio_pres;
+            prev_value = prev_pqtzuv[index];
+            next_value = next_pqtzuv[index];
+            if (is_eq(prev_value, bad_data_float) || is_eq(next_value, bad_data_float)) {
+               if ((!IGNORE_Q_PBL && index==1) || (!IGNORE_Z_PBL && index==3)) {
+                  mlog << Warning << method_name << "   Missing value for "
+                       << (is_eq(prev_value, bad_data_float) ? "previous" : "next")
+                       << " data for index " << index << " at pressure "
+                       << (is_eq(prev_value, bad_data_float) ? prev_pqtzuv[0] : next_pqtzuv[0])
+                       << "\n";
+               }
+            }
+            else {
+               ratio_pres = USE_LOG_INTERPOLATION ? p_ratio_log : p_ratio;
+               cur_pqtzuv[index] = prev_value + (next_value - prev_value) * ratio_pres;
             }
          }
-         else {
-           ratio_pres = (cur_pqtzuv[0] - prev_pqtzuv[0]) / (next_pqtzuv[0] - prev_pqtzuv[0]);
-           cur_pqtzuv[index] = prev_value + (next_value - prev_value) * ratio_pres;
-         }
       }
+      mlog << Debug(9) << method_name << " pressure level [" << cur_pqtzuv[0]
+          << "] between " << prev_pqtzuv[0] << " and " << next_pqtzuv[0] << "\n";
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr) {
-   if (is_prepbufr) hdr_typ[6] = '\0';
-   else             hdr_typ[mxr8nm] = '\0';
-   // Change the trailing blank space to a null
-   for (int i=0; i<mxr8nm; i++) {
-      if (' ' == hdr_typ[i]) {
-         hdr_typ[i] = '\0';
+void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
+      map<float, float*> pqtzuv_map_aux, map<float, float*> &pqtzuv_map_merged) {
+
+   float cur_pres, next_pres;
+   float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
+   float *pqtzuv_merged, *pqtzuv_tq, *pqtzuv_uv;
+   std::map<float,float*>::iterator it_pivot, it_aux;
+   static const char *method_name = "merge_records() ";
+
+   float first_pres = first_pqtzuv[0];
+   prev_pqtzuv = first_pqtzuv;
+   it_aux = pqtzuv_map_aux.begin();
+   for (it_pivot=pqtzuv_map_pivot.begin(); it_pivot!=pqtzuv_map_pivot.end(); ++it_pivot) {
+      // Skip the records below the first mathcing/interpolated level
+      if (first_pres < it_pivot->first) break;
+   }
+   mlog << Debug(8) << method_name << "pivot->first: " << it_pivot->first
+        << "  aux->first " << it_aux->first << "  first_pres: " << first_pres
+        << "  prev_pqtzuv[0]" << prev_pqtzuv[0] << "\n";
+   // Find next UV level
+   for (; it_aux!=pqtzuv_map_aux.end(); ++it_aux) {
+      // Skip the records below the first mathcing/interpolated level
+      if (it_pivot->first < it_aux->first) {
+         next_pres = it_aux->first;
          break;
       }
+      prev_pqtzuv = (float *)it_aux->second;
    }
+   for (; it_pivot!=pqtzuv_map_pivot.end(); ++it_pivot) {
+      cur_pres = (float)it_pivot->first;
+      // Skip if already merged
+      if (0 < pqtzuv_map_merged.count(cur_pres)) {
+         mlog << Debug(9) << method_name << cur_pres << ": merged already\n";
+         continue;
+      }
+
+      cur_pqtzuv = (float *)it_pivot->second;
+      pqtzuv_merged = new float[mxr8vt];
+      copy_pqtzuv(pqtzuv_merged, cur_pqtzuv);
+      // Advance aux record if necessary
+      if (prev_pqtzuv[0] < cur_pres) {
+         for (; it_aux!=pqtzuv_map_aux.end(); ++it_aux) {
+            if (it_aux->first > cur_pres) break;
+            prev_pqtzuv = (float *)it_aux->second;
+         }
+         //Stop if no more aux records
+         if (it_aux == pqtzuv_map_aux.end()) {
+            if (prev_pqtzuv[0] == pqtzuv_merged[0]) {
+               copy_pqtzuv(pqtzuv_merged, prev_pqtzuv, false);
+            }
+            mlog << Debug(9) << method_name << "Added " << cur_pres << "\n";
+            pqtzuv_map_merged[cur_pres] = pqtzuv_merged;
+            break;
+         }
+      }
+      
+      if (it_aux->first == cur_pres) {
+         copy_pqtzuv(pqtzuv_merged, it_aux->second, false);
+         prev_pqtzuv = pqtzuv_merged;
+      }
+      else if (prev_pqtzuv[0] == pqtzuv_merged[0] ) {
+         copy_pqtzuv(pqtzuv_merged, prev_pqtzuv, false);
+      }
+      else {
+         next_pqtzuv = (float *)it_aux->second;
+         interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
+      }
+      mlog << Debug(9) << method_name << "Added " << cur_pres << "\n";
+      pqtzuv_map_merged[cur_pres] = pqtzuv_merged;
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
+                    map<float, float*> pqtzuv_map_uv, const char *method_name) {
+   int offset;
+   ConcatString buf;
+   StringArray log_array;
+   std::map<float,float*>::iterator it;
+
+   for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
+      float *pqtzuv = it->second;
+      buf.clear();
+      for (int idx=0; idx<mxr8vt; idx++) {
+         buf << " " << pqtzuv[idx];
+      }
+      log_array.add(buf.c_str());
+   }
+   offset = 0;
+   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "TQZ record: "
+           << offset++ << "\t" << log_array[idx] << "\n";
+   }
+   log_array.clear();
+   for (it=pqtzuv_map_uv.begin(); it!=pqtzuv_map_uv.end(); ++it) {
+      float *pqtzuv = it->second;
+      buf.clear();
+      for (int idx=0; idx<mxr8vt; idx++) {
+         buf << " " << pqtzuv[idx];
+      }
+      log_array.add(buf.c_str());
+   }
+   offset = 0;
+   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << " UV record: "
+           << offset++ << "\t" << log_array[idx] << "\n";
+   }
+   log_array.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
+                       map<float, float*> pqtzuv_map_uv,
+                       map<float, float*> &pqtzuv_map_merged,
+                       const char *method_name) {
+   ConcatString buf;
+   StringArray log_array;
+   for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
+         it!=pqtzuv_map_merged.end(); ++it) {
+      float *pqtzuv = it->second;
+      buf.clear();
+      for (int idx=0; idx<mxr8vt; idx++) {
+        buf << " " << pqtzuv[idx];
+      }
+      bool has_tq = (0 < (pqtzuv_map_tq.count(it->first)));
+      bool has_uv = (0 < (pqtzuv_map_uv.count(it->first)));
+      if (has_tq || has_uv) {
+         buf << "\t(";
+         if (has_tq) buf << " tqz";
+         if (has_uv) buf << " uv";
+         buf << " )";
+      }
+      log_array.add(buf.c_str());
+   }
+   int offset = 0;
+   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    merged: "
+           << offset++ << "\t" << log_array[idx] << "\n";
+   }
+   log_array.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void log_pbl_input(int pbl_level, const char *method_name) {
+   ConcatString buf;
+   StringArray log_array;
+   int vlevels = pbl_level;
+   if (vlevels >= MAX_PBL_LEVEL) vlevels = MAX_PBL_LEVEL;
+   for (int idx=0; idx<vlevels; idx++) {
+      buf.clear();
+      buf << " " << pbl_data_pres[idx];
+      buf << " " << pbl_data_temp[idx];
+      buf << " " << pbl_data_spfh[idx];
+      buf << " " <<  pbl_data_hgt[idx];
+      buf << " " << pbl_data_ugrd[idx];
+      buf << " " << pbl_data_vgrd[idx];
+      log_array.add(buf.c_str());
+   }
+   int offset = 0;
+   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+      mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    input to calpbl_: "
+           << offset++ << "\t" << log_array[idx] << "\n";
+   }
+   log_array.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////

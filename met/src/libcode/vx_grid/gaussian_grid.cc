@@ -283,7 +283,7 @@ if ( (iy < 0) || (iy >= Ny) )  {
 
 lat = Latitudes[iy];
 
-lon = Lon_Zero - ix*Delta_Lon;
+lon = Lon_Zero + ix*Delta_Lon;
 
 return;
 
@@ -390,20 +390,25 @@ return;
 ConcatString GaussianGrid::serialize() const
 
 {
+    
+ConcatString a;
+char junk[256];
 
-mlog << Error << "\nGaussianGrid::serialize() -> not yet implemented\n\n";
+a << "Projection: Gaussian";
 
-exit ( 1 );
+snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
+
+a << " Nx: " << Nx;
+a << " Ny: " << Ny;
 
    //
    //  done
    //
 
-ConcatString a;
-
 return ( a );
 
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////

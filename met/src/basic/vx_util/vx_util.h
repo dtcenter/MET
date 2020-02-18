@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -56,6 +57,7 @@
 #include "polyline.h"
 #include "mask_poly.h"
 #include "read_fortran_binary.h"
+#include "stat_column_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////
