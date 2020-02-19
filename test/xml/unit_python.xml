@@ -269,6 +269,19 @@
     </output>
   </test>
 
+  <!-- Invokes Python script to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_python_AGGR_MPR_to_SL1L2.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_python_AGGR_MPR_to_SL1L2.stat</stat>
+    </output>
+  </test>
+
   <!-- Invokes Python pickle logic to read point data  -->
   <test name="python_ascii2nc_pickle">
     <exec>&MET_BIN;/ascii2nc</exec>
@@ -301,6 +314,22 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/python/letter_pickle.ps</ps>
+    </output>
+  </test>
+
+  <!-- Invokes Python pickle logic to pass MPR data to Stat-Analysis  -->
+  <test name="python_stat_analysis_pickle">
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <env>
+       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
+      -out_stat &OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/python/stat_analysis_pickle_AGGR_MPR_to_SL1L2.stat</stat>
     </output>
   </test>
 

@@ -19,7 +19,7 @@ if len(sys.argv) == 2:
     try:
         print("Input File:\t" + repr(input_file))
 
-        # Read and formatting the input 11-column observations:
+        # Read and format the input 11-column observations:
         #   (1)  string:  Message_Type
         #   (2)  string:  Station_ID
         #   (3)  string:  Valid_Time(YYYYMMDD_HHMMSS)
