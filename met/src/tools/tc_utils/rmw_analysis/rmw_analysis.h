@@ -79,6 +79,7 @@ static ConcatString out_dir;
 ConcatString out_file;
 
 // NetCDF file information
+static NcFile* nc_in = (NcFile*) 0;
 static NcFile* nc_out = (NcFile*) 0;
 
 // Grid dimension information

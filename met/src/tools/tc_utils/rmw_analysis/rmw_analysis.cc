@@ -142,7 +142,7 @@ void set_config(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_out(const StringArray& a) {
-    out_dir = a[0];
+    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,24 +163,24 @@ void set_verbosity(const StringArray& a) {
 void setup() {
 
     // Open first data file
-    nc_out = open_ncfile(data_files[0].c_str());
+    nc_in = open_ncfile(data_files[0].c_str());
     mlog << Debug(1) << "Reading dimensions from"
          << data_files[0] << "\n";
 
     // Get dimension sizes
-    get_dim(nc_out, "range", n_range, true);
-    range_dim = get_nc_dim(nc_out, "range");
+    get_dim(nc_in, "range", n_range, true);
+    range_dim = get_nc_dim(nc_in, "range");
 
-    get_dim(nc_out, "azimuth", n_azimuth, true);
-    azimuth_dim = get_nc_dim(nc_out, "azimuth");
+    get_dim(nc_in, "azimuth", n_azimuth, true);
+    azimuth_dim = get_nc_dim(nc_in, "azimuth");
 
-    if (get_dim(nc_out, "height", n_level)) {
+    if (get_dim(nc_in, "height", n_level)) {
         mlog << Debug(1) << "Found height vertical dimension.\n";
-        level_dim = get_nc_dim(nc_out, "height");
+        level_dim = get_nc_dim(nc_in, "height");
         level_name = "height";
-    } else if (get_dim(nc_out, "pressure", n_level)) {
+    } else if (get_dim(nc_in, "pressure", n_level)) {
         mlog << Debug(1) << "Found pressure vertical dimension.\n";
-        level_dim = get_nc_dim(nc_out, "pressure");
+        level_dim = get_nc_dim(nc_in, "pressure");
         level_name = "pressure";
     } else {
         mlog << Warning << "No vertical dimension found.\n";
@@ -190,11 +190,34 @@ void setup() {
          << "(n_range, n_azimuth, n_level) = ("
          << n_range << ", " << n_azimuth << ", " << n_level << ")\n"; 
 
+    // Get dimension coordinates
+    vector<size_t> start;
+    vector<size_t> count;
+    start.push_back(0);
+
+    NcVar range_var = get_nc_var(nc_in, "range");
+    count.clear();
+    count.push_back(n_range);
+    range_coord.resize(n_range);
+    range_var.getVar(start, count, range_coord.data());
+
+    NcVar azimuth_var = get_nc_var(nc_in, "azimuth");
+    count.clear();
+    count.push_back(n_azimuth);
+    azimuth_coord.resize(n_azimuth);
+    azimuth_var.getVar(start, count, azimuth_coord.data());
+
+    NcVar level_var = get_nc_var(nc_in, level_name.c_str());
+    count.clear();
+    count.push_back(n_level);
+    level_coord.resize(n_level);
+    level_var.getVar(start, count, level_coord.data());
+
     // Read variable information
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         data_names.push_back(conf_info.data_info[i_var]->name().string());
         NcVar var = get_nc_var(
-            nc_out, conf_info.data_info[i_var]->name().c_str());
+            nc_in, conf_info.data_info[i_var]->name().c_str());
         int n_dim = get_dim_count(&var) - 1;
         data_n_dims.push_back(n_dim);
         ConcatString s;
@@ -269,15 +292,15 @@ void process_files() {
     for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
         mlog << Debug(1) << "Processing "
              << data_files[i_file] << "\n";
-        nc_out = open_ncfile(data_files[i_file].c_str());
+        nc_in = open_ncfile(data_files[i_file].c_str());
 
-        get_dim(nc_out, "track_point", n_track_point, true);
-        track_point_dim = get_nc_dim(nc_out, "track_point");
+        get_dim(nc_in, "track_point", n_track_point, true);
+        track_point_dim = get_nc_dim(nc_in, "track_point");
         mlog << Debug(1) << "Number of track points "
              << n_track_point << "\n";
 
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
-            NcVar var = get_nc_var(nc_out, data_names[i_var].c_str());
+            NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
             mlog << Debug(2) << "Processing "
                  << data_names[i_var] << "\n";
 
@@ -336,6 +359,27 @@ void normalize_stats() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_stats() {
+
+    // Create output file
+    nc_out = open_ncfile(out_file.c_str(), true);
+
+    // Define dimensions
+    range_dim = add_dim(nc_out, "range", n_range);
+    azimuth_dim = add_dim(nc_out, "azimuth", n_azimuth);
+    level_dim = add_dim(nc_out, level_name, n_level);
+
+    vector<NcDim> dims_2d;
+    dims_2d.push_back(range_dim);
+    dims_2d.push_back(azimuth_dim);
+
+    vector<NcDim> dims_3d;
+    dims_3d.push_back(range_dim);
+    dims_3d.push_back(azimuth_dim);
+    dims_3d.push_back(level_dim);
+
+    NcVar range_var = nc_out->addVar("range", ncFloat, range_dim);
+    NcVar azimuth_var = nc_out->addVar("azimuth", ncFloat, azimuth_dim);
+    NcVar level_var = nc_out->addVar(level_name, ncFloat, level_dim);
 
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
     }
