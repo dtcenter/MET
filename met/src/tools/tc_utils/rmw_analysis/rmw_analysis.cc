@@ -195,6 +195,8 @@ void setup() {
     vector<size_t> count;
     start.push_back(0);
 
+    ConcatString s;
+
     NcVar range_var = get_nc_var(nc_in, "range");
     count.clear();
     count.push_back(n_range);
@@ -206,12 +208,16 @@ void setup() {
     count.push_back(n_azimuth);
     azimuth_coord.resize(n_azimuth);
     azimuth_var.getVar(start, count, azimuth_coord.data());
+    get_att_value_string(&azimuth_var, "units", s);
+    azimuth_units = s.string();
 
     NcVar level_var = get_nc_var(nc_in, level_name.c_str());
     count.clear();
     count.push_back(n_level);
     level_coord.resize(n_level);
     level_var.getVar(start, count, level_coord.data());
+    get_att_value_string(&level_var, "units", s);
+    level_units = s.string();
 
     // Read variable information
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
@@ -390,9 +396,18 @@ void write_stats() {
     count_azimuth.push_back(n_azimuth);
     count_level.push_back(n_level);
 
+    for (int r = 0; r < n_range; r++) {
+        range_coord[r] = r;
+    }
+
     range_var.putVar(offset, count_range, range_coord.data());
+    add_att(&range_var, "units", "RMW");
+
     azimuth_var.putVar(offset, count_azimuth, azimuth_coord.data());
+    add_att(&azimuth_var, "units", azimuth_units);
+
     level_var.putVar(offset, count_level, level_coord.data());
+    add_att(&level_var, "units", level_units);
 
     vector<size_t> offset_2d;
     vector<size_t> count_2d;
@@ -417,7 +432,7 @@ void write_stats() {
                 data_names[i_var] + "_mean",
                 ncDouble, dims_2d);
             add_att(&var_mean, "long_name",
-                data_long_names[i_var] + " mean");
+                data_long_names[i_var] + " Mean");
             add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
                 data_means[i_var].data());
@@ -426,7 +441,7 @@ void write_stats() {
                 data_names[i_var] + "_stdev",
                 ncDouble, dims_2d);
             add_att(&var_stdev, "long_name",
-                data_long_names[i_var] + " standard deviation");
+                data_long_names[i_var] + " Standard Deviation");
             add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
                 data_stdevs[i_var].data());
@@ -435,7 +450,7 @@ void write_stats() {
                 data_names[i_var] + "_min",
                 ncDouble, dims_2d);
             add_att(&var_min, "long_name",
-                data_long_names[i_var] + " minimum");
+                data_long_names[i_var] + " Minimum");
             add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_2d, count_2d,
                 data_mins[i_var].data());
@@ -444,7 +459,7 @@ void write_stats() {
                 data_names[i_var] + "_max",
                 ncDouble, dims_2d);
             add_att(&var_max, "long_name",
-                data_long_names[i_var] + " maximum");
+                data_long_names[i_var] + " Maximum");
             add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_2d, count_2d,
                 data_maxs[i_var].data());
@@ -455,7 +470,7 @@ void write_stats() {
                 data_names[i_var] + "_mean",
                 ncDouble, dims_3d);
             add_att(&var_mean, "long_name",
-                data_long_names[i_var] + " mean");
+                data_long_names[i_var] + " Mean");
             add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
                 data_means[i_var].data());
@@ -464,7 +479,7 @@ void write_stats() {
                 data_names[i_var] + "_stdev",
                 ncDouble, dims_3d);
             add_att(&var_stdev, "long_name",
-                data_long_names[i_var] + " standard deviation");
+                data_long_names[i_var] + " Standard Deviation");
             add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
                 data_stdevs[i_var].data());
@@ -473,7 +488,7 @@ void write_stats() {
                 data_names[i_var] + "_min",
                 ncDouble, dims_3d);
             add_att(&var_min, "long_name",
-                data_long_names[i_var] + " minimum");
+                data_long_names[i_var] + " Minimum");
             add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_3d, count_3d,
                 data_mins[i_var].data());
@@ -482,7 +497,7 @@ void write_stats() {
                 data_names[i_var] + "_max",
                 ncDouble, dims_3d);
             add_att(&var_max, "long_name",
-                data_long_names[i_var] + " maximum");
+                data_long_names[i_var] + " Maximum");
             add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_3d, count_3d,
                 data_maxs[i_var].data());
