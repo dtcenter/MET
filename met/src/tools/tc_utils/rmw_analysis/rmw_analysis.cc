@@ -377,12 +377,39 @@ void write_stats() {
     dims_3d.push_back(azimuth_dim);
     dims_3d.push_back(level_dim);
 
-    NcVar range_var = nc_out->addVar("range", ncFloat, range_dim);
-    NcVar azimuth_var = nc_out->addVar("azimuth", ncFloat, azimuth_dim);
-    NcVar level_var = nc_out->addVar(level_name, ncFloat, level_dim);
+    NcVar range_var = nc_out->addVar("range", ncDouble, range_dim);
+    NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
+    NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
+
+    vector<size_t> offset_2d;
+    vector<size_t> count_2d;
+    vector<size_t> offset_3d;
+    vector<size_t> count_3d;
+
+    offset_2d.push_back(0);
+    offset_2d.push_back(0);
+    count_2d.push_back(n_range);
+    count_2d.push_back(n_azimuth);
+
+    offset_3d.push_back(0);
+    offset_3d.push_back(0);
+    offset_3d.push_back(0);
+    count_3d.push_back(n_range);
+    count_3d.push_back(n_azimuth);
+    count_3d.push_back(n_level);
 
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
+        if (data_n_dims[i_var] == 2) {
+            NcVar var = nc_out->addVar(data_names[i_var],
+                ncDouble, dims_2d);
+        }
+        if (data_n_dims[i_var] == 3) {
+            NcVar var = nc_out->addVar(data_names[i_var],
+                ncDouble, dims_3d);
+        }
     }
+
+    nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
