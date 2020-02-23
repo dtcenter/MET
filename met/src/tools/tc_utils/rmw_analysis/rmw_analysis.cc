@@ -325,7 +325,7 @@ void process_files() {
 
                     // Update partial sums
                     data_2d_sq = data_2d;
-                    data_2d_sq.square();
+                    // data_2d_sq.square();
                     data_counts[i_var].increment();
                     data_means[i_var].add_assign(data_2d);
                     data_stdevs[i_var].add_assign(data_2d_sq);
@@ -339,7 +339,7 @@ void process_files() {
 
                     // Update partial sums
                     data_3d_sq = data_3d;
-                    data_3d_sq.square();
+                    // data_3d_sq.square();
                     data_counts[i_var].increment();
                     data_means[i_var].add_assign(data_3d);
                     data_stdevs[i_var].add_assign(data_3d_sq);
@@ -358,14 +358,15 @@ void normalize_stats() {
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
 
         // Normalize
+        // data_means[i_var].divide_assign(n_track_point);
         data_means[i_var].divide_assign(data_counts[i_var]);
         data_stdevs[i_var].divide_assign(data_counts[i_var]);
 
         // Compute standard deviation
-        DataCube data_mean_sq = data_means[i_var];
-        data_mean_sq.square();
-        data_stdevs[i_var].subtract_assign(data_mean_sq);
-        data_stdevs[i_var].square_root();
+        // DataCube data_mean_sq = data_means[i_var];
+        // data_mean_sq.square();
+        // data_stdevs[i_var].subtract_assign(data_mean_sq);
+        // data_stdevs[i_var].square_root();
     }
 }
 
