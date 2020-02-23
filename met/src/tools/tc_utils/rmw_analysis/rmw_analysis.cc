@@ -416,43 +416,74 @@ void write_stats() {
             NcVar var_mean = nc_out->addVar(
                 data_names[i_var] + "_mean",
                 ncDouble, dims_2d);
+            add_att(&var_mean, "long_name",
+                data_long_names[i_var] + " mean");
+            add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
                 data_means[i_var].data());
+
             NcVar var_stdev = nc_out->addVar(
                 data_names[i_var] + "_stdev",
                 ncDouble, dims_2d);
+            add_att(&var_stdev, "long_name",
+                data_long_names[i_var] + " standard deviation");
+            add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
                 data_stdevs[i_var].data());
+
             NcVar var_min = nc_out->addVar(
                 data_names[i_var] + "_min",
                 ncDouble, dims_2d);
+            add_att(&var_min, "long_name",
+                data_long_names[i_var] + " minimum");
+            add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_2d, count_2d,
                 data_mins[i_var].data());
+
             NcVar var_max = nc_out->addVar(
                 data_names[i_var] + "_max",
                 ncDouble, dims_2d);
+            add_att(&var_max, "long_name",
+                data_long_names[i_var] + " maximum");
+            add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_2d, count_2d,
                 data_maxs[i_var].data());
         }
+
         if (data_n_dims[i_var] == 3) {
             NcVar var_mean = nc_out->addVar(
                 data_names[i_var] + "_mean",
                 ncDouble, dims_3d);
+            add_att(&var_mean, "long_name",
+                data_long_names[i_var] + " mean");
+            add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
                 data_means[i_var].data());
+
             NcVar var_stdev = nc_out->addVar(
                 data_names[i_var] + "_stdev",
                 ncDouble, dims_3d);
+            add_att(&var_stdev, "long_name",
+                data_long_names[i_var] + " standard deviation");
+            add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
                 data_stdevs[i_var].data());
+
             NcVar var_min = nc_out->addVar(
                 data_names[i_var] + "_min",
                 ncDouble, dims_3d);
+            add_att(&var_min, "long_name",
+                data_long_names[i_var] + " minimum");
+            add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_3d, count_3d,
                 data_mins[i_var].data());
+
             NcVar var_max = nc_out->addVar(
                 data_names[i_var] + "_max",
                 ncDouble, dims_3d);
+            add_att(&var_max, "long_name",
+                data_long_names[i_var] + " maximum");
+            add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_3d, count_3d,
                 data_maxs[i_var].data());
         }
