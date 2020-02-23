@@ -413,12 +413,48 @@ void write_stats() {
 
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
         if (data_n_dims[i_var] == 2) {
-            NcVar var = nc_out->addVar(data_names[i_var],
+            NcVar var_mean = nc_out->addVar(
+                data_names[i_var] + "_mean",
                 ncDouble, dims_2d);
+            var_mean.putVar(offset_2d, count_2d,
+                data_means[i_var].data());
+            NcVar var_stdev = nc_out->addVar(
+                data_names[i_var] + "_stdev",
+                ncDouble, dims_2d);
+            var_mean.putVar(offset_2d, count_2d,
+                data_stdevs[i_var].data());
+            NcVar var_min = nc_out->addVar(
+                data_names[i_var] + "_min",
+                ncDouble, dims_2d);
+            var_min.putVar(offset_2d, count_2d,
+                data_mins[i_var].data());
+            NcVar var_max = nc_out->addVar(
+                data_names[i_var] + "_max",
+                ncDouble, dims_2d);
+            var_max.putVar(offset_2d, count_2d,
+                data_maxs[i_var].data());
         }
         if (data_n_dims[i_var] == 3) {
-            NcVar var = nc_out->addVar(data_names[i_var],
+            NcVar var_mean = nc_out->addVar(
+                data_names[i_var] + "_mean",
                 ncDouble, dims_3d);
+            var_mean.putVar(offset_3d, count_3d,
+                data_means[i_var].data());
+            NcVar var_stdev = nc_out->addVar(
+                data_names[i_var] + "_stdev",
+                ncDouble, dims_3d);
+            var_mean.putVar(offset_3d, count_3d,
+                data_stdevs[i_var].data());
+            NcVar var_min = nc_out->addVar(
+                data_names[i_var] + "_min",
+                ncDouble, dims_3d);
+            var_min.putVar(offset_3d, count_3d,
+                data_mins[i_var].data());
+            NcVar var_max = nc_out->addVar(
+                data_names[i_var] + "_max",
+                ncDouble, dims_3d);
+            var_max.putVar(offset_3d, count_3d,
+                data_maxs[i_var].data());
         }
     }
 
