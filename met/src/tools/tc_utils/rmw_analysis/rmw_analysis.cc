@@ -381,6 +381,19 @@ void write_stats() {
     NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
     NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
 
+    vector<size_t> offset;
+    vector<size_t> count_range;
+    vector<size_t> count_azimuth;
+    vector<size_t> count_level;
+    offset.push_back(0);
+    count_range.push_back(n_range);
+    count_azimuth.push_back(n_azimuth);
+    count_level.push_back(n_level);
+
+    range_var.putVar(offset, count_range, range_coord.data());
+    azimuth_var.putVar(offset, count_azimuth, azimuth_coord.data());
+    level_var.putVar(offset, count_level, level_coord.data());
+
     vector<size_t> offset_2d;
     vector<size_t> count_2d;
     vector<size_t> offset_3d;
