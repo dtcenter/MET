@@ -76,10 +76,10 @@
 \begin_body
 
 \begin_layout Chapter
-RMW-Analysis Tool
+Grid-Diagnostics Tool
 \begin_inset CommandInset label
 LatexCommand label
-name "chap:RMW-Analysis-tool"
+name "chap:Grid-Diagnostics-tool"
 
 \end_inset
 
@@ -90,7 +90,7 @@ name "chap:RMW-Analysis-tool"
 Introduction
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:RMW-Analysis_Introduction"
+name "sec:Grid-Diagnostics_Introduction"
 
 \end_inset
 
@@ -106,7 +106,7 @@ name "sec:RMW-Analysis_Introduction"
 Input/output format
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:RMW-Analysis_Input/output-format"
+name "sec:Grid-Diagnostics_Input/output-format"
 
 \end_inset
 
@@ -122,7 +122,7 @@ name "sec:RMW-Analysis_Input/output-format"
 Practical information
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:RMW-Analysis_Practical-information"
+name "sec:Grid-Diagnostics_Practical-information"
 
 \end_inset
 
@@ -132,7 +132,7 @@ name "sec:RMW-Analysis_Practical-information"
 \begin_layout Standard
 
 \series medium
-This section briefly describes how to run rmw_analysis.
+This section briefly describes how to run grid_diag.
 \end_layout
 
 \end_body
