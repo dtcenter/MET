@@ -343,8 +343,8 @@ void process_files() {
                     var.getVar(start_2d, count_2d, data_2d.data());
 
                     // Update partial sums
-                    // data_2d_sq = data_2d;
-                    // data_2d_sq.square();
+                    data_2d_sq = data_2d;
+                    data_2d_sq.square();
                     data_counts[i_var]->increment();
                     mlog << Debug(4) << i_track << " "
                          << data_counts[i_var]->data()[0] << "\n";
@@ -353,7 +353,7 @@ void process_files() {
                     data_means[i_var]->add_assign(data_2d);
                     mlog << Debug(4) << i_track << " "
                          << data_means[i_var]->data()[0] << "\n";
-                    // data_stdevs[i_var]->add_assign(data_2d_sq);
+                    data_stdevs[i_var]->add_assign(data_2d_sq);
                     data_mins[i_var]->min_assign(data_2d);
                     mlog << Debug(4) << i_track << " "
                          << data_mins[i_var]->data()[0] << "\n";
@@ -367,11 +367,11 @@ void process_files() {
                     var.getVar(start_3d, count_3d, data_3d.data());
 
                     // Update partial sums
-                    // data_3d_sq = data_3d;
-                    // data_3d_sq.square();
+                    data_3d_sq = data_3d;
+                    data_3d_sq.square();
                     data_counts[i_var]->increment();
                     data_means[i_var]->add_assign(data_3d);
-                    // data_stdevs[i_var]->add_assign(data_3d_sq);
+                    data_stdevs[i_var]->add_assign(data_3d_sq);
                     data_mins[i_var]->min_assign(data_3d);
                     data_maxs[i_var]->max_assign(data_3d);
                 }
@@ -388,13 +388,13 @@ void normalize_stats() {
 
         // Normalize
         data_means[i_var]->divide_assign(*data_counts[i_var]);
-        // data_stdevs[i_var]->divide_assign(*data_counts[i_var]);
+        data_stdevs[i_var]->divide_assign(*data_counts[i_var]);
 
         // Compute standard deviation
-        // DataCube data_mean_sq = *data_means[i_var];
-        // data_mean_sq.square();
-        // data_stdevs[i_var]->subtract_assign(data_mean_sq);
-        // data_stdevs[i_var]->square_root();
+        DataCube data_mean_sq = *data_means[i_var];
+        data_mean_sq.square();
+        data_stdevs[i_var]->subtract_assign(data_mean_sq);
+        data_stdevs[i_var]->square_root();
     }
 }
 
