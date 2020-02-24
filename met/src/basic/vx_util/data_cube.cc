@@ -159,7 +159,9 @@ void DataCube::assign(const DataCube& other) {
 
     set_size(other.Nx, other.Ny, other.Nz);
 
-    Data = other.Data;
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = other.Data[n];
+    }
 
     return;
 }
@@ -209,6 +211,17 @@ void DataCube::multiply_assign(const DataCube& other) {
 
     for (int n = 0; n < Nxyz; n++) {
         Data[n] *= other.Data[n];
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void DataCube::divide_assign(int denom) {
+
+    for (int n = 0; n < Nxyz; n++) {
+        Data[n] = Data[n] / denom;
     }
 
     return;

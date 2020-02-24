@@ -64,6 +64,8 @@ class DataCube {
 
         void multiply_assign(const DataCube&);
 
+        void divide_assign(int);
+
         void divide_assign(const DataCube&);
 
         void min_assign(const DataCube&);
