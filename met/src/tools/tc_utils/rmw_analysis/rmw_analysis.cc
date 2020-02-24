@@ -22,11 +22,7 @@ using namespace std;
 #include <unistd.h>
 
 #include "rmw_analysis.h"
-#include "rmw_analysis_utils.h"
 
-// #include "vx_grid.h"
-// #include "vx_regrid.h"
-// #include "vx_tc_util.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
 #include "vx_log.h"

@@ -12,8 +12,7 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = rmw_analysis
 rmw_analysis_SOURCES = rmw_analysis.cc \
-	rmw_analysis_conf_info.cc \
-	rmw_analysis_utils.cc
+	rmw_analysis_conf_info.cc
 rmw_analysis_CPPFLAGS = ${MET_CPPFLAGS}
 rmw_analysis_LDFLAGS = ${MET_LDFLAGS}
 rmw_analysis_LDADD = -lvx_stat_out \
@@ -42,5 +41,4 @@ rmw_analysis_LDADD = -lvx_stat_out \
 	$(FLIBS)
 
 EXTRA_DIST = rmw_analysis_conf_info.h \
-	rmw_analysis.h \
-	rmw_analysis_utils.h
+	rmw_analysis.h
