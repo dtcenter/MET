@@ -119,11 +119,11 @@ static vector<string> data_long_names;
 static vector<string> data_units;
 
 // Variable data
-static vector<DataCube> data_counts;
-static vector<DataCube> data_means;
-static vector<DataCube> data_stdevs;
-static vector<DataCube> data_mins;
-static vector<DataCube> data_maxs;
+static vector<DataCube*> data_counts;
+static vector<DataCube*> data_means;
+static vector<DataCube*> data_stdevs;
+static vector<DataCube*> data_mins;
+static vector<DataCube*> data_maxs;
 
 #endif  //  __RMW_ANALYSIS_H__
 

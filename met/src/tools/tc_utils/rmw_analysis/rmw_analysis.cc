@@ -233,25 +233,24 @@ void setup() {
         data_units.push_back(s.string());
     }
 
-    // Size data cubes
-    DataCube data_2d;
-    DataCube data_3d;
-    DataCube data_high_2d;
-    DataCube data_high_3d;
-
-    data_2d.set_size(n_range, n_azimuth, 1);
-    data_3d.set_size(n_range, n_azimuth, n_level);
-    data_high_2d.set_size(n_range, n_azimuth, 1);
-    data_high_3d.set_size(n_range, n_azimuth, n_level);
-
-    data_2d.set_constant(0);
-    data_3d.set_constant(0);
-
-    data_high_2d.set_constant(1.0e6);
-    data_high_3d.set_constant(1.0e6);
-
     // Initialize statistical data cube lists
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
+        // Size data cubes
+        DataCube* data_2d = new DataCube();
+        DataCube* data_3d = new DataCube();
+        DataCube* data_high_2d = new DataCube();
+        DataCube* data_high_3d = new DataCube();
+
+        data_2d->set_size(n_range, n_azimuth, 1);
+        data_3d->set_size(n_range, n_azimuth, n_level);
+        data_high_2d->set_size(n_range, n_azimuth, 1);
+        data_high_3d->set_size(n_range, n_azimuth, n_level);
+
+        data_2d->set_constant(0);
+        data_3d->set_constant(0);
+        data_high_2d->set_constant(1.0e6);
+        data_high_3d->set_constant(1.0e6);
+
         if (data_n_dims[i_var] == 2) {
             data_counts.push_back(data_2d);
             data_means.push_back(data_2d);
@@ -280,7 +279,9 @@ void process_files() {
     DataCube data_3d_sq;
 
     data_2d.set_size(n_range, n_azimuth, 1);
+    // data_2d_sq.set_size(n_range, n_azimuth, 1);
     data_3d.set_size(n_range, n_azimuth, n_level);
+    // data_3d_sq.set_size(n_range, n_azimuth, n_level);
 
     // Set up array track point slices
     vector<size_t> start_2d;
@@ -325,12 +326,12 @@ void process_files() {
 
                     // Update partial sums
                     data_2d_sq = data_2d;
-                    // data_2d_sq.square();
-                    data_counts[i_var].increment();
-                    data_means[i_var].add_assign(data_2d);
-                    data_stdevs[i_var].add_assign(data_2d_sq);
-                    data_mins[i_var].min_assign(data_2d);
-                    data_maxs[i_var].max_assign(data_2d);
+                    data_2d_sq.square();
+                    data_counts[i_var]->increment();
+                    data_means[i_var]->add_assign(data_2d);
+                    data_stdevs[i_var]->add_assign(data_2d_sq);
+                    data_mins[i_var]->min_assign(data_2d);
+                    data_maxs[i_var]->max_assign(data_2d);
                 }
                 if (data_n_dims[i_var] == 3) {
                     mlog << Debug(4) << data_names[i_var] << i_track << "\n";
@@ -339,12 +340,12 @@ void process_files() {
 
                     // Update partial sums
                     data_3d_sq = data_3d;
-                    // data_3d_sq.square();
-                    data_counts[i_var].increment();
-                    data_means[i_var].add_assign(data_3d);
-                    data_stdevs[i_var].add_assign(data_3d_sq);
-                    data_mins[i_var].min_assign(data_3d);
-                    data_maxs[i_var].max_assign(data_3d);
+                    data_3d_sq.square();
+                    data_counts[i_var]->increment();
+                    data_means[i_var]->add_assign(data_3d);
+                    data_stdevs[i_var]->add_assign(data_3d_sq);
+                    data_mins[i_var]->min_assign(data_3d);
+                    data_maxs[i_var]->max_assign(data_3d);
                 }
             } // end loop over track points
         } // end loop over variables
@@ -358,15 +359,14 @@ void normalize_stats() {
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
 
         // Normalize
-        // data_means[i_var].divide_assign(n_track_point);
-        data_means[i_var].divide_assign(data_counts[i_var]);
-        data_stdevs[i_var].divide_assign(data_counts[i_var]);
+        data_means[i_var]->divide_assign(*data_counts[i_var]);
+        data_stdevs[i_var]->divide_assign(*data_counts[i_var]);
 
         // Compute standard deviation
-        // DataCube data_mean_sq = data_means[i_var];
-        // data_mean_sq.square();
-        // data_stdevs[i_var].subtract_assign(data_mean_sq);
-        // data_stdevs[i_var].square_root();
+        DataCube data_mean_sq = *data_means[i_var];
+        data_mean_sq.square();
+        data_stdevs[i_var]->subtract_assign(data_mean_sq);
+        data_stdevs[i_var]->square_root();
     }
 }
 
@@ -443,7 +443,7 @@ void write_stats() {
                 data_long_names[i_var] + " Mean");
             add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
-                data_means[i_var].data());
+                data_means[i_var]->data());
 
             NcVar var_stdev = nc_out->addVar(
                 data_names[i_var] + "_stdev",
@@ -452,7 +452,7 @@ void write_stats() {
                 data_long_names[i_var] + " Standard Deviation");
             add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_2d, count_2d,
-                data_stdevs[i_var].data());
+                data_stdevs[i_var]->data());
 
             NcVar var_min = nc_out->addVar(
                 data_names[i_var] + "_min",
@@ -461,7 +461,7 @@ void write_stats() {
                 data_long_names[i_var] + " Minimum");
             add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_2d, count_2d,
-                data_mins[i_var].data());
+                data_mins[i_var]->data());
 
             NcVar var_max = nc_out->addVar(
                 data_names[i_var] + "_max",
@@ -470,7 +470,7 @@ void write_stats() {
                 data_long_names[i_var] + " Maximum");
             add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_2d, count_2d,
-                data_maxs[i_var].data());
+                data_maxs[i_var]->data());
         }
 
         if (data_n_dims[i_var] == 3) {
@@ -481,7 +481,7 @@ void write_stats() {
                 data_long_names[i_var] + " Mean");
             add_att(&var_mean, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
-                data_means[i_var].data());
+                data_means[i_var]->data());
 
             NcVar var_stdev = nc_out->addVar(
                 data_names[i_var] + "_stdev",
@@ -490,7 +490,7 @@ void write_stats() {
                 data_long_names[i_var] + " Standard Deviation");
             add_att(&var_stdev, "units", data_units[i_var]);
             var_mean.putVar(offset_3d, count_3d,
-                data_stdevs[i_var].data());
+                data_stdevs[i_var]->data());
 
             NcVar var_min = nc_out->addVar(
                 data_names[i_var] + "_min",
@@ -499,7 +499,7 @@ void write_stats() {
                 data_long_names[i_var] + " Minimum");
             add_att(&var_min, "units", data_units[i_var]);
             var_min.putVar(offset_3d, count_3d,
-                data_mins[i_var].data());
+                data_mins[i_var]->data());
 
             NcVar var_max = nc_out->addVar(
                 data_names[i_var] + "_max",
@@ -508,7 +508,7 @@ void write_stats() {
                 data_long_names[i_var] + " Maximum");
             add_att(&var_max, "units", data_units[i_var]);
             var_max.putVar(offset_3d, count_3d,
-                data_maxs[i_var].data());
+                data_maxs[i_var]->data());
         }
     }
 
