@@ -3965,7 +3965,7 @@ Column Number
 \begin_layout Plain Layout
 
 \series bold
-ECNT Column Name
+RPS Column Name
 \end_layout
 
 \end_inset
@@ -3996,7 +3996,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-ECNT
+RPS
 \end_layout
 
 \end_inset
@@ -4005,7 +4005,7 @@ ECNT
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ensemble Continuous Statistics line type
+Ranked Probability Score line type
 \end_layout
 
 \end_inset
