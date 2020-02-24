@@ -646,25 +646,30 @@ void ModeConfInfo::read_fields (Mode_Field_Info * & info_array, Dictionary * dic
 
 {
 
-   //
-   //  is it an array?
-   //    if so, then we're in multivar mode
-   //
+const DictionaryEntry * ee = dict->lookup(conf_key_field);
 
-const bool multivar = dict->is_array();
+if ( !ee )  {
 
-const int N = ( multivar ? dict->n_entries() : 1 );
+   mlog << "\n\n ModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+
+   exit ( 1 );
+
+}
+
+const Dictionary * field = ee->dict();
+
+const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
 
 info_array = new Mode_Field_Info [N];
 
 N_fields = N;
 
 
-if ( multivar ) {
+if ( field->is_array() ) {
 
-   int j;
+   int j, k;
    const DictionaryEntry * e = 0;
-   Dictionary & D = *dict;
+   const Dictionary & D = *field;
 
    if ( (N_fields > 0) && (N != N_fields) )  {
 
@@ -688,9 +693,19 @@ if ( multivar ) {
 
       }
 
-      info_array[j].set(j, e->dict_value(), &conf, type, _fo, false);
+      info_array[j].set(true, j, e->dict_value(), &conf, type, _fo, false);
 
-   }
+      if ( j == 0 )  {
+
+         for (k=1; k<N; ++k)  {   //  k starts at one, here
+
+            info_array[k] = info_array[0];
+
+         }   //  for k
+
+      }
+
+   }   //  for j
 
    return;
 
@@ -700,7 +715,7 @@ if ( multivar ) {
    //  nope, traditional mode
    //
 
-info_array[0].set(0, dict, &conf, type, _fo);
+info_array[0].set(false, 0, dict, &conf, type, _fo);
 
    //
    //  done

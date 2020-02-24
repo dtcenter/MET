@@ -47,11 +47,13 @@ class Mode_Field_Info {
 
       Dictionary * dict;   //  not allocated
 
-      MetConfig * conf;   //  not allocated
+      MetConfig * conf;    //  not allocated
 
       GrdFileType gft;
 
       char FO;   //  'F' or 'O', for fcst or obs
+
+      bool Multivar;
 
    public:
 
@@ -62,7 +64,7 @@ class Mode_Field_Info {
 
       void clear();
 
-      void set (int _index, Dictionary *, MetConfig *, GrdFileType, char _fo, bool do_clear = false);
+      void set (const bool _multivar, int _index, Dictionary *, MetConfig *, GrdFileType, char _fo, bool do_clear = false);
 
       int index;
 
@@ -92,7 +94,7 @@ class Mode_Field_Info {
       void           set_merge_thresh_by_index (int);
       int            n_merge_threshs () const;
       bool           need_merge_thresh () const;   //  mergetype is both or thresh
-      AttrFilterMap  filter_attr_map;              // Discard objects that don't meet these attribute thresholds
+      AttrFilterMap  filter_attr_map;              //  Discard objects that don't meet these attribute thresholds
 
 };
 

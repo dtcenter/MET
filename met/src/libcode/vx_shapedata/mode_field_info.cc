@@ -121,6 +121,8 @@ conf = 0;   //  not allocated, so don't delete
 
 gft = FileType_None;
 
+Multivar = false;
+
 FO = (char) 0;
 
 conv_radius = 0;
@@ -153,7 +155,7 @@ void Mode_Field_Info::assign(const Mode_Field_Info & i)
 
 {
 
-set(i.index, i.dict, i.conf, i.gft, i.FO, true);
+set(i.Multivar, i.index, i.dict, i.conf, i.gft, i.FO, true);
 
 return;
 
@@ -163,13 +165,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Mode_Field_Info::set (int _index, Dictionary * _dict, MetConfig * _conf, GrdFileType type, char _fo, bool do_clear)
+void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict, MetConfig * _conf, GrdFileType type, char _fo, bool do_clear)
 
 {
 
 VarInfoFactory info_factory;
 
 if ( do_clear )  clear();
+
+Multivar = _multivar;
 
 index = _index;
 
@@ -179,9 +183,19 @@ conf = _conf;
 
 var_info = info_factory.new_var_info(type);
 
-var_info->set_dict(*(dict->lookup_dictionary(conf_key_field)));
+if ( _multivar )  {
+
+   var_info->set_dict(*dict);
+
+} else {
+
+   var_info->set_dict(*(dict->lookup_dictionary(conf_key_field)));
+
+}
 
 FO = _fo;
+
+gft = type;
 
 if ( dict->lookup(conf_key_raw_thresh) )  {
 

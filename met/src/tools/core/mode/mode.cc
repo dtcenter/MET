@@ -103,6 +103,8 @@ static const char * default_out_dir = ".";
 
 static int compress_level = -1;
 
+static int field_index = -1;
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -118,7 +120,9 @@ static void set_config_merge_file (const StringArray &);
 static void set_outdir            (const StringArray &);
 static void set_logfile           (const StringArray &);
 static void set_verbosity         (const StringArray &);
-static void set_compress(const StringArray &);
+static void set_compress          (const StringArray &);
+
+static void set_field_index       (const StringArray &);   //  undocumented
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -145,6 +149,8 @@ process_command_line(argc, argv);
    //
 
 ModeConfInfo & conf = mode_exec.engine.conf_info;
+
+if ( field_index >= 0 )  conf.set_field_index(field_index);
 
 mode_exec.setup_fcst_obs_data();
 
@@ -284,6 +290,12 @@ void process_command_line(int argc, char **argv)
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
 
+      //
+      //  add for mode mulltivar ... undocumented
+      //
+
+   cline.add(set_field_index, "-field_index", 1);
+
    // Parse the command line
    cline.parse();
 
@@ -386,3 +398,31 @@ void set_compress(const StringArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void set_field_index(const StringArray & a)
+
+{
+
+field_index = atoi(a[0].c_str());
+
+if ( field_index < 0 )  {
+
+   mlog << Error
+        << program_name << ": bad index value ... "
+        << field_index << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
