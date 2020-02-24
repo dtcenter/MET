@@ -132,7 +132,7 @@ void process_command_line(int argc, char **argv) {
     cline.add(set_adeck,      "-adeck", -1);
     cline.add(set_bdeck,      "-bdeck", -1);
     cline.add(set_config,     "-config", 1);
-    cline.add(set_out_dir,    "-out",    1);
+    cline.add(set_out_dir,    "-outdir", 1);
     cline.add(set_out_prefix, "-prefix", -1);
     cline.add(set_logfile,    "-log",    1);
     cline.add(set_verbosity,  "-v",      1);
@@ -202,7 +202,6 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
                         false, false);
 
     ConcatString adeck_track_file("adeck.nc");
-    // write_tc_tracks(adeck_track_file, adeck_tracks);
     write_tc_tracks(nc_out, track_point_dim, adeck_tracks);
 }
 
@@ -436,7 +435,6 @@ void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
 
     // Create output NetCDF file name
-    // out_nc_file.add("tc_rmw_out.nc");
     build_outfile_name(out_prefix, "out.nc", out_nc_file);
 
     mlog << Debug(1) << out_nc_file << "\n";
@@ -460,7 +458,8 @@ void setup_nc_file() {
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid);
+    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
+        conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
@@ -489,18 +488,6 @@ void setup_nc_file() {
         = get_pressure_level_indices(pressure_level_strings, pressure_levels);
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
-
-    // Define variables
-    // for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-        // Get VarInfo
-        // data_info = conf_info.data_info[i_var];
-        // def_tc_data(nc_out, range_dim, azimuth_dim,
-        //     track_point_dim, data_var, data_info);
-        // data_vars.push_back(data_var);
-        // def_tc_azi_mean_data(nc_out, range_dim,
-        //     track_point_dim, data_var, data_info);
-        // azi_mean_data_vars.push_back(data_var);
-    // }
 
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
@@ -645,10 +632,6 @@ void process_fields(const TrackInfoArray& tracks) {
                 write_tc_data_rev(nc_out, tcrmw_grid, i_point,
                     data_3d_vars[data_info->name()], data_dp.data());
             }
-            // write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-            //     data_vars[i_var], data_dp.data());
-            // write_tc_azi_mean_data(nc_out, tcrmw_grid, i_point,
-            //     azi_mean_data_vars[i_var], data_dp.data());
         }
     } // Close loop over track points
 

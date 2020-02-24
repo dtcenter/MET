@@ -4,7 +4,6 @@
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
-
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
@@ -21,7 +20,7 @@
       -adeck &DATA_DIR;/adeck/aal142016_short.dat \
       -config &CONFIG_DIR;/TCRMWConfig_pressure_lev_out \
       -prefix _pressure_lev \
-      -out &OUTPUT_DIR;/tc_rmw \
+      -outdir &OUTPUT_DIR;/tc_rmw \
       -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
       -v 2
     </param>

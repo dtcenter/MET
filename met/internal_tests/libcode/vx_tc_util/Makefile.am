@@ -15,7 +15,8 @@ endif
 # Test programs
 
 noinst_PROGRAMS = test_read \
-	test_read_prob
+	test_read_prob \
+	test_read_rmw
 
 test_read_SOURCES = test_read.cc
 test_read_CPPFLAGS = ${MET_CPPFLAGS}

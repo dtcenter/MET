@@ -5,25 +5,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// ATCF file format reference:
-//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
-//
-
-//
 // Data
 //
 data = {
     field = [
       {
         name = "PRMSL";
-        level = [ "" ];
       },
       {
         name = "TMP";
-        level = [ "" ];
       }
     ];
 }
+
+level = [ "" ];
 
 //
 // Model
