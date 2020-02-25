@@ -753,9 +753,9 @@ name
  list the Python script to be run followed by any command line arguments
  for that script.
  However, in the Python command, replace the name of the input gridded data
- file with the constant string MET_PYTHON_INPUT_FILE.
+ file with the constant string MET_PYTHON_INPUT_ARG.
  When looping over multiple input files, the MET tools will replace that
- constant MET_PYTHON_INPUT_FILE with the path to the file currently being
+ constant MET_PYTHON_INPUT_ARG with the path to the file currently being
  processed.
  The example 
 \family typewriter
@@ -780,8 +780,7 @@ plot_data_plane data/python/fcst.txt fcst.ps
 
 \begin_layout Plain Layout
 
-  'name="scripts/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST";
- 
+  'name="scripts/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; 
 \backslash
 
 \end_layout

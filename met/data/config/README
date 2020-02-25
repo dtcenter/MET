@@ -705,12 +705,12 @@ regrid = {
 //            PYTHON_NUMPY or PYTHON_XARRAY.
 //          - Specify the configuration "name" entry as the Python command to be
 //            executed to read the data, but replace the input gridded data file
-//            with the constant MET_PYTHON_INPUT_FILE.
+//            with the constant MET_PYTHON_INPUT_ARG.
 //          - The "level" entry is not required for Python.
 //          e.g.
 //             file_type = PYTHON_NUMPY;
 //             field     = [
-//               { name = "read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST"; }
+//               { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
 //             ];
 //
 fcst = {
