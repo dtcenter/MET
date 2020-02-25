@@ -21,6 +21,7 @@
 
 #include "two_d_array.h"
 #include "bool_calc.h"
+#include "vx_pxm.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,17 @@ extern void combine_boolplanes(const BoolPlane * array, const int n_planes,
                                BoolPlane & bp_out);
 
                                 
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  useful mainly for debugging
+   //
+
+
+extern void boolplane_to_pgm(const BoolPlane & in, Pgm & out);
 
 
 ////////////////////////////////////////////////////////////////////////

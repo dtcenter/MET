@@ -73,5 +73,42 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void boolplane_to_pgm(const BoolPlane & in, Pgm & out)
+
+{
+
+int x, y;
+bool tf = false;
+const Color white (255, 255, 255);
+const Color black (  0,   0,   0);
+
+
+out.set_size_xy(in.nx(), in.ny());
+
+out.all_white();
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   for (y=0; y<(out.ny()); ++y)  {
+
+      tf = in.get(x, y);
+
+      out.putxy ( (tf ? black : white), x, y);
+
+   }   //  for y
+
+}   //  for s
+
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
