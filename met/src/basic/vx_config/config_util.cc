@@ -1639,7 +1639,7 @@ void HiRAInfo::clear() {
    width.clear();
    vld_thresh = bad_data_double;
    cov_ta.clear();
-   rps_ta.clear();
+   prob_cat_ta.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
 
@@ -1723,8 +1723,8 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    // Error check the coverage (probability) thresholds
    check_prob_thresh(info.cov_ta);
 
-   // Conf: rps_thresh
-   info.rps_ta = hira_dict->lookup_thresh_array(conf_key_rps_thresh);
+   // Conf: prob_cat_thresh
+   info.prob_cat_ta = hira_dict->lookup_thresh_array(conf_key_prob_cat_thresh);
 
    return(info);
 }

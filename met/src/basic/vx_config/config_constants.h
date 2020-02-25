@@ -321,11 +321,11 @@ struct NbrhdInfo {
 //
 
 struct HiRAInfo {
-   bool        flag;       // Flag to turn on/off HiRA logic
-   IntArray    width;      // Array for HiRA widths
-   double      vld_thresh; // Proportion of valid data values
-   ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
-   ThreshArray rps_ta;     // Ranked Probability Score thresholds
+   bool        flag;        // Flag to turn on/off HiRA logic
+   IntArray    width;       // Array for HiRA widths
+   double      vld_thresh;  // Proportion of valid data values
+   ThreshArray cov_ta;      // HiRA coverage (probability) thresholds
+   ThreshArray prob_cat_ta; // Categorical thresholds defining probabilities
    GridTemplateFactory::GridTemplates shape; // Area shape
 
    HiRAInfo();
@@ -693,7 +693,7 @@ static const char conf_key_nmep_flag[]        = "nmep";
 static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
-static const char conf_key_rps_thresh[]       = "rps_thresh";
+static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
 static const char conf_key_obs_error[]        = "obs_error";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";
