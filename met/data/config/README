@@ -1448,17 +1448,18 @@ topo_mask = {
 //    - The "shape" entry defines the shape of the neighborhood.
 //      Valid values are "SQUARE" or "CIRCLE"
 //
-//    - The "rps_thresh" entry defines the thresholds to be used in computing
-//      the ranked probability score. If left empty but climatology data is
-//      provided, the climo_cdf thresholds will be used instead.
+//    - The "prob_cat_thresh" entry defines the thresholds which define ensemble
+//      probabilities from which to compute the ranked probability score output.
+//      If left empty but climatology data is provided, the climo_cdf thresholds
+//      will be used instead.
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
-   shape      = SQUARE;
-   rps_thresh = [];
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 //
@@ -1856,15 +1857,15 @@ nmep_smooth = {
 // is defined as the ceiling of 1.0 / ens_phist_bin_size. For example, a bin
 // size of 0.05 results in 20 PHIST bins.
 //
-// The "rps_thresh" entry is an array of thresholds to be applied in the
+// The "prob_cat_thresh" entry is an array of thresholds to be applied in the
 // computation of the ranked probability score.  If left empty, but climatology
 // data is provided, the climo_cdf thresholds will be used instead.
 //
 fcst = {
-   message_type = [ "ADPUPA" ];
+   message_type       = [ "ADPUPA" ];
    ens_ssvar_bin_size = 1;
    ens_phist_bin_size = 0.05;
-   rps_thresh = [];
+   prob_cat_thresh    = [];
 
    field = [
       {

@@ -178,12 +178,12 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = TRUE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
-   shape      = SQUARE;
-   rps_thresh = [];
+   flag            = TRUE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
