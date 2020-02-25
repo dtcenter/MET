@@ -147,6 +147,8 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 int x, y, n, k;
 bool tf;
 
+bp_out.set_size(nx, ny);
+
 for (x=0; x<nx; ++x)  {
 
    for (y=0; y<ny; ++y)  {
