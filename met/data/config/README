@@ -634,6 +634,7 @@ regrid = {
 //       - The "GRIB1_center" is an integer specifying the originating center.
 //       - The "GRIB1_subcenter" is an integer specifying the originating
 //         subcenter.
+//       - The "GRIB1_tri" is an integer specifying the time range indicator.
 //       - The "GRIB2_mtab" is an integer specifying the master table number.
 //       - The "GRIB2_ltab" is an integer specifying the local table number.
 //       - The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
