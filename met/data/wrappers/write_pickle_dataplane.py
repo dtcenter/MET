@@ -1,12 +1,12 @@
-################################################
+########################################################################
 #
 #    Adapted from a script provided by George McCabe
 #    Adapted by Randy Bullock
 #
-#    usage:  /path/to/python write_pickle.py pickle_output_filename <user_python_script>.py <args>
+#    usage:  /path/to/python write_pickle_dataplane.py \
+#            pickle_output_filename <user_python_script>.py <args>
 #
-################################################
-
+########################################################################
 
 import os
 import sys

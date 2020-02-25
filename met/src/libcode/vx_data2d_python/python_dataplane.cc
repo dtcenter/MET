@@ -31,9 +31,9 @@ GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = 0;
 
-static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle.py";
+static const char write_pickle         [] = "MET_BASE/wrappers/write_pickle_dataplane.py";
 
-static const char generic_pickle       [] = "generic_pickle";   //  NO ".py" suffix
+static const char read_pickle          [] = "read_pickle_dataplane";   //  NO ".py" suffix
 
 static const char pickle_base_name     [] = "tmp_met_pickle";
 
@@ -362,7 +362,7 @@ mlog << Debug(3) << "Reading temporary pickle file: "
 
 StringArray a;
 
-a.add(generic_pickle);
+a.add(read_pickle);
 
 a.add(pickle_path);
 
@@ -374,7 +374,7 @@ PySys_SetArgv (wa.wargc(), wa.wargv());
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(generic_pickle);
+path = get_short_name(read_pickle);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
