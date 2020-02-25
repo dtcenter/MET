@@ -1,56 +1,49 @@
+
+////////////////////////////////////////////////////////////////////////
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2019
+// ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Warning:
-   //
-   //     This file is machine generated.
-   //
-   //     Do not edit by hand.
-   //
-   //
-   //     Created by enum_to_string from file "token.h"
-   //
-   //     on February 25, 2020   11:23 am MST
-   //
+#ifndef  __MODE_OBJECTS_FROM_NETCDF_H__
+#define  __MODE_OBJECTS_FROM_NETCDF_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __TOKENTYPE_TO_STRING_H__
-#define  __TOKENTYPE_TO_STRING_H__
+#include "two_d_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "concat_string.h"
-#include "token.h"
+   //
+   //  grabs the objects from a MODE output netcdf file
+   //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ConcatString tokentype_to_string(const TokenType);
-
-
-extern bool string_to_tokentype(const char *, TokenType &);
+extern void objects_from_netcdf(const char * netcdf_filename, 
+                                bool do_clusters,     //  do we look at cluster objects or simple objects?
+                                BoolPlane & fcst_out, 
+                                BoolPlane & obs_out);
+                                
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __TOKENTYPE_TO_STRING_H__  */
+#endif   /*  __MODE_OBJECTS_FROM_NETCDF_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

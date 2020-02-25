@@ -94,6 +94,8 @@ class TwoD_Array {
 
       void put(const T &, int _x, int _y);
 
+      T get(int _x, int _y) const;   //  there are times when operator[] or operator() are inconvenient
+
       bool s_is_on(int _x, int _y) const;
       bool f_is_on(int _x, int _y) const;
 
@@ -250,6 +252,20 @@ T TwoD_Array<T>::operator()(int _x, int _y) const
 return ( E[two_to_one(_x, _y)] );
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+T TwoD_Array<T>::get(int _x, int _y) const
+
+{
+
+return ( E[two_to_one(_x, _y)] );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
