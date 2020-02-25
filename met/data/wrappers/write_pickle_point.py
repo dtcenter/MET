@@ -18,8 +18,9 @@ print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1];
 
-pyembed_module_dir  = os.path.dirname(sys.argv[2])
+pyembed_module_dir  = os.path.dirname(sys.argv[2]) or '.'
 pyembed_module_name = os.path.basename(sys.argv[2]).replace('.py','')
+
 sys.argv = sys.argv[2:]
 
 sys.path.append(pyembed_module_dir)

@@ -21,11 +21,10 @@ pickle_filename = sys.argv[1];
 pyembed_module_name = sys.argv[2].replace('.py','')
 sys.argv = sys.argv[2:]
 
-user_dir  = os.path.dirname(pyembed_module_name)
+user_dir  = os.path.dirname(pyembed_module_name) or '.'
 user_base = os.path.basename(pyembed_module_name)
 
-if len(user_dir) != 0:
-   sys.path.append(user_dir)
+sys.path.append(user_dir)
 
 met_in = __import__(user_base)
 
