@@ -105,8 +105,6 @@ int main(int argc, char * argv[]) {
 
    std::ios::sync_with_stdio(true);
 
-   // cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
-
    //
    // set the default color table
    //
