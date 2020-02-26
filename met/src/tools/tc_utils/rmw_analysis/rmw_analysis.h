@@ -54,6 +54,9 @@ using namespace netCDF;
 // Program name
 static const char* program_name = "rmw_analysis";
 
+// ATCF file suffix
+static const char* atcf_suffix = ".dat";
+
 // Default configuration file name
 static const char* default_config_filename =
     "MET_BASE/config/RMWAnalysisConfig_default";
@@ -124,6 +127,8 @@ static vector<DataCube*> data_means;
 static vector<DataCube*> data_stdevs;
 static vector<DataCube*> data_mins;
 static vector<DataCube*> data_maxs;
+
+static StringArray    adeck_source, adeck_model_suffix;
 
 #endif  //  __RMW_ANALYSIS_H__
 

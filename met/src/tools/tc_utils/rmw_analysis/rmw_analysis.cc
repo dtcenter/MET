@@ -24,6 +24,7 @@ using namespace std;
 #include "rmw_analysis.h"
 
 #include "vx_nc_util.h"
+#include "vx_tc_util.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -34,6 +35,7 @@ using namespace std;
 static void usage();
 static void process_command_line(int, char**);
 static void set_data_files(const StringArray&);
+static void set_adeck(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
@@ -42,6 +44,12 @@ static void setup();
 static void process_files();
 static void normalize_stats();
 static void write_stats();
+static void process_adecks(TrackInfoArray&);
+static void set_atcf_source(const StringArray&,
+    StringArray&, StringArray&);
+static void get_atcf_files(const StringArray&,
+    const StringArray&, StringArray&, StringArray&);
+static void filter_tracks(TrackInfoArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +105,7 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     cline.add(set_data_files, "-data",   -1);
+    cline.add(set_adeck,      "-adeck",   1);
     cline.add(set_config,     "-config", -1);
     cline.add(set_out,        "-out",     1);
     cline.add(set_logfile,    "-log",     1);
@@ -127,6 +136,46 @@ void process_command_line(int argc, char **argv) {
 
 void set_data_files(const StringArray& a) {
     data_files = a;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_adeck(const StringArray& a) {
+    set_atcf_source(a, adeck_source, adeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_atcf_source(const StringArray& a,
+                     StringArray& source,
+                     StringArray& model_suffix) {
+
+    StringArray sa;
+    ConcatString cs, suffix;
+
+    // Check for optional suffix sub-argument
+    for(int i = 0; i < a.n_elements(); i++) {
+        if(a[i] == "suffix") {
+            cs = a[i];
+            sa = cs.split("=");
+            if(sa.n_elements() != 2) {
+                mlog << Error
+                     << "\nset_atcf_source() -> "
+                     << "the model suffix must be specified as "
+                     << "\"suffix=string\".\n\n";
+            }
+            else {
+                suffix = sa[1];
+            }
+        }
+    }
+
+    // Parse remaining sources
+    for(int i = 0; i < a.n_elements(); i++) {
+        if( a[i] == "suffix" ) continue;
+        source.add(a[i]);
+        model_suffix.add(suffix);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -540,3 +589,60 @@ void write_stats() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void process_adecks(TrackInfoArray& adeck_tracks) {
+    StringArray files, files_model_suffix;
+
+    // Initialize
+    adeck_tracks.clear();
+
+    // Get list of track files
+    get_atcf_files(adeck_source, adeck_model_suffix,
+                   files, files_model_suffix);
+
+    mlog << Debug(2)
+         << "Processing " << files.n_elements() << " ADECK file(s).\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_atcf_files(const StringArray& source,
+                    const StringArray& model_suffix,
+                    StringArray& files,
+                    StringArray& files_model_suffix) {
+
+    StringArray cur_source, cur_files;
+
+    if(source.n_elements() != model_suffix.n_elements()) {
+        mlog << Error
+             << "\nget_atcf_files() -> "
+             << "the source and suffix arrays must be equal length!\n\n";
+        exit(1);
+    }
+
+    // Initialize
+    files.clear();
+    files_model_suffix.clear();
+
+    // Build list of files from all sources
+    for(int i = 0; i < source.n_elements(); i++) {
+        cur_source.clear();
+        cur_source.add(source[i]);
+        cur_files = get_filenames(cur_source, NULL, atcf_suffix);
+
+        for(int j = 0; j < cur_files.n_elements(); j++) {
+            files.add(cur_files[j]);
+            files_model_suffix.add(model_suffix[i]);
+        }
+    }
+
+    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+static void filter_tracks(TrackInfoArray&) {
+
+}
+
