@@ -73,8 +73,9 @@ using namespace netCDF;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#ifdef WITH_PYTHON
 #include "global_python.h"
-
+#endif
 #include "ascii2nc_conf_info.h"
 #include "file_handler.h"
 #include "little_r_handler.h"
@@ -105,8 +106,8 @@ enum ASCIIFormat {
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
    ASCIIFormat_Aeronet_v2,
-   ASCIIFormat_Aeronet_v3, 
-   ASCIIFormat_Python, 
+   ASCIIFormat_Aeronet_v3,
+   ASCIIFormat_Python,
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -142,16 +143,18 @@ static void set_mask_sid(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
+#ifdef WITH_PYTHON
 static void setup_wrapper_path();
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[])
 
 {
-
-setup_wrapper_path();
-
+#ifdef WITH_PYTHON
+   setup_wrapper_path();
+#endif
    CommandLine cline;
 
    //
@@ -632,32 +635,24 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+#ifdef WITH_PYTHON
+void setup_wrapper_path() {
+   ConcatString command;
 
-void setup_wrapper_path()
+   GP.initialize();
 
-{
+   run_python_string("import sys");
 
-ConcatString command;
+   command << cs_erase
+         << "sys.path.append(\""
+         << replace_path(wrappers_dir)
+         << "\")";
 
+   cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
 
-GP.initialize();
-
-run_python_string("import sys");
-
-command << cs_erase
-        << "sys.path.append(\""
-        << replace_path(wrappers_dir)
-        << "\")";
-
-cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
-
-run_python_string(command.text());
-
-
-return;
-
+   run_python_string(command.text());
 }
-
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
