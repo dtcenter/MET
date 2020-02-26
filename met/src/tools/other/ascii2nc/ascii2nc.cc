@@ -146,12 +146,7 @@ static void setup_wrapper_path();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[])
-
-{
-
-setup_wrapper_path();
-
+int main(int argc, char *argv[]) {
    CommandLine cline;
 
    //
@@ -265,13 +260,11 @@ setup_wrapper_path();
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename)
+FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename) {
 
-{
-
-#ifdef ENABLE_PYTHON
-PythonHandler * ph = 0;
-#endif
+   #ifdef ENABLE_PYTHON
+   PythonHandler * ph = 0;
+   #endif
 
    //
    // If the ASCII format was specified, just create the appropriate
@@ -306,12 +299,13 @@ PythonHandler * ph = 0;
          handler->setFormatVersion(3);
          return((FileHandler *) handler);
       }
-#ifdef ENABLE_PYTHON
+      #ifdef ENABLE_PYTHON
       case ASCIIFormat_Python: {
+         setup_wrapper_path();
          ph = new PythonHandler(program_name, ascii_filename.text());
          return((FileHandler *) ph);
       }
-#endif
+      #endif
 
       default: {
         return(determine_ascii_format(ascii_filename));
@@ -527,11 +521,11 @@ void set_format(const StringArray & a) {
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v3;
    }
-#ifdef ENABLE_PYTHON
+   #ifdef ENABLE_PYTHON
    else if(PythonHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat_Python;
    }
-#endif
+   #endif
    else {
       mlog << Error << "\nset_format() -> "
            << "unsupported ASCII observation format \""
@@ -632,32 +626,25 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void setup_wrapper_path() {
 
-void setup_wrapper_path()
+   #ifdef ENABLE_PYTHON
+   ConcatString command;
 
-{
+   GP.initialize();
 
-ConcatString command;
+   run_python_string("import sys");
 
+   command << cs_erase
+           << "sys.path.append(\""
+           << replace_path(wrappers_dir)
+           << "\")";
 
-GP.initialize();
+   run_python_string(command.text());
+   #endif
 
-run_python_string("import sys");
-
-command << cs_erase
-        << "sys.path.append(\""
-        << replace_path(wrappers_dir)
-        << "\")";
-
-cout << "\n\n  command = \"" << command << "\"\n\n" << flush;
-
-run_python_string(command.text());
-
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
