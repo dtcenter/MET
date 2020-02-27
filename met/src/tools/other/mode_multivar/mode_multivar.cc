@@ -6,6 +6,8 @@
 // static const char program [] = "(#1 || #2) && (!#3)";
 static const char program [] = "#1 && #2 && #3";
 
+static const char atts_out_filename [] = "atts.out";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,6 +53,8 @@ static const char mode_path [] = "/d3/personal/randy/github/feature_1184_dryline
 
 static const char sep [] = "====================================================\n";
 
+static const char tab [] = "   ";
+
 static const bool do_clusters = false;
 
 
@@ -64,6 +68,9 @@ static void usage();
 
 
 static void get_filename_list(const char * fof_name, StringArray &);
+
+static void write(ostream &, const SingleFeature &);
+static void write(ostream &, const   PairFeature &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -254,10 +261,10 @@ PairFeature pair;
 
 const int perc                 =   50;    //  doesn't matter
 const bool precip_flag         = true;    //  shouldn't matter
-const double max_centroid_dist = 1.0e4;   //  shouldn't matter
+const double max_centroid_dist = 1.0e9;   //  want this to be large
 
 f_single.set(f_shape, f_shape, f_shape, perc, precip_flag);
-o_single.set(f_shape, f_shape, f_shape, perc, precip_flag);
+o_single.set(o_shape, o_shape, o_shape, perc, precip_flag);
 
 pair.set(f_single, o_single, max_centroid_dist);
 
@@ -265,6 +272,39 @@ pair.set(f_single, o_single, max_centroid_dist);
    //  write attributes
    //
 
+ofstream out;
+
+out.open(atts_out_filename);
+
+if ( ! out )  {
+
+   mlog << Error
+        << "\n\n  " << program_name << ": can't open attributes output file\n\n";
+
+   exit ( 1 );
+
+}
+
+out << '\n'
+    << "fcst single\n"
+    << "===========\n";
+
+write(out, f_single);
+
+out << '\n'
+    << "obs single\n"
+    << "==========\n";
+
+write(out, o_single);
+
+out << '\n'
+    << "pair\n"
+    << "====\n";
+
+write(out, pair);
+
+
+out.close();
 
    //
    //  done
@@ -326,6 +366,74 @@ while ( in.getline(line, sizeof(line)) )  {
 
 
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void write(ostream & out, const SingleFeature & s)
+
+{
+
+out << "centroid_x"   << tab << s.centroid_x   << '\n';
+out << "centroid_y"   << tab << s.centroid_y   << '\n';
+out << "axis_ang"     << tab << s.axis_ang     << '\n';
+out << "length"       << tab << s.length       << '\n';
+out << "width"        << tab << s.width        << '\n';
+out << "area"         << tab << s.area         << '\n';
+out << "aspect_ratio" << tab << s.aspect_ratio << '\n';
+out << "complexity"   << tab << s.complexity   << '\n';
+
+
+
+// out << "curvature"    << tab << s.curvature    << '\n';
+// out << "curvature_x"  << tab << s.curvature_x  << '\n';
+// out << "curvature_y"  << tab << s.curvature_y  << '\n';
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void write(ostream & out, const PairFeature & p)
+
+{
+
+out << "centroid_dist"              << tab << p.centroid_dist              << '\n';
+out << "boundary_dist"              << tab << p.boundary_dist              << '\n';
+out << "convex_hull_dist"           << tab << p.convex_hull_dist           << '\n';
+out << "angle_diff"                 << tab << p.angle_diff                 << '\n';
+out << "aspect_diff"                << tab << p.aspect_diff                << '\n';
+out << "area_ratio"                 << tab << p.area_ratio                 << '\n';
+out << "intersection_area"          << tab << p.intersection_area          << '\n';
+out << "union_area"                 << tab << p.union_area                 << '\n';
+out << "symmetric_diff"             << tab << p.symmetric_diff             << '\n';
+out << "intersection_over_area"     << tab << p.intersection_over_area     << '\n';
+out << "curvature_ratio"            << tab << p.curvature_ratio            << '\n';
+out << "complexity_ratio"           << tab << p.complexity_ratio           << '\n';
+
+
+// out << "percentile_intensity_ratio" << tab << p.percentile_intensity_ratio << '\n';
+
+   //
+   //  done
+   //
+
+out.flush();
 
 return;
 
