@@ -3,7 +3,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char program [] = "(#1 || #2) && (!#3)";
+// static const char program [] = "(#1 || #2) && (!#3)";
+static const char program [] = "#1 && #2 && #3";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,6 +35,8 @@ using namespace std;
 #include "vx_util.h"
 #include "two_d_array.h"
 #include "get_filenames.h"
+#include "shapedata.h"
+#include "interest.h"
 
 #include "combine_boolplanes.h"
 #include "objects_from_netcdf.h"
@@ -148,12 +151,12 @@ for (j=0; j<n_files; ++j)  {
 }   //  for j
 
 
-nc_files.dump(cout, 1);
+// nc_files.dump(cout, 1);
 
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
 BoolPlane f_result, o_result;
-char junk[256];
+// char junk[256];
 Pgm image;
 
 
@@ -184,7 +187,7 @@ const int ny = f_plane[0].ny();
 
 calc.set(program);
 
-calc.dump_program(cout);
+// calc.dump_program(cout);
 
 f_result.set_size(nx, ny);
 o_result.set_size(nx, ny);
@@ -200,6 +203,67 @@ boolplane_to_pgm(o_result, image);
 
 image.write("o_result.pgm");
 
+
+   //
+   //  bool plane -> data plane & shape data
+   //
+
+
+ShapeData f_shape, o_shape;
+
+int x, y;
+double value;
+DataPlane & f_dp = f_shape.data;
+DataPlane & o_dp = o_shape.data;
+
+f_dp.set_size(nx, ny);
+o_dp.set_size(nx, ny);
+
+for (x=0; x<nx; ++x)  {
+
+   for (y=0; y<ny; ++y)  {
+
+      value = ( f_result(x, y) ? 1.0 : 0.0 );
+
+      f_dp.set(value, x, y);
+
+      value = ( o_result(x, y) ? 1.0 : 0.0 );
+
+      o_dp.set(value, x, y);
+
+   }   //  for ny
+
+}   //  for nx
+
+f_shape.calc_moments();
+o_shape.calc_moments();
+
+   //
+   //  shape data -> single feature & pair feature
+   //
+
+SingleFeature f_single, o_single;
+PairFeature pair;
+
+      //
+      //  We're not intrested in data values inside
+      //    the super-objects, so we'll just pass
+      //    the same shapedata for raw, thresh
+      //    and mask
+      //
+
+const int perc                 =   50;    //  doesn't matter
+const bool precip_flag         = true;    //  shouldn't matter
+const double max_centroid_dist = 1.0e4;   //  shouldn't matter
+
+f_single.set(f_shape, f_shape, f_shape, perc, precip_flag);
+o_single.set(f_shape, f_shape, f_shape, perc, precip_flag);
+
+pair.set(f_single, o_single, max_centroid_dist);
+
+   //
+   //  write attributes
+   //
 
 
    //
