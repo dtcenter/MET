@@ -42,8 +42,7 @@ class TrackPairInfo {
 
       void init_from_scratch();
       void assign(const TrackPairInfo &);
-
-      void extend(int);
+      void extend(int, bool exact = true);
 
       // Number of track points
       int          NPoints;
@@ -179,7 +178,7 @@ class TrackPairInfoArray {
 
       void init_from_scratch();
       void assign(const TrackPairInfoArray &);
-      void extend(int);
+      void extend(int, bool exact = true);
 
       TrackPairInfo *Pair;
       int            NPairs;

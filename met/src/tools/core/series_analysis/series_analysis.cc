@@ -666,7 +666,7 @@ void process_scores() {
 
    // Allocate space to store the pairs for each grid point
    pd_ptr = new PairDataPoint [conf_info.block_size];
-   for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series, true);
+   for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
 
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {

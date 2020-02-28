@@ -482,7 +482,7 @@ void PairDataEnsemble::compute_relp() {
    relp_na.clear();
 
    // Allocate space
-   min_ens.extend(n_ens, true);
+   min_ens.extend(n_ens);
 
    // Initialize counts to 0
    for(i=0; i<n_ens; i++) relp_na.add(0);
@@ -726,7 +726,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
 
    // Set the ensemble size and allocate memory
    pd.set_ens_size(n_ens);
-   pd.extend(n_obs, true);
+   pd.extend(n_obs);
    pd.phist_bin_size  = phist_bin_size;
    pd.ssvar_bin_size  = ssvar_bin_size;
    pd.obs_error_entry = obs_error_entry;
@@ -1787,7 +1787,7 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
 
    // Set the ensemble size and allocate memory
    out_pd.set_ens_size(pd.n_ens);
-   out_pd.extend(pd.n_obs, true);
+   out_pd.extend(pd.n_obs);
 
    bool cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.o_na, pd.csd_na);

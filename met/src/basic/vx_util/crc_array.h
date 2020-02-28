@@ -99,7 +99,7 @@ class CRC_Array {
 
       void clear();
 
-      void extend(int, bool exact = false);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -244,7 +244,7 @@ clear();
 
 if ( a.Nelements == 0 )  return;
 
-extend(a.Nelements, true);
+extend(a.Nelements);
 
 int j;
 
@@ -494,7 +494,7 @@ void CRC_Array<T>::add(const T & k)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = k;
 

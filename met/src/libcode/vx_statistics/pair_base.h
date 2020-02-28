@@ -112,7 +112,7 @@ class PairBase {
       void clear();
       void erase();
 
-      void extend(int, bool exact = false); // Allocate memory for expected size
+      void extend(int, bool exact = true); // Allocate memory for expected size
 
       void set_mask_name(const char *);
       void set_mask_area_ptr(MaskPlane *);

@@ -41,7 +41,7 @@ class ThreshArray {
 
       void clear();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 

@@ -184,7 +184,8 @@ u = new unixtime [n];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid TimeArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nvoid TimeArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -310,7 +311,7 @@ void TimeArray::add(unixtime u)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = u;
 
@@ -382,7 +383,8 @@ void TimeArray::set(int n, unixtime u)
 
 if ( (n < 0) || (n >= Nelements) )  {
 
-   mlog << Error << "\nTimeArray::set(int, unixtime) -> range check error\n\n";
+   mlog << Error << "\nTimeArray::set(int, unixtime) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 

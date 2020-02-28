@@ -59,7 +59,7 @@ class NumArray {
 
       void erase();
 
-      void extend(int, bool exact = false);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 

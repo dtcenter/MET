@@ -355,7 +355,7 @@ void PairBase::add_climo_cdf() {
       exit(1);
    }
 
-   cdf_na.extend(o_na.n(), true);
+   cdf_na.extend(o_na.n());
 
    for(i=0; i<o_na.n(); i++) {
       cdf_na.add(is_bad_data(o_na[i])   ||
