@@ -148,20 +148,20 @@ void PairBase::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::extend(int n) {
+void PairBase::extend(int n, bool exact) {
 
-   lat_na.extend(n);
-   lon_na.extend(n);
-   x_na.extend(n);
-   y_na.extend(n);
-   wgt_na.extend(n);
-   vld_ta.extend(n);
-   lvl_na.extend(n);
-   elv_na.extend(n);
-   o_na.extend(n);
-   cmn_na.extend(n);
-   csd_na.extend(n);
-   cdf_na.extend(n);
+   lat_na.extend(n, exact);
+   lon_na.extend(n, exact);
+   x_na.extend  (n, exact);
+   y_na.extend  (n, exact);
+   wgt_na.extend(n, exact);
+   vld_ta.extend(n, exact);
+   lvl_na.extend(n, exact);
+   elv_na.extend(n, exact);
+   o_na.extend  (n, exact);
+   cmn_na.extend(n, exact);
+   csd_na.extend(n, exact);
+   cdf_na.extend(n, exact);
 
    return;
 }
@@ -355,7 +355,7 @@ void PairBase::add_climo_cdf() {
       exit(1);
    }
 
-   cdf_na.extend(o_na.n());
+   cdf_na.extend(o_na.n(), true);
 
    for(i=0; i<o_na.n(); i++) {
       cdf_na.add(is_bad_data(o_na[i])   ||

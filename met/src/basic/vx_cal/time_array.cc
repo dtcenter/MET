@@ -159,19 +159,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TimeArray::extend(int n)
+void TimeArray::extend(int n, bool exact)
+
 
 {
 
 if ( Nalloc >= n )  return;
 
-int k;
+if ( ! exact )  {
 
-k = n/time_array_alloc_inc;
+   int k;
 
-if ( n%time_array_alloc_inc )  ++k;
+   k = n/time_array_alloc_inc;
 
-n = k*time_array_alloc_inc;
+   if ( n%time_array_alloc_inc )  ++k;
+
+   n = k*time_array_alloc_inc;
+
+}
 
 unixtime * u = (unixtime *) 0;
 

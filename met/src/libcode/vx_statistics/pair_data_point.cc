@@ -97,11 +97,11 @@ void PairDataPoint::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::extend(int n) {
+void PairDataPoint::extend(int n, bool exact) {
 
-   PairBase::extend(n);
+   PairBase::extend(n, exact);
 
-   f_na.extend(n);
+   f_na.extend(n, exact);
 
    return;
 }
@@ -114,7 +114,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    clear();
 
    // Allocate memory for output pairs
-   extend(pd.n_obs);
+   extend(pd.n_obs, true);
 
    set_mask_name(pd.mask_name.c_str());
    set_mask_area_ptr(pd.mask_area_ptr);
@@ -216,7 +216,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    }
 
    // Allocate enough memory
-   extend(o_in.n());
+   extend(o_in.n(), true);
 
    f_na.add(f_in);
    o_na.add(o_in);
@@ -1299,7 +1299,7 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
    PairDataPoint out_pd;
 
    // Allocate memory for output pairs
-   out_pd.extend(pd.n_obs);
+   out_pd.extend(pd.n_obs, true);
 
    bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
@@ -1365,8 +1365,8 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    // Initialize and allocate memory for output pairs
    out_pd_u.erase();
    out_pd_v.erase();
-   out_pd_u.extend(pd_u.n_obs);
-   out_pd_v.extend(pd_v.n_obs);
+   out_pd_u.extend(pd_u.n_obs, true);
+   out_pd_v.extend(pd_v.n_obs, true);
 
    bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
                    set_climo_flag(pd_v.f_na, pd_v.cmn_na);
@@ -1453,7 +1453,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    PairDataPoint out_pd;
 
    // Allocate memory for output pairs
-   out_pd.extend(pd.n_obs);
+   out_pd.extend(pd.n_obs, true);
 
    bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);

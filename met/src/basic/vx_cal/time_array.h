@@ -55,7 +55,7 @@ class TimeArray {
 
       void clear();
 
-      void extend(int);
+      void extend(int, bool exact = false);
 
       void dump(ostream &, int depth = 0) const;
 

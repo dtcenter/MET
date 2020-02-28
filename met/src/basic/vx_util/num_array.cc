@@ -174,19 +174,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::extend(int len)
+void NumArray::extend(int len, bool exact)
 
 {
 
 if ( Nalloc >= len )  return;
 
-int k;
+if ( ! exact )  {
 
-k = len/num_array_alloc_inc;
+   int k;
 
-if ( len%num_array_alloc_inc )  ++k;
+   k = len/num_array_alloc_inc;
 
-len = k*num_array_alloc_inc;
+   if ( len%num_array_alloc_inc )  ++k;
+
+   len = k*num_array_alloc_inc;
+
+}
 
 double * u = (double *) 0;
 
@@ -194,7 +198,7 @@ u = new double [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid NumArray::extend(int) -> "
+   mlog << Error << "\nvoid NumArray::extend(int, bool) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
