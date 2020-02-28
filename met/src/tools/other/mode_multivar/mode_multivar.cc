@@ -6,7 +6,11 @@
 // static const char program [] = "(#1 || #2) && (!#3)";
 static const char program [] = "#1 && #2 && #3";
 
-static const char atts_out_filename [] = "atts.out";
+static const char fcst_super_nc_filename [] = "f_super.nc";
+static const char  obs_super_nc_filename [] = "o_super.nc";
+
+static const char config_constants    [] = "config/ConfigConstants";   //  relative to MET_BASE
+static const char mode_default_config [] = "config/MODEConfig_default";   //  relative to MET_BASE
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,17 +35,24 @@ using namespace std;
 #include <limits.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <cstdio>
 #include <cmath>
+
+#include <netcdf>
 
 #include "vx_util.h"
 #include "two_d_array.h"
 #include "get_filenames.h"
+#include "mode_conf_info.h"
 #include "shapedata.h"
 #include "interest.h"
 
 #include "combine_boolplanes.h"
 #include "objects_from_netcdf.h"
+
+
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -57,6 +68,8 @@ static const char tab [] = "   ";
 
 static const bool do_clusters = false;
 
+static const char * config_file = 0;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -69,8 +82,9 @@ static void usage();
 
 static void get_filename_list(const char * fof_name, StringArray &);
 
-static void write(ostream &, const SingleFeature &);
-static void write(ostream &, const   PairFeature &);
+static void run_command(const ConcatString & command);
+
+static void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filename);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,6 +93,8 @@ static void write(ostream &, const   PairFeature &);
 int main(int argc, char * argv [])
 
 {
+
+cout << "\n\n  MET_BASE = " << getenv("MET_BASE") << "\n\n" << flush;
 
 program_name = get_short_name(argv[0]);
 
@@ -89,7 +105,7 @@ StringArray fcst_filenames;
 StringArray  obs_filenames;
 const char * const    fcst_fof = argv[1];
 const char * const     obs_fof = argv[2];
-const char * const config_file = argv[3];
+config_file = argv[3];
 
 
 get_filename_list(fcst_fof, fcst_filenames);
@@ -107,13 +123,16 @@ if ( fcst_filenames.n() != obs_filenames.n() )  {
 }
 
 const int n_files = fcst_filenames.n();
-int status;
 ConcatString mode_args;
 ConcatString command;
 StringArray a, nc_files;
 char dir [32];
 
 mlog << Debug(1) << sep;
+
+   //
+   //  do the individual mode runs
+   //
 
 for (j=0; j<n_files; ++j)  {
 
@@ -137,17 +156,7 @@ for (j=0; j<n_files; ++j)  {
 
    // cout << command.text() << '\n' << flush;
 
-   status = system(command.text());
-
-   if ( status )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": "
-           << "mode run failed!\n\n";
-
-      exit ( 1 );
-
-   }
+   run_command(command);
 
    mlog << Debug(1) << sep;
 
@@ -166,6 +175,9 @@ BoolPlane f_result, o_result;
 // char junk[256];
 Pgm image;
 
+   //
+   //  load the objects from the mode output files
+   //
 
 for (j=0; j<n_files; ++j)  {
 
@@ -187,6 +199,9 @@ for (j=0; j<n_files; ++j)  {
 
 }
 
+   //
+   //  combine the objects into super-objects
+   //
 
 BoolCalc calc;
 const int nx = f_plane[0].nx();
@@ -210,101 +225,34 @@ boolplane_to_pgm(o_result, image);
 
 image.write("o_result.pgm");
 
-
    //
-   //  bool plane -> data plane & shape data
-   //
-
-
-ShapeData f_shape, o_shape;
-
-int x, y;
-double value;
-DataPlane & f_dp = f_shape.data;
-DataPlane & o_dp = o_shape.data;
-
-f_dp.set_size(nx, ny);
-o_dp.set_size(nx, ny);
-
-for (x=0; x<nx; ++x)  {
-
-   for (y=0; y<ny; ++y)  {
-
-      value = ( f_result(x, y) ? 1.0 : 0.0 );
-
-      f_dp.set(value, x, y);
-
-      value = ( o_result(x, y) ? 1.0 : 0.0 );
-
-      o_dp.set(value, x, y);
-
-   }   //  for ny
-
-}   //  for nx
-
-f_shape.calc_moments();
-o_shape.calc_moments();
-
-   //
-   //  shape data -> single feature & pair feature
+   //  copy one of the input mode files to
+   //    hold the super-object data
    //
 
-SingleFeature f_single, o_single;
-PairFeature pair;
+command << cs_erase << "cp -u " << fcst_filenames[0] << ' ' << fcst_super_nc_filename;
 
-      //
-      //  We're not intrested in data values inside
-      //    the super-objects, so we'll just pass
-      //    the same shapedata for raw, thresh
-      //    and mask
-      //
+run_command(command);
 
-const int perc                 =   50;    //  doesn't matter
-const bool precip_flag         = true;    //  shouldn't matter
-const double max_centroid_dist = 1.0e9;   //  want this to be large
+command << cs_erase << "cp -u " <<  obs_filenames[0] << ' ' <<  obs_super_nc_filename;
 
-f_single.set(f_shape, f_shape, f_shape, perc, precip_flag);
-o_single.set(o_shape, o_shape, o_shape, perc, precip_flag);
+run_command(command);
 
-pair.set(f_single, o_single, max_centroid_dist);
+command << cs_erase << "chmod u+rw " << fcst_super_nc_filename;
+
+run_command(command);
+
+command << cs_erase << "chmod u+rw " << obs_super_nc_filename;
+
+run_command(command);
 
    //
-   //  write attributes
+   //  replace the data
    //
 
-ofstream out;
+replace_data(f_result, fcst_super_nc_filename);
+replace_data(o_result,  obs_super_nc_filename);
 
-out.open(atts_out_filename);
-
-if ( ! out )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": can't open attributes output file\n\n";
-
-   exit ( 1 );
-
-}
-
-out << '\n'
-    << "fcst single\n"
-    << "===========\n";
-
-write(out, f_single);
-
-out << '\n'
-    << "obs single\n"
-    << "==========\n";
-
-write(out, o_single);
-
-out << '\n'
-    << "pair\n"
-    << "====\n";
-
-write(out, pair);
-
-
-out.close();
 
    //
    //  done
@@ -375,31 +323,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write(ostream & out, const SingleFeature & s)
+void run_command(const ConcatString & command)
 
 {
 
-out << "centroid_x"   << tab << s.centroid_x   << '\n';
-out << "centroid_y"   << tab << s.centroid_y   << '\n';
-out << "axis_ang"     << tab << s.axis_ang     << '\n';
-out << "length"       << tab << s.length       << '\n';
-out << "width"        << tab << s.width        << '\n';
-out << "area"         << tab << s.area         << '\n';
-out << "aspect_ratio" << tab << s.aspect_ratio << '\n';
-out << "complexity"   << tab << s.complexity   << '\n';
+int status;
 
+cout << "command = \"" << command << "\"\n" << flush;
 
+status = system(command.text());
 
-// out << "curvature"    << tab << s.curvature    << '\n';
-// out << "curvature_x"  << tab << s.curvature_x  << '\n';
-// out << "curvature_y"  << tab << s.curvature_y  << '\n';
+if ( status )  {
 
+   mlog << Error
+        << "\n\n  " << program_name << ": "
+        << "command \"" << command << "\" failed!\n\n";
 
-   //
-   //  done
-   //
+   exit ( 1 );
 
-out.flush();
+}
 
 return;
 
@@ -409,31 +351,93 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write(ostream & out, const PairFeature & p)
+void replace_data(const BoolPlane & bp, const char * fcst_super_nc_filename)
 
 {
 
-out << "centroid_dist"              << tab << p.centroid_dist              << '\n';
-out << "boundary_dist"              << tab << p.boundary_dist              << '\n';
-out << "convex_hull_dist"           << tab << p.convex_hull_dist           << '\n';
-out << "angle_diff"                 << tab << p.angle_diff                 << '\n';
-out << "aspect_diff"                << tab << p.aspect_diff                << '\n';
-out << "area_ratio"                 << tab << p.area_ratio                 << '\n';
-out << "intersection_area"          << tab << p.intersection_area          << '\n';
-out << "union_area"                 << tab << p.union_area                 << '\n';
-out << "symmetric_diff"             << tab << p.symmetric_diff             << '\n';
-out << "intersection_over_area"     << tab << p.intersection_over_area     << '\n';
-out << "curvature_ratio"            << tab << p.curvature_ratio            << '\n';
-out << "complexity_ratio"           << tab << p.complexity_ratio           << '\n';
+// ModeConfInfo conf(config_file);
+MetConfig conf;
+ConcatString path;
+
+   //
+   //  probably could move the conf stuff up into main()
+   //
+
+// path << cs_erase << getenv("MET_BASE") << '/' << mode_default_config;
+
+path << cs_erase << getenv("MET_BASE") << '/' << config_constants;
+
+conf.read(path.c_str());
+
+conf.read(config_file);
+
+NcFile nc((string) fcst_super_nc_filename, NcFile::write, NcFile::classic);
+
+   //
+   //  get variable name
+   //
+
+const DictionaryEntry * e = 0;
+
+e = conf.lookup("fcst", DictionaryType);
+
+Dictionary * fcst_dict = e->dict();
+
+e = fcst_dict->lookup((string) "field");
+
+Dictionary * field = e->dict();
+
+e = (*field)[0];
+
+Dictionary * d = e->dict();
+
+e = d->lookup("name");
+
+e->dump(cout);
+
+ConcatString var_name = *(e->string_value());
+
+cout << "\n\n    var_name = \"" << var_name << "\"\n\n" << flush;
+
+   //
+   //  get variable and dimensions
+   //
+
+int x, y, n;
+NcVar data_var = nc.getVar(var_name.text());
+// NcDim lat_dim  = nc.getDim("lat");
+// NcDim lon_dim  = nc.getDim("lon");
+const int nx = bp.nx();
+const int ny = bp.ny();
+const int nxy = nx*ny;
+double value;
+
+float * buf = new float [nxy];
+
+for (x=0; x<nx; ++x)  {
+
+   for (y=0; y<ny; ++y)  {
+
+      n = y*nx + x;
+
+      value = ( (bp(x, y)) ? 100.0 : 0.0 );
+
+      buf[n] = (float) value;
+
+   }   //  for y
+
+}   //  for x
+
+data_var.putVar(buf);
 
 
-// out << "percentile_intensity_ratio" << tab << p.percentile_intensity_ratio << '\n';
+
 
    //
    //  done
    //
 
-out.flush();
+nc.close();
 
 return;
 
