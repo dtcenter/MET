@@ -40,7 +40,6 @@ min_duration = 12;
 // track point where all of these criteria are met.
 //
 fcst_genesis = {
-   category    = [];
    vmax_thresh = NA;
    mslp_thresh = NA;
 }

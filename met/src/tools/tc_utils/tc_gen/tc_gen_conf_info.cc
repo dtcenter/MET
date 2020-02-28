@@ -560,8 +560,8 @@ GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
    // Conf: technique (optional)
    info.Technique = dict->lookup_string(conf_key_technique, false);
 
-   // Conf: category
-   sa = dict->lookup_string_array(conf_key_category);
+   // Conf: category (optional)
+   sa = dict->lookup_string_array(conf_key_category, false);
    for(i=0; i<sa.n(); i++) {
       info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
    }
