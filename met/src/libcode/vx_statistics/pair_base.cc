@@ -75,6 +75,8 @@ void PairBase::clear() {
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
    o_na.clear();
+   x_na.clear();
+   y_na.clear();
    wgt_na.clear();      
    cmn_na.clear();
    csd_na.clear();
@@ -83,8 +85,6 @@ void PairBase::clear() {
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
-   x_na.clear();
-   y_na.clear();
    vld_ta.clear();
    lvl_na.clear();
    elv_na.clear();
@@ -122,6 +122,8 @@ void PairBase::erase() {
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
    o_na.erase();
+   x_na.erase();
+   y_na.erase();
    wgt_na.erase();      
    cmn_na.erase();
    csd_na.erase();
@@ -130,8 +132,6 @@ void PairBase::erase() {
    sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
-   x_na.erase();
-   y_na.erase();
    vld_ta.erase();
    lvl_na.erase();
    elv_na.erase();
@@ -156,6 +156,8 @@ void PairBase::erase() {
 void PairBase::extend(int n, bool exact) {
 
    o_na.extend  (n, exact);
+   x_na.extend  (n, exact);
+   y_na.extend  (n, exact);
    wgt_na.extend(n, exact);
 
    cmn_na.extend(n, exact);
@@ -165,8 +167,6 @@ void PairBase::extend(int n, bool exact) {
    if(IsPointVx) {
       lat_na.extend(n, exact);
       lon_na.extend(n, exact);
-      x_na.extend  (n, exact);
-      y_na.extend  (n, exact);
       vld_ta.extend(n, exact);
       lvl_na.extend(n, exact);
       elv_na.extend(n, exact);
@@ -761,19 +761,14 @@ void PairBase::add_grid_obs(double o, double cmn, double csd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_grid_obs(int i_obs, double o, double cmn, double csd,
+void PairBase::add_grid_obs(double x, double y,
+                            double o, double cmn, double csd,
                             double wgt) {
 
-   if(i_obs < 0 || i_obs >= n_obs) {
-      mlog << Error << "\nPairBase::set_grid_obs() -> "
-           << "range check error: " << i_obs << " not in (0, "
-           << n_obs << ").\n\n";
-      exit(1);
-   }
+   add_grid_obs(o, cmn, csd, wgt);
 
-   o_na.set(i_obs, o);
-   wgt_na.set(i_obs, wgt);
-   set_climo(i_obs, o, cmn, csd);
+   x_na.add(x);
+   y_na.add(y);
 
    return;
 }

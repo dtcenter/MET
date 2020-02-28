@@ -1906,7 +1906,7 @@ void process_grid_scores(int i_vx,
          csd = (csd_flag ? csd_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_grid_obs(oraw_dp(x, y), cmn, csd, wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cmn, csd, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {

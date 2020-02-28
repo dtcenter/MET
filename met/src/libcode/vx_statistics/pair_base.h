@@ -81,6 +81,8 @@ class PairBase {
 
       // Point and Grid Observation Information
       NumArray    o_na;    // Observation value [n_obs]
+      NumArray    x_na;    // X [n_obs]
+      NumArray    y_na;    // Y [n_obs]
       NumArray    wgt_na;  // Weight [n_obs]
 
       // Point and Grid Climatology Information
@@ -92,8 +94,6 @@ class PairBase {
       StringArray sid_sa;  // Station ID [n_obs]
       NumArray    lat_na;  // Latitude [n_obs]
       NumArray    lon_na;  // Longitude [n_obs]
-      NumArray    x_na;    // X [n_obs]
-      NumArray    y_na;    // Y [n_obs]
       TimeArray   vld_ta;  // Valid time [n_obs]
       NumArray    lvl_na;  // Level [n_obs]
       NumArray    elv_na;  // Elevation [n_obs]
@@ -154,10 +154,12 @@ class PairBase {
       void set_point_obs(int, const char *, double, double, double, double,
                          unixtime, double, double, double,
                          const char *, double, double, double);
-      
-      void add_grid_obs(double, double, double, double);
 
-      void set_grid_obs(int, double, double, double, double);
+      void add_grid_obs(double, double, double, double);
+      
+      void add_grid_obs(double, double, double,
+                        double, double, double);
+
 
       void add_climo(double, double, double);
       void set_climo(int, double, double, double);
