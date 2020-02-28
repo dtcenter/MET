@@ -148,6 +148,7 @@ return;
 void StringArray::clear()
 
 {
+
 s.clear();
 
 return;

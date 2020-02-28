@@ -61,6 +61,8 @@ void PairBase::init_from_scratch() {
 
 void PairBase::clear() {
 
+   IsPointVx = false;
+
    mask_name.clear();
    mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
    mask_sid_ptr   = (StringArray *) 0;  // Not allocated
@@ -72,20 +74,21 @@ void PairBase::clear() {
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
+   o_na.clear();
+   wgt_na.clear();      
+   cmn_na.clear();
+   csd_na.clear();
+   cdf_na.clear();
+
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
    x_na.clear();
    y_na.clear();
-   wgt_na.clear();
    vld_ta.clear();
    lvl_na.clear();
    elv_na.clear();
-   o_na.clear();
    o_qc_sa.clear();
-   cmn_na.clear();
-   csd_na.clear();
-   cdf_na.clear();
 
    n_obs = 0;
 
@@ -105,6 +108,8 @@ void PairBase::clear() {
 
 void PairBase::erase() {
 
+   IsPointVx = false;
+
    mask_name.erase();
    mask_area_ptr  = (MaskPlane *)   0;  // Not allocated
    mask_sid_ptr   = (StringArray *) 0;  // Not allocated
@@ -116,21 +121,21 @@ void PairBase::erase() {
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
 
-   sid_sa.clear();
-   vld_ta.clear();
-   o_qc_sa.clear();
+   o_na.erase();
+   wgt_na.erase();      
+   cmn_na.erase();
+   csd_na.erase();
+   cdf_na.erase();
 
+   sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
    x_na.erase();
    y_na.erase();
-   wgt_na.erase();
+   vld_ta.erase();
    lvl_na.erase();
    elv_na.erase();
-   o_na.erase();
-   cmn_na.erase();
-   csd_na.erase();
-   cdf_na.erase();
+   o_qc_sa.clear(); // no erase option
 
    n_obs = 0;
 
@@ -150,18 +155,22 @@ void PairBase::erase() {
 
 void PairBase::extend(int n, bool exact) {
 
-   lat_na.extend(n, exact);
-   lon_na.extend(n, exact);
-   x_na.extend  (n, exact);
-   y_na.extend  (n, exact);
-   wgt_na.extend(n, exact);
-   vld_ta.extend(n, exact);
-   lvl_na.extend(n, exact);
-   elv_na.extend(n, exact);
    o_na.extend  (n, exact);
+   wgt_na.extend(n, exact);
+
    cmn_na.extend(n, exact);
    csd_na.extend(n, exact);
    cdf_na.extend(n, exact);
+
+   if(IsPointVx) {
+      lat_na.extend(n, exact);
+      lon_na.extend(n, exact);
+      x_na.extend  (n, exact);
+      y_na.extend  (n, exact);
+      vld_ta.extend(n, exact);
+      lvl_na.extend(n, exact);
+      elv_na.extend(n, exact);
+   }
 
    return;
 }
@@ -300,6 +309,11 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
    int i, status = 0;
 
    //
+   // Only valid for point data
+   //
+   if(!IsPointVx) return(false);
+
+   //
    // Check for an existing record of this observation
    //
    for(i=0, i_obs=-1; i<n_obs; i++) {
@@ -375,6 +389,18 @@ bool PairBase::add_point_obs(const char *sid,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
                              double cmn, double csd, double wgt) {
+
+   //
+   // Set or check the IsPointVx flag
+   //
+   if(n_obs == 0) {
+      IsPointVx = true;
+   }
+   else if(!IsPointVx) {
+      mlog << Error << "\nPairBase::add_point_obs() -> "
+           << "should not be called for gridded verification!\n\n";
+      exit(1);
+   }
 
    bool ret = false;
 
@@ -595,9 +621,11 @@ ob_val_t PairBase::compute_percentile(string obs_key, int perc) {
 
 void PairBase::print_obs_summary(){
 
+   if(!IsPointVx) return;
+
    if(obs_summary == ObsSummary_None ||
-      4 > mlog.verbosity_level() ||
-      ! map_val.size() ) return;
+      mlog.verbosity_level() < 4 ||
+      !map_val.size()) return;
 
    //  iterate over ordered list map keys in the station id map
    for(int i=0; i<map_key.n(); i++) {
@@ -628,6 +656,8 @@ void PairBase::print_obs_summary(){
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::calc_obs_summary(){
+
+   if(!IsPointVx) return;
 
    //  iterate over the keys in the unique station id map
    for(int i=0; i<map_key.n(); i++) {
@@ -692,7 +722,7 @@ void PairBase::calc_obs_summary(){
       elv_na.add (svt.elv);
       o_na.add   (ob.val);
       o_qc_sa.add(ob.qc.c_str());
-      add_climo(ob.val, svt.cmn, svt.csd);
+      add_climo  (ob.val, svt.cmn, svt.csd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -704,20 +734,23 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_grid_obs(double x, double y, double o,
-                            double cmn, double csd, double wgt) {
+void PairBase::add_grid_obs(double o, double cmn, double csd,
+                            double wgt) {
 
-   sid_sa.add(na_str);
-   lat_na.add(bad_data_double);
-   lon_na.add(bad_data_double);
-   x_na.add(x);
-   y_na.add(y);
-   wgt_na.add(wgt);
-   vld_ta.add(bad_data_int);
-   lvl_na.add(bad_data_double);
-   elv_na.add(bad_data_double);
+   //
+   // Set or check the IsPointVx flag
+   //
+   if(n_obs == 0) {
+      IsPointVx = false;
+   }
+   else if(IsPointVx) {
+      mlog << Error << "\nPairBase::add_grid_obs() -> "
+           << "should not be called for point verification!\n\n";
+      exit(1);
+   }
+
    o_na.add(o);
-   o_qc_sa.add(na_str);
+   wgt_na.add(wgt);
    add_climo(o, cmn, csd);
 
    // Increment the number of observations
@@ -728,8 +761,8 @@ void PairBase::add_grid_obs(double x, double y, double o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_grid_obs(int i_obs, double x, double y,
-                            double o, double cmn, double csd, double wgt) {
+void PairBase::set_grid_obs(int i_obs, double o, double cmn, double csd,
+                            double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_grid_obs() -> "
@@ -738,17 +771,8 @@ void PairBase::set_grid_obs(int i_obs, double x, double y,
       exit(1);
    }
 
-   sid_sa.set(i_obs, na_str);
-   lat_na.set(i_obs, bad_data_double);
-   lon_na.set(i_obs, bad_data_double);
-   x_na.set(i_obs, x);
-   y_na.set(i_obs, y);
-   wgt_na.set(i_obs, wgt);
-   vld_ta.set(i_obs, bad_data_int);
-   lvl_na.set(i_obs, bad_data_double);
-   elv_na.set(i_obs, bad_data_double);
    o_na.set(i_obs, o);
-   o_qc_sa.set(i_obs, na_str);
+   wgt_na.set(i_obs, wgt);
    set_climo(i_obs, o, cmn, csd);
 
    return;
