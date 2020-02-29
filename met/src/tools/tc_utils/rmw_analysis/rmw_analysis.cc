@@ -678,8 +678,32 @@ bool is_keeper(const ATCFLineBase* line) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void filter_tracks(TrackInfoArray&) {
+void filter_tracks(TrackInfoArray& tracks) {
 
+    TrackInfoArray t = tracks;
+
+    // Initialize
+    tracks.clear();
+
+    // Loop over tracks
+    for(int i = 0; i < t.n_tracks(); i++) {
+        // Valid time window
+        if((conf_info.ValidBeg > 0 &&
+            conf_info.ValidBeg > t[i].valid_min()) ||
+           (conf_info.ValidEnd > 0 &&
+            conf_info.ValidEnd < t[i].valid_max())) {
+             mlog << Debug(4)
+                  << "Discarding track " << i+1
+                  << " for falling outside the "
+                  << "valid time window: "
+                  << unix_to_yyyymmdd_hhmmss(t[i].valid_min()) << " to "
+                  << unix_to_yyyymmdd_hhmmss(t[i].valid_max()) << "\n";
+            continue;
+        }
+
+        // Retain track
+        tracks.add(t[i]);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
