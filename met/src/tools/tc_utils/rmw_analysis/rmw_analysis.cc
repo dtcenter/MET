@@ -49,7 +49,8 @@ static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
-static void filter_tracks(TrackInfoArray &);
+static bool is_keeper(const ATCFLineBase*);
+static void filter_tracks(TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -639,6 +640,41 @@ void get_atcf_files(const StringArray& source,
     return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool is_keeper(const ATCFLineBase* line) {
+    bool keep = true;
+
+    // Check model
+    if(conf_info.Model.n_elements() > 0 &&
+        !conf_info.Model.has(line->technique()))
+        keep = false;
+
+    // Check storm id
+    else if(conf_info.StormId.n_elements() > 0 &&
+            !has_storm_id(conf_info.StormId, line->basin(),
+                          line->cyclone_number(), line->warning_time()))
+        keep = false;
+
+    // Check basin
+    else if(conf_info.Basin.n_elements() > 0 &&
+            !conf_info.Basin.has(line->basin()))
+        keep = false;
+
+    // Check cyclone
+    else if(conf_info.Cyclone.n_elements() > 0 &&
+            !conf_info.Cyclone.has(line->cyclone_number()))
+        keep = false;
+
+    // Initialization time window
+    else if((conf_info.InitBeg > 0 &&
+             conf_info.InitBeg > line->warning_time()) ||
+            (conf_info.InitEnd > 0 &&
+             conf_info.InitEnd < line->warning_time()))
+        keep = false;
+
+    return keep;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -646,3 +682,4 @@ static void filter_tracks(TrackInfoArray&) {
 
 }
 
+////////////////////////////////////////////////////////////////////////
