@@ -49,7 +49,7 @@ static const char * program_name = "tc_gen";
 static const char * atcf_gen_reg_exp = "atcf_gen";
 
 // ATCF file name regular expression 
-static const char * atcf_reg_exp = ".dat$";
+static const char * atcf_reg_exp = ".dat";
 
 // Default configuration file name
 static const char * default_config_filename =
