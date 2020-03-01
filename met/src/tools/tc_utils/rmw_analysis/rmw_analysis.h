@@ -44,6 +44,7 @@ using namespace netCDF;
 #include "rmw_analysis_conf_info.h"
 
 #include "vx_util.h"
+#include "vx_tc_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -128,6 +129,8 @@ static vector<DataCube*> data_stdevs;
 static vector<DataCube*> data_mins;
 static vector<DataCube*> data_maxs;
 
+// Track information
+static TrackInfoArray adeck_tracks;
 static StringArray    adeck_source, adeck_model_suffix;
 
 #endif  //  __RMW_ANALYSIS_H__

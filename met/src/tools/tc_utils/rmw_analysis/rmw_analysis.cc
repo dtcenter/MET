@@ -51,6 +51,7 @@ static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static bool is_keeper(const ATCFLineBase*);
 static void filter_tracks(TrackInfoArray&);
+static void read_nc_tracks(const NcFile*);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -376,6 +377,9 @@ void process_files() {
         track_point_dim = get_nc_dim(nc_in, "track_point");
         mlog << Debug(1) << "Number of track points "
              << n_track_point << "\n";
+
+        // Read track information
+        read_nc_tracks(nc_in);
 
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
             NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
@@ -704,6 +708,12 @@ void filter_tracks(TrackInfoArray& tracks) {
         // Retain track
         tracks.add(t[i]);
     }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_nc_tracks(const NcFile*) {
+
 }
 
 ////////////////////////////////////////////////////////////////////////
