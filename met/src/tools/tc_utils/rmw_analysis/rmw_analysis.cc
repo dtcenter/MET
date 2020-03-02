@@ -51,7 +51,7 @@ static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static bool is_keeper(const ATCFLineBase*);
 static void filter_tracks(TrackInfoArray&);
-static void read_nc_tracks(const NcFile*);
+static void read_nc_tracks(NcFile*);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -712,8 +712,30 @@ void filter_tracks(TrackInfoArray& tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_nc_tracks(const NcFile*) {
+void read_nc_tracks(NcFile* nc_in) {
 
+    NcDim track_line_dim;
+
+    get_dim(nc_in, "track_line", n_track_line, true);
+
+    mlog << Debug(3) << "Number of track lines "
+         << n_track_line << "\n";
+
+    NcVar track_lines_var = get_nc_var(nc_in, "TrackLines");
+
+    vector<size_t> counts;
+    vector<size_t> offsets;
+
+    for(int i = 0; i < n_track_line; i++) {
+        offsets.clear();
+        offsets.push_back(i);
+        counts.clear();
+        counts.push_back(1);
+
+        char* str;
+        track_lines_var.getVar(offsets, counts, &str);
+        mlog << Debug(3) << str << "\n";
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -106,6 +106,7 @@ static int n_range;
 static int n_azimuth;
 static int n_level;
 static int n_track_point;
+static int n_track_line;
 
 vector<double> range_coord;
 vector<double> azimuth_coord;
