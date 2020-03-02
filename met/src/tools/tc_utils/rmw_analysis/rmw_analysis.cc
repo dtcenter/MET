@@ -714,8 +714,9 @@ void filter_tracks(TrackInfoArray& tracks) {
 
 void read_nc_tracks(NcFile* nc_in) {
 
-    NcDim track_line_dim;
+    adeck_tracks.clear();
 
+    NcDim track_line_dim;
     get_dim(nc_in, "track_line", n_track_line, true);
 
     mlog << Debug(3) << "Number of track lines "
@@ -732,9 +733,14 @@ void read_nc_tracks(NcFile* nc_in) {
         counts.clear();
         counts.push_back(1);
 
-        char* str;
-        track_lines_var.getVar(offsets, counts, &str);
-        mlog << Debug(3) << str << "\n";
+        char* track_line_str;
+        track_lines_var.getVar(offsets, counts, &track_line_str);
+        ConcatString track_line(track_line_str);
+        mlog << Debug(3) << track_line << "\n";
+
+        ATCFTrackLine line;
+        // if(!is_keeper(&line)) continue;
+        // tracks.add(line, true, false);
     }
 }
 
