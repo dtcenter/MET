@@ -83,11 +83,10 @@ oper_genesis = {
 // settings.
 //
 filter = [
-  { desc = "ALL"; },
-  { desc = "AL_BASIN"; basin = [ "AL" ]; },
-  { desc = "EP_BASIN"; basin = [ "EP" ]; },
-  { desc = "ALL_3DAY"; genesis_window = { beg = -3*24; end = 3*24; } },
-  { desc = "ALL_5DAY"; genesis_window = { beg = -5*24; end = 5*24; } }
+  { desc = "3DAY_300KM"; genesis_window = { beg = -3*24; end = 3*24; }; genesis_radius = 300; },
+  { desc = "3DAY_600KM"; genesis_window = { beg = -3*24; end = 3*24; }; genesis_radius = 600; },
+  { desc = "5DAY_300KM"; genesis_window = { beg = -5*24; end = 5*24; }; genesis_radius = 300; },
+  { desc = "5DAY_600KM"; genesis_window = { beg = -5*24; end = 5*24; }; genesis_radius = 600; }
 ];
 
 //
@@ -97,57 +96,45 @@ desc = "NA";
 
 //
 // Forecast ATCF ID's
-// If empty, all non-BEST track ATCF ID's found will be processed.
-// Statistics will be generated separately for each amodel entry.
+// If empty, all ATCF ID's found will be processed.
+// Statistics will be generated separately for each ATCF ID.
 //
 model = [];
 
 //
-// Storm identifiers
+// BEST and operational track storm identifiers
 //
 storm_id = [];
 
 //
-// Basins
-//
-basin = [];
-
-//
-// Cyclone numbers
-//
-cyclone = [];
-
-//
-// Storm names
+// BEST and operational track storm names
 //
 storm_name = [];
 
 //
-// Model initialization time windows to include or exclude
+// Forecast and operational initialization time window
 //
 init_beg = "";
 init_end = "";
-init_inc = [];
-init_exc = [];
 
 //
-// Valid model time window
+// Forecast, BEST, and operational valid time window
 //
 valid_beg = "";
 valid_end = "";
 
 //
-// Model initialization hours
+// Forecast and operational initialization hours
 //
 init_hour = [];
 
 //
-// Model lead times in hours
+// Forecast and operational lead times in hours
 //
 lead = [];
 
 //
-// Spatial masking region (polyline, named grid, or path to gridded data file)
+// Spatial masking region (path to gridded data file or polyline file)
 //
 vx_mask = "";
 
@@ -157,14 +144,17 @@ vx_mask = "";
 dland_thresh = NA;
 
 //
-// Genesis matching time window, in hours relative to the model genesis time
+// Genesis matching time window, in hours relative to the forecast genesis time
 //
-genesis_window = { beg = -24; end = 24; }
+genesis_window = {
+   beg = -24;
+   end =  24;
+}
 
 //
 // Genesis matching search radius in km.
 //
-genesis_radius = 600;
+genesis_radius = 300;
 
 ////////////////////////////////////////////////////////////////////////////////
 //

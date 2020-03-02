@@ -254,12 +254,12 @@ void process_genesis() {
       // Loop through and process the genesis event pairs
       for(j=0,it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++,j++) {
          mlog << Debug(2)
-              << "[Filter " << i+1 << ": Model " << j+1 << "] "
-              << "For " << it->first << " model, comparing "
-              << it->second.n() << " genesis forecasts to "
-              << best_ga.n() << " " << conf_info.BestEventInfo.Technique
-              << " and " << oper_ga.n() << " "
-              << conf_info.OperEventInfo.Technique
+              << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+              << ") " << ": Model " << j+1 << "] " << "For " << it->first
+              << " model, comparing " << it->second.n()
+              << " genesis forecasts to " << best_ga.n() << " "
+              << conf_info.BestEventInfo.Technique << " and "
+              << oper_ga.n() << " " << conf_info.OperEventInfo.Technique
               << " genesis events.\n";
          process_genesis_pair(i, it->first, it->second,
                               best_ga, oper_ga, cur_info);
