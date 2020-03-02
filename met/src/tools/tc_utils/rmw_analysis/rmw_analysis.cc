@@ -381,6 +381,9 @@ void process_files() {
         // Read track information
         read_nc_tracks(nc_in);
 
+        // Filter tracks
+        filter_tracks(adeck_tracks);
+
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
             NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
             mlog << Debug(2) << "Processing "
