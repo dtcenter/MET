@@ -141,7 +141,9 @@ class GridStatVxOpt {
       VarInfo *        obs_info;         // obs VarInfo pointer (allocated)
 
       ConcatString     desc;             // Description string
-      ConcatString     var_str;          // nc_pairs_var_str string
+      ConcatString     var_name;         // nc_pairs_var_name string
+      ConcatString     var_suffix;       // nc_pairs_var_suffix string
+                                         // nc_pairs_var_str is deprecated
 
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds

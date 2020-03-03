@@ -1534,21 +1534,39 @@ nc_pairs_flag = {
 }
 
 //
-// The "nc_pairs_var_str" entry specifies a string for each verification task
+// The "nc_pairs_var_name" entry specifies a string for each verification task
 // in Grid-Stat. This string is parsed from each "obs.field" dictionary entry
-// and is used to customize the variable names written to the NetCDF matched
-// pairs output file. The default is an empty string, meaning that no
-// customization is applied to the output variable names. When the Grid-Stat
-// config file contains two fields with the same name and level value, this
-// entry is used to make the resulting variable names unique.
-// e.g. nc_pairs_var_str = "MIN";
+// and is used to construct variable names for the NetCDF matched pairs output
+// file. The default value of an empty string indicates that the "name" and
+// "level" strings of the input data should be used.  If the input data "level"
+// string changes for each run of Grid-Stat, using this option to define a
+// constant string may make downstream processing more convenient.
 //
-nc_pairs_var_str = "";
+// e.g. nc_pairs_var_name = "TMP";
+//
+nc_pairs_var_name = "";
+
+//
+// The "nc_pairs_var_suffix" entry is similar to the "nc_pairs_var_name" entry
+// described above.  It is also parsed from each "obs.field" dictionary entry.
+// However, it defines a suffix to be appended to the output variable name.
+// This enables the output variable names to be made unique. For example, when
+// verifying height for multiple level types but all with the same level value,
+// use this option to customize the output variable names.
+//
+// e.g. nc_pairs_var_suffix = "TROPO"; (for the tropopause height)
+//      nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
+//
+// NOTE: This option was previously named "nc_pairs_var_str", which is
+//       now deprecated.
+//
+nc_pairs_var_suffix = "";
 
 //
 // The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 // indicating whether a PostScript plot should be generated summarizing
 // the verification.
+//
 ps_plot_flag = TRUE;
 
 //

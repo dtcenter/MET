@@ -637,18 +637,21 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 //
 // Grid-Stat specific parameter key names
 //
-static const char conf_key_nc_pairs_var_str[]  = "nc_pairs_var_str";
-static const char conf_key_fourier[]           = "fourier";
-static const char conf_key_wave_1d_beg[]       = "wave_1d_beg";
-static const char conf_key_wave_1d_end[]       = "wave_1d_end";
-static const char conf_key_gradient[]          = "gradient";
-static const char conf_key_dx[]                = "dx";
-static const char conf_key_dy[]                = "dy";
-static const char conf_key_distance_map[]      = "distance_map";
-static const char conf_key_baddeley_p[]        = "baddeley_p";
-static const char conf_key_baddeley_max_dist[] = "baddeley_max_dist";
-static const char conf_key_fom_alpha[]         = "fom_alpha";
-static const char conf_key_zhu_weight[]        = "zhu_weight";
+static const char conf_key_nc_pairs_var_name[]   = "nc_pairs_var_name";
+static const char conf_key_nc_pairs_var_suffix[] = "nc_pairs_var_suffix";
+// nc_pairs_var_str is deprecated and replaced by nc_pairs_var_suffix
+static const char conf_key_nc_pairs_var_str[]    = "nc_pairs_var_str";
+static const char conf_key_fourier[]             = "fourier";
+static const char conf_key_wave_1d_beg[]         = "wave_1d_beg";
+static const char conf_key_wave_1d_end[]         = "wave_1d_end";
+static const char conf_key_gradient[]            = "gradient";
+static const char conf_key_dx[]                  = "dx";
+static const char conf_key_dy[]                  = "dy";
+static const char conf_key_distance_map[]        = "distance_map";
+static const char conf_key_baddeley_p[]          = "baddeley_p";
+static const char conf_key_baddeley_max_dist[]   = "baddeley_max_dist";
+static const char conf_key_fom_alpha[]           = "fom_alpha";
+static const char conf_key_zhu_weight[]          = "zhu_weight";
 
 //
 // Wavelet-Stat specific parameter key names
