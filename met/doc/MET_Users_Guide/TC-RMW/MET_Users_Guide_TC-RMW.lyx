@@ -90,7 +90,7 @@ name "chap:TC-RMW-tool"
 Introduction
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:TC_Introduction"
+name "sec:TC-RMW_Introduction"
 
 \end_inset
 
@@ -100,6 +100,10 @@ name "sec:TC_Introduction"
 \begin_layout Standard
 
 \series medium
+The TC-RMW tool regrids tropical cyclone model data onto a
+ moving range-azimuth grid centered on points along the storm track.
+The radial grid spacing may be set
+ as a factor of the radius of maximum winds (RMW).
 \end_layout
 
 \begin_layout Section
@@ -132,7 +136,19 @@ name "sec:TC_Practical-information"
 \begin_layout Standard
 
 \series medium
-This section briefly describes how to run tc_rmw.
+The following sections describe the usage statement, required arguments,
+ and optional arguments for
+\series bold
+ tc_rmw
+\series default
+.
+\end_layout
+
+\begin_layout LyX-Code
+\series bold
+Usage:
+\series default
+ tc_rmw
 \end_layout
 
 \end_body
