@@ -55,7 +55,7 @@ C --------------------------------------------------------------------
      & (H10E5=100000.E0
      &, EPSQ=2.E-12
      &, G=9.8E0,CP=1004.6E0,CAPA=0.28589641E0,ROG=287.04/G)
-        PARAMETER (NLEV=100)
+        PARAMETER (NLEV=256)
         DIMENSION Z(NLEV),U(NLEV),V(NLEV),TH(NLEV),Q(NLEV),
      &            P(NLEV),T(NLEV)
 
