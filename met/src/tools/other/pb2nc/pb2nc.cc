@@ -168,11 +168,11 @@ static float static_dummy_201[MAX_CAPE_LEVEL+1];
 
 #define ROG             287.04
 #define MAX_PBL         5000
-#define MAX_PBL_LEVEL   100
+#define MAX_PBL_LEVEL   256
 #define PBL_DEBUG_LEVEL 8
 static bool IGNORE_Q_PBL = true;
 static bool IGNORE_Z_PBL = true;
-static bool USE_LOG_INTERPOLATION = false;
+static bool USE_LOG_INTERPOLATION = true;
 static float pbl_data_pres[MAX_PBL_LEVEL];  // mb
 static float pbl_data_temp[MAX_PBL_LEVEL];  // Kelvin
 static float pbl_data_spfh[MAX_PBL_LEVEL];  // ? / 1,000,000
@@ -1777,6 +1777,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[3]   = 0;                                  // AIRNOW obs at surface
                   quality_mark = bufr_obs_extra[lv][1];
                   // Convert a special number (1e+11) to NA at addObservation
+                  if(conf_info.quality_mark_thresh < quality_mark) continue;
                }
                else {
                   // Retain the pressure in hPa for each observation record
