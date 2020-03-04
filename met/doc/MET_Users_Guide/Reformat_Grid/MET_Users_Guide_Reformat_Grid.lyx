@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -1668,8 +1674,6 @@ This section contains a description of running the regrid_data_plane tool.
  This tool may be run to read data from any gridded file MET supports (i.e
  GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a user-specified
  grid, and write the field(s) out in NetCDF format.
- In addition, regrid_data_plane can read GOES-16/17 input files in NetCDF
- format.
  The user may specify the method of interpolation used for regridding as
  well as which fields to regrid.
  This tool is particularly useful when dealing with GRIB2 and NetCDF input
@@ -1784,22 +1788,6 @@ hskip 0.5in}
 
 \end_inset
 
-[-qc flags]
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-method type] 
 \end_layout
 
@@ -1881,22 +1869,6 @@ hskip 0.5in}
 \end_inset
 
 [-vld_thresh n] 
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-[-adp adp_file_name]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2035,20 +2007,10 @@ Optional arguments for regrid_data_plane
 \series default
 The 
 \series bold
--qc flags
+-method type
 \series default
- option specifies a comma-separated list of QC flags, for example "0,1"
- for GOES-16 and GOES-17 data.
- This option is only applied if the variable's grid_mapping attribute is
- 
-\begin_inset Quotes eld
-\end_inset
-
-goes_imager_projection
-\begin_inset Quotes erd
-\end_inset
-
- and the associated QC variable exists.
+ option overrides the default regridding method.
+ Default is NEAREST.
 \end_layout
 
 \begin_layout Description
@@ -2059,10 +2021,12 @@ goes_imager_projection
 \series default
 The 
 \series bold
--method type
+-width n
 \series default
- option overrides the default regridding method.
- Default is NEAREST.
+ option overrides the default regridding width.
+ Default is 1.
+ In case of MAXGAUSS method, the width should be the ratio between from_grid
+ and to_grid (for example, 27 if from_grid is 3km and to_grid is 81.271km)
 \end_layout
 
 \begin_layout Description
@@ -2073,10 +2037,11 @@ The
 \series default
 The 
 \series bold
--width n
+-gaussian_dx
 \series default
- option overrides the default regridding width.
- Default is 1.
+ option overrides the default delta distance for Gaussian smoothing.
+ Default is 81.271.
+ Ignored if not GAUSSIAN or MAXGAUSS methods.
 \end_layout
 
 \begin_layout Description
@@ -2087,30 +2052,17 @@ The
 \series default
 The 
 \series bold
--gaussian_dx
+-gaussian_radius
 \series default
- option overrides the default delta distance for Gaussian smoothing.
- Default is 81.271.
+ option overrides the default radius of influence for Gaussian interpolation.
+ Default is 120.
+ Ignored if not GAUSSIAN or MAXGAUSS methods.
 \end_layout
 
 \begin_layout Description
 
 \series medium
 9.
- 
-\series default
-The 
-\series bold
--gaussian_radius
-\series default
- option overrides the default radius of influence for Gaussian interpolation.
- Default is 120.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-10.
  
 \series default
 The 
@@ -2124,7 +2076,7 @@ The
 \begin_layout Description
 
 \series medium
-11.
+10.
  
 \series default
 The 
@@ -2139,41 +2091,7 @@ The
 \begin_layout Description
 
 \series medium
-12.
- 
-\series default
-The 
-\series bold
--adp adp_file_name
-\series default
- option provides additional ADP (Aerosol Detection Product) information
- on aerosols, dust, and smoke.
- This option is ignored if the requested varaible is not AOD (
-\begin_inset Quotes eld
-\end_inset
-
-AOD_Dust
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-AOD_Smoke
-\begin_inset Quotes erd
-\end_inset
-
-).
- The regrided data is filtered by the presence of dust/smoke.
- If -qc options is given, it's applied to QC of dust/smoke, too (First filtering
- with AOD QC values and the second filtering with dust/smoke QC values).
-\end_layout
-
-\begin_layout Description
-
-\series medium
-13.
+11.
  
 \series default
 The 
@@ -2187,7 +2105,7 @@ The
 \begin_layout Description
 
 \series medium
-14.
+12.
  The 
 \series bold
 -log file
@@ -2206,7 +2124,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-15.
+13.
  The 
 \series bold
 -v level
@@ -2232,7 +2150,7 @@ level
 \begin_layout Description
 
 \series medium
-16.
+14.
 
 \series default
  The 
@@ -2361,70 +2279,6 @@ regridded.nc
 \series default
 will include 6-hour accumulated precipitation, 2m temperature, 10m U and
  V components of the wind, and the 500mb geopotential height.
-\end_layout
-
-\begin_layout Standard
-For the GOES-16 and GOES-17 data, the computing lat/long is time consuming.
- So the computed coordinate (lat/long) is saved into the NetCDF file to
- the environment variable MET_TMP_DIR or /tmp if MET_TMP_DIR is not defined.
- The computing lat/long step can be skipped if the coordinate file is given
- through the environment variable MET_GEOSTATIONARY_DATA.
- 
-\series medium
-An example of call regrid_data_plane to process GOES-16 AOD data is shown
- below:
-\end_layout
-
-\begin_layout LyX-Code
-regrid_data_plane 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
-OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc
- 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
-G212 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
-regrid_data_plane_GOES-16_AOD_TO_G212.nc 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
--field 'name="AOD"; level="(*,*)";' 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
--qc 0,1,2
-\end_layout
-
-\begin_layout LyX-Code
--method MAX -v 1
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-When processing GOES-16 data, the 
-\series bold
--qc
-\series medium
- option may also be used to specify the acceptable quality control flag
- values.
- The example above regrids the GOES-16 AOD values to NCEP Grid number 212,
- writing to the output the maximum AOD value falling inside each grid box.
 \end_layout
 
 \begin_layout Subsection
