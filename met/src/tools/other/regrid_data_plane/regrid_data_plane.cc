@@ -489,7 +489,7 @@ void usage() {
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
         << "\t\t\tThe width should be the ratio of dx between from_grid and to_grid for MAXGAUSS.\n"
-        << "\t\t\tFor example, width=" << nint(RGInfo.gaussian.dx / 3) " if the from_grid is 3 km and to_grid is "
+        << "\t\t\tFor example, width=" << nint(RGInfo.gaussian.dx / 3) << " if the from_grid is 3 km and to_grid is "
         << RGInfo.gaussian.dx << "km.\n"
 
         << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
