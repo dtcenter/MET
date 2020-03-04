@@ -70,8 +70,6 @@ static StringArray FieldSA;
 static RegridInfo RGInfo;
 static StringArray VarNameSA;
 static int compress_level = -1;
-static bool opt_override_method = false;
-static bool opt_override_width = false;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -490,6 +488,9 @@ void usage() {
 
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
+        << "\t\t\tThe width should be the ratio of dx between from_grid and to_grid for MAXGAUSS.\n"
+        << "\t\t\tFor example, width=" << nint(RGInfo.gaussian.dx / 3) " if the from_grid is 3 km and to_grid is "
+        << RGInfo.gaussian.dx << "km.\n"
 
         << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"
@@ -529,7 +530,6 @@ void set_field(const StringArray &a) {
 
 void set_method(const StringArray &a) {
    RGInfo.method = string_to_interpmthd(a[0].c_str());
-   opt_override_method = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -541,7 +541,6 @@ void set_gaussian_dx(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
-   opt_override_width = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
