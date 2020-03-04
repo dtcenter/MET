@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -5675,6 +5681,11 @@ Point2Grid tool
 The Point2Grid tool takes point observations from a NetCDF output file from
  one of the four previously mentioned MET tools (ascii2nc, madis2nc, pb2nc,
  lidar2nc) and creates a gridded NetCDF gridded file.
+ The other point observations are 
+\series medium
+GOES-16/17 input files in NetCDF format
+\series default
+ (especially, Aersol Optical Depth.
  Future development will include support for reading input files not produced
  from MET tools.
 \end_layout
@@ -5870,7 +5881,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-obs_thresh n]
+[-prob_cat_thresh n]
 \end_layout
 
 \begin_layout LyX-Code
@@ -5971,6 +5982,7 @@ input_filename
  argument indicates the name of the input NetCDF file to be processed.
  Currently, only NetCDF files produced from the ascii2nc, madis2nc, pb2nc,
  and lidar2nc are supported.
+ And AOD dataset from GOES16/17 are supported, too.
  Support for additional file types will be added in future releases.
 \end_layout
 
@@ -5993,6 +6005,27 @@ input_filename
 4.
  The -field string argument is a string that defines the data to be regridded.
  It may be used multiple times.
+ If -adp option is given (for AOD data from GOES16/17), the name consists
+ with the variable name from the input data file and the variable name from
+ ADP data file (for example, 
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Smoke
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Dust
+\begin_inset Quotes erd
+\end_inset
+
+: getting AOD variable from the input data and applying smoke or dust variable
+ from ADP data file).
+ 
 \end_layout
 
 \begin_layout Standard
@@ -6012,8 +6045,12 @@ Optional arguments for point2grid
 
 \begin_layout Description
 6.
- The -qc flags option specifies a comma-separated list of quality control
- (QC) flags, for example 
+ The 
+\series bold
+-qc
+\series default
+ flags option specifies a comma-separated list of quality control (QC) flags,
+ for example 
 \begin_inset Quotes eld
 \end_inset
 
@@ -6035,56 +6072,103 @@ goes_imager_projection
 
 \begin_layout Description
 7.
- The -adp option specifies the Aerosol Detect Products (ADP) input data
- for Aersol Optical Depth (AOD) dataset (must be from GOES16/17 otherwise
- this option is ignored).
+ The 
+\series bold
+-adp adp_file_name
+\series default
+ option provides an additional Aerosol Detection Product (ADP) information
+ on aerosols, dust, and smoke.
+ This option is ignored if the requested varaible is not AOD (
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Dust
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+AOD_Smoke
+\begin_inset Quotes erd
+\end_inset
+
+) from GOES16/17.
+ The grided data is filtered by the presence of dust/smoke.
+ If -qc options is given, it's applied to QC of dust/smoke, too (First filtering
+ with AOD QC values and the second filtering with dust/smoke QC values).
 \end_layout
 
 \begin_layout Description
 8.
- The -method type option specifies the regridding method.
+ The 
+\series bold
+-method type
+\series default
+ option specifies the regridding method.
  The default method is UW_MEAN.
 \end_layout
 
 \begin_layout Description
 9.
- The -gaussian_dx n option defines the 
+ The 
+\series bold
+-gaussian_dx n
+\series default
+ option defines the 
 \series medium
 distance interval for Gaussian smoothing.
- 8.
  
 \series default
 The default is 81.271 km.
+ Ignored if the method is not GAUSSIAN.
 \end_layout
 
 \begin_layout Description
 10.
- The -gaussain_radius n option defines the
+ The 
+\series bold
+-gaussain_radius n
+\series default
+ option defines the
 \series medium
  
 \series default
 radius of influence for Gaussian interpolation.
  The default is 120.
+ Ignored if the method is not GAUSSIAN.
 \end_layout
 
 \begin_layout Description
 11.
- The -obs_thresh n option sets the observation value to compute the probability
- of occurrence.
+ The 
+\series bold
+-prob_cat_thresh n
+\series default
+ option sets the threshold to compute the probability of occurrence.
  The default is set to disabled.
  This option is relevant when calculating practically perfect forecasts.
 \end_layout
 
 \begin_layout Description
 12.
- The -vld_thresh n option sets the required ratio of valid data for regridding.
+ The 
+\series bold
+-vld_thresh n
+\series default
+ option sets the required ratio of valid data for regridding.
  The default is 0.5.
 \end_layout
 
 \begin_layout Description
 13.
- The -name list option specifies a comma-separated list of output variable
- names for reach field specified.
+ The 
+\series bold
+-name list
+\series default
+ option specifies a comma-separated list of output variable names for reach
+ field specified.
  
 \end_layout
 
@@ -6163,6 +6247,70 @@ level
 n.
 \end_layout
 
+\begin_layout Standard
+For the GOES-16 and GOES-17 data, the computing lat/long is time consuming.
+ So the computed coordinate (lat/long) is saved into the NetCDF file to
+ the environment variable MET_TMP_DIR or /tmp if MET_TMP_DIR is not defined.
+ The computing lat/long step can be skipped if the coordinate file is given
+ through the environment variable MET_GEOSTATIONARY_DATA.
+ 
+\series medium
+An example of call point2grid to process GOES-16 AOD data is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+point2grid 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+G212 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+regrid_data_plane_GOES-16_AOD_TO_G212.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-field 'name="AOD"; level="(*,*)";' 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-qc 0,1,2
+\end_layout
+
+\begin_layout LyX-Code
+-method MAX -v 1
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When processing GOES-16 data, the 
+\series bold
+-qc
+\series medium
+ option may also be used to specify the acceptable quality control flag
+ values.
+ The example above regrids the GOES-16 AOD values to NCEP Grid number 212
+ (which QC flags are high, mediun, and low), writing to the output the maximum
+ AOD value falling inside each grid box.
+\end_layout
+
 \begin_layout Subsection
 point2grid output
 \end_layout
@@ -6222,7 +6370,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 \begin_layout Standard
 6.
  The probability field which is the probability of the event defined by
- the line option -obs_thresh n occurring.
+ the line option -prob_cat_thresh n occurring.
  Ranges from 0 to 1.
  
 \end_layout
