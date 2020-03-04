@@ -26,6 +26,8 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_cts.txt</stat>
     </output>
   </test>
 
