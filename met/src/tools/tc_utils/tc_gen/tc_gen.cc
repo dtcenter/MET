@@ -675,6 +675,7 @@ void setup_txt_files(int n_model) {
          n_rows = 1 + n_model * conf_info.n_vx();
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
+         setup_table(txt_at[i]);
 
          // Write header row
          write_header_row(txt_columns[i], n_txt_columns[i], 1,
