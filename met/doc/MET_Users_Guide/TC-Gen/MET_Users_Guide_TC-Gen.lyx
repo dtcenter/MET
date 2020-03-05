@@ -1401,7 +1401,7 @@ tc_gen_cts.txt
 \end_inset
 
 .
- The contents of these output files are described in 
+ The contents of these output files are described in section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:point_stat-output"
@@ -1413,14 +1413,14 @@ reference "subsec:point_stat-output"
 
 \begin_layout Standard
 Like all STAT output, the output of TC-Gen may be further processed using
- the 
+ the Stat-Analysis tool, described in chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "chap:The-Stat-Analysis-Tool"
 
 \end_inset
 
- tool.
+.
 \end_layout
 
 \end_body
