@@ -1421,13 +1421,6 @@ reference "chap:The-Stat-Analysis-Tool"
 \end_inset
 
  tool.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:The-Stat-Analysis-Tool"
-
-\end_inset
-
-
 \end_layout
 
 \end_body
