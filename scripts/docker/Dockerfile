@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7/
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
@@ -165,7 +165,7 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && ./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python \
     MET_FREETYPEINC=/usr/include/freetype2 MET_FREETYPELIB=/usr/lib \
     MET_CAIROINC=/usr/include/cairo MET_CAIROLIB=/usr/lib \
-    MET_PYTHON_CC='-I/usr/include/python3.6m' MET_PYTHON_LD='-lpython3.6m' > ${LOG_FILE} \
+    MET_PYTHON_CC='-I/usr/include/python2.7' MET_PYTHON_LD='-lpython2.7' > ${LOG_FILE} \
  && LOG_FILE=/met/MET-${MET_GIT_NAME}/make_install.log \
  && echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
