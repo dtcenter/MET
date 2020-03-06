@@ -1,4 +1,4 @@
-FROM centos:7/
+FROM centos:7
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
