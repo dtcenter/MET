@@ -985,6 +985,7 @@ void process_pbfile(int i_pb) {
    float pbl_qm = bad_data_float;
 
    bool has_pbl_data;
+   bool do_pbl = false;
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
 
@@ -1311,7 +1312,8 @@ void process_pbfile(int i_pb) {
          cape_level = 0;
       }
 
-      if (cal_pbl) {
+      do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
+      if (do_pbl) {
          pbl_level = 0;
       }
 
@@ -1472,7 +1474,7 @@ void process_pbfile(int i_pb) {
                   }
                }
 
-               if (cal_pbl && (pbl_level == 0)) {
+               if (do_pbl && (pbl_level == 0)) {
                   pbl_qm = quality_mark;
                }
             }
@@ -1547,7 +1549,7 @@ void process_pbfile(int i_pb) {
          if (cal_cape) {
             if (cape_member_cnt >= 3) cape_level++;
          }
-         if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
+         if (do_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
 
             // Allocated memory is deleted after all observations are processed
             float *tmp_pqtzuv = new float [mxr8vt];
@@ -1805,7 +1807,7 @@ void process_pbfile(int i_pb) {
          n_total_obs += n_other_total_obs;
       }
 
-      if (cal_pbl) {
+      if (do_pbl) {
          pbl_level = 0;
          is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
                && is_eq(prev_hdr_lat, hdr_lat)
@@ -1858,7 +1860,7 @@ void process_pbfile(int i_pb) {
    } // end for i_read
 
    has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
-   if (cal_pbl && has_pbl_data) {
+   if (do_pbl && has_pbl_data) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                  hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);
