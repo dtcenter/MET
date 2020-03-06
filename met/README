@@ -292,6 +292,9 @@ Version 9.0 BETA4 Release Notes:
    - Stat-Analysis
       - Add support for evaluating point forecast by reading matched pairs via
         python embedding (#1143).
+   - TC-Gen
+      - Fix bug when checking the 'min_duration', refine log messages, and
+        remove filtering options for basin and cyclone (#1127).
 
 Version 9.0 BETA3 Release Notes:
 -------------------------------
