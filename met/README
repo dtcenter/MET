@@ -256,7 +256,7 @@ Version 9.0 BETA4 Release Notes:
 -------------------------------
 
 - What's New:
-   - Major Enhancements: python embedding in stat_analysis, reduce
+   - Major Enhancements: python embedding in Stat-Analysis, reduce
      Series-Analysis memory usage, documentation updates
    - New Tools: None
 
