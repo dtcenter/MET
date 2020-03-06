@@ -51,9 +51,9 @@ RUN yum -y update \
                    flex flex-devel bison bison-devel unzip \
  && yum -y install git g2clib-devel hdf5-devel.x86_64 gsl-devel \
  && yum -y install gv ncview wgrib wgrib2 ImageMagick ps2pdf \
- && yum -y install python3 python3-devel python3-pip \
- && pip3 install --upgrade pip \
- && python3 -m pip install numpy xarray
+ && yum -y install python2 python2-pip python2-devel \
+ && pip install --upgrade pip \
+ && pip install xarray numpy
 
 #
 # Set the working directory.
