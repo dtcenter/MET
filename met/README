@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0 BETA3 (February 7, 2020)
+Model Evaluation Tools version 9.0 BETA4 (March 6, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -251,6 +251,47 @@ Release Notes
 When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
+
+Version 9.0 BETA4 Release Notes:
+-------------------------------
+
+- What's New:
+   - Major Enhancements: python embedding in stat_analysis, reduce
+     Series-Analysis memory usage, documentation updates
+   - New Tools: None
+
+- Bugfixes:
+   - Fix PCP-Combine bug in the handling of bad data for the '-subtract' command
+     (#1255).
+   - Fix Series-Analysis memory allocation logic to dramatically reduce memory
+     usage (#1267).
+   - Fix Grid-Diag bug in the application of the masking regions (#1261).
+   - Fix bug in the handling of some pre-defined NCEP grids (#1253).
+   - Fix inconsistencies for many of the pre-defined NCEP grids (#1254).
+   - Fix segfault when passing as input a thinned lat/lon grid (#1252).
+
+- Enhancements to Existing Tools:
+   - Common Libraries
+      - Add definitions for 51 missing pre-defined NCEP grids (#893).
+      - Refine and simplify the python embedding pickle logic by testing on NOAA
+        machines, Hera and WCOSS (#1264).
+      - For python embedding, rename the constant 'MET_PYTHON_INPUT_FILE' as
+        'MET_PYTHON_INPUT_ARG' (#1260).
+      - Add 'GRIB1_tri' configuration file option to filter GRIB1 records based
+        on the time range indicator value (#1263).
+   - PB2NC
+      - Continue refinement of the PBL derivation to match VSDB values (#1199).
+   - Point-Stat
+      - Enhance the HiRA logic to support CDP threshold types (#1251).
+   - Grid-Stat
+      - Add an 'nc_pairs_var_name' configuration file option to explicitly
+        define the NetCDF matched pairs output variable names (#1271).
+   - Ensemble-Stat and Point-Stat
+      - Rename the 'rps_thresh' configuration file option to 'prob_cat_thresh'
+        for consistency with future development plans (#1262).
+   - Stat-Analysis
+      - Add support for evaluating point forecast by reading matched pairs via
+        python embedding (#1143).
 
 Version 9.0 BETA3 Release Notes:
 -------------------------------
