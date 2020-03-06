@@ -775,109 +775,20 @@ https://dtcenter.org/community-code/model-evaluation-tools-met/user-support
 ).
  Plans are also in place to incorporate many new capabilities and options
  in future releases of MET.
- Some of the planned additions are listed below.
+ Please refer to the issues listed in the MET GitHub repository (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/NCAR/MET/issues
 \end_layout
 
-\begin_layout Standard
-Additional statistical capabilities
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Additional spatial forecast verification methods 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Additional hurricane verification fields and methods
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Enhanced support for time series verification
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Additional methods for verification of climate and seasonal forecasts
-\end_layout
-
-\begin_layout Standard
-Additional analysis capabilities and plotting routines
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Post to the MET website sample analysis and plotting routines that may include
-\series default
-
-\begin_inset Separator latexpar
 \end_inset
 
-
+) to see our development priorities for upcoming releases.
 \end_layout
 
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Boxplots
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Discrimination plots
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Reliability diagrams
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Scatter/density plots
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Color-fill/contour maps of statistics
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Height series
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Histograms
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Taylor diagrams
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Performance diagrams
-\end_layout
-
-\end_deeper
 \begin_layout Section
 Code support
 \begin_inset CommandInset label
