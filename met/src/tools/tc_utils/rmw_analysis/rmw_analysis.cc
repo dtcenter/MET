@@ -717,6 +717,11 @@ void filter_tracks(TrackInfoArray& tracks) {
 
 void read_nc_tracks(NcFile* nc_in) {
 
+    mlog << Debug(3) << adeck_source[0] << "\n";
+
+    ofstream f;
+    f.open(adeck_source[0].c_str());
+
     adeck_tracks.clear();
 
     NcDim track_line_dim;
@@ -741,9 +746,10 @@ void read_nc_tracks(NcFile* nc_in) {
         ConcatString track_line(track_line_str);
         mlog << Debug(3) << track_line << "\n";
 
-        ATCFTrackLine line;
+        // ATCFTrackLine line;
         // if(!is_keeper(&line)) continue;
         // tracks.add(line, true, false);
+        f << track_line;
     }
 }
 
