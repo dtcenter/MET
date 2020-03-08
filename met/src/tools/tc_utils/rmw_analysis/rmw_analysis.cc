@@ -751,6 +751,7 @@ void read_nc_tracks(NcFile* nc_in) {
         // tracks.add(line, true, false);
         f << track_line;
     }
+    f.close();
 }
 
 ////////////////////////////////////////////////////////////////////////
