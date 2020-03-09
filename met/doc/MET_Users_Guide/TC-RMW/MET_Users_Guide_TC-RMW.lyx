@@ -115,7 +115,18 @@ The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth
 Practical information
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:TC_Practical-information"
+name "sec:TC-RMW_Practical-information"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+tc_rmw usage
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:tc_pairs-usage"
 
 \end_inset
 
@@ -181,6 +192,15 @@ Required arguments for tc_rmw
 1.
  The 
 \series bold
+-data source
+\series default
+ 
+\end_layout
+
+\begin_layout Description
+2.
+ The 
+\series bold
 -adeck source
 \series default
  
@@ -191,7 +211,7 @@ argument indicates the adeck ATCF format data source containing tropical
 \end_layout
 
 \begin_layout Description
-2.
+3.
  The 
 \series bold
 -config file
@@ -202,8 +222,54 @@ argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Description
 
+\series bold
+\bar under
+Optional arguments for tc_pairs
+\end_layout
+
+\begin_layout Description
+5.
+ The 
+\series bold
+-out 
+\series medium
+argument indicates the name of the output file.
+\end_layout
+
+\begin_layout Description
+6.
+ The 
+\series bold
+-log file
+\series default
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as standard out and error.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+7.
+ The 
+\series bold
+-v level
+\series default
+ option indicates the desired level of verbosity.
+ The contents of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
 \end_body
