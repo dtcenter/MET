@@ -99,8 +99,6 @@ void usage() {
          << "\t-data file_1 ... file_n | data_file_list\n"
          << "\t-adeck file\n"
          << "\t-config file\n"
-         << "\t[-bdeck file]\n"
-         << "\t[-ddeck file]\n"
          << "\t[-log file]\n"
          << "\t[-out file]\n"
          << "\t[-v level]\n\n" << flush;
