@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -100,26 +106,9 @@ name "sec:TC-RMW_Introduction"
 \begin_layout Standard
 
 \series medium
-The TC-RMW tool regrids tropical cyclone model data onto a
- moving range-azimuth grid centered on points along the storm track.
-The radial grid spacing may be set
- as a factor of the radius of maximum winds (RMW).
-\end_layout
-
-\begin_layout Section
-Input/output format
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:TC_Input/output-format"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\series medium
+The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth
+ grid centered on points along the storm track.The radial grid spacing may
+ be set as a factor of the radius of maximum winds (RMW).
 \end_layout
 
 \begin_layout Section
@@ -145,10 +134,76 @@ The following sections describe the usage statement, required arguments,
 \end_layout
 
 \begin_layout LyX-Code
+
 \series bold
 Usage:
 \series default
  tc_rmw
+\end_layout
+
+\begin_layout LyX-Code
+-data file_1 ...
+ file_n | data_file_list
+\end_layout
+
+\begin_layout LyX-Code
+-adeck file
+\end_layout
+
+\begin_layout LyX-Code
+-config file
+\end_layout
+
+\begin_layout LyX-Code
+[-out file]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Standard
+tc_rmw has required arguments and can accept several optional arguments.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Required arguments for tc_rmw
+\end_layout
+
+\begin_layout Description
+1.
+ The 
+\series bold
+-adeck source
+\series default
+ 
+\series medium
+argument indicates the adeck ATCF format data source containing tropical
+ cyclone model forecast (output from tracker) data to be verified.
+ It specifies the name of an ATCF format file.
+\end_layout
+
+\begin_layout Description
+2.
+ The 
+\series bold
+-config file
+\series default
+ 
+\series medium
+argument indicates the name of the configuration file to be used.
+ The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \end_body
