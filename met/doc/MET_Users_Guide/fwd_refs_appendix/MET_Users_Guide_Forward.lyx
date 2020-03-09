@@ -144,11 +144,14 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-MET version 9.0 includes some major enhancements, including the transition
- from Python 2 to 3, Python embedding in ASCII2NC and Stat-Analysis, handling
- the user's Python environment, the application of binned climatologies,
+MET version 9.0 includes some major enhancements.
+ For Python embedding, these include the transition from Python 2 to 3,
+ adding support in ASCII2NC and Stat-Analysis, supporting multiple input
+ files in Ensemble-Stat, Series-Analysis, and MTD, supporting Pandas, and
+ handling the user's Python environment.
+ Additional enhancements include the application of binned climatologies,
  the computation of the Ranked Probability Score (RPS) and Distance Map
- (DMAP) output lines types, and the addition of 5 new tools: Grid-Diag,
+ (DMAP) output lines types, and the addition of five new tools: Grid-Diag,
  Point2Grid, TC-Gen, TC-RMW, and RMW-Analysis.
 \end_layout
 

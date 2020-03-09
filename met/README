@@ -255,11 +255,19 @@ describes the bugfix, enhancement, or new feature:
 Version 9.0 Release Notes:
 --------------------------
 
-- What's New:
-   - Major Enhancements: switch from Python 2 to 3, Python embedding in ASCII2NC
-     and Stat-Analysis, handle user's Python environment, binned climatologies,
-     and the new RPS and DMAP line types
-   - New Tools: Grid-Diag, Point2Grid, TC-Gen, TC-RMW, RMW-Analysis
+- Major Enhancements:
+   - Python embedding: switch from Python 2 to 3, added to ASCII2NC and
+     Stat-Analysis, support for multiple input files in Ensemble-Stat,
+     Series-Analysis, and MTD, support for Pandas, handle user's Python
+     environment
+   - Other: binned climatologies and new RPS and DMAP line types
+
+- New Tools:
+   - Grid-Diag
+   - Point2Grid
+   - TC-Gen
+   - TC-RMW
+   - RMW-Analysis
 
 - Output Format Changes:
    - Add new ensemble Ranked Probability Score (RPS) line type to the output of
