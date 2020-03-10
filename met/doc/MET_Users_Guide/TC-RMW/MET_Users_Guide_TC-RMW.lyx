@@ -114,7 +114,9 @@ The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth
 l wind components will be computed.
  Any regridding method available in MET can be used to interpolate data
  on the model output grid to the specified range-azimuth grid.
- 
+ The regridding will be done separately on each vertical level.
+ The model data files must coincide with track points in a user provided
+ ATCF formatted track file.
 \end_layout
 
 \begin_layout Section
@@ -203,7 +205,7 @@ Required arguments for tc_rmw
 \series default
  
 \series bold
-fcst_file_list
+data_file_list
 \series default
  options specify the gridded data files or an ASCII file containing list
  of file names to be used.
@@ -521,6 +523,15 @@ n_range = 100;
 \end_layout
 
 \begin_layout Standard
+The 
+\series bold
+n_range 
+\series default
+parameter is the number of equally spaced range intervals in the range-azimuth
+ grid.
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -536,6 +547,20 @@ height "1pt"
 
 \series bold
 n_azimuth = 180;
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+n_azimuth 
+\series default
+parameter is the number of equally spaced azimuth intervals in the range-azimuth
+ grid.
+ The azimuthal grid spacing is 360 / 
+\series bold
+n_azimuth
+\series default
+ degrees.
 \end_layout
 
 \begin_layout Standard
@@ -557,21 +582,20 @@ max_range_km = 100.0;
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
+The 
 \series bold
-delta_range_km = 1.0;
+max_range_km 
+\series default
+parameter specifies the maximum range of the range-azimuth grid, in kilometers.
+ If this parameter is specified and not
+\series bold
+ rmw_scale
+\series default
+, the radial grid spacing will be 
+\series bold
+max_range_km / n_range
+\series default
+.
 \end_layout
 
 \begin_layout Standard
@@ -592,6 +616,23 @@ height "1pt"
 rmw_scale = 0.2;
 \end_layout
 
+\begin_layout Standard
+The
+\series bold
+ rmw_scale 
+\series default
+parameter overrides the 
+\series bold
+max_range_km 
+\series default
+parameter.
+ When this is set the radial grid spacing will be 
+\series bold
+rmw_scale 
+\series default
+in units of the RMW, which varies along the storm track.
+\end_layout
+
 \begin_layout Subsection
 tc_rmw output file
 \begin_inset CommandInset label
@@ -601,6 +642,10 @@ name "subsec:TC_RMW-output-file"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The NetCDF output file will 
 \end_layout
 
 \end_body
