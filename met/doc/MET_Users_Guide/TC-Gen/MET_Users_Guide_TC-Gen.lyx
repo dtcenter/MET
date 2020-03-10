@@ -102,7 +102,7 @@ name "sec:TC-Gen_Introduction"
 \series medium
 The TC-Gen tool provides verification of tropical cyclone genesis forecasts
  in ATCF file format.
- Producing reliable tropical cyclone genesis foreasts is an important metric
+ Producing reliable tropical cyclone genesis forecasts is an important metric
  for global numerical weather prediction models.
  This tool ingests deterministic model output post-processed by a genesis
  tracking software (e.g.
@@ -118,9 +118,10 @@ hit
 \begin_inset Quotes erd
 \end_inset
 
- forecast is included to give users the ability to condition the critera
+ forecast is included to give users the ability to condition the criteria
  based on model performance and/or conduct sensitivity analyses.
- Practical aspects of the TC-Gen tool are discribed in Section 21.3.
+ Statistical aspects are outlines in Section 21.2 and practical aspects of
+ the TC-Gen tool are described in Section 21.3.
 \end_layout
 
 \begin_layout Section
@@ -162,7 +163,7 @@ This section describes how to configure and run the TC-Gen tool.
  events, classify them, and populate a contingency table with hits, misses,
  and false alarms.
  It writes the categorical counts and statistics to the output file(s).
- The tool can be configured to apply one or more sets of filtering critera
+ The tool can be configured to apply one or more sets of filtering criteria
  in a single run.
  The following sections describe the usage statement, required arguments,
  and optional arguments for 
@@ -454,7 +455,7 @@ Parse the BEST and operational track data and identify observed genesis
 \begin_layout Itemize
 
 \series medium
-Loop over the filters defined in the cofiguration file and apply the following
+Loop over the filters defined in the configuration file and apply the following
  logic for each.
 \end_layout
 
@@ -564,7 +565,7 @@ The
 \series bold
 init_freq
 \series medium
- variable is an integer specifying the model initialization freqency in
+ variable is an integer specifying the model initialization frequency in
  hours, starting at 00Z.
  The default value of 6 indicates that the model is initialized every day
  at 00Z, 06Z, 12Z, and 18Z.
@@ -923,7 +924,7 @@ model
 \series medium
  entry is an array defining the model ATCF ID's for which output should
  be computed.
- If left emtpy, the default setting, output will be computed for each model
+ If left empty, the default setting, output will be computed for each model
  encountered in the data.
  Otherwise, output will be computed only for the ATCF ID's listed.
 \end_layout
@@ -974,7 +975,7 @@ storm_name
  Note that these strings only appear in the BEST and operational tracks,
  not the forecast genesis data.
  Therefore, these filters only apply to the BEST and operational tracks.
- Care should be given when interpreting the contignecy table results for
+ Care should be given when interpreting the contingency table results for
  filtered data.
 \end_layout
 
@@ -1018,11 +1019,11 @@ and
  entries are strings in YYYYMMDD[_HH[MMSS]] format which defining which
  forecast and operational tracks initializations to be processed.
  If left empty, all tracks will be used.
- Otherwise, only those tracks whose intialization time falls within the
+ Otherwise, only those tracks whose initialization time falls within the
  window will be included.
  Note that these settings only apply to the forecast and operational tracks,
  not the BEST tracks, for which the initialization time is undefined.
- Care should be given when interpreting the contignecy table results for
+ Care should be given when interpreting the contingency table results for
  filtered data.
 \end_layout
 
@@ -1113,11 +1114,11 @@ lead
  entries are arrays of strings in HH[MMSS] format defining which forecast
  and operational tracks should be included.
  If left empty, all tracks will be used.
- Otherwise, only those forecast and operational tracks whose intialization
+ Otherwise, only those forecast and operational tracks whose initialization
  hour and lead times appear in the list will be used.
  Note that these settings only apply to the forecast and operational tracks,
  not the BEST tracks, for which the initialization time is undefined.
- Care should be given when interpreting the contignecy table results for
+ Care should be given when interpreting the contingency table results for
  filtered data.
 \end_layout
 
@@ -1379,7 +1380,7 @@ TC-Gen produces output in STAT and, optionally, ASCII format.
 -out
 \series default
  command line argument.
- The deafult output base name, 
+ The default output base name, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1387,7 +1388,7 @@ TC-Gen produces output in STAT and, optionally, ASCII format.
 \begin_inset Quotes erd
 \end_inset
 
- writes output files in the curent working directory named 
+ writes output files in the current working directory named 
 \begin_inset Quotes eld
 \end_inset
 
