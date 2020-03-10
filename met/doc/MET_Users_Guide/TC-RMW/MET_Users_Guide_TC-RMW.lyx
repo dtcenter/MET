@@ -241,7 +241,7 @@ Optional arguments for tc_rmw
 \series bold
 -out 
 \series medium
-argument indicates the name of the netcdf output file.
+argument indicates the name of the NetCDF output file.
 \end_layout
 
 \begin_layout Description
@@ -442,6 +442,46 @@ name = "VGRD";
 }
 \end_layout
 
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid = {
+\end_layout
+
+\begin_layout LyX-Code
+    
+\series bold
+method = NEAREST;
+\end_layout
+
+\begin_layout LyX-Code
+    
+\series bold
+width = 1;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    vld_thresh = 0.5;
+\end_layout
+
+\begin_layout LyX-Code
+    
+\series bold
+shape = SQUARE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
 \begin_layout Standard
 
 \series medium
@@ -466,6 +506,84 @@ height "1pt"
 \end_inset
 
 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+n_range = 100;
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+n_azimuth = 180;
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+max_range_km = 100.0;
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+delta_range_km = 1.0;
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rmw_scale = 0.2;
 \end_layout
 
 \end_body
