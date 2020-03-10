@@ -322,6 +322,126 @@ height "1pt"
 model          = "GFS-FV3";
 \end_layout
 
+\begin_layout LyX-Code
+
+\series bold
+data           = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    field = [
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+{
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+name = "PRMSL";
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+level = ["L0"];
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+},
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+{
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+name = "TMP";
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+level = ["P1000", "P500"];
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+},
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+{
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+name = "UGRD";
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+level = ["P1000", "P500"];
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+},
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+{
+\end_layout
+
+\begin_layout LyX-Code
+           
+\series bold
+name = "VGRD";
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+   level = ["P1000", "P500"];
+\end_layout
+
+\begin_layout LyX-Code
+        
+\series bold
+},
+\end_layout
+
+\begin_layout LyX-Code
+    
+\series bold
+];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
 \begin_layout Standard
 
 \series medium
