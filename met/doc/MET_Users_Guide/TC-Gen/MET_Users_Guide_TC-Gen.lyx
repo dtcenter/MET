@@ -100,8 +100,27 @@ name "sec:TC-Gen_Introduction"
 \begin_layout Standard
 
 \series medium
-The TC-Gen tool ...
- Kathryn will add content.
+The TC-Gen tool provides verification of tropical cyclone genesis forecasts
+ in ATCF file format.
+ Producing reliable tropical cyclone genesis foreasts is an important metric
+ for global numerical weather prediction models.
+ This tool ingests deterministic model output post-processed by a genesis
+ tracking software (e.g.
+ GFDL vortex tracker) and ATCF format reference dataset(s) (e.g.
+ Best Track analysis and CARQ operational tracks) and outputs categorical
+ counts and statistics.
+ The capability to modify the spatial and temporal tolerances that define
+ a 
+\begin_inset Quotes eld
+\end_inset
+
+hit
+\begin_inset Quotes erd
+\end_inset
+
+ forecast is included to give users the ability to condition the critera
+ based on model performance and/or conduct sensitivity analyses.
+ Practical aspects of the TC-Gen tool are discribed in Section 21.3.
 \end_layout
 
 \begin_layout Section
@@ -365,7 +384,7 @@ argument indicates the name of the configuration file to be used.
 
 \series bold
 \bar under
-Optional arguments for tc_pairs
+Optional arguments for tc_gen
 \end_layout
 
 \begin_layout Description
@@ -415,7 +434,7 @@ level
 \begin_layout Standard
 
 \series medium
-The TC-Pairs tool implements the following logic:
+The TC-Gen tool implements the following logic:
 \end_layout
 
 \begin_layout Itemize
