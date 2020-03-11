@@ -645,7 +645,58 @@ name "subsec:TC_RMW-output-file"
 \end_layout
 
 \begin_layout Standard
-The NetCDF output file will 
+The NetCDF output file contains the following dimensions:
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+range 
+\emph default
+- the radial dimension of the range-azimuth grid
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+azimuth 
+\emph default
+- the azimuthal dimension of the range-azimuth grid
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+pressure
+\emph default
+ - if any pressure levels are specified in the data variable list, they
+ will be sorted and combined into a 3D NetCDF variable, which 
+\emph on
+pressure
+\emph default
+ as the vertical dimension and 
+\emph on
+range
+\emph default
+ and 
+\emph on
+azimuth
+\emph default
+ as the horizontal dimensions
+\end_layout
+
+\begin_layout Enumerate
+
+\emph on
+track_point - 
+\emph default
+the track points corresponding to the model output valid times
+\end_layout
+
+\begin_layout Standard
+For each data variable specified in the data variable list, a corresponding
+ NetCDF variable will be created with the same name and units.
+ 
 \end_layout
 
 \end_body
