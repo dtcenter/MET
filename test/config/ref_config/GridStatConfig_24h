@@ -40,15 +40,17 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [];
-cnt_thresh    = [ NA ];
-cnt_logic     = UNION;
-wind_thresh   = [ NA ];
-wind_logic    = UNION;
-eclv_points   = 0.05;
-
+censor_thresh       = [];
+censor_val          = [];
+cat_thresh          = [];
+cnt_thresh          = [ NA ];
+cnt_logic           = UNION;
+wind_thresh         = [ NA ];
+wind_logic          = UNION;
+eclv_points         = 0.05;
+nc_pairs_var_name   = "";
+nc_pairs_var_suffix = "";
+rank_corr_flag      = FALSE;
 //
 // Forecast and observation fields to be verified
 //
@@ -191,7 +193,6 @@ nc_pairs_flag = FALSE;
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${MODEL}_F${FCST_TIME}_24h";
 version          = "V9.0";

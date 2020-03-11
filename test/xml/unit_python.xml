@@ -40,7 +40,7 @@
     <param> \
       &DATA_DIR_PYTHON;/letter.txt \
       &OUTPUT_DIR;/python/letter_file_type.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE LETTER"; file_type=PYTHON_NUMPY;' \
+      'name = "&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG LETTER"; file_type=PYTHON_NUMPY;' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane using file_type option" \
       -v 1
@@ -196,8 +196,8 @@
   <test name="python_numpy_series_analysis">
     <exec>&MET_BIN;/series_analysis</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
     </env>
     <param> \
       -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
@@ -215,8 +215,8 @@
   <test name="python_numpy_mtd">
     <exec>&MET_BIN;/mtd</exec>
     <env>
-      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
       <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
     </env>
     <param> \
@@ -239,8 +239,8 @@
   <test name="python_numpy_ensemble_stat">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_FILE OBS</value></pair>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
       <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
     </env>
     <param> \

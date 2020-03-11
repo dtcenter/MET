@@ -91,16 +91,12 @@ class TCGenVxOpt {
       ConcatString Desc;     // Description string
       StringArray  Model;    // Forecast ATCF ID's
 
-      // Track filtering criteria
+      // Analysis track filtering criteria
       StringArray StormId;   // List of storm ids
-      StringArray Basin;     // List of basin names
-      StringArray Cyclone;   // List of cyclone numbers
       StringArray StormName; // List of storm names
 
       // Timing information
       unixtime  InitBeg, InitEnd;
-      TimeArray InitInc;
-      TimeArray InitExc;
       unixtime  ValidBeg, ValidEnd;
       NumArray  InitHour;
       NumArray  Lead;

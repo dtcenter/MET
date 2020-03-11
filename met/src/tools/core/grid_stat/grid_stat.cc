@@ -104,6 +104,8 @@
 //                    percentile thresholds.
 //   049    11/15/19  Halley Gotway  Apply climatology bins to
 //                    continuous and probabilistic statistics.
+//   050    03/02/20  Halley Gotway  Add nc_pairs_var_name and rename
+//                    nc_pairs_var_str to nc_pairs_var_suffix.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2400,14 +2402,27 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
               int i_vx, const ConcatString &interp_mthd,
               int interp_pnts, FieldType field_type) {
    int i, x, y, n, n_masks;
-   ConcatString var_name, var_str, interp_str, mask_str;
+   ConcatString var_name, var_suffix, interp_str, mask_str;
+   ConcatString fcst_name, obs_name, fcst_obs_name;
    ConcatString name_att, long_att, level_att, units_att;
    NcVar nc_var;
    bool apply_mask;
 
-   // Append nc_pairs_var_str config file entry
-   if(conf_info.vx_opt[i_vx].var_str.length() > 0) {
-      var_str << "_" << conf_info.vx_opt[i_vx].var_str;
+   // Set output forecast and observation names
+   if(conf_info.vx_opt[i_vx].var_name.length() > 0) {
+      fcst_name = obs_name = fcst_obs_name = conf_info.vx_opt[i_vx].var_name;
+   }
+   else {
+      fcst_name     << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
+                    << conf_info.vx_opt[i_vx].fcst_info->level_name();
+      obs_name      << conf_info.vx_opt[i_vx].obs_info->name() << "_"
+                    << conf_info.vx_opt[i_vx].obs_info->level_name();
+      fcst_obs_name << fcst_name << "_" << obs_name;
+   }
+   
+   // Append nc_pairs_var_suffix config file entry
+   if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {
+      var_suffix << "_" << conf_info.vx_opt[i_vx].var_suffix;
    }
 
    // Append smoothing info for all but nearest neighbor
@@ -2444,11 +2459,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
       // Build the NetCDF variable name
       if(field_name == "FCST") {
-         var_name  << cs_erase
-                   << "FCST_"
-                   << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << fcst_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Fcst ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2461,11 +2473,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].fcst_info->units();
       }
       else if(field_name == "OBS") {
-         var_name  << cs_erase
-                   << "OBS_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Obs ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2478,13 +2487,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
       else if(field_name == "DIFF") {
-         var_name  << cs_erase
-                   << "DIFF_"
-                   << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->level_name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str << interp_str;
+         var_name  << cs_erase << field_name << "_"
+                   << fcst_obs_name << var_suffix << "_" << mask_str << interp_str;
          name_att  << cs_erase
                    << "Forecast " << shc.get_fcst_var()
                    << " minus Observed " << shc.get_obs_var();
@@ -2501,11 +2505,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].obs_info->units();
       }
       else if(field_name == "CLIMO_MEAN") {
-         var_name  << cs_erase
-                   << "CLIMO_MEAN_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          // Append interpolation string for Fourier decomposition
          if(interp_str.nonempty()) {
             if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
@@ -2519,11 +2520,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
       else if(field_name == "CLIMO_STDEV") {
-         var_name  << cs_erase
-                   << "CLIMO_STDEV_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology standard deviation for "
@@ -2533,11 +2531,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
       else if(field_name == "CLIMO_CDF") {
-         var_name  << cs_erase
-                   << "CLIMO_CDF_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology cumulative distribution function for "
@@ -2551,7 +2546,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name() << "_"
                    << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+                   << var_suffix << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology distribution percentile thresholds for "
@@ -2562,11 +2557,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       }
       else if(check_reg_exp("FCST_XGRAD_", field_name.c_str()) ||
               check_reg_exp("FCST_YGRAD_", field_name.c_str())) {
-         var_name  << cs_erase
-                   << field_name << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << fcst_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Fcst ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2581,11 +2573,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       }
       else if(check_reg_exp("OBS_XGRAD_", field_name.c_str()) ||
               check_reg_exp("OBS_YGRAD_", field_name.c_str())) {
-         var_name  << cs_erase
-                   << field_name << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Obs ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2599,11 +2588,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].obs_info->units();
       }
       else if(check_reg_exp("FCST_DMAP_", field_name.c_str())) {
-         var_name  << cs_erase
-                   << field_name << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].fcst_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << fcst_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Fcst ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2617,11 +2603,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          units_att = conf_info.vx_opt[i_vx].fcst_info->units();
       }
       else if(check_reg_exp("OBS_DMAP_", field_name.c_str())) {
-         var_name  << cs_erase
-                   << field_name << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                   << conf_info.vx_opt[i_vx].obs_info->level_name()
-                   << var_str << "_" << mask_str;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
          if(field_type == FieldType_Obs ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2711,13 +2694,24 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     const SingleThresh &obs_st, int i_mask, int wdth) {
    int n, x, y;
    int fcst_flag, obs_flag;
-   ConcatString fcst_var_name, obs_var_name, var_str, mask_str;
-   ConcatString att_str, mthd_str, nbrhd_str;
+   ConcatString fcst_var_name, obs_var_name, var_suffix, mask_str;
+   ConcatString fcst_name, obs_name, att_str, mthd_str, nbrhd_str;
    bool apply_mask;
 
-   // Append nc_pairs_var_str config file entry
-   if(conf_info.vx_opt[i_vx].var_str.length() > 0) {
-      var_str << "_" << conf_info.vx_opt[i_vx].var_str;
+   // Set output forecast and observation names
+   if(conf_info.vx_opt[i_vx].var_name.length() > 0) {
+      fcst_name = obs_name = conf_info.vx_opt[i_vx].var_name;
+   }
+   else {
+      fcst_name     << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
+                    << conf_info.vx_opt[i_vx].fcst_info->level_name();
+      obs_name      << conf_info.vx_opt[i_vx].obs_info->name() << "_"
+                    << conf_info.vx_opt[i_vx].obs_info->level_name();
+   }
+
+   // Append nc_pairs_var_suffix config file entry
+   if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {
+      var_suffix << "_" << conf_info.vx_opt[i_vx].var_suffix;
    }
 
    // Store the apply_mask option
@@ -2741,19 +2735,13 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i_mask] : "FULL");
 
    // Build the forecast variable name
-   fcst_var_name << cs_erase
-                 << "FCST_"
-                 << conf_info.vx_opt[i_vx].fcst_info->name() << "_"
-                 << conf_info.vx_opt[i_vx].fcst_info->level_name()
-                 << var_str << "_" << mask_str << "_"
+   fcst_var_name << cs_erase << "FCST_"
+                 << fcst_name << var_suffix << "_" << mask_str << "_"
                  << fcst_st.get_abbr_str() << nbrhd_str;
 
    // Build the observation variable name
-   obs_var_name << cs_erase
-                << "OBS_"
-                << conf_info.vx_opt[i_vx].obs_info->name() << "_"
-                << conf_info.vx_opt[i_vx].obs_info->level_name()
-                << var_str << "_" << mask_str << "_"
+   obs_var_name << cs_erase << "OBS_"
+                << obs_name << var_suffix << "_" << mask_str << "_"
                 << obs_st.get_abbr_str() << nbrhd_str;
 
    // Figure out which fields should be written

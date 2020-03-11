@@ -202,11 +202,11 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 #ifdef WITH_PYTHON
       //
-      // Set MET_PYTHON_INPUT_FILE environment variable for python types
+      // Set MET_PYTHON_INPUT_ARG environment variable for python types
       //
       if(type == FileType_Python_Numpy ||
          type == FileType_Python_Xarray) {
-         setenv(met_python_input_file, filename, 1);
+         setenv(met_python_input_arg, filename, 1);
       }
 #endif
 

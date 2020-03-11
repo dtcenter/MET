@@ -28,11 +28,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  dataline_charextend_alloc_inc = 512;
-
-static const int  dataline_intextend_alloc_inc  = 100;
-
-static const char dataline_default_delim[]      = " \t";
+static const char dataline_default_delim[] = " \t";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,9 +52,6 @@ class DataLine {
       friend Logger & operator<<(Logger &, const DataLine &);
 
    protected:
-
-      //void extend_char  (int);
-      //void extend_int   (int);
 
       std::string Line;
       std::vector<std::string> Items;

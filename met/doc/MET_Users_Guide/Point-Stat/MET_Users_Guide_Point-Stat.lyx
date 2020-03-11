@@ -2512,37 +2512,37 @@ hira = {
 \begin_layout LyX-Code
 
 \series bold
-   flag       = FALSE;
+   flag            = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   width      = [ 2, 3, 4, 5 ]
+   width           = [ 2, 3, 4, 5 ]
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   vld_thresh = 1.0;
+   vld_thresh      = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   cov_thresh = [ ==0.25 ];
+   cov_thresh      = [ ==0.25 ];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   shape      = SQUARE;
+   shape           = SQUARE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   rps_thresh = [];
+   prob_cat_thresh = [];
 \end_layout
 
 \begin_layout LyX-Code
@@ -2612,7 +2612,7 @@ cov_thresh
  for computing probabilistic statistics.
  The 
 \series bold
-rps_thresh
+prob_cat_thresh
 \series default
  entry defines the thresholds to be used in computing the ranked probability
  score in the RPS output line type.
@@ -2622,7 +2622,7 @@ rps_thresh
 \series default
  thresholds will be used instead of 
 \series bold
-rps_thresh
+prob_cat_thresh
 \series default
 .
 \end_layout

@@ -2229,7 +2229,7 @@ unixtime Dictionary::lookup_unixtime(const char * name,
 ConcatString cs = lookup_string(name, error_out, print_warning);
 
 if ( cs.empty() )  return ( (unixtime) 0 );
- else               return ( timestring_to_unix( cs.c_str() ) );
+else               return ( timestring_to_unix( cs.c_str() ) );
 
 }
 

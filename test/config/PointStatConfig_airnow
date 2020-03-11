@@ -29,7 +29,6 @@ regrid = {
    width      = 1;
    vld_thresh = 0.5;
    shape      = SQUARE;
-   rps_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,11 +190,12 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 hira = {
-   flag       = FALSE;
-   width      = [ 2, 3, 4, 5 ];
-   vld_thresh = 1.0;
-   cov_thresh = [ ==0.25 ];
-   shape      = SQUARE;
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

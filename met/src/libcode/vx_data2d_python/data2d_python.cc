@@ -345,14 +345,14 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
    ConcatString cur_req_name = vinfo.req_name();
 
    //
-   //  replace MET_PYTHON_INPUT_FILE constant with the current environment
+   //  replace MET_PYTHON_INPUT_ARG constant with the current environment
    //  variable value
    //
 
    ConcatString cur_env_val;
-   if ( get_env(met_python_input_file, cur_env_val) )  {
+   if ( get_env(met_python_input_arg, cur_env_val) )  {
 
-      cur_req_name.replace(met_python_input_file, cur_env_val.c_str(), false);
+      cur_req_name.replace(met_python_input_arg, cur_env_val.c_str(), false);
 
    }
 
@@ -404,14 +404,14 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
    ConcatString cur_req_name = vinfo.req_name();
 
    //
-   //  replace MET_PYTHON_INPUT_FILE constant with the current environment
+   //  replace MET_PYTHON_INPUT_ARG constant with the current environment
    //  variable value
    //
 
    ConcatString cur_env_val;
-   if ( get_env(met_python_input_file, cur_env_val) )  {
+   if ( get_env(met_python_input_arg, cur_env_val) )  {
 
-      cur_req_name.replace(met_python_input_file, cur_env_val.c_str(), false);
+      cur_req_name.replace(met_python_input_arg, cur_env_val.c_str(), false);
 
    }
 

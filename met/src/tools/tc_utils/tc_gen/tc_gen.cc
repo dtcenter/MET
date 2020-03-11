@@ -185,7 +185,8 @@ void process_genesis() {
                   genesis_files,  genesis_files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << genesis_files.n() << " genesis track files.\n";
+        << "Processing " << genesis_files.n()
+        << " forecast genesis track files.\n";
    process_track_files(genesis_files, genesis_files_model_suffix,
                        fcst_ga, false);
 
@@ -194,7 +195,8 @@ void process_genesis() {
                   track_files,  track_files_model_suffix);
 
    mlog << Debug(2)
-        << "Processing " << track_files.n() << " verifying track files.\n";
+        << "Processing " << track_files.n()
+        << " verifying track files.\n";
    process_track_files(track_files, track_files_model_suffix,
                        anly_ga, true);
 
@@ -252,12 +254,12 @@ void process_genesis() {
       // Loop through and process the genesis event pairs
       for(j=0,it=fcst_ga_map.begin(); it!=fcst_ga_map.end(); it++,j++) {
          mlog << Debug(2)
-              << "[Filter " << i+1 << ": Model " << j+1 << "] "
-              << "For " << it->first << " model, comparing "
-              << it->second.n() << " genesis forecasts to "
-              << best_ga.n() << " " << conf_info.BestEventInfo.Technique
-              << " and " << oper_ga.n() << " "
-              << conf_info.OperEventInfo.Technique
+              << "[Filter " << i+1 << " (" << conf_info.VxOpt[i].Desc
+              << ") " << ": Model " << j+1 << "] " << "For " << it->first
+              << " model, comparing " << it->second.n()
+              << " genesis forecasts to " << best_ga.n() << " "
+              << conf_info.BestEventInfo.Technique << " and "
+              << oper_ga.n() << " " << conf_info.OperEventInfo.Technique
               << " genesis events.\n";
          process_genesis_pair(i, it->first, it->second,
                               best_ga, oper_ga, cur_info);
@@ -347,21 +349,28 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
       // Print log messages about matches
       if(g_ptr) {
           mlog << Debug(4) << fga[i].technique() << " "
+               << unix_to_yyyymmdd_hhmmss(fga[i].init())
+               << " initialization, "
+               << fga[i].lead_time()/sec_per_hour << " lead, "
                << unix_to_yyyymmdd_hhmmss(fga[i].genesis_time())
-               << " genesis at (" << fga[i].lat() << ", " << fga[i].lon()
-               << ") is a hit for " << g_ptr->technique() << " "
+               << " genesis at ("
+               << fga[i].lat() << ", " << fga[i].lon()
+               << ") is a HIT for " << g_ptr->technique() << " "
                << unix_to_yyyymmdd_hhmmss(g_ptr->genesis_time())
-               << " genesis at (" << g_ptr->lat() << ", " << g_ptr->lon()
-               << ").\n";
+               << " genesis at (" << g_ptr->lat() << ", "
+               << g_ptr->lon() << ").\n";
 
           // Increment the HIT count
           info.cts_info.cts.inc_fy_oy();
       }
       else {
           mlog << Debug(4) << fga[i].technique() << " "
+               << unix_to_yyyymmdd_hhmmss(fga[i].init())
+               << " initialization, "
+               << fga[i].lead_time()/sec_per_hour << " lead, "
                << unix_to_yyyymmdd_hhmmss(fga[i].genesis_time())
-               << " genesis at (" << fga[i].lat() << ", " << fga[i].lon()
-               << ") is a false alarm.\n";
+               << " genesis at (" << fga[i].lat() << ", "
+               << fga[i].lon() << ") is a FALSE ALARM.\n";
 
           // Increment the FALSE ALARM count
           info.cts_info.cts.inc_fy_on();
@@ -411,7 +420,7 @@ void process_genesis_pair(int i_vx, const ConcatString &model,
                  << bga[i].lon() << ") for "
                  << unix_to_yyyymmdd_hhmmss(ut) << " initialization "
                  << (bga[i].genesis_time() - ut)/sec_per_hour
-                 << " lead is a miss.\n";
+                 << " lead is a MISS.\n";
             info.cts_info.cts.inc_fn_oy();
          }
       } // end for ut
@@ -461,16 +470,26 @@ void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
                          GenesisInfoArray &genesis, bool is_anly) {
    int i, j, k;
-   int n_lines, tot_lines, tot_tracks;
-   ConcatString cs;
+   int n_lines, tot_lines, tot_tracks, n_genesis;
+   ConcatString cs, atcf_ids;
    LineDataFile f;
    ATCFTrackLine line;
    TrackInfoArray tracks;
    bool keep;
 
+   // Analysis ATCF ID's
+   if(is_anly) {
+      atcf_ids << conf_info.BestEventInfo.Technique << " or "
+               << conf_info.OperEventInfo.Technique << " analysis";
+   }
+   // Forecast ATCF ID's
+   else {
+      atcf_ids << "forecast";
+   }
+
    // Initialize
    genesis.clear();
-   tot_lines = tot_tracks = 0;
+   tot_lines = tot_tracks = n_genesis = 0;
 
    // Process each of the input ATCF files
    for(i=0; i<files.n(); i++) {
@@ -538,7 +557,7 @@ void process_track_files(const StringArray &files,
             }
 
             // Check the minimum duration
-            if(tracks[j].duration() < conf_info.MinDur) {
+            if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
                continue;
             }
 
@@ -561,16 +580,18 @@ void process_track_files(const StringArray &files,
 
       // Dump out the current number of lines
       mlog << Debug(4)
-           << "[File " << i+1 << " of " << files.n()
-           << "] Found " << genesis.n() << " genesis events, from "
-           << tracks.n() << " tracks, from " << n_lines
+           << "[File " << i+1 << " of " << files.n() << "] Found "
+           << genesis.n() - n_genesis << " " << atcf_ids
+           << " genesis events, from " << tracks.n()
+           << " tracks, from " << n_lines
            << " input lines, from file \"" << files[i] << "\".\n";
+      n_genesis = genesis.n();
 
    } // end for i
 
    // Dump out the total number of lines
    mlog << Debug(3)
-        << "Found a total of " << genesis.n()
+        << "Found a total of " << genesis.n() << " " << atcf_ids
         << " genesis events, from " << tot_tracks << " tracks, from "
         << tot_lines << " input lines, from " << files.n()
         << " input files.\n";
@@ -583,17 +604,19 @@ void process_track_files(const StringArray &files,
 
    // Dump out the track information
    mlog << Debug(2)
-        << "Identified " << genesis.n() << " genesis events.\n";
+        << "Identified " << genesis.n() << " "
+        << (is_anly ? "analysis" : "forecast")
+        << " genesis events.\n";
 
    // Dump out very verbose output
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5)
+   if(mlog.verbosity_level() >= 6) {
+      mlog << Debug(6)
            << genesis.serialize_r() << "\n";
    }
    // Dump out track info
    else {
       for(i=0; i<genesis.n(); i++) {
-         mlog << Debug(4)
+         mlog << Debug(6)
               << "[Genesis " << i+1 << " of " << genesis.n()
               << "] " << genesis[i].serialize() << "\n";
       }
@@ -652,6 +675,7 @@ void setup_txt_files(int n_model) {
          n_rows = 1 + n_model * conf_info.n_vx();
          n_cols = 1 + n_header_columns + n_txt_columns[i];
          txt_at[i].set_size(n_rows, n_cols);
+         setup_table(txt_at[i]);
 
          // Write header row
          write_header_row(txt_columns[i], n_txt_columns[i], 1,

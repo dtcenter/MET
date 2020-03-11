@@ -93,13 +93,14 @@ void VarInfoGrib::assign(const VarInfoGrib &v) {
    VarInfo::assign(v);
 
    // Copy
-   PTV     = v.ptv();
-   Code    = v.code();
-   LvlType = v.lvl_type();
-   PCode   = v.p_code();
-   Center   = v.center ();
-   Subcenter   = v.subcenter ();
-   FieldRec   = v.field_rec ();
+   PTV       = v.ptv();
+   Code      = v.code();
+   LvlType   = v.lvl_type();
+   PCode     = v.p_code();
+   Center    = v.center ();
+   Subcenter = v.subcenter ();
+   FieldRec  = v.field_rec ();
+   TRI       = v.tri();
 
    return;
 }
@@ -180,10 +181,18 @@ void VarInfoGrib::set_p_code(int v) {
    PCode = v;
    return;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoGrib::set_field_rec(int v) {
    FieldRec = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib::set_tri(int v) {
+   TRI = v;
    return;
 }
 
@@ -237,9 +246,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
                  << "\n\n";
             exit(1);
          }
-
       }
-
    }
 
       //  if the field name is not specified, look for and use indexes
@@ -303,6 +310,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    set_subcenter   (field_subcenter);
    set_ptv         (field_ptv);
    set_ens         (ens_str.c_str());
+   set_tri         (dict.lookup_int(conf_key_GRIB1_tri, false));
 
    //  call the parent to set the level information
    set_level_info_grib(dict);

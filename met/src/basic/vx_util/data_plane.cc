@@ -984,7 +984,7 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void DataPlaneArray::extend(int n)
+void DataPlaneArray::extend(int n, bool exact)
 
 {
 
@@ -995,9 +995,12 @@ DataPlane ** p = (DataPlane **) 0;
 double * b = (double *) 0;
 double * t = (double *) 0;
 
-k = (n + AllocInc - 1)/AllocInc;
+if ( ! exact )  {
 
-n = k*AllocInc;
+   k = (n + AllocInc - 1)/AllocInc;
+   n = k*AllocInc;
+
+}
 
 p = new DataPlane * [n];
 b = new double      [n];
@@ -1056,7 +1059,7 @@ void DataPlaneArray::add(const DataPlane & p, double _low, double _up)
 
 check_xy_size(p);
 
-extend(Nplanes + 1);
+extend(Nplanes + 1, false);
 
 Plane[Nplanes] = new DataPlane;
 

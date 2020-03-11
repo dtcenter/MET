@@ -99,7 +99,7 @@ class CRC_Array {
 
       void clear();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -267,19 +267,23 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::extend(int len)
+void CRC_Array<T>::extend(int len, bool exact)
 
 {
 
 if ( Nalloc >= len )  return;
 
-int k;
+if ( ! exact )  {
 
-k = len/crc_array_alloc_inc;
+   int k;
 
-if ( len%crc_array_alloc_inc )  ++k;
+   k = len/crc_array_alloc_inc;
 
-len = k*crc_array_alloc_inc;
+   if ( len%crc_array_alloc_inc )  ++k;
+
+   len = k*crc_array_alloc_inc;
+
+}
 
 T * u = (T *) 0;
 
@@ -287,7 +291,7 @@ u = new T [len];
 
 if ( !u )  {
 
-   mlog << Error << "\nvoid CRC_Array::extend(int) -> "
+   mlog << Error << "\nvoid CRC_Array::extend(int, bool) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
@@ -490,7 +494,7 @@ void CRC_Array<T>::add(const T & k)
 
 {
 
-extend(Nelements + 1);
+extend(Nelements + 1, false);
 
 e[Nelements++] = k;
 

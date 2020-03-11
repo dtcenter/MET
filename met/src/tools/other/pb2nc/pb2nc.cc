@@ -168,11 +168,11 @@ static float static_dummy_201[MAX_CAPE_LEVEL+1];
 
 #define ROG             287.04
 #define MAX_PBL         5000
-#define MAX_PBL_LEVEL   100
+#define MAX_PBL_LEVEL   256
 #define PBL_DEBUG_LEVEL 8
 static bool IGNORE_Q_PBL = true;
 static bool IGNORE_Z_PBL = true;
-static bool USE_LOG_INTERPOLATION = false;
+static bool USE_LOG_INTERPOLATION = true;
 static float pbl_data_pres[MAX_PBL_LEVEL];  // mb
 static float pbl_data_temp[MAX_PBL_LEVEL];  // Kelvin
 static float pbl_data_spfh[MAX_PBL_LEVEL];  // ? / 1,000,000
@@ -985,6 +985,7 @@ void process_pbfile(int i_pb) {
    float pbl_qm = bad_data_float;
 
    bool has_pbl_data;
+   bool do_pbl = false;
    bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
    bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
 
@@ -1311,7 +1312,8 @@ void process_pbfile(int i_pb) {
          cape_level = 0;
       }
 
-      if (cal_pbl) {
+      do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
+      if (do_pbl) {
          pbl_level = 0;
       }
 
@@ -1472,7 +1474,7 @@ void process_pbfile(int i_pb) {
                   }
                }
 
-               if (cal_pbl && (pbl_level == 0)) {
+               if (do_pbl && (pbl_level == 0)) {
                   pbl_qm = quality_mark;
                }
             }
@@ -1547,7 +1549,7 @@ void process_pbfile(int i_pb) {
          if (cal_cape) {
             if (cape_member_cnt >= 3) cape_level++;
          }
-         if (cal_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
+         if (do_pbl && !is_eq(pqtzuv[0], bad_data_float)) {
 
             // Allocated memory is deleted after all observations are processed
             float *tmp_pqtzuv = new float [mxr8vt];
@@ -1777,6 +1779,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[3]   = 0;                                  // AIRNOW obs at surface
                   quality_mark = bufr_obs_extra[lv][1];
                   // Convert a special number (1e+11) to NA at addObservation
+                  if(conf_info.quality_mark_thresh < quality_mark) continue;
                }
                else {
                   // Retain the pressure in hPa for each observation record
@@ -1804,7 +1807,7 @@ void process_pbfile(int i_pb) {
          n_total_obs += n_other_total_obs;
       }
 
-      if (cal_pbl) {
+      if (do_pbl) {
          pbl_level = 0;
          is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
                && is_eq(prev_hdr_lat, hdr_lat)
@@ -1857,7 +1860,7 @@ void process_pbfile(int i_pb) {
    } // end for i_read
 
    has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
-   if (cal_pbl && has_pbl_data) {
+   if (do_pbl && has_pbl_data) {
       float pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
       insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                  hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid);

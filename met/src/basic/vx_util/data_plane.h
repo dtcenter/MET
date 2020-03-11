@@ -154,7 +154,7 @@ class DataPlaneArray {
 
       void assign(const DataPlaneArray &);
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       void check_xy_size(const DataPlane &) const;   //  check to make sure all planes added are same size
 

@@ -155,12 +155,8 @@ void DataLine::assign(const DataLine & a)
 
 clear();
 
-//extend_char(a.N_chars);
-
 Line = a.Line;
 Items = a.Items;
-
-//extend_int(a.N_items);
 
 Offset = a.Offset;
 
@@ -296,67 +292,6 @@ return ( c );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void DataLine::extend_char(int n)
-
-{
-
-++n;   //  add room for trailing nul, if needed
-
-if ( N_chars >= n )  return;
-
-int k;
-
-k = n/dataline_charextend_alloc_inc;
-
-if ( n%dataline_charextend_alloc_inc ) ++k;
-
-n = k*dataline_charextend_alloc_inc;
-
-Line.reserve(n);
-N_chars = n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void DataLine::extend_int(int n)
-
-{
-
-if ( N_ints >= n )  return;
-
-int k;
-
-k = n/dataline_intextend_alloc_inc;
-
-if ( n%dataline_intextend_alloc_inc ) ++k;
-
-n = k*dataline_intextend_alloc_inc;
-
-Offset.reserve(n);
-
-N_ints = n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 int DataLine::max_item_width() const
 
@@ -414,7 +349,6 @@ size_t len, tpos = std::string::npos;
 
 if (!Line.find_first_not_of(Delimiter)) { // no leading delimiter
     ++count;
-    //extend_int(count);
     Offset.push_back(pos);
     Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
@@ -425,7 +359,6 @@ while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos) 
     pos += tpos + len;
     
     ++count;
-    //extend_int(count);
     Offset.push_back(pos);
     Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
@@ -471,8 +404,6 @@ for( i=0; i<n_wdth; i++ )  {
 
    if ( !f )  { clear();  return ( 0 ); }
 
-   //extend_char(pos + wdth[i] + 1);   //  better safe than sorry
-   //extend_int(++count);
    ++count;
 
    //

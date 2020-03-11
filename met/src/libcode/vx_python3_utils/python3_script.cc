@@ -116,6 +116,7 @@ Module = PyImport_ImportModule (path.text());
 
 if ( ! Module )  {
 
+   PyErr_Print();
    mlog << Error << "\nPython3_Script::Python3_Script(const char *) -> "
         << "unable to open script \"" << path << "\"\n\n";
 

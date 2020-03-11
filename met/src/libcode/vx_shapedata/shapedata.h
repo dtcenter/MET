@@ -214,7 +214,6 @@ class Cell {
       void extend(int);
 
 
-
       int * e;
 
       int n;

@@ -655,7 +655,7 @@ void EnsembleStatVxOpt::clear() {
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
-   rps_ta.clear();
+   prob_cat_ta.clear();
 
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
@@ -784,8 +784,8 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: phist_bin_size
    phist_bin_size = odict.lookup_double(conf_key_phist_bin);
 
-   // Conf: rps_thresh
-   rps_ta = fdict.lookup_thresh_array(conf_key_rps_thresh);
+   // Conf: prob_cat_thresh
+   prob_cat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&odict);

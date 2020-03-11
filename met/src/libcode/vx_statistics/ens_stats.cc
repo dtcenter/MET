@@ -451,7 +451,7 @@ void RPSInfo::assign(const RPSInfo &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::set_rps_thresh(const ThreshArray &ta) {
+void RPSInfo::set_prob_cat_thresh(const ThreshArray &ta) {
    fthresh = ta;
 }
     
@@ -492,7 +492,8 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    if(fthresh.n() == 0) {
       mlog << Error << "\nRPSInfo::set(const PairDataEnsemble &) -> "
            << "no thresholds provided to compute the RPS line type! "
-           << "Specify thresholds using the \"" << conf_key_rps_thresh
+           << "Specify thresholds using the \""
+           << conf_key_prob_cat_thresh
            << "\" configuration file option.\n\n";
       exit(1);
    }

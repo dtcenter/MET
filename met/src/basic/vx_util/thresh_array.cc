@@ -121,16 +121,18 @@ void ThreshArray::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ThreshArray::extend(int n) {
+void ThreshArray::extend(int n, bool exact) {
    int j, k;
 
    if(n <= Nalloc) return;
 
-   k = n/thresharray_alloc_inc;
+   if(!exact) {
+      k = n/thresharray_alloc_inc;
 
-   if(n%thresharray_alloc_inc) k++;
+      if(n%thresharray_alloc_inc) k++;
 
-   n = k*thresharray_alloc_inc;
+      n = k*thresharray_alloc_inc;
+   }
 
    SingleThresh *u = (SingleThresh *) 0;
 
@@ -182,7 +184,7 @@ SingleThresh ThreshArray::operator[](int n) const {
 
 void ThreshArray::add(const SingleThresh &st) {
 
-   extend(Nelements + 1);
+   extend(Nelements + 1, false);
 
    t[Nelements] = st;
 
@@ -198,7 +200,7 @@ void ThreshArray::add(const double val, const ThreshType type) {
 
    st.set(val, type);
 
-   extend(Nelements + 1);
+   extend(Nelements + 1, false);
 
    t[Nelements] = st;
 
@@ -214,7 +216,7 @@ void ThreshArray::add(const char *thresh_str) {
 
    st.set(thresh_str);
 
-   extend(Nelements + 1);
+   extend(Nelements + 1, false);
 
    t[Nelements] = st;
 

@@ -2040,10 +2040,10 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // Store observation filering threshold
    rps_info.othresh = othresh;
-   rps_info.set_rps_thresh(vx_opt.rps_ta);
+   rps_info.set_prob_cat_thresh(vx_opt.prob_cat_ta);
 
-   // If rps_thresh is empty and climo data is available, use climo_cdf
-   // thresholds instead
+   // If prob_cat_thresh is empty and climo data is available,
+   // use climo_cdf thresholds instead
    if(rps_info.fthresh.n()      == 0 &&
       pd_ptr->cmn_na.n_valid()   > 0 &&
       pd_ptr->csd_na.n_valid()   > 0 &&

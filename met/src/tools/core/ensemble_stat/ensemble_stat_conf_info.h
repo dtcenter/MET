@@ -121,7 +121,7 @@ class EnsembleStatVxOpt {
 
       double         ssvar_bin_size;     // SSVAR bin size
       double         phist_bin_size;     // PHIST bin size
-      ThreshArray    rps_ta;             // RPS thresholds
+      ThreshArray    prob_cat_ta;        // Categorical thresholds for probabilities
 
       DuplicateType  duplicate_flag;     // Duplicate observations
       ObsSummary     obs_summary;        // Summarize observations

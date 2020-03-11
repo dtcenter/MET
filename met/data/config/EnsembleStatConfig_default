@@ -136,7 +136,7 @@ obs_error = {
 }
 
 //
-// Mapping of message type group name to comma-separated list of values.
+// Mapping of message type group name to comma-separated list of values
 //
 message_type_group_map = [
    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
@@ -153,10 +153,10 @@ ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
 //
-// Ranked Probability Score thresholds
+// Categorical thresholds to define ensemble probabilities
 // May be set separately in each "fcst.field" entry
 //
-rps_thresh = [];
+prob_cat_thresh = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 

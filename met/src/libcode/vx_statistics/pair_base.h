@@ -53,6 +53,8 @@ class PairBase {
 
       void init_from_scratch();
 
+      bool IsPointVx;
+
    public:
 
       PairBase();
@@ -79,25 +81,25 @@ class PairBase {
 
       // Point and Grid Observation Information
       NumArray    o_na;    // Observation value [n_obs]
-      NumArray    wgt_na;  // Weight [n_obs]
-      
-      // Point Observation Information
-      StringArray sid_sa;  // Station ID [n_obs]
-      NumArray    lat_na;  // Latitude [n_obs]
-      NumArray    lon_na;  // Longitude [n_obs]
       NumArray    x_na;    // X [n_obs]
       NumArray    y_na;    // Y [n_obs]
-      TimeArray   vld_ta;  // Valid time [n_obs]
-      NumArray    lvl_na;  // Level [n_obs]
-      NumArray    elv_na;  // Elevation [n_obs]
-      StringArray o_qc_sa; // Observation quality control [n_obs]
-      int         n_obs;   // Number of observations
+      NumArray    wgt_na;  // Weight [n_obs]
 
       // Point and Grid Climatology Information
       NumArray    cmn_na;  // Climatology mean [n_obs]
       NumArray    csd_na;  // Climatology standard deviation [n_obs]
       NumArray    cdf_na;  // Climatology cumulative distribution function [n_obs]
 
+      // Point Observation Information
+      StringArray sid_sa;  // Station ID [n_obs]
+      NumArray    lat_na;  // Latitude [n_obs]
+      NumArray    lon_na;  // Longitude [n_obs]
+      TimeArray   vld_ta;  // Valid time [n_obs]
+      NumArray    lvl_na;  // Level [n_obs]
+      NumArray    elv_na;  // Elevation [n_obs]
+      StringArray o_qc_sa; // Observation quality control [n_obs]
+
+      int         n_obs;   // Number of observations
       unixtime    fcst_ut; // Forecast valid time
 
       bool       check_unique;   // Check for duplicates, keeping unique obs
@@ -112,7 +114,9 @@ class PairBase {
       void clear();
       void erase();
 
-      void extend(int);    // Allocate memory for expected size
+      void extend(int, bool exact = true); // Allocate memory for expected size
+
+      bool is_point_vx() const;
 
       void set_mask_name(const char *);
       void set_mask_area_ptr(MaskPlane *);
@@ -150,12 +154,12 @@ class PairBase {
       void set_point_obs(int, const char *, double, double, double, double,
                          unixtime, double, double, double,
                          const char *, double, double, double);
-      
-      void add_grid_obs(double, double, double, double, double,
-                        double);
 
-      void set_grid_obs(int, double, double, double, double, double,
-                        double);
+      void add_grid_obs(double, double, double, double);
+      
+      void add_grid_obs(double, double, double,
+                        double, double, double);
+
 
       void add_climo(double, double, double);
       void set_climo(int, double, double, double);
@@ -168,6 +172,10 @@ class PairBase {
       void calc_obs_summary();
 
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline bool PairBase::is_point_vx() const { return(IsPointVx); }
 
 ////////////////////////////////////////////////////////////////////////
 //

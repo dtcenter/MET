@@ -1,11 +1,12 @@
-################################################
+########################################################################
 #
 #    Adapted from a script provided by George McCabe
 #    Adapted by Randy Bullock
 #
-#    usage:  /path/to/python point_write_pickle.py pickle_output_filename <user_python_script>.py <args>
+#    usage:  /path/to/python write_pickle_mpr.py \
+#            pickle_output_filename <user_python_script>.py <args>
 #
-################################################
+########################################################################
 
 import os
 import sys
@@ -17,11 +18,14 @@ print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1];
 
-pyembed_module_dir  = os.path.dirname(sys.argv[2])
+pyembed_module_dir  = os.path.dirname(sys.argv[2]) or '.'
 pyembed_module_name = os.path.basename(sys.argv[2]).replace('.py','')
+
 sys.argv = sys.argv[2:]
 
 sys.path.append(pyembed_module_dir)
 met_in = __import__(pyembed_module_name)
 
-pickle.dump( met_in.point_data, open( pickle_filename, "wb" ) )
+print(met_in)
+
+pickle.dump( met_in.mpr_data, open( pickle_filename, "wb" ) )

@@ -29,7 +29,7 @@ using namespace std;
 static const char generic_python_wrapper [] = "generic_python";
 static const char generic_pickle_wrapper [] = "generic_pickle";
 
-static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/point_write_pickle.py";
+static const char write_pickle_wrapper   [] = "MET_BASE/wrappers/write_pickle_point.py";
 
 static const char list_name              [] = "point_data";
 

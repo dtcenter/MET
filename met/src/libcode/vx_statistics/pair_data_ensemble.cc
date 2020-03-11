@@ -136,32 +136,32 @@ void PairDataEnsemble::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::extend(int n) {
+void PairDataEnsemble::extend(int n, bool exact) {
    int i;
 
    // Allocate memory for the number of observations.
    // Only applies to arrays sized by n_obs which does not include:
    //   rhist_na, relp_na, phist_na
 
-   PairBase::extend(n);
+   PairBase::extend(n, exact);
 
-   obs_error_entry.extend(n);
+   obs_error_entry.extend(n, exact);
 
-   for(i=0; i<n_ens; i++) e_na[i].extend(n);
+   for(i=0; i<n_ens; i++) e_na[i].extend(n, exact);
 
-   v_na.extend(n);
-   r_na.extend(n);
-   crps_na.extend(n);
-   ign_na.extend(n);
-   pit_na.extend(n);
-   skip_ba.extend(n);
-   spread_na.extend(n);
-   spread_oerr_na.extend(n);
-   spread_plus_oerr_na.extend(n);
-   esum_na.extend(n);
-   esumsq_na.extend(n);
-   mn_na.extend(n);
-   mn_oerr_na.extend(n);
+   v_na.extend               (n, exact);
+   r_na.extend               (n, exact);
+   crps_na.extend            (n, exact);
+   ign_na.extend             (n, exact);
+   pit_na.extend             (n, exact);
+   skip_ba.extend            (n, exact);
+   spread_na.extend          (n, exact);
+   spread_oerr_na.extend     (n, exact);
+   spread_plus_oerr_na.extend(n, exact);
+   esum_na.extend            (n, exact);
+   esumsq_na.extend          (n, exact);
+   mn_na.extend              (n, exact);
+   mn_oerr_na.extend         (n, exact);
 
    return;
 }

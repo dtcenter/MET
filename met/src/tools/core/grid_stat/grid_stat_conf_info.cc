@@ -489,7 +489,8 @@ void GridStatVxOpt::clear() {
    // Initialize values
 
    desc.clear();
-   var_str.clear();
+   var_name.clear();
+   var_suffix.clear();
 
    fcat_ta.clear();
    ocat_ta.clear();
@@ -583,8 +584,26 @@ void GridStatVxOpt::process_config(
    // Conf: desc
    desc = parse_conf_string(&odict, conf_key_desc);
 
-   // Conf: nc_pairs_var_str
-   var_str = parse_conf_string(&odict, conf_key_nc_pairs_var_str, false);
+   // Conf: nc_pairs_var_name
+   var_name = parse_conf_string(&odict, conf_key_nc_pairs_var_name, false);
+
+   // Check to see if the deprecated nc_pairs_var_str has been used
+
+   // Conf: nc_pairs_var_str (deprecated)
+   var_suffix = odict.lookup_string(conf_key_nc_pairs_var_str, false, false);
+
+   // If found, print a warning.
+   if(odict.last_lookup_status()) {
+      mlog << Warning << "\nGridStatVxOpt::process_config() -> \""
+           << conf_key_nc_pairs_var_str << "\" (" << var_suffix
+           << ") is deprecated and replaced by \""
+           << conf_key_nc_pairs_var_suffix << "\".\n\n";
+   }
+   // Otherwise, parse the new option
+   else {
+      // Conf: nc_pairs_var_suffix
+      var_suffix = parse_conf_string(&odict, conf_key_nc_pairs_var_suffix, false);
+   }
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
@@ -852,7 +871,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
    //
    // The following do not impact matched pairs:
-   //    desc, var_str,
+   //    desc, var_name, var_suffix,
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,

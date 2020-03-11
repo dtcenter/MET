@@ -53,7 +53,7 @@
       G212 \
       &OUTPUT_DIR;/regrid/pb2nc_TMP_prob.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
-      -name TEMP -obs_thresh 280.0 \
+      -name TEMP -prob_cat_thresh 280.0 \
       -v 1
     </param>
     <!--  -->
@@ -69,7 +69,7 @@
       G212 \
       &OUTPUT_DIR;/regrid/pb2nc_TMP_prob_gaussian.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
-      -name TEMP -obs_thresh 280.0 -method GAUSSIAN \
+      -name TEMP -prob_cat_thresh 280.0 -method GAUSSIAN \
       -v 1
     </param>
     <!--  -->

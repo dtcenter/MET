@@ -99,9 +99,8 @@ static RegridInfo RGInfo;
 static StringArray VarNameSA;
 static int compress_level = -1;
 static bool opt_override_method = false;
-static bool opt_override_width = false;
 static bool do_gaussian_filter = false;
-static double obs_thresh = bad_data_double;
+static double prob_cat_thresh = bad_data_double;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -124,7 +123,7 @@ static void close_nc();
 static void usage();
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
-static void set_obs_thresh(const StringArray &);
+static void set_prob_cat_thresh(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
@@ -238,7 +237,7 @@ int process_command_line(int argc, char **argv) {
    cline.add(set_qc_flags,   "-qc",         1);
    cline.add(set_adp,        "-adp",        1);
    cline.add(set_config,     "-config",     1);
-   cline.add(set_obs_thresh, "-obs_thresh", 1);
+   cline.add(set_prob_cat_thresh, "-prob_cat_thresh", 1);
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
    cline.add(set_gaussian_dx,     "-gaussian_dx",     1);
 
@@ -375,8 +374,6 @@ void process_data_file(int obs_type) {
    //GridTemplateFactory gtf;
    mlog << Debug(2) << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
-        //<< ", width = " << RGInfo.width
-        //<< ", shape = " << gtf.enum2String(RGInfo.shape)
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
 
    // Build the run command string
@@ -552,7 +549,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    bool use_var_id = true;
-   bool has_prob_thresh = !is_eq(obs_thresh, bad_data_double);
+   bool has_prob_thresh = !is_eq(prob_cat_thresh, bad_data_double);
    unixtime requested_valid_time, valid_time = 0;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_point_file() -> ";
@@ -828,7 +825,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      cnt_dp.set(data_count, x_idx, y_idx);
                      mask_dp.set(1, x_idx, y_idx);
                      to_dp.set(to_value, x_idx, y_idx);
-                     if ((has_prob_thresh && (to_value >= obs_thresh))
+                     if ((has_prob_thresh && (to_value >= prob_cat_thresh))
                          || (do_gaussian_filter && !has_prob_thresh)) {
                         prob_dp.set(1, x_idx, y_idx);
                         prob_mask_dp.set(1, x_idx, y_idx);
@@ -2026,10 +2023,10 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 ////////////////////////////////////////////////////////////////////////
 
 void set_goes_interpolate_option() {
-   if (!opt_override_width && RGInfo.width == DefaultInterpWdth) {
-      RGInfo.width = 2;
-   }
-   if (!opt_override_method && RGInfo.method == DefaultInterpMthd) {
+   //if (RGInfo.width == DefaultInterpWdth) {
+   //   RGInfo.width = 2;
+   //}
+   if (RGInfo.method == DefaultInterpMthd) {
       RGInfo.method = InterpMthd_UW_Mean;
    }
 }
@@ -2131,11 +2128,9 @@ void usage() {
         << "\t[-config file]\n"
         << "\t[-qc flags]\n"
         << "\t[-method type]\n"
-        //<< "\t[-width n]\n"
-        //<< "\t[-shape type]\n"
         << "\t[-gaussian_dx n]\n"
         << "\t[-gaussian_radius n]\n"
-        << "\t[-obs_thresh n]\n"
+        << "\t[-prob_cat_thresh n]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -2173,7 +2168,7 @@ void usage() {
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-obs_thresh n\" sets observation value to compute the probability."
+        << "\t\t\"-prob_cat_thresh n\" sets observation value to compute the probability."
         << " The default is disabled (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
@@ -2214,22 +2209,8 @@ void set_method(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//void set_width(const StringArray &a) {
-//   RGInfo.width = atoi(a[0].c_str());
-//   opt_override_width = true;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//void set_shape(const StringArray &a) {
-//   GridTemplateFactory gtf;
-//   RGInfo.shape = gtf.string2Enum(a[0]);
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_thresh(const StringArray &a) {
-   obs_thresh = atof(a[0].c_str());
+void set_prob_cat_thresh(const StringArray &a) {
+   prob_cat_thresh = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

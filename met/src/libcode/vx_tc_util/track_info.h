@@ -41,7 +41,7 @@ class TrackInfo {
 
       void init_from_scratch();
       void assign(const TrackInfo &);
-      void extend(int);
+      void extend(int, bool exact = true);
 
       bool         IsSet;
       bool         IsBestTrack;
@@ -198,7 +198,7 @@ class TrackInfoArray {
 
       void init_from_scratch();
       void assign(const TrackInfoArray &);
-      void extend(int);
+      void extend(int, bool exact = true);
 
       TrackInfo     *Track;
       int            NTracks;

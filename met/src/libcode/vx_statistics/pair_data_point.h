@@ -49,7 +49,7 @@ class PairDataPoint : public PairBase {
       void clear();
       void erase();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,

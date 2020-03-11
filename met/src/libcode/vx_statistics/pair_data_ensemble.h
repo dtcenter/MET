@@ -117,7 +117,7 @@ class PairDataEnsemble : public PairBase {
 
       void clear();
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       bool has_obs_error() const;
 

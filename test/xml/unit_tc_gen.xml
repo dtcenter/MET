@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data/genesis">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_gen_2016">
+    <exec>&MET_BIN;/tc_gen</exec>
+    <param> \
+      -genesis &DATA_DIR;/suite1/2016*/genesis*2016* \
+      -track &DATA_DIR;/atcf/2016 \
+      -config &CONFIG_DIR;/TCGenConfig_2016 \
+      -out &OUTPUT_DIR;/tc_gen/tc_gen_2016 \
+      -log &OUTPUT_DIR;/tc_gen/tc_gen_2016.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/tc_gen/tc_gen_2016_cts.txt</stat>
+    </output>
+  </test>
+
+</met_test>

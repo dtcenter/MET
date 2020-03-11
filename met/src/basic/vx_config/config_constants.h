@@ -321,11 +321,11 @@ struct NbrhdInfo {
 //
 
 struct HiRAInfo {
-   bool        flag;       // Flag to turn on/off HiRA logic
-   IntArray    width;      // Array for HiRA widths
-   double      vld_thresh; // Proportion of valid data values
-   ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
-   ThreshArray rps_ta;     // Ranked Probability Score thresholds
+   bool        flag;        // Flag to turn on/off HiRA logic
+   IntArray    width;       // Array for HiRA widths
+   double      vld_thresh;  // Proportion of valid data values
+   ThreshArray cov_ta;      // HiRA coverage (probability) thresholds
+   ThreshArray prob_cat_ta; // Categorical thresholds defining probabilities
    GridTemplateFactory::GridTemplates shape; // Area shape
 
    HiRAInfo();
@@ -497,6 +497,7 @@ static const char conf_key_GRIB1_center[]      = "GRIB1_center";
 static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
 static const char conf_key_GRIB1_code[]        = "GRIB1_code";
+static const char conf_key_GRIB1_tri[]         = "GRIB1_tri";
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
@@ -636,18 +637,21 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 //
 // Grid-Stat specific parameter key names
 //
-static const char conf_key_nc_pairs_var_str[]  = "nc_pairs_var_str";
-static const char conf_key_fourier[]           = "fourier";
-static const char conf_key_wave_1d_beg[]       = "wave_1d_beg";
-static const char conf_key_wave_1d_end[]       = "wave_1d_end";
-static const char conf_key_gradient[]          = "gradient";
-static const char conf_key_dx[]                = "dx";
-static const char conf_key_dy[]                = "dy";
-static const char conf_key_distance_map[]      = "distance_map";
-static const char conf_key_baddeley_p[]        = "baddeley_p";
-static const char conf_key_baddeley_max_dist[] = "baddeley_max_dist";
-static const char conf_key_fom_alpha[]         = "fom_alpha";
-static const char conf_key_zhu_weight[]        = "zhu_weight";
+static const char conf_key_nc_pairs_var_name[]   = "nc_pairs_var_name";
+static const char conf_key_nc_pairs_var_suffix[] = "nc_pairs_var_suffix";
+// nc_pairs_var_str is deprecated and replaced by nc_pairs_var_suffix
+static const char conf_key_nc_pairs_var_str[]    = "nc_pairs_var_str";
+static const char conf_key_fourier[]             = "fourier";
+static const char conf_key_wave_1d_beg[]         = "wave_1d_beg";
+static const char conf_key_wave_1d_end[]         = "wave_1d_end";
+static const char conf_key_gradient[]            = "gradient";
+static const char conf_key_dx[]                  = "dx";
+static const char conf_key_dy[]                  = "dy";
+static const char conf_key_distance_map[]        = "distance_map";
+static const char conf_key_baddeley_p[]          = "baddeley_p";
+static const char conf_key_baddeley_max_dist[]   = "baddeley_max_dist";
+static const char conf_key_fom_alpha[]           = "fom_alpha";
+static const char conf_key_zhu_weight[]          = "zhu_weight";
 
 //
 // Wavelet-Stat specific parameter key names
@@ -692,7 +696,7 @@ static const char conf_key_nmep_flag[]        = "nmep";
 static const char conf_key_rank_flag[]        = "rank";
 static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
-static const char conf_key_rps_thresh[]       = "rps_thresh";
+static const char conf_key_prob_cat_thresh[]  = "prob_cat_thresh";
 static const char conf_key_obs_error[]        = "obs_error";
 static const char conf_key_dist_type[]        = "dist_type";
 static const char conf_key_dist_parm[]        = "dist_parm";

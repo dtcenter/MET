@@ -54,8 +54,6 @@ class StringArray {
 
       void clear();
 
-      void extend(int);
-
       void dump(std::ostream &, int depth = 0) const;
 
       const std::string operator[](int) const;

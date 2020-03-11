@@ -81,7 +81,7 @@ class TCPolyArray {
 
       void assign(const TCPolyArray &);
 
-      void extend(int);
+      void extend(int, bool exact = true);
 
       TCPoly * Poly;
       int      NPolys;

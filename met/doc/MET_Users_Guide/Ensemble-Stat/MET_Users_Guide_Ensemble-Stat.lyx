@@ -271,8 +271,8 @@ The relative position (RELP) is a count of the number of times each ensemble
 The ranked probability score (RPS) is included in the Ranked Probability
  Score (RPS) line type.
  It is the mean of the Brier scores computed from ensemble probabilities
- derived for each RPS threshold (rps_thresh) specified in the configuration
- file.
+ derived for each probability category threshold (prob_cat_thresh) specified
+ in the configuration file.
  The continuous ranked probability score (CRPS) is the average the distance
  between the forecast (ensemble) cumulative distribution function and the
  observation cumulative distribution function.
@@ -1515,7 +1515,7 @@ ens_phist_bin_size = 0.05;
 \begin_layout LyX-Code
 
 \series bold
-rps_thresh         = [];
+prob_cat_thresh    = [];
 \end_layout
 
 \begin_layout Standard
@@ -1614,7 +1614,7 @@ ens_phist_bin_size
 \begin_layout Standard
 The 
 \series bold
-rps_thresh
+prob_cat_thresh
 \series default
  entry is an array of thresholds to be applied in the computation of the
  RPS line type.
@@ -1632,7 +1632,7 @@ climo_cdf
  If not climatology data is provide, and the RPS output line type is requested,
  then the 
 \series bold
-rps_thresh
+prob_cat_thresh
 \series default
  array must be defined.
  

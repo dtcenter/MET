@@ -35,8 +35,7 @@ class LongArray {
 
       void assign(const LongArray &);
 
-      void extend(int);
-
+      void extend(int, bool exact = true);
 
       int Nelements;
 

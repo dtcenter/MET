@@ -133,10 +133,10 @@ ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
 
 //
-// Ranked Probability Score thresholds
+// Categorical thresholds to define ensemble probabilities
 // May be set separately in each "fcst.field" entry
 //
-rps_thresh = [];
+prob_cat_thresh = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 

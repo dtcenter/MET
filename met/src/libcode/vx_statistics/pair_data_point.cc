@@ -97,11 +97,11 @@ void PairDataPoint::erase() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::extend(int n) {
+void PairDataPoint::extend(int n, bool exact) {
 
-   PairBase::extend(n);
+   PairBase::extend(n, exact);
 
-   f_na.extend(n);
+   f_na.extend(n, exact);
 
    return;
 }
@@ -126,7 +126,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    set_interp_shape(pd.interp_shape);
 
    // Handle point data
-   if(pd.sid_sa.n() == pd.n_obs) {
+   if(pd.is_point_vx()) {
 
       for(i=0; i<pd.n_obs; i++) {
          add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i], pd.lon_na[i],
@@ -152,8 +152,8 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                                    double f, double o, const char *qc,
                                    double cmn, double csd, double wgt) {
 
-   if(!PairBase::add_point_obs(sid, lat, lon, x, y, ut, lvl, elv,
-                               o, qc, cmn, csd, wgt) ) return(false);
+   if(!add_point_obs(sid, lat, lon, x, y, ut, lvl, elv, o, qc,
+                     cmn, csd, wgt)) return(false);
 
    f_na.add(f);
 
@@ -177,8 +177,8 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
       exit(1);
    }
 
-   PairBase::set_point_obs(i_obs, sid, lat, lon, x, y, ut, lvl, elv,
-                           o, qc, cmn, csd, wgt);
+   set_point_obs(i_obs, sid, lat, lon, x, y, ut, lvl, elv,
+                 o, qc, cmn, csd, wgt);
 
    f_na.set(i_obs, f);
 
@@ -190,11 +190,9 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
 bool PairDataPoint::add_grid_pair(double f, double o,
                                   double cmn, double csd, double wgt) {
 
+   add_grid_obs(o, cmn, csd, wgt);
+
    f_na.add(f);
-   o_na.add(o);
-   wgt_na.add(wgt);
-   add_climo(o, cmn, csd);
-   n_obs++;
 
    return(true);
 }
@@ -1321,7 +1319,7 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
                          ft, ot, type)) {
 
          // Handle point data
-         if(pd.sid_sa.n() == pd.n_obs) {
+         if(pd.is_point_vx()) {
             out_pd.add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i],
                       pd.lon_na[i], pd.x_na[i], pd.y_na[i],
                       pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
@@ -1402,7 +1400,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
                          ft, ot, type)) {
 
          // Handle point data
-         if(pd_u.sid_sa.n() == pd_u.n_obs) {
+         if(pd_u.is_point_vx()) {
             out_pd_u.add_point_pair(pd_u.sid_sa[i].c_str(),
                         pd_u.lat_na[i], pd_u.lon_na[i],
                         pd_u.x_na[i], pd_u.y_na[i], pd_u.vld_ta[i],
@@ -1474,7 +1472,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
       if(ta.check_bins(pd.cdf_na[i]) == (i_bin + 1)) {
 
          // Handle point data
-         if(pd.sid_sa.n() == pd.n_obs) {
+         if(pd.is_point_vx()) {
             out_pd.add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i],
                       pd.lon_na[i], pd.x_na[i], pd.y_na[i],
                       pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],

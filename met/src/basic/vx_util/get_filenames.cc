@@ -116,7 +116,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
    //  process directory
    //
 
-  b = get_filenames_from_dir(search_dir.c_str(), prefix, suffix);
+   b = get_filenames_from_dir(search_dir.c_str(), prefix, suffix);
 
    a.add(b);
 

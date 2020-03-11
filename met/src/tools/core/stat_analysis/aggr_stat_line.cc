@@ -3079,7 +3079,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(0.0, 0.0, cur.obs, cur.climo,
+         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo,
                                     bad_data_double, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;

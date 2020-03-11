@@ -153,12 +153,8 @@ void TCGenVxOpt::clear() {
    Desc.clear();
    Model.clear();
    StormId.clear();
-   Basin.clear();
-   Cyclone.clear();
    StormName.clear();
    InitBeg = InitEnd = (unixtime) 0;
-   InitInc.clear();
-   InitExc.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    InitHour.clear();
    Lead.clear();
@@ -190,28 +186,12 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    // Conf: storm_id
    StormId = dict.lookup_string_array(conf_key_storm_id);
 
-   // Conf: basin
-   Basin = dict.lookup_string_array(conf_key_basin);
-
-   // Conf: cyclone
-   Cyclone = dict.lookup_string_array(conf_key_cyclone);
-
    // Conf: storm_name
    StormName = dict.lookup_string_array(conf_key_storm_name);
 
    // Conf: init_beg, init_end
    InitBeg = dict.lookup_unixtime(conf_key_init_beg);
    InitEnd = dict.lookup_unixtime(conf_key_init_end);
-
-   // Conf: init_inc
-   sa = dict.lookup_string_array(conf_key_init_inc);
-   for(i=0; i<sa.n_elements(); i++)
-      InitInc.add(timestring_to_unix(sa[i].c_str()));
-
-   // Conf: init_exc
-   sa = dict.lookup_string_array(conf_key_init_exc);
-   for(i=0; i<sa.n_elements(); i++)
-      InitExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: valid_beg, valid_end
    ValidBeg = dict.lookup_unixtime(conf_key_valid_beg);
@@ -270,14 +250,6 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
          !has_storm_id(StormId, g.basin(), g.cyclone(), g.init()))
          keep = false;
 
-      // Check basin
-      else if(Basin.n() > 0 && !Basin.has(g.basin()))
-         keep = false;
-
-      // Check cyclone
-      else if(Cyclone.n() > 0 && !Cyclone.has(g.cyclone()))
-         keep = false;
-
       // Check storm name
       else if(StormName.n() > 0 && !StormName.has(g.storm_name()))
          keep = false;
@@ -291,10 +263,8 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    if(!g.is_best_track() || g.is_oper_track()) {
 
       // Initialization time window
-      if((InitBeg     > 0 &&  InitBeg > g.init())    ||
-         (InitEnd     > 0 &&  InitEnd < g.init())    ||
-         (InitInc.n() > 0 && !InitInc.has(g.init())) ||
-         (InitExc.n() > 0 &&  InitExc.has(g.init())))
+      if((InitBeg     > 0 &&  InitBeg > g.init()) ||
+         (InitEnd     > 0 &&  InitEnd < g.init()))
          keep = false;
 
       // Initialization hours
@@ -509,7 +479,37 @@ void TCGenConfInfo::process_config() {
          }
       } // end for i
    }
-       
+
+   // If not already set, define the valid time window relative to the
+   // initialization time window.
+   for(size_t j=0; j<VxOpt.size(); j++) {
+
+      if(VxOpt[j].InitBeg != 0 && VxOpt[j].ValidBeg == 0) {
+         VxOpt[j].ValidBeg = VxOpt[j].InitBeg + LeadSecBeg + VxOpt[j].GenesisSecBeg;
+         mlog << Debug(3) << "For filter " << j+1 << " setting "
+              << conf_key_valid_beg << " ("
+              << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidBeg)
+              <<  ") = " << conf_key_init_beg << " ("
+              << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitBeg)
+              << ") + " << conf_key_lead_window << ".beg ("
+              << LeadSecBeg/sec_per_hour
+              << ") + " << conf_key_genesis_window << ".beg ("
+              << VxOpt[j].GenesisSecBeg/sec_per_hour << ").\n";
+      }
+
+      if(VxOpt[j].InitEnd != 0 && VxOpt[j].ValidEnd == 0) {
+         VxOpt[j].ValidEnd = VxOpt[j].InitEnd + LeadSecEnd + VxOpt[j].GenesisSecEnd;
+         mlog << Debug(3) << "For filter " << j+1 << " setting "
+              << conf_key_valid_end << " ("
+              << unix_to_yyyymmdd_hhmmss(VxOpt[j].ValidEnd)
+              <<  ") = " << conf_key_init_end << " ("
+              << unix_to_yyyymmdd_hhmmss(VxOpt[j].InitEnd)
+              << ") + " << conf_key_lead_window << ".end ("
+              << LeadSecEnd/sec_per_hour
+              << ") + " << conf_key_genesis_window << ".end ("
+              << VxOpt[j].GenesisSecEnd/sec_per_hour << ").\n";
+      }
+   }
 
    return;
 }
@@ -560,8 +560,8 @@ GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
    // Conf: technique (optional)
    info.Technique = dict->lookup_string(conf_key_technique, false);
 
-   // Conf: category
-   sa = dict->lookup_string_array(conf_key_category);
+   // Conf: category (optional)
+   sa = dict->lookup_string_array(conf_key_category, false);
    for(i=0; i<sa.n(); i++) {
       info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
    }
