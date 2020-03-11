@@ -24,6 +24,7 @@ using namespace std;
 #include "rmw_analysis.h"
 
 #include "vx_nc_util.h"
+#include "vx_tc_util.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -34,6 +35,7 @@ using namespace std;
 static void usage();
 static void process_command_line(int, char**);
 static void set_data_files(const StringArray&);
+static void set_adeck(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
@@ -42,6 +44,14 @@ static void setup();
 static void process_files();
 static void normalize_stats();
 static void write_stats();
+static void process_adecks(TrackInfoArray&);
+static void set_atcf_source(const StringArray&,
+    StringArray&, StringArray&);
+static void get_atcf_files(const StringArray&,
+    const StringArray&, StringArray&, StringArray&);
+static bool is_keeper(const ATCFLineBase*);
+static void filter_tracks(TrackInfoArray&);
+static void read_nc_tracks(NcFile*);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +107,7 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     cline.add(set_data_files, "-data",   -1);
+    cline.add(set_adeck,      "-adeck",   1);
     cline.add(set_config,     "-config", -1);
     cline.add(set_out,        "-out",     1);
     cline.add(set_logfile,    "-log",     1);
@@ -127,6 +138,46 @@ void process_command_line(int argc, char **argv) {
 
 void set_data_files(const StringArray& a) {
     data_files = a;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_adeck(const StringArray& a) {
+    set_atcf_source(a, adeck_source, adeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_atcf_source(const StringArray& a,
+                     StringArray& source,
+                     StringArray& model_suffix) {
+
+    StringArray sa;
+    ConcatString cs, suffix;
+
+    // Check for optional suffix sub-argument
+    for(int i = 0; i < a.n_elements(); i++) {
+        if(a[i] == "suffix") {
+            cs = a[i];
+            sa = cs.split("=");
+            if(sa.n_elements() != 2) {
+                mlog << Error
+                     << "\nset_atcf_source() -> "
+                     << "the model suffix must be specified as "
+                     << "\"suffix=string\".\n\n";
+            }
+            else {
+                suffix = sa[1];
+            }
+        }
+    }
+
+    // Parse remaining sources
+    for(int i = 0; i < a.n_elements(); i++) {
+        if( a[i] == "suffix" ) continue;
+        source.add(a[i]);
+        model_suffix.add(suffix);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -326,6 +377,12 @@ void process_files() {
         track_point_dim = get_nc_dim(nc_in, "track_point");
         mlog << Debug(1) << "Number of track points "
              << n_track_point << "\n";
+
+        // Read track information
+        read_nc_tracks(nc_in);
+
+        // Filter tracks
+        filter_tracks(adeck_tracks);
 
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
             NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
@@ -537,6 +594,164 @@ void write_stats() {
     }
 
     nc_out->close();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_adecks(TrackInfoArray& adeck_tracks) {
+    StringArray files, files_model_suffix;
+
+    // Initialize
+    adeck_tracks.clear();
+
+    // Get list of track files
+    get_atcf_files(adeck_source, adeck_model_suffix,
+                   files, files_model_suffix);
+
+    mlog << Debug(2)
+         << "Processing " << files.n_elements() << " ADECK file(s).\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_atcf_files(const StringArray& source,
+                    const StringArray& model_suffix,
+                    StringArray& files,
+                    StringArray& files_model_suffix) {
+
+    StringArray cur_source, cur_files;
+
+    if(source.n_elements() != model_suffix.n_elements()) {
+        mlog << Error
+             << "\nget_atcf_files() -> "
+             << "the source and suffix arrays must be equal length!\n\n";
+        exit(1);
+    }
+
+    // Initialize
+    files.clear();
+    files_model_suffix.clear();
+
+    // Build list of files from all sources
+    for(int i = 0; i < source.n_elements(); i++) {
+        cur_source.clear();
+        cur_source.add(source[i]);
+        cur_files = get_filenames(cur_source, NULL, atcf_suffix);
+
+        for(int j = 0; j < cur_files.n_elements(); j++) {
+            files.add(cur_files[j]);
+            files_model_suffix.add(model_suffix[i]);
+        }
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_keeper(const ATCFLineBase* line) {
+    bool keep = true;
+
+    // Check model
+    if(conf_info.Model.n_elements() > 0 &&
+        !conf_info.Model.has(line->technique()))
+        keep = false;
+
+    // Check storm id
+    else if(conf_info.StormId.n_elements() > 0 &&
+            !has_storm_id(conf_info.StormId, line->basin(),
+                          line->cyclone_number(), line->warning_time()))
+        keep = false;
+
+    // Check basin
+    else if(conf_info.Basin.n_elements() > 0 &&
+            !conf_info.Basin.has(line->basin()))
+        keep = false;
+
+    // Check cyclone
+    else if(conf_info.Cyclone.n_elements() > 0 &&
+            !conf_info.Cyclone.has(line->cyclone_number()))
+        keep = false;
+
+    // Initialization time window
+    else if((conf_info.InitBeg > 0 &&
+             conf_info.InitBeg > line->warning_time()) ||
+            (conf_info.InitEnd > 0 &&
+             conf_info.InitEnd < line->warning_time()))
+        keep = false;
+
+    return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void filter_tracks(TrackInfoArray& tracks) {
+
+    TrackInfoArray t = tracks;
+
+    // Initialize
+    tracks.clear();
+
+    // Loop over tracks
+    for(int i = 0; i < t.n_tracks(); i++) {
+        // Valid time window
+        if((conf_info.ValidBeg > 0 &&
+            conf_info.ValidBeg > t[i].valid_min()) ||
+           (conf_info.ValidEnd > 0 &&
+            conf_info.ValidEnd < t[i].valid_max())) {
+             mlog << Debug(4)
+                  << "Discarding track " << i+1
+                  << " for falling outside the "
+                  << "valid time window: "
+                  << unix_to_yyyymmdd_hhmmss(t[i].valid_min()) << " to "
+                  << unix_to_yyyymmdd_hhmmss(t[i].valid_max()) << "\n";
+            continue;
+        }
+
+        // Retain track
+        tracks.add(t[i]);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_nc_tracks(NcFile* nc_in) {
+
+    mlog << Debug(3) << adeck_source[0] << "\n";
+
+    ofstream f;
+    f.open(adeck_source[0].c_str());
+
+    adeck_tracks.clear();
+
+    NcDim track_line_dim;
+    get_dim(nc_in, "track_line", n_track_line, true);
+
+    mlog << Debug(3) << "Number of track lines "
+         << n_track_line << "\n";
+
+    NcVar track_lines_var = get_nc_var(nc_in, "TrackLines");
+
+    vector<size_t> counts;
+    vector<size_t> offsets;
+
+    for(int i = 0; i < n_track_line; i++) {
+        offsets.clear();
+        offsets.push_back(i);
+        counts.clear();
+        counts.push_back(1);
+
+        char* track_line_str;
+        track_lines_var.getVar(offsets, counts, &track_line_str);
+        ConcatString track_line(track_line_str);
+        mlog << Debug(3) << track_line << "\n";
+
+        // ATCFTrackLine line;
+        // if(!is_keeper(&line)) continue;
+        // tracks.add(line, true, false);
+        f << track_line;
+    }
+    f.close();
 }
 
 ////////////////////////////////////////////////////////////////////////

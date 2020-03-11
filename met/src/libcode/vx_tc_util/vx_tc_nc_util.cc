@@ -111,12 +111,6 @@ void write_tc_tracks(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_tc_tracks(NcFile*, TrackInfoArray&) {
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
 set<string> get_pressure_level_strings(
     map<string, vector<string> > variable_levels) {
 

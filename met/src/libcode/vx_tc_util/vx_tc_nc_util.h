@@ -30,8 +30,6 @@ using namespace netCDF;
 extern void write_tc_tracks(NcFile*,
     const NcDim&, const TrackInfoArray&);
 
-extern void read_tc_tracks(NcFile*, TrackInfoArray&);
-
 extern set<string> get_pressure_level_strings(
     map<string, vector<string> >);
 

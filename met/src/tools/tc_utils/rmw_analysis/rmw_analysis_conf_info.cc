@@ -63,10 +63,12 @@ void RMWAnalysisConfInfo::clear() {
     StormName.clear();
     InitBeg = InitEnd = (unixtime) 0;
     ValidBeg = ValidEnd = (unixtime) 0;
+
     InitMaskName.clear();
     InitPolyMask.clear();
     InitGridMask.clear();
     InitAreaMask.clear();
+
     ValidMaskName.clear();
     ValidPolyMask.clear();
     ValidGridMask.clear();

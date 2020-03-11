@@ -44,6 +44,7 @@ using namespace netCDF;
 #include "rmw_analysis_conf_info.h"
 
 #include "vx_util.h"
+#include "vx_tc_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -53,6 +54,9 @@ using namespace netCDF;
 
 // Program name
 static const char* program_name = "rmw_analysis";
+
+// ATCF file suffix
+static const char* atcf_suffix = ".dat";
 
 // Default configuration file name
 static const char* default_config_filename =
@@ -102,6 +106,7 @@ static int n_range;
 static int n_azimuth;
 static int n_level;
 static int n_track_point;
+static int n_track_line;
 
 vector<double> range_coord;
 vector<double> azimuth_coord;
@@ -124,6 +129,10 @@ static vector<DataCube*> data_means;
 static vector<DataCube*> data_stdevs;
 static vector<DataCube*> data_mins;
 static vector<DataCube*> data_maxs;
+
+// Track information
+static TrackInfoArray adeck_tracks;
+static StringArray    adeck_source, adeck_model_suffix;
 
 #endif  //  __RMW_ANALYSIS_H__
 
