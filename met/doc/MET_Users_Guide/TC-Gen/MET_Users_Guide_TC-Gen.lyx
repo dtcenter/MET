@@ -138,8 +138,44 @@ name "sec:TC-Gen-Statistical-aspects"
 \begin_layout Standard
 
 \series medium
-The TC-Gen tool ...
- Kathryn will add content.
+The TC-Gen tool populates a contingency table with hits, misses, and false
+ alarms.
+ As with other extreme events (where the event occurs much less frequently
+ than the non-event), the correct negative category is not computed the
+ non-events would dominate the contingency table.
+ Therefore, only statistics that do not include correct negatives should
+ be considered for this tool.
+ The following CTS statistics are relevant: Base rate (BASER), Mean forecast
+ (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False
+ Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS),
+ Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS),
+ Bias Adjusted Gilbert Skill Score (BAGSS).
+ 
+\end_layout
+
+\begin_layout Standard
+Other considerations for interpreting the output of the TC-Gen tool involve
+ the size of the contingency table output.
+ The size of the contingency table will change depending on the number of
+ matches.
+ Additionally, the number of misses is based on the forecast duration and
+ interval (specified in the configuration file).
+ This change is due to the number of model opportunities to forecast the
+ event, which is determined by the specified duration/interval.
+\end_layout
+
+\begin_layout Standard
+Care should be taken when interpreting the statistics for filtered data.
+ In some cases, variables (e.g.
+ storm name) are only available in either the forecast or reference datasets,
+ rather than both.
+ When filtering on a field that is only present in one dataset, the contingency
+ table counts will be impacted.
+ Similarly, the initialization field only impacts the model forecast data.
+ If the valid time (which will impact the reference dataset) isn't also
+ specified, the forecasts will be filtered and matched such that the number
+ of misses will erroneously increase.
+ See section 1.3.2 for more detail.
 \end_layout
 
 \begin_layout Section
