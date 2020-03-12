@@ -54,14 +54,6 @@ void TCRMWConfInfo::init_from_scratch() {
 
 void TCRMWConfInfo::clear() {
 
-    Model.clear();
-    Basin.clear();
-    StormName.clear();
-    StormId.clear();
-    // InitTime = (unixtime) 0;
-    // LeadTimes.clear();
-    Version.clear();
-
     // Clear data_info
     if(data_info) {
         for(int i = 0; i < n_data; i++) {
@@ -104,32 +96,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     Dictionary *fdict = (Dictionary *) 0;
 
     // Conf: Version
-    Version = Conf.lookup_string(conf_key_version);
-    check_met_version(Version.c_str());
-
-    // Conf: Model
-    Model = Conf.lookup_string(conf_key_model);
-
-    // Conf: Basin
-    Basin = Conf.lookup_string(conf_key_basin);
-
-    // Conf: StormName
-    StormName = Conf.lookup_string(conf_key_storm_name);
-
-    // Conf: StormId
-    StormId = Conf.lookup_string(conf_key_storm_id);
-
-    // Conf: Cyclone
-    Cyclone = Conf.lookup_int(conf_key_cyclone);
-
-    // Conf: InitTime
-    // InitTime = Conf.lookup_unixtime(conf_key_init_time);
-
-    // Conf: LeadTimes
-    // sa = Conf.lookup_string_array(conf_key_lead_time);
-    // for(i=0; i<sa.n_elements(); i++){
-    //     LeadTimes.add(timestring_to_sec(sa[i].c_str()));
-    // }
+    check_met_version(Conf.lookup_string(conf_key_version).c_str());
 
     // Conf: n_range
     n_range = Conf.lookup_int(conf_key_n_range);

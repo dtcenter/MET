@@ -36,18 +36,6 @@ class TCRMWConfInfo {
         // TCRMW configuration object
         MetConfig Conf;
 
-        // Track filtering criteria
-        ConcatString Model;     // Model name
-        ConcatString Basin;     // Basin name
-        ConcatString StormName; // Storm name
-        ConcatString StormId;   // Storm id
-
-        int Cyclone;  // Cyclone number
-
-        // Timing information
-        unixtime  InitTime;
-        NumArray  LeadTimes;
-
         int n_range;
         int n_azimuth;
         double max_range_km;
@@ -56,9 +44,6 @@ class TCRMWConfInfo {
 
         // Variable information
         VarInfo** data_info;
-
-        // Config file version
-        ConcatString Version;
 
         TCRMWConfInfo();
         ~TCRMWConfInfo();
