@@ -598,8 +598,8 @@ void process_track_files(const StringArray &files,
 
    // Compute the distance to land
    for(i=0; i<genesis.n(); i++) {
-      genesis.set_dland(i, conf_info.compute_dland(genesis[i].lat(),
-                                                   genesis[i].lon()));
+      genesis.set_dland(i, conf_info.compute_dland(     genesis[i].lat(),
+                                                   -1.0*genesis[i].lon()));
    }
 
    // Dump out the track information
