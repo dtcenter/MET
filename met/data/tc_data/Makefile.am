@@ -22,6 +22,7 @@ tcdata_DATA = \
 	aland.dat \
 	wland.dat \
 	shland.dat \
+	basin_global_tenth_degree.nc \
 	dland_nw_hem_tenth_degree.nc \
 	dland_global_tenth_degree.nc \
 	wwpts_us.txt
