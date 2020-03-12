@@ -251,7 +251,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
          keep = false;
 
       // Check storm name
-      else if(StormName.n() > 0 && !StormName.has(g.storm_name()))
+      if(StormName.n() > 0 && !StormName.has(g.storm_name()))
          keep = false;
    }
 
@@ -268,11 +268,11 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
          keep = false;
 
       // Initialization hours
-      else if(InitHour.n() > 0 && !InitHour.has(g.init_hour()))
+      if(InitHour.n() > 0 && !InitHour.has(g.init_hour()))
          keep = false;
 
       // Lead times
-      else if(Lead.n() > 0 && !Lead.has(g.lead_time()))
+      if(Lead.n() > 0 && !Lead.has(g.lead_time()))
          keep = false;
    }
 
@@ -284,12 +284,12 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
       keep = false;
 
    // Poly masking
-   else if(VxPolyMask.n_points() > 0 &&
-           !VxPolyMask.latlon_is_inside(g.lat(), g.lon()))
+   if(VxPolyMask.n_points() > 0 &&
+     !VxPolyMask.latlon_is_inside(g.lat(), g.lon()))
       keep = false;
 
    // Area masking
-   else if(!VxAreaMask.is_empty() ) {
+   if(!VxAreaMask.is_empty()) {
       double x, y;
       VxGridMask.latlon_to_xy(g.lat(), -1.0*g.lon(), x, y);
       if(x < 0 || x >= VxGridMask.nx() ||
@@ -302,8 +302,8 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    }
 
    // Distance to land
-   else if((DLandThresh.get_type() != no_thresh_type) &&
-           (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
+   if((DLandThresh.get_type() != no_thresh_type) &&
+      (is_bad_data(g.dland()) || !DLandThresh.check(g.dland())))
       keep = false;
 
    // Return the keep status
