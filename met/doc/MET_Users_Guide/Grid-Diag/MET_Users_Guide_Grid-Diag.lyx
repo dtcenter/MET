@@ -106,7 +106,7 @@ name "sec:Grid-Diag_Introduction"
 \begin_layout Standard
 
 \series medium
-The Grid-Diag tool
+The Grid-Diag tool 
 \end_layout
 
 \begin_layout Section
@@ -299,6 +299,8 @@ height "1pt"
 
 \begin_layout LyX-Code
 
+\series bold
+model          = "GFS-FV3";
 \end_layout
 
 \begin_layout Subsection
