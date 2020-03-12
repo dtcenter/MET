@@ -291,7 +291,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &g) {
    // Area masking
    else if(!VxAreaMask.is_empty() ) {
       double x, y;
-      VxGridMask.latlon_to_xy(g.lat(), g.lon(), x, y);
+      VxGridMask.latlon_to_xy(g.lat(), -1.0*g.lon(), x, y);
       if(x < 0 || x >= VxGridMask.nx() ||
          y < 0 || y >= VxGridMask.ny()) {
          keep = false;
