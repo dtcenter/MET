@@ -521,6 +521,34 @@ filename "TC-Gen/MET_Users_Guide_TC-Gen.lyx"
 
 \begin_inset CommandInset include
 LatexCommand include
+filename "TC-RMW/MET_Users_Guide_TC-RMW.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
+filename "RMW-Analysis/MET_Users_Guide_RMW-Analysis.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
 filename "Plotting/MET_Users_Guide_Plotting.lyx"
 
 \end_inset
