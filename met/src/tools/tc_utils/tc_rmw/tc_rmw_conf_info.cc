@@ -95,7 +95,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) 0;
 
-    // Conf: Version
+    // Conf: version
     check_met_version(Conf.lookup_string(conf_key_version).c_str());
 
     // Conf: n_range
