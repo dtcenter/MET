@@ -443,6 +443,80 @@ height "1pt"
 
 \end_layout
 
+\begin_layout LyX-Code
+
+\series bold
+basin = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+storm_name = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+storm_id = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+cyclone = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+init_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+init_end = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+valid_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+valid_end = "";
+\end_layout
+
+\begin_layout Standard
+The track filter options available in rmw_analysis and listed above are
+ 
+\series medium
+described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:IO_MET-TC-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 rmw_analysis output file
 \begin_inset CommandInset label
