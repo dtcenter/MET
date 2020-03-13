@@ -41,19 +41,16 @@ static void usage();
 static void process_command_line(int, char**);
 static void process_decks();
 static void process_adecks(TrackInfoArray&);
-static void process_bdecks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
     const StringArray&, TrackInfoArray&, bool, bool);
 static void set_adeck(const StringArray&);
-static void set_bdeck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
-static void set_out_dir(const StringArray&);
-static void set_out_prefix(const StringArray&);
+static void set_out(const StringArray&);
 static void set_logfile(const StringArray&);
 static void set_verbosity(const StringArray&);
 static void setup_grid();
@@ -99,8 +96,8 @@ void usage() {
          << "\t-data file_1 ... file_n | data_file_list\n"
          << "\t-adeck file\n"
          << "\t-config file\n"
-         << "\t[-log file]\n"
          << "\t[-out file]\n"
+         << "\t[-log file]\n"
          << "\t[-v level]\n\n" << flush;
 
     exit(1);
@@ -119,6 +116,9 @@ void process_command_line(int argc, char **argv) {
     // Default output prefix
     out_prefix = replace_path(default_out_prefix);
 
+    // Print usage statement for no arguments
+    if(argc <= 1) usage();
+
     // Parse command line into tokens
     cline.set(argc, argv);
 
@@ -126,22 +126,15 @@ void process_command_line(int argc, char **argv) {
     cline.set_usage(usage);
 
     // Add function calls for arguments
-    cline.add(set_data_files, "-data",  -1);
-    cline.add(set_adeck,      "-adeck", -1);
-    cline.add(set_bdeck,      "-bdeck", -1);
-    cline.add(set_config,     "-config", 1);
-    cline.add(set_out_dir,    "-outdir", 1);
-    cline.add(set_out_prefix, "-prefix", -1);
-    cline.add(set_logfile,    "-log",    1);
-    cline.add(set_verbosity,  "-v",      1);
+    cline.add(set_data_files, "-data",   -1);
+    cline.add(set_adeck,      "-adeck",  -1);
+    cline.add(set_config,     "-config",  1);
+    cline.add(set_out,        "-out",     1);
+    cline.add(set_logfile,    "-log",     1);
+    cline.add(set_verbosity,  "-v",       1);
 
     // Parse command line
     cline.parse();
-
-    // Check number of arguments
-    // if(cline.n() != 1) usage();
-
-    // data_file = cline[0];
 
     // Create default config file name
     default_config_file = replace_path(default_config_filename);
@@ -158,7 +151,7 @@ void process_command_line(int argc, char **argv) {
 
     // Get data file type from config
     ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
-        conf_key_data));
+                                 conf_key_data));
 
     // Process the configuration
     conf_info.process_config(ftype);
@@ -172,13 +165,12 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_decks() {
+
     // Process ADECK files
     TrackInfoArray adeck_tracks;
     process_adecks(adeck_tracks);
 
     process_fields(adeck_tracks);
-
-    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -201,25 +193,6 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
 
     ConcatString adeck_track_file("adeck.nc");
     write_tc_tracks(nc_out, track_point_dim, adeck_tracks);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_bdecks(TrackInfoArray& bdeck_tracks) {
-    StringArray files, files_model_suffix;
-
-    // Initialize
-    bdeck_tracks.clear();
-
-    // Get list of track files
-    get_atcf_files(bdeck_source, bdeck_model_suffix,
-                   files, files_model_suffix);
-
-    mlog << Debug(2)
-         << "Processing " << files.n_elements() << " BDECK file(s).\n";
-
-    process_track_files(files, files_model_suffix, bdeck_tracks,
-                        false, false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -295,9 +268,6 @@ void process_track_files(const StringArray& files,
         // Read each line
         while(f >> line) {
 
-            // line.dump(cout);
-            // cout << line.get_line() << "\n";
-
             // Increment line counts
             cur_read++;
             tot_read++;
@@ -336,12 +306,6 @@ void process_track_files(const StringArray& files,
 
 void set_adeck(const StringArray& a) {
     set_atcf_source(a, adeck_source, adeck_model_suffix);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_bdeck(const StringArray& b) {
-    set_atcf_source(b, bdeck_source, bdeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -391,14 +355,8 @@ void set_config(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_dir(const StringArray& a) {
-    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_out_prefix(const StringArray& a) {
-    out_prefix = a[0];
+void set_out(const StringArray& a) {
+    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -432,18 +390,17 @@ void setup_grid() {
 void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
 
-    // Create output NetCDF file name
-    build_outfile_name(out_prefix, "out.nc", out_nc_file);
-
-    mlog << Debug(1) << out_nc_file << "\n";
+   // List the output file
+   mlog << Debug(1)
+        << "Creating output file: " << out_file << "\n";
 
     // Create NetCDF file
-    nc_out = open_ncfile(out_nc_file.c_str(), true);
+    nc_out = open_ncfile(out_file.c_str(), true);
 
     if(IS_INVALID_NC_P(nc_out)) {
         mlog << Error << "\nsetup_nc_file() -> "
              << "trouble opening output NetCDF file "
-             << out_nc_file << "\n\n";
+             << out_file << "\n\n";
         exit(1);
     }
 
@@ -491,23 +448,6 @@ void setup_nc_file() {
         variable_levels, variable_long_names, variable_units,
         range_dim, azimuth_dim, pressure_dim, track_point_dim,
         data_3d_vars);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void build_outfile_name(
-    const ConcatString& prefix, const char* suffix, ConcatString& str) {
-
-    // Append output directory and program name
-    str << cs_erase << out_dir << "/" << program_name;
-
-    // Append prefix
-    str << prefix << "_";
-
-    // Append suffix
-    str << suffix;
-
-    return;
 }
 
 ////////////////////////////////////////////////////////////////////////

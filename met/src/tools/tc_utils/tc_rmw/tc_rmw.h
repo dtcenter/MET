@@ -98,7 +98,7 @@ static ConcatString out_prefix;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static ConcatString out_nc_file;
+static ConcatString out_file;
 static NcFile*      nc_out = (NcFile*) 0;
 static NcDim        range_dim;
 static NcDim        azimuth_dim;
