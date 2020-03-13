@@ -455,7 +455,14 @@ name "subsec:RMW_Analysis-output-file"
 \end_layout
 
 \begin_layout Standard
-The NetCDF output file
+The NetCDF output file will inherit the spatial grid from the first tc_rmw
+ output file in the output file list.
+ All tc_rmw files in this list must have the same grid dimension sizes.
+ A NetCDF output error will result if that is not the case.
+ For each data variable specified in the config file, four corresponding
+ NetCDF variables will be written, e.g.
+ TMP_mean, TMP_stdev, TMP_min, TMP_max.
+ No track point dimension is retained in the rmw_analysis output.
 \end_layout
 
 \end_body
