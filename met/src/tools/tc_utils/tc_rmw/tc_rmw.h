@@ -71,7 +71,7 @@ static const char* default_out_dir = ".";
 static const char* default_out_prefix = "";
 
 // Nautical mile to kilometer conversion
-static const float nm_to_km = 1.852;
+static const double nm_to_km = 1.852;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -124,7 +124,7 @@ static map<string, string> variable_long_names;
 static map<string, string> variable_units;
 
 static set<string> pressure_level_strings;
-static set<float> pressure_levels;
+static set<double> pressure_levels;
 static map<string, int> pressure_level_indices;
 
 ////////////////////////////////////////////////////////////////////////
