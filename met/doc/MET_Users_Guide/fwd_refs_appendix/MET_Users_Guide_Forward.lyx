@@ -427,6 +427,10 @@ Fix inconsistencies for many of the pre-defined NCEP grids (#1254).
 Fix segfault when passing as input a thinned lat/lon grid (#1252).
 \end_layout
 
+\begin_layout Itemize
+Fix for Lambert Conformal grids crossing the international date line (#1276).
+\end_layout
+
 \end_deeper
 \begin_layout Itemize
 
