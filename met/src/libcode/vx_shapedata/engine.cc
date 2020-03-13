@@ -2206,13 +2206,18 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    double total;
    
    if(mlog.verbosity_level() >= print_interest_log_level) {
+
       ConcatString cs;
-      cs << (is_single ? "single" : "cluster");
+      if(is_single) {
+         cs.format("single pair F%03d_O%03d", fcst_num, obs_num);
+      }
+      else {
+         cs.format("cluster pair CF%03d_CO%03d", fcst_num, obs_num);
+      }
+
       mlog << Debug(print_interest_log_level)
            << "\n" << sep_str << "\n\n"
-           << "Computing total interest for "
-           << cs << " forecast object " << fcst_num << " and "
-           << cs << " observation object " << obs_num << " pair.\n\n";
+           << "Computing total interest for " << cs << ".\n\n";
    }
 
    ////////////////////////////////////////////////////////////////////
