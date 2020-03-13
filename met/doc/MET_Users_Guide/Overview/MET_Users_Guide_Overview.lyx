@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -224,12 +230,15 @@ reference "chap:MET-TC-Overview"
  - 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "chap:TC-Stat"
+reference "chap:RMW-Analysis-tool"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
  describe tools focused on tropical cyclones, including MET-TC Overview,
- TC-Dland, TC-Pairs and TC-Stat.
+ TC-Dland, TC-Pairs, TC-Stat, TC-RMW and RMW-Analysis.
  Finally, Chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -715,16 +724,22 @@ The Stat-Analysis and MODE-Analysis tools aggregate the output statistics
 \begin_layout Standard
 Tropical cyclone forecasts and observations are quite different than numerical
  model forecasts, and thus they have their own set of tools.
- The MET-TC package includes three modules: TC-DLAND, TC-PAIRS, and TC-STAT.
- The TC-DLAND module calculates the distance to land from all locations
+ The MET-TC package includes several modules: TC-Dland, TC-Pairs, TC-Stat,
+ TC-Gen, TC-RMW, and RMW-Analysis.
+ The TC-Dland module calculates the distance to land from all locations
  on a specified grid.
  This information can be used in later modules to eliminate tropical cyclones
  that are over land from being included in the statistics.
- TC-PAIRS matches up tropical cyclone forecasts and observations and writes
+ TC-Pairs matches up tropical cyclone forecasts and observations and writes
  all output to a file.
- In TC-STAT, these forecast / observation pairs are analyzed according to
+ In TC-Stat, these forecast / observation pairs are analyzed according to
  user preference to produce statistics.
- 
+ TC-Gen evaluates the performance of Tropical Cyclone genesis forecast using
+ contingency table counts and statistics.
+ TC-RMW performs a coordinate transformation for gridded model or analysis
+ fields centered on the current storm location.
+ RMW-Analysis filters and aggregates the output of TC-RMW across multiple
+ cases.
 \end_layout
 
 \begin_layout Standard
@@ -874,13 +889,11 @@ Fortify
 \end_layout
 
 \begin_layout Standard
-Since the previous release of MET, requirements from various government
- agencies that use MET have resulted in our code being analyzed by Fortify,
- a proprietary static source code analyzer owned by HP Enterprise Security
- Products.
- Briefly, Fortify looks at source code and analyzes it for security risks,
- memory leaks, uninitialized variables, and other such weaknesses and bad
- coding practices.
+Requirements from various government agencies that use MET have resulted
+ in our code being analyzed by Fortify, a proprietary static source code
+ analyzer owned by HP Enterprise Security Products.
+ Fortify analyzes source code to identify for security risks, memory leaks,
+ uninitialized variables, and other such weaknesses and bad coding practices.
  Fortify categorizes any issues it finds as low priority, high priority,
  or critical, and reports these issues back to the developers for them to
  address.
@@ -893,18 +906,14 @@ Since the previous release of MET, requirements from various government
 \end_layout
 
 \begin_layout Standard
-The MET developers are pleased to report that after several months of work
- we have achieved this goal.
- Fortify now reports 
-\shape italic
-zero
-\shape default
- high priority or critical issues in the MET code.
- Users of MET tools who work in high security environments can therefore
- rest assured about the possibility of security risks when using MET, since
- the quality of the code has now been vetted by unbiased third-party experts.
- The MET developers plan to continue using Fortify regularly to ensure that
- these counts remain at zero in all future releases.
+The MET developers are pleased to report that Fortify reports zero critical
+ issues in the MET code.
+ Users of the MET tools who work in high security environments can rest
+ assured about the possibility of security risks when using MET, since the
+ quality of the code has now been vetted by unbiased third-party experts.
+ The MET developers continue using Fortify routinely to ensure that the
+ critical counts remain at zero and to further reduce the counts for lower
+ priority issues.
 \end_layout
 
 \end_body
