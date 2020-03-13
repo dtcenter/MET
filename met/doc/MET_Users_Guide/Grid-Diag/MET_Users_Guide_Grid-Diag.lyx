@@ -106,7 +106,12 @@ name "sec:Grid-Diag_Introduction"
 \begin_layout Standard
 
 \series medium
-The Grid-Diag tool 
+The Grid-Diag tool creates histograms (probability distributions when normalized
+) for an arbitrary collection of data fields and levels.
+ Joint histograms will be created for all possible pairs of variables.
+ Masks can be used to subset the data fields spatially.
+ The histograms are accumulated over a time series of input data files,
+ similar to Series Analysis.
 \end_layout
 
 \begin_layout Section
@@ -437,6 +442,24 @@ data           =
 }
 \end_layout
 
+\begin_layout Standard
+The 
+\series bold
+n_bins
+\series default
+ parameter specifies the number of histogram bins for that variable, and
+ the 
+\series bold
+range
+\series default
+ parameter the lower and upper bounds of the histogram.
+ The interval length is the upper and lower difference divided by 
+\series bold
+n_bins
+\series default
+.
+\end_layout
+
 \begin_layout Subsection
 grid_diag output file
 \begin_inset CommandInset label
@@ -449,7 +472,27 @@ name "subsec:Grid_Diag-output-file"
 \end_layout
 
 \begin_layout Standard
-The NetCDF output file contains the following dimensions:
+The NetCDF file has a dimension for each of the specified data variable
+ and level combinations, e.g.
+ APCP_L0 and PWAT_L0.
+ The bin minimum, midpoint, and maximum values are indiciated with an _min,
+ _min, or _max appended to the variable/level.
+\end_layout
+
+\begin_layout Standard
+For each variable/level combination in the data dictionary a corresponding
+ histogram will be output to the NetCDF file.
+ For example, hist_APCP_L0 and hist_PWAT_L0.
+ These are the counts of all data values falling within the bin.
+ Data values below the minimum or above the maximum are included in the
+ lowest and highest bins, respectively.
+\end_layout
+
+\begin_layout Standard
+In addition to 1D histograms, 2D histograms for all variable/level pairs
+ are written.
+ For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two
+ variables/levels.
 \end_layout
 
 \end_body
