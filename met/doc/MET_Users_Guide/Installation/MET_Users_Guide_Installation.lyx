@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -180,7 +186,7 @@ The MET package, including MET-TC, is written primarily in C/C++ in order
 \series medium
 NCEP's BUFRLIB is written entirely in Fortran.
  The portion of MET that handles the interface to the BUFRLIB for reading
- PrepBufr point observation files is also written in Fortran.
+ PrepBUFR point observation files is also written in Fortran.
 \end_layout
 
 \begin_layout Standard
@@ -208,9 +214,8 @@ name "sec:Install_Required-compilers-and"
 \begin_layout Standard
 
 \series medium
-The MET package was developed and tested using the GNU g++/gfortran compilers,
- the Portland Group (PGI) pgCC or pgc++ and pgf90 compilers, and the Intel
- icc/ifort compilers.
+The MET package was developed and tested using the GNU g++/gfortran compilers
+ and the Intel icc/ifort compilers.
  As additional compilers are successfully tested, they will be added to
  the list of supported platforms/compilers.
 \end_layout
@@ -237,7 +242,18 @@ The MET package consists of a group of command line utilities that are compiled
 
 \series medium
 In order to control the desired flow through MET, users are encouraged to
- run the tools via a script.
+ run the tools via a script or consider using the METplus package (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://dtcenter.org/community-code/metplus
+\end_layout
+
+\end_inset
+
+).
  Some sample scripts are provided in the distribution; these examples are
  written in the Bourne shell.
  However, users are free to adapt these sample scripts to any scripting
@@ -276,7 +292,7 @@ reference "sec:Installation-of-required"
 \series medium
 1.
  NCEP's BUFRLIB is used by MET to decode point-based observation datasets
- in PrepBufr format.
+ in PrepBUFR format.
  BUFRLIB is distributed and supported by NCEP and is freely available for
  download from NCEP's website at 
 \begin_inset Flex URL
@@ -458,7 +474,7 @@ reference "sec:Install_Required-libraries-and"
 \series medium
 1.
  NCEP's BUFRLIB is used by the MET to decode point-based observation datasets
- in PrepBufr format.
+ in PrepBUFR format.
  Once you have downloaded and unpacked the BUFRLIB tarball, refer to the
  README_BUFRLIB file.
  When compiling the library using the GNU C and Fortran compilers, users
@@ -1078,11 +1094,11 @@ The following environment variables should also be set:
 \end_layout
 
 \begin_layout Standard
-MET_PYTHON_CC='-I/usr/include/python2.7'
+MET_PYTHON_CC='-I/usr/include/python3.6'
 \end_layout
 
 \begin_layout Standard
-MET_PYTHON_LD='-L/usr/lib/python2.7/config-x86_64-linux-gnu -lpython2.7'
+MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
 \end_layout
 
 \begin_layout Standard
@@ -1191,7 +1207,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 \series medium
 If all tools are enabled and the build is successful, the "<prefix>/bin"
  directory (where <prefix> is the prefix you specified on your configure
- command line) will contain 31 executables:
+ command line) will contain 36 executables:
 \end_layout
 
 \begin_layout LyX-Code
@@ -1228,6 +1244,10 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 
 \begin_layout LyX-Code
 - gis_dump_shx
+\end_layout
+
+\begin_layout LyX-Code
+- grid_diag
 \end_layout
 
 \begin_layout LyX-Code
@@ -1301,9 +1321,17 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 \end_layout
 
 \begin_layout LyX-Code
+- point2grid
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 - point_stat
+\end_layout
+
+\begin_layout LyX-Code
+- rmw_analysis
 \end_layout
 
 \begin_layout LyX-Code
@@ -1333,9 +1361,17 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 \end_layout
 
 \begin_layout LyX-Code
+- tc_gen
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 - tc_pairs
+\end_layout
+
+\begin_layout LyX-Code
+- tc_rmw
 \end_layout
 
 \begin_layout LyX-Code
@@ -1396,21 +1432,23 @@ The configure script has command line options to specify where to install
 \begin_layout Standard
 
 \series bold
-–prefix=PREFIX
+--prefix=PREFIX
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 By default, MET will install all the files in "/usr/local/bin".
- You can specify an installation prefix other than "/usr/local" using "–prefix",
- for instance "–prefix=$HOME" or "–prefix=`pwd`".
+ You can specify an installation prefix 
+\series default
+other than "/usr/local" using "--prefix", for instance "--prefix=$HOME"
+ or "--prefix=`pwd`".
 \end_layout
 
 \begin_layout Standard
 
 \series bold
-–enable-grib2
+--enable-grib2
 \end_layout
 
 \begin_layout Standard
@@ -1434,329 +1472,22 @@ Enable compilation of python interface.
 \begin_layout Standard
 
 \series bold
-–disable-block4
+--disable-block4
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 Disable use of BLOCK4 in the compilation.
- Use this if you have trouble using PrepBufr files.
+ Use this if you have trouble using PrepBUFR files.
 \end_layout
 
 \begin_layout Standard
-
+Run the configure script with the 
 \series bold
-–disable-ascii2nc
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of ascii2nc
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-ensemble_stat
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of ensemble_stat
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-gen_vx_mask
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of gen_vx_mask
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-gis_utils
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of gis_dump_dbf, gis_dump_shp, and gis_dump_shx
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-grid_stat
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of grid_stat
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–enable-lidar2nc
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Enable compilation of lidar2nc.
- Requires $MET_HDF.
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-madis2nc
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of madis2nc
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-mode
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of mode
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-mode_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of mode_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-pb2nc
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of pb2nc
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-pcp_combine
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of pcp_combine
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-plot_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of plot_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-plot_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of plot_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-regrid_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of regrid_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-shift_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of shift_data_plane
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-plot_point_obs
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of plot_point_obs
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-point_stat
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of point_stat
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-stat_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of stat_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-wavelet_stat
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of wavelet_stat
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-series_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of series_analysis
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-wwmca
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of wwmca
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–enable-modis
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Enable compilation of modis.
- Requires $MET_HDF and $MET_HDFEOS.
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–enable-mode_graphics
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Enable compilation of mode_graphics.
- Requires $MET_CARIO, $MET_FREETYPE, $MET_FONT_DIR.
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-mode_time_domain
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of mode_time_domain
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-tc_utils
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of tc_utils
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-–disable-gsi_tools
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Disable compilation of gsi_tools
+--help
+\series default
+ argument to see the full list of configuration options.
 \end_layout
 
 \begin_layout Standard
@@ -1891,8 +1622,12 @@ Once the MET package has been built successfully, the user is encouraged
 \series medium
 4.
  In particular, check that the PB2NC tool ran without error.
- If there was an error, run "make clean" then rerun your configure command
- adding "–disable-block4" to your configure command line and rebuild MET.
+ If there was an error, run "make 
+\series default
+clean" then rerun your configure command adding "--disable-block4" to your
+ configure
+\series medium
+ command line and rebuild MET.
 \end_layout
 
 \end_body
