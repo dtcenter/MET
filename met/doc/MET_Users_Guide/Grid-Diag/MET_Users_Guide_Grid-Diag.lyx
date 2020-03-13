@@ -303,6 +303,140 @@ height "1pt"
 model          = "GFS-FV3";
 \end_layout
 
+\begin_layout LyX-Code
+
+\series bold
+mask           = { grid = [ "FULL" ]; poly = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+        
+\end_layout
+
+\begin_layout LyX-Code
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An example data field dictionary is
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+data           = 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    field = [
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+        {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            name = "APCP";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            level = ["L0"];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            n_bins = 30;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            range = [0, 12];},
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+        {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            name = "PWAT";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            level = ["L0"];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            n_bins = 35;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+            range = [35, 70];}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+    ]
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
 \begin_layout Subsection
 grid_diag output file
 \begin_inset CommandInset label
