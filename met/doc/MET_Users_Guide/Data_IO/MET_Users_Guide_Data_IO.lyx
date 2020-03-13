@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -90,7 +96,7 @@ name "chap:MET-Data-I/O"
 \begin_layout Standard
 
 \series medium
-Data must be preprocessed prior to using for verification.
+Data must often be preprocessed prior to using it for verification.
  Several MET tools exist for this purpose.
  In addition to preprocessing observations, some plotting utilities for
  data checking are also provided and described at the end of this chapter.
@@ -168,10 +174,11 @@ name "sec:IO_Input-data-formats"
 \begin_layout Standard
 
 \series medium
-The MET package can handle gridded input data in one of three formats: GRIB
- version 1, GRIB version 2, or netCDF classic format (CF compliant).
+The MET package can handle gridded input data in one of four formats: GRIB
+ version 1, GRIB version 2, NetCDF files following the Climate and Forecast
+ (CF) conventions, and NetCDF files produced by the MET tools themselves.
  MET supports standard NCEP, USAF, UKMet Office and ECMWF grib tables along
- with custom, user defined grib tables and the extended PDS including ensemble
+ with custom, user-defined GRIB tables and the extended PDS including ensemble
  member metadata.
  See 
 \begin_inset CommandInset ref
@@ -181,25 +188,29 @@ reference "subsec:IO_General-MET-Config-Options"
 \end_inset
 
  for more information.
- Point observation files may be supplied in either PrepBufr, ASCII, or MADIS
- format.
+ Point observation files may be supplied in either 
+\series default
+PrepBUFR
+\series medium
+, ASCII, or MADIS format.
  Note that MET does not require the Unified Post-Processor to be used, but
  does require that the input GRIB data be on a standard, de-staggered grid
  on pressure or regular levels in the vertical.
- While the Grid-Stat, Wavelet-Stat, and MODE tools can be run on a gridded
- field at virtually any level, the Point-Stat tool can only be used to verify
- forecasts at the surface or on pressure levels.
+ While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a
+ gridded field at virtually any level, the Point-Stat tool can only be used
+ to verify forecasts at the surface or on pressure or height levels.
+ MET does not interpolate between native model vertical levels.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, Ensemble-Sta
-t, MODE, or MODE-TD tools, the input model and observation datasets must
- be on the same grid.
+t, MODE, MTD, or Series-Analysis tools, the input model and observation
+ datasets must be on the same grid.
  MET will regrid files according to user specified options.
- Alternately, outside of MET, the copygb utility is recommended for re-gridding
- GRIB files.
+ Alternately, outside of MET, the copygb and wgrib2 utilities are recommended
+ for re-gridding GRIB1 and GRIB2 files, respectively.
  To preserve characteristics of the observations, it is generally preferred
  to re-grid the model data to the observation grid, rather than vice versa.
 \end_layout
@@ -207,20 +218,39 @@ t, MODE, or MODE-TD tools, the input model and observation datasets must
 \begin_layout Standard
 
 \series medium
-Input point observation files in PrepBufr format are available through NCEP.
- The PrepBufr observation files contain a wide variety of point-based observatio
-n types in a single file in a standard format.
+Input point observation files in 
+\series default
+PrepBUFR
+\series medium
+ format are available through NCEP.
+ The 
+\series default
+PrepBUFR
+\series medium
+ observation files contain a wide variety of point-based observation types
+ in a single file in a standard format.
  However, some users may wish to use observations not included in the standard
- PrepBufr files.
+ 
+\series default
+PrepBUFR
+\series medium
+ files.
  For this reason, prior to performing the verification step in the Point-Stat
- tool, the PrepBufr file is reformatted with the PB2NC tool.
+ tool, the 
+\series default
+PrepBUFR
+\series medium
+ file is reformatted with the PB2NC tool.
  In this step, the user can select various ways of stratifying the observation
  data spatially, temporally, and by type.
  The remaining observations are reformatted into an intermediate NetCDF
  file.
  The ASCII2NC tool may be used to convert ASCII point observations that
- are not available in the PrepBufr files into this NetCDF format for use
- by the Point-Stat verification tool.
+ are not available in the 
+\series default
+PrepBUFR
+\series medium
+ files into this NetCDF format for use by the Point-Stat verification tool.
  Users with METAR or RAOB data from MADIS can convert these observations
  into NetCDF format with the MADIS2NC tool, then use them with the Point-Stat
  verification tool.
@@ -318,7 +348,11 @@ The
 \series bold
 PB2NC
 \series medium
- tool is used to reformat the input PrepBufr files containing point observations.
+ tool is used to reformat the input 
+\series default
+PrepBUFR
+\series medium
+ files containing point observations.
  This tool stratifies the observations as requested in a configuration file
  and writes out the remaining observations in a NetCDF format.
  The NetCDF output of the PB2NC tool is used as input to the verification
@@ -543,7 +577,11 @@ PB2NC Tool
 \series bold
 Input
 \series medium
-: One PrepBufr point observation file and one configuration file.
+: One 
+\series default
+PrepBUFR
+\series medium
+ point observation file and one configuration file.
 \end_layout
 
 \begin_layout Description

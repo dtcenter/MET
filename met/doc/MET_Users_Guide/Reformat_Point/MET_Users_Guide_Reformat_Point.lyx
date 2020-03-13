@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -92,9 +98,13 @@ name "chap:Re-Formatting-of-Point"
 \series medium
 There are several formats of point observations that may preprocessed using
  the suite of reformatting tools in MET.
- These include PrepBufr data from NCEP, SURFRAD data from NOAA, AERONET
- data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
- user defined data in a generic ASCII format.
+ These include 
+\series default
+PrepBUFR
+\series medium
+ data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data
+ from NOAA, little_r from WRF simulations, and user defined data in a generic
+ ASCII format.
  These steps are represented by the first columns in the MET flowchart depicted
  in Figure 
 \begin_inset CommandInset ref
@@ -123,11 +133,18 @@ name "sec:PB2NC-tool"
 
 \series medium
 This section describes how to configure and run the PB2NC tool.
- The PB2NC tool is used to stratify the contents of an input PrepBufr point
- observation file and reformat it into NetCDF format for use by the Point-Stat
- tool.
- The PB2NC tool must be run on the input PrepBufr point observation file
- prior to performing verification with the MET statistics tools.
+ The PB2NC tool is used to stratify the contents of an input 
+\series default
+PrepBUFR
+\series medium
+ point observation file and reformat it into NetCDF format for use by the
+ Point-Stat tool.
+ The PB2NC tool must be run on the input 
+\series default
+PrepBUFR
+\series medium
+ point observation file prior to performing verification with the MET statistics
+ tools.
 \end_layout
 
 \begin_layout Subsection
@@ -156,19 +173,7 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-prepbufr_file
+PrepBUFR_file
 \end_layout
 
 \begin_layout LyX-Code
@@ -216,7 +221,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-pbfile prepbufr_file]
+[-pbfile PrepBUFR_file]
 \end_layout
 
 \begin_layout LyX-Code
@@ -364,10 +369,16 @@ Required arguments for pb2nc
 \series medium
 1.
  The 
+\series default
+PrepBUFR
 \series bold
-prepbufr_file
+_file
 \series medium
- argument indicates the name of the PrepBufr file to be processed.
+ argument indicates the name of the 
+\series default
+PrepBUFR
+\series medium
+ file to be processed.
 \end_layout
 
 \begin_layout Description
@@ -406,9 +417,17 @@ Optional arguments for pb2nc
 1.
  The 
 \series bold
--pbfile prepbufr_file
+-pbfile 
+\series default
+PrepBUFR
+\series bold
+_file
 \series medium
- option may be used to pass additional PrepBufr files to the PB2NC tool.
+ option may be used to pass additional 
+\series default
+PrepBUFR
+\series medium
+ files to the PB2NC tool.
 \end_layout
 
 \begin_layout Description
@@ -456,7 +475,11 @@ num_messages
 \begin_inset Quotes erd
 \end_inset
 
- PrepBufr messages should be processed rather than the whole file.
+ 
+\series default
+PrepBUFR
+\series medium
+ messages should be processed rather than the whole file.
  This option is provided to speed up testing because running the PB2NC tool
  can take a few minutes for each file.
  Most users will not need this option.
@@ -470,8 +493,11 @@ num_messages
 \series bold
 -dump path
 \series medium
- option may be used to dump the entire contents of the PrepBufr file to
- several ASCII files written to the directory specified by 
+ option may be used to dump the entire contents of the 
+\series default
+PrepBUFR
+\series medium
+ file to several ASCII files written to the directory specified by 
 \begin_inset Quotes eld
 \end_inset
 
@@ -485,7 +511,11 @@ path
 
 .
  The user may use this option to view a human-readable version of the input
- PrepBufr file, although writing the contents to ASCII files can be slow.
+ 
+\series default
+PrepBUFR
+\series medium
+ file, although writing the contents to ASCII files can be slow.
 \end_layout
 
 \begin_layout Description
@@ -785,8 +815,12 @@ message_type = [];
 \begin_layout Standard
 
 \series medium
-Each PrepBufr message is tagged with one of eighteen message types as listed
- in the share/met/config/README file.
+Each 
+\series default
+PrepBUFR
+\series medium
+ message is tagged with one of eighteen message types as listed in the share/met
+/config/README file.
  The 'message_type' refers to the type of observation from which the observation
  value (or 'report') was derived.
  The user may specify a comma-separated list of message types to be retained.
@@ -844,9 +878,16 @@ key
 val
 \series medium
  string.
- This defines a mapping of input PrepBufr message types to output message
- types.
- This provides a method for renaming input PrepBufr message types.
+ This defines a mapping of input 
+\series default
+PrepBUFR
+\series medium
+ message types to output message types.
+ This provides a method for renaming input 
+\series default
+PrepBUFR
+\series medium
+ message types.
 \end_layout
 
 \begin_layout Standard
@@ -948,8 +989,11 @@ station_id = [];
 \begin_layout Standard
 
 \series medium
-Each PrepBufr message has a station identification string associated with
- it.
+Each 
+\series default
+PrepBUFR
+\series medium
+ message has a station identification string associated with it.
  The user may specify a comma-separated list of station IDs to be retained.
  Providing an empty list indicates that messages from all station IDs will
  be retained.
@@ -1034,10 +1078,17 @@ pb_report_type, in_report_type
 \series bold
 instrument_type
 \series medium
- variables are used to specify comma-separated lists of PrepBufr report
- types, input report types, and instrument types to be retained, respectively.
- If left empty, all PrepBufr report types, input report types, and instrument
- types will be retained.
+ variables are used to specify comma-separated lists of 
+\series default
+PrepBUFR
+\series medium
+ report types, input report types, and instrument types to be retained,
+ respectively.
+ If left empty, all 
+\series default
+PrepBUFR
+\series medium
+ report types, input report types, and instrument types will be retained.
  See the following for more details:
 \end_layout
 
@@ -1047,7 +1098,7 @@ status open
 
 \begin_layout Plain Layout
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_4.htm
 \end_layout
 
 \end_inset
@@ -1061,7 +1112,7 @@ status open
 
 \begin_layout Plain Layout
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
+http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_6.htm
 \end_layout
 
 \end_inset
@@ -1116,8 +1167,11 @@ The
 \series bold
 level_category
 \series medium
- variable is used to specify a comma-separated list of Prepbufr data level
- categories to retain.
+ variable is used to specify a comma-separated list of 
+\series default
+PrepBUFR
+\series medium
+ data level categories to retain.
  An empty string indicates that all level categories should be retained.
  Accepted values and their meanings are described in Table 
 \begin_inset CommandInset ref
@@ -1138,7 +1192,7 @@ status open
 
 \begin_layout Plain Layout
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm 
+http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm 
 \end_layout
 
 \end_inset
@@ -1401,7 +1455,11 @@ obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 \begin_layout Standard
 
 \series medium
-Each PrepBufr message will likely contain multiple observation variables.
+Each 
+\series default
+PrepBUFR
+\series medium
+ message will likely contain multiple observation variables.
  The 
 \series bold
 obs_bufr_var
@@ -1583,8 +1641,12 @@ event_stack_flag = TOP;
 \begin_layout Standard
 
 \series medium
-A PrepBufr message may contain duplicate observations with different quality
- mark values.
+A 
+\series default
+PrepBUFR
+\series medium
+ message may contain duplicate observations with different quality mark
+ values.
  The 
 \series bold
 event_stack_flag
@@ -2030,7 +2092,7 @@ nobs
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of PrepBufr observations in the file (UNLIMITED)
+Number of PrepBUFR observations in the file (UNLIMITED)
 \end_layout
 
 \end_inset
@@ -2050,7 +2112,7 @@ nhdr, npbhdr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of PrepBufr messages in the file (variable) 
+Number of PrepBUFR messages in the file (variable) 
 \end_layout
 
 \end_inset
@@ -2575,7 +2637,7 @@ npbhdr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Integer PREPBUFR report type value.
+Integer PrepBUFR report type value.
 \end_layout
 
 \end_inset
@@ -2879,8 +2941,12 @@ This section describes how to run the ASCII2NC tool.
  The ASCII2NC tool is used to reformat ASCII point observations into the
  NetCDF format expected by the Point-Stat tool.
  For those users wishing to verify against point observations that are not
- available in PrepBufr format, the ASCII2NC tool provides a way of incorporating
- those observations into MET.
+ available in 
+\series default
+PrepBUFR
+\series medium
+ format, the ASCII2NC tool provides a way of incorporating those observations
+ into MET.
  If the ASCII2NC tool is used to perform a reformatting step, no configuration
  file is needed.
  However, for more complex processing, such as summarizing time series observati

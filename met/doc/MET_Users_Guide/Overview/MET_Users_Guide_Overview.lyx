@@ -486,8 +486,11 @@ reference "chap:MET-Data-I/O"
 \series medium
 The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
  Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble-Stat tools.
- The PB2NC tool is used to create NetCDF files from input PrepBufr files
- containing point observations.
+ The PB2NC tool is used to create NetCDF files from input 
+\series default
+PrepBUFR
+\series medium
+ files containing point observations.
  Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII
  point observations.
  Many types of data from the MADIS network can be formatted for use in MET

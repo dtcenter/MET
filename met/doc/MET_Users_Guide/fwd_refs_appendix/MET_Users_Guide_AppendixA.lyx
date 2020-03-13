@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -119,7 +125,11 @@ MET relies upon the object-oriented aspects of C++, particularly in using
 
 \series bold
 Q.
- Why is PrepBufr used?
+ Why is 
+\series default
+PrepBUFR
+\series bold
+ used?
 \end_layout
 
 \begin_layout Standard
@@ -242,6 +252,7 @@ https://dtcenter.org/community-code/model-evaluation-tools-met
 LatexCommand href
 name "met_help@ucar.edu"
 type "mailto:"
+literal "false"
 
 \end_inset
 
@@ -480,7 +491,7 @@ Point-Stat won't run
 \end_layout
 
 \begin_layout Description
-* Have you run pb2nc first on your PrepBufr observation data?
+* Have you run pb2nc first on your PrepBUFR observation data?
 \end_layout
 
 \begin_layout Standard
@@ -557,6 +568,7 @@ If none of the above suggestions have helped solve your problem, help is
 LatexCommand href
 name "met_help@ucar.edu"
 type "mailto:"
+literal "false"
 
 \end_inset
 
@@ -584,6 +596,7 @@ If you have code you would like to contribute, we will gladly consider your
 LatexCommand href
 name "met_help@ucar.edu"
 type "mailto:"
+literal "false"
 
 \end_inset
 

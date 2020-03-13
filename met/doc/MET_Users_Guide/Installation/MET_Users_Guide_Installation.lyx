@@ -186,7 +186,11 @@ The MET package, including MET-TC, is written primarily in C/C++ in order
 \series medium
 NCEP's BUFRLIB is written entirely in Fortran.
  The portion of MET that handles the interface to the BUFRLIB for reading
- PrepBUFR point observation files is also written in Fortran.
+ 
+\series default
+PrepBUFR
+\series medium
+ point observation files is also written in Fortran.
 \end_layout
 
 \begin_layout Standard
@@ -292,7 +296,11 @@ reference "sec:Installation-of-required"
 \series medium
 1.
  NCEP's BUFRLIB is used by MET to decode point-based observation datasets
- in PrepBUFR format.
+ in 
+\series default
+PrepBUFR
+\series medium
+ format.
  BUFRLIB is distributed and supported by NCEP and is freely available for
  download from NCEP's website at 
 \begin_inset Flex URL
@@ -474,7 +482,11 @@ reference "sec:Install_Required-libraries-and"
 \series medium
 1.
  NCEP's BUFRLIB is used by the MET to decode point-based observation datasets
- in PrepBUFR format.
+ in 
+\series default
+PrepBUFR
+\series medium
+ format.
  Once you have downloaded and unpacked the BUFRLIB tarball, refer to the
  README_BUFRLIB file.
  When compiling the library using the GNU C and Fortran compilers, users
@@ -1479,7 +1491,11 @@ Enable compilation of python interface.
 
 \series medium
 Disable use of BLOCK4 in the compilation.
- Use this if you have trouble using PrepBUFR files.
+ Use this if you have trouble using 
+\series default
+PrepBUFR
+\series medium
+ files.
 \end_layout
 
 \begin_layout Standard
