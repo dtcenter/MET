@@ -350,8 +350,7 @@ class ModeFuzzyEngine {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern double total_interest(ModeConfInfo &, int, const PairFeature &);
-extern double total_interest_print(ModeConfInfo &, int, const PairFeature &, ostream *);
+extern double total_interest     (ModeConfInfo &, const PairFeature &, int, int, bool is_single);
 extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
 extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &);
