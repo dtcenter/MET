@@ -16,7 +16,7 @@
     <param> \
       -config &CONFIG_DIR;/RMWAnalysisConfig \
       -data &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.nc \
-      -out &OUTPUT_DIR;/rmw_analysis/rmw_analysis_out.nc
+      -out &OUTPUT_DIR;/rmw_analysis/rmw_analysis_out.nc \
       -v 2
     </param>
     <output>
