@@ -33,23 +33,23 @@ extern void write_tc_tracks(NcFile*,
 extern set<string> get_pressure_level_strings(
     map<string, vector<string> >);
 
-extern set<float> get_pressure_levels(
+extern set<double> get_pressure_levels(
     map<string, vector<string> >);
 
-extern set<float> get_pressure_levels(
+extern set<double> get_pressure_levels(
     set<string>);
 
-extern map<float, int> get_pressure_level_indices(
-    set<float>);
+extern map<double, int> get_pressure_level_indices(
+    set<double>);
 
 extern map<string, int> get_pressure_level_indices(
-    set<string>, set<float>);
+    set<string>, set<double>);
 
 extern void def_tc_pressure(NcFile*,
-    const NcDim&, set<float>);
+    const NcDim&, set<double>);
 
 extern void def_tc_range_azimuth(NcFile*,
-    const NcDim&, const NcDim&, const TcrmwGrid&, float);
+    const NcDim&, const NcDim&, const TcrmwGrid&, double);
 
 extern void def_tc_lat_lon_time(NcFile*,
     const NcDim&, const NcDim&, const NcDim&,

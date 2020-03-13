@@ -49,17 +49,17 @@ void write_tc_tracks(NcFile* nc_out,
         "TrackLines", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
-        "Lat", ncFloat, track_point_dim);
+        "Lat", ncDouble, track_point_dim);
     add_att(&track_lat_var, "long_name", "Track Point Latitude");
     add_att(&track_lat_var, "units", "degrees_east");
     add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
-        "Lon", ncFloat, track_point_dim);
+        "Lon", ncDouble, track_point_dim);
     add_att(&track_lon_var, "long_name", "Track Point Longitude");
     add_att(&track_lon_var, "units", "degrees_north");
     add_att(&track_lon_var, "standard_name", "longitude_track");
     NcVar track_mrd_var = nc_out->addVar(
-        "RMW", ncFloat, track_point_dim);
+        "RMW", ncDouble, track_point_dim);
     add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
     add_att(&track_mrd_var, "units", "nautical_miles");
     add_att(&track_mrd_var, "standard_name", "radius_max_wind");
@@ -67,9 +67,9 @@ void write_tc_tracks(NcFile* nc_out,
     mlog << Debug(2) << "write_tc_tracks:n_points:"
          << track.n_points() << "\n";
 
-    float* track_lat_data = new float[track.n_points()];
-    float* track_lon_data = new float[track.n_points()];
-    float* track_mrd_data = new float[track.n_points()];
+    double* track_lat_data = new double[track.n_points()];
+    double* track_lon_data = new double[track.n_points()];
+    double* track_mrd_data = new double[track.n_points()];
 
     for(int i = 0; i < track.n_points(); i++) {
         mlog << Debug(4) << track[i].serialize() << "\n";
@@ -133,10 +133,10 @@ set<string> get_pressure_level_strings(
 
 ////////////////////////////////////////////////////////////////////////
 
-set<float> get_pressure_levels(
+set<double> get_pressure_levels(
     map<string, vector<string> > variable_levels) {
 
-    set<float> pressure_levels;
+    set<double> pressure_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
@@ -144,7 +144,7 @@ set<float> get_pressure_levels(
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
-            float level = atof(levels[j].substr(1).c_str());
+            double level = atof(levels[j].substr(1).c_str());
             if (label == "P") {
                 pressure_levels.insert(level);
             }
@@ -156,16 +156,16 @@ set<float> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-set<float> get_pressure_levels(
+set<double> get_pressure_levels(
     set<string> pressure_level_strings) {
 
-    set<float> pressure_levels;
+    set<double> pressure_levels;
 
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
         string level_str = *i;
-        float level = atof(level_str.substr(1).c_str());
+        double level = atof(level_str.substr(1).c_str());
         pressure_levels.insert(level);
     }
 
@@ -174,17 +174,17 @@ set<float> get_pressure_levels(
 
 ////////////////////////////////////////////////////////////////////////
 
-map<float, int> get_pressure_level_indices(
-    set<float> pressure_levels) {
+map<double, int> get_pressure_level_indices(
+    set<double> pressure_levels) {
 
-    map<float, int> pressure_level_indices;
+    map<double, int> pressure_level_indices;
 
     int k = pressure_levels.size() - 1;
 
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
 
-        float level = *i;
+        double level = *i;
         pressure_level_indices[level] = k; 
         k--;
     }
@@ -195,18 +195,18 @@ map<float, int> get_pressure_level_indices(
 ////////////////////////////////////////////////////////////////////////
 
 map<string, int> get_pressure_level_indices(
-    set<string> pressure_level_strings, set<float> pressure_levels) {
+    set<string> pressure_level_strings, set<double> pressure_levels) {
 
     map<string, int> pressure_level_indices;
 
-    map<float, int> indices_from_levels
+    map<double, int> indices_from_levels
         = get_pressure_level_indices(pressure_levels);
 
     for (set<string>::iterator i = pressure_level_strings.begin();
         i != pressure_level_strings.end(); ++i) {
 
         string level_str = *i;
-        float level = atof(level_str.substr(1).c_str());
+        double level = atof(level_str.substr(1).c_str());
         pressure_level_indices[level_str] = indices_from_levels[level];
     }
 
@@ -216,14 +216,14 @@ map<string, int> get_pressure_level_indices(
 ////////////////////////////////////////////////////////////////////////
 
 void def_tc_pressure(NcFile* nc_out,
-    const NcDim& pressure_dim, set<float> pressure_levels) {
+    const NcDim& pressure_dim, set<double> pressure_levels) {
 
     NcVar pressure_var;
 
-    float* pressure_data = new float[pressure_levels.size()];
+    double* pressure_data = new double[pressure_levels.size()];
 
     // Define variable
-    pressure_var = nc_out->addVar("pressure", ncFloat, pressure_dim);
+    pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
 
     // Set attributes
     add_att(&pressure_var, "long_name", "pressure");
@@ -232,7 +232,7 @@ void def_tc_pressure(NcFile* nc_out,
 
     // Extract pressure coordinates
     int k = pressure_levels.size() - 1;
-    for (set<float>::iterator i = pressure_levels.begin();
+    for (set<double>::iterator i = pressure_levels.begin();
         i != pressure_levels.end(); ++i) {
         pressure_data[k] = *i;
         k--;
@@ -241,7 +241,7 @@ void def_tc_pressure(NcFile* nc_out,
     put_nc_data(&pressure_var, &pressure_data[0]);
 
     // Cleanup
-    if(pressure_data) { delete [] pressure_data; pressure_data = (float *) 0; }
+    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
 
     return;
 }
@@ -250,17 +250,17 @@ void def_tc_pressure(NcFile* nc_out,
 
 void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
-    const TcrmwGrid& grid, float rmw_scale) {
+    const TcrmwGrid& grid, double rmw_scale) {
 
     NcVar range_var;
     NcVar azimuth_var;
 
-    float* range_data = new float[grid.range_n()];
-    float* azimuth_data = new float[grid.azimuth_n()];
+    double* range_data = new double[grid.range_n()];
+    double* azimuth_data = new double[grid.azimuth_n()];
 
     // Define variables
-    range_var = nc_out->addVar("range", ncFloat, range_dim);
-    azimuth_var = nc_out->addVar("azimuth", ncFloat, azimuth_dim);
+    range_var = nc_out->addVar("range", ncDouble, range_dim);
+    azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
 
     // Set attributes
     add_att(&range_var, "long_name", "range");
@@ -283,8 +283,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     put_nc_data(&azimuth_var, &azimuth_data[0]);
 
     // Cleanup
-    if(range_data)   { delete [] range_data;   range_data   = (float *) 0; }
-    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (float *) 0; }
+    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
 
     return;
 }
