@@ -342,6 +342,8 @@ Version 9.0 Release Notes:
       - Fix bug in the handling of some pre-defined NCEP grids (#1253).
       - Fix inconsistencies for many of the pre-defined NCEP grids (#1254).
       - Fix segfault when passing as input a thinned lat/lon grid (#1252).
+      - Fix for Lambert Conformal grids crossing the international date line
+        (#1276).
    - Python Embedding
       - Switch Python embedding from Python 2 to Python 3 (#1080).
       - Enhance Python embedding to support multiple input data types (#1056).
