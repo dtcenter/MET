@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 1
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -1938,7 +1944,7 @@ reference "table_PS_format_info_CTS"
 \begin_layout Standard
 
 \series medium
-The symmetric extremal dependency idex measures the association between
+The symmetric extremal dependency index measures the association between
  forecast and observed rare events.
  SEDI is defined as
 \begin_inset Newline newline
@@ -3405,7 +3411,7 @@ The Anomaly correlation coefficient is equivalent to the Pearson correlation
 c
 \series default
 ) of some variety.
- It measures the strength of linear association between the forecast anomolies
+ It measures the strength of linear association between the forecast anomalies
  and observed anomalies.
  The Anomaly correlation coefficient is defined as:
 \begin_inset Newline newline
@@ -3502,7 +3508,7 @@ The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries
  partial sums) that can later be accumulated into verification statistics.
  These are divided according to scalar or vector summaries (S or V).
  The climate anomaly values (A) can be stored in place of the actuals, which
- is just a recentering of the values around the climatological average.
+ is just a re-centering of the values around the climatological average.
  L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred
  to as the “city block” and “Euclidean” distances.
  The city block is the absolute value of a distance while the Euclidean
@@ -5953,7 +5959,7 @@ hbox{BS}_{ref}}}.$$
 \end_layout
 
 \begin_layout Standard
-BSS is computed using the climatology specified in the confguration file
+BSS is computed using the climatology specified in the configuration file
  while BSS_SMPL is computed using the sample climatology of the current
  set of observations.
 \end_layout
@@ -6917,8 +6923,8 @@ The probability integral transform (PIT) is the analog of the rank histogram
  Its interpretation is the same as that of the verification rank histogram:
  Calibrated probabilistic forecasts yield PIT histograms that are flat,
  or uniform.
- Underdispersed (not enough spread in the ensemble) forecasts have U-shaped
- PIT histograms while overdispersed forecasts have bell-shaped histograms.
+ Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped
+ PIT histograms while over-dispersed forecasts have bell-shaped histograms.
  In MET, the PIT calculation uses a normal distribution fit to the ensemble
  forecasts.
  In many cases, use of other distributions would be better.
@@ -8542,7 +8548,7 @@ Several of the MET tools make use of percentiles in one way or another.
  or can be written out as elements of some of the standard verification
  statistics.
  There are several widely-used conventions for calculating percentiles however,
- so in this secion we describe how percentiles are calculated in MET.
+ so in this section we describe how percentiles are calculated in MET.
 \end_layout
 
 \begin_layout Standard

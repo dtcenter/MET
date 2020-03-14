@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -225,7 +231,7 @@ _list}
 \end_inset
 
  represents one or more WWMCA cloud percent files given on the command line.
- As with any command given to a UNIX shell, the user can use metacharacters
+ As with any command given to a UNIX shell, the user can use meta-characters
  as a shorthand way to specify many filenames.
 \end_layout
 
@@ -436,7 +442,7 @@ To grid = "G218";
 
 \begin_layout Standard
 and that will work.
- Failing that, youmust give the parameters that specify the grid and it’s
+ Failing that, you must give the parameters that specify the grid and it’s
  projection.
  Four projections are supported: Lambert Conformal, Polar Stereographic,
  Plate Carrée, and Mercator.
@@ -791,28 +797,27 @@ good percent = 0;
 \begin_layout Standard
 The rest of the config file parameters have to do with how the output netCDF
  file represents the data.
- These should be selfexplanatory, so I’ll just give an example:
+ These should be self-explanatory, so I’ll just give an example:
 \end_layout
 
 \begin_layout LyX-Code
-variable name = "Cloud Pct"; 
+variable_name = "Cloud Pct"; 
 \end_layout
 
 \begin_layout LyX-Code
-long name = "cloud cover percent"; 
+long_name     = "cloud cover percent"; 
 \end_layout
 
 \begin_layout LyX-Code
-grib code = 100; // not sure about this ...
- 
+grib_code     = 100;
 \end_layout
 
 \begin_layout LyX-Code
-units = "percent"; 
+units         = "percent"; 
 \end_layout
 
 \begin_layout LyX-Code
-level = "SFC"; 
+level         = "SFC"; 
 \end_layout
 
 \end_body

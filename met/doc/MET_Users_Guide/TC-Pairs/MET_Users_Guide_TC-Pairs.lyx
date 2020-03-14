@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -407,7 +413,7 @@ argument indicates the path of the output file base.
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -1778,7 +1784,7 @@ INIT
 \begin_inset Text
 
 \begin_layout Plain Layout
-Initialization time of forecast
+Initialization time of forecast in YYYYMMDD_HHMMSS format.
 \end_layout
 
 \end_inset
@@ -1807,7 +1813,7 @@ LEAD
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast lead time in HH format
+Forecast lead time in HHMMSS format.
 \end_layout
 
 \end_inset
@@ -1836,7 +1842,7 @@ VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid time in YYYYMMDD_HH
+Forecast valid time in YYYYMMDD_HHMMSS format.
 \end_layout
 
 \end_inset
@@ -4063,7 +4069,7 @@ N_THRESH
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of proability thresholds
+Number of pro-ability thresholds
 \end_layout
 
 \end_inset

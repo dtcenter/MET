@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -977,11 +983,11 @@ delta
 \begin_inset Quotes eld
 \end_inset
 
-forecast minus observed.
+forecast minus observed
 \begin_inset Quotes erd
 \end_inset
 
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -1455,7 +1461,7 @@ $(x, y)$
 \end_layout
 
 \begin_layout Standard
-◦ Centroid latitude and longidude
+◦ Centroid latitude and longitude
 \end_layout
 
 \begin_layout Standard
@@ -2445,7 +2451,7 @@ fcst = {
 \begin_layout LyX-Code
 
 \series bold
-      name = "APCP";
+      name  = "APCP";
 \end_layout
 
 \begin_layout LyX-Code
@@ -2875,49 +2881,57 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
-   space_centroid_dist = (...);
+   space_centroid_dist = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   time_centroid_delta = (...);
+   time_centroid_delta = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   speed_delta         = (...); 
+   speed_delta         = ( ...
+ ); 
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   direction_diff      = (...);
+   direction_diff      = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   volume_ratio        = (...);
+   volume_ratio        = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   axis_angle_diff     = (...); 
+   axis_angle_diff     = ( ...
+ ); 
 \end_layout
 
 \begin_layout LyX-Code
    
 \series bold
-start_time_delta    = (...);
+start_time_delta    = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   end_time_delta      = (...);
+   end_time_delta      = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
@@ -2984,19 +2998,19 @@ nc_output = {
 \begin_layout LyX-Code
 
 \series bold
-   latlon = true;
+   latlon     = true;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   raw = true;
+   raw        = true;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   object_id = true;
+   object_id  = true;
 \end_layout
 
 \begin_layout LyX-Code
@@ -3117,13 +3131,13 @@ txt_output = {
 \begin_layout LyX-Code
 
 \series bold
-   attributes_2d   = true;
+   attributes_2d = true;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   attributes_3d   = true;
+   attributes_3d = true;
 \end_layout
 
 \begin_layout LyX-Code
@@ -3606,7 +3620,7 @@ FCST_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid time in YYYYMMDDHH format
+Forecast valid time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3664,7 +3678,7 @@ OBS_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid time in YYYYMMDDHH format
+Observation valid time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -5750,7 +5764,7 @@ $(x, y)$
 
 \end_inset
 
- coordintates of object spacetime centroid
+ coordinates of object spacetime centroid
 \end_layout
 
 \end_inset

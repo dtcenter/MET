@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -106,7 +112,7 @@ This section describes how to check your data files using plotting utilities.
  A single model level can be plotted using the plot_data_plane utility.
  For object based evaluations, the MODE objects can be plotted using plot_mode_f
 ield.
- Occasionally, a postprocessing or timing error can lead to errors in MET.
+ Occasionally, a post-processing or timing error can lead to errors in MET.
  These tools can assist the user by showing the data to be verified to ensure
  that times and locations match up as expected.
  
@@ -350,7 +356,7 @@ Optional arguments for plot_point_obs
 \series bold
 -dotsize val
 \series medium
- option overrides the default dotsize value (1).
+ option overrides the default dot size value (1).
  
 \end_layout
 
@@ -981,13 +987,12 @@ plotMODEconfig mode_120000L_20050807_120000V_000000A_obj.nc
 
 \series medium
 In this example, the plot_mode_field tool will plot simple objects from
- an observed precipitation field using parameters from the configuration
- file plotMODEconfig and objects from the MODE output file 
-\emph on
-mode_120000L_20050807_120000V_000000A_obj.nc.
-
-\emph default
+ an observed precipitation field using parameters fro
+\series default
+m the configuration file plotMODEconfig and objects from the MODE output
+ file mode_120000L_20050807_120000V_000000A_obj.nc.
  An example plot showing twelve simple observed precipitation objects is
+\series medium
  shown below.
  
 \end_layout
@@ -1245,7 +1250,7 @@ Traditional verification scores applied to output of the MODE tool, computed
  by defining matched observed objects to be hits, unmatched observed objects
  to be misses, and unmatched forecast objects to be false alarms; weighted
  by object area.
- Bar plots show numbers (pennultimate row) and areas (bottom row) of observed
+ Bar plots show numbers (penultimate row) and areas (bottom row) of observed
  and forecast objects, respectively.
 \end_layout
 

@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -106,18 +112,12 @@ Many filtering criteria within the MET-TC tools depend on the distinction
  jobs that only verify over water, threshold verification based on distance
  to land, and exclusion of forecasts outside a specified time window of
  landfall.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The TC-dland tool underwent a major overhaul for MET v5.1, switching from
- running legacy FORTRAN code over one quarter of the earth to computing
- more sophisticated great circle arc distances over the entire globe.
- The resulting distances are more accurate but take considerably longer
- to compute.
- Existing users of MET-TC may notice TC-dland running more slowly and slight
- differences in the computed distances compared with the previous version.
+ For each grid point in the user-specified grid, it computes the great circle
+ arc distance to the nearest coast line.
+ Great circle arc distances are more accurate but take considerably longer
+ to compute than a simple Euclidean distance.
+ Grid points over land have distances greater than zero while point over
+ land have distances less than zero.
 \end_layout
 
 \begin_layout Standard
@@ -143,8 +143,8 @@ name "sec:TC_Input/output-format"
 
 \series medium
 The input for the TC-dland tool is a file containing the longitude (degrees
- W negative) and latitude (degrees N positive) of all the coastlines and
- islands considered to be a significant landmass.
+ east) and latitude (degrees north) of all the coastlines and islands considered
+ to be a significant landmass.
  The default input is to use all three land data files (aland.dat, shland.dat,
  wland.dat) found in the installed 
 \series bold
@@ -456,7 +456,7 @@ level
 \series default
  option specifies the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  Setting the compression level to 0 will make no compression for the NetCDF
  output.
  Lower number is for fast compression and higher number is for better compressio

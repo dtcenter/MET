@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -149,10 +155,10 @@ rirw
  or weakening events, populates a 2x2 contingency table, and derives contingency
  table statistics.
  The 
-\series default
-probrirw
+\series bold
+probrirwjob
 \series medium
-job process 
+ process 
 \series default
 PROBRIRW 
 \series medium
@@ -397,7 +403,7 @@ name "subsec:tc_stat-rirw"
 \begin_layout Standard
 
 \series medium
-The TC-Stat tool can be used to read TCMPR lines and compare the occurence
+The TC-Stat tool can be used to read TCMPR lines and compare the occurrence
  of rapid intensification (i.e.
  increase in intensity) or weakening (i.e.
  decrease in intensity) between the adeck and bdeck.
@@ -425,7 +431,7 @@ Users may specify several job command options to configure the behavior
  and for each track point (i.e.
  each TCMPR line) determines whether rapid intensification or weakening
  occurred.
- For each point in time, it uses the forecast and BEST track event occurence
+ For each point in time, it uses the forecast and BEST track event occurrence
  to populate a 2x2 contingency table.
  The job may be configured to require that forecast and BEST track events
  occur at exactly the same time to be considered a hit.
@@ -465,7 +471,7 @@ PROBRIRW
 line contains a probabilistic forecast for a specified intensity change
  along with the actual intensity change that occurred in the BEST track.
  Accurately forecast the likelihood of large changes in intensity is a challengi
-ng problem and this job helps quanity a model's ability to do so.
+ng problem and this job helps quantify a model's ability to do so.
 \end_layout
 
 \begin_layout Standard
@@ -474,8 +480,8 @@ Users may specify several job command options to configure the behavior
  The TC-Stat tools reads the input PROBI lines, applies the configurable
  options to extract a forecast probability value and BEST track event, and
  bins those probabilistic pairs into an Nx2 contingency table.
- This job writes up to four probabilstic output line types summarizing the
- performance.
+ This job writes up to four probabilistic output line types summarizing
+ the performance.
 \end_layout
 
 \begin_layout Section
@@ -729,7 +735,7 @@ argument indicates the desired name of the TCST format output file.
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -1882,10 +1888,6 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\end_layout
-
-\begin_layout LyX-Code
-
 \series bold
 event_equal = FALSE;
 \end_layout
@@ -2046,7 +2048,7 @@ The user may specify one or more analysis jobs to be performed on the TCST
  lines that remain after applying the filtering parameters listed above.
  Each entry in the joblist contains the task and additional filtering options
  for a single analysis to be performed.
- There are three typs of jobs available including 
+ There are three types of jobs available including 
 \series default
 \shape italic
 filter, summary, and rirw.
@@ -2417,7 +2419,7 @@ Total
 \begin_inset Text
 
 \begin_layout Plain Layout
-Vaild
+Valid
 \end_layout
 
 \end_inset
@@ -2537,7 +2539,7 @@ Maximum Value
 \begin_inset Text
 
 \begin_layout Plain Layout
-Interqurtile range (75th - 25th percentile)
+Interquartile range (75th - 25th percentile)
 \end_layout
 
 \end_inset
@@ -2651,7 +2653,7 @@ The RIRW job produces contingency table counts and statistics defined by
 \series default
  
 \series medium
-Users may specify several job command options to configure the beahvior
+Users may specify several job command options to configure the behavior
  of this job:
 \end_layout
 
@@ -2692,7 +2694,7 @@ option (or
  to specify different settings) is a boolean defining whether the exact
  intensity change or maximum intensity change over that time window should
  be used.
- For rapid intesification, the maximum increase in computed.
+ For rapid intensification, the maximum increase in computed.
  For rapid weakening, the maximum decrease is used.
  The default is true.
 \end_layout
@@ -2725,8 +2727,8 @@ HH[MMSS]
 \series medium
  format to define how close adeck and bdeck events must be to be considered
  hits or correct negatives.
- One timestring defines a symmetric time window while two timestrings define
- an asymmetric time winow.
+ One time string defines a symmetric time window while two time strings
+ define an asymmetric time window.
  The default is 0, requiring an exact match in time.
 \end_layout
 
@@ -2803,7 +2805,7 @@ line type is selected for the job.
 \series bold
 -prob_thresh 30 
 \series medium
-to evaluate forecast probabilites of a 30 kt increase or use 
+to evaluate forecast probabilities of a 30 kt increase or use 
 \series bold
 -prob_thresh -30
 \series medium
@@ -2856,7 +2858,7 @@ The
  option defines the probability thresholds used to create the output Nx2
  contingency table.
  The default is probability bins of width 0.1.
- These probabilities may be specfied as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
+ These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
  or using shorthand notation (==0.25) for bins of equal width.
 \end_layout
 

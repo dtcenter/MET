@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -1418,8 +1424,7 @@ mysep
 \end_layout
 
 \begin_layout Standard
-FBAR asnd OBAR are the average values of the forecast and observed wind
- speed.
+FBAR and OBAR are the average values of the forecast and observed wind speed.
 \end_layout
 
 \begin_layout Standard
@@ -1712,7 +1717,7 @@ mu_o$
 
 \end_inset
 
- are the average forecast and obxserved wind speeds
+ are the average forecast and observed wind speeds
 \end_layout
 
 \begin_layout Standard
@@ -2125,7 +2130,7 @@ it not}
  the same as the difference in lengths (speeds) of the average forecast
  and observed wind vectors.
  That quantity is called SPEED_ERR (see below).
- There is a relationshop between these two statisics however: using some
+ There is a relationship between these two statistics however: using some
  of the results obtained in the introduction to this appendix, we can say
  that 
 \begin_inset ERT

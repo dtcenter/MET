@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -444,7 +450,7 @@ argument indicates the path of the output file base.
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -984,13 +990,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-storm_id     = [];
+storm_id   = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-storm_name   = [];
+storm_name = [];
 \end_layout
 
 \begin_layout Standard
@@ -1030,13 +1036,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-init_beg  = "";
+init_beg = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-init_end  = "";
+init_end = "";
 \end_layout
 
 \begin_layout Standard
@@ -1173,7 +1179,39 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-vx_mask = "";
+vx_mask = "MET_BASE/tc_data/basin_global_tenth_degree.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+           { 'name=
+\backslash
+
+\begin_inset Quotes erd
+\end_inset
+
+basin
+\backslash
+
+\begin_inset Quotes erd
+\end_inset
+
+;level=
+\backslash
+
+\begin_inset Quotes erd
+\end_inset
+
+(*,*)
+\backslash
+
+\begin_inset Quotes erd
+\end_inset
+
+; } ==1";
 \end_layout
 
 \begin_layout Standard
@@ -1184,9 +1222,23 @@ The
 vx_mask
 \series medium
  entry is a string defining the path to a Lat/Lon polyline file or a gridded
- data file that MET can read.
+ data file that MET can read to subset the results spatially.
  If specified, only those genesis events whose Lat/Lon location falls within
  the specified area will be included.
+ The installed NetCDF file, 
+\series bold
+share/met/tc_data/basin_global_tenth_degree.nc
+\series medium
+, contains a global definition of the Regional Specialized Meteorology Centers
+ (RSMC)
+\series default
+ and hurricane basin regions.
+ The above example uses this file to stratify genesis results for the Atlantic
+ Basin, where the 
+\series bold
+basin
+\series default
+ variable equals ones.
 \end_layout
 
 \begin_layout Standard
@@ -1332,19 +1384,19 @@ output_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   fho    = BOTH;
+   fho = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   ctc    = BOTH;
+   ctc = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   cts    = BOTH;
+   cts = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
