@@ -386,6 +386,8 @@ void process_files() {
         // Filter tracks
         filter_tracks(adeck_tracks);
 
+        if (adeck_tracks.n_tracks() > 0) {
+
         for(int i_var = 0; i_var < data_names.size(); i_var++) {
             NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
             mlog << Debug(2) << "Processing "
@@ -432,6 +434,7 @@ void process_files() {
                 }
             } // end loop over track points
         } // end loop over variables
+        } // end if have tracks
     } // end loop over files
 }
 
