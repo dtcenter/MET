@@ -83,7 +83,7 @@
 \begin_body
 
 \begin_layout Chapter
-Ensemble Stat Tool
+Ensemble-Stat Tool
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:The-Ensemble-Stat"
@@ -107,10 +107,9 @@ name "sec:ES_Introduction"
 \begin_layout Standard
 
 \series medium
-This chapter contains a description of the Ensemble-Stat tool.
- This tool may be run to create simple ensemble forecasts (mean, probability,
- spread, etc) from a set of several forecast model files to be used by the
- MET statistics tools.
+The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean,
+ probability, spread, etc) from a set of several forecast model files to
+ be used by the MET statistics tools.
  If observations are also included, ensemble statistics such as rank histograms,
  probability integral transform histograms, spread/skill variance, relative
  position and continuous ranked probability score are produced.
@@ -157,7 +156,7 @@ Ensemble forecasts are often created as a set of deterministic forecasts.
  The ensemble members are rarely used separately.
  Instead, they can be combined in various ways to produce a forecast.
  MET can combine the ensemble members into some type of summary forecast
- according to user specificaitons.
+ according to user specifications.
  Ensemble means are the most common, and can be paired with the ensemble
  variance or spread.
  Maximum, minimum and other summary values are also available, with details
@@ -170,7 +169,7 @@ The ensemble relative frequency is the simplest method for turning a set
  of deterministic forecasts into something resembling a probability forecast.
  MET will create the ensemble relative frequency as the proportion of ensemble
  members forecasting some event.
- For example, if 5 out of 10 ensemble members predict measureable precipitation
+ For example, if 5 out of 10 ensemble members predict measurable precipitation
  at a grid location, then the ensemble relative frequency of precipitation
  will be 
 \begin_inset ERT
@@ -197,13 +196,13 @@ The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble
  The NMEP value is computed as the fraction of ensemble members for which
  the event is occurring somewhere within the surrounding neighborhood.
  The NMEP output is typically smoothed using a Gaussian kernel filter.
- The neighborhood sizes and smoothing options are set in the configuration
- file.
+ The neighborhood sizes and smoothing options can be customized in the configura
+tion file.
 \end_layout
 
 \begin_layout Standard
 The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and
- NMEP outputs to a NetCDF output file.
+ NMEP fields to a NetCDF output file.
  Probabilistic verification methods can then be applied to those fields
  by evaluating them with the Grid-Stat and/or Point-Stat tools.
 \end_layout
@@ -239,16 +238,16 @@ Rank histograms and probability integral transform (PIT) histograms are
 \begin_layout Standard
 
 \series medium
-Often, the goal of enesmble forecasting is to reproduce the distribution
+Often, the goal of ensemble forecasting is to reproduce the distribution
  of observations using a set of many forecasts.
- In other words, the ensemble members represtent the set of all possible
+ In other words, the ensemble members represent the set of all possible
  outcomes.
  When this is true, the spread of the ensemble is identical to the error
  in the mean forecast.
  Though this rarely occurs in practice, the spread / skill relationship
  is still typically assessed for ensemble forecasts (Barker, 1991; Buizza,
  1997).
- MET calcualtes the spread and skill in user defined categories according
+ MET calculates the spread and skill in user defined categories according
  to Eckel 
 \series default
 \emph on
@@ -314,11 +313,11 @@ In an attempt to ameliorate the effect of observation errors on the verification
  in Candile and Talagrand (2008) can be replicated using the appropriate
  options.
  The user selects a distribution for the observation error, along with parameter
-s for that distrubtion.
+s for that distribution.
  Rescaling and bias correction can also be specified prior to the perturbation.
  Random draws from the distribution can then be added to either, or both,
  of the forecast and observed fields, including ensemble members.
- Details about the effects of the choices on verification statstics should
+ Details about the effects of the choices on verification statistics should
  be considered, with many details provided in the literature (e.g.
  Candille and Talagrand, 2008; Saetra et al., 2004; Santos and Ghelli, 2012).
  Generally, perturbation make verification statistics better when applied
@@ -329,7 +328,7 @@ s for that distrubtion.
 \begin_layout Standard
 Normal and uniform are common choices for the observation error distribution.
  The uniform distribution provides the benefit of being bounded on both
- sides, thus preventing the pertubation from taking on extreme values.
+ sides, thus preventing the perturbation from taking on extreme values.
  Normal is the most common choice for observation error.
  However, the user should realize that with the very large samples typical
  in NWP, some large outliers will almost certainly be introduced with the
@@ -338,7 +337,7 @@ Normal and uniform are common choices for the observation error distribution.
  observation errors (e.g.
  larger errors with larger measurements), a lognormal distribution may be
  selected.
- Wind speeds and precipitaiton measurements are the most common of this
+ Wind speeds and precipitation measurements are the most common of this
  type of NWP variable.
  The lognormal error perturbation prevents measurements of 0 from being
  perturbed, and applies larger perturbations when measurements are larger.
@@ -775,7 +774,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -930,19 +929,22 @@ regrid         = { ...
 \begin_layout LyX-Code
 
 \series bold
-climo_mean     = {}
+climo_mean     = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_stdev    = {}
+climo_stdev    = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_cdf      = {}
+climo_cdf      = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
@@ -1576,7 +1578,7 @@ The
 \series bold
 obs
 \series medium
- dictionary looks very simliar to the 
+ dictionary looks very similar to the 
 \series bold
 fcst
 \series medium
@@ -2367,81 +2369,42 @@ name "subsec:ensemble_stat-output"
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-ensemble_stat
-\series default
- can produce output in STAT, ASCII, and NetCDF formats.
+ensemble_stat can produce output in STAT, ASCII, and NetCDF formats.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
  The output files are written to the default output directory or the directory
- specified by the -outdir
-\series medium
- 
-\series default
-command line
-\series medium
- option.
+ specified by the -outdir command line option.
  
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The output STAT file is named using the following naming convention: 
 \end_layout
 
 \begin_layout Standard
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat
-\series medium
- where 
-\series default
-PREFIX
-\series medium
- indicates the user-defined output prefix and 
-\series default
-YYYYMMDD_HHMMSSV
-\series medium
- indicates the forecast valid time.
- Note that
-\series default
- the forecast lead time is not included in the output file names 
-\series medium
-since it would not be well-defined for time-lagged ensembles.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-define
+d output prefix and YYYYMMDD_HHMMSSV indicates the forecast valid time.
+ Note that the forecast lead time is not included in the output file names
+ since it would not be well-defined for time-lagged ensembles.
  When verifying multiple lead times for the same valid time, users should
  either write the output to separate directories or specify a output prefix
- to ensure unqiue file names.
+ to ensure unique file names.
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The output ASCII files are named similarly: 
 \end_layout
 
 \begin_layout Standard
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt
-\series medium
- where 
-\series default
-TYPE
-\series medium
- is one of 
-\series default
-ecnt, rps, rhist, phist, relp, orank, and ssvar
-\series medium
- to indicate the line type it contains.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of ecnt,
+ rps, rhist, phist, relp, orank, and ssvar to indicate the line type it
+ contains.
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 When fields are requested in the ens dictionary of the configuration file
- or verificaiton against gridded fields is performed, 
-\series bold
-ensemble_stat
-\series medium
- can produce output NetCDF files using the following naming convention:
+ or verification against gridded fields is performed, ensemble_stat can
+ produce output NetCDF files using the following naming convention:
 \end_layout
 
 \begin_layout Standard
@@ -2528,7 +2491,7 @@ Rank for each Observation Value (if gridded observation field provided)
 
 \begin_layout Standard
 When gridded or point observations are provided, using the -grid_obs and
- -point_obs command line options, repsectively, the Ensemble-Stat tool can
+ -point_obs command line options, respectively, the Ensemble-Stat tool can
  compute the following statistics for the fields specified in the fcst and
  obs dictionaries of the configuration file:
 \end_layout
@@ -2808,7 +2771,7 @@ FCST_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid start time in YYYYMMDDHH format
+Forecast valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -2837,7 +2800,7 @@ FCST_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid end time in YYYYMMDDHH format
+Forecast valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -2895,7 +2858,7 @@ OBS_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid start time in YYYYMMDDHH format
+Observation valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -2924,7 +2887,7 @@ OBS_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid end time in YYYYMMDDHH format
+Observation valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -4469,7 +4432,7 @@ RANK_i
 \begin_inset Text
 
 \begin_layout Plain Layout
-Count of observations with the ith rank (repeated)
+Count of observations with the i-th rank (repeated)
 \end_layout
 
 \end_inset
@@ -5185,7 +5148,7 @@ OBS_SID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Station Identifiier
+Station Identifier
 \end_layout
 
 \end_inset
@@ -6456,7 +6419,7 @@ MBIAS
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mangitude bias
+Magnitude bias
 \end_layout
 
 \end_inset

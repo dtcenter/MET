@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation 0bp
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -1541,7 +1547,7 @@ option indicates the directory where output files should be written.
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -1565,7 +1571,7 @@ option indicates the directory where output files should be written.
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -1641,7 +1647,7 @@ MODEConfig_nc
 \end_layout
 
 \begin_layout Standard
-In Example 2, the MODE tool will verify the model data in the sampe_fcst.nc
+In Example 2, the MODE tool will verify the model data in the sample_fcst.nc
  NetCDF output of pcp_combine using the observations in the sample_obs.nc
  NetCDF output of pcp_combine, using the configuration options specified
  in the MODEConfig_nc file.
@@ -2662,7 +2668,7 @@ orientation angle difference
 \series default
 , the 
 \series bold
-aspect ratio differene
+aspect ratio difference
 \series default
 , the 
 \series bold
@@ -2731,31 +2737,36 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
-   centroid_dist      = (...);
+   centroid_dist      = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   boundary_dist      = (...);
+   boundary_dist      = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   convex_hull_dist   = (...);
+   convex_hull_dist   = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   angle_diff         = (...);
+   angle_diff         = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   aspect_diff        = (...);
+   aspect_diff        = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
@@ -2779,7 +2790,8 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
-   int_area_ratio     = (...);
+   int_area_ratio     = ( ...
+ );
 \end_layout
 
 \begin_layout LyX-Code
@@ -3610,7 +3622,7 @@ FCST_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid start time in YYYYMMDDHH format
+Forecast valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3698,7 +3710,7 @@ OBS_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid start time in YYYYMMDDHH format
+Observation valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -5499,7 +5511,7 @@ FCST_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid start time in YYYYMMDDHH format
+Forecast valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -5587,7 +5599,7 @@ OBS_VALID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid start time in YYYYMMDDHH format
+Observation valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset

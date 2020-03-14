@@ -2636,98 +2636,47 @@ name "subsec:grid_stat-output"
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-grid_stat
-\series default
- produces output in STAT and, optionally, ASCII and NetCDF formats.
+grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
  The output files are written to the default output directory or the directory
- specified by the -outdir
-\series medium
- 
-\series default
-command line
-\series medium
- option.
+ specified by the -outdir command line option.
  
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The output STAT file is named using the following naming convention: 
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
-\series medium
- where 
-\series bold
-PREFIX
-\series medium
- indicates the user-defined output prefix, 
-\series bold
-HHMMSSL
-\series medium
- indicates the forecast lead time and 
-\series bold
-YYYYMMDD_HHMMSSV
-\series medium
- indicates the forecast valid time.
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the
+ user-defined output prefix, HHMMSSL indicates the forecast lead time and
+ YYYYMMDD_HHMMSSV indicates the forecast valid time.
  
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The output ASCII files are named similarly: 
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
-\series medium
- where 
-\series bold
-TYPE
-\series medium
- is one of 
-\series bold
-fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc,
- eclv, nbrctc, nbrcts, nbrcnt, dmap,
-\series default
- or 
-\series bold
-grad
-\series medium
- to indicate the line type it contains.
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho,
+ ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc, eclv,
+ nbrctc, nbrcts, nbrcnt, dmap, or grad to indicate the line type it contains.
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
  as the format of the STAT and ASCII output of the Point-Stat tool with
  the exception of the five additional line types.
- Please refer to the tables in 
-\series default
-Section
-\series medium
- 
+ Please refer to the tables in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:point_stat-output"
 
 \end_inset
 
- 
-\series default
-for a description of the common output STAT and optional ASCII file line
+ for a description of the common output STAT and optional ASCII file line
  types.
  The formats of the five additional line types for grid_stat are explained
  in the following tables.
@@ -2972,7 +2921,7 @@ FCST_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid start time in YYYYMMDDHH format
+Forecast valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3001,7 +2950,7 @@ FCST_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid end time in YYYYMMDDHH format
+Forecast valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3059,7 +3008,7 @@ OBS_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid start time in YYYYMMDDHH format
+Observation valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3088,7 +3037,7 @@ OBS_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid end time in YYYYMMDDHH format
+Observation valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset

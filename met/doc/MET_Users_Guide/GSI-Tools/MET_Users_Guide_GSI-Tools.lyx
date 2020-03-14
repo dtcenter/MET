@@ -2120,7 +2120,7 @@ This section describes how to run the tool gsidens2orank tool.
  The gsidens2orank tool processes an ensemble of GSI diagnostic files and
  reformats them into the MET observation rank (ORANK) line type, similar
  to the output of the Ensemble-Stat tool.
- The ORANK line type contains ensemble matched pair information and is anologous
+ The ORANK line type contains ensemble matched pair information and is analogous
  to the MPR line type for a deterministic model.
  The output ORANK data may be passed to the Stat-Analysis tool to compute
  ensemble statistics.
@@ -2512,7 +2512,7 @@ name "subsec:gsidens2orank-output"
 \series medium
 The gsidens2orank tool performs a simple reformatting step and thus requires
  no configuration file.
- The mulitple files passed to it are interpreted as members of the same
+ The multiple files passed to it are interpreted as members of the same
  ensemble.
  Therefore, each call to the tool processes exactly one ensemble.
  All input ensemble GSI diagnostic files must be of the same type.
@@ -3657,7 +3657,7 @@ The gsidens2orank output may be passed to the Stat-Analysis tool to derive
 aggregate_stat
 \series default
  job type to read ORANK lines and ranked histograms (RHIST), probability
- integral transform historgrams (PHIST), and spread-skill variance output
+ integral transform histograms (PHIST), and spread-skill variance output
  (SSVAR).
  Stat-Analysis has been enhanced to parse any extra columns found at the
  end of the input lines.
