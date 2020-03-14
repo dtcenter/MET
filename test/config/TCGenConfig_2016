@@ -85,14 +85,14 @@ oper_genesis = {
 filter = [
   { desc           = "AL_BASIN";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                      {'name=\"basin\"; level=\"(*,*)\";} ==1"; },
+                     { name=\"basin\"; level=\"(*,*)\"; } ==1"; },
   { desc           = "AL_DLAND_300";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                    {'name=\"basin\"; level=\"(*,*)\";} ==1";
+                     { name=\"basin\"; level=\"(*,*)\"; } ==1";
     dland_thresh   = >0&&<300; },
   { desc           = "EP_CP_BASIN";
     vx_mask        = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-                     {'name=\"basin\"; level=\"(*,*)\";} ==2||==3"; },
+                     { name=\"basin\"; level=\"(*,*)\";} ==2||==3"; },
   { desc           = "EP_BASIN";
     genesis_window = { beg = -3*24; end = 3*24; }; genesis_radius = 300; },
   { desc           = "3DAY_300KM";
