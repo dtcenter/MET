@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -90,10 +96,8 @@ name "chap:Re-Formatting-of-Gridded"
 \begin_layout Standard
 
 \series medium
-Several MET tools exist for the purpose of reformatting gridded fields.
- MET offers a suite of reformatting tools to put data in a common format.
- Both the input and output file formats of these reformatting tools are
- described in this chapter.
+Several MET tools exist for the purpose of reformatting gridded fields,
+ and they are described in this chapter.
  These tools are represented by the reformatting column of MET flowchart
  depicted in 
 \series default
@@ -123,9 +127,9 @@ name "sec:Pcp-Combine-tool"
 \begin_layout Standard
 
 \series medium
-This section contains a description of running the Pcp-Combine tool.
- The Pcp-Combine tool summarizes data across multiple input gridded data
- files and writes the results to a single NetCDF output file.
+This section describes the Pcp-Combine tool which summarizes data across
+ multiple input gridded data files and writes the results to a single NetCDF
+ output file.
  It is often used to modify precipitation accumulation intervals in the
  forecast and/or observation datasets to make them comparable.
  However it can also be used to derive summary fields, such as daily min/max
@@ -191,7 +195,7 @@ sum
 
  on the command line is optional.
  Using the sum arguments described below, Pcp-Combine searches the input
- data directories (
+ directories (
 \begin_inset Quotes eld
 \end_inset
 
@@ -199,7 +203,7 @@ sum
 \begin_inset Quotes erd
 \end_inset
 
- option) for data which matches the requested time stamps and accumulation
+ option) for data that matches the requested time stamps and accumulation
  intervals.
  Pcp-Combine only considers files from the input data directory which match
  the specified regular expression (
@@ -273,9 +277,9 @@ By default, the Pcp-Combine tool processes data for
 \series bold
 APCP
 \series medium
-, the GRIB string for accumulated preciptation.
+, the GRIB string for accumulated precipitation.
  When requesting data using time strings (i.e.
- [HH]MMSS), pcp_combine searches for accumulated precipitation for that
+ [HH]MMSS), Pcp-Combine searches for accumulated precipitation for that
  accumulation interval.
  Alternatively, use the 
 \begin_inset Quotes eld
@@ -818,7 +822,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
 \end_layout
 
 \begin_layout Description
@@ -855,7 +859,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -1059,7 +1063,7 @@ file_1 config_str_1 ...
 config_str_i
 \series medium
  argument describing the data can be a set to a time string in HH[MMSS]
- format for accumulated preciptiation or a full configuration string.
+ format for accumulated precipitation or a full configuration string.
  For example, use 
 \series bold
 'name="TMP"; level="P500";'
@@ -1631,7 +1635,7 @@ lat, lon
 \begin_layout Plain Layout
 Data value (i.e.
  accumulated precipitation) for each point in the grid.
- The name of the variable describes the name and level and any deriviation
+ The name of the variable describes the name and level and any derivation
  logic that was applied.
 \end_layout
 
@@ -1665,15 +1669,14 @@ name "sec:Reformat_Grid-Regrid-data-plane"
 
 \series medium
 This section contains a description of running the regrid_data_plane tool.
- This tool may be run to read data from any gridded file MET supports (i.e
- GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a user-specified
- grid, and write the field(s) out in NetCDF format.
+ This tool may be run to read data from any gridded file MET supports, interpola
+te to a user-specified grid, and write the field(s) out in NetCDF format.
  The user may specify the method of interpolation used for regridding as
  well as which fields to regrid.
  This tool is particularly useful when dealing with GRIB2 and NetCDF input
  files that need to be regridded.
  For GRIB1 files, it has also been tested for compatibility with the 
-\series bold
+\series default
 copygb
 \series medium
  regridding utility mentioned in Section 
@@ -2035,7 +2038,7 @@ The
 \series default
  option overrides the default delta distance for Gaussian smoothing.
  Default is 81.271.
- Ignored if not GAUSSIAN or MAXGAUSS methods.
+ Ignored if not the MAXGAUSS method.
 \end_layout
 
 \begin_layout Description
@@ -2050,7 +2053,7 @@ The
 \series default
  option overrides the default radius of influence for Gaussian interpolation.
  Default is 120.
- Ignored if not GAUSSIAN or MAXGAUSS methods.
+ Ignored if not the MAXGAUSS method.
 \end_layout
 
 \begin_layout Description
@@ -2112,7 +2115,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
 \end_layout
 
 \begin_layout Description
@@ -2153,7 +2156,7 @@ level
 \series default
  option specifies the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  Setting the compression level to 0 will make no compression for the NetCDF
  output.
  Lower number is for fast compression and higher number is for better compressio
@@ -2319,8 +2322,7 @@ name "sec:Reform_Grid-Shift-Data-Plane"
 \begin_layout Standard
 
 \series medium
-This section contains a description of running the shift_data_plane tool.
- This tool may be run to perform a rigged shift of the entire grid based
+The Shift-Data-Plane tool performs a rigid shift of the entire grid based
  on user-defined specifications and write the field(s) out in NetCDF format.
  This tool was originally designed to account for track error when comparing
  fields associated with tropical cyclones.
@@ -2328,7 +2330,7 @@ This section contains a description of running the shift_data_plane tool.
  points to define the shift.
  Both points must fall within the domain and are used to define the X and
  Y direction grid unit shift.
- The rigid is then applied to all grid points.
+ The shift is then applied to all grid points.
  The user may specify the method of interpolation and the field to be shifted.
  The effects of topography and land/water masks are ignored.
  
@@ -2436,7 +2438,7 @@ hskip 0.5in}
 
 \end_inset
 
--to   lat lon
+-to lat lon
 \end_layout
 
 \begin_layout LyX-Code
@@ -2581,9 +2583,8 @@ The
 \series bold
 -from lat lon
 \series default
- specifies the starting location to define the shift (location must be in
- the file).
- Lat is deg N, Lon is deg E.
+ specifies the starting location within the domain to define the shift.
+ Latitude and longitude are defined in degrees North and East, respectively.
 \end_layout
 
 \begin_layout Description
@@ -2596,8 +2597,7 @@ The
 \series bold
 -to lat lon
 \series default
- specifies the ending location to define the shift (location may or may
- not be in the file).
+ specifies the ending location within the domain to define the shift.
  Lat is deg N, Lon is deg E.
 \end_layout
 
@@ -2652,7 +2652,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
 \end_layout
 
 \begin_layout Description
@@ -2693,7 +2693,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -2779,7 +2779,7 @@ nam_shift_APCP_12.nc
 \begin_layout Standard
 
 \series medium
-In this example, the shift_data_plane tool reads 12-hour accumulated preciptiati
+In this example, the shift_data_plane tool reads 12-hour accumulated precipitati
 on from the 
 \series bold
 nam.grb
@@ -3006,7 +3006,7 @@ hskip 0.5in}
 
 \end_inset
 
-    modis_file
+modis_file
 \end_layout
 
 \begin_layout Standard
@@ -3098,7 +3098,7 @@ Required arguments for modis_regrid
 7.
  The 
 \series bold
--modis_file
+modis_file
 \series medium
  argument is the name of the MODIS input file.
 \end_layout
@@ -3134,7 +3134,7 @@ Optional arguments for modis_regrid
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -3277,9 +3277,9 @@ name "WWMCA-Tool-Documentation"
 There are two WWMCA tools available.
  The WWMCA-Plot tool makes a PostScript plot of one or more WWMCA cloud
  percent files and the WWMCA-Regrid tool regrids binary WWMCA data files
- and reformats them into netCDF files that the other MET tools can read.
- In METv5.2, the WWMCA-Regrid tool was generalized to more broadly support
- any data stored in the WWMCA binary format.
+ and reformats them into NetCDF files that the other MET tools can read.
+ The WWMCA-Regrid tool has been generalized to more broadly support any
+ data stored in the WWMCA binary format.
 \end_layout
 
 \begin_layout Standard
@@ -3296,7 +3296,7 @@ MSS] format.
  Therefore, a string of 1 to 4 numbers is interpreted as the forecast lead
  time in hours.
  While parsing the filename provides default values for this timing information,
- they can be overridden by explicting setting their values in the WWMCA-Regrid
+ they can be overridden by explicitly setting their values in the WWMCA-Regrid
  configuration file.
 \end_layout
 
@@ -3430,7 +3430,7 @@ wwmca_cloud_pct_file_list
  argument 
 \series default
 represents one or more WWMCA cloud percent files given on the command line.
- As with any command given to a UNIX shell, the user can use metacharacters
+ As with any command given to a UNIX shell, the user can use meta-characters
  as a shorthand way to specify many filenames.
  For each input file specified, one output PostScript plot will be created.
 \end_layout
@@ -3485,7 +3485,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -3793,7 +3793,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -3831,7 +3831,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -4055,7 +4055,7 @@ The settings listed above are strings which specify the timing information
  for the data being processed.
  The accumulation time is specified in HH[MMSS] format and, by default,
  is set to a value of 1 hour.
- The initializaiton and valid time strings are specified in YYYYMMDD[_HH[MMSS]]
+ The initialization and valid time strings are specified in YYYYMMDD[_HH[MMSS]]
  format.
  However, by default they are set to empty strings.
  If empty, the timing information parsed from the filename will be used.

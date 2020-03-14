@@ -83,7 +83,8 @@
 \begin_body
 
 \begin_layout Chapter
-Re-Formatting of Point Observations
+Re-Formatting of Pointdoc/MET_Users_Guide/fwd_refs_appendix/MET_Users_Guide_Forw
+ard.lyx Observations
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Re-Formatting-of-Point"
@@ -3976,80 +3977,8 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-time_summary = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   flag       = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   raw_data   = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   beg        = "000000";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   end        = "235959";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   step       = 300;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   width      = 600;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   grib_code  = [ 11, 204, 211 ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   obs_var    = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
- ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_freq   = 0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_thresh = 0.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
+time_summary = { ...
+ }
 \end_layout
 
 \begin_layout Standard
@@ -4811,80 +4740,8 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-time_summary = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   flag       = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-   
-\series bold
-raw_data   = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   beg        = "000000";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   end        = "235959";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   step       = 300;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   width      = 600;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   grib_code  = [ 11, 204, 211 ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   obs_var    = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
- ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_freq   = 0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_thresh = 0.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
+time_summary = { ...
+ }
 \end_layout
 
 \begin_layout Standard
@@ -4894,9 +4751,7 @@ The
 \series bold
 time_summary
 \series medium
- feature was implemented to allow additional processing of observations
- with high temporal resolution.
- This option is described in Section 
+ dictionary is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:pb2nc-configuration-file"
