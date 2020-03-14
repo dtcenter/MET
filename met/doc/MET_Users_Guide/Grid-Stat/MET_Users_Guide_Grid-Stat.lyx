@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -112,7 +118,7 @@ The Grid-Stat tool provides verification statistics for a matched forecast
  However, the interpolation parameters may be used to perform a smoothing
  operation on the forecast and observation fields prior to verification.
  In addition to traditional verification approaches, the Grid-Stat tool
- includes fourier decompositions, gradient statistics, distance metrics,
+ includes Fourier decompositions, gradient statistics, distance metrics,
  and neighborhood methods, designed to examine forecast performance as a
  function of spatial scale.
 \end_layout
@@ -324,7 +330,7 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  range is defined as: t1 <= p < t2.
  The exception is for the highest set of thresholds, when the range includes
  1: t1 <= p <= 1.To make configuration easier, in METv6.0, these probabilities
- may be specfied in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
+ may be specified in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
  or using shorthand notation (==0.25) for bins of equal width.
 \end_layout
 
@@ -334,7 +340,7 @@ In METv6.0, when the "prob" entry is set as a dictionary to define the field
  be processed as regular scalars rather than probabilities.For example, this
  option can be used to compute traditional 2x2 contingency tables and neighborho
 od verification statistics for probability data.
- It can also be used to compare two probabilityfields directly.
+ It can also be used to compare two probability fields directly.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -350,7 +356,7 @@ The Grid-Stat tool allows evaluation of model forecasts compared with a
  user-supplied climatology.
  Prior to calculation of statistics, the climatology must be put on the
  same grid as the forecasts and observations.
- In particular, the anomoly correlation and mean squared error skill score
+ In particular, the anomaly correlation and mean squared error skill score
  provide a measure of the forecast skill versus the climatology.
  For more details about climatological comparisons and reference forecasts,
  see the relevant section in the Point-Stat Chapter, Section 
@@ -561,8 +567,8 @@ Decomposition via Fourier transform allows the user to evaluate the model
  or reduction, in anomaly correlation of geopotential height at various
  levels for bands of waves.
  A band of low wave numbers, say 0 - 3, represent larger frequency components,
- while a band of higher wave numbers,for example 70 - 72, represent smaller
- freqency components.
+ while a band of higher wave numbers, for example 70 - 72, represent smaller
+ frequency components.
  Generally, anomaly correlation should be higher for frequencies with low
  wave numbers than for frequencies with high wave numbers, hence the "dieoff".
 \end_layout
@@ -1201,7 +1207,7 @@ Optional arguments for grid_stat
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -1233,7 +1239,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -1439,19 +1445,22 @@ regrid         = { ...
 \begin_layout LyX-Code
 
 \series bold
-climo_mean     = {}
+climo_mean     = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_stdev    = {}
+climo_stdev    = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_cdf      = {}
+climo_cdf      = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
@@ -2652,18 +2661,20 @@ The output STAT file is named using the following naming convention:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
 \series medium
  where 
-\series default
+\series bold
 PREFIX
 \series medium
  indicates the user-defined output prefix, 
-\series default
+\series bold
 HHMMSSL
 \series medium
  indicates the forecast lead time and 
-\series default
+\series bold
 YYYYMMDD_HHMMSSV
 \series medium
  indicates the forecast valid time.
@@ -2677,20 +2688,22 @@ The output ASCII files are named similarly:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
 \series medium
  where 
-\series default
+\series bold
 TYPE
 \series medium
  is one of 
-\series default
+\series bold
 fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc,
- eclv, nbrctc, nbrcts
-\series medium
-, 
+ eclv, nbrctc, nbrcts, nbrcnt, dmap,
 \series default
-nbrcnt, and grad
+ or 
+\series bold
+grad
 \series medium
  to indicate the line type it contains.
 \end_layout
@@ -2700,26 +2713,24 @@ nbrcnt, and grad
 \series medium
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
  as the format of the STAT and ASCII output of the Point-Stat tool with
- the exception of the four additional neighborhood line types.
+ the exception of the five additional line types.
  Please refer to the tables in 
 \series default
 Section
 \series medium
-
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:point_stat-output"
 
 \end_inset
 
- (
-\series bold
-point_stat
+ 
 \series default
- output) for a description of the common output STAT and optional ASCII
- file line types.
- The formats of the four additional neighborhood line types for grid_stat
- are explained in the following tables.
+for a description of the common output STAT and optional ASCII file line
+ types.
+ The formats of the five additional line types for grid_stat are explained
+ in the following tables.
 \end_layout
 
 \begin_layout Standard
@@ -3534,10 +3545,6 @@ reference "subsec:point_stat-output"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -3548,10 +3555,6 @@ reference "subsec:point_stat-output"
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -6538,15 +6541,19 @@ Mean of ZHU_FO and ZHU_OF
 \begin_layout Standard
 
 \series medium
-If requested in the 
+If requested 
 \series default
-output_flag
+using the 
+\series bold
+nc_pairs_flag
 \series medium
- array, a NetCDF file containing the matched pair and forecast minus observation
- difference fields for each combination of variable type/level and masking
- region applied will be generated.
+ dictionary in the configuration file, a NetCDF file containing the matched
+ pair and forecast minus observation difference fields for each combination
+ of variable type/level and masking region applied will be generated.
+ The contents of this file are determined by the contents of the nc_pairs_flag
+ dictionary.
  The output NetCDF file is named similarly to the other output files: 
-\series default
+\series bold
 grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc
 \series medium
 .
@@ -6718,7 +6725,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Variables defined in NetCDF matched pair output.
+A selection of variables that can appear in the NetCDF matched pair output.
 \end_layout
 
 \end_inset
@@ -6982,6 +6989,48 @@ List the gradient of the forecast and observation fields computed in the
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+climo        = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   climo_cdp    = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   weight       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   nbrhd        = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gradient     = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   distance_map = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+   
+\series bold
+apply_mask   = TRUE;
 \end_layout
 
 \begin_layout Standard

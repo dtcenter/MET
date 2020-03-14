@@ -111,8 +111,8 @@ The Point-Stat tool provides verification statistics for forecasts at observatio
 n points (as opposed to over gridded analyses).
  The Point-Stat tool matches gridded forecasts to point observation locations
  and supports several different interpolation options.
- The tool then computes continuous, categorical, and probabilistic verification
- statistics.
+ The tool then computes continuous, categorical, spatial, and probabilistic
+ verification statistics.
  The categorical and probabilistic statistics generally are derived by applying
  a threshold to the forecast and observation values.
  Confidence intervals - representing the uncertainty in the verification
@@ -218,7 +218,7 @@ This section provides information about the various methods available in
 
 \series medium
 In the vertical, if forecasts and observations are at the same vertical
- level, then they are paired as is.
+ level, then they are paired as-is.
  If any discrepancy exists between the vertical levels, then the forecasts
  are interpolated to the level of the observation.
  The vertical interpolation is done in natural log of pressure coordinates,
@@ -237,7 +237,7 @@ SURFACE
 message_type_group_map
 \series medium
  configuration option.
- By defualt, the surface message types include ADPSFC, SFCSHP, and MSONET.
+ By default, the surface message types include ADPSFC, SFCSHP, and MSONET.
  
 \end_layout
 
@@ -446,7 +446,11 @@ regrid
 interp
 \series default
  configuration option in grid-to-grid comparisons, the Gaussian method is
- implemented as a 2-step process.
+ named 
+\series bold
+MAXGAUSS
+\series default
+ and is implemented as a 2-step process.
  First, the data is regridded or smoothed using the maximum value interpolation
  method described below, where the 
 \series bold
@@ -1089,18 +1093,18 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  range is defined as: t1 <= p < t2.
  The exception is for the highest set of thresholds, when the range includes
  1: t1 <= p <= 1.
- To make configuration easier, in METv6.0, these probabilities may be specfied
+ To make configuration easier, in METv6.0, these probabilities may be specified
  in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using
  shorthand notation (==0.25) for bins of equal width.
 \end_layout
 
 \begin_layout Standard
-In METv6.0, when the "prob" entry is set as a dictionary to define the field
- of interest, setting "prob_as_scalar = TRUE" indicates that this data should
- be processed as regular scalars rather than probabilities.For example, this
- option can be used to compute traditional 2x2 contingency tables and neighborho
-od verification statistics for probability data.
- It can also be used to compare two probabilityfields directly.
+When the "prob" entry is set as a dictionary to define the field of interest,
+ setting "prob_as_scalar = TRUE" indicates that this data should be processed
+ as regular scalars rather than probabilities.
+ For example, this option can be used to compute traditional 2x2 contingency
+ tables and neighborhood verification statistics for probability data.
+ It can also be used to compare two probability fields directly.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1122,7 +1126,7 @@ name "subsec:Climatology"
 
 \series medium
 For each of the types of statistics mentioned above (categorical, continuous,
- and probabilistic), it is possible to calculate mesures of skill relative
+ and probabilistic), it is possible to calculate measures of skill relative
  to climatology.
  MET will accept a climatology file provided by the user, and will evaluate
  it as a reference forecast.
@@ -1132,7 +1136,7 @@ For each of the types of statistics mentioned above (categorical, continuous,
  nature of the forecast.
  Common statistics that use a climatological reference include: the mean
  squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR),
- scalar and vector anomolies (SAL1L2 and VAL1L2), continuous ranked probability
+ scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability
  skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
 \end_layout
 
@@ -1538,10 +1542,8 @@ name "sec:Practical-information"
 \begin_layout Standard
 
 \series medium
-This section contains a description of how to configure and run the Point-Stat
- tool.
- The Point-Stat tool is used to perform verification of a gridded model
- field using point observations.
+The Point-Stat tool is used to perform verification of a gridded model field
+ using point observations.
  The gridded model field to be verified must be in one of the supported
  file formats.
  The point observations must be formatted as the NetCDF output of the 
@@ -1859,7 +1861,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -1995,19 +1997,22 @@ regrid         = { ...
 \begin_layout LyX-Code
 
 \series bold
-climo_mean     = {}
+climo_mean     = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_stdev    = {}
+climo_stdev    = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_cdf      = {}
+climo_cdf      = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
@@ -2207,21 +2212,20 @@ The
 \series bold
 obs
 \series medium
- dictionary looks very simliar to the 
+ dictionary looks very similar to the 
 \series bold
 fcst
 \series medium
  dictionary.
- However since point observation are assigned GRIB1 codes, the observation
- section must be defined following GRIB1 conventions.
- When verifying GRIB1 forecast data, one can easily copy over the forecast
- settings to the observation dictionary using 
+ When the forecast and observation variables follow the same naming convention,
+ one can easily copy over the forecast settings to the observation dictionary
+ using 
 \series bold
 obs = fcst;
 \series medium
 .
- However, when verifying non-GRIB1 forecast data, users will need to specify
- the 
+ However when verifying forecast data in NetCDF format or verifying against
+ not-standard observation variables, users will need to specify the 
 \series bold
 fcst
 \series medium
@@ -2229,7 +2233,16 @@ fcst
 \series bold
 obs
 \series medium
- sections separately.
+ dictionaries separately.
+ The number of fields specified in the 
+\series bold
+fcst
+\series medium
+ and 
+\series bold
+obs
+\series medium
+ dictionaries must match.
 \end_layout
 
 \begin_layout Standard
@@ -2260,12 +2273,12 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm
 \end_inset
 
  for a list of the possible types.
- If verifying GRIB1 forecsat data, it may be defined in the forecast dictionary
- and the copied into the observation dictionary using 
+ If using 
 \series bold
 obs = fcst;
 \series medium
-.
+, it can be defined in the forecast dictionary and the copied into the observati
+on dictionary.
 \end_layout
 
 \begin_layout Standard
@@ -2979,7 +2992,7 @@ ECNT
 \series bold
 RPS
 \series medium
- for Ranked Probabilty Score is only computed for the HiRA methodology
+ for Ranked Probability Score is only computed for the HiRA methodology
 \end_layout
 
 \begin_layout Description
@@ -3029,7 +3042,7 @@ Note that writing out matched pair data (MPR lines) for a large number of
 \end_layout
 
 \begin_layout Standard
-If all line types corresponding to a particular verificaiton method are
+If all line types corresponding to a particular verification method are
  set to NONE, the computation of those statistics will be skipped in the
  code and thus make the Point-Stat tool run more efficiently.
  For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool
@@ -5476,8 +5489,8 @@ EDS _BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Extreme Depenency Score including normal and bootstrap upper and lower confidenc
-e limits
+Extreme Dependency Score including normal and bootstrap upper and lower
+ confidence limits
 \end_layout
 
 \end_inset
@@ -5522,8 +5535,8 @@ SEDS _BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Symmetric Extreme Depenency Score including normal and bootstrap upper and
- lower confidence limits
+Symmetric Extreme Dependency Score including normal and bootstrap upper
+ and lower confidence limits
 \end_layout
 
 \end_inset
@@ -5568,8 +5581,8 @@ EDI _BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-Extreme Depenency Index including normal and bootstrap upper and lower confidenc
-e limits
+Extreme Dependency Index including normal and bootstrap upper and lower
+ confidence limits
 \end_layout
 
 \end_inset
@@ -6798,7 +6811,7 @@ ANOM_CORR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-The Anomoly Correlation including normal and bootstrap upper and lower confidenc
+The Anomaly Correlation including normal and bootstrap upper and lower confidenc
 e limits
 \end_layout
 

@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -103,7 +109,7 @@ masking
  Defining a masking region is simply selecting the desired set of grid points
  to be used.
  The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask
- and Gen-Circle-Mask tools in previous releases.
+ and Gen-Circle-Mask tools from previous releases.
  It may be run to create a bitmap verification masking region to be used
  by many of the statistical tools.
  This tool enables the user to generate a masking region once for a domain
@@ -111,7 +117,7 @@ masking
  It has been enhanced to support additional types of masking region definition
  (e.g.
  tropical-cyclone track over water only).
- An iterative approach may be used to define complex areas by combininig
+ An iterative approach may be used to define complex areas by combining
  multiple masking regions together.
 \end_layout
 
@@ -129,15 +135,14 @@ name "sec:Gen-Vx-Mask-tool"
 \begin_layout Standard
 
 \series medium
-This section contains a description of running the Gen-Vx-Mask tool.
- The Gen-Vx-Mask tool may be run to create a bitmap verification masking
+The Gen-Vx-Mask tool may be run to create a bitmap verification masking
  region to be used by the the MET statistics tools.
  This tool enables the user to generate a masking region once for a domain
  and apply it to many cases.
- While the MET statistics tools can define some masking regions on the fly,
- doing so can be slow especially for complex polylines containing hundreds
- of vertices.
- Using the Gen-Poly-Mask tool to create a bitmap masking region before running
+ While the MET statistics tools can define some masking regions on the fly
+ use polylines, doing so can be slow, especially for complex polylines containin
+g hundreds of vertices.
+ Using the Gen-Vx-Mask tool to create a bitmap masking region before running
  the other MET tools will make them run more efficiently.
 \end_layout
 
@@ -559,7 +564,7 @@ solar_azi
 \begin_inset Quotes erd
 \end_inset
 
- masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]]
+ masking, specify a gridded data file or a time string in YYYYMMDD[_HH[MMSS]]
  format.
 \end_layout
 
@@ -917,7 +922,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -947,7 +952,7 @@ standard out and error
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -1027,7 +1032,7 @@ or
 \series bold
 circle
 \series medium
-) masking reads an input ASCII file contianing Lat/Lon locations and for
+) masking reads an input ASCII file containing Lat/Lon locations and for
  each grid point, computes the minimum great-circle arc distance in kilometers
  to those points.
  If the 
@@ -1050,7 +1055,7 @@ circle
 \series bold
 track
 \series medium
-) masking reads an input ASCII file contianing Lat/Lon locations and for
+) masking reads an input ASCII file containing Lat/Lon locations and for
  each grid point, computes the minimum great-circle arc distance in kilometers
  to the track defined by those points.
  The first and last track points are not connected.
@@ -1118,7 +1123,7 @@ solar_alt
 \series bold
 solar_azi
 \series medium
-) masking computes the solar alitude and azimuth values at each grid point
+) masking computes the solar altitude and azimuth values at each grid point
  for the time defined by the 
 \series bold
 mask_file
@@ -1128,7 +1133,7 @@ mask_file
 \series bold
 mask_file
 \series medium
- may either to set to an explict timestring in YYYYMMDD[_HH[MMSS]] format
+ may either to set to an explicit time string in YYYYMMDD[_HH[MMSS]] format
  or to a gridded data file.
  If set to a gridded data file, the 
 \series bold
@@ -1300,11 +1305,11 @@ If the
 input_file
 \series default
  is the output from a previous run of Gen-Vx-Mask, automatically initialize
- the 
+ each grid point with the 
 \series bold
 input_field
 \series default
- at each grid point to the input mask value.
+ value.
 \end_layout
 
 \end_deeper
