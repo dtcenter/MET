@@ -83,8 +83,7 @@
 \begin_body
 
 \begin_layout Chapter
-Re-Formatting of Pointdoc/MET_Users_Guide/fwd_refs_appendix/MET_Users_Guide_Forw
-ard.lyx Observations
+Re-Formatting of Point Observations
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Re-Formatting-of-Point"
@@ -3024,6 +3023,20 @@ http://aeronet.gsfc.nasa.gov/
 \end_layout
 
 \begin_layout Standard
+MET version 9.0 adds support for the passing observations to ascii2nc using
+ a Python script with the 
+\begin_inset Quotes eld
+\end_inset
+
+-format python
+\begin_inset Quotes erd
+\end_inset
+
+ option.
+ An example of running ASCII2NC with Python embedding is included below.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 The default ASCII point observation format consists of one row of data per
@@ -3687,6 +3700,16 @@ Required arguments for ascii2nc
 ascii_file
 \series medium
  argument is the ASCII point observation file(s) to be processed.
+ If using Python embedding with 
+\begin_inset Quotes eld
+\end_inset
+
+-format python
+\begin_inset Quotes erd
+\end_inset
+
+ provide a quoted string containing the Python script to be run followed
+ by any command line arguments that script takes.
 \end_layout
 
 \begin_layout Description
@@ -3715,8 +3738,71 @@ Optional arguments for ascii2nc
 \series bold
 -format ASCII_format
 \series medium
- option may be set to "met_point", "little_r", "surfrad", "wwsis", "aeronet",
- "aeronetv2", or "aeronetv3".
+ option may be set to 
+\begin_inset Quotes eld
+\end_inset
+
+met_point
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+little_r
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+surfrad
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+wwsis
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+aeronet
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+aeronetv2
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+aeronetv3
+\begin_inset Quotes erd
+\end_inset
+
+, or 
+\begin_inset Quotes eld
+\end_inset
+
+python
+\begin_inset Quotes erd
+\end_inset
+
+.
  If passing in ISIS data, use the 
 \begin_inset Quotes eld
 \end_inset
@@ -3897,6 +3983,44 @@ sample_ascii_obs.txt file
 sample_ascii_obs.nc
 \series medium
 .
+\end_layout
+
+\begin_layout Standard
+Here is an example of processing the same set of observations but using
+ Python embedding instead:
+\end_layout
+
+\begin_layout LyX-Code
+ascii2nc -format python 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset Quotes eld
+\end_inset
+
+MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+sample_ascii_obs_python.nc
+\end_layout
+
+\begin_layout Standard
+Please refer to Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_F_Python_Embedding"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details about Python embedding in MET.
 \end_layout
 
 \begin_layout Subsection

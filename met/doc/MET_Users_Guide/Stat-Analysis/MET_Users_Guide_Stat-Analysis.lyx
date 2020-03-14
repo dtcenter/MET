@@ -114,6 +114,31 @@ The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat,
  of ways which are described in this chapter.
 \end_layout
 
+\begin_layout Standard
+MET version 9.0 adds support for the passing matched pair data (MPR) into
+ Stat-Analysis using a Python script with the 
+\begin_inset Quotes eld
+\end_inset
+
+-lookin python ...
+\begin_inset Quotes erd
+\end_inset
+
+ option.
+ An example of running Stat-Analysis with Python embedding is shown in Section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:stat_analysis-usage"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 Scientific and statistical aspects
 \begin_inset CommandInset label
@@ -1684,10 +1709,38 @@ Required arguments for stat_analysis
 \series bold
 path
 \series default
- specifies the name of a specific STAT file (any file ending in .stat) or
- the name of a directory where the Stat-Analysis tool will search for STAT
- files.
- This option may be used multiple times to specify multiple locations.
+ specifies the name of a directory to be searched recursively for STAT files
+ (ending in 
+\begin_inset Quotes eld
+\end_inset
+
+.stat
+\begin_inset Quotes erd
+\end_inset
+
+) or any explicit file name with any suffix (such as 
+\begin_inset Quotes eld
+\end_inset
+
+_ctc.txt
+\begin_inset Quotes erd
+\end_inset
+
+) to be read.
+ This option may be used multiple times to specify multiple directories
+ and/or files to be read.
+ If 
+\begin_inset Quotes eld
+\end_inset
+
+-lookin python
+\begin_inset Quotes erd
+\end_inset
+
+ is used, it must be followed a Python embedding script and any command
+ line arguments it takes.
+ Python embedding can be used to pass matched pair (MPR) lines as input
+ to Stat-Analysis.
 \end_layout
 
 \begin_layout Description
@@ -1824,7 +1877,55 @@ In this example, the Stat-Analysis tool will search for valid STAT lines
 config/STATAnalysisConfig
 \series default
 .
- 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The example below uses Python embedding.
+\end_layout
+
+\begin_layout LyX-Code
+stat_analysis 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-lookin python MET_BASE/python/read_ascii_mpr.py point_stat_mpr.txt 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-job aggregate_stat -line_type MPR -out_line_type CNT 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-by FCST_VAR,FCST_LEV
+\end_layout
+
+\begin_layout Standard
+In this example, rather than passing the MPR output lines from Point-Stat
+ directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.
+py Python embedding script reads that file and passes the data to Stat-Analysis.
+ The aggregate_stat job is defined on the command line and CNT statistics
+ are derived from the MPR input data.
+ Separate CNT statistics are computed for each unique combination of FCST_VAR
+ and FCST_LEV present in the input.
+ Please refer to Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_F_Python_Embedding"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ for more details about Python embedding in MET.
 \end_layout
 
 \begin_layout Subsection
