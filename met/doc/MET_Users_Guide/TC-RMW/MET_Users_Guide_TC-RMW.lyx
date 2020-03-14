@@ -134,7 +134,7 @@ name "sec:TC-RMW_Practical-information"
 tc_rmw usage
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:tc_pairs-usage"
+name "subsec:tc_rmw-usage"
 
 \end_inset
 
@@ -290,7 +290,7 @@ level
 tc_rmw configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:TC_RMW-configuration-file"
+name "subsec:tc_rmw-configuration-file"
 
 \end_inset
 
@@ -327,19 +327,19 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model          = "GFS-FV3";
+model = "GFS-FV3";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-data           = {
+data  = {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-    field = [
+   field = [
 \end_layout
 
 \begin_layout LyX-Code
@@ -435,7 +435,7 @@ name = "VGRD";
 \begin_layout LyX-Code
         
 \series bold
-},
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -457,37 +457,8 @@ name = "VGRD";
 \begin_layout LyX-Code
 
 \series bold
-regrid = {
-\end_layout
-
-\begin_layout LyX-Code
-    
-\series bold
-method = NEAREST;
-\end_layout
-
-\begin_layout LyX-Code
-    
-\series bold
-width = 1;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-    vld_thresh = 0.5;
-\end_layout
-
-\begin_layout LyX-Code
-    
-\series bold
-shape = SQUARE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
+regrid = { ...
+ }
 \end_layout
 
 \begin_layout Standard
@@ -637,7 +608,7 @@ in units of the RMW, which varies along the storm track.
 tc_rmw output file
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:TC_RMW-output-file"
+name "subsec:tc_rmw-output-file"
 
 \end_inset
 
