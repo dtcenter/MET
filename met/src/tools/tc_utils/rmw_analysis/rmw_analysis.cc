@@ -701,7 +701,7 @@ void process_track_files(const StringArray& files,
                 line.set_technique(cs);
             }
 
-            // if(!is_keeper(&line)) continue;
+            if(!is_keeper(&line)) continue;
 
             // Attempt to add the current line to the TrackInfoArray
             if(tracks.add(line, false, false)) {
@@ -733,30 +733,30 @@ bool is_keeper(const ATCFLineBase* line) {
     bool keep = true;
 
     // Check model
-    if(conf_info.Model.n_elements() > 0 &&
+    if(conf_info.Model.n_elements() > 1 &&
         !conf_info.Model.has(line->technique()))
         keep = false;
 
     // Check storm id
-    else if(conf_info.StormId.n_elements() > 0 &&
+    else if(conf_info.StormId.n_elements() > 1 &&
             !has_storm_id(conf_info.StormId, line->basin(),
                           line->cyclone_number(), line->warning_time()))
         keep = false;
 
     // Check basin
-    else if(conf_info.Basin.n_elements() > 0 &&
+    else if(conf_info.Basin.n_elements() > 1 &&
             !conf_info.Basin.has(line->basin()))
         keep = false;
 
     // Check cyclone
-    else if(conf_info.Cyclone.n_elements() > 0 &&
+    else if(conf_info.Cyclone.n_elements() > 1 &&
             !conf_info.Cyclone.has(line->cyclone_number()))
         keep = false;
 
     // Initialization time window
-    else if((conf_info.InitBeg > 0 &&
+    else if((conf_info.InitBeg > 1 &&
              conf_info.InitBeg > line->warning_time()) ||
-            (conf_info.InitEnd > 0 &&
+            (conf_info.InitEnd > 1 &&
              conf_info.InitEnd < line->warning_time()))
         keep = false;
 
