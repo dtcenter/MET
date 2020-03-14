@@ -238,7 +238,7 @@ noprefix "false"
 \end_inset
 
  describe tools focused on tropical cyclones, including MET-TC Overview,
- TC-Dland, TC-Pairs, TC-Stat, TC-RMW and RMW-Analysis.
+ TC-Dland, TC-Pairs, TC-Stat, TC-Gen, TC-RMW and RMW-Analysis.
  Finally, Chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -467,7 +467,7 @@ reference "Fig_Overview_MET_Overview_Flowchart"
  The main stages represented are input, reformatting, plotting, intermediate
  output, statistical analyses, and output and aggregation/analysis.
  The MET-TC package functions independently of the other MET modules, as
- inducated in the Figure.
+ indicated in the Figure.
  Each of these stages is described further in later chapters.
  For example, the input and output formats are discussed in 
 \begin_inset CommandInset ref
@@ -504,7 +504,7 @@ PrepBUFR
  The output mask can then be used to efficiently limit verification to the
  interior of a user specified region.
  The Pcp-Combine tool can be used to add, subtract, or derive fields across
- multiple timesteps.
+ multiple time steps.
  Often it is run to accumulate precipitation amounts into the time interval
  selected by the user - if a user would like to verify over a different
  time interval than is included in their forecast or observational dataset.
@@ -541,7 +541,7 @@ status open
 \begin_layout Plain Layout
 Basic representation of current MET structure and modules.
  Gray areas represent input and output files.
- Dark green areas represent reformating and pre-processing tools.
+ Dark green areas represent reformatting and pre-processing tools.
  Light green areas represent plotting utilities.
  Blue areas represent statistical tools.
  Yellow areas represent aggregation and analysis tools.
@@ -659,7 +659,7 @@ The MODE (Method for Object-based Diagnostic Evaluation) tool also uses
 \series medium
 The MODE-TD tool extends object-based analysis from two-dimensional forecasts
  and observations to include the time dimension.
- In addition to the two dimensional information provded by MODE, MODE-TD
+ In addition to the two dimensional information provided by MODE, MODE-TD
  can be used to examine even more features including displacement in time,
  and duration and speed of moving areas of interest.
 \end_layout

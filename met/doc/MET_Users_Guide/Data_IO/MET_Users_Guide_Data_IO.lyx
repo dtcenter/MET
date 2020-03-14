@@ -340,7 +340,7 @@ The MODE tool creates two ASCII output files as well (although they are
 \end_layout
 
 \begin_layout Standard
-The TC-Pairs and TC-Stat utiltiies produce ASCII output, similar in style
+The TC-Pairs and TC-Stat utilities produce ASCII output, similar in style
  to the STAT files, but with TC relevant fields.
 \end_layout
 
@@ -1540,7 +1540,7 @@ Input
 Output
 \series medium
 : One gridded NetCDF file containing the requested model fields transformed
- into cylindircal coordinates.
+ into cylindrical coordinates.
 \end_layout
 
 \end_deeper
@@ -1721,7 +1721,7 @@ GIS-Util Tools
 \series bold
 Input
 \series medium
-: ESRI shapefiles ending in .dbf, .shp, or .shx.
+: ESRI shape files ending in .dbf, .shp, or .shx.
 \end_layout
 
 \begin_layout Description

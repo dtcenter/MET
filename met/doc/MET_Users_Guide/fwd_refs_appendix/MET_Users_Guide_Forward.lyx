@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -111,6 +117,7 @@ It is important to note here that MET is an evolving software package.
 LatexCommand href
 name "met_help@ucar.edu"
 type "mailto:"
+literal "false"
 
 \end_inset
 
@@ -161,6 +168,7 @@ When applicable, release notes are followed by the GitHub issue number which
 \begin_inset CommandInset href
 LatexCommand href
 target "https://github.com/NCAR/MET/issues"
+literal "false"
 
 \end_inset
 
@@ -314,7 +322,7 @@ Add the "inten_perc_value" option to specify the desired intensity percentile
 
 \end_deeper
 \begin_layout Itemize
-Point2Grid, GridDiag, TC-Gen, TC-RMW, RMW-Analysis
+Point2Grid, Grid-Diag, TC-Gen, TC-RMW, RMW-Analysis
 \end_layout
 
 \begin_deeper
@@ -377,6 +385,7 @@ Changes for all bugs fixed by met-8.1.1 and met-8.1.2.
 \begin_inset CommandInset href
 LatexCommand href
 target "https://github.com/NCAR/MET/milestone/61?closed=1"
+literal "false"
 
 \end_inset
 
@@ -389,6 +398,7 @@ target "https://github.com/NCAR/MET/milestone/61?closed=1"
 \begin_inset CommandInset href
 LatexCommand href
 target "https://github.com/NCAR/MET/milestone/60?closed=1"
+literal "false"
 
 \end_inset
 
@@ -1090,7 +1100,7 @@ name "chap:Acknowledgments"
 \series medium
 We thank the the National Science Foundation (NSF) along with three organization
 s within the National Oceanic and Atmospheric Administration (NOAA): 1)
- Office of Atmospheric Research (OAR); 2) Next Generation Global Predition
+ Office of Atmospheric Research (OAR); 2) Next Generation Global Prediction
  System project (NGGPS); and 3) United State Weather Research Program (USWRP),
  the United States Air Force (USAF), and the United States Department of
  Energy (DOE) for their support of this work.
@@ -1106,7 +1116,7 @@ s within the National Oceanic and Atmospheric Administration (NOAA): 1)
  help, advice, and many types of support.
  We released METv1.0 in January 2008 and would not have made a decade of
  cutting-edge verification support without those who participated in the
- original MET planning workshopsand the now dis-banded verification advisory
+ original MET planning workshops and the now dis-banded verification advisory
  group (Mike Baldwin, Matthew Sittel, Elizabeth Ebert, Geoff DiMego, Chris
  Davis, and Jason Knievel).
 \end_layout
