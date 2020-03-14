@@ -49,6 +49,8 @@ static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
+static void process_track_files(const StringArray&,
+    const StringArray&, TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase*);
 static void filter_tracks(TrackInfoArray&);
 static void read_nc_tracks(NcFile*);
@@ -609,7 +611,10 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
                    files, files_model_suffix);
 
     mlog << Debug(2)
-         << "Processing " << files.n_elements() << " ADECK file(s).\n";
+         << "Processing " << files.n_elements()
+         << " ADECK file(s).\n";
+
+    process_track_files(files, files_model_suffix, adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -643,6 +648,78 @@ void get_atcf_files(const StringArray& source,
             files_model_suffix.add(model_suffix[i]);
         }
     }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_track_files(const StringArray& files,
+                         const StringArray& model_suffix,
+                         TrackInfoArray& tracks) {
+
+    int cur_read, cur_add, tot_read, tot_add;
+    LineDataFile f;
+    ConcatString cs;
+    ATCFTrackLine line;
+
+    // Initialize
+    tracks.clear();
+
+    // Initialize counts
+    tot_read = tot_add = 0;
+
+    // Process each of the input ATCF files
+    for(int i=0; i<files.n_elements(); i++) {
+
+        // Open the current file
+        if(!f.open(files[i].c_str())) {
+            mlog << Error
+                 << "\nprocess_track_files() -> "
+                 << "unable to open file \""
+                 << files[i] << "\"\n\n";
+            exit(1);
+        }
+
+        // Initialize counts
+        cur_read = cur_add = 0;
+
+        // Read each line in the file
+        while(f >> line) {
+            mlog << Debug(3) << line << "\n";
+
+            // Increment the line counts
+            cur_read++;
+            tot_read++;
+
+            // Add model suffix, if specified
+            if(model_suffix[i].length() > 0) {
+                cs << cs_erase << line.technique() << model_suffix[i];
+                line.set_technique(cs);
+            }
+
+            // if(!is_keeper(&line)) continue;
+
+            // Attempt to add the current line to the TrackInfoArray
+            if(tracks.add(line, false, false)) {
+                cur_add++;
+                tot_add++;
+            }
+        } // End while loop over lines
+
+        // Close the current file
+        f.close();
+
+    } // End loop over files
+
+    // Dump out the total number of lines
+    mlog << Debug(3)
+         << "Used " << tot_add << " of " << tot_read
+         << " lines read from " << files.n_elements() << " file(s).\n";
+
+    // Dump out the track information
+    mlog << Debug(3)
+         << "Identified " << tracks.n_tracks() << " track(s).\n";
 
     return;
 }
@@ -746,12 +823,11 @@ void read_nc_tracks(NcFile* nc_in) {
         ConcatString track_line(track_line_str);
         mlog << Debug(3) << track_line << "\n";
 
-        // ATCFTrackLine line;
-        // if(!is_keeper(&line)) continue;
-        // tracks.add(line, true, false);
-        f << track_line;
+        f << track_line << "\n";
     }
     f.close();
+
+    process_adecks(adeck_tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
