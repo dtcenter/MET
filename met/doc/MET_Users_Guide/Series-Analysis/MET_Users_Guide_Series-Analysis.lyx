@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -51,6 +53,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -63,7 +66,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -108,7 +114,8 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal
  This differs from the Grid-Stat tool in that Grid-Stat verifies all grid
  locations together as a group.
  Thus, the Series-Analysis Tool can be used to find verification information
- specific to certain locations or to identify differences.
+ specific to certain locations or see how model performance varies over
+ the domain.
  
 \end_layout
 
@@ -126,11 +133,9 @@ name "sec:SeA_Practical-Information"
 \begin_layout Standard
 
 \series medium
-This section contains a description of how to configure and run the Series-Analy
-sis tool.
- This tool performs verification of gridded model fields using matching
- gridded observation fields.
- The Series-Analysis tool will produce a variety of user-selected statistics.
+This Series-Analysis tool performs verification of gridded model fields
+ using matching gridded observation fields.
+ It computes a variety of user-selected statistics.
  These statistics are a subset of those produced by the Grid-Stat tool,
  with options for statistic types, thresholds, and conditional verification
  options as discussed in the Chapter 
@@ -141,7 +146,7 @@ reference "chap:The-Grid-Stat-Tool"
 \end_inset
 
 .
- However, these statistics will be produced separately for each grid location
+ However, these statistics are computed separately for each grid location
  and accumulated over some series such as time or height, rather than accumulate
 d over the whole domain for a single time or height as is done by Grid-Stat.
  
@@ -491,7 +496,7 @@ both_file_list
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -695,25 +700,29 @@ regrid         = { ...
 \begin_layout LyX-Code
 
 \series bold
-fcst           = {}
+fcst           = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-obs            = {}
+obs            = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_mean     = {}
+climo_mean     = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-climo_stdev    = {}
+climo_stdev    = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
@@ -944,7 +953,7 @@ output_stats
 array controls the type of output that the Series-Analysis tool generates.
  Each flag corresponds to an output line type in the STAT file and is used
  to specify the comma-separated list of statistics to be computed.
- Use the column names from the tables listed below to spcify the statistics.
+ Use the column names from the tables listed below to specify the statistics.
  The output flags correspond to the following types of output line types:
 \end_layout
 
@@ -1058,7 +1067,7 @@ reference "table_PS_format_info_SL1L2"
 \series bold
 SAL1L2
 \series default
- for Scalar Anomoly L1L2 Partial Sums 
+ for Scalar Anomaly L1L2 Partial Sums 
 \series medium
 climatological data is supplied 
 \series default

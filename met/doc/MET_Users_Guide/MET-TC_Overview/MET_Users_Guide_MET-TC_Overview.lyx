@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation skip
 \defskip bigskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -115,7 +121,7 @@ The purpose of this User's Guide is to provide basic information to the
 The following chapters provide an overview of MET-TC and its components,
  as well as basic information on the software build.
  The required input, including file format and the MET-TC are discussed
- followed by a descritpion of the TC-dland tool, TC-Pairs, and TC-Stat tools.
+ followed by a description of the TC-Dland tool, TC-Pairs, and TC-Stat tools.
  Each chapter cover the input and output, and practical usage including
  a description of the configuration files.
  This is followed by a short overview of graphical utilities available within
@@ -136,73 +142,37 @@ name "sec:TC-components"
 \begin_layout Standard
 
 \series medium
-The MET-TC software is included as a module within the full Model Evaluation
- Tools (MET) v5.1.
- Figure 
+The MET tools used in the verification of Tropical Cyclones are referred
+ to as MET-TC.
+ These tools are shown across the bottom of the flowchart in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "Fig_MET-TC_Overview-Flowchart"
+reference "Fig_Overview_MET_Overview_Flowchart"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
- shows the basic stages of the MET-TC module.
- The required input and output, as well as each separate tool are described
- in more detail in later chapters.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename image002.png
-	scale 80
-
-\end_inset
-
-
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-
-\series medium
-Basic representation of the structure of the MET-TC module.
- Dark blue areas represent each executable and light blue areas represent
- required input and output to MET-TC.
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "Fig_MET-TC_Overview-Flowchart"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+.
+ The MET-TC tools are described in more detail in later chapters.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The TC-dland tool is used to generate a gridded file that determines the
+The TC-Dland tool is used to generate a gridded file that determines the
  location of coastlines and islands, and is used as input to the TC-Pairs
  tool to determine the distance from land of a particular track point.
- The TC-Pairs tool matches pairs of input model data and best track (or
+ The TC-Pairs tool matches pairs of input model data and BEST track (or
  any reference forecast) and calculates position errors.
  The TC-Stat tool uses the TC-Pairs output to perform filter and summary
  jobs over the matched pair dataset.
+ The TC-Gen tool performs a categorical analysis for tropical cyclone genesis
+ forecasts.
+ The TC-RMW tool performs a coordinate transformation of gridded model data,
+ centered on the storm's location.
+ The RMW-Analysis tool aggregates TC-RMW output across multiple cases.
 \end_layout
 
 \begin_layout Section
@@ -662,7 +632,7 @@ The MET package produces output in four basic file formats: STAT files,
  Matched Pairs).
  As more line types are included in future releases, all line types will
  be included in a single TCSTAT file.
- MET-TC also outputs a NetCDF format file in the TC-dland tool, as input
+ MET-TC also outputs a NetCDF format file in the TC-Dland tool, as input
  to the TC-Pairs tool.
 \end_layout
 

@@ -111,7 +111,7 @@ The Grid-Diag tool creates histograms (probability distributions when normalized
  Joint histograms will be created for all possible pairs of variables.
  Masks can be used to subset the data fields spatially.
  The histograms are accumulated over a time series of input data files,
- similar to Series Analysis.
+ similar to Series-Analysis.
 \end_layout
 
 \begin_layout Section
@@ -161,11 +161,11 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
--config file
+-out file
 \end_layout
 
 \begin_layout LyX-Code
-[-out file]
+-config file
 \end_layout
 
 \begin_layout LyX-Code
@@ -206,11 +206,20 @@ data_file_list
 2.
  The 
 \series bold
+-out 
+\series medium
+argument is the NetCDF output file.
+\end_layout
+
+\begin_layout Description
+3.
+ The 
+\series bold
 -config file
 \series default
  
 \series medium
-argument indicates the name of the configuration file to be used.
+is the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
@@ -219,15 +228,6 @@ argument indicates the name of the configuration file to be used.
 \series bold
 \bar under
 Optional arguments for grid_diag
-\end_layout
-
-\begin_layout Description
-3.
- The 
-\series bold
--out 
-\series medium
-argument indicates the name of the NetCDF output file.
 \end_layout
 
 \begin_layout Description
@@ -240,7 +240,7 @@ argument indicates the name of the NetCDF output file.
  All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -305,24 +305,22 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model          = "GFS-FV3";
+model   = "GFS-FV3";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-mask           = { grid = [ "FULL" ]; poly = []; }
+mask    = { grid = [ "FULL" ]; poly = []; }
 \end_layout
 
 \begin_layout LyX-Code
 
+\series bold
+version = "VN.N";
 \end_layout
 
-\begin_layout LyX-Code
-        
-\end_layout
-
-\begin_layout LyX-Code
+\begin_layout Standard
 
 \series medium
 The configuration options listed above are common to many MET tools and
@@ -348,92 +346,94 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Standard
-An example data field dictionary is
+\begin_layout LyX-Code
+
+\series bold
+data = {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-data           = 
+   field = [
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-{
+      {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-    field = [
+         name   = "APCP";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-        {
+         level  = ["L0"];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            name = "APCP";
+         n_bins = 30;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            level = ["L0"];
+         range  = [0, 12];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            n_bins = 30;
+      },
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            range = [0, 12];},
+      {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-        {
+         name   = "PWAT";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            name = "PWAT";
+         level  = ["L0"];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            level = ["L0"];
+         n_bins = 35;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            n_bins = 35;
+         range  = [35, 70];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-            range = [35, 70];}
+      }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-    ]
+   ];
 \end_layout
 
 \begin_layout LyX-Code
@@ -444,6 +444,19 @@ data           =
 
 \begin_layout Standard
 The 
+\series bold
+name
+\series default
+ and 
+\series bold
+level
+\series default
+ entries in the 
+\series bold
+data
+\series default
+ dictionary define the data to be processed.
+ The 
 \series bold
 n_bins
 \series default
@@ -475,7 +488,7 @@ name "subsec:Grid_Diag-output-file"
 The NetCDF file has a dimension for each of the specified data variable
  and level combinations, e.g.
  APCP_L0 and PWAT_L0.
- The bin minimum, midpoint, and maximum values are indiciated with an _min,
+ The bin minimum, midpoint, and maximum values are indicated with an _min,
  _min, or _max appended to the variable/level.
 \end_layout
 

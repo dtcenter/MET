@@ -3061,11 +3061,7 @@ name "subsec:point_stat-output"
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-point_stat
-\series default
- produces output in STAT and, optionally, ASCII format.
+point_stat produces output in STAT and, optionally, ASCII format.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
  The output files will be written to the default output directory or the
@@ -3077,69 +3073,28 @@ The output STAT file will be named using the following naming convention:
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat 
-\series medium
-where 
-\series bold
-PREFIX
-\series medium
- indicates the user-defined output prefix, 
-\series bold
-HHMMSSL
-\series medium
- indicates the forecast lead time and 
-\series bold
-YYYYMMDD_HHMMSS
-\series medium
- indicates the forecast valid time.
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the
+ user-defined output prefix, HHMMSSL indicates the forecast lead time and
+ YYYYMMDD_HHMMSS indicates the forecast valid time.
  
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The output ASCII files are named similarly: 
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
-\series medium
- where 
-\series bold
-TYPE
-\series medium
- is one of 
-\series bold
-mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv,
- sl1l2, sal1l2, vl1l2
-\series default
-, 
-\series bold
-vcnt
-\series medium
- or 
-\series bold
-val1l2
-\series medium
- to indicate the line type it contains.
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of
+ mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv,
+ sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
 \end_layout
 
 \begin_layout Standard
-
-\series medium
 The first set of header columns are common to all of the output files generated
  by the Point-Stat tool.
  Tables describing the contents of the header columns and the contents of
  the additional columns for each line type are listed in the following tables.
- The 
-\series bold
-ECNT 
-\series default
-line type is described in Section 
+ The ECNT line type is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "table_ES_header_info_es_out_ECNT"
@@ -3147,13 +3102,7 @@ reference "table_ES_header_info_es_out_ECNT"
 \end_inset
 
 .
- 
-\series medium
-The 
-\series bold
-RPS 
-\series default
-line type is described in Section 
+ The RPS line type is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "table_ES_header_info_es_out_RPS"
@@ -3402,7 +3351,7 @@ FCST_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid start time in YYYYMMDDHH format
+Forecast valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3431,7 +3380,7 @@ FCST_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Forecast valid end time in YYYYMMDDHH format
+Forecast valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3489,7 +3438,7 @@ OBS_VALID_BEG
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid start time in YYYYMMDDHH format
+Observation valid start time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
@@ -3518,7 +3467,7 @@ OBS_VALID_END
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation valid end time in YYYYMMDDHH format
+Observation valid end time in YYYYMMDD_HHMMSS format
 \end_layout
 
 \end_inset
