@@ -103,7 +103,7 @@ There are several formats of point observations that may preprocessed using
 PrepBUFR
 \series medium
  data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data
- from NOAA, little_r from WRF simulations, and user defined data in a generic
+ from NOAA, little_r from WRF simulations, and user-defined data in a generic
  ASCII format.
  These steps are represented by the first columns in the MET flowchart depicted
  in Figure 
@@ -114,8 +114,7 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 \end_inset
 
 .
- Output data formats and the software modules used to reformat point data
- are described in later sections.
+ The software tools used to reformat point data are described in this chapter.
 \end_layout
 
 \begin_layout Section
@@ -137,8 +136,8 @@ This section describes how to configure and run the PB2NC tool.
 \series default
 PrepBUFR
 \series medium
- point observation file and reformat it into NetCDF format for use by the
- Point-Stat tool.
+ point observation file and reformat it into NetCDF format for use by other
+ MET tools.
  The PB2NC tool must be run on the input 
 \series default
 PrepBUFR
@@ -173,7 +172,19 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
-PrepBUFR_file
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+prepbufr_file
 \end_layout
 
 \begin_layout LyX-Code
@@ -369,14 +380,12 @@ Required arguments for pb2nc
 \series medium
 1.
  The 
-\series default
-PrepBUFR
 \series bold
-_file
+prepbufr_file
 \series medium
- argument indicates the name of the 
+ argument is the 
 \series default
-PrepBUFR
+input PrepBUFR
 \series medium
  file to be processed.
 \end_layout
@@ -389,7 +398,7 @@ PrepBUFR
 \series bold
 netcdf_file
 \series medium
- argument indicates the name given to the output NetCDF file.
+ argument is the output NetCDF file to be written.
 \end_layout
 
 \begin_layout Description
@@ -400,7 +409,7 @@ netcdf_file
 \series bold
 config_file
 \series medium
- argument indicates the name of the configuration file to be used.
+ argument is the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
@@ -417,17 +426,13 @@ Optional arguments for pb2nc
 1.
  The 
 \series bold
--pbfile 
-\series default
-PrepBUFR
-\series bold
-_file
+-pbfile prepbufr_file
 \series medium
- option may be used to pass additional 
+ option is used to pass additional 
 \series default
-PrepBUFR
+input PrepBUFR
 \series medium
- files to the PB2NC tool.
+ files.
 \end_layout
 
 \begin_layout Description
@@ -528,7 +533,7 @@ PrepBUFR
 \series medium
  option shows the available variables with valid data from the BUFR input.
  It collects the available variable list from BUFR input and checks the
- existance of valid data and directs the variable names with valid data
+ existence of valid data and directs the variable names with valid data
  to the screen.
  The NetCDF output won't be generated.
  
@@ -550,7 +555,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -588,7 +593,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -1469,10 +1474,11 @@ obs_bufr_var
  The variable name comes from BUFR file which includes BUFR table.
  The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for
  specific humidity, temperature, height, and the u and v components of winds.
- The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, and
- D_PRMSL for dewpoint, wind speed, relative humidity, mixing ratio, and
- pressure reduced to MSL.
- This connfiguration replaces 
+ The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL,
+ D_PBL, and D_CAPE for dew point, wind speed, relative humidity, mixing
+ ratio, pressure reduced to MSL, planetary boundary layer height, and convective
+ available potential energy.
+ This configuration replaces 
 \series bold
 obs_grib_code
 \series medium
@@ -1569,6 +1575,18 @@ obs_bufr_map = [
 
 \series bold
 { key = 'D_PRMSL';  val = 'PRMSL'; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_PBL';    val = 'PBL';   },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_CAPE';   val = 'CAPE';  }
 \end_layout
 
 \begin_layout LyX-Code
@@ -1694,6 +1712,12 @@ time_summary = {
 \begin_layout LyX-Code
 
 \series bold
+   raw_data   = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    beg        = "000000";
 \end_layout
 
@@ -1724,13 +1748,13 @@ time_summary = {
 \begin_layout LyX-Code
 
 \series bold
-   grib_code  = [ 11, 204, 211 ];
+   grib_code  = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   obs_var    = [];
+   obs_var    = [ "TMP", "WDIR", "RH" ];
 \end_layout
 
 \begin_layout LyX-Code
@@ -1784,6 +1808,13 @@ TRUE
 FALSE
 \series medium
 ).
+ If the 
+\series bold
+raw_data
+\series medium
+ flag is set to TRUE, then both the individual observation values and the
+ derived time summary value will be written to the output.
+ If FALSE, only the summary values are written.
  Observations may be summarized across the user specified time period defined
  by the 
 \series bold
@@ -1873,7 +1904,7 @@ obs_var
 \series bold
 grib_code
 \series medium
- entry is an array of itegers while the 
+ entry is an array of integers while the 
 \series bold
 obs_var
 \series medium
@@ -1927,7 +1958,7 @@ vld_thresh
 \series bold
 vld_freq
 \series default
- entry specifies the expected frequency of obesrvations in seconds.
+ entry specifies the expected frequency of observations in seconds.
  The width of the time window is divided by this frequency to compute the
  expected number of observations for the time window.
  The actual number of valid observations is divided by the expected number
@@ -2975,7 +3006,7 @@ http://www.esrl.noaa.gov/gmd/grad/surfrad/
 \end_inset
 
 ), the Western Wind and Solar Integration Study (WWSIS) format, and the
- AErosol RObotic NEtwork (AERONET) format (found at 
+ AErosol RObotic NEtwork (AERONET) versions 2 and 3 format (found at 
 \begin_inset Flex URL
 status open
 
@@ -3300,7 +3331,7 @@ Elevation in msl of the observing location.
 \begin_inset Text
 
 \begin_layout Plain Layout
-Grib_Code or Variable_Name
+GRIB_Code or Variable_Name
 \end_layout
 
 \end_inset
@@ -3654,8 +3685,7 @@ Required arguments for ascii2nc
 \series bold
 ascii_file
 \series medium
- argument indicates the name of the ASCII point observation file(s) to be
- processed.
+ argument is the ASCII point observation file(s) to be processed.
 \end_layout
 
 \begin_layout Description
@@ -3666,7 +3696,7 @@ ascii_file
 \series bold
 netcdf_file
 \series medium
- argument indicates the name given to the output NetCDF file.
+ argument is the NetCDF output file to be written.
 \end_layout
 
 \begin_layout Standard
@@ -3705,8 +3735,7 @@ surfrad
 \series bold
 -config file 
 \series medium
-option specifies the configuration file to generate summaries of the fields
- in the ASCII files.
+option is the configuration file for generating time summaries.
 \end_layout
 
 \begin_layout Description
@@ -3717,8 +3746,8 @@ option specifies the configuration file to generate summaries of the fields
 \series bold
 -mask_grid string
 \series medium
- option specifies a named grid or a gridded data file for filtering the
- point observations spatially.
+ option is a named grid or a gridded data file to filter the point observations
+ spatially.
 \end_layout
 
 \begin_layout Description
@@ -3726,13 +3755,10 @@ option specifies the configuration file to generate summaries of the fields
 \series medium
 6.
  The 
-\series default
--
 \series bold
-mask_poly file
+-mask_poly file
 \series medium
- option defines a polyline masking file for filtering the point observations
- spatially.
+ option is a polyline masking file to filter the point observations spatially.
 \end_layout
 
 \begin_layout Description
@@ -3744,7 +3770,7 @@ mask_poly file
 -mask_sid file|list 
 \series medium
 option is a station ID masking file or a comma-separated list of station
- ID's for filtering the point observations spatially.
+ ID's to filter the point observations spatially.
  See the description of the 
 \begin_inset Quotes eld
 \end_inset
@@ -3779,7 +3805,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -3821,7 +3847,7 @@ level
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -3897,7 +3923,7 @@ Ascii2NcConfig_default
 
 \begin_layout Standard
 The ASCII2NC configuration file is optional and only necessary when defining
- time summaries or message type mapping for litte_r data.
+ time summaries or message type mapping for little_r data.
 
 \series medium
  The contents of the default ASCII2NC configuration file are described below.
@@ -3957,6 +3983,12 @@ time_summary = {
 
 \series bold
    flag       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   raw_data   = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -4236,7 +4268,8 @@ hskip 0.5in}
 
 \end_inset
 
-madis_file
+madis_file [madis_file2 ...
+ madis_filen]
 \end_layout
 
 \begin_layout LyX-Code
@@ -4467,7 +4500,7 @@ Required arguments for madis2nc
 \series bold
 madis_file
 \series medium
- argument indicates the name of the point observation file to be processed.
+ argument is one or more input MADIS point observation files to be processed.
 \end_layout
 
 \begin_layout Description
@@ -4478,7 +4511,7 @@ madis_file
 \series bold
 netcdf_file
 \series medium
- argument indicates the name given to the output NetCDF file.
+ argument is the NetCDF output file to be written.
 \end_layout
 
 \begin_layout Description
@@ -4489,8 +4522,8 @@ netcdf_file
 \series bold
 -type str
 \series medium
- specifies the type of MADIS observations (metar, raob, profiler, maritime,
- mesonet or acarsProfiles).
+ is type of MADIS observations (metar, raob, profiler, maritime, mesonet
+ or acarsProfiles).
 \end_layout
 
 \begin_layout Standard
@@ -4543,7 +4576,7 @@ option specifies the configuration file to generate summaries of the fields
 \series bold
 -rec_beg n
 \series medium
- specifies the index of the first MADIS record toprocess and 
+ specifies the index of the first MADIS record to process and 
 \series bold
 -rec_end n
 \series medium
@@ -4619,7 +4652,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -4661,7 +4694,7 @@ level
 \series default
  option specifies the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  Setting the compression level to 0 will make no compression for the NetCDF
  output.
  Lower number is for fast compression and higher number is for better compressio
@@ -4681,7 +4714,7 @@ madis2nc sample_madis_obs.nc
 \end_layout
 
 \begin_layout LyX-Code
-sample_madis_obs_met.nc -log madislog -v 3
+sample_madis_obs_met.nc -log madis.log -v 3
 \end_layout
 
 \begin_layout Standard
@@ -4696,8 +4729,8 @@ sample_madis_obs.nc
 sample_madis_obs_met.nc
 \series medium
 .
- Warnings and error messages will be written to the madislog file, and the
- verbosity will be level three.
+ Warnings and error messages will be written to the madis.log file, and the
+ verbosity level of logging is three.
 \end_layout
 
 \begin_layout Subsection
@@ -4785,6 +4818,12 @@ time_summary = {
 
 \series bold
    flag       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+   
+\series bold
+raw_data   = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -4897,8 +4936,8 @@ LIDAR2NC tool
 \end_layout
 
 \begin_layout Standard
-The LIDAR2NC tool creates a NetCDF point observation file (similar to the
- output of ASCII2NC and PB2NC) from a CALIPSO HDF data file.
+The LIDAR2NC tool creates a NetCDF point observation file from a CALIPSO
+ HDF data file.
  Not all of the data present in the CALIPSO file is reproduced in the output,
  however.
  Instead, the output focuses mostly on information about clouds (as opposed
@@ -5006,7 +5045,7 @@ hskip 0.5in}
 \begin_layout Standard
 Unlike most of the MET tools, lidar2nc does not use a config file.
  Currently, the options needed to run lidar2nc are not complex enough to
- reqire one.
+ require one.
  
 \end_layout
 
@@ -5025,7 +5064,7 @@ Required arguments for lidar2nc
 \series bold
 lidar_file
 \series medium
- argument indicates the name of the input HDF lidar data file to be processed.
+ argument is the input HDF lidar data file to be processed.
  Currently, 
 \series default
 CALIPSO
@@ -5042,7 +5081,7 @@ CALIPSO
 \series bold
 out_file
 \series medium
- argument indicates the name of the output NetCDF file.
+ argument is the NetCDF output file to be written.
 \end_layout
 
 \begin_layout Standard
@@ -5068,7 +5107,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -5110,7 +5149,7 @@ The
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -5745,7 +5784,7 @@ The Point2Grid tool takes point observations from a NetCDF output file from
 \series medium
 GOES-16/17 input files in NetCDF format
 \series default
- (especially, Aersol Optical Depth.
+ (especially, Aerosol Optical Depth.
  Future development will include support for reading input files not produced
  from MET tools.
 \end_layout
@@ -6099,8 +6138,11 @@ Optional arguments for point2grid
 
 \series medium
 5.
- The -config file option uses the specified configuration file to generate
- gridded data.
+ The 
+\series bold
+-config
+\series medium
+ file option is the configuration file to be used.
 \end_layout
 
 \begin_layout Description
@@ -6138,7 +6180,7 @@ goes_imager_projection
 \series default
  option provides an additional Aerosol Detection Product (ADP) information
  on aerosols, dust, and smoke.
- This option is ignored if the requested varaible is not AOD (
+ This option is ignored if the requested variable is not AOD (
 \begin_inset Quotes eld
 \end_inset
 
@@ -6155,7 +6197,7 @@ AOD_Smoke
 \end_inset
 
 ) from GOES16/17.
- The grided data is filtered by the presence of dust/smoke.
+ The gridded data is filtered by the presence of dust/smoke.
  If -qc options is given, it's applied to QC of dust/smoke, too (First filtering
  with AOD QC values and the second filtering with dust/smoke QC values).
 \end_layout
@@ -6248,7 +6290,7 @@ standard out and error
 .
  Thus, users can save the messages without having to redirect the output
  on the command line.
- The default behavior is no logfile.
+ The default behavior is no log file.
  
 \end_layout
 
@@ -6290,7 +6332,7 @@ The
 \series default
  option indicates the desired level of compression (deflate level) for NetCDF
  variables.
- Tha valid level is between 0 and 9.
+ The valid level is between 0 and 9.
  The value of 
 \begin_inset Quotes eld
 \end_inset
@@ -6367,7 +6409,7 @@ When processing GOES-16 data, the
  option may also be used to specify the acceptable quality control flag
  values.
  The example above regrids the GOES-16 AOD values to NCEP Grid number 212
- (which QC flags are high, mediun, and low), writing to the output the maximum
+ (which QC flags are high, medium, and low), writing to the output the maximum
  AOD value falling inside each grid box.
 \end_layout
 
@@ -6471,7 +6513,7 @@ The point2grid tool will output a gridded NetCDF file containing the following:
 \begin_inset Quotes erd
 \end_inset
 
- meaniung that the probability value does exist.
+ meaning that the probability value does exist.
  
 \end_layout
 
