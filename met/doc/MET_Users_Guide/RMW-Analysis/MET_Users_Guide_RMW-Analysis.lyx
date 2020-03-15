@@ -308,7 +308,7 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model = "GFS-FV3";
+model = "GFS";
 \end_layout
 
 \begin_layout LyX-Code

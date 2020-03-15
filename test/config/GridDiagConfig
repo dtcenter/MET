@@ -7,7 +7,7 @@
 //
 // Model
 //
-model = "GFS-FV3";
+model = "GFS";
 
 //
 // Data fields
