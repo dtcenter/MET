@@ -84,8 +84,8 @@ void usage() {
          << "\t[-v level]\n\n"
 
          << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
-         << "is the NetCDF output of TC-RMW to be processed "
-         << "(required).\n"
+         << "is the NetCDF output of TC-RMW to be processed or an "
+         << "ASCII file containing a list of files (required).\n"
 
          << "\t\t\"-config file\" is the RMWAnalysisConfig to be used "
          << "(required).\n"

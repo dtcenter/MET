@@ -47,6 +47,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
           unit_tc_rmw.xml \
+          unit_rmw_analysis.xml \
           unit_tc_gen.xml \
           unit_met_test_scripts.xml  \
           unit_modis.xml  \
@@ -71,8 +72,6 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_gaussian.xml \
           unit_grid_diag.xml \
           unit_quality_filter.xml"
-
-# NOT WORKING unit_rmw_analysis.xml \
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do

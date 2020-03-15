@@ -102,7 +102,7 @@ void usage() {
 
          << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
          << "specifies the gridded data files or an ASCII file "
-         << "containing list of file names to be used (required).\n"
+         << "containing a list of files to be used (required).\n"
 
          << "\t\t\"-adeck source\" is the adeck ATCF format data "
          << "source (required).\n"
