@@ -132,7 +132,7 @@ static vector<DataCube*> data_maxs;
 
 // Track information
 static TrackInfoArray adeck_tracks;
-static StringArray    adeck_source, adeck_model_suffix;
+static ConcatString adeck_source = "adeck.tmp";
 
 #endif  //  __RMW_ANALYSIS_H__
 
