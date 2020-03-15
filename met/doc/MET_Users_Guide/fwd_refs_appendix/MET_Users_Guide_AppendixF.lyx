@@ -937,10 +937,10 @@ The ASCII2NC tool supports the
 
  option.
  With this option, point observations may be passed as input.
- An example of this is provided for ASCII2NC 
+ An example of this is provided in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "example:ascii2nc-pyembed"
+reference "subsec:StA-pyembed"
 plural "false"
 caps "false"
 noprefix "false"
@@ -981,7 +981,7 @@ The Stat-Analysis tool supports the
 
  option.
  With this option, matched pair (MPR) data may be passed as input.
- An example of this is provided for Stat-Analysis 
+ An example of this is provided in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "example:StA-pyembed"

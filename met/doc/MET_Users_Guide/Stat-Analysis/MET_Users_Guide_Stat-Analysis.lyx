@@ -1879,17 +1879,21 @@ config/STATAnalysisConfig
 .
 \end_layout
 
-\begin_layout Standard
-
-\series medium
-The example below uses Python embedding.
+\begin_layout Subsubsection
+Python Embedding for Matched Pairs
 \begin_inset CommandInset label
 LatexCommand label
-name "example:StA-pyembed"
+name "subsec:StA-pyembed"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The example below uses Python embedding.
 \end_layout
 
 \begin_layout LyX-Code
