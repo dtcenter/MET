@@ -601,6 +601,8 @@ void process_track_file(const ConcatString& filename,
     mlog << Debug(3)
          << "Identified " << tracks.n_tracks() << " track(s).\n";
 
+    remove(adeck_source.c_str());
+
     return;
 }
 
