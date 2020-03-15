@@ -1438,6 +1438,20 @@ obtype         = "ANALYS";
 \begin_layout LyX-Code
 
 \series bold
+fcst           = { ...
+ }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs            = { ...
+ }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 regrid         = { ...
  }
 \end_layout
