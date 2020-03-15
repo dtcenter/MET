@@ -937,10 +937,10 @@ The ASCII2NC tool supports the
 
  option.
  With this option, point observations may be passed as input.
- An example of this is provided in Section 
+ An example of this is provided for ASCII2NC 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:ascii2nc-usage"
+reference "example:ascii2nc-pyembed"
 plural "false"
 caps "false"
 noprefix "false"
@@ -948,6 +948,15 @@ noprefix "false"
 \end_inset
 
 .
+ That example uses the 
+\series bold
+read_ascii_point.py
+\series default
+ sample script which is included in the MET release (MET_BASE/python/read_ascii_
+point.py).
+ It reads ASCII data in MET's 11-column point observation format and formats
+ it into a pandas dataframe to be read by the ASCII2NC tool using Python
+ embedding.
 \end_layout
 
 \begin_layout Section
@@ -972,10 +981,10 @@ The Stat-Analysis tool supports the
 
  option.
  With this option, matched pair (MPR) data may be passed as input.
- An example of this is provided in Section 
+ An example of this is provided for Stat-Analysis 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:stat_analysis-usage"
+reference "example:StA-pyembed"
 plural "false"
 caps "false"
 noprefix "false"
@@ -983,6 +992,14 @@ noprefix "false"
 \end_inset
 
 .
+ That example uses the 
+\series bold
+read_ascii_mpr.py
+\series default
+ sample script which is included in the MET release (MET_BASE/python/read_ascii_
+mpr.py).
+ It reads MPR data and formats it into a pandas dataframe to be read by
+ the Stat-Analysis tool using Python embedding.
 \end_layout
 
 \end_body

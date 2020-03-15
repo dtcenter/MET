@@ -1883,6 +1883,13 @@ config/STATAnalysisConfig
 
 \series medium
 The example below uses Python embedding.
+\begin_inset CommandInset label
+LatexCommand label
+name "example:StA-pyembed"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code

@@ -3988,6 +3988,13 @@ sample_ascii_obs.nc
 \begin_layout Standard
 Here is an example of processing the same set of observations but using
  Python embedding instead:
+\begin_inset CommandInset label
+LatexCommand label
+name "example:ascii2nc-pyembed"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
