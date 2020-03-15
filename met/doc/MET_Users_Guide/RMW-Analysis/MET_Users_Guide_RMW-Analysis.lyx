@@ -168,7 +168,7 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
-[-out file]
+-out file
 \end_layout
 
 \begin_layout LyX-Code
@@ -201,8 +201,8 @@ Required arguments for rmw_analysis
 \series bold
 data_file_list
 \series default
- options specify the tc_rmw data files or an ASCII file containing list
- of file names to be used.
+ argument is the NetCDF output of TC-RMW to be processed or an ASCII file
+ containing a list of files.
 \end_layout
 
 \begin_layout Description
@@ -213,8 +213,17 @@ data_file_list
 \series default
  
 \series medium
-argument indicates the name of the configuration file to be used.
+argument is the RMWAnalysisConfig to be used.
  The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Description
+3.
+ The 
+\series bold
+-out file 
+\series medium
+argument is the NetCDF output file to be written.
 \end_layout
 
 \begin_layout Description
@@ -222,15 +231,6 @@ argument indicates the name of the configuration file to be used.
 \series bold
 \bar under
 Optional arguments for rmw_analysis
-\end_layout
-
-\begin_layout Description
-3.
- The 
-\series bold
--out 
-\series medium
-argument indicates the name of the NetCDF output file.
 \end_layout
 
 \begin_layout Description
@@ -308,95 +308,47 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model          = "GFS-FV3";
+model = "GFS-FV3";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-data           = {
+data  = {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-    field = [
+   field = [
 \end_layout
 
 \begin_layout LyX-Code
-        
+   
 \series bold
-{
+   { name = "PRMSL"; },
 \end_layout
 
 \begin_layout LyX-Code
-           
+      
 \series bold
-name = "PRMSL";
+{ name = "TMP";   },
 \end_layout
 
 \begin_layout LyX-Code
-        
+      
 \series bold
-},
+{ name = "UGRD";  },
 \end_layout
 
 \begin_layout LyX-Code
-        
+      
 \series bold
-{
+{ name = "VGRD";  }
 \end_layout
 
 \begin_layout LyX-Code
-           
-\series bold
-name = "TMP";
-\end_layout
-
-\begin_layout LyX-Code
-        
-\series bold
-},
-\end_layout
-
-\begin_layout LyX-Code
-        
-\series bold
-{
-\end_layout
-
-\begin_layout LyX-Code
-           
-\series bold
-name = "UGRD";
-\end_layout
-
-\begin_layout LyX-Code
-        
-\series bold
-},
-\end_layout
-
-\begin_layout LyX-Code
-        
-\series bold
-{
-\end_layout
-
-\begin_layout LyX-Code
-           
-\series bold
-name = "VGRD";
-\end_layout
-
-\begin_layout LyX-Code
-        
-\series bold
-},
-\end_layout
-
-\begin_layout LyX-Code
-    
+   
 \series bold
 ];
 \end_layout
@@ -409,12 +361,8 @@ name = "VGRD";
 
 \begin_layout LyX-Code
 
-\end_layout
-
-\begin_layout LyX-Code
-
 \series bold
-level = "";
+level = [];
 \end_layout
 
 \begin_layout Standard
@@ -446,7 +394,7 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-basin = "";
+basin      = "";
 \end_layout
 
 \begin_layout LyX-Code
@@ -458,37 +406,55 @@ storm_name = "";
 \begin_layout LyX-Code
 
 \series bold
-storm_id = "";
+storm_id   = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-cyclone = "";
+cyclone    = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-init_beg = "";
+init_beg   = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-init_end = "";
+init_end   = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-valid_beg = "";
+valid_beg  = "";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-valid_end = "";
+valid_end  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+init_mask  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+valid_mask = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version    = "VN.N";
 \end_layout
 
 \begin_layout Standard

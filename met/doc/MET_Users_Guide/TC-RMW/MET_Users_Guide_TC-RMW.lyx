@@ -174,7 +174,7 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
-[-out file]
+-out file
 \end_layout
 
 \begin_layout LyX-Code
@@ -207,8 +207,8 @@ Required arguments for tc_rmw
 \series bold
 data_file_list
 \series default
- options specify the gridded data files or an ASCII file containing list
- of file names to be used.
+ options specify the gridded data files or an ASCII file containing a list
+ of files to be used.
 \end_layout
 
 \begin_layout Description
@@ -219,9 +219,7 @@ data_file_list
 \series default
  
 \series medium
-argument indicates the adeck ATCF format data source containing tropical
- cyclone model forecast (output from tracker) data to be verified.
- It specifies the name of an ATCF format file.
+argument is the adeck ATCF format data source.
 \end_layout
 
 \begin_layout Description
@@ -232,8 +230,17 @@ argument indicates the adeck ATCF format data source containing tropical
 \series default
  
 \series medium
-argument indicates the name of the configuration file to be used.
+argument is the configuration file to be used.
  The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Description
+4.
+ The 
+\series bold
+-out 
+\series medium
+argument is the NetCDF output file to be written.
 \end_layout
 
 \begin_layout Description
@@ -247,15 +254,6 @@ Optional arguments for tc_rmw
 5.
  The 
 \series bold
--out 
-\series medium
-argument indicates the name of the NetCDF output file.
-\end_layout
-
-\begin_layout Description
-6.
- The 
-\series bold
 -log file
 \series default
  option directs output and errors to the specified log file.
@@ -267,7 +265,7 @@ argument indicates the name of the NetCDF output file.
 \end_layout
 
 \begin_layout Description
-7.
+6.
  The 
 \series bold
 -v level
