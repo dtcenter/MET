@@ -370,8 +370,8 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Check for no valid files
-   if(i == fcst_files.n()) {
-      mlog << Error << "\nTrouble reading forecast files.\n\n";
+   if(i == file_list.n()) {
+      mlog << Error << "\nTrouble reading input data files.\n\n";
       exit(1);
    }
 
