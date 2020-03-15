@@ -940,7 +940,7 @@ The ASCII2NC tool supports the
  An example of this is provided in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:StA-pyembed"
+reference "subsec:ascii2nc-pyembed"
 plural "false"
 caps "false"
 noprefix "false"
@@ -984,7 +984,7 @@ The Stat-Analysis tool supports the
  An example of this is provided in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "example:StA-pyembed"
+reference "subsec:StA-pyembed"
 plural "false"
 caps "false"
 noprefix "false"
