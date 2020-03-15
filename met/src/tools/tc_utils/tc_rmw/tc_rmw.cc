@@ -96,9 +96,28 @@ void usage() {
          << "\t-data file_1 ... file_n | data_file_list\n"
          << "\t-adeck file\n"
          << "\t-config file\n"
-         << "\t[-out file]\n"
+         << "\t-out file\n"
          << "\t[-log file]\n"
-         << "\t[-v level]\n\n" << flush;
+         << "\t[-v level]\n\n"
+
+         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+         << "specifies the gridded data files or an ASCII file "
+         << "containing list of file names to be used (required).\n"
+
+         << "\t\t\"-adeck source\" is the adeck ATCF format data "
+         << "source (required).\n"
+
+         << "\t\t\"config_file\" is a TCRMWConfig file to be used "
+         << "(required).\n"
+
+         << "\t\t\"-out file\" is the NetCDF output file to be written "
+         << "(required).\n"
+
+         << "\t\t\"-log file\" outputs log messages to the specified "
+         << "file (optional).\n"
+
+         << "\t\t\"-v level\" overrides the default level of logging ("
+         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
     exit(1);
 }

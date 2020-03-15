@@ -77,9 +77,27 @@ void usage() {
     cout << "\n*** Model Evaluation Tools (MET" << met_version
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
-         << "\t[-out file]\n"
+         << "\t-data file_1 ... file_n | data_file_list\n"
+         << "\t-config file\n"
+         << "\t-out file\n"
          << "\t[-log file]\n"
-         << "\t[-v level]\n\n" << flush;
+         << "\t[-v level]\n\n"
+
+         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+         << "is the NetCDF output of TC-RMW to be processed "
+         << "(required).\n"
+
+         << "\t\t\"-config file\" is the RMWAnalysisConfig to be used "
+         << "(required).\n"
+
+         << "\t\t\"-out file\" is the NetCDF output file to be written "
+         << "(required).\n"
+
+         << "\t\t\"-log file\" outputs log messages to the specified "
+         << "file (optional).\n"
+
+         << "\t\t\"-v level\" overrides the default level of logging ("
+         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
     exit(1);
 }
@@ -93,6 +111,9 @@ void process_command_line(int argc, char **argv) {
 
     // Default output directory
     out_dir = replace_path(default_out_dir);
+
+    // Print usage statement for no arguments
+    if(argc <= 1) usage();
 
     // Parse command line into tokens
     cline.set(argc, argv);
