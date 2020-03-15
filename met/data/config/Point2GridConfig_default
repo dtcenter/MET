@@ -10,7 +10,7 @@
 // NetCDF output variable timing information:
 //   - valid_time in YYYYMMDD[_HH[MMSS]] format
 //
-valid_time    = "";
+valid_time = "";
 
 //
 // Observation time window

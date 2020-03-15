@@ -1,6 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Default RMW Analysis configuration file
+// RMW-Analysis configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -8,17 +10,14 @@
 // Data
 //
 data = {
-    field = [
-      {
-        name = "PRMSL";
-      },
-      {
-        name = "TMP";
-      }
-    ];
+   level = [ "" ];
+   field = [
+      { name = "PRMSL"; },
+      { name = "TMP";   }
+   ];
 }
 
-level = [ "" ];
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Model
@@ -63,8 +62,9 @@ valid_end = "";
 init_mask  = "";
 valid_mask = "";
 
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
+////////////////////////////////////////////////////////////////////////////////
+
 version = "V9.0";
+
+////////////////////////////////////////////////////////////////////////////////
+
