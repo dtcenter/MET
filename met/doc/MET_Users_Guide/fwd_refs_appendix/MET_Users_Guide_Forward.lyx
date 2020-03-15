@@ -154,7 +154,7 @@ name "sec:New-for-MET"
 MET version 9.0 includes some major enhancements.
  For Python embedding, these include the transition from Python 2 to 3,
  adding support in ASCII2NC and Stat-Analysis, supporting multiple input
- files in Ensemble-Stat, Series-Analysis, and MTD, supporting Pandas, and
+ files in Ensemble-Stat, Series-Analysis, and MTD, supporting pandas, and
  handling the user's Python environment.
  Additional enhancements include the application of binned climatologies,
  the computation of the Ranked Probability Score (RPS) and Distance Map
@@ -578,7 +578,7 @@ Report AW_MEAN regridding width at 1, not NA (#1186).
 
 \series medium
 Add support for climatological distribution percentile thresholds, such
- as >CDP50, (#1138).
+ as >CDP50 (#1138).
 \end_layout
 
 \begin_layout Itemize

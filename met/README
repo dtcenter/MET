@@ -258,7 +258,7 @@ Version 9.0 Release Notes:
 - Major Enhancements:
    - Python embedding: switch from Python 2 to 3, added to ASCII2NC and
      Stat-Analysis, support for multiple input files in Ensemble-Stat,
-     Series-Analysis, and MTD, support for Pandas, handle user's Python
+     Series-Analysis, and MTD, support for pandas, handle user's Python
      environment
    - Other: binned climatologies and new RPS and DMAP line types
 
@@ -376,7 +376,7 @@ Version 9.0 Release Notes:
         neighborhood prior to applying the Gaussian filter (#1234).
       - Report AW_MEAN regridding width at 1, not NA (#1186).
       - Add support for climatological distribution percentile thresholds,
-        such as >CDP50, (#1138).
+        such as >CDP50 (#1138).
       - Fix MET-TC bug in the computation of initialization hour and valid hour
         (#1227).
    - PB2NC
