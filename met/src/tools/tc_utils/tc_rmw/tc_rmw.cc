@@ -171,6 +171,10 @@ void process_decks() {
     process_adecks(adeck_tracks);
 
     process_fields(adeck_tracks);
+
+    // List the output file
+    mlog << Debug(1)
+         << "Writing output file: " << out_file << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -389,10 +393,6 @@ void setup_grid() {
 
 void setup_nc_file() {
     VarInfo* data_info = (VarInfo*) 0;
-
-   // List the output file
-   mlog << Debug(1)
-        << "Creating output file: " << out_file << "\n";
 
     // Create NetCDF file
     nc_out = open_ncfile(out_file.c_str(), true);

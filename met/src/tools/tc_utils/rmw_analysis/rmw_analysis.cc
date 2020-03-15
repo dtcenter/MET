@@ -28,8 +28,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 
-// #include "met_file.h"
-
 ////////////////////////////////////////////////////////////////////////
 
 static void usage();
@@ -415,6 +413,8 @@ void write_stats() {
 
     // Create output file
     nc_out = open_ncfile(out_file.c_str(), true);
+
+    mlog << Debug(1) << "Writing output file: " << out_file << "\n";
 
     // Define dimensions
     range_dim = add_dim(nc_out, "range", n_range);
