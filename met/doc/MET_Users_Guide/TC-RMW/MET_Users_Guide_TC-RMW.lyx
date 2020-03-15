@@ -325,7 +325,19 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model = "GFS";
+model         = "GFS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+censor_thresh = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+censor_val    = [];
 \end_layout
 
 \begin_layout LyX-Code
@@ -450,10 +462,6 @@ name = "VGRD";
 
 \begin_layout LyX-Code
 
-\end_layout
-
-\begin_layout LyX-Code
-
 \series bold
 regrid = { ...
  }
@@ -565,6 +573,32 @@ parameter specifies the maximum range of the range-azimuth grid, in kilometers.
 max_range_km / n_range
 \series default
 .
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+delta_range_km = 10.0;
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+delta_range_km 
+\series default
+parameter specifies the spacing of the range rings, in kilometers.
 \end_layout
 
 \begin_layout Standard

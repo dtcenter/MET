@@ -305,19 +305,38 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-model   = "GFS";
+model         = "GFS";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-mask    = { grid = [ "FULL" ]; poly = []; }
+regrid        = { ...
+ }
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-version = "VN.N";
+censor_thresh = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+censor_val    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask          = { grid = [ "FULL" ]; poly = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version       = "VN.N";
 \end_layout
 
 \begin_layout Standard
