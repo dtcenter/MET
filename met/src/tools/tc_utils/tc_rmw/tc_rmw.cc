@@ -39,6 +39,10 @@
 
 static void usage();
 static void process_command_line(int, char**);
+
+static GrdFileType get_file_type(const StringArray &, const GrdFileType);
+static bool file_is_ok(const ConcatString &, const GrdFileType);
+
 static void process_decks();
 static void process_adecks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
@@ -167,10 +171,12 @@ void process_command_line(int argc, char **argv) {
     conf_info.read_config(default_config_file.c_str(),
                           config_file.c_str());
 
-
     // Get data file type from config
     ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
                                  conf_key_data));
+
+    // Get data file type from input files
+    ftype = get_file_type(data_files, ftype);
 
     // Process the configuration
     conf_info.process_config(ftype);
@@ -179,6 +185,48 @@ void process_command_line(int argc, char **argv) {
     data_files = parse_file_list(data_files);
 
     return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GrdFileType get_file_type(const StringArray &file_list,
+                          const GrdFileType in_ftype) {
+    int i;
+    Met2dDataFileFactory mtddf_factory;
+    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+    GrdFileType out_ftype;
+
+    // Find the first file that actually exists
+    for(i=0; i<file_list.n(); i++) {
+        if(file_is_ok(file_list[i], in_ftype)) break;
+    }
+
+    // Check for no valid files
+    if(i == file_list.n()) {
+        mlog << Error << "\nTrouble reading input data files.\n\n";
+        exit(1);
+    }
+
+    // Read first valid file
+    if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), in_ftype))) {
+        mlog << Error << "\nTrouble reading data file \""
+             << file_list[i] << "\"\n\n";
+        exit(1);
+    }
+
+    // Store the file type
+    out_ftype = mtddf->file_type();
+
+    // Clean up
+    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
+    return(out_ftype);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+    return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////

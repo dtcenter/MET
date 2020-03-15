@@ -139,10 +139,6 @@ static TcrmwData    grid_data;
 static TcrmwGrid    tcrmw_grid;
 static Grid         grid;
 
-// Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile* data_mtddf = (Met2dDataFile*) 0;
-
 // Grid coordinate arrays
 static double* lat_arr;
 static double* lon_arr;

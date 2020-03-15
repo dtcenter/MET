@@ -25,10 +25,10 @@ censor_val    = [];
 data = {
    level = [ "P1000", "P900", "P800", "P700", "P500", "P100" ];
    field = [
-      { name = "PRMSL"; },
-      { name = "TMP";   },
-      { name = "UGRD";  },
-      { name = "VGRD";  }
+      { name = "PRMSL"; level = [ "L0" ]; },
+      { name = "TMP"; },
+      { name = "UGRD"; },
+      { name = "VGRD"; }
    ];
 }
 
