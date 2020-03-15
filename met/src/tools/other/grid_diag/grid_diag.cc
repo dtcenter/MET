@@ -184,7 +184,7 @@ void process_command_line(int argc, char **argv) {
     // Determine the verification grid
     grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
         &(data_mtddf->grid()), &(data_mtddf->grid()));
-
+    
     // Process masking regions
     conf_info.process_masks(grid);
 }
@@ -192,7 +192,7 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_series(void) {
-
+    Grid cur_grid;
     DataPlane data_dp;
     DataPlane joint_dp;
 
@@ -220,7 +220,16 @@ void process_series(void) {
                  << data_info->n_bins() << "\n";
 
             get_series_entry(i_series, data_info,
-                data_files, dtype, found_data_files, data_dp, grid);
+                data_files, dtype, found_data_files, data_dp, cur_grid);
+
+            // Regrid, if necessary
+            if(!(cur_grid == grid)) {
+                mlog << Debug(1)
+                     << "Regridding field " << data_info->magic_str()
+                     << " to the verification grid.\n";
+                data_dp = met_regrid(data_dp, cur_grid, grid,
+                                     data_info->regrid());
+            }
 
             // Update partial sums
             update_pdf(bin_mins[data_info->magic_str()][0],
@@ -234,7 +243,16 @@ void process_series(void) {
                 VarInfo* joint_info = conf_info.data_info[j_var];
 
                 get_series_entry(i_series, joint_info,
-                    data_files, dtype, found_data_files, joint_dp, grid);
+                    data_files, dtype, found_data_files, joint_dp, cur_grid);
+
+                // Regrid, if necessary
+                if(!(cur_grid == grid)) {
+                    mlog << Debug(1)
+                         << "Regridding field " << data_info->magic_str()
+                         << " to the verification grid.\n"; 
+                    data_dp = met_regrid(data_dp, cur_grid, grid,
+                                         data_info->regrid());
+                }
 
                 ConcatString joint_str = data_info->magic_str();
                 joint_str.add("_");
@@ -489,7 +507,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
 
     Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
-    mlog << "Enter get_mtddf.\n";
+    mlog << Debug(2) << "Enter get_mtddf.\n";
 
     int i;
     // Find the first file that actually exists
