@@ -159,23 +159,83 @@ Usage:
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -data file_1 ...
  file_n | data_file_list
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -config file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -out file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
@@ -320,6 +380,12 @@ data  = {
 \begin_layout LyX-Code
 
 \series bold
+   level = [ "" ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    field = [
 \end_layout
 
@@ -332,19 +398,7 @@ data  = {
 \begin_layout LyX-Code
       
 \series bold
-{ name = "TMP";   },
-\end_layout
-
-\begin_layout LyX-Code
-      
-\series bold
-{ name = "UGRD";  },
-\end_layout
-
-\begin_layout LyX-Code
-      
-\series bold
-{ name = "VGRD";  }
+{ name = "TMP";   }
 \end_layout
 
 \begin_layout LyX-Code
@@ -357,12 +411,6 @@ data  = {
 
 \series bold
 }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-level = [];
 \end_layout
 
 \begin_layout Standard

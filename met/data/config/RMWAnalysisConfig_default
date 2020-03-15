@@ -10,15 +10,10 @@
 // Data
 //
 data = {
+   level = [ "" ];
    field = [
-      {
-         name = "PRMSL";
-         level = [ "" ];
-      },
-      {
-         name = "TMP";
-         level = [ "" ];
-      }
+      { name = "PRMSL"; },
+      { name = "TMP";   }
    ];
 }
 
