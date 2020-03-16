@@ -952,18 +952,29 @@ noprefix "false"
 \series bold
 read_ascii_point.py
 \series default
- sample script which can be found in the MET installation directory (MET_BASE/py
-thon/read_ascii_point.py).
- That script reads ASCII data in MET's 11-column point observation format
- and stores it in a Pandas dataframe to be read by the ASCII2NC tool with
- Python.
+ sample script which is included with the MET code.
+ It reads ASCII data in MET's 11-column point observation format and stores
+ it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
 \end_layout
 
 \begin_layout Standard
-You can also find this sample Python script in MET's GitHub repository:
+The 
+\series bold
+read_ascii_point.py
+\series default
+ sample script can be found in:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
+MET installation directory in 
+\series bold
+MET_BASE/python
+\series default
+.
+\end_layout
+
+\begin_layout Itemize
+MET GitHub repository (
 \begin_inset Flex URL
 status open
 
@@ -974,9 +985,11 @@ https://github.com/NCAR/MET
 
 \end_inset
 
- in 
+) in 
 \series bold
-met/scripts/python/read_ascii_point.py
+met/scripts/python
+\series default
+.
 \end_layout
 
 \begin_layout Section
@@ -1016,17 +1029,29 @@ noprefix "false"
 \series bold
 read_ascii_mpr.py
 \series default
- sample script which can be found in the MET installation directory (MET_BASE/py
-thon/read_ascii_mpr.py).
- That script reads MPR data and stores it in a Pandas dataframe to be read
- by the Stat-Analysis tool with Python.
+ sample script which is included with the MET code.
+ It reads MPR data and stores it in a Pandas dataframe to be read by the
+ Stat-Analysis tool with Python.
 \end_layout
 
 \begin_layout Standard
-You can also find this sample Python script in MET's GitHub repository:
+The 
+\series bold
+read_ascii_mpr.py
+\series default
+ sample script can be found in:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
+MET installation directory in 
+\series bold
+MET_BASE/python
+\series default
+.
+\end_layout
+
+\begin_layout Itemize
+MET GitHub repository (
 \begin_inset Flex URL
 status open
 
@@ -1037,9 +1062,11 @@ https://github.com/NCAR/MET
 
 \end_inset
 
- in 
+) in 
 \series bold
-met/scripts/python/read_ascii_mpr.py
+met/scripts/python
+\series default
+.
 \end_layout
 
 \end_body
