@@ -1225,7 +1225,7 @@ vx_mask
  data file that MET can read to subset the results spatially.
  If specified, only those genesis events whose Lat/Lon location falls within
  the specified area will be included.
- The MET release includes the file 
+ The MET code includes the file 
 \series bold
 basin_global_tenth_degree.nc
 \series medium
