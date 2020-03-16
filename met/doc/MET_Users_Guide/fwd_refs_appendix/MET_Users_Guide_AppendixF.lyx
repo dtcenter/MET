@@ -952,11 +952,23 @@ noprefix "false"
 \series bold
 read_ascii_point.py
 \series default
- sample script which is included in the MET release (MET_BASE/python/read_ascii_
-point.py).
- It reads ASCII data in MET's 11-column point observation format and formats
- it into a pandas dataframe to be read by the ASCII2NC tool using Python
- embedding.
+ sample script which can be found in the MET installation directory (MET_BASE/py
+thon/read_ascii_point.py).
+ It can also be found in MET's GitHub repository (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/NCAR/MET
+\end_layout
+
+\end_inset
+
+) in met/scripts/python/read_ascii_point.py.
+ That script reads ASCII data in MET's 11-column point observation format
+ and stores it in a Pandas dataframe to be read by the ASCII2NC tool with
+ Python.
 \end_layout
 
 \begin_layout Section
@@ -996,10 +1008,22 @@ noprefix "false"
 \series bold
 read_ascii_mpr.py
 \series default
- sample script which is included in the MET release (MET_BASE/python/read_ascii_
-mpr.py).
- It reads MPR data and formats it into a pandas dataframe to be read by
- the Stat-Analysis tool using Python embedding.
+ sample script which can be found in the MET installation directory (MET_BASE/py
+thon/read_ascii_mpr.py).
+ It can also be found in MET's GitHub repository (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/NCAR/MET
+\end_layout
+
+\end_inset
+
+) in met/scripts/python/read_ascii_mpr.py.
+ That script reads MPR data and stores it in a Pandas dataframe to be read
+ by the Stat-Analysis tool with Python.
 \end_layout
 
 \end_body

@@ -578,10 +578,7 @@ For each variable/level combination in the data dictionary a corresponding
  These are the counts of all data values falling within the bin.
  Data values below the minimum or above the maximum are included in the
  lowest and highest bins, respectively.
-\end_layout
-
-\begin_layout Standard
-In addition to 1D histograms, 2D histograms for all variable/level pairs
+ In addition to 1D histograms, 2D histograms for all variable/level pairs
  are written.
  For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two
  variables/levels.
