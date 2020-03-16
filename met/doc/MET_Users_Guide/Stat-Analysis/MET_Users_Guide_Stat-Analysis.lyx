@@ -3610,7 +3610,15 @@ CASE
 
 \series bold
 -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,OBS_SID
- -set_hdr VX_MASK OBS_SID -set_hdr DESC CASE
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-set_hdr VX_MASK OBS_SID -set_hdr DESC CASE
 \end_layout
 
 \begin_layout Standard

@@ -1225,12 +1225,12 @@ vx_mask
  data file that MET can read to subset the results spatially.
  If specified, only those genesis events whose Lat/Lon location falls within
  the specified area will be included.
- The installed NetCDF file, 
+ The MET release includes the file 
 \series bold
-share/met/tc_data/basin_global_tenth_degree.nc
+basin_global_tenth_degree.nc
 \series medium
-, contains a global definition of the Regional Specialized Meteorology Centers
- (RSMC)
+, which contains a global definition of the Regional Specialized Meteorology
+ Centers (RSMC)
 \series default
  and hurricane basin regions.
  The above example uses this file to stratify genesis results for the Atlantic

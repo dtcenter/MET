@@ -6956,48 +6956,6 @@ List the gradient of the forecast and observation fields computed in the
 
 \begin_layout Standard
 
-\series bold
-climo        = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   climo_cdp    = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   weight       = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   nbrhd        = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   gradient     = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   distance_map = FALSE;
-\end_layout
-
-\begin_layout LyX-Code
-   
-\series bold
-apply_mask   = TRUE;
-\end_layout
-
-\begin_layout Standard
-
 \series medium
 The STAT output files described for 
 \series bold

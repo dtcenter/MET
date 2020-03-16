@@ -185,8 +185,11 @@ Add new ensemble Ranked Probability Score (RPS) line type to the output
 \end_layout
 
 \begin_layout Itemize
-Add MTD header columns for "FCST_CONV_TIME_BEG", "FCST_CONV_TIME_END", "OBS_CONV
-_TIME_BEG", and "OBS_CONV_TIME_END" (#1133).
+Add MTD header columns for "FCST_CONV_TIME_BEG", "FCST_CONV_TIME_END",
+\begin_inset Newline newline
+\end_inset
+
+"OBS_CONV_TIME_BEG", and "OBS_CONV_TIME_END" (#1133).
 \end_layout
 
 \begin_layout Itemize
