@@ -27,6 +27,7 @@ data = {
    field = [
       { name = "PRMSL"; level = [ "L0" ]; },
       { name = "TMP"; },
+      { name = "RH"; },
       { name = "UGRD"; },
       { name = "VGRD"; }
    ];
