@@ -1140,9 +1140,12 @@ SLIB to point to the directory with the HDF EOS library files.
 
 \series medium
 - If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo
- directory, or set $MET_CAIROINC to point to the directory with the Cairo
- include files and set $MET_CAIROLIB to point to the directory with the
- Cairo library files.
+ directory, or set
+\begin_inset Newline newline
+\end_inset
+
+$MET_CAIROINC to point to the directory with the Cairo include files and
+ set $MET_CAIROLIB to point to the directory with the Cairo library files.
  Also, set $MET_FREETYPE to point to the main FreeType directory, or set
  $MET_FREETYPEINC to point to the directory with the FreeType include files
  and set $MET_FREETYPELIB to point to the directory with the FreeType library

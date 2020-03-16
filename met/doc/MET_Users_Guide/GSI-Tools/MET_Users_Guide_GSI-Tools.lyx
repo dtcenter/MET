@@ -2082,9 +2082,11 @@ stat_analysis -lookin diag_conv_ges.mem001.stat
 \series medium
 In this example, the Stat-Analysis tool will read MPR lines from the input
  file named
-\series default
- 
 \series bold
+
+\begin_inset Newline newline
+\end_inset
+
 diag_conv_ges.mem001.stat
 \series default
 , retain only those lines where the 
@@ -3697,8 +3699,12 @@ stat_analysis -lookin diag_conv_ges_ens_mean_orank.txt
 \begin_layout Standard
 
 \series medium
-In this example, the Stat-Analysis tool will read ORANK lines from 
+In this example, the Stat-Analysis tool will read ORANK lines from
 \series bold
+
+\begin_inset Newline newline
+\end_inset
+
 diag_conv_ges_ens_mean_orank.txt
 \series default
 , retain only those lines where the 

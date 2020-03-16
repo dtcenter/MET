@@ -1409,7 +1409,11 @@ cat_thresh
 \series bold
 nbrhd_prob.width
 \series medium
-), and smoothing method (
+), and smoothing method
+\begin_inset Newline newline
+\end_inset
+
+(
 \series bold
 nmep_smooth.type
 \series medium
@@ -1772,8 +1776,12 @@ LOGNORMAL
 \series bold
 EXPONENTIAL
 \series medium
-, 
+,
 \series bold
+
+\begin_inset Newline newline
+\end_inset
+
 CHISQUARED
 \series medium
 , 

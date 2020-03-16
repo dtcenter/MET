@@ -258,7 +258,11 @@ Grid-Stat
 \begin_deeper
 \begin_layout Itemize
 Replace the "nc_pairs_var_str" option with the "nc_pairs_var_suffix" and
- add the "nc_pairs_var_name" option (#1271).
+ add the
+\begin_inset Newline newline
+\end_inset
+
+"nc_pairs_var_name" option (#1271).
 \end_layout
 
 \begin_layout Itemize
@@ -345,12 +349,20 @@ Transition MET source code and issue tracking from Subversion and Jira to
 
 \begin_layout Itemize
 Enable the G2C library archive file name to be specified at configuration
- time by setting "GRIB2CLIB_NAME" (default is libgrib2c.a) (#1240).
+ time by setting
+\begin_inset Newline newline
+\end_inset
+
+"GRIB2CLIB_NAME" (default is libgrib2c.a) (#1240).
 \end_layout
 
 \begin_layout Itemize
 Enable the BUFRLIB library archive file name to be specified at configuration
- time by setting "BUFRLIB_NAME" (default is libbufr.a) (#1185).
+ time by setting
+\begin_inset Newline newline
+\end_inset
+
+"BUFRLIB_NAME" (default is libbufr.a) (#1185).
 \end_layout
 
 \begin_layout Itemize
@@ -567,8 +579,12 @@ When the climo mean and/or standard deviation fields contain bad data, exclude
 \series medium
 Break out the Gaussian algorithm into "GAUSSIAN" and "MAXGAUSS" where "GAUSSIAN"
  applies a Gaussian filter using the "gaussian_dx" and "gaussian_radius"
- options while "MAXGAUSS" computes the maximum over the neighborhood prior
- to applying the Gaussian filter (#1234).
+ options while
+\begin_inset Newline newline
+\end_inset
+
+"MAXGAUSS" computes the maximum over the neighborhood prior to applying
+ the Gaussian filter (#1234).
 \end_layout
 
 \begin_layout Itemize

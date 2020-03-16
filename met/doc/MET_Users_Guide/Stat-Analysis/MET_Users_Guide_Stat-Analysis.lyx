@@ -4665,7 +4665,11 @@ The output from this job consists of three lines, the first two of which
 \series bold
 JOB_LIST
 \series default
-" and "
+" and
+\begin_inset Newline newline
+\end_inset
+
+"
 \series bold
 COL_NAME
 \series default
@@ -4693,7 +4697,11 @@ The output from this job consists of three lines, the first two of which
 \series bold
 JOB_LIST
 \series default
-" and "
+" and
+\begin_inset Newline newline
+\end_inset
+
+"
 \series bold
 COL_NAME
 \series default
