@@ -11,7 +11,7 @@ assignees: ''
 *Provide a description of the requested software enhancement here.*
 
 ### Time Estimate ###
-*Estimate the amount of work required.*
+*Estimate the amount of work required here.*
 *Issues should represent approximately 1 to 3 days of work.*
 *Larger issues should be broken down into sub-issues.*
 

@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 ## Description of Bug ##
-*Provide a clear and concise description of the bug.*
+*Provide a clear and concise description of the bug here.*
 
 ### Environment ###
 Describe your runtime environment:
@@ -26,7 +26,7 @@ Describe the steps to reproduce the behavior:
 *https://dtcenter.org/community-code/model-evaluation-tools-met/met-help-desk#ftp*
 
 ### Expected Behavior ###
-*Provide a clear and concise description of what you expected to happen.*
+*Provide a clear and concise description of what you expected to happen here.*
 
 ### Relevant Deadlines ###
 *List relevant project deadlines here or state NONE.*
