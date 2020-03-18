@@ -9,16 +9,16 @@ assignees: ''
 
 Replace *italics* below with details for this issue.
 
-## Description of Bug ##
+## Description ##
 *Provide a clear and concise description of the bug here.*
 
-### Description of Expected Behavior ###
+### Expected Behavior ###
 *Provide a clear and concise description of what you expected to happen here.*
 
 ### Environment ###
 Describe your runtime environment:
 *1. Machine: (e.g. HPC name, Linux Workstation, Mac Laptop)*
-*2. OS: (e.g. RedHat Linux, MacOS version number)*
+*2. OS: (e.g. RedHat Linux, MacOS)*
 *3. MET software version number*
 
 ### To Reproduce ###

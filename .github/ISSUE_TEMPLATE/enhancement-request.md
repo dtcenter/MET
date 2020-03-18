@@ -9,7 +9,7 @@ assignees: ''
 
 Replace *italics* below with details for this issue.
 
-## Description of Enhancement ##
+## Description ##
 *Provide a description of the requested software enhancement here.*
 
 ### Time Estimate ###
