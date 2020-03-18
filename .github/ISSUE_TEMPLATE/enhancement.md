@@ -21,17 +21,19 @@ assignees: ''
 ## Funding Source ##
 *Define the source of funding and account keys here.*
 
-## Assignees ##
+## Define Metadata ##
+
+### Assignee ###
 - [ ] Select **engineer(s)**
 - [ ] Or select **no engineer** required
 - [ ] Select **scientist(s)**
 - [ ] Or select **no scientist** required
 
-## Labels ##
+### Labels ###
 - [ ] Select **component(s)**
 - [ ] Select **priority**
 - [ ] Select **requestor(s)**
 
-## Projects and Milestone ##
+### Projects and Milestone ###
 - [ ] Review **projects** and select relevant **Repository** and **Organization** ones
 - [ ] Select **milestone**
