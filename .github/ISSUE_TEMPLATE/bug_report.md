@@ -7,8 +7,13 @@ assignees: ''
 
 ---
 
+Replace *italics* below with details for this issue.
+
 ## Description of Bug ##
 *Provide a clear and concise description of the bug here.*
+
+### Description of Expected Behavior ###
+*Provide a clear and concise description of what you expected to happen here.*
 
 ### Environment ###
 Describe your runtime environment:
@@ -24,9 +29,6 @@ Describe the steps to reproduce the behavior:
 *4. See error*
 *Post relevant sample data following these instructions:*
 *https://dtcenter.org/community-code/model-evaluation-tools-met/met-help-desk#ftp*
-
-### Expected Behavior ###
-*Provide a clear and concise description of what you expected to happen here.*
 
 ### Relevant Deadlines ###
 *List relevant project deadlines here or state NONE.*
