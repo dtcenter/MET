@@ -32,6 +32,6 @@ assignees: ''
 - [ ] Select **priority**
 - [ ] Select **requestor(s)**
 
-## Projects and Milestones ##
-- [ ] Select **project**
+## Projects and Milestone ##
+- [ ] Review **projects** and select relevant **Repository** and **Organization** ones
 - [ ] Select **milestone**
