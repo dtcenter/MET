@@ -7,19 +7,19 @@ assignees: ''
 
 ---
 
-## Description of Enhancement ##
+## Description ##
 *Provide a description of the requested software enhancement here.*
 
-## Time Estimate ##
+### Time Estimate ###
 *Estimate the amount of work required.*
 *Issues should represent approximately 1 to 3 days of work.*
 *Larger issues should be broken down into sub-issues.*
 
-## Relevant Deadlines ##
-*List relevant project deadlines here.*
+### Relevant Deadlines ###
+*List relevant project deadlines here or state NONE.*
 
-## Funding Source ##
-*Define the source of funding and account keys here.*
+### Funding Source ###
+*Define the source of funding and account keys here or state NONE.*
 
 ## Define Metadata ##
 
