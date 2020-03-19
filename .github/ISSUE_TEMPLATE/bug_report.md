@@ -39,10 +39,8 @@ Describe the steps to reproduce the behavior:
 ## Define the Metadata ##
 
 ### Assignee ###
-- [ ] Select **engineer(s)**
-- [ ] Or select **no engineer** required
-- [ ] Select **scientist(s)**
-- [ ] Or select **no scientist** required
+- [ ] Select **engineer(s)** or **no engineer** required
+- [ ] Select **scientist(s)** or **no scientist** required
 
 ### Labels ###
 - [ ] Select **component(s)**
