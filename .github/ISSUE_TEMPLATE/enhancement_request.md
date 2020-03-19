@@ -38,5 +38,12 @@ assignees: ''
 - [ ] Review **projects** and select relevant **Repository** and **Organization** ones
 - [ ] Select **milestone**
 
-## Define Related Issue(s) for METplus Components ##
-- [ ] Consider the impacts on the METplus, MET, METdb, METviewer, METexpress, METcalcpy, and METplotpy repositories.
+## Define Related Issue(s) ##
+Consider the impact to other METplus components.
+Delete items that do not apply.
+- [ ] Define new issue for METplus.
+- [ ] Define new issue for METdb.
+- [ ] Define new issue for METviewer.
+- [ ] Define new issue for METexpress.
+- [ ] Define new issue for METcalcpy.
+- [ ] Define new issue for METplotpy.
