@@ -39,3 +39,6 @@ assignees: ''
 ### Projects and Milestone ###
 - [ ] Review **projects** and select relevant **Repository** and **Organization** ones
 - [ ] Select **milestone**
+
+## Define Related Issue(s) for METplus Components ##
+- [ ] Consider the impacts on the METplus, MET, METdb, METviewer, METexpress, METcalcpy, and METplotpy repositories.

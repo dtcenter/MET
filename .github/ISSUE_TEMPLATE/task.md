@@ -1,20 +1,16 @@
 ---
-name: New featue request
-about: Make it do something new
+name: Task
+about: Improve something that it's currently doing
 title: ''
-labels: 'type: new feature'
+labels: 'type: task'
 assignees: ''
 
 ---
 
 *Replace italics below with details for this issue.*
 
-## Describe the New Feature ##
-*Provide a description of the requested software enhancement here.*
-
-### Acceptance Testing ###
-*List input data types and sources.*
-*Describe tests required for new functionality.*
+## Describe the Enhancement ##
+*Provide a description of the task here.*
 
 ### Time Estimate ###
 *Estimate the amount of work required here.*
@@ -43,6 +39,3 @@ assignees: ''
 ### Projects and Milestone ###
 - [ ] Review **projects** and select relevant **Repository** and **Organization** ones
 - [ ] Select **milestone**
-
-## Define Related Issue(s) for METplus Components ##
-- [ ] Consider the impacts on the METplus, MET, METdb, METviewer, METexpress, METcalcpy, and METplotpy repositories.
