@@ -1,6 +1,6 @@
 ---
 name: Task
-about: Improve something that it's currently doing
+about: Describe something that needs to be done
 title: ''
 labels: 'type: task'
 assignees: ''
@@ -9,7 +9,7 @@ assignees: ''
 
 *Replace italics below with details for this issue.*
 
-## Describe the Enhancement ##
+## Describe the Task ##
 *Provide a description of the task here.*
 
 ### Time Estimate ###
