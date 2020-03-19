@@ -1,13 +1,13 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Fix something that's not working
 title: ''
 labels: 'type: bug'
 assignees: ''
 
 ---
 
-Replace *italics* below with details for this issue.
+*Replace italics below with details for this issue.*
 
 ## Description ##
 *Provide a clear and concise description of the bug here.*

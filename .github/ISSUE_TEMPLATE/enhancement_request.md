@@ -1,13 +1,13 @@
 ---
 name: Enhancement request
-about: Tell us what else the software should do
+about: Improve something that it's currently doing
 title: ''
 labels: 'type: enhancement'
 assignees: ''
 
 ---
 
-Replace *italics* below with details for this issue.
+*Replace italics below with details for this issue.*
 
 ## Description ##
 *Provide a description of the requested software enhancement here.*
