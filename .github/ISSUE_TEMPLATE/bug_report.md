@@ -9,7 +9,7 @@ assignees: ''
 
 *Replace italics below with details for this issue.*
 
-## Description ##
+## Describe the Problem ##
 *Provide a clear and concise description of the bug here.*
 
 ### Expected Behavior ###
@@ -36,7 +36,7 @@ Describe the steps to reproduce the behavior:
 ### Funding Source ###
 *Define the source of funding and account keys here or state NONE.*
 
-## Define Metadata ##
+## Define the Metadata ##
 
 ### Assignee ###
 - [ ] Select **engineer(s)**

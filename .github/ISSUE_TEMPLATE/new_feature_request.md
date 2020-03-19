@@ -1,6 +1,6 @@
 ---
 name: New featue request
-about: Make it doing something new
+about: Make it do something new
 title: ''
 labels: 'type: new feature'
 assignees: ''
@@ -9,7 +9,7 @@ assignees: ''
 
 *Replace italics below with details for this issue.*
 
-## Description ##
+## Describe the New Feature ##
 *Provide a description of the requested software enhancement here.*
 
 ### Acceptance Testing ###
@@ -27,7 +27,7 @@ assignees: ''
 ### Funding Source ###
 *Define the source of funding and account keys here or state NONE.*
 
-## Define Metadata ##
+## Define the Metadata ##
 
 ### Assignee ###
 - [ ] Select **engineer(s)**
