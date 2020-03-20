@@ -176,7 +176,7 @@ if ( empty(command) )  {
 
 }
 
-if ( PyRun_String(command, Py_file_input, Dict, Dict) < 0 )  {
+if ( ! PyRun_String(command, Py_file_input, Dict, Dict) )  {
 
    mlog << Error << "\nPython3_Script::run(const char *) -> "
         << "command \"" << command << "\" failed!\n\n";
