@@ -39,11 +39,11 @@ assignees: ''
 - [ ] Select **milestone**
 
 ## Define Related Issue(s) ##
-Consider the impact to other METplus components.
-- [ ] Define related issue(s) for METplus, MET, METdb, METviewer, METexpress, METcalcpy, and/or METplotpy.
+Consider the impact to the other METplus components.
+- [ ] Define related issue(s) for [METplus](https://github.com/NCAR/METplus/issues/new/choose), [MET](https://github.com/NCAR/MET/issues/new/choose), [METdb](https://github.com/NCAR/METdb/issues/new/choose), [METviewer](https://github.com/NCAR/METviewer/issues/new/choose), [METexpress](https://github.com/NCAR/METexpress/issues/new/choose), [METcalcpy](https://github.com/NCAR/METcalcpy/issues/new/choose), and/or [METplotpy](https://github.com/NCAR/METplotpy/issues/new/choose).
 
 ## Enhancement Checklist ##
-See [METplus Workflow](https://ncar.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
+See the [METplus Workflow](https://ncar.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
 - [ ] Complete the issue definition above.
 - [ ] Fork this repository or branch **develop** into **feature_\<GitHub Issue Number\>_\<Brief Description\>**.
 - [ ] Complete the development and test your changes.
