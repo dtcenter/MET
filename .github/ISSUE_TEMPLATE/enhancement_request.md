@@ -40,10 +40,17 @@ assignees: ''
 
 ## Define Related Issue(s) ##
 Consider the impact to other METplus components.
-Delete items that do not apply.
-- [ ] Define new issue for METplus.
-- [ ] Define new issue for METdb.
-- [ ] Define new issue for METviewer.
-- [ ] Define new issue for METexpress.
-- [ ] Define new issue for METcalcpy.
-- [ ] Define new issue for METplotpy.
+- [ ] Define related issue(s) for METplus, MET, METdb, METviewer, METexpress, METcalcpy, and/or METplotpy.
+
+## Enhancement Checklist ##
+See [METplus Workflow](https://ncar.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
+- [ ] Complete the issue definition above.
+- [ ] Fork this repository or branch **develop** into **feature_\<GitHub Issue Number\>_\<Brief Description\>**.
+- [ ] Complete the development and test your changes.
+- [ ] Add/update unit tests.
+- [ ] Add/update documentation.
+- [ ] Push local changes to GitHub.
+- [ ] Submit a pull request to merge into **develop**, listing the **\<GitHub Issue Number\>** in the title.
+- [ ] Iterate until the reviewer(s) accept and merge your changes.
+- [ ] Delete the **feature_\<GitHub Issue Number\>_\<Brief Description\>** branch.
+- [ ] Close this issue.
