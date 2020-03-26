@@ -56,5 +56,5 @@ See the [METplus Workflow](https://ncar.github.io/METplus/Contributors_Guide/git
 - [ ] Push local changes to GitHub.
 - [ ] Submit a pull request to merge into **develop**, listing the **\<GitHub Issue Number\>** in the title.
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
-- [ ] Delete the **feature_\<GitHub Issue Number\>_\<Brief Description\>** branch.
+- [ ] Delete your fork or branch.
 - [ ] Close this issue.
