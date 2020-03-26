@@ -145,13 +145,14 @@ static const int var_gc[mxr8vt] = {
 };
 
 // Number of variable types which may be derived
-static const int n_derive_gc = 6;
+static const int n_derive_gc = 8;
 
 // Listing of grib codes for variable types which may be derived
 static const int derive_gc[n_derive_gc] = {
    dpt_grib_code,  wdir_grib_code,
    wind_grib_code, rh_grib_code,
-   mixr_grib_code, prmsl_grib_code
+   mixr_grib_code, prmsl_grib_code,
+   cape_grib_code, pbl_grib_code
 };
 static int bufr_var_code[mxr8vt];
 static int bufr_derive_code[n_derive_gc];

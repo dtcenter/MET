@@ -52,18 +52,22 @@ static const char vgrd_grib_name[] = "VGRD";    // 34 V-component of wind
 // Grib codes for quantities that can be derived from
 // the P, Q, T, Z, U, V variables
 //
-static const int dpt_grib_code   = 17; // Dewpoint temperature
-static const int wdir_grib_code  = 31; // Wind direction
-static const int wind_grib_code  = 32; // Wind speed
-static const int rh_grib_code    = 52; // Relative humidity
-static const int mixr_grib_code  = 53; // Humidity mixing ratio
-static const int prmsl_grib_code = 2;  // Pressure Reduced to MSL
-static const char dpt_grib_name[]   = "DPT";    // 17 Dewpoint temperature
-static const char wdir_grib_name[]  = "WDIR";   // 31 Wind direction
-static const char wind_grib_name[]  = "WIND";   // 32 Wind speed
-static const char rh_grib_name[]    = "RH";     // 52 Relative humidity
-static const char mixr_grib_name[]  = "MIXR";   // 53 Humidity mixing ratio
-static const char prmsl_grib_name[] = "PRMSL";  //  2 Pressure Reduced to MSL
+static const int dpt_grib_code   = 17;  // Dewpoint temperature
+static const int wdir_grib_code  = 31;  // Wind direction
+static const int wind_grib_code  = 32;  // Wind speed
+static const int rh_grib_code    = 52;  // Relative humidity
+static const int mixr_grib_code  = 53;  // Humidity mixing ratio
+static const int prmsl_grib_code = 2;   // Pressure Reduced to MSL
+static const int cape_grib_code  = 157; // Convective available potential energy
+static const int pbl_grib_code   = 221; // Planetary boundary layer height
+static const char dpt_grib_name[]   = "DPT";    //  17 Dewpoint temperature
+static const char wdir_grib_name[]  = "WDIR";   //  31 Wind direction
+static const char wind_grib_name[]  = "WIND";   //  32 Wind speed
+static const char rh_grib_name[]    = "RH";     //  52 Relative humidity
+static const char mixr_grib_name[]  = "MIXR";   //  53 Humidity mixing ratio
+static const char prmsl_grib_name[] = "PRMSL";  //   2 Pressure Reduced to MSL
+static const char cape_grib_name[]  = "CAPE";   // 157 Convective available potential energy
+static const char pbl_grib_name[]   = "PBL";    // 221 Planetary boundary layer height
 
 ////////////////////////////////////////////////////////////////////////
 
