@@ -105,6 +105,9 @@ if(is.na(MET_INSTALL_DIR)) {
   quit(status=1);
 }
 
+# Expand environment variables
+MET_INSTALL_DIR = system(paste("echo", MET_INSTALL_DIR), intern=TRUE);
+
 # Source utilities
 RSCRIPT_INC_DIR = paste(MET_INSTALL_DIR, "/share/met/Rscripts/include", sep='');
 source(paste(RSCRIPT_INC_DIR, "/plot_tcmpr_util.R", sep=''));
@@ -203,7 +206,7 @@ usage = function() {
 ########################################################################
 
 # Path to the tc_stat tool
-tc_stat = "${MET_INSTALL_DIR}/bin/tc_stat";
+tc_stat = paste(MET_INSTALL_DIR, "/bin/tc_stat", sep='');
 
 # Strings used to select the plots to be created
 boxplot_str = "BOXPLOT";
@@ -628,9 +631,9 @@ for(i in 1:length(dep_list)) {
     }
     else {
       out_file = paste(outdir, "/", out_file_dep, "_", 
-                       tolower(plot_list[j]), ".", img_ext, sep="");
+                       tolower(plot_list[j]), ".", img_ext, sep='');
       log_file = paste(outdir, "/", out_file_dep, "_",
-                       tolower(plot_list[j]), ".log", sep="");
+                       tolower(plot_list[j]), ".log", sep='');
     }
 
     # PLOT: Create time series of boxplots.
@@ -831,9 +834,9 @@ if(scatter_str %in% plot_list) {
     }
     else {
       out_file = paste(outdir, "/", out_file_x, "_vs_", out_file_y, "_scatter",
-                       ".", img_ext, sep="");
+                       ".", img_ext, sep='');
       log_file = paste(outdir, "/",  out_file_x, "_vs_", out_file_y, "_scatter",
-                       ".log", sep="");
+                       ".log", sep='');
     }
 
     # Set plotting strings

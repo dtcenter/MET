@@ -24,12 +24,14 @@ if(is.na(MET_INSTALL_DIR)) {
   quit(status=1);
 }
 
+# Expand environment variables
+MET_INSTALL_DIR = system(paste("echo", MET_INSTALL_DIR), intern=TRUE);
+
 # Make sure that tc_stat can be found
-#tc_stat = Sys.which("tc_stat");
-tc_stat = ${MET_INSTALL_DIR}/bin/tc_stat";
+tc_stat = paste(MET_INSTALL_DIR, "/bin/tc_stat", sep='');
 
 if(nchar(tc_stat) == 0) {
-  cat("ERROR: Cannot find the tc_stat tool in your path.\n");
+  cat("ERROR: Cannot find the tc_stat tool.\n");
   quit(status=1);
 }
 
