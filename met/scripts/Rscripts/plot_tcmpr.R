@@ -105,25 +105,19 @@ if(is.na(MET_INSTALL_DIR)) {
   quit(status=1);
 }
 
-MET_BASE = Sys.getenv("MET_BASE", unset=NA);
-if(is.na(MET_BASE)) {
-  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n");
-  quit(status=1);
-}
-
-
 # Source utilities
-source(paste(MET_BASE, "/Rscripts/include/plot_tcmpr_util.R", sep=''));
-source(paste(MET_BASE, "/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
-source(paste(MET_BASE, "/Rscripts/include/Compute_STDerr.R", sep=''));
+RSCRIPT_INC_DIR = paste(MET_INSTALL_DIR, "/share/met/Rscripts/include", sep='');
+source(paste(RSCRIPT_INC_DIR, "/plot_tcmpr_util.R", sep=''));
+source(paste(RSCRIPT_INC_DIR, "/plot_tcmpr_config_default.R", sep=''));
+source(paste(RSCRIPT_INC_DIR, "/Compute_STDerr.R", sep=''));
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
-  paste(MET_BASE, "/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
+  paste(RSCRIPT_INC_DIR, "/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1);
   
 # Read the HFIP baseline information from a data file.
-baseline = read.table(paste(MET_BASE, "/Rscripts/include/hfip_baseline.dat", sep=''), header=TRUE)
+baseline = read.table(paste(RSCRIPT_INC_DIR, "/hfip_baseline.dat", sep=''), header=TRUE)
 
 ########################################################################
 #

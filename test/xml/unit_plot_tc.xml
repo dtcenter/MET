@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY MET_SCRIPTS    "${MET_BUILD_BASE}/scripts">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+]>
+
+<met_test>
+
+  <!-- Dependency: unit_tc_pairs.xml -->
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="plot_tc_TCMPR">
+    <exec>Rscript &MET_SCRIPTS;/Rscripts/plot_tcmpr.R</exec>
+    <param> \
+      -adeck &DATA_DIR;/adeck/*2010.dat \
+      -bdeck &DATA_DIR;/bdeck/*2010.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_ALAL2010 \
+      -out &OUTPUT_DIR;/tc_pairs/alal2010 \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_ALAL2010.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2010.tcst</stat>
+    </output>
+  </test>
+
+  <test name="plot_tc_PROBRI">
+    <exec>Rscript &MET_SCRIPTS;/Rscripts/plot_probri.R</exec>
+    <param> \
+      -adeck &DATA_DIR;/adeck/*2013.dat \
+      -bdeck &DATA_DIR;/bdeck/*2013.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_INTERP12 \
+      -out &OUTPUT_DIR;/tc_pairs/al022013_interp12_fill \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_INTERP12_FILL.log \
+      -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al022013_interp12_fill.tcst</stat>
+    </output>
+  </test>
+
+</met_test>
