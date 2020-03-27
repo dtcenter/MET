@@ -54,7 +54,8 @@ quilt = FALSE;
 // name  = "precipitationCal";
 // "PrecipRate_0mabovemeansealevel"
 // A_PCP_GDS5_SFC_acc1h
-fcst = {
+fcst = [
+{
    field = {
      name  = "precipitationCal";
      level = "(0,*,*)";
@@ -68,8 +69,9 @@ fcst = {
    merge_thresh       = >=1.0;
    merge_flag         = THRESH;
    
-}
-obs = {
+} ]
+obs = [
+{
    field = {
       name  = "PrecipRate_0mabovemeansealevel";
       level = "(0,*,*)";
@@ -83,7 +85,7 @@ obs = {
    merge_thresh       = >=1.0;
    merge_flag         = THRESH;
    
-}
+}]
 
 ////////////////////////////////////////////////////////////////////////////////
 bool_combo = "#1 && #2 && #3";
