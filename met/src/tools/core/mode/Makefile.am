@@ -12,6 +12,8 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = mode
 mode_SOURCES = mode.cc \
+	mode_singlevar.cc \
+	mode_multivar.cc \
 	mode_ps_file.cc \
 	plot_engine.cc \
 	page_1.cc \
