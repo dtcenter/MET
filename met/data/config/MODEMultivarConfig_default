@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "IMERG-MRMS-Comparison";
+model = "WRF";
 
 //
 // Output description to be written
@@ -19,20 +19,17 @@ desc = "NA";
 //
 // Output observation type to be written
 //
-obtype = "ANALYS";
+obtype = "PRECIP";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Verification grid
-// May be set separately in each "field" entry
 //
 regrid = {
-   to_grid    = NONE;
-   method     = NEAREST;
-   width      = 1;
-   vld_thresh = 0.5;
-   shape      = SQUARE;
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +37,7 @@ regrid = {
 //
 // Approximate grid resolution (km)
 //
-grid_res = 10;
+grid_res = 20;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -51,44 +48,48 @@ quilt = FALSE;
 
 //
 // Forecast and observation fields to be verified
-// name  = "precipitationCal";
-// "PrecipRate_0mabovemeansealevel"
-// A_PCP_GDS5_SFC_acc1h
-fcst = [
-{
-   field = {
-     name  = "precipitationCal";
-     level = "(0,*,*)";
-   }
+//
+fcst = {
 
-   censor_thresh      = [];
-   censor_val         = [];
-   conv_radius        = 0; // in grid squares hatman tanzimat berooz shavad
-   conv_thresh        = >0.1;
-   vld_thresh         = 0;
-   merge_thresh       = >=1.0;
-   merge_flag         = THRESH;
-   
-} ]
-obs = [
-{
-   field = {
-      name  = "PrecipRate_0mabovemeansealevel";
-      level = "(0,*,*)";
-   }
+   // field = {
+   //    name  = "GAMMA";
+   //    level = "(*,*)";
+   // }
 
-   censor_thresh      = [];
-   censor_val         = [];
-   conv_radius        = 0; // in grid squares
-   conv_thresh        = >0.1;
-   vld_thresh         = 0;
-   merge_thresh       = >=1.0;
-   merge_flag         = THRESH;
-   
-}]
+   field = [
 
-////////////////////////////////////////////////////////////////////////////////
-bool_combo = "#1 && #2 && #3";
+      {
+         name  = "ALPHA";
+         level = "(*,*)";
+      }, 
+
+      {
+         name  = "BETA";
+         level = "(*,*)";
+      }, 
+
+      {
+         name  = "GAMMA";
+         level = "(*,*)";
+      }
+
+   ];
+
+   conv_radius        = 2; // in grid squares
+   conv_thresh        = >=5.0;
+   vld_thresh         = 0.5;
+   filter_attr_name   = [];
+   filter_attr_thresh = [];
+   merge_thresh       = >=3.5;
+   merge_flag         = NONE;
+}
+obs = fcst;
+// obs = {
+//    field = {
+//       name  = "APCP_";
+//       level = "A06";
+//    }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -100,7 +101,7 @@ mask_missing_flag = NONE;
 //
 // Match objects between the forecast and observation fields
 //
-match_flag = MERGE_BOTH;
+match_flag = NONE;
 
 //
 // Maximum centroid distance for objects to be compared
@@ -218,14 +219,14 @@ met_data_dir = "MET_BASE";
 fcst_raw_plot = {
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
-   plot_max         = 0.0;
+   plot_max         = 25.4;
    colorbar_spacing = 1;
 }
 
 obs_raw_plot = {
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
-   plot_max         = 0.0;
+   plot_max         = 25.4;
    colorbar_spacing = 1;
 }
 
@@ -249,23 +250,12 @@ plot_gcarc_flag = FALSE;
 // NetCDF matched pairs, PostScript, and contingency table output files
 //
 ps_plot_flag    = TRUE;
-nc_pairs_flag   = {
-   latlon       = TRUE;
-   raw          = TRUE;
-   object_raw   = TRUE;
-   object_id    = TRUE;
-   cluster_id   = TRUE;
-   polylines    = TRUE;
-}
+nc_pairs_flag   = TRUE;
 ct_stats_flag   = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-shift_right = 0;   //  grid squares
-
-////////////////////////////////////////////////////////////////////////////////
-
-output_prefix  = "";
-version        = "V8.0";
+output_prefix  = "r_";
+version        = "V9.0";
 
 ////////////////////////////////////////////////////////////////////////////////
