@@ -46,6 +46,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_dland.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
+          unit_plot_tc.xml \
           unit_tc_rmw.xml \
           unit_rmw_analysis.xml \
           unit_tc_gen.xml \
