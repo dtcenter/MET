@@ -10,7 +10,7 @@ assignees: ''
 *Replace italics below with details for this issue.*
 
 ## Describe the Enhancement ##
-*Provide a description of the requested software enhancement here.*
+*Provide a description of the enhancement request here.*
 
 ### Time Estimate ###
 *Estimate the amount of work required here.*

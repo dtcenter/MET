@@ -10,7 +10,7 @@ assignees: ''
 *Replace italics below with details for this issue.*
 
 ## Describe the New Feature ##
-*Provide a description of the requested software enhancement here.*
+*Provide a description of the new feature request here.*
 
 ### Acceptance Testing ###
 *List input data types and sources.*
