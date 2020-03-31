@@ -26,10 +26,10 @@
       -dep 'TK_ERR,ABS(AMAX_WIND-BMAX_WIND)'
     </param>
     <output>
-      <exists>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.png</exists> 
-      <exists>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.log</exists> 
-      <exists>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.png</exists> 
-      <exists>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.log</exists> 
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.png</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.log</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.png</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.log</exist> 
     </output>
   </test>
 
