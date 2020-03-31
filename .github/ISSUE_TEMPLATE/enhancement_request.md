@@ -15,7 +15,10 @@ assignees: ''
 ### Time Estimate ###
 *Estimate the amount of work required here.*
 *Issues should represent approximately 1 to 3 days of work.*
-*Larger issues should be broken down into sub-issues.*
+
+### Sub-Issues ###
+Consider breaking the enhancement down into sub-issues.
+- [ ] *Add a checkbox for each sub-issue here.*
 
 ### Relevant Deadlines ###
 *List relevant project deadlines here or state NONE.*
