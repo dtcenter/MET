@@ -132,7 +132,8 @@ static void      apply_grid_mask(DataPlane &dp);
 static void      apply_data_mask(DataPlane &dp);
 static void      apply_solar_mask(DataPlane &dp);
 static void      apply_lat_lon_mask(DataPlane &dp);
-static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, SetLogic);
+static DataPlane combine(const DataPlane &dp_data,
+                         const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
 static void      set_type(const StringArray &);
