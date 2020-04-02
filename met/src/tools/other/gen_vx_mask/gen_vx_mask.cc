@@ -55,19 +55,9 @@ using namespace std;
 #include "shp_file.h"
 #include "grid_closed_poly.h"
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-static void get_shapefile_outline(ShpPolyRecord & shape);
-
-
-////////////////////////////////////////////////////////////////////////
-
-int main(int argc, char *argv[])
-
-{
-
+int main(int argc, char *argv[]) {
    static DataPlane dp_data, dp_mask, dp_out;
 
    // Set handler to be called for memory allocation error
@@ -203,24 +193,17 @@ void process_input_grid(DataPlane &dp) {
    return;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void process_mask_file(DataPlane &dp)
-
-{
-
+void process_mask_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
 
-      // Initialize
-
+   // Initialize
    solar_ut = (unixtime) 0;
 
-      // Process the mask file as a lat/lon polyline file
-
+   // Process the mask file as a lat/lon polyline file
    if(mask_type == MaskType_Poly   ||
       mask_type == MaskType_Box    ||
       mask_type == MaskType_Circle ||
@@ -234,11 +217,8 @@ void process_mask_file(DataPlane &dp)
            << " containing " << poly_mask.n_points() << " points\n";
    }
 
-      //
-      //  process the mask from a shapefile
-      //
-
-   else if ( mask_type == MaskType_Shape )  {
+   // Process the mask from a shapefile
+   else if(mask_type == MaskType_Shape) {
 
       get_shapefile_outline(shape);
 
@@ -295,11 +275,9 @@ void process_mask_file(DataPlane &dp)
               << "Mask Grid -> " << grid_mask.serialize() << "\n\n";
          exit(1);
       }
-
-   }  //  else
+   }
 
    // For solar masking, parse the valid time from gridded data
-
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
       if(mask_field_str.length() == 0) {
@@ -313,14 +291,11 @@ void process_mask_file(DataPlane &dp)
       solar_ut = dp.valid();
       dp.clear();
 
-      mlog << Debug(2)
-           << "Solar File Time:\t"
+      mlog << Debug(2) << "Solar File Time:\t"
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
-
-   }   //  if
+   }
 
    // Read mask_field for data masking
-
    if(mask_type == MaskType_Data) {
 
       if(mask_field_str.length() == 0) {
@@ -331,10 +306,10 @@ void process_mask_file(DataPlane &dp)
       }
       get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
 
-   } else { // Otherwise, initialize the masking data
-
+   }
+   // Otherwise, initialize the masking data
+   else {
       dp.set_size(grid.nx(), grid.ny());
-
    }
 
    // Construct the mask
@@ -472,10 +447,49 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_poly_mask(DataPlane & dp)
+void get_shapefile_outline(ShpPolyRecord & cur_shape) {
+   const char * const shape_filename = mask_filename.c_str();
+   ShpFile f;
+   ShpPolyRecord & pr = cur_shape;
 
-{
+   // Open shapefile
+   if(!(f.open(shape_filename))) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "unable to open shape file \"" << shape_filename
+           << "\"\n\n";
+      exit(1);
+   }
 
+   // Make sure it's a polygon file, and not some other type
+   if(f.shape_type() != shape_type_polygon) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "shape file \"" << shape_filename
+           << "\" is not a polygon file\n\n";
+      exit(1);
+   }
+
+   // Skip through un-needed records
+   for(int i=0; i<shape_number; i++) {
+      if(f.at_eof()) break;
+      f >> pr;
+   }
+
+   if(f.at_eof()) {
+      mlog << Error << "\nget_shapefile_outline() -> "
+           << "hit eof before reading specified record\n\n";
+      exit(1);
+   }
+
+   // Get the target record
+   f >> pr;
+   pr.toggle_longitudes();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_poly_mask(DataPlane & dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon;
@@ -982,96 +996,74 @@ void apply_lat_lon_mask(DataPlane &dp) {
    }
 
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void apply_shape_mask(DataPlane & dp) {
+   int x, y, n_in;
+   int j, k, n;
+   int start, stop;
+   double dx, dy, lat, lon;
+   bool status = false;
+   GridClosedPoly p;
+   GridClosedPolyArray a;
 
-void apply_shape_mask(DataPlane & dp)
+   // Load up array
+   for(j=0; j<(shape.n_parts); j++) {
 
-{
+      p.clear();
 
-int x, y, n_in;
-int j, k, n;
-int start, stop;
-double dx, dy, lat, lon;
-bool status = false;
-GridClosedPoly p;
-GridClosedPolyArray a;
+      start = shape.start_index(j);
+      stop  = shape.stop_index(j);
 
-   //
-   //  load up array
-   //
+      n = stop - start + 1;
 
-for (j=0; j<(shape.n_parts); ++j)  {
+      for(k=0; k<n; ++k) {
 
-   p.clear();
+         lat = shape.lat(start + k);
+         lon = shape.lon(start + k);
 
-   start = shape.start_index(j);
-   stop  = shape.stop_index(j);
+         lon = -lon;   //  west is positive for us
 
-   n = stop - start + 1;
+         grid.latlon_to_xy(lat, lon, dx, dy);
 
-   for (k=0; k<n; ++k)  {
+         x = nint(dx);
+         y = nint(dy);
 
-      lat = shape.lat(start + k);
-      lon = shape.lon(start + k);
+         p.add_point(x, y);
+      } // for k
 
-      lon = -lon;   //  west is positive for us
+      a.add(p);
 
-      grid.latlon_to_xy(lat, lon, dx, dy);
+   } // for j
 
-      x = nint(dx);
-      y = nint(dy);
+   // Check grid points
+   for(x=0, n_in=0; x<(grid.nx()); x++) {
+      for (y=0; y<(grid.ny()); y++) {
 
-      p.add_point(x, y);
+         status = a.is_inside(x, y);
 
-   }   //  for k
+         // Check the complement
+         if(complement) status = !status;
 
-   a.add(p);
+         if(status) n_in++;
 
-}   //  for j
+         dp.set( (status ? 1.0 : 0.0 ), x, y);
+      } // for y
+   } // for x
 
+   if(complement) {
+      mlog << Debug(3)
+           << "Applying complement of the shapefile mask.\n";
+   }
 
-
-   //
-   //  check grid points
-   //
-
-for (x=0, n_in=0; x<(grid.nx()); ++x)  {
-
-   for (y=0; y<(grid.ny()); ++y)  {
-
-      status = a.is_inside(x, y);
-
-      // Check the complement
-      if(complement) status = !status;
-
-      if(status)  n_in++;
-
-      dp.set( (status ? 1.0 : 0.0 ), x, y);
-
-   }   //  for y
-
-}   //  for x
-
-if(complement) {
+   // List number of points inside the mask
    mlog << Debug(3)
-        << "Applying complement of the shapefile mask.\n";
-}
+        << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
+        << " points inside\n";
 
-   //
-   //  done
-   //
-
-// List number of points inside the mask
-mlog << Debug(3)
-     << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-     << " points inside\n";
-
-return;
-
+   return;
 }
 
 
@@ -1522,107 +1514,17 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_shapeno(const StringArray & a) {
 
-void set_shapeno(const StringArray & a)
+   shape_number = atoi(a[0].c_str());
 
-{
+   if(shape_number < 0) {
+      mlog << Error << "\n" << program_name
+           << ": bad shapeno ... " << shape_number << "\n\n";
+      exit(1);
+   }
 
-shape_number = atoi(a[0].c_str());
-
-if ( shape_number < 0 )  {
-
-   mlog << Error
-        << program_name << ": bad shapeno ... " << shape_number << "\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_shapefile_outline(ShpPolyRecord & cur_shape)
-
-{
-
-
-int j;
-const char * const shape_filename = mask_filename.c_str();
-ShpFile f;
-ShpPolyRecord & pr = cur_shape;
-
-
-   //
-   //  open shapefile
-   //
-
-if ( ! (f.open(shape_filename)) )  {
-
-   mlog << Error
-        << program_name << ": unable to open shape file \""
-        << shape_filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  make sure it's a polygon file, and not some other type
-   //
-
-if ( f.shape_type() != shape_type_polygon )  {
-
-   mlog << Error
-        << "\n" << program_name << ": shape file \""
-        << shape_filename << "\" is not a polygon file\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  skip through un-needed records
-   //
-
-for (j=0; j<shape_number; ++j)  {
-
-   if ( f.at_eof() )  break;
-
-   f >> pr;
-
-}   //  for j
-
-
-if ( f.at_eof() )  {
-
-   mlog << Error
-        << program_name << ": get_shapefile_outline() -> hit eof before reading specified record\n\n";
-
-   exit ( 1 );
-
-}
-
-
-   //
-   //  get the target record
-   //
-
-f >> pr;
-
-
-   //
-   //  done
-   //
-
-pr.toggle_longitudes();
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////

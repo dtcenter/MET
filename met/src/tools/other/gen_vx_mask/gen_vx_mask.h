@@ -122,6 +122,7 @@ static void      get_data_plane(Met2dDataFile *mtddf_ptr,
                                 const char *config_str, DataPlane &dp);
 static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
                                       DataPlane &dp);
+static void      get_shapefile_outline(ShpPolyRecord &shape);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
 static void      apply_box_mask(DataPlane &dp);
