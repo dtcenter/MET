@@ -85,7 +85,7 @@ static const double default_mask_val = 1.0;
 ////////////////////////////////////////////////////////////////////////
 
 // Input data file, mask file, and output NetCDF file
-static ConcatString input_filename, mask_filename, out_filename;
+static ConcatString input_gridname, mask_filename, out_filename;
 
 // Optional arguments
 static MaskType mask_type = default_mask_type;
@@ -116,7 +116,7 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 static void      process_command_line(int, char **);
-static void      process_input_file(DataPlane &dp);
+static void      process_input_grid(DataPlane &dp);
 static void      process_mask_file(DataPlane &dp);
 static void      get_data_plane(Met2dDataFile *mtddf_ptr,
                                 const char *config_str, DataPlane &dp);

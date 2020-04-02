@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the data file and extract the grid information
-   process_input_file(dp_data);
+   // Process the input grid
+   process_input_grid(dp_data);
 
    // Process the mask file
    process_mask_file(dp_mask);
@@ -145,13 +145,13 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 3) usage();
 
    // Store the arguments
-   input_filename = cline[0];
+   input_gridname = cline[0];
    mask_filename  = cline[1];
    out_filename   = cline[2];
 
    // List the input files
    mlog << Debug(1)
-        << "Input File:\t\t" << input_filename << "\n"
+        << "Input Grid:\t\t" << input_gridname << "\n"
         << "Mask File:\t\t"  << mask_filename  << "\n";
 
    return;
@@ -159,7 +159,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_input_file(DataPlane &dp) {
+void process_input_grid(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
@@ -170,10 +170,10 @@ void process_input_file(DataPlane &dp) {
       ftype = parse_conf_file_type(&config);
    }
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename.c_str(), ftype);
+   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_gridname.c_str(), ftype);
    if(!mtddf_ptr) {
-      mlog << Error << "\nprocess_input_file() -> "
-           << "can't open input file \"" << input_filename << "\"\n\n";
+      mlog << Error << "\nprocess_input_grid() -> "
+           << "can't open input file \"" << input_gridname << "\"\n\n";
       exit(1);
    }
 
@@ -1322,7 +1322,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tinput_file\n"
+        << "\tinput_grid\n"
         << "\tmask_file\n"
         << "\tout_file\n"
         << "\t[-type string]\n"
@@ -1340,49 +1340,76 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"input_file\" is a gridded data file which specifies the grid definition (required).\n"
-        << "\t\t   If output from " << program_name << ", automatically read mask data as the \"input_field\".\n"
+        << "\twhere\t\"input_grid\" is a named grid, the path to a "
+        << "gridded data file, or an explicit grid specification "
+        << "string (required).\n"
+        << "\t\t   If set to a " << program_name << " output file, "
+        << "automatically read mask data as the \"input_field\".\n"
 
-        << "\t\t\"mask_file\" defines the masking information, see below (required).\n"
-        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" masking, specify an ASCII Lat/Lon file.\n"
-        << "\t\t   For \"grid\" and \"data\" masking, specify a gridded data file.\n"
-        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]] format.\n"
-        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" needed, simply repeat the path for \"input_file\".\n"
-        << "\t\t   For \"shape\" masking, specify a shapefile (suffix \".shp\").\n"
+        << "\t\t\"mask_file\" defines the masking information "
+        << "(required).\n"
+        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" "
+        << "masking, specify an ASCII Lat/Lon file.\n"
+        << "\t\t   For \"grid\" masking, specify a named grid, the "
+        << "path to a gridded data file, or an explicit grid "
+        << "specification.\n"
+        << "\t\t   For \"data\" masking specify a gridded data file.\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
+        << "specify a gridded data file or a timestring in "
+        << "YYYYMMDD[_HH[MMSS]] format.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" "
+        << "needed, simply repeat \"input_grid\".\n"
+        << "\t\t   For \"shape\" masking, specify a shapefile "
+        << "(suffix \".shp\").\n"
 
-        << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
+        << "\t\t\"out_file\" is the output NetCDF mask file to be "
+        << "written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
-        << masktype_to_string(default_mask_type) << ") (optional):\n"
-        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" or \"shape\"\n"
+        << masktype_to_string(default_mask_type) << ") (optional)\n"
+        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
+        << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
+        << "or \"shape\"\n"
 
-        << "\t\t\"-input_field string\" reads existing mask data from \"input_file\" (optional).\n"
+        << "\t\t\"-input_field string\" reads existing mask data from "
+        << "the \"input_grid\" gridded data file (optional).\n"
 
-        << "\t\t\"-mask_field string\" (optional)\n"
-        << "\t\t   For \"data\" masking, define the field from \"mask_file\" to be used.\n"
+        << "\t\t\"-mask_field string\" (optional).\n"
+        << "\t\t   For \"data\" masking, define the field from "
+        << "\"mask_file\" to be used.\n"
 
-        << "\t\t\"-complement\" to compute the complement of the area defined by \"mask_file\" (optional).\n"
+        << "\t\t\"-complement\" computes the complement of the current "
+        << "mask (optional).\n"
 
-        << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
-        << "masks from \"input_file\" and \"mask_file\" (optional).\n"
+        << "\t\t\"-union | -intersection | -symdiff\" specify how "
+        << "to combine the \"input_field\" data with the current mask "
+        << "(optional).\n"
 
-        << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
-        << "\t\t   For \"circle\" and \"track\" masking, threshold the distance (km).\n"
-        << "\t\t   For \"data\" masking, threshold the values of \"mask_field\".\n"
-        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, threshold the computed solar values.\n"
-        << "\t\t   For \"lat\" and \"lon\" masking, threshold the latitude and longitude values.\n"
 
-        << "\t\t\"-height n\" and \"-width n\" (optional)\n"
-        << "\t\t   For \"box\" masking, specify these dimensions in grid units.\n"
+        << "\t\t\"-thresh string\" defines the threshold to be applied "
+        << "(optional).\n"
+        << "\t\t   For \"circle\" and \"track\" masking, threshold the "
+        << "distance (km).\n"
+        << "\t\t   For \"data\" masking, threshold the values of "
+        << "\"mask_field\".\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
+        << "threshold the computed solar values.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, threshold the "
+        << "latitude and longitude values.\n"
 
-        << "\t\t\"-shapeno n\" (optional)\n"
-        << "\t\t   For \"shape\" masking, specify the shape number (0-based) to be used.\n"
+        << "\t\t\"-height n\" and \"-width n\" (optional).\n"
+        << "\t\t   For \"box\" masking, specify these dimensions in grid "
+        << "units.\n"
 
-        << "\t\t\"-value n\" overrides the default output mask data value ("
-        << default_mask_val << ") (optional).\n"
+        << "\t\t\"-shapeno n\" (optional).\n"
+        << "\t\t   For \"shape\" masking, specify the shape number "
+        << "(0-based) to be used.\n"
 
-        << "\t\t\"-name string\" specifies the output variable name for the mask"
-        << " (optional).\n"
+        << "\t\t\"-value n\" overrides the default output mask data "
+        << "value (" << default_mask_val << ") (optional).\n"
+
+        << "\t\t\"-name string\" specifies the output variable name "
+        << "for the mask (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -1390,8 +1417,9 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << config.nc_compression() << ") (optional).\n\n"
+        << "\t\t\"-compress level\" overrides the compression level of "
+        << "NetCDF variable (" << config.nc_compression()
+        << ") (optional).\n\n"
 
         << flush;
 
@@ -1598,6 +1626,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
