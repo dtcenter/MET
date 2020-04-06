@@ -191,9 +191,6 @@ void process_input_grid(DataPlane &dp) {
          exit(1);
       }
 
-      // Extract the grid
-      grid = mtddf_ptr->grid();
-
       // Read the input data plane, if requested
       if(input_field_str.length() > 0) {
          get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
@@ -201,6 +198,9 @@ void process_input_grid(DataPlane &dp) {
       // Check for the output of a previous call to this tool
       else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
       }
+
+      // Extract the grid
+      grid = mtddf_ptr->grid();
    }
 
    // If not yet set, fill the input data plane with zeros
@@ -284,17 +284,21 @@ void process_mask_file(DataPlane &dp) {
          exit(1);
       }
 
+      // Read mask_field, if specified
+      if(mask_field_str.length() > 0) {
+         get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
+      }
+
       // Extract the grid
       grid_mask = mtddf_ptr->grid();
 
       mlog << Debug(2)
-           << "Parsed Mask Grid:\t" << grid_mask.name()
-           << " (" << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
+           << "Parsed Mask Grid:\t" << grid_mask.serialize() << "\n";
 
       // Check for matching grids
       if(mask_type == MaskType_Data && grid != grid_mask) {
          mlog << Error << "\nprocess_mask_file() -> "
-              << "The data grid and mask grid must be identical for "
+              << "The input grid and mask grid must be identical for "
               << "\"data\" masking.\n"
               << "Data Grid -> " << grid.serialize() << "\n"
               << "Mask Grid -> " << grid_mask.serialize() << "\n\n";
@@ -312,7 +316,6 @@ void process_mask_file(DataPlane &dp) {
               << "\"solar_azi\" masking.\n\n";
          exit(1);
       }
-      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
       solar_ut = dp.valid();
       dp.clear();
 
@@ -320,22 +323,16 @@ void process_mask_file(DataPlane &dp) {
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
    }
 
-   // Read mask_field for data masking
-   if(mask_type == MaskType_Data) {
-
-      if(mask_field_str.length() == 0) {
-         mlog << Error << "\nprocess_mask_file() -> "
-              << "use \"-mask_field\" to specify the field for "
-              << "\"data\" masking.\n\n";
-         exit(1);
-      }
-      get_data_plane(mtddf_ptr, mask_field_str.c_str(), dp);
-
+   // Check that mask_field has been set for data masking
+   if(mask_type == MaskType_Data && mask_field_str.length() == 0) {
+      mlog << Error << "\nprocess_mask_file() -> "
+           << "use \"-mask_field\" to specify the field for "
+           << "\"data\" masking.\n\n";
+      exit(1);
    }
-   // Otherwise, initialize the masking data
-   else {
-      dp.set_size(grid.nx(), grid.ny());
-   }
+
+   // Initialize the masking field, if needed
+   if(dp.is_empty()) dp.set_size(grid.nx(), grid.ny());
 
    // Construct the mask
    switch(mask_type) {
