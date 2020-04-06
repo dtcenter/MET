@@ -210,7 +210,8 @@ void process_input_grid(DataPlane &dp) {
    }
 
    mlog << Debug(2)
-        << "Parsed Input Grid:\t" << grid.serialize() << "\n";
+        << "Parsed Input Grid:\t" << grid.name()
+        << " (" << grid.nx() << " x " << grid.ny() << ")\n";
 
    // Clean up
    if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) 0; }
@@ -293,7 +294,8 @@ void process_mask_file(DataPlane &dp) {
       grid_mask = mtddf_ptr->grid();
 
       mlog << Debug(2)
-           << "Parsed Mask Grid:\t" << grid_mask.serialize() << "\n";
+           << "Parsed Mask Grid:\t" << grid_mask.name()
+           << " (" << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
 
       // Check for matching grids
       if(mask_type == MaskType_Data && grid != grid_mask) {
