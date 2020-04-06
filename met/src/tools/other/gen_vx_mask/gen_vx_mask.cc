@@ -23,6 +23,7 @@
 //   005    04/08/17  Halley Gotway   Add lat/lon masking types.
 //   006    07/09/18  Bullock         Add shapefile masking type.
 //   007    04/08/19  Halley Gotway   Add percentile thresholds.
+//   008    04/06/20  Halley Gotway   Generalize input_grid option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -160,32 +161,56 @@ void process_input_grid(DataPlane &dp) {
       ftype = parse_conf_file_type(&config);
    }
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_gridname.c_str(), ftype);
-   if(!mtddf_ptr) {
-      mlog << Error << "\nprocess_input_grid() -> "
-           << "can't open input file \"" << input_gridname << "\"\n\n";
-      exit(1);
-   }
+   // Parse info.name as a white-space separated string
+   StringArray sa;
+   sa.parse_wsss(input_gridname);
 
-   // Extract the grid
-   grid = mtddf_ptr->grid();
-
-   // Read the input data plane, if requested
-   if(input_field_str.length() > 0) {
-      get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
+   // Search for a named grid
+   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+      mlog << Debug(3)
+           << "Use the grid named \"" << input_gridname << "\".\n";
    }
-   // Check for the output of a previous call to this tool
-   else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
+   // Parse grid definition
+   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
+      mlog << Debug(3)
+           << "Use the grid defined by string \"" << input_gridname
+           << "\".\n";
    }
-   // Otherwise, fill the input data plane with zeros
+   // Extract the grid from a gridded data file
    else {
+
+      mlog << Debug(3)
+           << "Use the grid defined by file \"" << input_gridname
+           << "\".\n";
+
+      // Attempt to open the data file
+      mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_gridname.c_str(), ftype);
+      if(!mtddf_ptr) {
+         mlog << Error << "\nprocess_input_grid() -> "
+              << "can't open input file \"" << input_gridname << "\"\n\n";
+         exit(1);
+      }
+
+      // Extract the grid
+      grid = mtddf_ptr->grid();
+
+      // Read the input data plane, if requested
+      if(input_field_str.length() > 0) {
+         get_data_plane(mtddf_ptr, input_field_str.c_str(), dp);
+      }
+      // Check for the output of a previous call to this tool
+      else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
+      }
+   }
+
+   // If not yet set, fill the input data plane with zeros
+    if(dp.is_empty()) {
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
 
    mlog << Debug(2)
-        << "Parsed Data Grid:\t" << grid.name()
-        << " (" << grid.nx() << " x " << grid.ny() << ")\n";
+        << "Parsed Input Grid:\t" << grid.serialize() << "\n";
 
    // Clean up
    if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) 0; }
@@ -1165,7 +1190,6 @@ void write_netcdf(const DataPlane &dp) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
       exit(1);
