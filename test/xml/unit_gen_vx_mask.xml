@@ -418,4 +418,24 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- PYTHON: python embedding                                         -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_PYTHON">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      PYTHON_NUMPY \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/gen_vx_mask/PYTHON_FCST_or_OBS_mask.nc \
+      -type data \
+      -input_field 'name="&MET_BASE;/python/read_ascii_numpy.py &MET_DATA;/python/fcst.txt FCST";' \
+      -mask_field  'name="&MET_BASE;/python/read_ascii_numpy.py &MET_DATA;/python/obs.txt  OBS";' \
+      -thresh gt0 -union -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/PYTHON_FCST_or_OBS_mask.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
