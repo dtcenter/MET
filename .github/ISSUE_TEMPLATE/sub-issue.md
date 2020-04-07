@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-This is a sub-issue of *Provide link to parent issue here*.
+This is a sub-issue of #*List the parent issue number here*.
 
 ## Describe the Sub-Issue ##
 *Provide a description of the sub-issue here.*
