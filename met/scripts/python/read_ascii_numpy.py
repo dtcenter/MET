@@ -58,7 +58,7 @@ attrs = {
       'scale_lat_2': 25.0,
 
       'lat_pin': 12.19,
-      'lon_pin': -133.459,
+      'lon_pin': -135.459,
 
       'x_pin': 0.0,
       'y_pin': 0.0,
