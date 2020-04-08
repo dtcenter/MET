@@ -609,6 +609,8 @@ GridRep * MercatorGrid::copy() const
 
 MercatorGrid * p = new MercatorGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }

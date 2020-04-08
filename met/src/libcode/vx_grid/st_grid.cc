@@ -591,6 +591,8 @@ GridRep * StereographicGrid::copy() const
 
 StereographicGrid * p = new StereographicGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }

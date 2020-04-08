@@ -675,6 +675,8 @@ GridRep * LambertGrid::copy() const
 
 LambertGrid * p = new LambertGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }

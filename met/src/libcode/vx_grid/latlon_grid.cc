@@ -396,6 +396,8 @@ GridRep * LatLonGrid::copy() const
 
 LatLonGrid * p = new LatLonGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }
