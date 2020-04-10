@@ -336,7 +336,7 @@
       -censor lt0 -9999
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR.nc</grid_nc>
     </output>
   </test>
 
