@@ -72,18 +72,7 @@ switch ( info.method )  {
    //  apply convert logic
    //
 
-if ( info.convert_fx.is_set() )  {
-
-   mlog << Debug(3) << "Applying conversion function.\n";
-
-   int Nxy = out.nx()*out.ny();
-
-   for (int j=0; j<Nxy; ++j)  {
-      if ( ! is_bad_data(out.buf()[j]) )  {
-         out.buf()[j] = info.convert_fx(out.buf()[j]);
-      }
-   }
-}
+out.convert(info.convert_fx);
 
    //
    //  apply censor logic

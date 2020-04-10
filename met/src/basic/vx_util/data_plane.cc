@@ -282,6 +282,21 @@ void DataPlane::threshold(const SingleThresh &st) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
+
+   if(!convert_fx.is_set()) return;
+
+   mlog << Debug(3) << "Applying conversion function.\n";
+
+   for(int i=0; i<Nxy; i++) {
+      if(!is_bad_data(buf()[i])) buf()[i] = convert_fx(buf()[i]);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void DataPlane::censor(const ThreshArray &censor_thresh,
                        const NumArray &censor_val) {
    int i, j, count;
