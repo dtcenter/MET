@@ -93,7 +93,7 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
-static void set_convert_x(const StringArray &);
+static void set_convert(const StringArray &);
 static void set_censor(const StringArray &);
 static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
@@ -152,7 +152,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
    cline.add(set_gaussian_dx,     "-gaussian_dx",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_convert_x,  "-convert_x",  1);
+   cline.add(set_convert,    "-convert",    1);
    cline.add(set_censor,     "-censor",     2);
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
@@ -468,7 +468,7 @@ void usage() {
         << "\t[-gaussian_radius n]\n"
         << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
-        << "\t[-convert_x fx]\n"
+        << "\t[-convert string]\n"
         << "\t[-censor thresh value]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -515,8 +515,9 @@ void usage() {
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
         << ") (optional).\n"
 
-        << "\t\t\"-convert_x fx\" specifies a conversion for the "
-        << "regridded output as a function of \"x\" (optional).\n"
+        << "\t\t\"-convert string\" specifies a conversion for the "
+        << "regridded output (optional).\n"
+        << "\t\t\tFor example, -convert 'convert(x) = x - 273.15;'\n"
 
         << "\t\t\"-censor thresh value\" specifies censoring logic for "
         << "the regridded output as a threshold string and replacement "
@@ -588,19 +589,17 @@ void set_vld_thresh(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_convert_x(const StringArray &a) {
+void set_convert(const StringArray &a) {
 
    // Can only be used once
    if(RGInfo.convert_fx.is_set()) {
-      mlog << Error << "\nset_convert_x() -> "
+      mlog << Error << "\nset_convert() -> "
            << "-convert_x may only be used once!\n\n";
       exit(1);
    }
 
-   ConcatString cs;
-   cs << "convert(x)=" << a[0] << ";";
    MetConfig config;
-   config.read_string(cs.c_str());
+   config.read_string(a[0].c_str());
 
    RGInfo.convert_fx.set(config.lookup(conf_key_convert));
 }

@@ -332,7 +332,7 @@
       G212 \
       &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR.nc \
       -field 'name="TMP";  level="Z2";' \
-      -convert_x 'x - 273.15' \
+      -convert 'convert(x) = x - 273.15;' \
       -censor lt0 -9999
     </param>
     <output>
