@@ -22,6 +22,7 @@
 //   002    06-25-17  Howard Soh     Support GOES-16
 //   003    09-24-17  Howard Soh     Support Gaussian filtering
 //   004    01-28-20  Howard Soh     Moved GOES-16/17 to point2grib
+//   005    04-09-20  Halley Gotway  Add convert and censor options.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +77,6 @@ static NcFile *nc_out  = (NcFile *) 0;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
-
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
@@ -93,6 +93,8 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
+static void set_convert_x(const StringArray &);
+static void set_censor(const StringArray &);
 static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
@@ -150,6 +152,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_gaussian_radius, "-gaussian_radius", 1);
    cline.add(set_gaussian_dx,     "-gaussian_dx",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
+   cline.add(set_convert_x,  "-convert_x",  1);
+   cline.add(set_censor,     "-censor",     2);
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
    cline.add(set_verbosity,  "-v",          1);
@@ -464,6 +468,8 @@ void usage() {
         << "\t[-gaussian_radius n]\n"
         << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
+        << "\t[-convert_x fx]\n"
+        << "\t[-censor thresh value]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -472,8 +478,8 @@ void usage() {
         << "\twhere\t\"input_filename\" is the gridded data file to be "
         << "read (required).\n"
 
-        << "\t\t\"to_grid\" defines the output grid as a named grid, the "
-        << "path to a gridded data file, or an explicit grid "
+        << "\t\t\"to_grid\" defines the output grid as a named grid, "
+        << "the path to a gridded data file, or an explicit grid "
         << "specification string (required).\n"
 
         << "\t\t\"output_filename\" is the output NetCDF file to be "
@@ -488,23 +494,33 @@ void usage() {
 
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
-        << "\t\t\tThe width should be the ratio of dx between from_grid and to_grid for MAXGAUSS.\n"
-        << "\t\t\tFor example, width=" << nint(RGInfo.gaussian.dx / 3) << " if the from_grid is 3 km and to_grid is "
+        << "\t\t\tThe width should be the ratio of dx between "
+        << "from_grid and to_grid for MAXGAUSS.\n"
+        << "\t\t\tFor example, width=" << nint(RGInfo.gaussian.dx / 3)
+        << " if the from_grid is 3 km and to_grid is "
         << RGInfo.gaussian.dx << "km.\n"
 
-        << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_dx n\" overrides the default a delta "
+        << "distance for Gaussian smoothing (" << RGInfo.gaussian.dx
+        << ") (optional).\n"
 
-        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian.radius << ". Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_radius n\" overrides the default radius of "
+        << "influence for Gaussian smoothing ("
+        << RGInfo.gaussian.radius << ") (optional).\n"
 
-        << "\t\t\"-shape type\" overrides the default interpolation shape ("
-        << gtf.enum2String(RGInfo.shape) << ") "
-        <<  "(optional).\n"
+        << "\t\t\"-shape type\" overrides the default interpolation "
+        << "shape (" << gtf.enum2String(RGInfo.shape) << ") (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
         << ") (optional).\n"
+
+        << "\t\t\"-convert_x fx\" specifies a conversion for the "
+        << "regridded output as a function of \"x\" (optional).\n"
+
+        << "\t\t\"-censor thresh value\" specifies censoring logic for "
+        << "the regridded output as a threshold string and replacement "
+        << "value (optional).\n"
 
         << "\t\t\"-name list\" specifies a comma-separated list of "
         << "output variable names for each field specified (optional).\n"
@@ -515,7 +531,8 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
+        << "\t\t\"-compress level\" overrides the compression level of "
+        << "NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
 }
@@ -567,6 +584,32 @@ void set_vld_thresh(const StringArray &a) {
            << RGInfo.vld_thresh << "\n\n";
       exit(1);
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_convert_x(const StringArray &a) {
+
+   // Can only be used once
+   if(RGInfo.convert_fx.is_set()) {
+      mlog << Error << "\nset_convert_x() -> "
+           << "-convert_x may only be used once!\n\n";
+      exit(1);
+   }
+
+   ConcatString cs;
+   cs << "convert(x)=" << a[0] << ";";
+   MetConfig config;
+   config.read_string(cs.c_str());
+
+   RGInfo.convert_fx.set(config.lookup(conf_key_convert));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_censor(const StringArray &a) {
+   RGInfo.censor_thresh.add(a[0].c_str());
+   RGInfo.censor_val.add(atof(a[1].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////

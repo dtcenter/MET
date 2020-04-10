@@ -410,13 +410,19 @@ obtype = "ANALYS";
 //
 //   - The "gaussian_dx" entry specifies a delta distance for Gaussian
 //     smoothing. The default is 81.271. Ignored if not Gaussian method.
-// 
+//
 //   - The "gaussian_radius" entry defines the radius of influence for Gaussian
 //     smoothing. The default is 120. Ignored if not Gaussian method.
 //
-//   - The "gaussian_dx" and "gaussian_radius" settings must be in the same units,
-//     such as kilometers or degress.  Their ratio (sigma = gaussian_radius /
-//     gaussian_dx) determines the Guassian weighting function.
+//   - The "gaussian_dx" and "gaussian_radius" settings must be in the same
+//     units, such as kilometers or degress.  Their ratio
+//     (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
+//     function.
+//
+//   - The "convert", "censor_thresh", and "censor_val" entries are described
+//     below.  When specified, these operations are applied to the output of the
+//     regridding step.  The conversion operation is applied first, followed by
+//     the censoring operation.
 //
 regrid = {
    to_grid         = NONE;
@@ -426,6 +432,9 @@ regrid = {
    shape           = SQUARE;
    gaussian_dx     = 81.271;
    gaussian_radius = 120;
+   convert(x)      = x;
+   censor_thresh   = [];
+   censor_val      = [];
 }
 
 //
@@ -921,7 +930,7 @@ climo_stdev = {
 }
 
 //
-// The "climo_cdf" dictionary specifies how the the climatological mean 
+// The "climo_cdf" dictionary specifies how the the climatological mean
 // ("climo_mean") and standard deviation ("climo_stdev") data are used to
 // evaluate model performance relative to where the observation value falls
 // within the climatological distribution. This dictionary consists of 3
@@ -941,7 +950,7 @@ climo_stdev = {
 // climatological bins. The array must begin with 0.0 and end with 1.0.
 // For example:
 //   cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
-// 
+//
 // When "cdf_bins" is set to an integer, it defines the number of bins to be
 // used. The "center_bins" flag indicates whether or not the bins should be
 // centered on 0.5. An odd number of bins can be centered or uncentered while
@@ -980,7 +989,7 @@ climo_cdf = {
 //
 // When "climo_mean" and "climo_stdev" are both set to non-probability fields,
 // the MET tools use the mean, standard deviation, and observation event
-// threshold to derive a normal approximation of the climatological 
+// threshold to derive a normal approximation of the climatological
 // probabilities. Those derived probability values are used to compute BSS.
 //
 
