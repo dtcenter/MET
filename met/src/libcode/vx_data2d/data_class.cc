@@ -285,18 +285,7 @@ if ( ShiftRight != 0 )  dp.shift_right(ShiftRight);
    // Apply conversion logic.
    //
 
-if ( vinfo->ConvertFx.is_set() )  {
-
-   mlog << Debug(3) << "Applying conversion function.\n";
-
-   int Nxy = dp.nx()*dp.ny();
-
-   for (int j=0; j<Nxy; ++j)  {
-      if ( ! is_bad_data(dp.buf()[j]) )  {
-         dp.buf()[j] = vinfo->ConvertFx(dp.buf()[j]);
-      }
-   }
-}
+dp.convert(vinfo->ConvertFx);
 
    //
    // Apply censor logic.

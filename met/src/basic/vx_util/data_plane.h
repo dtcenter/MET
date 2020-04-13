@@ -20,6 +20,7 @@
 #include "thresh_array.h"
 #include "num_array.h"
 #include "two_d_array.h"
+#include "config_funcs.h"
 
 #include "vx_cal.h"
 
@@ -100,6 +101,7 @@ class DataPlane {
          //
 
       void threshold(const SingleThresh &);
+      void convert  (const UserFunc_1Arg &);
       void censor   (const ThreshArray &, const NumArray &);
 
       void replace_bad_data(const double value);

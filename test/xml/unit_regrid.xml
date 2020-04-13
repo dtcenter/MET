@@ -325,4 +325,19 @@
     </output>
   </test>
 
+  <test name="regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
+      G212 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR.nc \
+      -field 'name="TMP";  level="Z2";' \
+      -convert 'convert(x) = x - 273.15;' \
+      -censor lt0 -9999
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

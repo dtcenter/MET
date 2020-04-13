@@ -138,6 +138,9 @@ void RegridInfo::clear() {
    width = bad_data_int;
    gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
+   convert_fx.clear(); 
+   censor_thresh.clear();
+   censor_val.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -209,12 +212,22 @@ void RegridInfo::validate() {
    // Check the Gaussian filter
    if(method == InterpMthd_MaxGauss) {
       if(gaussian.radius < gaussian.dx) {
-         mlog << Error << "\n"
+         mlog << Error << "\nRegridInfo::validate() -> "
               << "The radius of influence (" << gaussian.radius
               << ") is less than the delta distance (" << gaussian.dx
               << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
          exit(1);
       }
+   }
+   
+   // Check for equal number of censor thresholds and values
+   if(censor_thresh.n() != censor_val.n()) {
+      mlog << Error << "\nRegridInfo::validate() -> "
+           << "The number of censor thresholds in \""
+           << conf_key_censor_thresh << "\" (" << censor_thresh.n()
+           << ") must match the number of replacement values in \""
+           << conf_key_censor_val << "\" (" << censor_val.n() << ").\n\n";
+      exit(1);
    }
 
 }
@@ -1169,6 +1182,16 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
    if (info.method == InterpMthd_Gaussian) info.gaussian.compute();
 
+   // Conf: convert
+   info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
+
+   // Conf: censor_thresh
+   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false);
+
+   // Conf: censor_val
+   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false);
+
+   // Validate the settings
    info.validate();
 
    return(info);

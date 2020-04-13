@@ -11,10 +11,12 @@
 #define __CONFIG_CONSTANTS_H__
 
 #include "vx_util.h"
+
 #include "GridTemplate.h"
 #include "int_array.h"
 #include "gsl_randist.h"
 #include "config_gaussian.h"
+#include "config_funcs.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -271,15 +273,20 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-   GaussianInfo gaussian;  // Gaussian smoothing
+   GaussianInfo gaussian;   // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
-   void *       hook;       // not allocated
+   // Process the regridded data
+   UserFunc_1Arg convert_fx;    // Conversion function
+   ThreshArray   censor_thresh; // Censoring thesholds
+   NumArray      censor_val;    // and replacement values
+
+   void *       hook;           // not allocated
 
    void         clear();
-   void         validate(); // ensure that width and method are accordant
-   void         validate_point();   // ensure that width and method are accordant
+   void         validate();        // ensure that width and method are accordant
+   void         validate_point();  // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
