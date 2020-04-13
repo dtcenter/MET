@@ -480,6 +480,8 @@ GridRep * GaussianGrid::copy() const
 
 GaussianGrid * p = new GaussianGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }

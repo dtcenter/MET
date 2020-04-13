@@ -413,6 +413,8 @@ GridRep * GoesImagerGrid::copy() const
 
 GoesImagerGrid * p = new GoesImagerGrid (Data);
 
+p->Name = Name;
+
 return ( p );
 
 }

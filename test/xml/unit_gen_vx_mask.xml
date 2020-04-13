@@ -317,13 +317,13 @@
   </test>
 
   <!--                                                                  -->
-  <!-- BOX: Specify size using height and width                         -->
+  <!-- BOX: Specify size using height and width using a named grid      -->
   <!--                                                                  -->
 
   <test name="gen_vx_mask_BOX">
     <exec>&MET_BIN;/gen_vx_mask</exec>
     <param> \
-      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      G212 \
       &MET_BASE;/poly/MLB_Stadiums.txt \
       &OUTPUT_DIR;/gen_vx_mask/BOX_5_by_10_mask.nc \
       -type box -height 5 -width 10 -v 2
@@ -334,13 +334,13 @@
   </test>
 
   <!--                                                                  -->
-  <!-- SOLAR_ALT: Solar altitude                                        -->
+  <!-- SOLAR_ALT: Solar altitude using a grid specification string      -->
   <!--                                                                  -->
 
   <test name="gen_vx_mask_SOLAR_ALT">
     <exec>&MET_BIN;/gen_vx_mask</exec>
     <param> \
-      &MET_DATA;/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      'lambert 185 129 12.190 -133.459 -95.0 40.635 6371.20 25.0 25.0 N' \
       20050808 \
       &OUTPUT_DIR;/gen_vx_mask/SOLAR_ALT_mask.nc \
       -type solar_alt -thresh gt0 -v 2
@@ -415,6 +415,26 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SHAPE_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- PYTHON: python embedding                                         -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_PYTHON">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      PYTHON_NUMPY \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/gen_vx_mask/PYTHON_FCST_or_OBS_mask.nc \
+      -type data \
+      -input_field 'name="&MET_BASE;/python/read_ascii_numpy.py &MET_DATA;/python/fcst.txt FCST";' \
+      -mask_field  'name="&MET_BASE;/python/read_ascii_numpy.py &MET_DATA;/python/obs.txt  OBS";' \
+      -thresh gt0 -union -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/PYTHON_FCST_or_OBS_mask.nc</grid_nc>
     </output>
   </test>
 
