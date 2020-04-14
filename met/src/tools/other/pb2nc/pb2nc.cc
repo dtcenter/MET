@@ -92,6 +92,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+struct derive_var_cfg {
+   int var_index;
+   ConcatString var_name;
+   derive_var_cfg(ConcatString _var_name);
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -143,6 +149,7 @@ static const int var_gc[mxr8vt] = {
    pres_grib_code, spfh_grib_code, tmp_grib_code,
    hgt_grib_code,  ugrd_grib_code, vgrd_grib_code
 };
+static int bufr_var_code[mxr8vt];
 
 // Number of variable types which may be derived
 static const int n_derive_gc = 6;
@@ -153,8 +160,6 @@ static const int derive_gc[n_derive_gc] = {
    wind_grib_code, rh_grib_code,
    mixr_grib_code, prmsl_grib_code
 };
-static int bufr_var_code[mxr8vt];
-static int bufr_derive_code[n_derive_gc];
 
 // The fortran code is hard-coded with 200 levels
 #define MAX_CAPE_VALUE 10000
@@ -286,7 +291,7 @@ static ConcatString bufr_hdrs;          // header name list to read header
 static StringArray bufr_hdr_name_arr;   // available header name list
 static StringArray bufr_obs_name_arr;   // available obs. name list
 static IntArray filtered_times;
-static StringArray prepbufr_core_vars;
+static vector<derive_var_cfg> bufr_derive_cfgs;
 static map<ConcatString, StringArray> variableTypeMap;
 
 static bool do_summary;
@@ -406,6 +411,14 @@ static void   display_bufr_variables(const StringArray &, const StringArray &,
 static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 
 ////////////////////////////////////////////////////////////////////////
+
+derive_var_cfg::derive_var_cfg(ConcatString _var_name) {
+   var_index = bad_data_int;
+   var_name = _var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 int main(int argc, char *argv[]) {
    int i;
@@ -1513,38 +1526,45 @@ void process_pbfile(int i_pb) {
 
          // Derive quantities which can be derived from
          // P, Q, T, Z, U, V
-         for(i=0; i<n_derive_gc; i++) {
-
-            bufr_var_index = bufr_derive_code[i];
-            if(keep_bufr_obs_index(bufr_var_index)) {
-
-               // Only derive PRMSL for surface message
-               if(derive_gc[i] == prmsl_grib_code &&
-                  !conf_info.surface_message_types.has(hdr_typ))
-                  continue;
-
-               // Store the grib code to be derived
-               obs_arr[1] = (float)bufr_var_index;
-
-               // Derive the value for the grib code
-               obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
-                                             pqtzuv_qty, hdr_lat,
-                                             quality_mark);
-
-               if(is_eq(obs_arr[4], fill_value)) continue;
-
-               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                     hdr_lat, hdr_lon, hdr_elv, quality_mark,
-                     OBS_BUFFER_SIZE);
-
-               // Increment the current and total observations counts
-               n_file_obs++;
-               n_total_obs++;
-
-               // Increment the number of obs counter for this header
-               n_hdr_obs++;
-            }
-         } // end for i
+         if (n_derive_gc > bufr_derive_cfgs.size()) {
+            mlog << Warning << "\n" << method_name << " -> "
+                 << "Skip the derived variables because of not requested ("
+                 << bufr_derive_cfgs.size() << ").\n\n";
+         }
+         else {
+            for(i=0; i<n_derive_gc; i++) {
+      
+               bufr_var_index = bufr_derive_cfgs[i].var_index;
+               if(keep_bufr_obs_index(bufr_var_index)) {
+      
+                  // Only derive PRMSL for surface message
+                  if(derive_gc[i] == prmsl_grib_code &&
+                     !conf_info.surface_message_types.has(hdr_typ))
+                     continue;
+      
+                  // Store the grib code to be derived
+                  obs_arr[1] = (float)bufr_var_index;
+      
+                  // Derive the value for the grib code
+                  obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
+                                                pqtzuv_qty, hdr_lat,
+                                                quality_mark);
+      
+                  if(is_eq(obs_arr[4], fill_value)) continue;
+      
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                        hdr_lat, hdr_lon, hdr_elv, quality_mark,
+                        OBS_BUFFER_SIZE);
+      
+                  // Increment the current and total observations counts
+                  n_file_obs++;
+                  n_total_obs++;
+      
+                  // Increment the number of obs counter for this header
+                  n_hdr_obs++;
+               }
+            } // end for i
+         }
 
          if (cal_cape) {
             if (cape_member_cnt >= 3) cape_level++;
@@ -2096,10 +2116,7 @@ void process_pbfile_metadata(int i_pb) {
 
    //Initialize index for prepbufr common variables
    for (int index=0; index<mxr8vt; index++) {
-      bufr_var_code[index] = -1;
-   }
-   for (int index=0; index<n_derive_gc; index++) {
-      bufr_derive_code[index] = -1;
+      bufr_var_code[index] = bad_data_int;
    }
 
    int index;
@@ -2357,12 +2374,15 @@ void process_pbfile_metadata(int i_pb) {
          }
       }
    }
+   bufr_derive_cfgs.clear();
    if (has_prepbufr_vars) {
       for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
          tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
+         bufr_derive_cfgs.push_back(derive_var_cfg(tmp_var_name));
          if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
+            // Set the variable index if requested
             bufr_obs_name_arr.add(tmp_var_name);
-            bufr_derive_code[vIdx] = bufr_var_index;
+            bufr_derive_cfgs[vIdx].var_index = bufr_var_index;
             bufr_var_index++;
          }
       }
