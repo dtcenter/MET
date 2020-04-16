@@ -3069,26 +3069,34 @@ int min_int(const int *v_int, int n) {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Compute variance from sums of squares
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_variance(double sum, double sum_sq, int n) {
+   double v;
+
+   if(n <= 1) {
+      v = bad_data_double;
+   }
+   else {
+      v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
+
+           if(is_eq(v, 0.0)) v = 0.0;
+      else if(v < 0)         v = bad_data_double;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Compute standard deviation from sums of squares
 //
 ////////////////////////////////////////////////////////////////////////
 
 double compute_stdev(double sum, double sum_sq, int n) {
-   double s, v;
-
-   if(n <= 1) {
-      s = bad_data_double;
-   }
-   else {
-
-      v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
-
-           if(is_eq(v, 0.0)) s = 0.0;
-      else if(v < 0)         s = bad_data_double;
-      else                   s = sqrt(v);
-   }
-
-   return(s);
+   return(square_root(compute_variance(sum, sum_sq, n)));
 }
 
 ////////////////////////////////////////////////////////////////////////
