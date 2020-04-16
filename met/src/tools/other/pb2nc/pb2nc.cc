@@ -1527,7 +1527,7 @@ void process_pbfile(int i_pb) {
          // Derive quantities which can be derived from
          // P, Q, T, Z, U, V
          if (n_derive_gc > bufr_derive_cfgs.size()) {
-            mlog << Warning << "\n" << method_name << " -> "
+            mlog << Debug(3) << "\n" << method_name << " -> "
                  << "Skip the derived variables because of not requested ("
                  << bufr_derive_cfgs.size() << ").\n\n";
          }
