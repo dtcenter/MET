@@ -283,9 +283,9 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    me   = fbar - obar;
    rmse = sqrt(ffbar + oobar - 2.0*fobar);
 
-   // Compute the average spread value
-   spread = pd.spread_na.wmean(pd.wgt_na);
-   
+   // Compute the square root of the average variance
+   spread = square_root(pd.var_na.wmean(pd.wgt_na));
+ 
    // If observation error was specified, compute ME_OERR and RMSE_OERR
    if(pd.has_obs_error()) {
 
@@ -312,11 +312,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
       rmse_oerr = bad_data_double;
    }
 
-   // Compute the average perturbed spread value
-   spread_oerr = pd.spread_oerr_na.wmean(pd.wgt_na);
+   // Compute the square root of the average perturbed variance
+   spread_oerr = square_root(pd.var_oerr_na.wmean(pd.wgt_na));
 
-   // Compute the average spread plus oerr value
-   spread_plus_oerr = pd.spread_plus_oerr_na.wmean(pd.wgt_na);
+   // Compute the square root of the average variance plus oerr
+   spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
 
    return;
 }
