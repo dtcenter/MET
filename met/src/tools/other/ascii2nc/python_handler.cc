@@ -172,7 +172,7 @@ for (j=0; j<(list.size()); ++j)  {
 
    a = list[j];
 
-   if ( ! PyList_Check(obj) )  {
+   if ( ! PyList_Check(a) )  {
 
       mlog << Error << "\nPythonHandler::load_python_obs(PyObject *) -> "
            << "non-list object found in main list!\n\n";
@@ -184,10 +184,30 @@ for (j=0; j<(list.size()); ++j)  {
    obs.set(a);
 
    //
-   //  reset use_var_id to true when varCode has bad data
+   //  set the observation variable code
    //
 
-   if ( is_bad_data (obs.getVarCode()) )  use_var_id = true;
+   if ( use_var_id || is_number(obs.getVarName().c_str()) )  {
+
+      use_var_id = true;
+
+      int var_index;
+
+      //  update the list of variable names
+
+      if ( !obs_names.has(obs.getVarName(), var_index) )  {
+         obs_names.add(obs.getVarName());
+         obs_names.has(obs.getVarName(), var_index);
+      }
+
+      obs.setVarCode(var_index);
+
+   }
+   else  {
+
+      obs.setVarCode(atoi(obs.getVarName().c_str()));
+
+   }
 
    _addObservations(obs);
 
@@ -230,7 +250,7 @@ ConcatString command, path, user_base;
 
 path = generic_python_wrapper;
 
-mlog << Debug(3) 
+mlog << Debug(3)
      << "Running user's python script ("
      << user_script_filename << ").\n";
 
@@ -334,7 +354,7 @@ path << cs_erase
 pickle_path = make_temp_file_name(path.text(), 0);
 
 command << cs_erase
-        << user_path_to_python                << ' '    //  user's path to python             
+        << user_path_to_python                << ' '    //  user's path to python
         << replace_path(write_pickle_wrapper) << ' '    //  write_pickle.py
         << pickle_path                        << ' '    //  pickle output filename
         << user_script_filename;                        //  user's script name
@@ -394,5 +414,3 @@ return ( true );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
