@@ -3719,7 +3719,7 @@ SPREAD
 \begin_inset Text
 
 \begin_layout Plain Layout
-The mean of the spread (standard deviation) of the unperturbed ensemble
+The square root of the mean of the variance of the unperturbed ensemble
  member values at each observation location
 \end_layout
 
@@ -3809,7 +3809,7 @@ SPREAD_OERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-The mean of the spread (standard deviation) of the PERTURBED ensemble member
+The square root of the mean of the variance of the PERTURBED ensemble member
  values (e.g.
  with Observation Error) at each observation location
 \end_layout
