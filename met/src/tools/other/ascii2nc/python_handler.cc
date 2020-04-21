@@ -187,7 +187,7 @@ for (j=0; j<(list.size()); ++j)  {
    //  set the observation variable code
    //
 
-   if ( use_var_id || is_number(obs.getVarName().c_str()) )  {
+   if ( use_var_id || !is_number(obs.getVarName().c_str()) )  {
 
       use_var_id = true;
 
