@@ -718,7 +718,7 @@ return(v);
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::compute_mean_stdev(double &mn, double &stdev) const
+void NumArray::compute_mean_variance(double &mn, double &var) const
 
 {
 
@@ -727,7 +727,7 @@ double s, s_sq;
 
 if(Nelements == 0) {
 
-   mn = stdev = bad_data_double;
+   mn = var = bad_data_double;
 
    return;
 }
@@ -748,14 +748,31 @@ else           mn = s/count;
 if(count > 1) {
 
    // Check for slightly negative precision error
-   double d = (s_sq - s*s/(double) count)/((double) (count - 1));
-   if(is_eq(d, 0.0)) d = 0;
-   stdev = sqrt(d);
+   var = (s_sq - s*s/(double) count)/((double) (count - 1));
+   if(is_eq(var, 0.0)) var = 0;
 
 }
 else {
-   stdev = bad_data_double;
+   var = bad_data_double;
 }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumArray::compute_mean_stdev(double &mn, double &stdev) const
+
+{
+
+double var;
+
+compute_mean_variance(mn, var);
+
+stdev = square_root(var);
 
 return;
 
