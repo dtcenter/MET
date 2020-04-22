@@ -50,7 +50,38 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF.  The DT
 
    overview
    installation
-   met_data_io
+   data_io
+   reformat_point
+   reformat_grid
+   masking
+   point-stat
+   grid-stat
+   ensemble-stat
+   wavelet-stat
+   gsI-tools
+   stat-analysis
+   series-analysis
+   grid-diag
+   mode
+   mode-analysis
+   mode-td
+   met-tc_overview
+   tc-dland
+   tc-pairs
+   tc-stat
+   tc-gen
+   tc-rmw
+   rmw-analysis
+   plotting
+   refs
+   appendixA
+   appendixB
+   appendixC
+   appendixD
+   appendixE
+   appendixF
+   appendixG
+   
 
 Indices and tables
 ==================
