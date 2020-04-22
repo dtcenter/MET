@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0 (March 15, 2020)
+Model Evaluation Tools version 9.0.1 (April 23, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -251,6 +251,17 @@ Release Notes
 When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
+
+Version 9.0.1 Release Notes:
+----------------------------
+https://github.com/NCAR/MET/milestone/64?closed=1
+
+- Correct the definition of ensemble spread (#1294).
+  - NOTE: This changes the spread statistics computed by MET!
+- Fix ascii2nc python embedding with observation variable names (#1306).
+- Fix python3_script.cc compilation error on a Mac (#1281).
+- Fix PB2NC memory corruption bug (#1286).
+- Fix point2grid segfault (#1298).
 
 Version 9.0 Release Notes:
 --------------------------
