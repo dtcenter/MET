@@ -624,10 +624,10 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
       if(i==0) cs << d->obs_qc[i];
       else     cs << "," << d->obs_qc[i];
    }
-   at.set_entry(row, col++, cs);                       // OBS_QC
-   at.set_entry(row, col++, ens_pd.mn_na[i_obs]);      // ENS_MEAN
-   at.set_entry(row, col++, bad_data_double);          // CLIMO
-   at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
+   at.set_entry(row, col++, cs);                                // OBS_QC
+   at.set_entry(row, col++, ens_pd.mn_na[i_obs]);               // ENS_MEAN
+   at.set_entry(row, col++, bad_data_double);                   // CLIMO
+   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // ENS_SPREAD
 
    at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
@@ -689,10 +689,10 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
       if(i==0) cs << d->obs_qc[i];
       else     cs << "," << d->obs_qc[i];
    }
-   at.set_entry(row, col++, cs);                       // OBS_QC
-   at.set_entry(row, col++, ens_pd.mn_na[i_obs]);      // ENS_MEAN
-   at.set_entry(row, col++, bad_data_double);          // CLIMO
-   at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
+   at.set_entry(row, col++, cs);                                // OBS_QC
+   at.set_entry(row, col++, ens_pd.mn_na[i_obs]);               // ENS_MEAN
+   at.set_entry(row, col++, bad_data_double);                   // CLIMO
+   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // ENS_SPREAD
 
    at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR

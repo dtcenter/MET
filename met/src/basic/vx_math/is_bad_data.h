@@ -60,6 +60,19 @@ inline int is_eq(double a, double b) {
    return(is_eq(a, b, default_tol));
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline double square(double v) {
+   return (is_bad_data(v) ? bad_data_double : v*v);
+}
+
+inline double square_root(double v) {
+   return (is_bad_data(v) ? bad_data_double : sqrt(v));
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 
 

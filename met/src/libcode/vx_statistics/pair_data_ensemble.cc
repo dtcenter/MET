@@ -110,9 +110,9 @@ void PairDataEnsemble::clear() {
    relp_na.clear();
    phist_na.clear();
 
-   spread_na.clear();
-   spread_oerr_na.clear();
-   spread_plus_oerr_na.clear();
+   var_na.clear();
+   var_oerr_na.clear();
+   var_plus_oerr_na.clear();
 
    esum_na.clear();
    esumsq_na.clear();
@@ -155,9 +155,9 @@ void PairDataEnsemble::extend(int n, bool exact) {
    ign_na.extend             (n, exact);
    pit_na.extend             (n, exact);
    skip_ba.extend            (n, exact);
-   spread_na.extend          (n, exact);
-   spread_oerr_na.extend     (n, exact);
-   spread_plus_oerr_na.extend(n, exact);
+   var_na.extend             (n, exact);
+   var_oerr_na.extend        (n, exact);
+   var_plus_oerr_na.extend   (n, exact);
    esum_na.extend            (n, exact);
    esumsq_na.extend          (n, exact);
    mn_na.extend              (n, exact);
@@ -210,9 +210,9 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    skip_const     = pd.skip_const;
    skip_ba        = pd.skip_ba;
 
-   spread_na      = pd.spread_na;
-   spread_oerr_na = pd.spread_oerr_na;
-   spread_plus_oerr_na = pd.spread_plus_oerr_na;
+   var_na           = pd.var_na;
+   var_oerr_na      = pd.var_oerr_na;
+   var_plus_oerr_na = pd.var_plus_oerr_na;
 
    esum_na        = pd.esum_na;
    esumsq_na      = pd.esumsq_na;
@@ -312,7 +312,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
-   double mean, variance, spread;
+   double mean, var_unperturbed, var_perturbed;
    double crps, ign, pit;
 
    // Check if the ranks have already been computed
@@ -364,10 +364,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 
       // Store bad data values if skipping this point
       if(skip_ba[i]) {
-         spread_na.add(bad_data_double);
+         var_na.add(bad_data_double);
          mn_oerr_na.add(bad_data_double);
-         spread_oerr_na.add(bad_data_double);
-         spread_plus_oerr_na.add(bad_data_double);
+         var_oerr_na.add(bad_data_double);
+         var_plus_oerr_na.add(bad_data_double);
          r_na.add(bad_data_int);
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
@@ -376,30 +376,29 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       // Otherwise, compute scores
       else {
 
-         // Compute the spread of the unperturbed ensemble members
-         spread = compute_stdev(esum_na[i], esumsq_na[i], v_na[i]);
-         spread_na.add(spread);
-         variance = spread * spread;
+         // Compute the variance of the unperturbed ensemble members
+         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], v_na[i]);
+         var_na.add(var_unperturbed);
 
          // Process the observation error information.
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
-            // Compute perturbed ensemble mean and spread
-            cur_ens.compute_mean_stdev(mean, spread);
+            // Compute perturbed ensemble mean and variance 
+            cur_ens.compute_mean_variance(mean, var_perturbed);
             mn_oerr_na.add(mean);
-            spread_oerr_na.add(spread);
+            var_oerr_na.add(var_perturbed);
 
-            // Compute the spread plus observation error variance.
-            spread_plus_oerr_na.add(sqrt(variance +
-                                         dist_var(e->dist_type,
-                                                  e->dist_parm[0], e->dist_parm[1])));
+            // Compute the variance plus observation error variance.
+            var_plus_oerr_na.add(var_unperturbed +
+                                 dist_var(e->dist_type,
+                                          e->dist_parm[0], e->dist_parm[1]));
          }
          // If no observation error specified, store bad data values.
          else {
             mn_oerr_na.add(bad_data_double);
-            spread_oerr_na.add(bad_data_double);
-            spread_plus_oerr_na.add(bad_data_double);
+            var_oerr_na.add(bad_data_double);
+            var_plus_oerr_na.add(bad_data_double);
          }
 
          // With no ties, the rank is the number below plus 1
@@ -567,7 +566,7 @@ struct ssvar_bin_comp {
 
 void PairDataEnsemble::compute_ssvar() {
    int i, j;
-   double mn, stdev, var;
+   double mn, var;
    ssvar_bin_map bins;
    NumArray cur;
 
@@ -601,11 +600,7 @@ void PairDataEnsemble::compute_ssvar() {
       for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
 
       // Compute standard deviation
-      cur.compute_mean_stdev(mn, stdev);
-
-      // Skip bad data points
-      if(is_bad_data(stdev)) continue;
-      else                   var = stdev*stdev;
+      cur.compute_mean_variance(mn, var);
 
       // Build a variance point
       ens_ssvar_pt pt;
@@ -752,8 +747,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na, crps_na,
-      //   ign_na, pit_na, spread_na, spread_oerr_na,
-      //   spread_plus_oerr_na, mn_na, mn_oerr_na, e_na
+      //   ign_na, pit_na, var_na, var_oerr_na,
+      //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -770,9 +765,9 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
       pd.skip_ba.add(false);
-      pd.spread_na.add(spread_na[i]);
-      pd.spread_oerr_na.add(spread_oerr_na[i]);
-      pd.spread_plus_oerr_na.add(spread_plus_oerr_na[i]);
+      pd.var_na.add(var_na[i]);
+      pd.var_oerr_na.add(var_oerr_na[i]);
+      pd.var_plus_oerr_na.add(var_plus_oerr_na[i]);
       pd.mn_na.add(mn_na[i]);
       pd.mn_oerr_na.add(mn_oerr_na[i]);
 
@@ -1812,8 +1807,8 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          //
          // Include in subset:
          //   wgt_na, o_na, cmn_na, csd_na, cdf_na, v_na, r_na, crps_na,
-         //   ign_na, pit_na, spread_na, spread_oerr_na,
-         //   spread_plus_oerr_na, mn_na, mn_oerr_na, e_na
+         //   ign_na, pit_na, var_na, var_oerr_na,
+         //   var_plus_oerr_na, mn_na, mn_oerr_na, e_na
          //
          // Exclude from subset:
          //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -1830,9 +1825,9 @@ PairDataEnsemble subset_climo_cdf_bin(const PairDataEnsemble &pd,
          out_pd.ign_na.add(pd.ign_na[i]);
          out_pd.pit_na.add(pd.pit_na[i]);
          out_pd.skip_ba.add(false);
-         out_pd.spread_na.add(pd.spread_na[i]);
-         out_pd.spread_oerr_na.add(pd.spread_oerr_na[i]);
-         out_pd.spread_plus_oerr_na.add(pd.spread_plus_oerr_na[i]);
+         out_pd.var_na.add(pd.var_na[i]);
+         out_pd.var_oerr_na.add(pd.var_oerr_na[i]);
+         out_pd.var_plus_oerr_na.add(pd.var_plus_oerr_na[i]);
          out_pd.mn_na.add(pd.mn_na[i]);
          out_pd.mn_oerr_na.add(pd.mn_oerr_na[i]);
 

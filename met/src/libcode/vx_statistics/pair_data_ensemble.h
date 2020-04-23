@@ -94,9 +94,9 @@ class PairDataEnsemble : public PairBase {
       double     phist_bin_size;  // Ensemble PIT histogram bin width
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
 
-      NumArray   spread_na;           // Spread of unperturbed members [n_obs]
-      NumArray   spread_oerr_na;      // Spread of perturbed members [n_obs]
-      NumArray   spread_plus_oerr_na; // Unperturbed ensemble spread plus observation error [n_obs]
+      NumArray   var_na;           // Variance of unperturbed members [n_obs]
+      NumArray   var_oerr_na;      // Variance of perturbed members [n_obs]
+      NumArray   var_plus_oerr_na; // Unperturbed variance plus observation error variance [n_obs]
 
       NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
       NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
