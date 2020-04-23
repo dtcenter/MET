@@ -6224,7 +6224,7 @@ The default is 81.271 km.
 10.
  The 
 \series bold
--gaussain_radius n
+-gaussian_radius n
 \series default
  option defines the
 \series medium
@@ -6262,7 +6262,7 @@ radius of influence for Gaussian interpolation.
 \series bold
 -name list
 \series default
- option specifies a comma-separated list of output variable names for reach
+ option specifies a comma-separated list of output variable names for each
  field specified.
  
 \end_layout
