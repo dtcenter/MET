@@ -1,6 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+ // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -101,7 +99,7 @@ static StringArray VarNameSA;
 static int compress_level = -1;
 static bool opt_override_method = false;
 static bool do_gaussian_filter = false;
-static double prob_cat_thresh = bad_data_double;
+static SingleThresh prob_cat_thresh;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -550,7 +548,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    bool use_var_id = true;
-   bool has_prob_thresh = !is_eq(prob_cat_thresh, bad_data_double);
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
    unixtime requested_valid_time, valid_time = 0;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_point_file() -> ";
@@ -830,7 +829,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      cnt_dp.set(data_count, x_idx, y_idx);
                      mask_dp.set(1, x_idx, y_idx);
                      to_dp.set(to_value, x_idx, y_idx);
-                     if ((has_prob_thresh && (to_value >= prob_cat_thresh))
+                     if ((has_prob_thresh && prob_cat_thresh.check(to_value))
                          || (do_gaussian_filter && !has_prob_thresh)) {
                         prob_dp.set(1, x_idx, y_idx);
                         prob_mask_dp.set(1, x_idx, y_idx);
@@ -1200,7 +1199,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          copy_nc_atts(&var_data, &to_var, opt_all_attrs);
       }
 
-      bool has_prob_thresh = !is_eq(prob_cat_thresh, bad_data_double);
+      bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
          DataPlane prob_dp, prob_mask_dp;
          ConcatString vname_prob = vname;
@@ -1215,7 +1214,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             for (int y=0; y<ny; y++) {
                float value = to_dp.get(x, y);
                if (!is_eq(value, bad_data_float) &&
-                     ((has_prob_thresh && (value >= prob_cat_thresh))
+                     ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
                   prob_dp.set(1, x, y);
                }
@@ -2184,7 +2183,7 @@ void usage() {
         << "\t[-method type]\n"
         << "\t[-gaussian_dx n]\n"
         << "\t[-gaussian_radius n]\n"
-        << "\t[-prob_cat_thresh n]\n"
+        << "\t[-prob_cat_thresh \"<op>n\"]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -2222,7 +2221,8 @@ void usage() {
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-prob_cat_thresh n\" sets observation value to compute the probability."
+        << "\t\t\"-prob_cat_thresh '<op>n'\" sets observation value to compute the probability."
+        << "<op> is a operator, like >, >=, <, <= ..."
         << " The default is disabled (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
@@ -2264,7 +2264,7 @@ void set_method(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_prob_cat_thresh(const StringArray &a) {
-   prob_cat_thresh = atof(a[0].c_str());
+   prob_cat_thresh.set(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
