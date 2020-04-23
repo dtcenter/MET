@@ -129,6 +129,11 @@ public:
     return varCode;
   }
 
+  void setVarCode(int v)
+  {
+    varCode = v;
+  }
+
   int getVarCode() const
   {
     return varCode;
@@ -220,7 +225,7 @@ protected:
 
     char time_string[80];
 
-    snprintf(time_string, sizeof(time_string), 
+    snprintf(time_string, sizeof(time_string),
              "%04d%02d%02d_%02d%02d%02d",
              time_struct->tm_year + 1900, time_struct->tm_mon + 1,
              time_struct->tm_mday,        time_struct->tm_hour,
@@ -237,7 +242,7 @@ protected:
 
     char time_string[80];
 
-    snprintf(time_string, sizeof(time_string), 
+    snprintf(time_string, sizeof(time_string),
              "%s-%s",
              start_time_string.c_str(), end_time_string.c_str());
 
@@ -254,5 +259,3 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
