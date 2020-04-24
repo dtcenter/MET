@@ -876,7 +876,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       
       if (has_prob_thresh || do_gaussian_filter) {
          ConcatString vname_prob = vname;
-         vname_prob << "_prob";
+         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
          ConcatString vname_prob_mask = vname_prob;
          vname_prob_mask << "_mask";
 
@@ -1203,7 +1203,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       if (has_prob_thresh || do_gaussian_filter) {
          DataPlane prob_dp, prob_mask_dp;
          ConcatString vname_prob = vname;
-         vname_prob << "_prob";
+         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
          int nx = to_dp.nx();
          int ny = to_dp.ny();
          prob_dp.set_size(nx, ny);
