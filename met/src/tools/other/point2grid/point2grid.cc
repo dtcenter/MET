@@ -2183,7 +2183,7 @@ void usage() {
         << "\t[-method type]\n"
         << "\t[-gaussian_dx n]\n"
         << "\t[-gaussian_radius n]\n"
-        << "\t[-prob_cat_thresh \"<op>n\"]\n"
+        << "\t[-prob_cat_thresh string]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -2221,8 +2221,7 @@ void usage() {
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-prob_cat_thresh '<op>n'\" sets observation value to compute the probability."
-        << "<op> is a operator, like >, >=, <, <= ..."
+        << "\t\t\"-prob_cat_thresh string\" sets observation value to compute the probability."
         << " The default is disabled (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "

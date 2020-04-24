@@ -5973,15 +5973,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-prob_cat_thresh 
-\begin_inset Quotes eld
-\end_inset
-
-<op>n
-\begin_inset Quotes erd
-\end_inset
-
-]
+[-prob_cat_thresh string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -6247,18 +6239,9 @@ radius of influence for Gaussian interpolation.
 11.
  The 
 \series bold
--prob_cat_thresh 
-\begin_inset Quotes eld
-\end_inset
-
-<op>n
-\begin_inset Quotes erd
-\end_inset
-
-
+-prob_cat_thresh string
 \series default
  option sets the threshold to compute the probability of occurrence.
- <op> is an equality or inequality symbol like =, <, <=, >, or >=.
  The default is set to disabled.
  This option is relevant when calculating practically perfect forecasts.
 \end_layout
