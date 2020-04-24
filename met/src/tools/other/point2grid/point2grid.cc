@@ -2221,7 +2221,7 @@ void usage() {
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-prob_cat_thresh string\" sets observation value to compute the probability."
+        << "\t\t\"-prob_cat_thresh string\" sets the threshold to compute the probability of occurrence (optional)."
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
