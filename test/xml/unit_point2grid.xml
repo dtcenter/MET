@@ -53,7 +53,7 @@
       G212 \
       &OUTPUT_DIR;/regrid/pb2nc_TMP_prob.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
-      -name TEMP -prob_cat_thresh 280.0 \
+      -name TEMP -prob_cat_thresh ">=280.0" \
       -v 1
     </param>
     <!--  -->
@@ -69,7 +69,7 @@
       G212 \
       &OUTPUT_DIR;/regrid/pb2nc_TMP_prob_gaussian.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
-      -name TEMP -prob_cat_thresh 280.0 -method GAUSSIAN \
+      -name TEMP -prob_cat_thresh ">=280.0" -method GAUSSIAN \
       -v 1
     </param>
     <!--  -->
@@ -108,6 +108,24 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_compute.nc</grid_nc>
+    </output>
+  </test>
+  
+  <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M3_G16_s20181341702215_e20181341704588_c20181341711418.nc \
+      G212 \
+      &OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc \
+      -field 'name="AOD";  level="(*,*)";' \
+      -method MAX -prob_cat_thresh ">=1.0" -method GAUSSIAN \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc</grid_nc>
     </output>
   </test>
   
