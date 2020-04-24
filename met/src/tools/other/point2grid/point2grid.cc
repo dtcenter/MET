@@ -572,17 +572,17 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       exit(1);
    }
    
-   int obs_ids[nobs];       // grib_code or var_id
-   int obs_hids[nobs];
-   float hdr_lats[nhdr];
-   float hdr_lons[nhdr];
-   //float hdr_elvs[nhdr];
-   float obs_lvls[nobs];
-   float obs_hgts[nobs];
-   float obs_vals[nobs];
-   int hdr_typ_ids[nhdr];
-   int hdr_vld_ids[nhdr];
-   int obs_qty_ids[nobs];
+   int *obs_ids = new int[nobs];       // grib_code or var_id
+   int *obs_hids = new int[nobs];
+   float *hdr_lats = new float[nhdr];
+   float *hdr_lons = new float[nhdr];
+   //float *hdr_elvs[nhdr] = new float[nhdr];
+   float *obs_lvls = new float[nobs];
+   float *obs_hgts = new float[nobs];
+   float *obs_vals = new float[nobs];
+   int *hdr_typ_ids = new int[nhdr];
+   int *hdr_vld_ids = new int[nhdr];
+   int *obs_qty_ids = new int[nobs];
    IntArray var_index_array;
    IntArray valid_time_array;
    StringArray qc_tables;
@@ -595,32 +595,60 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    prepare_message_types(hdr_types);
    
    // Check and read obs_vid and obs_var if exists
+   bool success_to_read = true;
    NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
    if (IS_VALID_NC(obs_vid_var)) {
-      if (!get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids)) exit(1);
-      if (!get_nc_data_string_array(nc_in, nc_var_obs_var, &var_names)) exit(1);
+      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_vid, obs_ids);
+      if (success_to_read) success_to_read = get_nc_data_string_array(nc_in, nc_var_obs_var, &var_names);
    }
    else {
       use_var_id = false;
-      if (!get_nc_data_int_array(nc_in, nc_var_obs_gc, obs_ids, false)) {
+      if (success_to_read) success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_gc, obs_ids, false);
+      if (!success_to_read) {
          mlog << Error << "\n" << method_name
               << "\"" << InputFilename << "\" is very old format. Not supported\n\n";
-         exit(1);
       }
    }
    
-   if (!get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids)) exit(1);
-   if (!get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids)) exit(1);
-   if (!get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids)) exit(1);
-   if (!get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids)) exit(1);
-   if (!get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats)) exit(1);
-   if (!get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons)) exit(1);
+   if (success_to_read)
+      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
+   if (success_to_read)
+      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_vld, hdr_vld_ids);
+   if (success_to_read)
+      success_to_read = get_nc_data_int_array(nc_in, nc_var_hdr_typ, hdr_typ_ids);
+   if (success_to_read)
+      success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_qty, obs_qty_ids);
+   if (success_to_read)
+      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lat, hdr_lats);
+   if (success_to_read)
+      success_to_read = get_nc_data_float_array(nc_in, nc_var_hdr_lon, hdr_lons);
    //if (!get_nc_data_float_array(nc_in, nc_var_hdr_elv, hdr_elvs)) exit(1);
-   if (!get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls)) exit(1);
-   if (!get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts)) exit(1);
-   if (!get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals)) exit(1);
-   if (!get_nc_data_string_array(nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times)) exit(1);
-   if (!get_nc_data_string_array(nc_in, nc_var_obs_qty_tbl, &qc_tables)) exit(1);
+   if (success_to_read)
+      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_lvl, obs_lvls);
+   if (success_to_read)
+      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_hgt, obs_hgts);
+   if (success_to_read)
+      success_to_read = get_nc_data_float_array(nc_in, nc_var_obs_val, obs_vals);
+   if (success_to_read)
+      success_to_read = get_nc_data_string_array(
+            nc_in, nc_var_hdr_vld_tbl, &hdr_valid_times);
+   if (success_to_read)
+      success_to_read = get_nc_data_string_array(
+            nc_in, nc_var_obs_qty_tbl, &qc_tables);
+   if (!success_to_read) {
+      delete [] obs_ids;
+      delete [] obs_hids;
+      delete [] hdr_lats;
+      delete [] hdr_lons;
+      delete [] obs_lvls;
+      delete [] obs_hgts;
+      delete [] obs_vals;
+      delete [] hdr_typ_ids;
+      delete [] hdr_vld_ids;
+      delete [] obs_qty_ids;
+      exit(1);
+   }
+   
    bool has_qc_flags = (qc_flags.n_elements() > 0);
    IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
 
@@ -954,6 +982,17 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    if (cellMapping) {
       delete [] cellMapping;   cellMapping = (IntArray *)0;
    }
+
+   delete [] obs_ids;
+   delete [] obs_hids;
+   delete [] hdr_lats;
+   delete [] hdr_lons;
+   delete [] obs_lvls;
+   delete [] obs_hgts;
+   delete [] obs_vals;
+   delete [] hdr_typ_ids;
+   delete [] hdr_vld_ids;
+   delete [] obs_qty_ids;
 
    return;
 }

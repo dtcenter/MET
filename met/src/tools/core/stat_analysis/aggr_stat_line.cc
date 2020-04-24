@@ -2573,9 +2573,9 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].ens_pd.crps_na.add(cur.crps);
          m[key].ens_pd.ign_na.add(cur.ign);
-         m[key].ens_pd.spread_na.add(cur.spread);
-         m[key].ens_pd.spread_oerr_na.add(cur.spread_oerr);
-         m[key].ens_pd.spread_plus_oerr_na.add(cur.spread_plus_oerr);
+         m[key].ens_pd.var_na.add(square(cur.spread));
+         m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
+         m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
          m[key].ens_pd.wgt_na.add(cur.total);
 
          //
@@ -3084,9 +3084,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
-         m[key].ens_pd.spread_na.add(cur.spread);
-         m[key].ens_pd.spread_oerr_na.add(cur.spread_oerr);
-         m[key].ens_pd.spread_plus_oerr_na.add(cur.spread_plus_oerr);
+         m[key].ens_pd.var_na.add(square(cur.spread));
+         m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
+         m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
          m[key].ens_pd.mn_na.add(cur.ens_mean);
          m[key].ens_pd.mn_oerr_na.add(cur.ens_mean_oerr);
 
