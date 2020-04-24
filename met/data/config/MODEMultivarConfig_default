@@ -17,6 +17,11 @@ model = "WRF";
 desc = "NA";
 
 //
+// MODE Multivar boolean combination logic
+//
+multivar_field_logic = "#1 && #2 && #3";
+
+//
 // Output observation type to be written
 //
 obtype = "PRECIP";
