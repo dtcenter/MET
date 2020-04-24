@@ -2222,7 +2222,6 @@ void usage() {
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
         << "\t\t\"-prob_cat_thresh string\" sets observation value to compute the probability."
-        << " The default is disabled (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
