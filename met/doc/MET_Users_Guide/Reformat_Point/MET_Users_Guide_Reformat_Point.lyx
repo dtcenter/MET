@@ -5973,7 +5973,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-prob_cat_thresh n]
+[-prob_cat_thresh string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -6239,7 +6239,7 @@ radius of influence for Gaussian interpolation.
 11.
  The 
 \series bold
--prob_cat_thresh n
+-prob_cat_thresh string
 \series default
  option sets the threshold to compute the probability of occurrence.
  The default is set to disabled.

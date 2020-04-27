@@ -1,5 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+ // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -100,7 +99,7 @@ static StringArray VarNameSA;
 static int compress_level = -1;
 static bool opt_override_method = false;
 static bool do_gaussian_filter = false;
-static double prob_cat_thresh = bad_data_double;
+static SingleThresh prob_cat_thresh;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -549,7 +548,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    bool use_var_id = true;
-   bool has_prob_thresh = !is_eq(prob_cat_thresh, bad_data_double);
+   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+
    unixtime requested_valid_time, valid_time = 0;
    IntArray *cellMapping = (IntArray *)0;
    static const char *method_name = "process_point_file() -> ";
@@ -798,6 +798,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          to_dp.set_constant(bad_data_double);
          cnt_dp.set_constant(0);
          mask_dp.set_constant(0);
+         if (has_prob_thresh || do_gaussian_filter) {
+            prob_dp.set_constant(0);
+            prob_mask_dp.set_constant(0);
+         }
          
          for (int x_idx = 0; x_idx<nx; x_idx++) {
             for (int y_idx = 0; y_idx<ny; y_idx++) {
@@ -853,7 +857,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                      cnt_dp.set(data_count, x_idx, y_idx);
                      mask_dp.set(1, x_idx, y_idx);
                      to_dp.set(to_value, x_idx, y_idx);
-                     if ((has_prob_thresh && (to_value >= prob_cat_thresh))
+                     if ((has_prob_thresh && prob_cat_thresh.check(to_value))
                          || (do_gaussian_filter && !has_prob_thresh)) {
                         prob_dp.set(1, x_idx, y_idx);
                         prob_mask_dp.set(1, x_idx, y_idx);
@@ -900,7 +904,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       
       if (has_prob_thresh || do_gaussian_filter) {
          ConcatString vname_prob = vname;
-         vname_prob << "_prob";
+         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
          ConcatString vname_prob_mask = vname_prob;
          vname_prob_mask << "_mask";
 
@@ -910,6 +914,14 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
+         if (do_gaussian_filter) {
+            NcVar prob_var = get_var(nc_out, vname_prob.c_str());
+            if (IS_VALID_NC(prob_var)) {
+               add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
+               add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
+               add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+            }
+         }
          
          tmp_long_name = vname_prob_mask;
          tmp_long_name << dim_string;
@@ -1216,7 +1228,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
-
+      
       NcVar to_var = get_nc_var(nc_out, vname.c_str());
       NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
       if(IS_VALID_NC(var_data)) {
@@ -1224,6 +1236,47 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
          }
          copy_nc_atts(&var_data, &to_var, opt_all_attrs);
+      }
+
+      bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
+      if (has_prob_thresh || do_gaussian_filter) {
+         DataPlane prob_dp, prob_mask_dp;
+         ConcatString vname_prob = vname;
+         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
+         int nx = to_dp.nx();
+         int ny = to_dp.ny();
+         prob_dp.set_size(nx, ny);
+         prob_dp.set_init(to_dp.init());
+         prob_dp.set_valid(to_dp.valid());
+         prob_dp.set_constant(0);
+         for (int x=0; x<nx; x++) {
+            for (int y=0; y<ny; y++) {
+               float value = to_dp.get(x, y);
+               if (!is_eq(value, bad_data_float) &&
+                     ((has_prob_thresh && prob_cat_thresh.check(value))
+                       || (do_gaussian_filter && !has_prob_thresh))) {
+                  prob_dp.set(1, x, y);
+               }
+            }
+         }
+          
+         if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
+         if(IS_VALID_NC(var_data)) {
+            NcVar prob_var = get_nc_var(nc_out, vname.c_str());
+            for (int idx=0; idx<global_attr_count; idx++) {
+               copy_nc_att(nc_in, &prob_var, (string)GOES_global_attr_names[idx]);
+            }
+            copy_nc_atts(&var_data, &prob_var, opt_all_attrs);
+            if (do_gaussian_filter) {
+               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
+               if (IS_VALID_NC(prob_var)) {
+                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
+                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
+                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+               }
+            }
+         }
       }
 
    } // end for i
@@ -2169,7 +2222,7 @@ void usage() {
         << "\t[-method type]\n"
         << "\t[-gaussian_dx n]\n"
         << "\t[-gaussian_radius n]\n"
-        << "\t[-prob_cat_thresh n]\n"
+        << "\t[-prob_cat_thresh string]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -2207,8 +2260,7 @@ void usage() {
         << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
 
-        << "\t\t\"-prob_cat_thresh n\" sets observation value to compute the probability."
-        << " The default is disabled (optional).\n"
+        << "\t\t\"-prob_cat_thresh string\" sets the threshold to compute the probability of occurrence (optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
@@ -2249,7 +2301,7 @@ void set_method(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_prob_cat_thresh(const StringArray &a) {
-   prob_cat_thresh = atof(a[0].c_str());
+   prob_cat_thresh.set(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

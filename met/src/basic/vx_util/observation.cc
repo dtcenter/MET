@@ -140,20 +140,7 @@ _elevation   = pyobject_as_double(list[5]);
 
       //////////////////////// 
 
-c            = pyobject_as_string(list[6]);
-
-if ( is_number(c.text()) )  {
-
-    varCode = atoi(c.text());
-   _varName = varCode;
-
-}
-else  {
-
-    varCode = bad_data_int;
-   _varName = c;
-
-}
+_varName     = pyobject_as_string(list[6]);
 
       //////////////////////// 
 
