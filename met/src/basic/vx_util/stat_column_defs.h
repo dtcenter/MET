@@ -283,7 +283,7 @@ static const char * ecnt_columns [] = {
 static const char * rps_columns [] = {
    "TOTAL",       "N_PROB",      "RPS_REL",
    "RPS_RES",     "RPS_UNC",     "RPS",
-   "RPSS",        "RPSS_SMPL"
+   "RPSS",        "RPSS_SMPL",   "RPS_COMP"
 };
 
 static const char * rhist_columns [] = {
