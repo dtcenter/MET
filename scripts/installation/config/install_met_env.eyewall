@@ -1,0 +1,23 @@
+export TEST_BASE=/d1/CODE/MET/MET_releases/met-9.0.1
+export COMPILER=gnu_6.3.0
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=met-9.0.1.20200423.tar.gz
+export USE_MODULES=FALSE
+export PYTHON_LOC=/d1/CODE/MET/MET_releases/external_libs/
+export MET_PYTHON=${PYTHON_LOC}/python-3.7.3
+export MET_PYTHON_LD=-L${PYTHON_LOC}/python-3.7.3/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
+export MET_PYTHON_CC=-I${PYTHON_LOC}/python-3.7.3/include/python3.7m
+export SET_D64BIT=FALSE
+export CFLAGS="-Wall -g"
+export CXXFLAGS="-Wall -g"
+
+#If you've already compiled these and don't need to compile them again, set the following
+#export EXTERNAL_LIBS=/d1/CODE/MET/MET_releases/met-9.0.1/external_libs
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lgrib2c
+#export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
+#export BUFRLIB_NAME=-lbufr
+#export MET_NETCDF=${EXTERNAL_LIBS}/lib
+# Also, don't forget to set the following options to zero within the compile script if you've already compiled those libraries as well: COMPILE_GSL, COMPILE_HDF, COMPILE_HDFEOS, COMPILE_CAIRO, COMPILE_FREETYPE
+    
