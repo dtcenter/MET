@@ -1,5 +1,7 @@
 Chapter 6 Regional Verification using Spatial Masking
 
+
+
 Verification over a particular region or area of interest may be performed using “masking”. Defining a masking region is simply selecting the desired set of grid points to be used. The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask and Gen-Circle-Mask tools from previous releases. It may be run to create a bitmap verification masking region to be used by many of the statistical tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. It has been enhanced to support additional types of masking region definition (e.g. tropical-cyclone track over water only). An iterative approach may be used to define complex areas by combining multiple masking regions together.
 
 6.1 Gen-Vx-Mask tool
@@ -12,7 +14,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
 
 Usage: gen_vx_mask
 
-{\hskip 0.5in}input_file
+{\hskip 0.5in}input_grid
 
 {\hskip 0.5in}mask_file
 
@@ -50,7 +52,7 @@ gen_vx_mask has three required arguments and can take optional ones.
 
 Required arguments for gen_vx_mask
 
-1. The input_file argument is a gridded data file which specifies the grid definition for the domain over which the masking bitmap is to be defined. If output from gen_vx_mask, automatically read mask data as the input_field.
+1.The input_grid argument defines the input grid as a named grid, the path to a gridded data file, or an explicit grid specification string. If output from gen_vx_mask, automatically read mask data as the input_field.
 
    2. The mask_file argument defines the masking information, see below.
 
@@ -60,7 +62,7 @@ Required arguments for gen_vx_mask
 
 	  • For “solar_alt” and “solar_azi” masking, specify a gridded data file or a time string in YYYYMMDD[_HH[MMSS]] format.
 
-	    • For “lat” and “lon” masking, no “mask_file” needed, simply repeat the path for “input_file”.
+	    • For “lat” and “lon” masking, no “mask_file” needed, simply repeat the path for “input_grid”.
 
 	      • For “shape” masking, specify an ESRI shapefile (.shp).
 
@@ -70,13 +72,13 @@ Required arguments for gen_vx_mask
 
 		   4. The -type string option can be used to override the default masking type (poly). See description of supported types below.
 
-		      5. The -input_field string option can be used to read existing mask data from “input_file”.
+		      5. The -input_field string option can be used to read existing mask data from “input_grid”, when specified as a gridded data file.
 
 			 6. The -mask_field string option can be used to define the field from “mask_file” to be used for “data” masking.
 
 			    7. The -complement option can be used to to compute the complement of the area defined by “mask_file”.
 
-			       8. The -union | -intersection | -symdiff option can be used to specify how to combine the masks from “input_file” and “mask_file”.
+			       8. The -union | -intersection | -symdiff option can be used to specify how to combine the masks from “input_grid” and “mask_file”.
 
 				  9. The -thresh string option can be used to define the threshold to be applied.
 
@@ -118,7 +120,7 @@ Required arguments for gen_vx_mask
 
 											   7. Solar altitude (solar_alt) and solar azimuth (solar_azi) masking computes the solar altitude and azimuth values at each grid point for the time defined by the mask_file setting. mask_file may either to set to an explicit time string in YYYYMMDD[_HH[MMSS]] format or to a gridded data file. If set to a gridded data file, the -mask_field command line option specifies the field of data whose valid time should be used. If the -thresh command line option is not used, the raw solar altitude or azimuth value for each grid point will be written to the output. If it is used, the resulting binary mask field will be written. This option is useful when defining a day/night mask.
 
-											      8. Latitude (lat) and longitude (lon) masking computes the latitude and longitude value at each grid point. This logic only requires the definition of the grid, specified by the input_file. Technically, the mask_file is not needed, but a value must be specified for the command line to parse correctly. Users are advised to simple repeat the input_file setting twice. If the -thresh command line option is not used, the raw latitude or longitude values for each grid point will be written to the output. This option is useful when defining latitude or longitude bands over which to compute statistics.
+											      8. Latitude (lat) and longitude (lon) masking computes the latitude and longitude value at each grid point. This logic only requires the definition of the grid, specified by the input_grid. Technically, the mask_file is not needed, but a value must be specified for the command line to parse correctly. Users are advised to simple repeat the input_grid setting twice. If the -thresh command line option is not used, the raw latitude or longitude values for each grid point will be written to the output. This option is useful when defining latitude or longitude bands over which to compute statistics.
 
 												 9. Shapefile (shape) masking uses a closed polygon taken from an ESRI shapefile to define the masking region. Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the latitude and longitudes of the vertices. The other types of shapefiles (index file, suffix “.shx”, and dBASE file, suffix “.dbf”) are not currently used. The shapefile must consist of closed polygons rather than polylines, points, or any of the other data types that shapefiles support. Shapefiles usually contain more than one polygon, and the -shape n command line option enables the user to select one polygon from the shapefile. The integer n tells which shape number to use from the shapefile. Note that this value is zero-based, so that the first polygon in the shapefile is polygon number 0, the second polygon in the shapefile is polygon number 1, etc. For the user's convenience, some utilities that perform human-readable screen dumps of shapefile contents are provided. The gis_dump_shp, gis_dump_shx and gis_dump_dbf tools enable the user to examine the contents of her shapefiles. As an example, if the user knows the name of the particular polygon he wishes to use but not the number of the polygon in the shapefile, he can use the gis_dump_dbf utility to examine the names of the polygons in the shapefile, and the information written to the screen will tell him what the corresponding polygon number is.
 
@@ -128,13 +130,13 @@ Required arguments for gen_vx_mask
 
 												    1. Determine the input_field and grid definition.
 
-												       • Read the input_file to determine the grid over which the mask should be defined.
+												       • Read the input_grid to determine the grid over which the mask should be defined.
 
 													 • By default, initialize the input_field at each grid point to a value of zero.
 
 													   • If the -input_field option was specified, initialize the input_field at each grid point to the value of that field.
 
-													     • If the input_file is the output from a previous run of Gen-Vx-Mask, automatically initialize each grid point with the input_field value.
+													     • If the input_grid is the output from a previous run of Gen-Vx-Mask, automatically initialize each grid point with the input_field value.
 
 													       2. Determine the mask_field.
 
