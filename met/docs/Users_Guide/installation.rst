@@ -142,11 +142,9 @@ Three external libraries are required for compiling/building MET and should be d
 
 									- If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB to point to the main GRIB2C directory which contains both the include and library files. These are used instead of $MET_GRIB2C since the main GRIB2C directory does not contain include and lib subdirectories.
 
-									  - If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the python library file and indicate the name of that file. For example:
+									  - If compiling support for PYTHON, set $MET_PYTHON_CC and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the python library file. For example: 
 
-									    MET_PYTHON_CC='-I/usr/include/python3.6'
-
-									    MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
+export MET_PYTHON_LD=-L/usrx/local/prod/packages/python/3.6.3/lib/\ -lpython3.6m\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
 
 									    For more information about Python support in MET, please refer to [chap:App_F_Python_Embedding].
 
