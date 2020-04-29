@@ -64,7 +64,7 @@ The following is a summary of the input and output formats for each of the tools
 
 			    5. Point2Grid Tool
 
-			       * Input: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
+			       * Input: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool and AOD variable from GOES16/17.
 
 				 * Output: One NetCDF file containing a gridded representation of the point observations.
 
