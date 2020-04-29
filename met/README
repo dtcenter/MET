@@ -260,6 +260,7 @@ Version 9.1 BETA1 Release Notes:
     https://github.com/NCAR/MET/milestone/64?closed=1
 
 - Enhancements to Existing Tools:
+   - Initial version of Sphinx documentation (#1217).
    - Add the complement of RPS to the existing RPS line type (#1280).
    - Remove MET_BASE references from Rscripts (#1289).
    - Enhance Point2Grid to enable Gaussian filtering for GOES16/17 data (#1291).
