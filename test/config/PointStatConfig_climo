@@ -272,6 +272,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V9.0";
+version        = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////
