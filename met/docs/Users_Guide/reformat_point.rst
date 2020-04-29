@@ -580,7 +580,7 @@ Required arguments for pb2nc
 
 																									    {\hskip 0.5in}[-gaussian_radius n]
 
-																									    {\hskip 0.5in}[-prob_cat_thresh n]
+																									    {\hskip 0.5in}[-prob_cat_thresh string]
 
 																									    {\hskip 0.5in}[-vld_thresh n]
 
@@ -616,7 +616,7 @@ Required arguments for pb2nc
 
 																												       10. The -gaussian_radius n option defines the radius of influence for Gaussian interpolation. The default is 120. Ignored if the method is not GAUSSIAN.
 
-																													   11. The -prob_cat_thresh n option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
+																													   11.The -prob_cat_thresh string option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
 
 																													       12. The -vld_thresh n option sets the required ratio of valid data for regridding. The default is 0.5.
 
