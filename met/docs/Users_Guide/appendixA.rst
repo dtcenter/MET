@@ -56,7 +56,6 @@ Q. Why was the MET written largely in C++ instead of FORTRAN?
 
 								    * Have these libraries been compiled and installed using the same set of compilers used to build MET?
 
-								      * Are you using NetCDF version 3.4 or version 4? Currently, only NetCDF version 3.6 can be used with MET.
 
 									Grid_stat won't run
 
