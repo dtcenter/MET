@@ -131,6 +131,9 @@ class RPSInfo {
       // Compute statistics
       void set(const PairDataEnsemble &);
 
+      // Compute the complement of the RPS
+      double rps_comp() const;
+
       void clear();
 };
 

@@ -3704,7 +3704,8 @@ void write_rps_cols(const RPSInfo &rps_info,
    // Dump out the RPS line:
    //    TOTAL,        N_PROB,
    //    RPS_REL,      RPS_RES,    RPS_UNC,
-   //    RPS,          RPSS,       RPSS_SMPL
+   //    RPS,          RPSS,       RPSS_SMPL,
+   //    RPS_COMP
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       rps_info.n_pair);
@@ -3729,6 +3730,9 @@ void write_rps_cols(const RPSInfo &rps_info,
 
    at.set_entry(r, c+7,  // Ranked Probability Score using sample climo
       rps_info.rpss_smpl);
+
+   at.set_entry(r, c+8,  // Complement of the Ranked Probability Score
+      rps_info.rps_comp());
 
    return;
 }
