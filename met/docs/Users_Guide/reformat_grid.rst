@@ -41,6 +41,10 @@ The Pcp-Combine tool supports four types of commands (“sum”, “add”, “s
 	    {\hskip 0.5in}[-name list]
 
 	    {\hskip 0.5in}[-vld_thresh n]
+	    
+	    {\hskip 0.5in}[-convert string]
+	    
+	    {\hskip 0.5in}[-censor thresh value]
 
 	    {\hskip 0.5in}[-log file]
 
@@ -239,16 +243,20 @@ The Pcp-Combine tool supports four types of commands (“sum”, “add”, “s
 											  9. The -shape option overrides the default interpolation shape. Default is SQUARE.
 
 											     10. The -vld_thresh n option overrides the default required ratio of valid data for regridding. Default is 0.5.
+												 11. The -convert string option specifies a conversion function to be applied to the regridded output values.  For example, “-convert ‘convert(x) = x - 273.15;’” would convert temperature values from Kelvin to Celcius.
+												     
+12. The -consor thresh value option specifies censoring logic to be applied to the regridded output as a threshold string and replacement value.
 
-												 11. The -name list specifies a comma-separated list of output variable names for each field specified.
 
-												     12. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+												 13. The -name list specifies a comma-separated list of output variable names for each field specified.
 
-													 13. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+												     14. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-													     14. The -compress level option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+													 15. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-														 For more details on setting the to_grid, -method, -width, and -vld_thresh options, see the regrid entry in Section [subsec:IO_General-MET-Config-Options]. An example of the regrid_data_plane calling sequence is shown below:
+													     16. The -compress level option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+
+														 For more details on setting the to_grid, -method, -width, and -vld_thresh, -convert, and -censor options, see the regrid entry in Section [subsec:IO_General-MET-Config-Options]. An example of the regrid_data_plane calling sequence is shown below:
 
 														 regrid_data_plane \
 
