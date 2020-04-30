@@ -1,3 +1,5 @@
+.. _tc-gen:
+
 Chapter 22 TC-Gen Tool
 
 22.1 Introduction

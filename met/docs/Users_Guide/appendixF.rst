@@ -1,3 +1,5 @@
+.. _appendixF:
+
 Appendix F Python Embedding
 
 F.1 Introduction

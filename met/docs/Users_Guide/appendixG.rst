@@ -1,3 +1,5 @@
+.. _appendixG:
+
 Appendix G Vectors and Vector Statistics
 
 In this appendix, we discuss some basic properties of vectors, concentrating on the two-dimensional case. To keep the discussion simple, we will assume we are using a Cartesian coordinate system. \def\vec#1{\hbox{\bf #1}}

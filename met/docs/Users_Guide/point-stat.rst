@@ -1,3 +1,5 @@
+.. _point-stat:
+
 Point-Stat Tool
 ===============
 

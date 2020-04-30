@@ -1,3 +1,5 @@
+.. _grid-diag:
+
 Chapter 14 Grid-Diag Tool
 
 14.1 Introduction

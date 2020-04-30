@@ -1,3 +1,5 @@
+.. _tc-pairs:
+
 Chapter 20 TC-Pairs Tool
 
 20.1 Introduction

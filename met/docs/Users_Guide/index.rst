@@ -58,7 +58,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF.  The DT
    grid-stat
    ensemble-stat
    wavelet-stat
-   gsI-tools
+   gsi-tools
    stat-analysis
    series-analysis
    grid-diag

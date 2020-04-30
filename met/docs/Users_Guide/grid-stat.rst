@@ -1,3 +1,5 @@
+.. _grid-stat:
+
 Chapter 8 Grid-Stat Tool
 
 8.1 Introduction

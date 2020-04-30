@@ -1,3 +1,5 @@
+.. _rmw-analysis:
+
 Chapter 24 RMW-Analysis Tool
 
 24.1 Introduction

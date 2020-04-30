@@ -1,3 +1,5 @@
+.. _gsi_tools:
+
 Chapter 11 GSI Tools
 
 Gridpoint Statistical Interpolation (GSI) diagnostic files are binary files written out from the data assimilation code before the first and after each outer loop. The files contain useful information about how a single observation was used in the analysis by providing details such as the innovation (O-B), observation values, observation error, adjusted observation error, and quality control information.

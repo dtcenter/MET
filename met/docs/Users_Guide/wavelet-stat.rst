@@ -1,3 +1,5 @@
+.. _wavelet-stat:
+
 Chapter 10 Wavelet-Stat Tool
 
 10.1 Introduction

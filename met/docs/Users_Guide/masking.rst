@@ -1,3 +1,5 @@
+.. _masking:
+
 Chapter 6 Regional Verification using Spatial Masking
 
 

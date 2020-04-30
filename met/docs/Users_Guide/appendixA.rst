@@ -1,3 +1,5 @@
+.. _appendixA:
+
 Appendix A FAQs & How do I ... ?
 
 A.1 Frequently Asked Questions

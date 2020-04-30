@@ -1,3 +1,5 @@
+.. _reformaat_point:
+
 Chapter 4 Re-Formatting of Point Observations
 
 There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in Figure [Fig_Overview_MET_Overview_Flowchart]. The software tools used to reformat point data are described in this chapter.
@@ -164,14 +166,33 @@ Required arguments for pb2nc
 
 						    The beg and end variables are used to stratify the model level of observations to be retained. The range shown above is 1 to 255.
 
-						    The level_category variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in Table [table_reform-point_pb2nc_level_category]. See the following for more details:
+						    The level_category variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in Table [table_reform-point_pb2nc_level_category] :ref:`table_reform-point_pb2nc_level_category`. See the following for more details:
 
 						    http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm
 
 						    Values for the level_category option.
 
+.. list-table:: table_reform-point_pb2nc_level_category
+   :widths: 30 70
+   :header-rows: 1
 
-
+   * - Level category value
+     - 1
+     - 2
+     - 3
+     - 4
+     - 5
+     - 6
+     - 7
+   * - Description
+     - Mandatory level
+     - Significant temperature level
+     - Winds-by-pressure level
+     - Winds-by-height level
+     - Tropopause level
+     - Reports on a single level
+     - Auxiliary levels generated via interpolation from spanning levels
+       
 						    obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 
 						    Each PrepBUFR message will likely contain multiple observation variables. The obs_bufr_var variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, and D_CAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, and convective available potential energy. This configuration replaces obs_grib_code. If the list is empty, all BUFR variables are retained.

@@ -1,3 +1,5 @@
+.. _plotting:
+
 Chapter 25 Plotting and Graphics Support
 
 25.1 Plotting Utilities

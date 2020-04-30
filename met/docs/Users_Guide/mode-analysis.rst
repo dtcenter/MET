@@ -1,3 +1,5 @@
+.. _mode-analysis:
+
 Chapter 16 MODE-Analysis Tool
 
 16.1 Introduction

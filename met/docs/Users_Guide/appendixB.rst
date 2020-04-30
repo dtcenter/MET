@@ -1,3 +1,5 @@
+.. _appendixB:
+
 Appendix B Map Projections, Grids, and Polylines
 
 B.1 Map Projections

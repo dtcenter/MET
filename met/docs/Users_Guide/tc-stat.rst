@@ -1,3 +1,5 @@
+.. _tc-stat:
+
 Chapter 21 TC-Stat Tool
 
 21.1 Introduction

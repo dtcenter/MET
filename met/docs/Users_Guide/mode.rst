@@ -1,3 +1,5 @@
+.. _mode:
+
 Chapter 15 MODE Tool
 
 15.1 Introduction

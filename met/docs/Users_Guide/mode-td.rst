@@ -1,3 +1,5 @@
+.. _mode-td:
+
 Chapter 17 MODE Time Domain Tool
 
 17.1 Introduction

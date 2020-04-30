@@ -1,3 +1,5 @@
+.. _data_io:
+
 Chapter 3 MET Data I/O
 
 Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this chapter. Both the input and output file formats are described in this chapter. Sections [sec:IO_Input-data-formats] and [sec:IO_Intermediate-data-formats] are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in Figure [Fig_Overview_MET_Overview_Flowchart]. Output data formats are described in later Section [sec:IO_Output-data-formats]. Common configuration files options are described in Section [sec:IO_Configuration-File-Details]. Description of software modules used to reformat the data may now be found in Chapters [chap:Re-Formatting-of-Point] and [chap:Re-Formatting-of-Gridded].

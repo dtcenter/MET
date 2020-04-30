@@ -1,3 +1,5 @@
+.. _ensemble-stat:
+
 USE JOHN's version bugfix_1294_master_v9.0_ens_spread  ?? unable to access this version.  Used develop instead.
 
 Chapter 9 Ensemble-Stat Tool

@@ -1,3 +1,5 @@
+.. _series-analysis:
+
 Chapter 13 Series-Analysis Tool
 
 13.1 Introduction

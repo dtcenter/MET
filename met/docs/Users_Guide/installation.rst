@@ -1,3 +1,5 @@
+.. _installation:
+
 Chapter 2 Software Installation/Getting Started
 
 2.1 Introduction

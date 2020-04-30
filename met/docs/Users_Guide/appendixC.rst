@@ -1,3 +1,5 @@
+.. _appendixC:
+
 stat_equivalency_table.rst
 belongs at the beginning or end of Appendix C  https://app.slack.com/client/TK4G2NW64/CK4G4DL1E
 
