@@ -1,0 +1,6 @@
+mode_multivar
+*.o
+*.a
+.deps
+Makefile
+Makefile.in

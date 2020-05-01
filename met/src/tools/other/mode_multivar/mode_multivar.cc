@@ -60,7 +60,7 @@ using namespace netCDF;
 
 static ConcatString program_name;
 
-static const char mode_path [] = "/d3/personal/randy/github/feature_1184_dryline/MET/met/src/tools/core/mode/mode";   //  hardwired for now
+static const char mode_path [] = "MET_BASE/../../bin/mode";   //  hardwired for now
 
 static const char sep [] = "====================================================\n";
 
@@ -137,7 +137,7 @@ mlog << Debug(1) << sep;
 for (j=0; j<n_files; ++j)  {
 
    command << cs_erase
-           << mode_path << ' '
+           << replace_path(mode_path) << ' '
            << fcst_filenames[j] << ' '
            <<  obs_filenames[j] << ' '
            << config_file;
