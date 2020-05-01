@@ -1,8 +1,10 @@
 .. _appendixB:
 
 Appendix B Map Projections, Grids, and Polylines
+================================================
 
 B.1 Map Projections
+___________________
 
 The following map projections are currently supported in MET:
 
@@ -17,8 +19,9 @@ The following map projections are currently supported in MET:
 	* Lat/Lon Projection
 
 	  * Rotated Lat/Lon Projection
-
-	    B.2 Grids
+	    
+B.2 Grids
+_________
 
 	    All of NCEP's pre-defined grids that reside on one of the projections listed above are implemented in MET. The user may specify one of these NCEP grids in the configuration files as "GNNN" where NNN is the 3-digit NCEP grid number. Defining a new masking grid in MET would involve modifying the vx_data_grids library and recompiling.
 
@@ -26,7 +29,8 @@ The following map projections are currently supported in MET:
 
 	    http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html.
 
-	    B.3 Polylines for NCEP Regions
+B.3 Polylines for NCEP Regions
+______________________________
 
 	    Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed share/met/poly directory. Users may also easily define their own lat/lon polyline files.
 

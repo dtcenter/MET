@@ -1,12 +1,15 @@
 .. _appendixF:
 
 Appendix F Python Embedding
+===========================
 
 F.1 Introduction
+________________
 
 MET includes the ability to embed Python to a limited degree. Users may use Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET version 9.0 is build on Python 3.6+.
 
 F.2 Compiling Python Support
+____________________________
 
 In order to use Python embedding, the user's local Python installation must have the C-language Python header files and libraries. Sometimes when Python is installed locally, these header files and libraries are deleted at the end of the installation process, leaving only the binary executable and run-time shared object files. But the Python header files and libraries must be present to compile support in MET for Python embedding. Assuming the requisite Python files are present, and that Python embedding is enabled when building MET (which is done by passing the --enable-python option to the configure command line), the MET C++ code will use these in the compilation process to link directly to the Python libraries.
 
@@ -20,7 +23,8 @@ In addition to the configure option mentioned above, two variables, MET_PYTHON_C
 
     \vskip 0.1in\centerline{\hbox to 3.0in{\hrulefill}}\vskip 0.1in
 
-    F.3 MET_PYTHON_EXE
+F.3 MET_PYTHON_EXE
+__________________
 
     When Python embedding support is compiled, MET instantiates the Python interpreter directly. However, for users of highly configurable Conda environments, the Python instance set at compilation time may not be sufficient. Users may want to switch between Conda environments for which different packages are available. MET version 9.0 has been enhanced to address this need.
 
@@ -38,7 +42,8 @@ In addition to the configure option mentioned above, two variables, MET_PYTHON_C
 
 	     With this approach, users should be able to execute Python scripts in their own custom environments.
 
-	     F.4 Python Embedding for 2D data
+F.4 Python Embedding for 2D data
+________________________________
 
 	     We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy arrays or by using Xarray objects. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as at the data has been loaded into either a NumPy array or an Xarray object by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy array or an Xarray object. MET can then ingest the data via the Python script. Note that whether a NumPy array or an Xarray object is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
 
@@ -76,7 +81,8 @@ In addition to the configure option mentioned above, two variables, MET_PYTHON_C
 
 	     plot_data_plane data/python/fcst.txt fcst.ps \
 
-	     F.5 Python Embedding for Point Observations
+F.5 Python Embedding for Point Observations
+___________________________________________
 
 	     The ASCII2NC tool supports the “-format python” option. With this option, point observations may be passed as input. An example of this is provided in Section [subsec:ascii2nc-pyembed]. That example uses the read_ascii_point.py sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
 
@@ -86,7 +92,8 @@ In addition to the configure option mentioned above, two variables, MET_PYTHON_C
 
 	       • MET GitHub repository (https://github.com/NCAR/MET) in met/scripts/python.
 
-		 F.6 Python Embedding for MPR data
+F.6 Python Embedding for MPR data
+_________________________________
 
 		 The Stat-Analysis tool supports the “-lookin python” option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in Section [subsec:StA-pyembed]. That example uses the read_ascii_mpr.py sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
 

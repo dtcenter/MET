@@ -1,8 +1,10 @@
 .. _appendixA:
 
 Appendix A FAQs & How do I ... ?
+================================
 
 A.1 Frequently Asked Questions
+______________________________
 
 Q. Why was the MET written largely in C++ instead of FORTRAN?
 

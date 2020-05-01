@@ -1,10 +1,12 @@
 .. _data_io:
 
 Chapter 3 MET Data I/O
+======================
 
 Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this chapter. Both the input and output file formats are described in this chapter. Sections [sec:IO_Input-data-formats] and [sec:IO_Intermediate-data-formats] are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in Figure [Fig_Overview_MET_Overview_Flowchart]. Output data formats are described in later Section [sec:IO_Output-data-formats]. Common configuration files options are described in Section [sec:IO_Configuration-File-Details]. Description of software modules used to reformat the data may now be found in Chapters [chap:Re-Formatting-of-Point] and [chap:Re-Formatting-of-Gridded].
 
 3.1 Input data formats
+______________________
 
 The MET package can handle gridded input data in one of four formats: GRIB version 1, GRIB version 2, NetCDF files following the Climate and Forecast (CF) conventions, and NetCDF files produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF grib tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See [subsec:IO_General-MET-Config-Options] for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
 
@@ -15,10 +17,12 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 Tropical cyclone forecasts and observations are typically provided in a specific ASCII format, in A Deck and B Deck files.
 
 3.2 Intermediate data formats
+_____________________________
 
 MET uses NetCDF as an intermediate file format. The MET tools which write gridded output files write to a common gridded NetCDF file format. The MET tools which write point output files write to a common point observation NetCDF file format.
 
 3.3 Output data formats
+_______________________
 
 The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, PostScript plots, and png plots from the Plot-Mode-Field utility.
 
@@ -37,6 +41,7 @@ The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing t
 Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs, and Plot-Mode-Field to produce graphics showing forecast, observation, and MODE object files.
 
 3.4 Data format summary
+_______________________
 
 The following is a summary of the input and output formats for each of the tools currently in MET. The output listed is the maximum number of possible output files. Generally, the type of output files generated can be controlled by the configuration files and/or the command line options:
 
@@ -232,7 +237,8 @@ The following is a summary of the input and output formats for each of the tools
 
 																														     * Output: ASCII description of their contents printed to the screen.
 
-																														       3.5 Configuration File Details
+3.5 Configuration File Details
+______________________________
 
 																														       Part of the strength of MET is the leveraging of capability across tools. There are several config options that are common to many of the tools. They are described in this section.
 
@@ -240,13 +246,15 @@ The following is a summary of the input and output formats for each of the tools
 
 																														       Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the chapters for those tools. In addition, these configuration settings are described in the share/met/config/README file and the share/met/config/README-TC file for the MET-Tropical Cyclone tools.
 
-																														       3.5.1 MET Configuration File Options
+3.5.1 MET Configuration File Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 																														       The information listed below may also be found in the data/config/README file.
 
 
 
-																														       3.5.2 MET-TC Configuration File Options
+3.5.2 MET-TC Configuration File Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 																														       The information listed below may also be found in the data/config/README_TC file.
 

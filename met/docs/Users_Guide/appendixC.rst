@@ -9,15 +9,13 @@ Statistics in MET and other names they have been published under.
 
 ?? Table did not copy over.
 
-
-
-USE JOHN's version bugfix_1294_master_v9.0_ens_spread  ??Unable to access this version.  Used what was in develop branch
-
 Appendix C Verification Measures
+================================
 
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 C.1 MET verification measures for categorical (dichotomous) variables
+_____________________________________________________________________
 
 The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table C-1. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-1 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}}
 
@@ -210,6 +208,7 @@ For cost / loss ratio below the base rate, the ECLV is defined as: $$ \hbox{ECLV
 For cost / loss ratio above the base rate, the ECLV is defined as: $$ \hbox{ECLV}={
 
 C.2 MET verification measures for continuous variables
+______________________________________________________
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
@@ -492,6 +491,7 @@ $\hbox{S1\_OG}={\displaystyle{
 $\hbox{FGOG\_RATIO}={\displaystyle{
 
 C.3 MET verification measures for probabilistic forecasts
+_________________________________________________________
 
 The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
 
@@ -624,6 +624,7 @@ The area under the receiver operating characteristic (ROC) curve is often used a
 The area under the curve can be estimated in a variety of ways. In MET, the simplest trapezoid method is used to calculate the area. AUC is calculated from the series of hit rate (POD) and false alarm rate (POFD) values (see the ROC entry below) for each user-specified threshold.$$\hbox{AUC}=\frac{1}{2}\sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}-POFD_i)$$
 
 C.4 MET verification measures for ensemble forecasts
+____________________________________________________
 
 CRPS
 
@@ -686,6 +687,7 @@ The ensemble spread for a single observation is the standard deviation of the en
 Note that prior to met-9.0.1, the ensemble spread of a spatial masking region was computed as the average of the spread values within that region. This algorithm was corrected in met-9.0.1 to average the ensemble variance values prior to computing the square root.
 
 C.5 MET verification measures for neighborhood methods
+______________________________________________________
 
 The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size.
 
@@ -757,7 +759,8 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 			  The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
 
-			  C.6 MET verification measures for distance map methods
+C.6 MET verification measures for distance map methods
+______________________________________________________
 
 			  The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 
@@ -835,7 +838,8 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 				   The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
-				   C.7 Calculating Percentiles
+C.7 Calculating Percentiles
+___________________________
 
 				   Several of the MET tools make use of percentiles in one way or another. Percentiles can be used as part of the internal computations of a tool, or can be written out as elements of some of the standard verification statistics. There are several widely-used conventions for calculating percentiles however, so in this section we describe how percentiles are calculated in MET.
 
