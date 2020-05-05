@@ -1,6 +1,10 @@
+.. _stat-analysis:
+
 Chapter 12 Stat-Analysis Tool
+=============================
 
 12.1 Introduction
+_________________
 
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this chapter.
 

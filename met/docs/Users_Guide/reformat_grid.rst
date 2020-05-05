@@ -1,8 +1,7 @@
 .. _reformat_grid:
 
-USE Howard So's feature_1291_develop_gaussian_to_GOES branch  ?? Unable to access that branch.  Used develop instead.
-
 Chapter 5 Re-Formatting of Gridded Fields
+=========================================
 
 Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in Figure [Fig_Overview_MET_Overview_Flowchart].
 

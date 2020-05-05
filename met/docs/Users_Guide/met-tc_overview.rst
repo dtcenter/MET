@@ -1,8 +1,10 @@
 .. _met-tc_overview:
 
 Chapter 18 MET-TC Overview
+==========================
 
 18.1 Introduction
+_________________
 
 The purpose of this User's Guide is to provide basic information to the users of the Model Evaluation Tools - Tropical Cyclone (MET-TC) to enable users to apply MET-TC to their tropical cyclone datasets and evaluation studies. MET-TC is intended for use with model forecasts run through a vortex tracking software or with operational model forecasts in Automated Tropical Cyclone Forecast (ATCF) file format.
 

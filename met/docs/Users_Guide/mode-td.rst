@@ -1,10 +1,13 @@
 .. _mode-td:
 
 Chapter 17 MODE Time Domain Tool
+================================
 
 17.1 Introduction
+_________________
 
 17.1.1 Motivation
+~~~~~~~~~~~~~~~~~
 
 MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method in inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
 

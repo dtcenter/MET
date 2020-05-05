@@ -1,8 +1,10 @@
 .. _wavelet-stat:
 
 Chapter 10 Wavelet-Stat Tool
+============================
 
 10.1 Introduction
+_________________
 
 The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This chapter describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by Casati et al. (2004).
 

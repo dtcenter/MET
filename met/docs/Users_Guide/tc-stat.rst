@@ -1,8 +1,10 @@
 .. _tc-stat:
 
 Chapter 21 TC-Stat Tool
+=======================
 
 21.1 Introduction
+_________________
 
 The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See Section[subsec:TC_Pairs-output] of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The filter job stratifies the TCST data using various conditions and thresholds described in Section[subsec:tc_stat-configuration-file]. The summary job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The rirw job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The probrirwjob process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in Section[sec:Statistical-aspects], and practical use information for the TC-Stat tool is described in Section[sec:Practical-information-1].
 

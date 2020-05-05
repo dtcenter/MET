@@ -1,16 +1,18 @@
 .. _ensemble-stat:
 
-USE JOHN's version bugfix_1294_master_v9.0_ens_spread  ?? unable to access this version.  Used develop instead.
-
 Chapter 9 Ensemble-Stat Tool
+============================
 
 9.1 Introduction
+________________
 
 The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. A climatology file may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in Appendix C [sec:App_C-ensemble].
 
 9.2 Scientific and statistical aspects
+______________________________________
 
 9.2.1 Ensemble forecasts derived from a set of deterministic ensemble members
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 

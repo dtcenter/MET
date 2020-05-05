@@ -1,14 +1,18 @@
 .. _grid-diag:
 
 Chapter 14 Grid-Diag Tool
+=========================
 
 14.1 Introduction
+_________________
 
 The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms will be created for all possible pairs of variables. Masks can be used to subset the data fields spatially. The histograms are accumulated over a time series of input data files, similar to Series-Analysis.
 
 14.2 Practical information
+__________________________
 
 14.2.1 grid_diag usage
+~~~~~~~~~~~~~~~~~~~~~~
 
 The following sections describe the usage statement, required arguments, and optional arguments for grid_diag.
 

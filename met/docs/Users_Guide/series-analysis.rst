@@ -1,8 +1,10 @@
 .. _series-analysis:
 
 Chapter 13 Series-Analysis Tool
+===============================
 
 13.1 Introduction
+_________________
 
 The Series-Analysis Tool accumulates statistics separately for each horizontal grid location over a series. Often, this series is over time or height, though any type of series is possible. This differs from the Grid-Stat tool in that Grid-Stat verifies all grid locations together as a group. Thus, the Series-Analysis Tool can be used to find verification information specific to certain locations or see how model performance varies over the domain.
 

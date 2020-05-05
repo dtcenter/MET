@@ -1,8 +1,10 @@
 .. _tc-dland:
 
 Chapter 19 TC-Dland Tool
+========================
 
 19.1 Introduction
+_________________
 
 Many filtering criteria within the MET-TC tools depend on the distinction between when a storm is over land or water. The TC-dland tool was developed to aid in quickly parsing data for filter jobs that only verify over water, threshold verification based on distance to land, and exclusion of forecasts outside a specified time window of landfall. For each grid point in the user-specified grid, it computes the great circle arc distance to the nearest coast line. Great circle arc distances are more accurate but take considerably longer to compute than a simple Euclidean distance. Grid points over land have distances greater than zero while point over land have distances less than zero.
 
