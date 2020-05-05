@@ -203,20 +203,22 @@ Values for the level_category option.
    :header-rows: 1
 
    * - Level category value
-     - 1
-     - 2
-     - 3
-     - 4
-     - 5
-     - 6
-     - 7
-   * - Description
+     - Description
+   * - 0
+     - Surface level
+   * - 1
      - Mandatory level
+   * - 2
      - Significant temperature level
+   * - 3
      - Winds-by-pressure level
-     - Winds-by-height level
-     - Tropopause level
-     - Reports on a single level
+   * - 4
+     - Winds-by-height level 
+   * - 5
+     - Tropopause level 
+   * - 6
+     - Reports on a single level     
+   * - 7
      - Auxiliary levels generated via interpolation from spanning levels
        
 
