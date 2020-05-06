@@ -473,8 +473,52 @@ MET version 9.0 adds support for the passing observations to ascii2nc using a Py
 
 The default ASCII point observation format consists of one row of data per observation value. Each row of data consists of 11 columns as shown in Table [table_reform-point_ascii2nc_format].
 
-Input MET ascii2nc point observation format
+Table 4.4 Input MET ascii2nc point observation format
 
+.. list-table:: table_reform-point_ascii2nc_format
+  :widths: auto
+  :header-rows: 1
+
+  * - ascii2nc ASCII Point Observation Format
+    - 
+    - 
+  * - **Column**
+    - **Name**
+    - **Description**
+  * - 1
+    - Message_Type
+    - Text string containing the observation message type as described in the previous section on the PB2NC tool.
+  * - 2
+    - Station_ID
+    - Text string containing the station id.
+  * - 3
+    - Valid_Time
+    - Text string containing the observation valid time in YYYYMMDD_HHMMSS format.
+  * - 4
+    - Lat
+    - Latitude in degrees north of the observing location.
+  * - 5
+    - Lon
+    - Longitude in degrees east of the observation location.
+  * - 6
+    - Elevation
+    - Elevation in msl of the observing location.
+  * - 7
+    - GRIB_Code or Variable_Name
+    - Integer GRIB code value or variable name corresponding to this observation type.
+  * - 8
+    - Level
+    - Pressure level in hPa or accumulation interval in hours for the observation value.
+  * - 9
+    - Height
+    - Height in msl or agl of the observation value.
+  * - 10
+    - QC_String
+    - Quality control value.
+  * - 11
+    - Observation_Value
+    - Observation value in units consistent with the GRIB code definition.
+      
 4.2.1 ascii2nc usage
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -824,8 +868,65 @@ We will not give a detailed description of each CALIPSO data product that lidar2
 Layer_Base gives the elevation in meters above ground level of the cloud base for each cloud level at each observation location. Similarly, Layer_Top gives the elevation of the top of each cloud layer. Note that if there are multiple cloud layers at a particular location, then there will be more than one base (or top) given for that location. For convenience, Min_Base and Max_Top give, respectively, the base elevation for the bottom cloud layer, and the top elevation for the top cloud layer. For these data types, there will be only one value per observation location regardless of how many cloud layers there are at that location.
 
 
-lidar2nc GRIB codes and their meaning, units, and abbreviations
+Table 4.5 lidar2nc GRIB codes and their meaning, units, and abbreviations
 
+.. list-table:: lidar2nc_grib_code_table
+  :widths: auto
+  :header-rows: 1
+
+  * - GRIB Code
+    - Meaning
+    - Units
+    - Abbreviation
+  * - 500
+    - Number of Cloud Layers
+    - NA
+    - NLayers
+  * - 501
+    - Cloud Layer Base AGL
+    - m
+    - Layer_Base
+  * - 502
+    - Cloud Layer Top AGL
+    - m
+    - Layer_Top
+  * - 503
+    - Cloud Opacity
+    - %
+    - Opacity
+  * - 504
+    - CAD Score
+    - NA
+    - CAD_Score
+  * - 505
+    - Minimum Cloud Base AGL
+    - m
+    - Min_Base
+  * - 506
+    - Maximum Cloud Top AGL
+    - m
+    - Max_Top
+  * - 600
+    - Feature Type
+    - NA
+    - Feature_Type
+  * - 601
+    - Ice/Water Phase
+    - NA
+    - Ice_Water_Phase
+  * - 602
+    - Feature Sub-Type
+    - NA
+    - Feature_Sub_Type
+  * - 603
+    - Cloud/Aerosol/PSC Type QA
+    - NA
+    - Cloud_Aerosol_PSC_Type_QA
+  * - 604
+    - Horizontal Averaging
+    - NA
+    - Horizontal_Averaging
+      
 
 4.5 Point2Grid tool
 ___________________
