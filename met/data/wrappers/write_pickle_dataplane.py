@@ -22,6 +22,9 @@ pickle_filename = sys.argv[1]
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
 
+if not pyembed_module_name.endswith('.py'):
+    pyembed_module_name += '.py'
+
 user_base = os.path.basename(pyembed_module_name).replace('.py','')
 
 spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
