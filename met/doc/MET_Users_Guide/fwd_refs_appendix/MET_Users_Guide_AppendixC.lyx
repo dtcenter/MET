@@ -7462,7 +7462,7 @@ reference "table_GS_format_info_NBRCNT"
 \begin_layout Standard
 
 \series medium
-The Uniform Fractions Skill Score (AFBS) is a reference statistic for the
+The Uniform Fractions Skill Score (UFBS) is a reference statistic for the
  Fractions Skill score based on a uniform distribution of the total forecast
  events across the grid.
  This no-skill forecast defines the UFSS, and thus a skilled forecast must
