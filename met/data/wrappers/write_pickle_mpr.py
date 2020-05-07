@@ -19,8 +19,7 @@ print('Write Pickle:\t',  sys.argv[1])
 
 pickle_filename = sys.argv[1]
 
-pyembed_module_name = os.path.basename(sys.argv[2])
-
+pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
 
 user_base = os.path.basename(pyembed_module_name).replace('.py','')
@@ -28,9 +27,6 @@ user_base = os.path.basename(pyembed_module_name).replace('.py','')
 spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
 met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
-
-sys.path.append(pyembed_module_dir)
-met_in = __import__(pyembed_module_name)
 
 print(met_in)
 
