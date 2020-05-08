@@ -11,19 +11,21 @@
 import os
 import sys
 import pickle
+import importlib.util
 
 print('Python Script:\t', sys.argv[0])
 print('User Command:\t',  sys.argv[2:])
 print('Write Pickle:\t',  sys.argv[1])
 
-pickle_filename = sys.argv[1];
+pickle_filename = sys.argv[1]
 
-pyembed_module_dir  = os.path.dirname(sys.argv[2]) or '.'
-pyembed_module_name = os.path.basename(sys.argv[2]).replace('.py','')
-
+pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
 
-sys.path.append(pyembed_module_dir)
-met_in = __import__(pyembed_module_name)
+user_base = os.path.basename(pyembed_module_name).replace('.py','')
+
+spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
+met_in = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(met_in)
 
 pickle.dump( met_in.point_data, open( pickle_filename, "wb" ) )
