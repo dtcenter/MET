@@ -826,32 +826,606 @@ Table 6 Format information for CNT(Continuous Statistics) output line type.
       
 Table 7  Format information for CNT(Continuous Statistics) output line type continued from above table
 
+.. list-table::  Format information for CNT(Continuous Statistics) output line type continued from above table
+  :widths: auto
+  :header-rows: 2
+
+  * - CNT OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - CNT Column Name
+    - Description
+  * - 66-68
+    - MBIAS, MBIAS_BCL, MBIAS_BCU
+    - Multiplicative bias including bootstrap upper and lower confidence limits
+  * - 69-71
+    - MAE, MAE_BCL, MAE_BCU
+    - Mean absolute error including bootstrap upper and lower confidence limits
+  * - 72-74
+    - MSE, MSE_BCL, MSE_BCU
+    - Mean squared error including bootstrap upper and lower confidence limits
+  * - 75-77
+    - BCMSE, BCMSE_BCL, BCMSE_BCU
+    - Bias-corrected mean squared error including bootstrap upper and lower confidence limits
+  * - 78-80
+    - RMSE, RMSE_BCL, RMSE_BCU
+    - Root mean squared error including bootstrap upper and lower confidence limits
+  * - 81-94
+    - E10, E10_BCL, E10_BCU, E25, E25_BCL, E25_BCU, E50, E50_BCL, E50_BCU, E75, E75_BCL, E75_BCU, E90, E90_BCL, E90_BCU
+    - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
+  * - 96-98
+    - IQR, IQR _BCL, IQR _BCU
+    - The Interquartile Range including bootstrap upper and lower confidence limits
+  * - 99-101
+    - MAD, MAD_BCL, MAD_BCU
+    - The Median Absolute Deviation including bootstrap upper and lower confidence limits
+  * - 102-106
+    - ANOM_CORR, ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
+    - The Anomaly Correlation including normal and bootstrap upper and lower confidence limits
+  * - 107-109
+    - ME2, ME2_BCL, ME2_BCU
+    - The square of the mean error (bias) including bootstrap upper and lower confidence limits
+  * - 110-112
+    - MSESS, MSESS_BCL, MSESS_BCU
+    - The mean squared error skill score including bootstrap upper and lower confidence limits
+  * - 113-115
+    - RMSFA, RMSFA_BCL, RMSFA_BCU
+    - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
+  * - 116-118
+    - RMSOA, RMSOA_BCL, RMSOA_BCU
+    - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
+     
+
+Table 8 Format information for MCTC (Multi-category Contingency Table Count) output line type.
+
+.. list-table:: Format information for MCTC (Multi-category Contingency Table Count) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - MCTC OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - MCTC Column Name
+    - Description
+  * - 24
+    - MCTC
+    - Multi-category Contingency Table Counts line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_CAT
+    - Dimension of the contingency table
+  * - 27
+    - Fi_Oj
+    - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
+      
+
+Table 9 Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+
+.. list-table:: Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - MCTS OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - MCTS Column Name
+    - Description
+  * - 24
+    - MCTS
+    - Multi-category Contingency Table Statistics line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_CAT
+    - The total number of categories in each of dimension of the contingency table. So the total number of cells is N_CAT*N_CAT.
+  * - 27-31
+    - ACC, ACC_NCL, ACC_NCU, ACC_BCL, ACC_BCU
+    - Accuracy, normal confidence limits and bootstrap confidence limits
+  * - 32-34
+    - HK, HK_BCL, HK_BCU
+    - Hanssen and Kuipers Discriminant and bootstrap confidence limits
+  * - 35-37
+    - HSS, HSS_BCL, HSS_BCU
+    - Heidke Skill Score and bootstrap confidence limits
+  * - 38-40
+    - GER, GER_BCL, GER_BCU
+    - Gerrity Score and bootstrap confidence limits
+
+Table 10 Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
+
+.. list-table:: Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - PCT OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - PCT Column Name
+    - Description
+  * - 24
+    - PCT
+    - Probability contingency table count line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_THRESH
+    - Number of probability thresholds
+  * - 27
+    - THRESH_i
+    - The ith probability threshold value (repeated)
+  * - 28
+    - OY_i
+    - Number of observation yes when forecast is between the ith and i+1th probability thresholds (repeated)
+  * - 29
+    - ON_i
+    - Number of observation no when forecast is between the ith and i+1th probability thresholds (repeated)
+  * - *
+    - THRESH_n
+    - Last probability threshold value
 
 
-Format information for MCTC (Multi-category Contingency Table Count) output line type.
+Table 11 Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type.
 
-Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+.. list-table:: Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
+  :widths: auto
+  :header-rows: 2
 
-Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
+  * - PSTD OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - PSTD Column Name
+    - Description
+  * - 24
+    - PSTD
+    - Probabilistic statistics for dichotomous outcome line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_THRESH
+    - Number of probability thresholds
+  * - 27-29
+    - BASER, BASER_NCL, BASER_NCU
+    - The Base Rate, including normal upper and lower confidence limits
+  * - 30
+    - RELIABILITY
+    - Reliability
+  * - 31
+    - RESOLUTION
+    - Resolution
+  * - 32
+    - UNCERTAINTY
+    - Uncertainty
+  * - 33
+    - ROC_AUC
+    - Area under the receiver operating characteristic curve
+  * - 34-36
+    - BRIER, BRIER_NCL, BRIER_NCU
+    - Brier Score including normal upper and lower confidence limits
+  * - 37-39
+    - BRIERCL, BRIERCL_NCL, BRIERCL_NCU
+    - Climatological Brier Score including upper and lower normal confidence limits
+  * - 40
+    - BSS
+    - Brier Skill Score relative to external climatology
+  * - 41
+    - BSS_SMPL
+    - Brier Skill Score relative to sample climatology
+  * - 42
+    - THRESH_i
+    - The ith probability threshold value (repeated)
 
-Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type.
+Table 12 Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
 
-Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
+  :widths: auto
+  :header-rows: 2
 
-Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
+  * - PJC OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - PJC Column Name
+    - Description
+  * - 24
+    - PJC
+    - Probabilistic Joint/Continuous line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_THRESH
+    - Number of probability thresholds
+  * - 27
+    - THRESH_i
+    - The ith probability threshold value (repeated)
+  * - 28
+    - OY_TP_i
+    - Number of observation yes when forecast is between the ith and i+1th probability thresholds as a proportion of the total OY (repeated)
+  * - 29
+    - ON_TP_i
+    - Number of observation no when forecast is between the ith and i+1th probability thresholds as a proportion of the total ON (repeated)
+  * - 30
+    - CALIBRATION_i
+    - Calibration when forecast is between the ith and i+1th probability thresholds (repeated)
+  * - 31
+    - REFINEMENT_i
+    - Refinement when forecast is between the ith and i+1th probability thresholds (repeated)
+  * - 32
+    - LIKELIHOOD_i
+    - Likelihood when forecast is between the ith and i+1th probability thresholds (repeated
+  * - 33
+    - BASER_i
+    - Base rate when forecast is between the ith and i+1th probability thresholds (repeated)
+  * - *
+    - THRESH_n
+    - Last probability threshold value
 
-Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
+Table 13 Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
 
-Format information for SL1L2 (Scalar Partial Sums) output line type.
+.. list-table:: Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
+  :widths: auto
+  :header-rows: 2
 
-Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
+  * - PRC OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - PRC Column Name
+    - Description
+  * - 24
+    - PRC
+    - Probability ROC points line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - N_THRESH
+    - Number of probability thresholds
+  * - 27
+    - THRESH_i
+    - The ith probability threshold value (repeated)
+  * - 28
+    - PODY_i
+    - Probability of detecting yes when forecast is greater than the ith probability thresholds (repeated)
+  * - 29
+    - POFD_i
+    - Probability of false detection when forecast is greater than the ith probability thresholds (repeated)
+  * - *
+    - THRESH_n
+    - Last probability threshold value
 
-Format information for VL1L2 (Vector Partial Sums) output line type.
+Table 14 Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
 
-Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
+.. list-table:: Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
+  :widths: auto
+  :header-rows: 2
 
-Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+  * - ECLV OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - PRC Column Name
+    - Description
+  * - 24
+    - ECLV
+    - Economic Cost/Loss Relative Value line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - BASER
+    - Base rate
+  * - 27
+    - VALUE_BASER
+    - Economic value of the base rate
+  * - 28
+    - N_PNT
+    - Number of Cost/Loss ratios
+  * - 29
+    - CL_i
+    - ith Cost/Loss ratio evaluated
+  * - 30
+    - VALUE_i
+    - Relative value for the ith Cost/Loss ratio
 
-Format information for MPR (Matched Pair) output line type.
+Table 15 Format information for SL1L2 (Scalar Partial Sums) output line type.
+
+.. list-table::  Format information for SL1L2 (Scalar Partial Sums) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SL1L2 OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - SL1L2 Column Name
+    - Description
+  * - 24
+    - SL1L2
+    - Scalar L1L2 line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs of forecast (f) and observation (o)
+  * - 26
+    - FBAR
+    - Mean(f)
+  * - 27
+    - OBAR
+    - Mean(o)
+  * - 28
+    - FOBAR
+    - Mean(f*o)
+  * - 29
+    - FFBAR
+    - Mean(f²)
+  * - 30
+    - OOBAR
+    - Mean(o²)
+  * - 31
+    - MAE
+    - Mean Absolute Error
+
+Table 16 Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
+
+.. list-table:: Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SAL1L2 OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - SAL1L2 Column Name
+    - Description
+  * - 24
+    - SAL1L2
+    - Scalar Anomaly L1L2 line type
+  * - 25
+    - TOTAL
+    - Total number of matched triplets of forecast (f), observation (o), and climatological value (c)
+  * - 26
+    - FABAR
+    - Mean(f-c)
+  * - 27
+    - OABAR
+    - Mean(o-c)
+  * - 28
+    - FOABAR
+    - Mean((f-c)*(o-c))
+  * - 29
+    - FFABAR
+    - Mean((f-c)²)
+  * - 30
+    - OOABAR
+    - Mean((o-c)²)
+  * - 31
+    - MAE
+    - Mean Absolute Error
+
+Table 17 Format information for VL1L2 (Vector Partial Sums) output line type.
+
+.. list-table:: Format information for VL1L2 (Vector Partial Sums) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - VL1L2 OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - VL1L2 Column Name
+    - Description
+  * - 24
+    - VL1L2
+    - Vector L1L2 line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs of forecast winds (uf, vf) and observation winds (uo, vo)
+  * - 26
+    - UFBAR
+    - Mean(uf)
+  * - 27
+    - VFBAR
+    - Mean(vf)
+  * - 28
+    - UOBAR
+    - Mean(uo)
+  * - 29
+    - VOBAR
+    - Mean(vo)
+  * - 30
+    - UVFOBAR
+    - Mean(uf*uo+vf*vo)
+  * - 31
+    - UVFFBAR
+    - Mean(uf²+vf²)
+  * - 32
+    - UVOOBAR
+    - Mean(uo²+vo²)
+  * - 33
+    - F_SPEED_BAR
+    - Mean forecast wind speed
+  * - 34
+    - O_SPEED_BAR
+    - Mean observed wind speed
+
+Table 18 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
+
+.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - VAL1L2 OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - VAL1L2 Column Name
+    - Description
+  * - 24
+    - VAL1L2
+    - Vector Anomaly L1L2 line type
+  * - 25
+    - TOTAL
+    - Total number of matched triplets of forecast winds (uf, vf), observation winds (uo, vo), and climatological winds (uc, vc)
+  * - 26
+    - UFABAR
+    - Mean(uf-uc)
+  * - 27
+    - VFABAR
+    - Mean(vf-vc)
+  * - 28
+    - UOABAR
+    - Mean(uo-uc)
+  * - 29
+    - VOABAR
+    - Mean(vo-vc)
+  * - 30
+    - UVFOABAR
+    - Mean((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc))
+  * - 31
+    - UVFFABAR
+    - Mean((uf-uc)²+(vf-vc)²)
+  * - 32
+    - UVOOABAR
+    - Mean((uo-uc)²+(vo-vc)²)
+
+Table 19 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+
+.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+  :widths: auto
+  :header-rows: 2
+
+  * - VCNT OUTPUT FORMAT
+    - 
+    - 
+  * - Column Numbers
+    - VCNT Column Name
+    - Description
+  * - 24
+    - VCNT
+    - Vector Continuous Statistics line type
+  * - 25
+    - TOTAL
+    - Total number of data points
+  * - 26–28
+    - FBAR
+    - Mean value of forecast wind speed
+  * - 29–31
+    - OBAR
+    - Mean value of observed wind speed
+  * - 32–34
+    - FS_RMS
+    - Root mean square forecast wind speed
+  * - 35–37
+    - OS_RMS
+    - Root mean square observed wind speed
+  * - 38–40
+    - MSVE
+    - Mean squared length of the vector difference between the forecast and observed winds
+  * - 41–43
+    - RMSVE
+    - Square root of MSVE
+  * - 45–46
+    - FSTDEV
+    - Standard deviation of the forecast wind speed
+  * - 47–49
+    - OSTDEV
+    - Standard deviation of the observed wind field
+  * - 50–52
+    - FDIR
+    - Direction of the average forecast wind vector
+  * - 53–55
+    - ODIR
+    - Direction of the average observed wind vector
+  * - 56–58
+    - FBAR_SPEED
+    - Length (speed) of the average forecast wind vector
+  * - 59–61
+    - OBAR_SPEED
+    - Length (speed) of the average observed wind vector
+  * - 62–64
+    - VDIFF_SPEED
+    - Length (speed) of the vector difference between the average forecast and average observed wind vectors
+  * - 65–67
+    - VDIFF_DIR
+    - Direction of the vector difference between the average forecast and average wind vectors
+  * - 68–70
+    - SPEED_ERR
+    - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O)
+  * - 71–73
+    - SPEED_ABSERR
+    - Absolute value of SPEED_ERR
+  * - 74–76
+    - DIR_ERR
+    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector
+  * - 77–79
+    - DIR_ABSERR
+    - Absolute value of DIR_ABSERR
+
+?? Missing table 20.  Were things mis-numbered?
+
+Table 21 Format information for MPR (Matched Pair) output line type.
+
+.. list-table:: Format information for MPR (Matched Pair) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - MPR OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - MPR Column Name
+    - Description
+  * - 24
+    - MPR
+    - Matched Pair line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - INDEX
+    - Index for the current matched pair
+  * - 27
+    - OBS_SID
+    - Station Identifier of observation
+  * - 28
+    - OBS_LAT
+    - Latitude of the observation in degrees north
+  * - 29
+    - OBS_LON
+    - Longitude of the observation in degrees east
+  * - 30
+    - OBS_LVL
+    - Pressure level of the observation in hPa or accumulation interval in hours
+  * - 31
+    - OBS_ELV
+    - Elevation of the observation in meters above sea level
+  * - 32
+    - FCST
+    - Forecast value interpolated to the observation location
+  * - 33
+    - OBS
+    - Observation value
+  * - 34
+    - OBS_QC
+    - Quality control flag for observation
+  * - 35
+    - CLIMO_MEAN
+    - Climatological mean value
+  * - 36
+    - CLIMO_STDEV
+    - Climatological standard deviation value
+  * - 37
+    - CLIMO_CDF
+    - Climatological cumulative distribution function value
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see Chapter [chap:The-Stat-Analysis-Tool]. 
