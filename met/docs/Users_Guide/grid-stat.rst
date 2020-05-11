@@ -11,8 +11,11 @@ The Grid-Stat tool provides verification statistics for a matched forecast and o
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this chapter, followed by practical details regarding usage and output from the tool.
 
 8.2 Scientific and statistical aspects
+______________________________________
+
 
 8.2.1 Statistical measures
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in Appendix [chap:App_C-Verification-Measures]. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2012), and on the world-wide web at
 
@@ -47,14 +50,17 @@ Use of analysis fields for verification
 The Grid-Stat tool allows evaluation of model forecasts using model analysis fields. However, users are cautioned that an analysis field is not independent of its parent model; for this reason verification of model output using an analysis field from the same model is generally not recommended and is not likely to yield meaningful information about model performance.
 
 8.2.2 Statistical confidence intervals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., Efron 2007). See Appendix [chap:App_D-Confidence-Intervals] for details regarding confidence intervals provided by MET.
 
 8.2.3 Grid weighting
+~~~~~~~~~~~~~~~~~~~~
 
 When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See [subsec:IO_General-MET-Config-Options]for more information.
 
 8.2.4 Neighborhood methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as “fuzzy” verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
 
@@ -63,6 +69,7 @@ There are several ways to present the results of the neighborhood approaches, su
 The user must specify several parameters in the grid_stat configuration file to utilize the neighborhood approach, such as the interpolation method, size of the smoothing window, and required fraction of valid data points within the smoothing window. For FSS-specific results, the user must specify the size of the neighborhood window, the required fraction of valid data points within the window, and the fractional coverage threshold from which the contingency tables are defined. These parameters are described further in the practical information section below.
 
 8.2.5 Fourier Decomposition
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The MET software will compute the full one-dimensional Fourier transform, then do a partial inverse transform based on the two user-defined wave numbers. These two wave numbers define a band pass filter in the Fourier domain. This process is conceptually similar to the operation of projecting onto subspace in linear algebra. If one were to sum up all possible wave numbers the result would be to simply reproduce the raw data.
 
@@ -71,12 +78,14 @@ Decomposition via Fourier transform allows the user to evaluate the model separa
 Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (Casati et al, 2004; Weniger et al 2016). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
 8.2.6 Gradient Statistics
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The S1 score has been in historical use for verification of forecasts, particularly for variables such as pressure and geopotential height. This score compares differences between adjacent grid points in the forecast and observed fields. When the adjacent points in both forecast and observed fields exhibit the same differences, the S1 score will be the perfect value of 0. Larger differences will result in a larger score.
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
 8.2.7 Distance Maps
+~~~~~~~~~~~~~~~~~~~
 
 The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, s=(x,y), in the domain, D, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas A, from one field and observation event areas B from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
 
@@ -95,12 +104,14 @@ The absolute difference between the distance maps in the bottom row of Figure [F
 The statistics derived from these distance maps are described in Appendix [sec:App_C-distance_maps]. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 
 8.3 Practical information
+_________________________
 
 This section contains information about configuring and running the Grid-Stat tool. The Grid-Stat tool verifies gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported file formats. The requirement of having all gridded fields using the same grid specification was removed in METv5.1. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded observation data may be a gridded analysis based on observations such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used.
 
 The Grid-Stat tool provides the capability of verifying one or more model variables/levels using multiple thresholds for each model variable/level. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. The interpolation parameters may be used to perform a smoothing operation on the forecast field prior to verifying it to investigate how the scale of the forecast affects the verification statistics. The Grid-Stat tool computes a number of continuous statistics for the forecast minus observation differences, discrete statistics once the data have been thresholded, or statistics for probabilistic forecasts. All types of statistics can incorporate a climatological reference.
 
 8.3.1 grid_stat usage
+~~~~~~~~~~~~~~~~~~~~~
 
 The usage statement for the Grid-Stat tool is listed below:
 
@@ -126,338 +137,719 @@ Required arguments for grid_stat
 
 1. The fcst_file argument indicates the gridded file containing the model data to be verified.
 
-   2. The obs_file argument indicates the gridded file containing the gridded observations to be used for the verification of the model.
+2. The obs_file argument indicates the gridded file containing the gridded observations to be used for the verification of the model.
 
-      3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-	 Optional arguments for grid_stat
+   Optional arguments for grid_stat
 
-	 4. The -outdir path indicates the directory where output files should be written.
+4. The -outdir path indicates the directory where output files should be written.
 
-	    5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-	       6. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+6. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-		  7. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-		     An example of the grid_stat calling sequence is listed below:
+An example of the grid_stat calling sequence is listed below:
 
-		     Example 1:
+Example 1:
 
-		     grid_stat sample_fcst.grb \
+grid_stat sample_fcst.grb \
+sample_obs.grb \
+GridStatConfig
 
-		     sample_obs.grb \
+In Example 1, the Grid-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the GridStatConfig file.
 
-		     GridStatConfig
+A second example of the grid_stat calling sequence is listed below:
 
-		     In Example 1, the Grid-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the GridStatConfig file.
+Example 2:
 
-		     A second example of the grid_stat calling sequence is listed below:
+grid_stat sample_fcst.nc
+sample_obs.nc
+GridStatConfig
 
-		     Example 2:
+In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
 
-		     grid_stat sample_fcst.nc
+8.3.2 grid_stat configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-		     sample_obs.nc
+The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed share/met/config directory. Other versions of the configuration file are included in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
-		     GridStatConfig
+Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
 
-		     In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
+model          = "WRF";
 
-		     8.3.2 grid_stat configuration file
+desc           = "NA";
 
-		     The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed share/met/config directory. Other versions of the configuration file are included in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
+obtype         = "ANALYS";
 
-		     Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
+fcst           = { ... }
 
+obs            = { ... }
 
+regrid         = { ... }
 
-		     model          = "WRF";
+climo_mean     = { ... }
 
-		     desc           = "NA";
+climo_stdev    = { ... }
 
-		     obtype         = "ANALYS";
+climo_cdf      = { ... }
 
-		     fcst           = { ... }
+mask           = { grid = [ "FULL" ]; poly = []; }
 
-		     obs            = { ... }
+ci_alpha       = [ 0.05 ];
 
-		     regrid         = { ... }
+boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
 
-		     climo_mean     = { ... }
+                   rng = "mt19937"; seed = ""; }
 
-		     climo_stdev    = { ... }
+interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 
-		     climo_cdf      = { ... }
+type = [ { method = NEAREST; width = 1; } ]; }
 
-		     mask           = { grid = [ "FULL" ]; poly = []; }
+censor_thresh  = [];
 
-		     ci_alpha       = [ 0.05 ];
+censor_val     = [];
 
-		     boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+eclv_points    = 0.05;
 
-		                        rng = "mt19937"; seed = ""; }
+rank_corr_flag = TRUE;
 
-					interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+tmp_dir        = "/tmp";
 
-					                   type = [ { method = NEAREST; width = 1; } ]; }
+output_prefix  = "";
 
+version        = "VN.N";
 
+The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
-							   censor_thresh  = [];
+nbrhd = {
 
-							   censor_val     = [];
+field      = BOTH;
 
-							   eclv_points    = 0.05;
+vld_thresh = 1.0;
 
-							   rank_corr_flag = TRUE;
+shape      = SQUARE;
 
+width      = [ 1 ];
 
+cov_thresh = [ >=0.5 ];
 
-							   tmp_dir        = "/tmp";
+         }
 
-							   output_prefix  = "";
+	 
+The nbrhd dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood shape is a SQUARE or CIRCLE centered on the current point, and the width value specifies the width of the square or diameter of the circle as an odd integer.
 
-							   version        = "VN.N";
+The field entry is set to BOTH, FCST, OBS, or NONE to indicate the fields to which the fractional coverage derivation logic should be applied. This should always to be set to BOTH unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
 
-							   The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The vld_thresh entry contains a number between 0 and 1. When performing neighborhood verification over some neighborhood of points the ratio of the number of valid data points to the total number of points in the neighborhood is computed. If that ratio is greater than this threshold, that value is included in the neighborhood verification. Setting this threshold to 1, which is the default, requires that the entire neighborhood must contain valid data. This variable will typically come into play only along the boundaries of the verification region chosen.
 
+The cov_thresh entry contains a comma separated list of thresholds to be applied to the neighborhood coverage field. The coverage is the proportion of forecast points in the neighborhood that exceed the forecast threshold. For example, if 10 of the 25 forecast grid points contain values larger than a threshold of 2, then the coverage is 10/25 = 0.4. If the coverage threshold is set to 0.5, then this neighborhood is considered to be a “No” forecast.
 
+fourier = {
 
-							   nbrhd = {
+wave_1d_beg = [ 0, 4, 10 ];
 
-							      field      = BOTH;
+wave_1d_end = [ 3, 9, 20 ];
 
-							         vld_thresh = 1.0;
+           }
 
-								    shape      = SQUARE;
 
-								       width      = [ 1 ];
+The fourier entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
 
-								          cov_thresh = [ >=0.5 ];
+The wave_1d_beg entry is an array of integers specifying the first wave number to be included. The wave_1d_end entry is an array of integers specifying the last wave number to be included.
 
-									  }
+grad = {
 
-									  The nbrhd dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood shape is a SQUARE or CIRCLE centered on the current point, and the width value specifies the width of the square or diameter of the circle as an odd integer.
+dx = [ 1 ];
 
-									  The field entry is set to BOTH, FCST, OBS, or NONE to indicate the fields to which the fractional coverage derivation logic should be applied. This should always to be set to BOTH unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
+dy = [ 1 ];
 
-									  The vld_thresh entry contains a number between 0 and 1. When performing neighborhood verification over some neighborhood of points the ratio of the number of valid data points to the total number of points in the neighborhood is computed. If that ratio is greater than this threshold, that value is included in the neighborhood verification. Setting this threshold to 1, which is the default, requires that the entire neighborhood must contain valid data. This variable will typically come into play only along the boundaries of the verification region chosen.
+       }
 
-									  The cov_thresh entry contains a comma separated list of thresholds to be applied to the neighborhood coverage field. The coverage is the proportion of forecast points in the neighborhood that exceed the forecast threshold. For example, if 10 of the 25 forecast grid points contain values larger than a threshold of 2, then the coverage is 10/25 = 0.4. If the coverage threshold is set to 0.5, then this neighborhood is considered to be a “No” forecast.
 
 
+The gradient entry is a dictionary which specifies the number and size of gradients to be computed. The dx and dy entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. dx and dy are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each obs.field entry.
 
-									  fourier = {
+distance_map = {
 
-									     wave_1d_beg = [ 0, 4, 10 ];
+baddeley_p        = 2;
 
-									        wave_1d_end = [ 3, 9, 20 ];
+baddeley_max_dist = NA;
 
-										}
+fom_alpha         = 0.1;
 
-										The fourier entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
+zhu_weight        = 0.5;
 
-										The wave_1d_beg entry is an array of integers specifying the first wave number to be included. The wave_1d_end entry is an array of integers specifying the last wave number to be included.
+               }
 
+The distance_map entry is a dictionary containing options related to the distance map statistics in the DMAP output line type. The baddeley_p entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley \Delta metric. The baddeley_max_dist entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of NA indicates that no maximum distance value should be used. The fom_alpha entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The zhu_weight specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each obs.field entry.
 
+ output_flag = {
 
-										grad = {
+ 	     fho    = BOTH;
 
-										   dx = [ 1 ];
+	     ctc    = BOTH;
 
-										      dy = [ 1 ];
+cts    = BOTH;
 
-										      }
+mctc   = BOTH;
 
-										      The gradient entry is a dictionary which specifies the number and size of gradients to be computed. The dx and dy entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. dx and dy are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each obs.field entry.
+mcts   = BOTH;
 
+cnt    = BOTH;
 
+sl1l2  = BOTH;
 
-										      distance_map = {
+sal1l2 = NONE;
 
-										         baddeley_p        = 2;
+vl1l2  = BOTH;
 
-											    baddeley_max_dist = NA;
+val1l2 = NONE;
 
-											       fom_alpha         = 0.1;
+vcnt   = BOTH;
 
-											          zhu_weight        = 0.5;
+pct    = BOTH;
 
-												  }
+pstd   = BOTH;
 
-												  The distance_map entry is a dictionary containing options related to the distance map statistics in the DMAP output line type. The baddeley_p entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley \Delta metric. The baddeley_max_dist entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of NA indicates that no maximum distance value should be used. The fom_alpha entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The zhu_weight specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each obs.field entry.
+pjc    = BOTH;
 
+prc    = BOTH;
 
+eclv   = BOTH;
 
-												  output_flag = {
+nbrctc = BOTH;
 
-												     fho    = BOTH;
+nbrcts = BOTH;
 
-												        ctc    = BOTH;
+nbrcnt = BOTH;
 
-													   cts    = BOTH;
+grad   = BOTH;
 
-													      mctc   = BOTH;
+dmap   = BOTH;
 
-													         mcts   = BOTH;
+       	 }
 
-														    cnt    = BOTH;
 
-														       sl1l2  = BOTH;
+The output_flag array controls the type of output that the Grid-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data are grouped by line type. These output flags correspond to the following types of output line types:
 
-														          sal1l2 = NONE;
 
-															     vl1l2  = BOTH;
+1. FHO for Forecast, Hit, Observation Rates
 
-															        val1l2 = NONE;
+2. CTC for Contingency Table Counts
 
-																   vcnt   = BOTH;
+3. CTS for Contingency Table Statistics
 
-																      pct    = BOTH;
+4. MCTC for Multi-Category Contingency Table Counts
 
-																         pstd   = BOTH;
+5. MCTS for Multi-Category Contingency Table Statistics
 
-																	    pjc    = BOTH;
+6. CNT for Continuous Statistics
 
-																	       prc    = BOTH;
+7. SL1L2 for Scalar L1L2 Partial Sums
 
-																	          eclv   = BOTH;
+8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
 
-																		     nbrctc = BOTH;
+9. VL1L2 for Vector L1L2 Partial Sums
 
-																		        nbrcts = BOTH;
+10. VAL1L2 for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-																			   nbrcnt = BOTH;
+11. VCNT for Vector Contingency Table Statistics
 
-																			      grad   = BOTH;
+12. PCT for Contingency Table Counts for Probabilistic forecasts
 
-																			         dmap   = BOTH;
+13. PSTD for Contingency Table Statistics for Probabilistic forecasts
 
-																				 }
+14. PJC for Joint and Conditional factorization for Probabilistic forecasts
 
-																				 The output_flag array controls the type of output that the Grid-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data are grouped by line type. These output flags correspond to the following types of output line types:
+15. PRC for Receiver Operating Characteristic for Probabilistic forecasts
 
-																				 1. FHO for Forecast, Hit, Observation Rates
+16. ECLV for Cost/Loss Ratio Relative Value
 
-																				    2. CTC for Contingency Table Counts
+17. NBRCTC for Neighborhood Contingency Table Counts
 
-																				       3. CTS for Contingency Table Statistics
+18. NBRCTS for Neighborhood Contingency Table Statistics
 
-																					  4. MCTC for Multi-Category Contingency Table Counts
+19. NBRCNT for Neighborhood Continuous Statistics
 
-																					     5. MCTS for Multi-Category Contingency Table Statistics
+20. GRAD for Gradient Statistics
 
-																						6. CNT for Continuous Statistics
+21. DMAP for Distance Map Statistics
 
-																						   7. SL1L2 for Scalar L1L2 Partial Sums
 
-																						      8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
+Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section [subsec:grid_stat-output].
 
-																							 9. VL1L2 for Vector L1L2 Partial Sums
 
-																							    10. VAL1L2 for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+nc_pairs_flag = {
 
-																								11. VCNT for Vector Contingency Table Statistics
+	      latlon       = TRUE;
 
-																								    12. PCT for Contingency Table Counts for Probabilistic forecasts
+	      raw          = TRUE;
 
-																									13. PSTD for Contingency Table Statistics for Probabilistic forecasts
+	      diff         = TRUE;
 
-																									    14. PJC for Joint and Conditional factorization for Probabilistic forecasts
+	      climo        = TRUE;
 
-																										15. PRC for Receiver Operating Characteristic for Probabilistic forecasts
+	      climo_cdp    = TRUE;
 
-																										    16. ECLV for Cost/Loss Ratio Relative Value
+	      weight       = FALSE;
 
-																											17. NBRCTC for Neighborhood Contingency Table Counts
+	      nbrhd        = FALSE;
 
-																											    18. NBRCTS for Neighborhood Contingency Table Statistics
+	      gradient     = FALSE;
 
-																												19. NBRCNT for Neighborhood Continuous Statistics
+	      distance_map = FALSE;
 
-																												    20. GRAD for Gradient Statistics
+	      apply_mask   = TRUE;
 
-																													21. DMAP for Distance Map Statistics
+                                     }
 
-																													    Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section [subsec:grid_stat-output].
 
+The nc_pairs_flag entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if output_flag dictionary indicates any statistics should be computed. The latlon, raw, and diff entries control the creation of output variables for the latitude and longitude, the raw forecast and observed fields, and the forecast minus observation difference fields. The climo, weight, and nbrhd entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
 
+Setting the climo_cdp entry to TRUE enables the creation of an output variable for each climatological distribution percentile (CDP) threshold requested in the configuration file. Note that enabling nbrhd output may lead to very large output files. The gradient entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The distance_map entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The apply_mask entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
 
-																													    nc_pairs_flag = {
+nc_pairs_var_name = "";
 
-																													       latlon       = TRUE;
 
-																													          raw          = TRUE;
+The nc_pairs_var_name entry specifies a string for each verification task. This string is parsed from each obs.field dictionary entry and is used to construct variable names for the NetCDF matched pairs output file. The default value of an empty string indicates that the name and level strings of the input data should be used. If the input data level string changes for each run of Grid-Stat, using this option to define a constant string may make downstream processing more convenient.
 
-																														     diff         = TRUE;
 
-																														        climo        = TRUE;
 
-																															   climo_cdp    = TRUE;
 
-																															      weight       = FALSE;
+nc_pairs_var_suffix = "";
 
-																															         nbrhd        = FALSE;
 
-																																    gradient     = FALSE;
+The nc_pairs_var_suffix entry is similar to the nc_pairs_var_name entry. It is also parsed from each obs.field dictionary entry. However, it defines a suffix to be appended to the output variable name. This enables the output variable names to be made unique. For example, when verifying height for multiple level types but all with the same level value, use this option to customize the output variable names. This option was previously named nc_pairs_var_str which is now deprecated.
 
-																																       distance_map = FALSE;
+8.3.3 grid_stat output
+~~~~~~~~~~~~~~~~~~~~~~
 
-																																          apply_mask   = TRUE;
+grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 
-																																	  }
+The output STAT file is named using the following naming convention:
 
-																																	  The nc_pairs_flag entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if output_flag dictionary indicates any statistics should be computed. The latlon, raw, and diff entries control the creation of output variables for the latitude and longitude, the raw forecast and observed fields, and the forecast minus observation difference fields. The climo, weight, and nbrhd entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix, HHMMSSL indicates the forecast lead time and YYYYMMDD_HHMMSSV indicates the forecast valid time.
 
-																																	  Setting the climo_cdp entry to TRUE enables the creation of an output variable for each climatological distribution percentile (CDP) threshold requested in the configuration file. Note that enabling nbrhd output may lead to very large output files. The gradient entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The distance_map entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The apply_mask entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
+The output ASCII files are named similarly:
 
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc, eclv, nbrctc, nbrcts, nbrcnt, dmap, or grad to indicate the line type it contains.
 
+The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
 
-																																	  nc_pairs_var_name = "";
+Table 1 Header information for each file grid-stat outputs.
 
-																																	  The nc_pairs_var_name entry specifies a string for each verification task. This string is parsed from each obs.field dictionary entry and is used to construct variable names for the NetCDF matched pairs output file. The default value of an empty string indicates that the name and level strings of the input data should be used. If the input data level string changes for each run of Grid-Stat, using this option to define a constant string may make downstream processing more convenient.
+.. list-table:: Header information for each file grid-stat outputs.
+  :widths: auto
+  :header-rows: 2
 
+  * - HEADER
+    - 
+    - 
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - User provided text string designating model name
+  * - 3
+    - DESC
+    - User provided text string describing the verification task
+  * - 4
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 5
+    - FCST_VALID_BEG
+    - Forecast valid start time in YYYYMMDD_HHMMSS format
+  * - 6
+    - FCST_VALID_END
+    - Forecast valid end time in YYYYMMDD_HHMMSS format
+  * - 7
+    - OBS_LEAD
+    - Observation lead time in HHMMSS format
+  * - 8
+    - OBS_VALID_BEG
+    - Observation valid start time in YYYYMMDD_HHMMSS format
+  * - 9
+    - OBS_VALID_END
+    - Observation valid end time in YYYYMMDD_HHMMSS format
+  * - 10
+    - FCST_VAR
+    - Model variable
+  * - 11
+    - FCST_UNITS
+    - Units for model variable
+  * - 12
+    - FCST_LEV
+    - Selected Vertical level for forecast
+  * - 13
+    - OBS_VAR
+    - Observation variable
+  * - 14
+    - OBS_UNITS
+    - Units for observation variable
+  * - 15
+    - OBS_LEV
+    - Selected Vertical level for observations
+  * - 16
+    - OBTYPE
+    - User provided text string designating the observation type
+  * - 17
+    - VX_MASK
+    - Verifying masking region indicating the masking grid or polyline region applied
+  * - 18
+    - INTERP_MTHD
+    - Interpolation method applied to forecast field
+  * - 19
+    - INTERP_PNTS
+    - Number of points used by interpolation method
+  * - 20
+    - FCST_THRESH
+    - The threshold applied to the forecast
+  * - 21
+    - OBS_THRESH
+    - The threshold applied to the observations
+  * - 22
+    - COV_THRESH
+    - Proportion of observations in specified neighborhood which must exceed obs_thresh
+  * - 23
+    - ALPHA
+    - Error percent value used in confidence intervals
+  * - 24
+    - LINE_TYPE
+    - Various line type options, refer to Section [subsec:point_stat-output] and the tables below.
 
+Table 2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type.
 
-																																	  nc_pairs_var_suffix = "";
+.. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type.
+  :widths: auto
+  :header-rows: 2
 
-																																	  The nc_pairs_var_suffix entry is similar to the nc_pairs_var_name entry. It is also parsed from each obs.field dictionary entry. However, it defines a suffix to be appended to the output variable name. This enables the output variable names to be made unique. For example, when verifying height for multiple level types but all with the same level value, use this option to customize the output variable names. This option was previously named nc_pairs_var_str which is now deprecated.
+  * - NBRCTC OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - NBRCTC Column Name
+    - Description
+  * - 24
+    - NBRCTC
+    - Neighborhood Contingency Table Counts line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - FY_OY
+    - Number of forecast yes and observation yes
+  * - 27
+    - FY_ON
+    - Number of forecast yes and observation no
+  * - 28
+    - FN_OY
+    - Number of forecast no and observation yes
+  * - 29
+    - FN_ON
+    - Number of forecast no and observation no
 
-																																	  8.3.3 grid_stat output
+Table 3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
 
-																																	  grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
+  :widths: auto
+  :header-rows: 2
 
-																																	  The output STAT file is named using the following naming convention:
+  * - NBRCTS OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - NBRCTS Column Name
+    - Description
+  * - 24
+    - NBRCTS
+    - Neighborhood Contingency Table Statistics line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26-30
+    - BASER, BASER_NCL, BASER_NCU, BASER_BCL, BASER_BCU
+    - Base rate including normal and bootstrap upper and lower confidence limits
+  * - 31-35
+    - FMEAN, FMEAN_NCL, FMEAN_NCU, FMEAN_BCL, FMEAN_BCU
+    - Forecast mean including normal and bootstrap upper and lower confidence limits
+  * - 36-40
+    - ACC, ACC_NCL, ACC_NCU, ACC_BCL, ACC_BCU
+    - Accuracy including normal and bootstrap upper and lower confidence limits
+  * - 41-43
+    - FBIAS, FBIAS_BCL, FBIAS_BCU
+    - Frequency Bias including bootstrap upper and lower confidence limits
+  * - 44-48
+    - PODY, PODY_NCL, PODY_NCU, PODY_BCL, PODY_BCU
+    - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
+  * - 49-53
+    - PODN, PODN_NCL, PODN_NCU, PODN_BCL, PODN_BCU
+    - Probability of detecting no including normal and bootstrap upper and lower confidence limits
+  * - 54-58
+    - POFD, POFD_NCL, POFD_NCU, POFD_BCL, POFD_BCU
+    - Probability of false detection including normal and bootstrap upper and lower confidence limits
+  * - 59-63
+    - FAR, FAR_NCL, FAR_NCU, FAR_BCL, FAR_BCU
+    - False alarm ratio including normal and bootstrap upper and lower confidence limits
+  * - 64-68
+    - CSI, CSI_NCL, CSI_NCU, CSI_BCL, CSI_BCU
+    - Critical Success Index including normal and bootstrap upper and lower confidence limits
+  * - 69-71
+    - GSS, GSS_BCL, GSS_BCU
+    - Gilbert Skill Score including bootstrap upper and lower confidence limits
 
-																																	  grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix, HHMMSSL indicates the forecast lead time and YYYYMMDD_HHMMSSV indicates the forecast valid time.
+Table 4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
 
-																																	  The output ASCII files are named similarly:
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
+  :widths: auto
+  :header-rows: 1
 
-																																	  grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc, eclv, nbrctc, nbrcts, nbrcnt, dmap, or grad to indicate the line type it contains.
-
-																																	  The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
-
-																																	  Header information for each file grid-stat outputs.
-
-																																	  Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type.
-
-
-
-																																	  Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
-
-																																	  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
-
-																																	  Format information for GRAD (Gradient Statistics) output line type.
-
-																																	  Format information for DMAP (Distance Map) output line type.
-
-																																	  If requested using the nc_pairs_flag dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
-
-																																	  The output NetCDF file contains the dimensions and variables shown in the following Tables [table_GS_Dimensions_NetCDF_matched_pair_out] and [table_GS_var_NetCDF_matched_pair_out].
-
-																																	  Dimensions defined in NetCDF matched pair output.
-
-																																	  A selection of variables that can appear in the NetCDF matched pair output.
-
-																																	  The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see Chapter [chap:The-Stat-Analysis-Tool]. 
+  * - Column Number
+    - NBRCTS Column Name
+    - Description
+  * - 72-76
+    - HK, HK_NCL, HK_NCU, HK_BCL, HK_BCU
+    - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
+  * - 77-79
+    - HSS, HSS_BCL, HSS_BCU
+    - Heidke Skill Score including bootstrap upper and lower confidence limits
+  * - 80-84
+    - ODDS, ODDS_NCL, ODDS_NCU, ODDS_BCL, ODDS_BCU
+    - Odds Ratio including normal and bootstrap upper and lower confidence limits
+  * - 85-89
+    - LODDS, LODDS_NCL, LODDS_NCU, LODDS_BCL, LODDS_BCU
+    - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
+  * - 90-94
+    - ORSS, ORSS _NCL, ORSS _NCU, ORSS _BCL, ORSS _BCU
+    - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
+  * - 95-99
+    - EDS, EDS _NCL, EDS _NCU, EDS _BCL, EDS _BCU
+    - Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+  * - 100-104
+    - SEDS, SEDS _NCL, SEDS _NCU, SEDS _BCL SEDS _BCU
+    - Symmetric Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+  * - 105-109
+    - EDI, EDI _NCL, EDI _NCU, EDI _BCL, EDI _BCU
+    - Extreme Depenency Index including normal and bootstrap upper and lower confidence limits
+  * - 110-114
+    - SEDI, SEDI _NCL, SEDI _NCU, SEDI _BCL,SEDI _BCU
+    - Symmetric Extremal Depenency Index including normal and bootstrap upper and lower confidence limits
+  * - 115-117
+    - BAGSS, BAGSS_BCL, BAGSS_BCU
+    - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+      
+Table 5 Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
+
+.. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - NBRCNT OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - NBRCNT Column Name
+    - Description
+  * - 24
+    - NBRCNT
+    - Neighborhood Continuous statistics line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26-28
+    - FBS, FBS_BCL, FBS_BCU
+    - Fractions Brier Score including bootstrap upper and lower confidence limits
+  * - 29-31
+    - FSS, FSS_BCL, FSS_BCU
+    - Fractions Skill Score including bootstrap upper and lower confidence limits
+  * - 32-34
+    - AFSS, AFSS_BCL, AFSS_BCU
+    - Asymptotic Fractions Skill Score including bootstrap upper and lower confidence limits
+  * - 35-37
+    - UFSS, UFSS_BCL, UFSS_BCU
+    - Uniform Fractions Skill Score including bootstrap upper and lower confidence limits
+  * - 38-40
+    - F_RATE, F_RATE _BCL, F_RATE _BCU
+    - Forecast event frequency including bootstrap upper and lower confidence limits
+  * - 41-43
+    - O_RATE, O _RATE _BCL, O _RATE _BCU
+    - Observed event frequency including bootstrap upper and lower confidence limits
+
+Table 6 Format information for GRAD (Gradient Statistics) output line type.
+
+.. list-table:: Format information for GRAD (Gradient Statistics) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - GRAD OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - GRAD Column Name
+    - Description
+  * - 24
+    - GRAD
+    - Gradient Statistics line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - FGBAR
+    - Mean of absolute value of forecast gradients
+  * - 27
+    - OGBAR
+    - Mean of absolute value of observed gradients
+  * - 28
+    - MGBAR
+    - Mean of maximum of absolute values of forecast and observed gradients
+  * - 29
+    - EGBAR
+    - Mean of absolute value of forecast minus observed gradients
+  * - 30
+    - S1
+    - S1 score
+  * - 31
+    - S1_OG
+    - S1 score with respect to observed gradient
+  * - 32
+    - FGOG_RATIO
+    - Ratio of forecast and observed gradients
+  * - 33
+    - DX
+    - Gradient size in the X-direction
+  * - 34
+    - DY
+    - Gradient size in the Y-direction
+
+Table 7 Format information for DMAP (Distance Map) output line type.
+
+.. list-table:: Format information for DMAP (Distance Map) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - DMAP OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - DMAP Column Name
+    - Description
+  * - 24
+    - DMAP
+    - Distance Map line type
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - FY
+    - Number of forecast events
+  * - 27
+    - OY
+    - Number of observation events
+  * - 28
+    - FBIAS
+    - Frequency Bias
+  * - 29
+    - BADDELEY
+    - Baddeley's ?? (triangle here)\Delta Metric
+  * - 30
+    - HAUSDORFF
+    - Hausdorff Distance
+  * - 31
+    - MED_FO
+    - Mean-error Distance from forecast to observation
+  * - 32
+    - MED_OF
+    - Mean-error Distance from observation to forecast
+  * - 33
+    - MED_MIN
+    - Minimum of MED_FO and MED_OF
+  * - 34
+    - MED_MAX
+    - Maximum of MED_FO and MED_OF
+  * - 35
+    - MED_MEAN
+    - Mean of MED_FO and MED_OF
+  * - 36
+    - FOM_FO
+    - Pratt's Figure of Merit from forecast to observation
+  * - 37
+    - FOM_OF
+    - Pratt's Figure of Merit from observation to forecast
+  * - 38
+    - FOM_MIN
+    - Minimum of FOM_FO and FOM_OF
+  * - 39
+    - FOM_MAX
+    - Maximum of FOM_FO and FOM_OF
+  * - 40
+    - FOM_MEAN
+    - Mean of FOM_FO and FOM_OF
+  * - 41
+    - ZHU_FO
+    - Zhu's Measure from forecast to observation
+  * - 42
+    - ZHU_OF
+    - Zhu's Measure from observation to forecast
+  * - 43
+    - ZHU_MIN
+    - Minimum of ZHU_FO and ZHU_OF
+  * - 44
+    - ZHU_MAX
+    - Maximum of ZHU_FO and ZHU_OF
+  * - 45
+    - ZHU_MEAN
+    - Mean of ZHU_FO and ZHU_OF
+
+If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
+
+The output NetCDF file contains the dimensions and variables shown in the following Tables [table_GS_Dimensions_NetCDF_matched_pair_out] and [table_GS_var_NetCDF_matched_pair_out].
+
+Table 8 Dimensions defined in NetCDF matched pair output.
+
+.. list-table:: Dimensions defined in NetCDF matched pair output.
+  :widths: auto
+  :header-rows: 2
+
+  * - grid_stat NETCDF DIMENSIONS
+    -
+  * - NetCDF Dimension
+    - Description
+  * - Lat
+    - Dimension of the latitude (i.e. Number of grid points in the North-South direction)
+  * - Lon
+    - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
+
+Table 9 A selection of variables that can appear in the NetCDF matched pair output.
+
+.. list-table:: A selection of variables that can appear in the NetCDF matched pair output.
+  :widths: auto
+  :header-rows: 2
+
+  * - grid_stat NETCDF VARIABLES
+    - 
+    - 
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - FCST_VAR_LVL_MASK  _INTERP_MTHD  _INTERP_PNTS
+    - lat, lon
+    - For each model variable (VAR), vertical level (LVL), masking region (MASK), and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS), the forecast value is listed for each point in the mask.
+  * - OBS_VAR_LVL_MASK  DIFF_FCSTVAR
+    - lat, lon
+    - For each model variable (VAR), vertical level (LVL), and masking region (MASK), the observation value is listed for each point in the mask .
+  * - DIFF_FCSTVAR  _FCSTLVL  _OBSVAR  _OBSLVL_MASK  _INTERP_MTHD  _INTERP_PNTS
+    - lat, lon
+    - For each model variable (VAR), vertical level (LVL), masking region (MASK), and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS), the difference (forecast - observation) is computed for each point in the mask.
+  * - FCST_XGRAD_DX  FCST_YGRAD_DX  OBS_XGRAD_DY  OBS_YGRAD_DY
+    - lat, lon
+    - List the gradient of the forecast and observation fields computed in the grid-x and grid-y directions where DX and DY indicate the gradient direction and size.
+
+
+
+The STAT output files described for **grid_stat** may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by **grid_stat**, please see Chapter [chap:The-Stat-Analysis-Tool]. 
