@@ -15,13 +15,12 @@ Appendix C Verification Measures
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 C.1 MET verification measures for categorical (dichotomous) variables
-_____________________________________________________________________
 
-The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table C-1. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-1 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}}
+The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table C-1. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-1 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}} 
 
 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The "." symbols in the total cells represent sums across categories.
 
-The counts, n11, n10, n01, and n00, are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively.
+The counts, n11, n10, n01, and n00, are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
 
 By dividing the counts in the cells by the overall total, T, the joint proportions, p11, p10, p01, and p00 can be computed. Note that p11 + p10 + p01 + p00 = 1. Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
 
@@ -47,7 +46,7 @@ Called "F_RATE" in FHO output ([table_PS_format_info_FHO])
 
 Called "FMEAN" in CTS output ([table_PS_format_info_CTS])
 
-The mean forecast value is defined as $\overline{f}=\displaystyle{{n_{11}+n_{10}}\over {T}}={{n_{1.}}\over {T}}$.
+The mean forecast value is defined as $\overline{f}=\displaystyle{{n_{11}+n_{10}}\over {T}}={{n_{1.}}\over {T}}$. 
 
 This statistic is comparable to the base rate and is the relative frequency of occurrence of a forecast of the event (i.e., f = 1). The mean forecast is equivalent to the "F" value computed by the NCEP Verification System.
 
@@ -65,7 +64,7 @@ Called "FBIAS" in CTS output ([table_PS_format_info_CTS])
 
 Frequency Bias is the ratio of the total number of forecasts of an event to the total number of observations of the event. It is defined as $$\hbox{Bias}={{n_{11}+n_{10}}\over {n_{11}+n_{01}}}={{n_{1.}}\over {n_1}}.$$
 
-A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates the event was forecasted too frequently and a value less than 1 indicates the event was not forecasted frequently enough.
+A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates the event was forecasted too frequently and a value less than 1 indicates the event was not forecasted frequently enough. 
 
 Probability of Detection (POD)
 
@@ -73,7 +72,7 @@ Called "H_RATE" in FHO output ([table_PS_format_info_FHO])
 
 Called "PODY" in CTS output ([table_PS_format_info_CTS])
 
-POD is defined as $$\hbox{POD}={{n_{11}\over{n_{11}+n_{01}}}}={n_{11}\over{n_{1}}}.$$
+POD is defined as $$\hbox{POD}={{n_{11}\over{n_{11}+n_{01}}}}={n_{11}\over{n_{1}}}.$$ 
 
 It is the fraction of events that were correctly forecasted to occur. POD is equivalent to the H value computed by the NCEP verification system and is also known as the hit rate. POD ranges from 0 to 1; a perfect forecast would have POD = 1.
 
@@ -81,7 +80,7 @@ Probability of False Detection (POFD)
 
 Called "POFD" in CTS output ([table_PS_format_info_CTS])
 
-POFD is defined as $$\hbox{POFD}={{n_{10}\over{n_{10}+n_{00}}}}={n_{10}\over{n_{.0}}}.$$
+POFD is defined as $$\hbox{POFD}={{n_{10}\over{n_{10}+n_{00}}}}={n_{10}\over{n_{.0}}}.$$ 
 
 It is the proportion of non-events that were forecast to be events. POFD is also often called the False Alarm Rate. POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 
@@ -89,7 +88,7 @@ Probability of Detection of the non-event (PODn)
 
 Called "PODN" in CTS output ([table_PS_format_info_CTS])
 
-PODn is defined as $$\hbox{PODN}={{n_{00}\over{n_{10}+n_{00}}}}={n_{00}\over{n_{.0}}}.$$
+PODn is defined as $$\hbox{PODN}={{n_{00}\over{n_{10}+n_{00}}}}={n_{00}\over{n_{.0}}}.$$ 
 
 It is the proportion of non-events that were correctly forecasted to be non-events. Note that PODn = 1 - POFD. PODn ranges from 0 to 1. Like POD, a perfect forecast would have PODn = 1.
 
@@ -97,15 +96,15 @@ False Alarm Ratio (FAR)
 
 Called "FAR" in CTS output ([table_PS_format_info_CTS])
 
-FAR is defined as $$\hbox{FAR}={{n_{10}\over{n_{10}+n_{11}}}}={n_{10}\over{n_{1.}}}.$$
+FAR is defined as $$\hbox{FAR}={{n_{10}\over{n_{10}+n_{11}}}}={n_{10}\over{n_{1.}}}.$$ 
 
-It is the proportion of forecasts of the event occurring for which the event did not occur. FAR ranges from 0 to 1; a perfect forecast would have FAR = 0.
+It is the proportion of forecasts of the event occurring for which the event did not occur. FAR ranges from 0 to 1; a perfect forecast would have FAR = 0. 
 
 Critical Success Index (CSI)
 
 Called "CSI" in CTS output ([table_PS_format_info_CTS])
 
-CSI is defined as $$\hbox{CSI}={{n_{11}\over{n_{11}+n_{10}+n_{01}}}}.$$
+CSI is defined as $$\hbox{CSI}={{n_{11}\over{n_{11}+n_{10}+n_{01}}}}.$$ 
 
 It is the ratio of the number of times the event was correctly forecasted to occur to the number of times it was either forecasted or occurred. CSI ignores the "correct rejections" category (i.e., n00). CSI is also known as the Threat Score (TS). CSI can also be written as a nonlinear combination of POD and FAR, and is strongly related to Frequency Bias and the Base Rate.
 
@@ -169,7 +168,7 @@ Extreme Dependency Index (EDI)
 
 Called "EDI" in CTS output ([table_PS_format_info_CTS])
 
-The extreme dependency index measures the association between forecast and observed rare events. EDI is defined as , where and are the Hit Rate and False Alarm Rate, respectively.
+The extreme dependency index measures the association between forecast and observed rare events. EDI is defined as , where and are the Hit Rate and False Alarm Rate, respectively. 
 
 EDI can range from -\infty to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (Ferro and Stephenson, 2011).
 
@@ -187,7 +186,7 @@ Called "SEDI" in CTS output ([table_PS_format_info_CTS])
 
 The symmetric extremal dependency index measures the association between forecast and observed rare events. SEDI is defined as $$\hbox{SEDI}={{\ln F-\ln H +\ln (1-H)-\ln (1-F)}\over{\ln F+\ln H + \ln (1-H)+\ln (1-F)}},$$
 
-where $\displaystyle {H={n_{11}\over{n_{11}+n_{01}}}}$ and $\displaystyle{F={n_{10}\over{n_{00}+n_{10}}}}$are the Hit Rate and False Alarm Rate, respectively.
+where $\displaystyle {H={n_{11}\over{n_{11}+n_{01}}}}$ and $\displaystyle{F={n_{10}\over{n_{00}+n_{10}}}}$are the Hit Rate and False Alarm Rate, respectively. 
 
 SEDI can range from -\infty to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (Ferro and Stephenson, 2011).
 
@@ -195,20 +194,19 @@ Bias Adjusted Gilbert Skill Score (GSS)
 
 Called "BAGSS" in CTS output ([table_PS_format_info_CTS])
 
-BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (Brill and Mesinger, 2009).
+BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (Brill and Mesinger, 2009). 
 
 Economic Cost Loss Relative Value (ECLV)
 
 Included in ECLV output ([table_PS_format_info_ECLV])
 
-The Economic Cost Loss Relative Value (ECLV) applies a weighting to the contingency table counts to determine the relative value of a forecast based on user-specific information. The cost is incurred to protect against an undesirable outcome, whether that outcome occurs or not. No cost is incurred if no protection is undertaken. Then, if the event occurs, the user sustains a loss. If the event does not occur, there is neither a cost nor a loss. The maximum forecast value is achieved when the cost/loss ratio equals the climatological probability. When this occurs, the ECLV is equal to the Hanssen and Kuipers discriminant. The Economic Cost Loss Relative Value is defined differently depending on whether the cost / loss ratio is lower than the base rate or higher. The ECLV is a function of the cost / loss ratio (cl), the hit rate (h), the false alarm rate (f), the miss rate (m), and the base rate (b).
+The Economic Cost Loss Relative Value (ECLV) applies a weighting to the contingency table counts to determine the relative value of a forecast based on user-specific information. The cost is incurred to protect against an undesirable outcome, whether that outcome occurs or not. No cost is incurred if no protection is undertaken. Then, if the event occurs, the user sustains a loss. If the event does not occur, there is neither a cost nor a loss. The maximum forecast value is achieved when the cost/loss ratio equals the climatological probability. When this occurs, the ECLV is equal to the Hanssen and Kuipers discriminant. The Economic Cost Loss Relative Value is defined differently depending on whether the cost / loss ratio is lower than the base rate or higher. The ECLV is a function of the cost / loss ratio (cl), the hit rate (h), the false alarm rate (f), the miss rate (m), and the base rate (b). 
 
 For cost / loss ratio below the base rate, the ECLV is defined as: $$ \hbox{ECLV}={
 
 For cost / loss ratio above the base rate, the ECLV is defined as: $$ \hbox{ECLV}={
 
 C.2 MET verification measures for continuous variables
-______________________________________________________
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
@@ -250,9 +248,9 @@ Pearson Correlation Coefficient
 
 Called "PR_CORR" in CNT output ([table_PS_format_info_CNT])
 
-The Pearson correlation coefficient, r, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as: $$r={{\sum_{i=1}^T(f_i-\overline f)(o_i-\overline o)}\over{\sqrt{\sum(f_i-\overline f)^2}\sqrt{\sum(o_i-\overline o)^2}}}$$
+The Pearson correlation coefficient, r, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as: $$r={{\sum_{i=1}^T(f_i-\overline f)(o_i-\overline o)}\over{\sqrt{\sum(f_i-\overline f)^2}\sqrt{\sum(o_i-\overline o)^2}}}$$ 
 
-r can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated.
+r can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 Spearman rank correlation coefficient (\rho_{s})
 
@@ -262,7 +260,7 @@ The Spearman rank correlation coefficient (\rho_{s}) is a robust measure of asso
 
 A simpler formulation of the Spearman-rank correlation is based on differences between the each of the pairs of ranks (denoted as d_{i}):$$\rho_s={6\over{n(n^2-1)}}\sum_{i=1}^{n}d_i^2$$
 
-Like r, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated.
+Like r, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 Kendall's Tau statistic (\tau)
 
@@ -272,7 +270,7 @@ Kendall's Tau statistic (\tau) is a robust measure of the level of association b
 
 where NC is the number of "concordant" pairs and ND is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the (f_{i}, o_{i}) pairs according to f_{i}, in which case the o_{i} values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of oi for the current pair is exceeded (that is, pairs for which the values of f and o are both larger than the value for the current pair). Once this is done, Nc is computed by summing the counts for all pairs. The total number of possible pairs is ; thus, the number of discordant pairs is .
 
-Like r and \rho_{s}, Kendall's Tau (\tau) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated.
+Like r and \rho_{s}, Kendall's Tau (\tau) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated. 
 
 Mean Error (ME)
 
@@ -296,7 +294,7 @@ Called "MBIAS" in CNT output ([table_PS_format_info_CNT])
 
 Multiplicative bias is simply the ratio of the means of the forecasts and the observations: $\hbox{MBIAS}={\overline{f}}/{\overline{o}}$
 
-Mean-squared error (MSE)
+Mean-squared error (MSE) 
 
 Called "MSE" in CNT output ([table_PS_format_info_CNT])
 
@@ -306,7 +304,7 @@ Root-mean-squared error (RMSE)
 
 Called "RMSE" in CNT output ([table_PS_format_info_CNT])
 
-RMSE is simply the square root of the MSE, RMSE=\sqrt{MSE}.
+RMSE is simply the square root of the MSE, RMSE=\sqrt{MSE}. 
 
 Standard deviation of the error
 
@@ -320,7 +318,7 @@ MSE and RMSE are strongly impacted by large errors. They also are strongly impac
 
 MSE can be re-written as $MSE=(\overline{f}-\overline{o})^{2}+s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}$, where $\overline{f}-\overline{o}=ME$ and $s^2_f+s^2_o-2s_fs_or_{fo}$ is the estimated variance of the error, $s^2_{fo}$. Thus, $MSE=ME^2+s^2_{f-o}$. To understand the behavior of MSE, it is important to examine both of the terms of MSE, rather than examining MSE alone. Moreover, MSE can be strongly influenced by ME, as shown by this decomposition.
 
-The standard deviation of the error, s_{f-o}, is s_{f-o}=\sqrt{s_{f-o}^{2}}=\sqrt{s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}}.
+The standard deviation of the error, s_{f-o}, is s_{f-o}=\sqrt{s_{f-o}^{2}}=\sqrt{s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}}. 
 
 Note that the square of the standard deviation of the error (ESTDEV2) is sometimes called the "Bias-corrected MSE" (BCMSE) because it removes the effect of overall bias from the forecast-observation squared differences.
 
@@ -352,7 +350,7 @@ Mean Squared Error Skill Score
 
 Called "MSESS" in CNT output ([table_PS_format_info_CNT])
 
-The Mean Squared Error Skill Score is one minus the ratio of the forecast MSE to some reference MSE, usually climatology. It is sometimes referred to as Murphy's Mean Squared Error Skill Score.
+The Mean Squared Error Skill Score is one minus the ratio of the forecast MSE to some reference MSE, usually climatology. It is sometimes referred to as Murphy's Mean Squared Error Skill Score. 
 
 $\hbox{MSESS}=1-{{\displaystyle{\hbox{MSE}_f}}\over{\displaystyle{\hbox{MSE}_r}}}$
 
@@ -378,17 +376,17 @@ Anomaly Correlation Coefficient
 
 Called "ANOM_CORR" in CNT output ([table_PS_format_info_CNT])
 
-The Anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (c) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The Anomaly correlation coefficient is defined as: $$ \hbox{Anomoly Correlation}={
+The Anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (c) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The Anomaly correlation coefficient is defined as: $$ \hbox{Anomoly Correlation}={ 
 
-Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
+Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated. 
 
 Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2) ([table_PS_format_info_SL1L2], [table_PS_format_info_SAL1L2], [table_PS_format_info_VL1L2], and [table_PS_format_info_VAL1L2])
 
-The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
+The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance. 
 
-The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are sufficient for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (Mood et al, 1974). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are jointly sufficient for estimates of the Gaussian distribution mean and variance.
+The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are sufficient for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (Mood et al, 1974). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are jointly sufficient for estimates of the Gaussian distribution mean and variance. 
 
-Minimally sufficient statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
+Minimally sufficient statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles. 
 
 Scalar L1 and L2 values
 
@@ -478,9 +476,9 @@ $\hbox{MGBAR}=\displaystyle{
 
 $\hbox{EGBAR}=\hbox{Mean}
 
-$\hbox{S1}=100\displaystyle{
+$\hbox{S1}=100\displaystyle{ 
 
-where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the $S1$ equation are as follows:
+where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the $S1$ equation are as follows: 
 
 $\hspace{36 pt}
 
@@ -491,15 +489,14 @@ $\hbox{S1\_OG}={\displaystyle{
 $\hbox{FGOG\_RATIO}={\displaystyle{
 
 C.3 MET verification measures for probabilistic forecasts
-_________________________________________________________
 
-The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
+The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced. 
 
-The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in Table C-2. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-2 are counts of the number of occurrences of all possible combinations of forecasts and observations. \setcounter{table}{0}\renewcommand{\thetable}{C.2}
-
+The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in Table C-2. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-2 are counts of the number of occurrences of all possible combinations of forecasts and observations. \setcounter{table}{0}\renewcommand{\thetable}{C.2} 
 
 
-Reliability
+
+Reliability 
 
 Called "RELIABILITY" in PSTD output ([table_PS_format_info_PSTD])
 
@@ -507,15 +504,15 @@ A component of the Brier score. Reliability measures the average difference betw
 
 $$\hbox{Reliability}=\frac{1}{T}\sum{n_i(p_i-\overline o_i)^2}$$
 
-Resolution
+Resolution 
 
 Called "RESOLUTION" in PSTD output ([table_PS_format_info_PSTD])
 
-A component of the Brier score that measures how well forecasts divide events into subsets with different outcomes. Larger values of resolution are best since it is desirable for event frequencies in the subsets to be different than the overall event frequency.
+A component of the Brier score that measures how well forecasts divide events into subsets with different outcomes. Larger values of resolution are best since it is desirable for event frequencies in the subsets to be different than the overall event frequency. 
 
 $$\hbox{Resolution}=\frac{1}{T}n_{i.}(\overline o_i-\overline o)^2$$
 
-Uncertainty
+Uncertainty 
 
 Called "UNCERTAINTY" in PSTD output ([table_PS_format_info_PSTD])
 
@@ -523,21 +520,21 @@ A component of the Brier score. For probabilistic forecasts, uncertainty is a fu
 
 $$\hbox{Uncertainty}=\frac{n_{.1}}{T}(1-\frac{n_{.1}}{T})$$
 
-Brier score
+Brier score 
 
 Called "BRIER" in PSTD output ([table_PS_format_info_PSTD])
 
 The Brier score is the mean squared probability error. In MET, the Brier Score (BS) is calculated from the nx2 contingency table via the following equation:
 
-$$BS={1 \over T}\sum_{i=1}^K \left[ n_{i1} (1 - p_i)^2 + n_{i0} \, p_i^2 \right]$$
+$$BS={1 \over T}\sum_{i=1}^K \left[ n_{i1} (1 - p_i)^2 + n_{i0} \, p_i^2 \right]$$ 
 
-The equation you will most often see in references uses the individual probability forecasts (\rho_{i}) and the corresponding observations (o_{i}), and is given as $BS=\frac{1}{T}\sum(p_i-o_i)^2$. This equation is equivalent when the midpoints of the binned probability values are used as the pi .
+The equation you will most often see in references uses the individual probability forecasts (\rho_{i}) and the corresponding observations (o_{i}), and is given as $BS=\frac{1}{T}\sum(p_i-o_i)^2$. This equation is equivalent when the midpoints of the binned probability values are used as the pi . 
 
 BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (Murphy, 1973).
 
 $$BS=\frac{1}{T}\sum_i(p_i-o_i)^2=\frac{1}{T}\sum n_{i.}(p_i-\overline o_i)^2-\frac{1}{T}\sum n_{i.}(\overline o_i-\overline o)^2+\overline o(1-\overline o)$$
 
-This score is sensitive to the base rate or climatological frequency of the event. Forecasts of rare events can have a good BS without having any actual skill. Since Brier score is a measure of error, smaller values are better.
+This score is sensitive to the base rate or climatological frequency of the event. Forecasts of rare events can have a good BS without having any actual skill. Since Brier score is a measure of error, smaller values are better. 
 
 Brier Skill Score (BSS)
 
@@ -551,7 +548,7 @@ OY_TP - Observed Yes Total Proportion
 
 Called "OY_TP" in PJC output ([table_PS_format_info_PJC])
 
-This is the cell probability for row i, column j=1 (observed event), a part of the joint distribution (Wilks, 2011). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
+This is the cell probability for row i, column j=1 (observed event), a part of the joint distribution (Wilks, 2011). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values. 
 
 $$OYTP(i)=\frac{n_{i1}}{T}=\hbox{probability}(o_{i1})$$
 
@@ -563,33 +560,33 @@ This is the cell probability for row i, column j=0 (observed non-event), a part 
 
 $$ONTP(i)=\frac{n_{i0}}{T}=\hbox{probability}(o_{i0})$$
 
-Calibration
+Calibration 
 
 Called "CALIBRATION" in PJC output ([table_PS_format_info_PJC])
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the nx2 contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in Wilks (2011). A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
+Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the nx2 contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in Wilks (2011). A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa. 
 
 $$\hbox{Calibration}(i)=\frac{n_{i1}}{n_{1.}}=\hbox{probability}(o_1|p_i)$$
 
-Refinement
+Refinement 
 
 Called "REFINEMENT" in PJC output ([table_PS_format_info_PJC])
 
-The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by Wilks (2011).
+The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by Wilks (2011). 
 
 $$\hbox{Refinement}(i)=\frac{n_{i.}}{T}=\hbox{probability}(p_i)$$
 
-Likelihood
+Likelihood 
 
 Called "LIKELIHOOD" in PJC output ([table_PS_format_info_PJC])
 
-Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see Wilks (2011) for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts.
+Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see Wilks (2011) for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts. 
 
 $$\hbox{Likelihood}(i)=\frac{n_{i1}}{n_{.1}}=\hbox{probability}(p_i|o_1)$$
 
 Likelihood values are also used to create "discrimination" plots that compare the distribution of forecast values for events to the distribution of forecast values for non-events. These plots show how well the forecasts categorize events and non-events. The distribution of forecast values for non-events can be derived from the POFD values computed by MET for the user-specified thresholds.
 
-Base Rate
+Base Rate 
 
 Called "BASER" in PJC output ([table_PS_format_info_PJC])
 
@@ -597,21 +594,21 @@ This is the probability of an event for each forecast category pi (row), i.e. th
 
 $$\hbox{Base Rate}(i)=\frac{n_{i1}}{n_{i.}}=\hbox{probability}(o_{i1})$$
 
-Reliability diagram
+Reliability diagram 
 
-The reliability diagram is a plot of the observed frequency of events versus the forecast probability of those events, with the range of forecast probabilities divided into categories.
+The reliability diagram is a plot of the observed frequency of events versus the forecast probability of those events, with the range of forecast probabilities divided into categories. 
 
-The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.\arabic{figure}}
+The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.\arabic{figure}} 
 
 
 
-Receiver operating characteristic
+Receiver operating characteristic 
 
 MET produces hit rate (POD) and false alarm rate (POFD) values for each user-specified threshold. This information can be used to create a scatter plot of POFD vs. POD. When the points are connected, the plot is generally referred to as the receiver operating characteristic (ROC) curve (also called the "relative operating characteristic" curve). See the area under the ROC curve (AUC) entry for related information.
 
-An ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast.
+An ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast. 
 
-An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.2}
+An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.2} 
 
 
 
@@ -619,36 +616,35 @@ Area Under the ROC curve (AUC)
 
 Called "ROC_AUC" in PSTD output ([table_PS_format_info_PSTD])
 
-The area under the receiver operating characteristic (ROC) curve is often used as a single summary measure. A larger AUC is better. A perfect forecast has AUC=1. Though the minimum value is 0, an AUC of 0.5 indicates no skill.
+The area under the receiver operating characteristic (ROC) curve is often used as a single summary measure. A larger AUC is better. A perfect forecast has AUC=1. Though the minimum value is 0, an AUC of 0.5 indicates no skill. 
 
 The area under the curve can be estimated in a variety of ways. In MET, the simplest trapezoid method is used to calculate the area. AUC is calculated from the series of hit rate (POD) and false alarm rate (POFD) values (see the ROC entry below) for each user-specified threshold.$$\hbox{AUC}=\frac{1}{2}\sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}-POFD_i)$$
 
 C.4 MET verification measures for ensemble forecasts
-____________________________________________________
 
 CRPS
 
 Called "CRPS" in ECNT output ([table_ES_header_info_es_out_ECNT])
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (Gneiting et al, 2004). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (Gneiting et al, 2004). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better. 
 
-WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
+WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables. 
 
 Closed form expressions for the CRPS are difficult to define when using data rather than distribution functions. However, if a normal distribution can be assumed, then the following equation gives the CRPS for each individual observation (denoted by a lowercase crps) and the corresponding distribution of forecasts.
 
 $$crps_i(N(\mu,\sigma^2),y)=\sigma\biggl({{y-\mu}\over{\sigma}}\biggl(2\Phi\biggl({{y-\mu} \over\sigma} \biggr)-1 \biggr)+2\phi\biggl({{y-\mu} \over\sigma}\biggr)-{1\over{\sqrt\pi}}\biggr)$$
 
-In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts (\mu and \sigma) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by \phi and the cumulative distribution function (CDF), denoted in the above equation by \phi.
+In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts (\mu and \sigma) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by \phi and the cumulative distribution function (CDF), denoted in the above equation by \phi. 
 
 The overall CRPS is calculated as the average of the individual measures. In equation form: $\hbox{CRPS}=\hbox{average(crps)}=\frac{1}{N}\sum_i^Ncrps_i$ .
 
-The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS.
+The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS. 
 
 CRPS Skill Score
 
 Called "CRPSS" in ECNT output ([table_ES_header_info_es_out_ECNT])
 
-The continuous ranked probability skill score (CRPSS) is similar to the MSESS and the BSS, in that it compares its namesake score to that of a reference forecast to produce a positively oriented score between 0 and 1.
+The continuous ranked probability skill score (CRPSS) is similar to the MSESS and the BSS, in that it compares its namesake score to that of a reference forecast to produce a positively oriented score between 0 and 1. 
 
 $$\hbox{CRPSS}=1-\frac{\hbox{CRPS}_{fcst}}{ \hbox{CRPS}_{ref} }$$
 
@@ -660,21 +656,21 @@ The ignorance score (IGN) is the negative logarithm of a predictive probability 
 
 $$\hbox{ign}(N(\mu,\sigma),y)=\frac{1}{2}ln\bigl(2\pi\sigma^2\bigr)+{{(y-\mu)^2} \over\sigma^2}.$$
 
-Accumulation of the ignorance score for many forecasts is via the average of individual ignorance scores. This average ignorance score is the value output by the MET software. Like many error statistics, the IGN is negatively oriented, so smaller numbers indicate better forecasts.
+Accumulation of the ignorance score for many forecasts is via the average of individual ignorance scores. This average ignorance score is the value output by the MET software. Like many error statistics, the IGN is negatively oriented, so smaller numbers indicate better forecasts. 
 
 PIT
 
 Called "PIT" in ORANK output ([table_ES_header_info_es_out_ORANK])
 
-The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (Dawid, 1984). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (Dawid, 1984). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better. 
 
 RANK
 
 Called "RANK" in ORANK output ([table_ES_header_info_es_out_ORANK])
 
-The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (Hamill, 2001). When ensemble forecasts possesses the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat.
+The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (Hamill, 2001). When ensemble forecasts possesses the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat. 
 
-The rank histogram does not provide information about the accuracy of ensemble forecasts. Further, examination of "rank" only makes sense for ensembles of a fixed size. Thus, if ensemble members are occasionally unavailable, the rank histogram should not be used. The PIT may be used instead.
+The rank histogram does not provide information about the accuracy of ensemble forecasts. Further, examination of "rank" only makes sense for ensembles of a fixed size. Thus, if ensemble members are occasionally unavailable, the rank histogram should not be used. The PIT may be used instead. 
 
 SPREAD
 
@@ -687,170 +683,165 @@ The ensemble spread for a single observation is the standard deviation of the en
 Note that prior to met-9.0.1, the ensemble spread of a spatial masking region was computed as the average of the spread values within that region. This algorithm was corrected in met-9.0.1 to average the ensemble variance values prior to computing the square root.
 
 C.5 MET verification measures for neighborhood methods
-______________________________________________________
 
-The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size.
+The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size. 
 
-The traditional contingency table statistics computed by the Grid-Stat neighborhood tool, and included in the NBRCTS output, are listed below:
+The traditional contingency table statistics computed by the Grid-Stat neighborhood tool, and included in the NBRCTS output, are listed below: 
 
 * Base Rate (called "BASER" in [table_GS_format_info_NBRCTS])
 
-  * Mean Forecast (called "FMEAN" in [table_GS_format_info_NBRCTS])
+* Mean Forecast (called "FMEAN" in [table_GS_format_info_NBRCTS])
 
-    * Accuracy (called "ACC" in [table_GS_format_info_NBRCTS])
+* Accuracy (called "ACC" in [table_GS_format_info_NBRCTS])
 
-      * Frequency Bias (called "FBIAS" in [table_GS_format_info_NBRCTS])
+* Frequency Bias (called "FBIAS" in [table_GS_format_info_NBRCTS])
 
-	* Probability of Detection (called "PODY" in [table_GS_format_info_NBRCTS])
+* Probability of Detection (called "PODY" in [table_GS_format_info_NBRCTS])
 
-	  * Probability of Detection of the non-event (called "PODN" in [table_GS_format_info_NBRCTS])
+* Probability of Detection of the non-event (called "PODN" in [table_GS_format_info_NBRCTS])
 
-	    * Probability of False Detection (called "POFD" in [table_GS_format_info_NBRCTS])
+* Probability of False Detection (called "POFD" in [table_GS_format_info_NBRCTS])
 
-	      * False Alarm Ratio (called "FAR" in [table_GS_format_info_NBRCTS])
+* False Alarm Ratio (called "FAR" in [table_GS_format_info_NBRCTS])
 
-		* Critical Success Index (called "CSI" in [table_GS_format_info_NBRCTS])
+* Critical Success Index (called "CSI" in [table_GS_format_info_NBRCTS])
 
-		  * Gilbert Skill Score (called "GSS" in [table_GS_format_info_NBRCTS])
+* Gilbert Skill Score (called "GSS" in [table_GS_format_info_NBRCTS])
 
-		    * Hanssen-Kuipers Discriminant (called "HK" in [table_GS_format_info_NBRCTS])
+* Hanssen-Kuipers Discriminant (called "HK" in [table_GS_format_info_NBRCTS])
 
-		      * Heidke Skill Score (called "HSS" in [table_GS_format_info_NBRCTS])
+* Heidke Skill Score (called "HSS" in [table_GS_format_info_NBRCTS])
 
-			* Odds Ratio (called "ODDS" in [table_GS_format_info_NBRCTS])
+* Odds Ratio (called "ODDS" in [table_GS_format_info_NBRCTS])
 
-			  All of these measures are defined in Section C.1 of Appendix C.
+All of these measures are defined in Section C.1 of Appendix C.
 
-			  In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in Ebert (2008) and Roberts and Lean (2008). Roberts and Lean (2008) also present an application of the methodology.
+In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in Ebert (2008) and Roberts and Lean (2008). Roberts and Lean (2008) also present an application of the methodology.
 
-			  Fractions Brier Score
+Fractions Brier Score
 
-			  Called "FBS" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "FBS" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The Fractions Brier Score (FBS) is defined as $\hbox{FBS}=\frac{1}{N}\sum_N[\langle P_f\rangle_s-\langle P_o\rangle_s]^2$, where N is the number of neighborhoods; \left\langle P_{f}\right\rangle _{s}is the proportion of grid boxes within a forecast neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have forecast events); and $\left\langle P_{o}\right\rangle _{s}$ is the proportion of grid boxes within an observed neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have observed events).
+The Fractions Brier Score (FBS) is defined as $\hbox{FBS}=\frac{1}{N}\sum_N[\langle P_f\rangle_s-\langle P_o\rangle_s]^2$, where N is the number of neighborhoods; \left\langle P_{f}\right\rangle _{s}is the proportion of grid boxes within a forecast neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have forecast events); and $\left\langle P_{o}\right\rangle _{s}$ is the proportion of grid boxes within an observed neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have observed events).
 
-			  Fractions Skill Score
+Fractions Skill Score
 
-			  Called "FSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "FSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The Fractions Skill Score (FSS) is defined as $$\hbox{FSS}=1-{\hbox{FBS}\over{\frac{1}{N}\biggl[\sum_N\langle P_f\rangle_s^2+\sum_N\left\langle P_o\right\rangle _s^2\biggr]}}$$, where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
+The Fractions Skill Score (FSS) is defined as $$\hbox{FSS}=1-{\hbox{FBS}\over{\frac{1}{N}\biggl[\sum_N\langle P_f\rangle_s^2+\sum_N\left\langle P_o\right\rangle _s^2\biggr]}}$$, where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
 
-			  Asymptotic Fractions Skill Score
+Asymptotic Fractions Skill Score
 
-			  Called "AFSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "AFSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The Asymptotic Fractions Skill Score (AFSS) is a special case of the Fractions Skill score where the entire domain is used as the single neighborhood. This provides the user with information about the overall frequency bias of forecasts versus observations. The formula is the same as for FSS above, but with N=1 and the neighborhood size equal to the domain.
+The Asymptotic Fractions Brier Score (AFBS) is a special case of the Fractions Skill score where the entire domain is used as the single neighborhood. This provides the user with information about the overall frequency bias of forecasts versus observations. The formula is the same as for FSS above, but with N=1 and the neighborhood size equal to the domain.
 
-			  Uniform Fractions Skill Score
+Uniform Fractions Skill Score
 
-			  Called "UFSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "UFSS" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total forecast events across the grid. This no-skill forecast defines the UFSS, and thus a skilled forecast must have a higher value of FSS than the UFSS. Again, the formula is the same as for FSS as above, the forecast proportion in each neighborhood is the same, and is equivalent to the overall forecast event proportion.
+The Uniform Fractions Skill Score (AFBS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total forecast events across the grid. This no-skill forecast defines the UFSS, and thus a skilled forecast must have a higher value of FSS than the UFSS. Again, the formula is the same as for FSS as above, the forecast proportion in each neighborhood is the same, and is equivalent to the overall forecast event proportion.
 
-			  Forecast Rate
+Forecast Rate
 
-			  Called "F_rate" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "F_rate" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The overall proportion of grid points with forecast events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts.
+The overall proportion of grid points with forecast events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts.
 
-			  Observation Rate
+Observation Rate
 
-			  Called "O_rate" in NBRCNT output ([table_GS_format_info_NBRCNT])
+Called "O_rate" in NBRCNT output ([table_GS_format_info_NBRCNT])
 
-			  The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
+The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
 
 C.6 MET verification measures for distance map methods
-______________________________________________________
 
-			  The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
+The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 
-			  A mathematical metric, m(A,B)\geq0, must have the following three properties:
+A mathematical metric, m(A,B)\geq0, must have the following three properties:
 
-			  1. Identity: m(A,B)=0 if and only if A=B.
+1. Identity: m(A,B)=0 if and only if A=B.
 
-			     2. Symmetry: m(A,B)=m(B,A)
+2. Symmetry: m(A,B)=m(B,A)
 
-				3. Triangle inequality: m(A,C)\leq m(A,B)+m(B,C)
+3. Triangle inequality: m(A,C)\leq m(A,B)+m(B,C)
 
-				   The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if C is closer to A than B is to A, then m(A,C)<M(A,B).
+The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if C is closer to A than B is to A, then m(A,C)<M(A,B).
 
-				   It has been argued in Gilleland (2017) that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
+It has been argued in Gilleland (2017) that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
-				   The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's \Delta Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
+The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's \Delta Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 
-				   Baddeley's \Delta Metric and Hausdorff Distance
+Baddeley's \Delta Metric and Hausdorff Distance
 
-				   Called “BADDELEY” and “HAUSDORFF” in the DMAP output ([table_GS_format_info_DMAP])
+Called “BADDELEY” and “HAUSDORFF” in the DMAP output ([table_GS_format_info_DMAP])
 
-				   The Baddeley's \Delta Metric is given by
+The Baddeley's \Delta Metric is given by
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   where d(s,\cdot)is the distance map for the respective event area, w(\cdot) is an optional concave function (i.e., w(t+u)\leq w(t)+w(u)) that is strictly increasing at zero with w(t)=0 if and only if t=0, N is the size of the domain, and p is a user chosen parameter for the L_{p} norm. The default choice of p=2 corresponds to a Euclidean average, p=1 is a simple average of the difference in distance maps, and the limiting case of p=\infty gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as H(A,B), and is the metric that motivated the development of Baddeley’s \Delta metric. A typical choice, and the only available with MET, for w(\cdot) is w(t)=\min\{t,c\}, where c is a user-chosen constant with c=\infty meaning that w(\cdot) is not applied. This choice of w(\cdot) provides a cutoff for distances beyond the pre-specified amount given by c.
+where d(s,\cdot)is the distance map for the respective event area, w(\cdot) is an optional concave function (i.e., w(t+u)\leq w(t)+w(u)) that is strictly increasing at zero with w(t)=0 if and only if t=0, N is the size of the domain, and p is a user chosen parameter for the L_{p} norm. The default choice of p=2 corresponds to a Euclidean average, p=1 is a simple average of the difference in distance maps, and the limiting case of p=\infty gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as H(A,B), and is the metric that motivated the development of Baddeley’s \Delta metric. A typical choice, and the only available with MET, for w(\cdot) is w(t)=\min\{t,c\}, where c is a user-chosen constant with c=\infty meaning that w(\cdot) is not applied. This choice of w(\cdot) provides a cutoff for distances beyond the pre-specified amount given by c. 
 
-				   In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in Figure [Fig4_Grid-Stat] provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of Figure [Fig3_Grid-Stat] would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of Figure [Fig4_Grid-Stat].
+In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in Figure [Fig4_Grid-Stat] provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of Figure [Fig3_Grid-Stat] would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of Figure [Fig4_Grid-Stat]. 
 
-				   The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
+The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
-				   Mean-error Distance
+Mean-error Distance
 
-				   Called “MED_FO”, “MED_OF”, “MED_MIN”, “MED_MAX”, and “MED_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
+Called “MED_FO”, “MED_OF”, “MED_MIN”, “MED_MAX”, and “MED_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
 
-				   The mean-error distance (MED) is given by
+The mean-error distance (MED) is given by
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   where n_{B} is the number of non-zero grid points that fall in the event set B. That is, it is the average of the distance map for the event set A calculated only over those grid points that fall inside the event set B. It gives the average shortest-distance from every point in B to the nearest point in A.
+where n_{B} is the number of non-zero grid points that fall in the event set B. That is, it is the average of the distance map for the event set A calculated only over those grid points that fall inside the event set B. It gives the average shortest-distance from every point in B to the nearest point in A.
 
-				   Unlike Baddeley’s \Delta metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
+Unlike Baddeley’s \Delta metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   \begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in Figure [Fig4_Grid-Stat] (top right), and MED(B,A) is the average of the values in Figure [Fig4_Grid-Stat] (bottom left). Note that the average is only over the circular regions depicted in the figure.
+\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in Figure [Fig4_Grid-Stat] (top right), and MED(B,A) is the average of the values in Figure [Fig4_Grid-Stat] (bottom left). Note that the average is only over the circular regions depicted in the figure. 
 
-				   The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
+The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
-				   Pratt's Figure of Merit
+Pratt's Figure of Merit
 
-				   Called “FOM_FO”, “FOM_OF”, “FOM_MIN”, “FOM_MAX”, and “FOM_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
+Called “FOM_FO”, “FOM_OF”, “FOM_MIN”, “FOM_MAX”, and “FOM_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
 
-				   Pratt’s Figure of Merit (FOM) is given by
+Pratt’s Figure of Merit (FOM) is given by
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   where n_{A} and n_{B} are the number of events within event areas A and B, respectively, d(s,A) is the distance map related to the event area A, and \alpha is a user-defined scaling constant. The default, and usual choice, is \alpha=\frac{1}{9} when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
+where n_{A} and n_{B} are the number of events within event areas A and B, respectively, d(s,A) is the distance map related to the event area A, and \alpha is a user-defined scaling constant. The default, and usual choice, is \alpha=\frac{1}{9} when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
 
-				   Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of Figure [Fig4_Grid-Stat].
+Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of Figure [Fig4_Grid-Stat]. 
 
-				   The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
+The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 
-				   Zhu's Measure
+Zhu's Measure
 
-				   Called “ZHU_FO”, “ZHU_OF”, “ZHU_MIN”, “ZHU_MAX”, and “ZHU_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
+Called “ZHU_FO”, “ZHU_OF”, “ZHU_MIN”, “ZHU_MAX”, and “ZHU_MEAN” in the DMAP output ([table_GS_format_info_DMAP])
 
-				   Another measure incorporates the amount of actual overlap between the event sets across the fields in addition to the MED from above and was proposed by Zhu et al. (2011). Their main proposed measure was a comparative forecast performance measure of two competing forecasts against the same observation, which is not included here, but as defined is a true mathematical metric. They also proposed a similar measure of only the forecast against the observation, which is included in MET. It is simply
+Another measure incorporates the amount of actual overlap between the event sets across the fields in addition to the MED from above and was proposed by Zhu et al. (2011). Their main proposed measure was a comparative forecast performance measure of two competing forecasts against the same observation, which is not included here, but as defined is a true mathematical metric. They also proposed a similar measure of only the forecast against the observation, which is included in MET. It is simply 
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   where MED(A,B) is as in the Mean-error distance, N is the total number of grid squares as in Baddeley's\Delta metric, I_{F}(s) ((I_{O}(s)) is the binary field derived from the forecast (observation), and \lambda is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight (\lambda=\frac{1}{2}) is sufficient. In Zhu et al (2011), they actually only consider Z(F,O) and not Z(O,F), but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience.
+where MED(A,B) is as in the Mean-error distance, N is the total number of grid squares as in Baddeley's\Delta metric, I_{F}(s) ((I_{O}(s)) is the binary field derived from the forecast (observation), and \lambda is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight (\lambda=\frac{1}{2}) is sufficient. In Zhu et al (2011), they actually only consider Z(F,O) and not Z(O,F), but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience. 
 
-				   The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
+The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
 C.7 Calculating Percentiles
-___________________________
 
-				   Several of the MET tools make use of percentiles in one way or another. Percentiles can be used as part of the internal computations of a tool, or can be written out as elements of some of the standard verification statistics. There are several widely-used conventions for calculating percentiles however, so in this section we describe how percentiles are calculated in MET.
+Several of the MET tools make use of percentiles in one way or another. Percentiles can be used as part of the internal computations of a tool, or can be written out as elements of some of the standard verification statistics. There are several widely-used conventions for calculating percentiles however, so in this section we describe how percentiles are calculated in MET.
 
-				   The explanation makes use of the floor function. The floor of a real number $x$, denoted $\lfloor x \rfloor$, is defined to be the greatest integer $\leq x$. For example, $\lfloor 3.01 \rfloor = 3$, $\lfloor 3.99 \rfloor = 3$, $\lfloor -3.01 \rfloor = -4$, $\lfloor -3.99 \rfloor = -4$. These examples show that the floor function does not simply round its argument to the nearest integer. Note also that $\lfloor x \rfloor = x$ if and only if $x$ is an integer.
+The explanation makes use of the floor function. The floor of a real number $x$, denoted $\lfloor x \rfloor$, is defined to be the greatest integer $\leq x$. For example, $\lfloor 3.01 \rfloor = 3$, $\lfloor 3.99 \rfloor = 3$, $\lfloor -3.01 \rfloor = -4$, $\lfloor -3.99 \rfloor = -4$. These examples show that the floor function does not simply round its argument to the nearest integer. Note also that $\lfloor x \rfloor = x$ if and only if $x$ is an integer.
 
-				   Suppose now that we have a collection of $N$ data points $x_i$ for $i = 0, 1, 2, \ldots, N - 1$. (Note that we're using the C/C++ convention here, where array indices start at zero by default.) We will assume that the data are sorted in increasing (strictly speaking, nondecreasing) order, so that $i \leq j$ implies $x_i \leq x_j$. Suppose also that we wish to calculate the $t$ percentile of the data, where $0 \leq t < 1$. For example, $t = 0.25$ for the 25th percentile of the data. Define
+Suppose now that we have a collection of $N$ data points $x_i$ for $i = 0, 1, 2, \ldots, N - 1$. (Note that we're using the C/C++ convention here, where array indices start at zero by default.) We will assume that the data are sorted in increasing (strictly speaking, nondecreasing) order, so that $i \leq j$ implies $x_i \leq x_j$. Suppose also that we wish to calculate the $t$ percentile of the data, where $0 \leq t < 1$. For example, $t = 0.25$ for the 25th percentile of the data. Define
 
-				   \begin{eqnarray*}
+\begin{eqnarray*}
 
-				   Then the value $p$ of the percentile is
+Then the value $p$ of the percentile is 
 
-				   \begin{displaymath}
-
-
+\begin{displaymath}

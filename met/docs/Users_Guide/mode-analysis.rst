@@ -34,15 +34,15 @@ Usage: mode_analysis
 
 {\hskip 0.5in}[-out filename]
 
-{\hskip 0.5in}[-log file]
+{\hskip 0.5in}[-log file] 
 
-{\hskip 0.5in}[-v level]
+{\hskip 0.5in}[-v level] 
 
 {\hskip 0.5in}[-help]
 
-{\hskip 0.5in}[MODE FILE LIST]
+{\hskip 0.5in}[MODE FILE LIST] 
 
-{\hskip 0.5in}[-config config_file] | [MODE LINE OPTIONS]
+{\hskip 0.5in}[-config config_file] | [MODE LINE OPTIONS] 
 
 The MODE-Analysis tool has two required arguments and can accept several optional arguments.
 
@@ -50,442 +50,442 @@ Required arguments for mode_analysis:
 
 1. The -lookin path specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
 
-   2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified.
+2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified. 
 
-      Specifying -summary will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the -column option. Column names are not case sensitive. The column names are the same as described in Section [subsec:MODE-output]. More information about this option is provided in subsequent sections.
+Specifying -summary will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the -column option. Column names are not case sensitive. The column names are the same as described in Section [subsec:MODE-output]. More information about this option is provided in subsequent sections.
 
-      Specifying -bycase will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
+Specifying -bycase will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
 
-      Optional arguments for mode_analysis
+Optional arguments for mode_analysis 
 
-      3. The mode_analysis options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
+3. The mode_analysis options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
 
-	 Analysis options
+Analysis options
 
-	 The general analysis options described below provide a way for the user to indicate configuration files to be used, where to write lines used to perform the analysis, and over which fields to generate statistics.
+The general analysis options described below provide a way for the user to indicate configuration files to be used, where to write lines used to perform the analysis, and over which fields to generate statistics.
 
 
 
-	 -config filename
+-config filename
 
-	 This option gives the name of a configuration file to be read. The contents of the configuration file are described in Section [subsec:mode_analysis-configuration-file].
+This option gives the name of a configuration file to be read. The contents of the configuration file are described in Section [subsec:mode_analysis-configuration-file].
 
 
 
-	 -dump_row filename
+-dump_row filename
 
-	 Any MODE lines kept from the input files are written to filename.
+Any MODE lines kept from the input files are written to filename.
 
 
 
-	 -column column
+-column column
 
-	 Specifies which columns in the MODE output files to generate statistics for. Fields may be indicated by name (case insensitive) or column number (beginning at one). This option can be repeated to specify multiple columns.
+Specifies which columns in the MODE output files to generate statistics for. Fields may be indicated by name (case insensitive) or column number (beginning at one). This option can be repeated to specify multiple columns.
 
 
 
-	 MODE Command Line Options
+MODE Command Line Options
 
-	 MODE command line options are used to create filters that determine which of the MODE output lines that are read in, are kept. The MODE line options are numerous. They fall into seven categories: toggles, multiple set string options, multiple set integer options, integer max/min options, date/time max/min options, floating-point max/min options, and miscellaneous options. These options are described here.
+MODE command line options are used to create filters that determine which of the MODE output lines that are read in, are kept. The MODE line options are numerous. They fall into seven categories: toggles, multiple set string options, multiple set integer options, integer max/min options, date/time max/min options, floating-point max/min options, and miscellaneous options. These options are described here.
 
-	 Toggles
+Toggles 
 
-	 The MODE line options described in this section are shown in pairs. These toggles represent parameters that can have only one (or none) of two values. Any of these toggles may be left unspecified. However, if neither option for each toggle is indicated, the analysis will produce results that combine data from both toggles. This may produce unintended results.
+The MODE line options described in this section are shown in pairs. These toggles represent parameters that can have only one (or none) of two values. Any of these toggles may be left unspecified. However, if neither option for each toggle is indicated, the analysis will produce results that combine data from both toggles. This may produce unintended results.
 
 
 
-	 -fcst | -obs
+-fcst | -obs
 
-	 This toggle indicates whether forecast or observed lines should be used for analysis.
+This toggle indicates whether forecast or observed lines should be used for analysis.
 
 
 
-	 -single | -pair
+-single | -pair
 
-	 This toggle indicates whether single object or object pair lines should be used.
+This toggle indicates whether single object or object pair lines should be used.
 
 
 
-	 -simple | -cluster
+-simple | -cluster
 
-	 This toggle indicates whether simple object or cluster object lines should be used.
+This toggle indicates whether simple object or cluster object lines should be used.
 
 
 
-	 -matched | -unmatched
+-matched | -unmatched
 
-	 This toggle indicates whether matched or unmatched object lines should be used.
+This toggle indicates whether matched or unmatched object lines should be used.
 
 
 
-	 Multiple-set string options
+Multiple-set string options 
 
-	 The following options set various string attributes. They can be set multiple times on the command line but must be separated by spaces. Each of these options must be indicated as a string. String values that include spaces may be used by enclosing the string in quotation marks.
+The following options set various string attributes. They can be set multiple times on the command line but must be separated by spaces. Each of these options must be indicated as a string. String values that include spaces may be used by enclosing the string in quotation marks.
 
 
 
-	 -model value
+-model value
 
-	 This option specifies which model to use; value must be a string.
+This option specifies which model to use; value must be a string.
 
 
 
-	 -fcst_thr value
+-fcst_thr value
 
-	 -obs_thr  value
+-obs_thr  value
 
-	 These two options specify thresholds for forecast and observation objects to be used in the analysis, respectively.
+These two options specify thresholds for forecast and observation objects to be used in the analysis, respectively. 
 
 
 
-	 -fcst_var value
+-fcst_var value
 
-	 -obs_var  value
+-obs_var  value
 
-	 These options indicate the names of variables to be used in the analysis for forecast and observed fields.
+These options indicate the names of variables to be used in the analysis for forecast and observed fields.
 
 
 
-	 -fcst_units value
+-fcst_units value
 
-	 -obs_units  value
+-obs_units  value
 
-	 These options indicate the units to be used in the analysis for forecast and observed fields.
+These options indicate the units to be used in the analysis for forecast and observed fields.
 
 
 
-	 -fcst_lev value
+-fcst_lev value
 
-	 -obs_lev  value
+-obs_lev  value
 
-	 These options indicate vertical levels for forecast and observed fields to be used in the analysis.
+These options indicate vertical levels for forecast and observed fields to be used in the analysis.
 
 
 
-	 Multiple-set integer options
+Multiple-set integer options 
 
-	 The following options set various integer attributes. They can be set multiple times on the command line but must be separated by spaces. Each of the following options may only be indicated as an integer.
+The following options set various integer attributes. They can be set multiple times on the command line but must be separated by spaces. Each of the following options may only be indicated as an integer.
 
 
 
-	 -fcst_lead value
+-fcst_lead value
 
-	 -obs_lead  value
+-obs_lead  value
 
-	 These options are integers of the form HH[MMSS] specifying an (hour-minute-second) lead time.
+These options are integers of the form HH[MMSS] specifying an (hour-minute-second) lead time.
 
 
 
-	 -fcst_accum value
+-fcst_accum value
 
-	 -obs_accum  value
+-obs_accum  value
 
-	 These options are integers of the form HHMMSS specifying an (hour-minute-second) accumulation time.
+These options are integers of the form HHMMSS specifying an (hour-minute-second) accumulation time.
 
 
 
-	 -fcst_rad value
+-fcst_rad value
 
-	 -obs_rad  value
+-obs_rad  value
 
-	 These options indicate the convolution radius used for forecast or observed objects, respectively.
+These options indicate the convolution radius used for forecast or observed objects, respectively.
 
 
 
-	 Integer max/min options
+Integer max/min options 
 
-	 These options set limits on various integer attributes. Leaving a maximum value unset means no upper limit is imposed on the value of the attribute. The option works similarly for minimum values.
+These options set limits on various integer attributes. Leaving a maximum value unset means no upper limit is imposed on the value of the attribute. The option works similarly for minimum values. 
 
 
 
-	 -area_min value
+-area_min value
 
-	 -area_max value
+-area_max value
 
-	 These options are used to indicate minimum/maximum values for the area attribute to be used in the analysis.
+These options are used to indicate minimum/maximum values for the area attribute to be used in the analysis.
 
 
 
-	 -area_filter_min value
+-area_filter_min value
 
-	 -area_filter_max value
+-area_filter_max value
 
-	 These options are used to indicate minimum/maximum values accepted for the area filter. The area filter refers to the number of non-zero values of the raw data found within the object.
+These options are used to indicate minimum/maximum values accepted for the area filter. The area filter refers to the number of non-zero values of the raw data found within the object.
 
 
 
-	 -area_thresh_min value
+-area_thresh_min value
 
-	 -area_thresh_max value
+-area_thresh_max value
 
-	 These options are used to indicate minimum/maximum values accepted for the area thresh. The area thresh refers to the number of values of the raw data found within the object that meet the object definition threshold criteria used.
+These options are used to indicate minimum/maximum values accepted for the area thresh. The area thresh refers to the number of values of the raw data found within the object that meet the object definition threshold criteria used.
 
 
 
-	 -intersection_area_min value
+-intersection_area_min value
 
-	 -intersection_area_max value
+-intersection_area_max value
 
-	 These options refer to the minimum/maximum values accepted for the intersection area attribute.
+These options refer to the minimum/maximum values accepted for the intersection area attribute.
 
 
 
-	 -union_area_min value
+-union_area_min value
 
-	 -union_area_max value
+-union_area_max value
 
-	 These options refer to the minimum/maximum union area values accepted for analysis.
+These options refer to the minimum/maximum union area values accepted for analysis.
 
 
 
-	 -symmetric_diff_min value
+-symmetric_diff_min value
 
-	 -symmetric_diff_max value
+-symmetric_diff_max value
 
-	 These options refer to the minimum/maximum values for symmetric difference for objects to be used in the analysis.
+These options refer to the minimum/maximum values for symmetric difference for objects to be used in the analysis.
 
 
 
-	 Date/time max/min options
+Date/time max/min options 
 
-	 These options set limits on various date/time attributes. The values can be specified in one of three ways:
+These options set limits on various date/time attributes. The values can be specified in one of three ways: 
 
-	 First, the options may be indicated by a string of the form YYYYMMDD_HHMMSS. This specifies a complete calendar date and time.
+First, the options may be indicated by a string of the form YYYYMMDD_HHMMSS. This specifies a complete calendar date and time. 
 
-	 Second, they may be indicated by a string of the form YYYYMMDD_HH. Here, the minutes and seconds are assumed to be zero.
+Second, they may be indicated by a string of the form YYYYMMDD_HH. Here, the minutes and seconds are assumed to be zero.
 
-	 The third way of indicating date/time attributes is by a string of the form YYYYMMDD. Here, hours, minutes and seconds are assumed to be zero.
+The third way of indicating date/time attributes is by a string of the form YYYYMMDD. Here, hours, minutes and seconds are assumed to be zero.
 
 
 
-	 -fcst_valid_min YYYYMMDD[_HH[MMSS]]
+-fcst_valid_min YYYYMMDD[_HH[MMSS]]
 
-	 -fcst_valid_max YYYYMMDD[_HH[MMSS]]
+-fcst_valid_max YYYYMMDD[_HH[MMSS]]
 
-	 -obs_valid_min  YYYYMMDD[_HH[MMSS]]
+-obs_valid_min  YYYYMMDD[_HH[MMSS]]
 
-	 -obs_valid_max  YYYYMMDD[_HH[MMSS]]
+-obs_valid_max  YYYYMMDD[_HH[MMSS]]
 
-	 These options indicate minimum/maximum values for the forecast and observation valid times.
+These options indicate minimum/maximum values for the forecast and observation valid times.
 
 
 
-	 -fcst_init_min YYYYMMDD[_HH[MMSS]]
+-fcst_init_min YYYYMMDD[_HH[MMSS]]
 
-	 -fcst_init_max YYYYMMDD[_HH[MMSS]]
+-fcst_init_max YYYYMMDD[_HH[MMSS]]
 
-	 -obs_init_min  YYYYMMDD[_HH[MMSS]]
+-obs_init_min  YYYYMMDD[_HH[MMSS]]
 
-	 -obs_init_max  YYYYMMDD[_HH[MMSS]]
+-obs_init_max  YYYYMMDD[_HH[MMSS]]
 
-	 These two options indicate minimum/maximum values for forecast and observation initialization times.
+These two options indicate minimum/maximum values for forecast and observation initialization times.
 
 
 
-	 Floating-point max/min options
+Floating-point max/min options 
 
-	 Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to Chapter [subsec:MODE-output] for a description of these attributes as needed.
+Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to Chapter [subsec:MODE-output] for a description of these attributes as needed.
 
 
 
-	 -centroid_x_min value
+-centroid_x_min value
 
-	 -centroid_x_max value
+-centroid_x_max value
 
 
 
-	 -centroid_y_min value
+-centroid_y_min value
 
-	 -centroid_y_max value
+-centroid_y_max value
 
 
 
-	 -centroid_lat_min value
+-centroid_lat_min value
 
-	 -centroid_lat_max value
+-centroid_lat_max value
 
 
 
-	 -centroid_lon_min value
+-centroid_lon_min value
 
-	 -centroid_lon_max value
+-centroid_lon_max value
 
 
 
-	 -axis_ang_min value
+-axis_ang_min value
 
-	 -axis_ang_max value
+-axis_ang_max value
 
 
 
-	 -length_min value
+-length_min value
 
-	 -length_max value
+-length_max value
 
 
 
-	 -width_min value
+-width_min value
 
-	 -width_max value
+-width_max value
 
 
 
-	 -curvature_min value
+-curvature_min value
 
-	 -curvature_max value
+-curvature_max value
 
 
 
-	 -curvature_x_min value
+-curvature_x_min value
 
-	 -curvature_x_max value
+-curvature_x_max value
 
 
 
-	 -curvature_y_min value
+-curvature_y_min value
 
-	 -curvature_y_max value
+-curvature_y_max value
 
 
 
-	 -complexity_min value
+-complexity_min value
 
-	 -complexity_max value
+-complexity_max value
 
 
 
-	 -intensity_10_min value
+-intensity_10_min value
 
-	 -intensity_10_max value
+-intensity_10_max value
 
 
 
-	 -intensity_25_min value
+-intensity_25_min value
 
-	 -intensity_25_max value
+-intensity_25_max value
 
 
 
-	 -intensity_50_min value
+-intensity_50_min value
 
-	 -intensity_50_max value
+-intensity_50_max value
 
 
 
-	 -intensity_75_min value
+-intensity_75_min value
 
-	 -intensity_75_max value
+-intensity_75_max value
 
 
 
-	 -intensity_90_min value
+-intensity_90_min value
 
-	 -intensity_90_max value
+-intensity_90_max value
 
 
 
-	 -intensity_user_min value
+-intensity_user_min value
 
-	 -intensity_user_max value
+-intensity_user_max value
 
 
 
-	 -intensity_sum_min value
+-intensity_sum_min value
 
-	 -intensity_sum_max value
+-intensity_sum_max value
 
 
 
-	 -centroid_dist_min value
+-centroid_dist_min value
 
-	 -centroid_dist_max value
+-centroid_dist_max value
 
 
 
-	 -boundary_dist_min value
+-boundary_dist_min value
 
-	 -boundary_dist_max value
+-boundary_dist_max value
 
 
 
-	 -convex_hull_dist_min value
+-convex_hull_dist_min value
 
-	 -convex_hull_dist_max value
+-convex_hull_dist_max value
 
 
 
-	 -angle_diff_min value
+-angle_diff_min value
 
-	 -angle_diff_max value
+-angle_diff_max value
 
 
 
-	 -aspect_diff_min value
+-aspect_diff_min value
 
-	 -aspect_diff_max value
+-aspect_diff_max value
 
 
 
-	 -area_ratio_min value
+-area_ratio_min value
 
-	 -area_ratio_max value
+-area_ratio_max value
 
 
 
-	 -intersection_over_area_min value
+-intersection_over_area_min value
 
-	 -intersection_over_area_max value
+-intersection_over_area_max value
 
 
 
-	 -curvature_ratio_min value
+-curvature_ratio_min value
 
-	 -curvature_ratio_max value
+-curvature_ratio_max value
 
 
 
-	 -complexity_ratio_min value
+-complexity_ratio_min value
 
-	 -complexity_ratio_max value
+-complexity_ratio_max value
 
 
 
-	 -percentile_intensity_ratio_min value
+-percentile_intensity_ratio_min value
 
-	 -percentile_intensity_ratio_max value
+-percentile_intensity_ratio_max value
 
 
 
-	 -interest_min value
+-interest_min value
 
-	 -interest_max value
+-interest_max value
 
 
 
-	 Miscellaneous options
+Miscellaneous options
 
-	 These options are used to indicate parameters that did not fall into any of the previous categories.
+These options are used to indicate parameters that did not fall into any of the previous categories.
 
 
 
-	 -mask_poly filename
+-mask_poly filename
 
-	 This option indicates the name of a polygon mask file to be used for filtering. The format for these files is the same as that of the polyline files for the other MET tools.
+This option indicates the name of a polygon mask file to be used for filtering. The format for these files is the same as that of the polyline files for the other MET tools.
 
 
 
-	 -help
+-help
 
-	 This option prints the usage message.
+This option prints the usage message.
 
 
 
-	 16.3.2 mode_analysis configuration file
+16.3.2 mode_analysis configuration file
 
-	 To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in Section[subsec:mode_analysis-usage].
+To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in Section[subsec:mode_analysis-usage].
 
-	 The parameters that are set in the configuration file either add to or override parameters that are set on the command line. For the “set string” and “set integer type” options enclosed in brackets, the values specified in the configuration file are added to any values set on the command line. For the “toggle” and “min/max type” options, the values specified in the configuration file override those set on the command line.
+The parameters that are set in the configuration file either add to or override parameters that are set on the command line. For the “set string” and “set integer type” options enclosed in brackets, the values specified in the configuration file are added to any values set on the command line. For the “toggle” and “min/max type” options, the values specified in the configuration file override those set on the command line.
 
-	 16.3.3 mode_analysis output
+16.3.3 mode_analysis output
 
-	 The output of the MODE-Analysis tool is a self-describing tabular format written to standard output. The length and contents of the table vary depending on whether -summary or -bycase is selected. The contents also change for -summary depending on the number of columns specified by the user.
+The output of the MODE-Analysis tool is a self-describing tabular format written to standard output. The length and contents of the table vary depending on whether -summary or -bycase is selected. The contents also change for -summary depending on the number of columns specified by the user.
