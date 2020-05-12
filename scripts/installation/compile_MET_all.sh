@@ -686,7 +686,7 @@ if [ $COMPILE_MET -eq 1 ]; then
   fi
 
   echo "cd `pwd`"
-  if [[ -z ${MET_PYTHON_CC} && ${MET_PYTHON_LD} ]]; then
+  if [[ -z ${MET_PYTHON_CC} && -z ${MET_PYTHON_LD} ]]; then
       if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
 	  echo "./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
 	  ./configure --prefix=${MET_DIR} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1

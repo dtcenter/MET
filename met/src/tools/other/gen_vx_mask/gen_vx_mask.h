@@ -89,6 +89,7 @@ static ConcatString input_gridname, mask_filename, out_filename;
 
 // Optional arguments
 static MaskType mask_type = default_mask_type;
+static bool type_is_set = false;
 static ConcatString input_field_str, mask_field_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;

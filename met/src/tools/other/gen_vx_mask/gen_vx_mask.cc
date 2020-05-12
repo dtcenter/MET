@@ -1444,7 +1444,16 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_type(const StringArray & a) {
+   if(type_is_set) {
+      mlog << Error << "\n" << program_name << " -> "
+           << "the -type command line option can only be used once!\n"
+           << "To apply multiple masks, run this tool multiple times "
+           << "using the output of one run as the input to the next."
+           << "\n\n"; 
+      exit(1);
+   }
    mask_type = string_to_masktype(a[0].c_str());
+   type_is_set = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1542,8 +1551,8 @@ void set_shapeno(const StringArray & a) {
    shape_number = atoi(a[0].c_str());
 
    if(shape_number < 0) {
-      mlog << Error << "\n" << program_name
-           << ": bad shapeno ... " << shape_number << "\n\n";
+      mlog << Error << "\n" << program_name << " -> "
+           << "bad shapeno ... " << shape_number << "\n\n";
       exit(1);
    }
 
