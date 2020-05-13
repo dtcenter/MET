@@ -1167,7 +1167,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
    conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
-   if (info.method == InterpMthd_Gaussian) info.gaussian.compute();
+   if(info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
 
    info.validate();
 
@@ -1391,7 +1391,9 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
          } // end for k
          
-         if (method == InterpMthd_Gaussian) info.gaussian.compute();
+         if(method == InterpMthd_Gaussian || method == InterpMthd_MaxGauss) {
+            info.gaussian.compute();
+         }
       } // end for j
    } // end for i
 
