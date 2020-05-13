@@ -81,7 +81,155 @@ The gsid2mpr tool writes the same set of MPR output columns for the conventional
 
 Table 11.1 Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
 
+.. list-table:: Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * -  
+    - 
+    - GSI DIAGNOSTIC CONVENTIONAL MPR OUTPUT FILE
+  * - Column Number
+    - Column Name
+    - Description
+  * - 1-37
+    - 
+    - Standard MPR columns described in Table [table_PS_format_info_MPR].
+  * - 38
+    - OBS_PRS
+    - Model pressure value at the observation height (hPa)
+  * - 39
+    - OBS_ERR_IN
+    - PrepBUFR inverse observation error
+  * - 40
+    - OBS_ERR_ADJ
+    - read_PrepBUFR inverse observation error
+  * - 41
+    - OBS_ERR_FIN
+    - Final inverse observation error
+  * - 42
+    - PREP_USE
+    - read_PrepBUFR usage
+  * - 43
+    - ANLY_USE
+    - Analysis usage (1 for yes, -1 for no)
+  * - 44
+    - SETUP_QC
+    - Setup quality control
+  * - 45
+    - QC_WGHT
+    - Non-linear quality control relative weight
+
 Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
+
+.. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - GSI DIAGNOSTIC RADIANCE MPR OUTPUT FILE
+  * - Column Number
+    - Column Name
+    - Description
+  * - 1-37
+    -  
+    - Standard MPR columns described in Table [table_PS_format_info_MPR].
+  * - 38
+    - CHAN_USE
+    - Channel used (1 for yes, -1 for no)
+  * - 39
+    - SCAN_POS
+    - Sensor scan position
+  * - 40
+    - SAT_ZNTH
+    - Satellite zenith angle (degrees)
+  * - 41
+    - SAT_AZMTH
+    - Satellite azimuth angle (degrees)
+  * - 42
+    - SUN_ZNTH
+    - Solar zenith angle (degrees)
+  * - 43
+    - SUN_AZMTH
+    - Solar azimuth angle (degrees)
+  * - 44
+    - SUN_GLNT
+    - Sun glint angle (degrees)
+  * - 45
+    - FRAC_WTR
+    - Fractional coverage by water
+  * - 46
+    - FRAC_LND
+    - Fractional coverage by land
+  * - 47
+    - FRAC_ICE
+    - Fractional coverage by ice
+  * - 48
+    - FRAC_SNW
+    - Fractional coverage by snow
+  * - 49
+    - SFC_TWTR
+    - Surface temperature over water (K)
+  * - 50
+    - SFC_TLND
+    - Surface temperature over land (K)
+  * - 51
+    - SFC_TICE
+    - Surface temperature over ice (K)
+  * - 52
+    - SFC_TSNW
+    - Surface temperature over snow (K)
+  * - 53
+    - TSOIL
+    - Soil temperature (K)
+  * - 54
+    - SOILM
+    - Soil moisture
+  * - 55
+    - LAND_TYPE
+    - Surface land type
+  * - 56
+    - FRAC_VEG
+    - Vegetation fraction
+  * - 57
+    - SNW_DPTH
+    - Snow depth
+  * - 58
+    - SFC_WIND
+    - Surface wind speed (m/s)
+  * - 59
+    - FRAC_CLD  CLD_LWC
+    - Cloud fraction (%)   Cloud liquid water (kg/m**2) (microwave only)
+  * - 60
+    - CTOP_PRS   TC_PWAT
+    - Cloud top pressure (hPa)   Total column precip. water (km/m**2) (microwave only)
+  * - 61
+    - TFND
+    - Foundation temperature: Tr
+  * - 62
+    - TWARM
+    - Diurnal warming: d(Tw) at depth zob
+  * - 63
+    - TCOOL
+    - Sub-layer cooling: d(Tc) at depth zob
+  * - 64
+    - TZFND
+    - d(Tz)/d(Tr)
+  * - 65
+    - OBS_ERR
+    - Inverse observation error
+  * - 66
+    - FCST_NOBC
+    - Brightness temperature with no bias correction (K)
+  * - 67
+    - SFC_EMIS
+    - Surface emissivity
+  * - 68
+    - STABILITY
+    - Stability index
+  * - 69
+    - PRS_MAX_WGT
+    - Pressure of the maximum weighing function
 
 The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the aggregate_stat job type to read MPR lines and compute partial sums (SL1L2), continuous statistics (CNT), contingency table counts (CTC), or contingency table statistics (CTS). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the -column_thresh and -column_str job command options.
 
@@ -169,7 +317,119 @@ The gsid2mpr tool writes the same set of ORANK output columns for the convention
 
 Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
 
+.. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - GSI DIAGNOSTIC CONVENTIONAL ORANK OUTPUT FILE
+  * - Column Number
+    - Column Name
+    - Description
+  * - 1-?
+    -  
+    - Standard ORANK columns described in Table [table_ES_header_info_es_out_ORANK].
+  * - Last-2
+    - N_USE
+    - Number of members with ANLY_USE = 1
+  * - Last-1
+    - PREP_USE
+    - read_PrepBUFR usage
+  * - Last
+    - SETUP_QC
+    - Setup quality control
+
 Table 11.4 Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
+
+.. list-table:: Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - GSI DIAGNOSTIC RADIANCE ORANK OUTPUT FILE
+  * - Column Number
+    - Column Name
+    - Description
+  * - 1-?
+    -  
+    - Standard ORANK columns described in Table [table_ES_header_info_es_out_ORANK].
+  * - Last-24
+    - N_USE
+    - Number of members with OBS_QC = 0
+  * - Last-23
+    - CHAN_USE
+    - Channel used (1 for yes, -1 for no)
+  * - Last-22
+    - SCAN_POS
+    - Sensor scan position
+  * - Last-21
+    - SAT_ZNTH
+    - Satellite zenith angle (degrees)
+  * - Last-20
+    - SAT_AZMTH
+    - Satellite azimuth angle (degrees)
+  * - Last-19
+    - SUN_ZNTH
+    - Solar zenith angle (degrees)
+  * - Last-18
+    - SUN_AZMTH
+    - Solar azimuth angle (degrees)
+  * - Last-17
+    - SUN_GLNT
+    - Sun glint angle (degrees)
+  * - Last-16
+    - FRAC_WTR
+    - Fractional coverage by water
+  * - Last-15
+    - FRAC_LND
+    - Fractional coverage by land
+  * - Last-14
+    - FRAC_ICE
+    - Fractional coverage by ice
+  * - Last-13
+    - FRAC_SNW
+    - Fractional coverage by snow
+  * - Last-12
+    - SFC_TWTR
+    - Surface temperature over water (K)
+  * - Last-11
+    - SFC_TLND
+    - Surface temperature over land (K)
+  * - Last-10
+    - SFC_TICE
+    - Surface temperature over ice (K)
+  * - Last-9
+    - SFC_TSNW
+    - Surface temperature over snow (K)
+  * - Last-8
+    - TSOIL
+    - Soil temperature (K)
+  * - Last-7
+    - SOILM
+    - Soil moisture
+  * - Last-6
+    - LAND_TYPE
+    - Surface land type
+  * - Last-5
+    - FRAC_VEG
+    - Vegetation fraction
+  * - Last-4
+    - SNW_DPTH
+    - Snow depth
+  * - Last-3
+    - TFND
+    - Foundation temperature: Tr
+  * - Last-2
+    - TWARM
+    - Diurnal warming: d(Tw) at depth zob
+  * - Last-1
+    - TCOOL
+    - Sub-layer cooling: d(Tc) at depth zob
+  * - Last
+    - TZFND
+    - d(Tz)/d(Tr)
 
 The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the aggregate_stat job type to read ORANK lines and ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the -column_thresh and -column_str job command options.
 

@@ -44,9 +44,32 @@ Note that the MSE of the original binary fields is equal to the proportion of th
 
 The Intensity-Scale (IS) skill score evaluates the forecast skill as a function of the precipitation intensity and of the spatial scale of the error. Positive values of the IS skill score are associated to a skillful forecast, whereas negative values are associated to no skill. Usually large scales exhibit positive skill (large scale events, such as fronts, are well predicted), whereas small scales exhibit negative skill (small scale events, such as convective showers, are less predictable), and the smallest scale and highest thresholds exhibit the worst skill. For the NIMROD case illustrated note the negative skill associated to the 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced almost its entire length.
 
-2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. 
+Table 10.1 2x2 contingency table in terms of counts. The nij (symbol for lowercase i & j??) values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations.
 
+.. list-table:: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. 
+  :widths: auto
+  :header-rows: 1
 
+  * - Forecast
+    - Observation
+    -  
+    - Total
+  * -  
+    - o = 1 (e.g., “Yes”)
+    - o = 0 (e.g., “No”)
+    -  
+  * - f = 1 (e.g., “Yes”)
+    - Hits=a
+    - False Alarms = b
+    - a+b
+  * - f = 0 (e.g., “No”)
+    - Misses=c
+    - Correct rejections = d
+    - c+d
+  * - Total
+    - a+c
+    - b+d
+    - a+b+c+d
 
 NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
 
@@ -262,17 +285,193 @@ wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indic
 
 The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
 
-Header information for each file wavelet-stat outputs.
+Table 10.2 Header information for each file wavelet-stat outputs.
 
-Format information for the ISC (Intensity-Scale) output line type.
+.. list-table:: Header information for each file wavelet-stat outputs.
+  :widths: auto
+  :header-rows: 2
+
+  * - HEADER
+    - 
+    - 
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - User provided text string designating model name
+  * - 3
+    - DESC
+    - User provided text string describing the verification task
+  * - 4
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 5
+    - FCST_VALID_BEG
+    - Forecast valid start time in YYYYMMDD_HHMMSS format
+  * - 6
+    - FCST_VALID_END
+    - Forecast valid end time in YYYYMMDD_HHMMSS format
+  * - 7
+    - OBS_LEAD
+    - Observation lead time in HHMMSS format
+  * - 8
+    - OBS_VALID_BEG
+    - Observation valid start time in YYYYMMDD_HHMMSS format
+  * - 9
+    - OBS_VALID_END
+    - Observation valid end time in YYYYMMDD_HHMMSS format
+  * - 10
+    - FCST_VAR
+    - Model variable
+  * - 11
+    - FCST_UNITS
+    - Units for model variable
+  * - 12
+    - FCST_LEV
+    - Selected Vertical level for forecast
+  * - 13
+    - OBS_VAR
+    - Observation variable
+  * - 14
+    - OBS_UNITS
+    - Units for observation variable
+  * - 15
+    - OBS_LEV
+    - Selected Vertical level for observations
+  * - 16
+    - OBTYPE
+    - User provided text string designating the observation type
+  * - 17
+    - VX_MASK
+    - Verifying masking region indicating the masking grid or polyline region applied
+  * - 18
+    - INTERP_MTHD
+    - NA in Wavelet-Stat
+  * - 19
+    - INTERP_PNTS
+    - NA in Wavelet-Stat
+  * - 20
+    - FCST_THRESH
+    - The threshold applied to the forecast
+  * - 21
+    - OBS_THRESH
+    - The threshold applied to the observations
+  * - 22
+    - COV_THRESH
+    - NA in Wavelet-Stat
+  * - 23
+    - ALPHA
+    - NA in Wavelet-Stat
+  * - 24
+    - LINE_TYPE
+    - See table below.
+
+Table 10.3 Format information for the ISC (Intensity-Scale) output line type.
+
+.. list-table:: Format information for the ISC (Intensity-Scale) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - ISC OUTPUT FORMAT
+    - 
+    - 
+  * - Column Number
+    - ISC Column Name
+    - Description
+  * - 24
+    - ISC
+    - Intensity-Scale line type
+  * - 25
+    - TOTAL
+    - The number of grid points (forecast locations) used
+  * - 26
+    - TILE_DIM
+    - The dimensions of the tile
+  * - 27
+    - TILE_XLL
+    - Horizontal coordinate of the lower left corner of the tile
+  * - 28
+    - TILE_YLL
+    - Vertical coordinate of the lower left corner of the tile
+  * - 29
+    - NSCALE
+    - Total number of scales used in decomposition
+  * - 30
+    - ISCALE
+    - The scale at which all information following applies
+  * - 31
+    - MSE
+    - Mean squared error for this scale
+  * - 32
+    - ISC
+    - The intensity scale skill score
+  * - 33
+    - FENERGY
+    - Forecast energy squared for this scale
+  * - 34
+    - OENERGY
+    - Observed energy squared for this scale
+  * - 35
+    - BASER
+    - The base rate (not scale dependent)
+  * - 36
+    - FBIAS
+    - The frequency bias
 
 The Wavelet-Stat tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
 
 The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables [table_NetCDF_dim_Wave_output] and [_table_variables_wave_NetCDF_output].
 
-Dimensions defined in NetCDF output.
+Table 10.4 Dimensions defined in NetCDF output.
 
+.. list-table:: Dimensions defined in NetCDF output.
+  :widths: auto
+  :header-rows: 2
 
+  * - wavelet_stat NetCDF DIMENSIONS
+    - 
+  * - NetCDF Dimension
+    - Description
+  * - x
+    - Dimension of the tile which equals 2ⁿ
+  * - y
+    - Dimension of the tile which equals 2ⁿ
+  * - scale
+    - Dimension for the number of scales. This is set to n+2, where 2ⁿ is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
+  * - tile
+    - Dimension for the number of tiles used
+
+Table 10.5 Variables defined in NetCDF output.
+
+.. list-table:: Variables defined in NetCDF output.
+  :widths: auto
+  :header-rows: 2
+
+  * - wavelet-stat NetCDF VARIABLES
+    - 
+    - 
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - FCST_FIELD_LEVEL_RAW
+    - tile, x, y
+    - Raw values for the forecast field specified by “FIELD_LEVEL”
+  * - OBS_FIELD_LEVEL_RAW
+    - tile, x, y
+    - Raw values for the observation field specified by “FIELD_LEVEL”
+  * - DIFF_FIELD_LEVEL_RAW
+    - tile, x, y
+    - Raw values for the difference field (f-o) specified by “FIELD_LEVEL”
+  * - FCST_FIELD_LEVEL_THRESH
+    - tile, scale, x, y
+    - Wavelet scale-decomposition of the forecast field specified by “FIELD_LEVEL_THRESH”
+  * - OBS_FIELD_LEVEL_THRESH
+    - tile, scale, x, y
+    - Wavelet scale-decomposition of the observation field specified by “FIELD_LEVEL_THRESH”
 
 Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the ps_plot_flag configuration file option.
 

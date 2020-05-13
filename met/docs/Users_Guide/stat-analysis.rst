@@ -44,7 +44,96 @@ When aggregating the matched pair line type (MPR) and computing an output contin
 
 The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. The GO Index is a special case of the Skill Score index for which a specific configuration file is provided. The GO index is a weighted average of the RMSE values for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in Table [compute_GO_Index] and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in Table [compute_GO_Index] to compute values for the GO Index. For a general skill score index, the user can specify the weights and variables to use in the calculations in a Stat-Analysis configuration file and run the ss_index job type.
 
-Variables, levels, and weights used to compute the GO Index. 
+Table 12.1 Variables, levels, and weights used to compute the GO Index.
+
+.. list-table:: Variables, levels, and weights used to compute the GO Index.
+  :widths: auto
+  :header-rows: 2
+
+  * - Variable
+    - Level
+    - Weights by Lead time
+    - 
+    -
+    - 
+  * -  
+    -  
+    - 12 h
+    - 24 h
+    - 36 h
+    - 48 h
+  * - Wind speed
+    - 250 hPa
+    - 4
+    - 3
+    - 2
+    - 1
+  * -  
+    - 400 hPa
+    - 4
+    - 3
+    - 2
+    - 1
+  * -  
+    - 850 hPa
+    - 4
+    - 3
+    - 2
+    - 1
+  * -  
+    - Surface
+    - 8
+    - 6
+    - 4
+    - 2
+  * - Dew point temperature
+    - 400 hPa
+    - 8
+    - 6
+    - 4
+    - 2
+  * -  
+    - 700 hPa
+    - 8
+    - 6
+    - 4
+    - 2
+  * -  
+    - 850 hPa
+    - 8
+    - 6
+    - 4
+    - 2
+  * -  
+    - Surface
+    - 8
+    - 6
+    - 4
+    - 2
+  * - Temperature
+    - 400 hPa
+    - 4
+    - 3
+    - 2
+    - 1
+  * -  
+    - Surface
+    - 8
+    - 6
+    - 4
+    - 2
+  * - Height
+    - 400 hPa
+    - 4
+    - 3
+    - 2
+    - 1
+  * - Pressure
+    - Mean sea level
+    - 8
+    - 6
+    - 4
+    - 2
 
 12.2.6 Ramp Events
 
@@ -308,8 +397,39 @@ The user may specify one or more analysis jobs to be performed on the STAT lines
 
 All possible tasks for job_name are listed in Table [Des_components_STAT_analysis_tool].
 
+Table 12.2 ?? formatting problems
 
+.. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
+  :widths: 15 55 20
+  :header-rows: 1
 
+  * - 
+    - 
+    - 
+  * - Job Name
+    - Job commandDescription
+    - Required Arguments
+  * - filter
+    - Filters out the statistics lines based on applying options* (See note below table)
+    - -dump_row
+  * - summary
+    - Computes the mean, standard deviation, percentiles (min, 10th, 25th, 50th, 75th, 90th, and max), interquartile range, range, wmo_mean, and wmo_weighted_mean
+    - -line_type  -column
+  * - aggregate
+    - Aggregates the statistics output, computing the statistic specified for the entire collection of valid lines
+    - -line_type
+  * - aggregate_stat
+    - Aggregates the statistics output, and converts the input line type to the output line type specified
+    - -line_type     -out_line_type
+  * - ss_index
+    - Calculates a user-defined Skill Score index as described in section [subsec:StA_Skill-Score-Index,].
+    - -model forecast     -model reference
+  * - go_index
+    - Calculates the GO Index as described in section [subsec:StA_Skill-Score-Index,].
+    - -model forecast     -model reference
+  * - ramp
+    - Defines a ramp event on a time-series of forecast and observed values. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
+    - -ramp_type  -ramp_thresh  -out_line_type  -column  -ramp_time  -ramp_exact  -ramp_window 
 
 
 out_alpha = 0.05;
@@ -430,6 +550,46 @@ Job: summary
 
 This job produces summary statistics for the column name and line type specified by the "-column" and "-line_type" options. The output of this job type consists of three lines. The first line contains "JOB_LIST", followed by a colon, then the filtering and job definition parameters used for this job. The second line contains "COL_NAME", followed by a colon, then the column names for the data in the next line. The third line contains the word "SUMMARY", followed by a colon, then the total, mean with confidence intervals, standard deviation with confidence intervals, minimum value, percentiles (10th, 25th, 50th, 75th, and 90th), the maximum value, the interquartile range, the range, and WMO mean information. The output columns are shown in Table [Columnar_output] below.
 
+Table 12.3 Columnar output of "summary" job output from the Stat-Analysis tool.
+
+.. list-table:: Columnar output of "summary" job output from the Stat-Analysis tool.
+  :widths: auto
+  :header-rows: 1
+
+  * - Column Number
+    - Description 
+  * - 1
+    - SUMMARY: (job type)
+  * - 2
+    - Total
+  * - 3-7
+    - Mean including normal and bootstrap upper and lower confidence limits
+  * - 8-10
+    - Standard deviation including bootstrap upper and lower confidence limits
+  * - 11
+    - Minimum value
+  * - 12
+    - 10th percentile
+  * - 13
+    - 25th percentile
+  * - 14
+    - Median (50th percentile)
+  * - 15
+    - 75th percentile
+  * - 16
+    - 90th percentile
+  * - 17
+    - Maximum value
+  * - 18
+    - Interquartile range (75th - 25th percentile)
+  * - 19
+    - Range (Maximum - Minimum)
+  * - 20
+    - WMO Mean type
+  * - 21
+    - WMO Unweighted Mean value
+  * - 22
+    - WMO Weighted Mean value
 
 
 Job: aggregate
@@ -440,7 +600,32 @@ Job: aggregate_stat
 
 This job is similar to the "aggregate" job listed above, however the format of its output is determined by the "-out_line_type" argument. Again the output consists of three lines for "JOB_LIST", "COL_NAME", and the name of the output STAT line, as described above. Valid combinations of the "-line_type" and "-out_line_type" arguments are listed in Table [arg_agg_stat_job] below.
 
+Table 12.4 Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
 
+.. list-table:: Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
+  :widths: auto
+  :header-rows: 1
+
+  * - Input Line Type
+    - Output Line Type
+  * - FHO or CTC
+    - CTS
+  * - MCTC
+    - MCTS
+  * - SL1L2 or SAL1L2
+    - CNT
+  * - VL1L2 or VAL1L2
+    - WDIR (wind direction)
+  * - PCT
+    - PSTD, PJC, PRC
+  * - NBRCTC
+    - NBRCTS
+  * - ORANK
+    - RHIST, PHIST, RELP, SSVAR
+  * - MPR
+    - CNT, SL1L2, SAL1L2, WDIR
+  * - MPR
+    - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "-out_fcst_thresh" and "-out_obs_thresh" arguments)
 
 Job: ss_index
 
