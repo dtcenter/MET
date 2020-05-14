@@ -954,6 +954,42 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+desc = "NA";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+desc
+\series medium
+ configuration option is common to many MET tools and is described in Section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+ 
+\series default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 model = [];
 \end_layout
 
@@ -980,10 +1016,6 @@ height "1pt"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout LyX-Code
 
 \end_layout
 
