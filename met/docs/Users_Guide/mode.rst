@@ -504,23 +504,358 @@ MODE produces output in ASCII, NetCDF, and PostScript formats.
 
 ASCII output
 
-The MODE tool creates two ASCII output files. The first ASCII file contains contingency table counts and statistics for comparing the forecast and observation fields. This file consists of 4 lines. The first is a header line containing column names. The second line contains data comparing the two raw fields after any masking of bad data or based on a grid or lat/lon polygon has been applied. The third contains data comparing the two fields after any raw thresholds have been applied. The fourth, and last, line contains data comparing the derived object fields scored using traditional measures. Format of MODE CTS output file.
+The MODE tool creates two ASCII output files. The first ASCII file contains contingency table counts and statistics for comparing the forecast and observation fields. This file consists of 4 lines. The first is a header line containing column names. The second line contains data comparing the two raw fields after any masking of bad data or based on a grid or lat/lon polygon has been applied. The third contains data comparing the two fields after any raw thresholds have been applied. The fourth, and last, line contains data comparing the derived object fields scored using traditional measures.
 
-This first file uses the following naming convention:
+Table 15.1 Format of MODE CTS output file.
+
+.. list-table:: Format of MODE CTS output file.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
+  * - Column Number
+    - MODE CTS Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - User provided text string designating model name
+  * - 3
+    - N_VALID
+    - Number of valid data points
+  * - 4
+    - GRID_RES
+    - User provided nominal grid resolution
+  * - 5
+    - DESC
+    - User provided text string describing the verification task
+  * - 6
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 7
+    - FCST_VALID
+    - Forecast valid start time in YYYYMMDD_HHMMSS format
+  * - 8
+    - FCST_ACCUM
+    - Forecast accumulation time in HHMMSS format
+  * - 9
+    - OBS_LEAD
+    - Observation lead time in HHMMSS format; when field2 is actually an observation, this should be "000000"
+  * - 10
+    - OBS_VALID
+    - Observation valid start time in YYYYMMDD_HHMMSS format
+  * - 11
+    - OBS_ACCUM
+    - Observation accumulation time in HHMMSS format
+  * - 12
+    - FCST_RAD
+    - Forecast convolution radius in grid squares
+  * - 13
+    - FCST_THR
+    - Forecast convolution threshold
+  * - 14
+    - OBS_RAD
+    - Observation convolution radius in grid squares
+  * - 15
+    - OBS_THR
+    - Observation convolution threshold
+  * - 16
+    - FCST_VAR
+    - Forecast variable
+  * - 17
+    - FCST_UNITS
+    - Units for model variable
+  * - 18
+    - FCST_LEV
+    - Forecast vertical level
+  * - 19
+    - OBS_VAR
+    - Observation variable
+  * - 20
+    - OBS_UNITS
+    - Units for observation variable
+  * - 21
+    - OBS_LEV
+    - Observation vertical level
+  * - 22
+    - OBTYPE
+    - User provided observation type
+  * - 23
+    - FIELD
+    - Field type for this line:* RAW for the raw input fields * OBJECT for the resolved object fields
+  * - 24
+    - TOTAL
+    - Total number of matched pairs
+  * - 25
+    - FY_OY
+    - Number of forecast yes and observation yes
+  * - 26
+    - FY_ON
+    - Number of forecast yes and observation no
+  * - 27
+    - FN_OY
+    - Number of forecast no and observation yes
+  * - 28
+    - FN_ON
+    - Number of forecast no and observation no
+  * - 29
+    - BASER
+    - Base rate
+  * - 30
+    - FMEAN
+    - Forecast mean
+  * - 31
+    - ACC
+    - Accuracy
+  * - 32
+    - FBIAS
+    - Frequency Bias
+  * - 33
+    - PODY
+    - Probability of detecting yes
+  * - 34
+    - PODN
+    - Probability of detecting no
+  * - 35
+    - POFD
+    - Probability of false detection
+  * - 36
+    - FAR
+    - False alarm ratio
+  * - 37
+    - CSI
+    - Critical Success Index
+  * - 38
+    - GSS
+    - Gilbert Skill Score
+  * - 39
+    - HK
+    - Hanssen-Kuipers Discriminant
+  * - 40
+    - HSS
+    - Heidke Skill Score
+  * - 41
+    - ODDS
+    - Odds Ratio
+
+This first file uses the following naming convention:  ?? missing code
 
 $$where {\tt PREFIX} indicates the user-defined output prefix, {\tt FCST\_VAR\_LVL} is the forecast variable and vertical level being used, {\tt OBS\_VAR\_LVL} is the observation variable and vertical level being used, {\tt HHMMSSL} indicates the forecast lead time, {\tt YYYYMMDD\_HHMMSSV} indicates the forecast valid time, and {\tt HHMMSSA} indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the {\tt ct\_stats\_flag} option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in Table [CTS_output].
 
 The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the OBJECT_ID column. The OBJECT_ID can take the following 6 forms: FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN. In each case, NNN is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for OBJECT_ID can be divided into two types - one for single objects and one for pairs of objects. The single object lines (FNN, ONN, CFNNN, and CONNN) contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in Table [MODE_object_attribute]. 
 
+Table 15.2 Object identifier descriptions for MODE object attribute output file.
 
+.. list-table:: Object identifier descriptions for MODE object attribute output file.
+  :widths: auto
+  :header-rows: 2
 
-A note on terminology: a cluster (referred to as "composite" in earlier versions) object need not necessarily consist of more than one simple object. A cluster object is by definition any set of one or more objects in one field which match a set of one or more objects in the other field. When a single simple forecast object matches a single simple observation object, they are each considered to be cluster objects as well.
+  * - 
+    - 
+    - mode ASCII OBJECT IDENTIFIER DESCRIPTIONS
+  * - Object identifier (object_id)
+    - Valid Data Columns
+    - Description of valid data
+  * - FNNN, ONNN
+    - 1-18,19-39
+    - Attributes for simple forecast, observation objects
+  * - FNNN\_   ONNN
+    - 1-18, 40-51
+    - Attributes for pairs of simple forecast and observation objects
+  * - CFNNN,   CONNN
+    - 1-18,19-39
+    - Attributes for merged cluster objects in forecast, observation fields
+  * - CFNNN\_   CONNN
+    - 1-18, 40-51
+    - Attributes for pairs of forecast and observation cluster objects
+
+**A note on terminology:** a cluster (referred to as "composite" in earlier versions) object need not necessarily consist of more than one simple object. A cluster object is by definition any set of one or more objects in one field which match a set of one or more objects in the other field. When a single simple forecast object matches a single simple observation object, they are each considered to be cluster objects as well.
 
 The contents of the columns in this ASCII file are summarized in Table [MODE_object_attribute_output] and [MODE_object_attribute_output_part_2].
 
+Table 15.3 Format of MODE object attribute output files.
+
+.. list-table:: Format of MODE object attribute output files.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
+  * - Column
+    - MODE Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - User provided text string designating model name
+  * - 3
+    - N_VALID
+    - Number of valid data points
+  * - 4
+    - GRID_RES
+    - User provided nominal grid resolution
+  * - 5
+    - DESC
+    - User provided text string describing the verification task
+  * - 6
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 7
+    - FCST_VALID
+    - Forecast valid start time in YYYYMMDD_HHMMSS format
+  * - 8
+    - FCST_ACCUM
+    - Forecast accumulation time in HHMMSS format
+  * - 9
+    - OBS_LEAD
+    - Observation lead time in HHMMSS format; when field2 is actually an observation, this should be "000000"
+  * - 10
+    - OBS_VALID
+    - Observation valid start time in YYYYMMDD_HHMMSS format
+  * - 11
+    - OBS_ACCUM
+    - Observation accumulation time in HHMMSS format
+  * - 12
+    - FCST_RAD
+    - Forecast convolution radius in grid squares
+  * - 13
+    - FCST_THR
+    - Forecast convolution threshold
+  * - 14
+    - OBS_RAD
+    - Observation convolution radius in grid squares
+  * - 15
+    - OBS_THR
+    - Observation convolution threshold
+  * - 16
+    - FCST_VAR
+    - Forecast variable
+  * - 17
+    - FCST_UNITS
+    - Units for forecast variable
+  * - 18
+    - FCST_LEV
+    - Forecast vertical level
+  * - 19
+    - OBS_VAR
+    - Observation variable
+  * - 20
+    - OBS_UNITS
+    - Units for observation variable
+  * - 21
+    - OBS_LEV
+    - Observation vertical level
+  * - 22
+    - OBTYPE
+    - User provided observation type
+  * - 23
+    - OBJECT_ID
+    - Object numbered from 1 to the number of objects in each field
+  * - 24
+    - OBJECT_CAT
+    - Object category indicating to which cluster object it belongs
+  * - 25-26
+    - CENTROID_X, _Y
+    - Location of the centroid (in grid units)
+  * - 27-28
+    - CENTROID_LAT, _LON
+    - Location of the centroid (in lat/lon degrees)
+  * - 29
+    - AXIS_ANG
+    - Object axis angle (in degrees)
+  * - 30
+    - LENGTH
+    - Length of the enclosing rectangle (in grid units)
+  * - 31
+    - WIDTH
+    - Width of the enclosing rectangle (in grid units)
+  * - 32
+    - AREA
+    - Object area (in grid squares)
+  * - 33
+    - AREA_THRESH
+    - Area of the object containing data values in the raw field that meet the object definition threshold criteria (in grid squares)
+  * - 34
+    - CURVATURE
+    - Radius of curvature of the object defined in terms of third order moments (in grid units)
+  * - 35-36
+    - CURVATURE_X, _Y
+    - Center of curvature (in grid coordinates)
+  * - 37
+    - COMPLEXITY
+    - Ratio of the difference between the area of an object and the area of its convex hull divided by the area of the complex hull (unitless)
+  * - 38-42
+    - INTENSITY_10, _25, _50, _75, _90
+    - 10th, 25th, 50th, 75th, and 90th percentiles of intensity of the raw field within the object (various units)
+  * - 43
+    - INTENSITY_NN
+    - The percentile of intensity chosen for use in the PERCENTILE_INTENSITY_RATIO column (variable units)
 
 
-Format of MODE object attribute output files, continued.
+Table 15.4 Format of MODE object attribute output files, continued.
+
+.. list-table:: Format of MODE object attribute output files continued.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
+  * - Column
+    - MODE Column Name
+    - Description
+  * - 44
+    - INTENSITY_SUM
+    - Sum of the intensities of the raw field within the object (variable units)
+  * - 45
+    - CENTROID_DIST
+    - Distance between two objects centroids (in grid units)
+  * - 46
+    - BOUNDARY_DIST
+    - Minimum distance between the boundaries of two objects (in grid units)
+  * - 47
+    - CONVEX_HULL    \_DIST
+    - Minimum distance between the convex hulls of two objects (in grid units)
+  * - 48
+    - ANGLE_DIFF
+    - Difference between the axis angles of two objects (in degrees)
+  * - 49
+    - ASPECT_DIFF
+    - Absolute value of the difference between the aspect ratios of two objects (unitless)
+  * - 50
+    - AREA_RATIO
+    - Ratio of the areas of two objects defined as the lesser of the two divided by the greater of the two (unitless)
+  * - 51
+    - INTERSECTION    \_AREA
+    - Intersection area of two objects (in grid squares)
+  * - 52
+    - UNION_AREA
+    - Union area of two objects (in grid squares)
+  * - 53
+    - SYMMETRIC_DIFF
+    - Symmetric difference of two objects (in grid squares)
+  * - 54
+    - INTERSECTION    \_OVER_AREA
+    - Ratio of intersection area to the lesser of the forecast and observation object areas (unitless)
+  * - 55
+    - CURVATURE    \_RATIO
+    - Ratio of the curvature of two objects defined as the lesser of the two divided by the greater of the two (unitless)
+  * - 56
+    - COMPLEXITY    \_RATIO
+    - Ratio of complexities of two objects defined as the lesser of the forecast complexity divided by the observation complexity or its reciprocal (unitless)
+  * - 57
+    - PERCENTILE    \_INTENSITY    \_RATIO
+    - Ratio of the nth percentile (INTENSITY_NN column) of intensity of the two objects defined as the lesser of the forecast intensity divided by the observation intensity or its reciprocal (unitless)
+  * - 58
+    - INTEREST
+    - Total interest value computed for a pair of simple objects (unitless)
 
 NetCDF Output
 
@@ -528,14 +863,245 @@ The MODE tool creates a NetCDF output file containing the object fields that are
 
 The dimensions and variables included in the mode NetCDF files are described in Tables [NetCDF_dimensions_for_MODE_output], [Variables_contained_in_MODE_NetCDF_output] and [Variables_contained_in_MODE_NetCDF_output_part_2].
 
+Table 15.5  NetCDF dimensions for MODE output.
+
+.. list-table:: NetCDF dimensions for MODE output.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - mode NETCDF DIMENSIONS
+  * - NetCDF Dimension
+    - Description
+  * - lat
+    - Dimension of the latitude (i.e. Number of grid points in the North-South direction)
+  * - lon
+    - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
+  * - fcst_thresh_length
+    - Number of thresholds applied to the forecast
+  * - obs_thresh_length
+    - Number of thresholds applied to the observations
+  * - fcst_simp
+    - Number of simple forecast objects
+  * - fcst_simp_bdy
+    - Number of points used to define the boundaries of all of the simple forecast objects
+  * - fcst_simp_hull
+    - Number of points used to define the hull of all of the simple forecast objects
+  * - obs_simp
+    - Number of simple observation objects
+  * - obs_simp_bdy
+    - Number of points used to define the boundaries of all of the simple observation objects
+  * - obs_simp_hull
+    - Number of points used to define the hull of all of the simple observation objects
+  * - fcst_clus
+    - Number of forecast clusters
+  * - fcst_clus_hull
+    - Number of points used to define the hull of all of the cluster forecast objects
+  * - obs_clus
+    - Number of observed clusters
+  * - obs_clus_hull
+    - Number of points used to define the hull of all of the cluster observation objects
 
 
+Table 15.6  Variables contained in MODE NetCDF output
+
+.. list-table:: Variables contained in MODE NetCDF output.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - mode NETCDF VARIABLES
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - lat
+    - lat, lon
+    - Latitude
+  * - lon
+    - lat, lon
+    - Longitude
+  * - fcst_raw
+    - lat, lon
+    - Forecast raw values
+  * - fcst_obj_raw
+    - lat, lon
+    - Forecast Object Raw Values
+  * - fcst_obj_id
+    - lat, lon
+    - Simple forecast object id number for each grid point
+  * - fcst_clus_id
+    - lat, lon
+    - Cluster forecast object id number for each grid point
+  * - obs_raw
+    - lat, lon
+    - Observation Raw Values
+  * - obs_obj_raw
+    - lat, lon
+    - Observation Object Raw Values
+  * - obs_obj_id
+    - \-
+    - Simple observation object id number for each grid point
+  * - obs_clus_id
+    - \-
+    - Cluster observation object id number for each grid point
+  * - fcst_conv_radius
+    - \-
+    - Forecast convolution radius
+  * - obs_conv_radius
+    - \-
+    - Observation convolution radius
+  * - fcst_conv    \_threshold
+    - \-
+    - Forecast convolution threshold
+  * - obs_conv    \_threshold
+    - \-
+    - Observation convolution threshold
+  * - n_fcst_simp
+    - \-
+    - Number of simple forecast objects
+  * - n_obs_simp
+    - \-
+    - Number of simple observation objects
+  * - n_clus
+    -  
+    - Number of cluster objects
+
+Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
+
+.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - mode NETCDF VARIABLES
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - fcst_simp_bdy     \_start
+    - fcst_simp
+    - Forecast Simple Boundary Starting Index
+  * - fcst_simp_bdy     \_npts
+    - fcst_simp
+    - Number of Forecast Simple Boundary Points
+  * - fcst_simp_bdy    \_lat
+    - fcst_simp_bdy
+    - Forecast Simple Boundary PoLatitude
+  * - fcst_simp_bdy    \_lon
+    - fcst_simp_bdy
+    - Forecast Simple Boundary PoLongitude
+  * - fcst_simp_bdy_x
+    - fcst_simp_bdy
+    - Forecast Simple Boundary PoX-Coordinate
+  * - fcst_simp_bdy_y
+    - fcst_simp_bdy
+    - Forecast Simple Boundary PoY-Coordinate
+  * - fcst_simp_hull    \_start
+    - fcst_simp
+    - Forecast Simple Convex Hull Starting Index
+  * - fcst_simp_hull    \_npts
+    - fcst_simp
+    - Number of Forecast Simple Convex Hull Points
+  * - fcst_simp_hull    \_lat
+    - fcst_simp_hull
+    - Forecast Simple Convex Hull Point Latitude
+  * - fcst_simp_hull    \_lon
+    - fcst_simp_hull
+    - Forecast Simple Convex Hull Point Longitude
+  * - fcst_simp_hull_x
+    - fcst_simp_hull
+    - Forecast Simple Convex Hull Po nt X-Coordinate
+  * - fcst_simp_hull_y
+    - fcst_simp_hull
+    - Forecast Simple Convex Hull Point Y-Coordinate
+  * - obs_simp_bdy   \_start
+    - obs_simp
+    - Observation Simple Boundary Starting Index
+  * - obs_simp_bdy    \_npts
+    - obs_simp
+    - Number of Observation Simple Boundary Points
+  * - obs_simp_bdy   \_lat
+    - obs_simp_bdy
+    - Observation Simple Boundary Point Latitude
+  * - obs_simp_bdy    \_lon
+    - obs_simp_bdy
+    - Observation Simple Boundary Point Longitude
+  * - obs_simp_bdy_x
+    - obs_simp_bdy
+    - Observation Simple Boundary Point X-Coordinate
+  * - obs_simp_bdy_y
+    - obs_simp_bdy
+    - Observation Simple Boundary Point Y-Coordinate
+  * - obs_simp_hull    \_start
+    - obs_simp
+    - Observation Simple Convex Hull Starting Index
+  * - obs_simp_hull    \_npts
+    - obs_simp
+    - Number of Observation Simple Convex Hull Points
+  * - obs_simp_hull    \_lat
+    - obs_simp_hull
+    - Observation Simple Convex Hull Point Latitude
+  * - obs_simp_hull    \_lon
+    - obs_simp_hull
+    - Observation Simple Convex Hull Point Longitude
+  * - obs_simp_hull_x
+    - obs_simp_hull
+    - Observation Simple Convex Hull Point X-Coordinate
+  * - obs_simp_hull_y
+    - obs_simp_hull
+    - Observation Simple Convex Hull Point Y-Coordinate
 
 
+Table 15.8 Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
 
+.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
+  :widths: auto
+  :header-rows: 2
 
-Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
-
+  * - 
+    - 
+    - mode NETCDF VARIABLES
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - fcst_clus_hull    \_start
+    - fcst_clus
+    - Forecast Cluster Convex Hull Starting Index
+  * - fcst_clus_hull    \_npts
+    - fcst_clus
+    - Number of Forecast Cluster Convex Hull Points
+  * - fcst_clus_hull    \_lat
+    - fcst_clus_hull
+    - Forecast Cluster Convex Hull Point Latitude
+  * - fcst_clus_hull    \_lon
+    - fcst_clus_hull
+    - Forecast Cluster Convex Hull Point Longitude
+  * - fcst_clus_hull_x
+    - fcst_clus_hull
+    - Forecast Cluster Convex Hull Point X-Coordinate
+  * - fcst_clus_hull_y
+    - fcst_clus_hull
+    - Forecast Cluster Convex Hull Point Y-Coordinate
+  * - obs_clus_hull    \_start
+    - obs_clus
+    - Observation Cluster Convex Hull Starting Index
+  * - obs_clus_hull    \_npts
+    - obs_clus
+    - Number of Observation Cluster Convex Hull Points
+  * - obs_clus_hull    \_lat
+    - obs_clus_hull
+    - Observation Cluster Convex Hull Point Latitude
+  * - obs_clus_hull    \_lon
+    - obs_clus_hull
+    - Observation Cluster Convex Hull Point Longitude
+  * - obs_clus_hull_x
+    - obs_clus_hull
+    - Observation Cluster Convex Hull Point X-Coordinate
+  * - obs_clus_hull_y
+    - obs_clus_hull
+    - Observation Cluster Convex Hull Point Y-Coordinate
+      
 Postscript File
 
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the ps_plot_flag configuration file option.
