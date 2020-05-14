@@ -6077,7 +6077,7 @@ MED_FO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean-error Distance from forecast to observation
+Mean-error Distance from observation to forecast
 \end_layout
 
 \end_inset
@@ -6106,7 +6106,7 @@ MED_OF
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean-error Distance from observation to forecast
+Mean-error Distance from forecast to observation
 \end_layout
 
 \end_inset
@@ -6222,7 +6222,7 @@ FOM_FO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Pratt's Figure of Merit from forecast to observation
+Pratt's Figure of Merit from observation to forecast
 \end_layout
 
 \end_inset
@@ -6251,7 +6251,7 @@ FOM_OF
 \begin_inset Text
 
 \begin_layout Plain Layout
-Pratt's Figure of Merit from observation to forecast
+Pratt's Figure of Merit from forecast to observation
 \end_layout
 
 \end_inset
@@ -6367,7 +6367,7 @@ ZHU_FO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Zhu's Measure from forecast to observation
+Zhu's Measure from observation to forecast
 \end_layout
 
 \end_inset
@@ -6396,7 +6396,7 @@ ZHU_OF
 \begin_inset Text
 
 \begin_layout Plain Layout
-Zhu's Measure from observation to forecast
+Zhu's Measure from forecast to observation
 \end_layout
 
 \end_inset
