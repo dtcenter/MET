@@ -4,7 +4,7 @@ Chapter 17 MODE Time Domain Tool
 ================================
 
 17.1 Introduction
-________________
+_________________
 
 17.1.1 Motivation
 ~~~~~~~~~~~~~~~~~
@@ -367,13 +367,267 @@ These columns are explained in Table [table_mtd-header-columns]. Each file conta
 
 The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using the same logic as the MODE tool. In these columns, the F and O prefixes are used to indicate simple forecast and observation objects, respectively. Similarly, the CF and CO prefixes indicate cluster forecast and observation objects, respectively. Each prefix is followed by a 3-digit number, using leading zeros, to indicate the object number (as in F001, O001, CF001, or CO000). Pairs of objects are indicated by listing the forecast object information followed by the observation object information, separated by an underscore (as in F001_O001 or CF001_CO001). The OBJECT_ID column indicates the single object or pair of objects being described in that line. The OBJECT_CAT column indicates the cluster or pair of clusters to which these object(s) belong. A simple object that is not part of a cluster is assigned a cluster number of zero (as in CF000 or CO000). When pairs of objects belong to the same matching cluster, the OBJECT_CAT column indicates the matching cluster number (as in CF001_CO001). When they do not, the OBJECT_CAT column is set to CF000_CO000.
 
-Text Header Columns
+Table 17.1 Text Header Columns
 
-2D Attribute
+.. list-table:: Text Header Columns
+  :widths: auto
+  :header-rows: 2
 
-3D Single Attribute
+  * - 
+    - 
+    - HEADER
+  * - Column
+    - Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - MODEL
+    - User provided text string giving model name
+  * - 3
+    - DESC
+    - User provided text string describing the verification task
+  * - 4
+    - FCST_LEAD
+    - Forecast lead time in HHMMSS format
+  * - 5
+    - FCST_VALID
+    - Forecast valid time in YYYYMMDD_HHMMSS format
+  * - 6
+    - OBS_LEAD
+    - Observation lead time in HHMMSS format
+  * - 7
+    - OBS_VALID
+    - Observation valid time in YYYYMMDD_HHMMSS format
+  * - 8
+    - T_DELTA
+    - Time separation between input data files in HHMMSS format
+  * - 9
+    - FCST_T_BEG
+    - Forecast time convolution begin offset
+  * - 10
+    - FCST_T_END
+    - Forecast time convolution end offset
+  * - 11
+    - FCST_RAD
+    - Forecast convolution radius in grid units
+  * - 12
+    - FCST_THR
+    - Forecast convolution threshold
+  * - 13
+    - OBS_T_BEG
+    - Observation time convolution begin offset
+  * - 14
+    - OBS_T_END
+    - Observation time convolution end offset
+  * - 15
+    - OBS_RAD
+    - Observation convolution radius in grid units
+  * - 16
+    - OBS_THR
+    - Observation convolution threshold
+  * - 17
+    - FCST_VAR
+    - Forecast variable
+  * - 18
+    - FCST_UNITS
+    - Units for forecast variable
+  * - 19
+    - FCST_LEV
+    - Forecast vertical level
+  * - 20
+    - OBS_VAR
+    - Observation variable
+  * - 21
+    - OBS_UNITS
+    - Units for observation variable
+  * - 22
+    - OBS_LEV
+    - Observation vertical level
 
-3D Pair Attribute
+Table 17.2 2D Attribute
+
+.. list-table:: 2D Attribute
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - 2D Attribute Columns
+  * - Column
+    - Name
+    - Description
+  * - 23
+    - OBJECT_ID
+    - Object number
+  * - 24
+    - OBJECT_CAT
+    - Object category
+  * - 25
+    - TIME_INDEX
+    - Time index of slice
+  * - 26
+    - AREA
+    - 2D cross-sectional area
+  * - 27
+    - CENTROID_X
+    - x coordinate of centroid
+  * - 28
+    - CENTROID_Y
+    - y coordinate of centroid
+  * - 29
+    - CENTROID_LAT
+    - Latitude of centroid
+  * - 30
+    - CENTROID_LON
+    - Longitude of centroid
+  * - 31
+    - AXIS_ANG
+    - Angle that the axis makes with the grid x direction
+  * - 32
+    - INTENSITY_10
+    - ?? missing code block percentile intensity in time slice
+  * - 33
+    - INTENSITY_25
+    - ?? missing code block percentile intensity in time slice
+  * - 34
+    - INTENSITY_50
+    - ?? missing code block percentile intensity in time slice
+  * - 35
+    - INTENSITY_75
+    - ?? missing code block percentile intensity in time slice
+  * - 36
+    - INTENSITY_90
+    - ?? missing code block percentile intensity in time slice
+  * - 37
+    - INTENSITY_*
+    - User-specified percentile intensity in time slice
+
+Table 17.3 3D Single Attribute
+
+.. list-table:: 3D Single Attribute
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - 3D Single Attribute Columns
+  * - Column
+    - Name
+    - Description
+  * - 23
+    - OBJECT_ID
+    - Object number
+  * - 24
+    - OBJECT_CAT
+    - Object category
+  * - 25
+    - CENTROID_X
+    - x coordinate of centroid
+  * - 26
+    - CENTROID_Y
+    - y coordinate of centroid
+  * - 27
+    - CENTROID_T
+    - t coordinate of centroid
+  * - 28
+    - CENTROID_LAT
+    - Latitude of centroid
+  * - 29
+    - CENTROID_LON
+    - Longitude of centroid
+  * - 30
+    - X_DOT
+    - x component of object velocity
+  * - 31
+    - Y_DOT
+    - y component of object velocity
+  * - 32
+    - AXIS_ANG
+    - Angle that the axis plane of an object makes with the grid x direction
+  * - 33
+    - VOLUME
+    - Integer count of the number of 3D “cells” in an object
+  * - 34
+    - START_TIME
+    - Object start time
+  * - 35
+    - END_TIME
+    - Object end time
+  * - 36
+    - CDIST_TRAVELLED
+    - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object
+  * - 37
+    - INTENSITY_10
+    - ?? missing code block.  percentile intensity inside object
+  * - 38
+    - INTENSITY_25
+    - ?? missing code block.  percentile intensity inside object
+  * - 39
+    - INTENSITY_50
+    - ?? missing code block.  percentile intensity inside object
+  * - 40
+    - INTENSITY_75
+    - ?? missing code block.  percentile intensity inside object
+  * - 41
+    - INTENSITY_90
+    - ?? missing code block.  percentile intensity inside object
+  * - 42
+    - INTENSITY_*
+    - User-specified percentile intensity inside object
+
+Table 17.4 3D Pair Attribute
+
+.. list-table:: 3D Pair Attribute
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - 3D Pair Attribute Columns
+  * - Column
+    - Name
+    - Description
+  * - 23
+    - OBJECT_ID
+    - Object number
+  * - 24
+    - OBJECT_CAT
+    - Object category
+  * - 25
+    - SPACE_CENTROID_DIST
+    - Spatial distance between ?? missing code box coordinates of object spacetime centroid
+  * - 26
+    - TIME_CENTROID_DELTA
+    - Difference in ?? missing code box. index of object spacetime centroid
+  * - 27
+    - AXIS_DIFF
+    - Difference in spatial axis plane angles
+  * - 28
+    - SPEED_DELTA
+    - Difference in object speeds
+  * - 29
+    - DIRECTION_DIFF
+    - Difference in object direction of movement
+  * - 30
+    - VOLUME_RATIO
+    - Ratio of object volumes
+  * - 31
+    - START_TIME_DELTA
+    - Difference in object starting time steps
+  * - 32
+    - END_TIME_DELTA
+    - Difference in object ending time steps
+  * - 33
+    - INTERSECTION_VOLUME
+    - “Volume” of object intersection
+  * - 34
+    - DURATION_DIFF
+    - Dfference in the lifetimes of the two objects
+  * - 35
+    - INTEREST
+    - Total interest for this object pair
 
 NetCDF File
 
