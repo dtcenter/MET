@@ -121,6 +121,9 @@ Table 11.1 Format information for GSI Diagnostic Conventional MPR (Matched Pair)
 
 Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
@@ -199,10 +202,10 @@ Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) out
     - Surface wind speed (m/s)
   * - 59
     - FRAC_CLD  CLD_LWC
-    - Cloud fraction (%)   Cloud liquid water (kg/m**2) (microwave only)
+    - Cloud fraction (%) :raw-html:`<br />`  Cloud liquid water (kg/m**2) (microwave only)
   * - 60
     - CTOP_PRS   TC_PWAT
-    - Cloud top pressure (hPa)   Total column precip. water (km/m**2) (microwave only)
+    - Cloud top pressure (hPa) :raw-html:`<br />`  Total column precip. water (km/m**2) (microwave only)
   * - 61
     - TFND
     - Foundation temperature: Tr
