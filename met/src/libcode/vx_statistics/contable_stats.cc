@@ -1055,6 +1055,12 @@ for (j=0; j<Nrows; ++j)  {
 }
 
    //
+   //  replace nan with bad data
+   //
+
+if (isnan(sum))  sum = bad_data_double;
+
+   //
    //  done
    //
 
