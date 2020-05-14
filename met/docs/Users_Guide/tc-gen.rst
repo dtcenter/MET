@@ -150,11 +150,15 @@ The filter entry is an array of dictionaries defining genesis filtering criteria
 
 
 
+desc = "NA";
+
+The desc configuration option is common to many MET tools and is described in Section [subsec:IO_General-MET-Config-Options].
+
+
+
 model = [];
 
 The model entry is an array defining the model ATCF ID's for which output should be computed. If left empty, the default setting, output will be computed for each model encountered in the data. Otherwise, output will be computed only for the ATCF ID's listed.
-
-
 
 
 
