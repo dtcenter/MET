@@ -399,6 +399,9 @@ All possible tasks for job_name are listed in Table [Des_components_STAT_analysi
 
 Table 12.2 ?? formatting problems
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
   :widths: 15 55 20
   :header-rows: 1
@@ -411,25 +414,25 @@ Table 12.2 ?? formatting problems
     - Required Arguments
   * - filter
     - Filters out the statistics lines based on applying options* (See note below table)
-    - -dump_row
+    - \-dump_row
   * - summary
     - Computes the mean, standard deviation, percentiles (min, 10th, 25th, 50th, 75th, 90th, and max), interquartile range, range, wmo_mean, and wmo_weighted_mean
-    - -line_type  -column
+    - \-line_type :raw-html:`<br />` \-column
   * - aggregate
     - Aggregates the statistics output, computing the statistic specified for the entire collection of valid lines
-    - -line_type
+    - \-line_type
   * - aggregate_stat
     - Aggregates the statistics output, and converts the input line type to the output line type specified
-    - -line_type     -out_line_type
+    - \-line_type  :raw-html:`<br />`   \-out_line_type
   * - ss_index
     - Calculates a user-defined Skill Score index as described in section [subsec:StA_Skill-Score-Index,].
-    - -model forecast     -model reference
+    - \-model forecast :raw-html:`<br />`  \-model reference
   * - go_index
     - Calculates the GO Index as described in section [subsec:StA_Skill-Score-Index,].
-    - -model forecast     -model reference
+    - \-model forecast :raw-html:`<br />`   \-model reference
   * - ramp
     - Defines a ramp event on a time-series of forecast and observed values. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
-    - -ramp_type  -ramp_thresh  -out_line_type  -column  -ramp_time  -ramp_exact  -ramp_window 
+    - \-ramp_type :raw-html:`<br />` \-ramp_thresh :raw-html:`<br />` \-out_line_type :raw-html:`<br />` \-column :raw-html:`<br />` \-ramp_time :raw-html:`<br />` \-ramp_exact :raw-html:`<br />` \-ramp_window 
 
 
 out_alpha = 0.05;
