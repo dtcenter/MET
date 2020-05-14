@@ -73,7 +73,6 @@ using namespace netCDF;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
-#include "global_python.h"
 
 #include "ascii2nc_conf_info.h"
 #include "file_handler.h"
@@ -84,6 +83,7 @@ using namespace netCDF;
 #include "aeronet_handler.h"
 
 #ifdef ENABLE_PYTHON
+#include "global_python.h"
 #include "python_handler.h"
 #endif
 
