@@ -762,10 +762,10 @@ Table 7 Format information for DMAP (Distance Map) output line type.
     - Hausdorff Distance
   * - 31
     - MED_FO
-    - Mean-error Distance from forecast to observation
+    - Mean-error Distance from observation to forecast
   * - 32
     - MED_OF
-    - Mean-error Distance from observation to forecast
+    - Mean-error Distance from forecast to observation
   * - 33
     - MED_MIN
     - Minimum of MED_FO and MED_OF
@@ -777,10 +777,10 @@ Table 7 Format information for DMAP (Distance Map) output line type.
     - Mean of MED_FO and MED_OF
   * - 36
     - FOM_FO
-    - Pratt's Figure of Merit from forecast to observation
+    - Pratt's Figure of Merit from observation to forecast
   * - 37
     - FOM_OF
-    - Pratt's Figure of Merit from observation to forecast
+    - Pratt's Figure of Merit from forecast to observation
   * - 38
     - FOM_MIN
     - Minimum of FOM_FO and FOM_OF
@@ -792,10 +792,10 @@ Table 7 Format information for DMAP (Distance Map) output line type.
     - Mean of FOM_FO and FOM_OF
   * - 41
     - ZHU_FO
-    - Zhu's Measure from forecast to observation
+    - Zhu's Measure from observation to forecast
   * - 42
     - ZHU_OF
-    - Zhu's Measure from observation to forecast
+    - Zhu's Measure from forecast to observation
   * - 43
     - ZHU_MIN
     - Minimum of ZHU_FO and ZHU_OF
