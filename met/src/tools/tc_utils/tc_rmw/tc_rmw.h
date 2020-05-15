@@ -8,13 +8,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//    Filename:    tc_rmw.h
+//   Filename:   tc_rmw.h
 //
-//    Description:
+//   Description:
 //
-//    Mod#  Date      Name      Description
-//    ----  ----      ----      -----------
-//    000   04/18/19  Fillmore  New
+//   Mod#  Date      Name      Description
+//   ----  ----      ----      -----------
+//   000   04/18/19  Fillmore  New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -70,9 +70,6 @@ static const char* default_out_dir = ".";
 // Default output prefix
 static const char* default_out_prefix = "";
 
-// Nautical mile to kilometer conversion
-static const double nm_to_km = 1.852;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -82,7 +79,6 @@ static const double nm_to_km = 1.852;
 // Input files
 static StringArray    data_files, found_data_files;
 static StringArray    adeck_source, adeck_model_suffix;
-static StringArray    bdeck_source, bdeck_model_suffix;
 static ConcatString   config_file;
 static TCRMWConfInfo  conf_info;
 static GrdFileType    ftype;

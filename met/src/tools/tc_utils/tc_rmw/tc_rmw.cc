@@ -14,7 +14,7 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    03/15/20  Fillmore       New
+//   000   04/18/19  Fillmore  New
 //   001    05/15/20  Halley Gotway  Fix data file list option logic.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -606,7 +606,7 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lon_center = - point.lon(); // internal sign change
         // RMW is same as mrd()
         grid_data.range_max_km = conf_info.rmw_scale *
-            point.mrd() * nm_to_km * conf_info.n_range;
+            point.mrd() * tc_km_per_nautical_miles * conf_info.n_range;
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();
