@@ -9,7 +9,28 @@ There are two main types of CIs available with MET: parametric and non-parametri
 
 The most commonly used confidence interval about an estimate for a statistic (or parameter), $\theta$, is given by the normal approximation $$ \theta \pm z_{\alpha/2}\cdot V(\theta ) ,\eqno{(D.1)}$$ 
 
-where $\displaystyle{z_{\alpha / 2}}$ is the $\displaystyle{\alpha-\hbox{th}}$ quantile of the standard normal distribution, and $V(\theta )$ is the standard error of the statistic (or parameter), $\theta$. For example, the most common example is for the mean of a sample, $\displaystyle{X_1,\cdots,X_n}$, of independent and identically distributed (iid) normal random variables with mean $\displaystyle{\mu}$ and variance $\displaystyle{\sigma}$. Here, the mean is estimated by , and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, $ \displaystyle{V( \theta ) = V ( \overline X ) = \frac {\sigma}{\sqrt n}} $, and this must be estimated by $\displaystyle{ \frac {1}{n} \sum _{i=1}^n X_i = \overline {X}}$, which is obtained here by replacing $\displaystyle{\sigma}$ by its estimate, $\displaystyle{\hat \sigma}$, where $\displaystyle{ \hat \sigma = \frac {1}{n-1} \sum _{i=1}^n \left(X_i - \overline X \right)^2}$.
+where $\displaystyle{z_{\alpha / 2}}$ is the $\displaystyle{\alpha-\hbox{th}}$ quantile of the standard normal distribution, and $V(\theta )$ is the standard error of the statistic (or parameter), $\theta$. For example, the most common example is for the mean of a sample, $\displaystyle{X_1,\cdots,X_n}$,
+
+?? Formulas need to be added to the table below.
+
+.. list-table:: Verification statistics with normal approximation CIs given by (D.1) provided in MET along with their associated standard error estimate.
+  :widths: auto
+  :header-rows: 1
+
+  * - ?? missing formula
+    - ?? missing formula
+  * - Forecast / Observation Mean
+    - where  emphasizes that this is the estimated standard deviation of the underlying sample.
+  * - Mean error
+    - , where  emphasizes that this is the estimated standard deviation of the errors, .
+  * - Brier Score (BS)
+    - where F is the probability forecast and O is the observation. See Bradley et al (2008) for derivation and details.
+  * - Peirce Skill Score (PSS)
+    - where H is the hit rate, F the false alarm rate,  the number of hits and misses, and  the number of false alarms and correct negatives.
+  * - Logarithm of the odds ratio (OR)
+    - , where the values in the denominators are the usual contingency table counts.
+
+of independent and identically distributed (iid) normal random variables with mean $\displaystyle{\mu}$ and variance $\displaystyle{\sigma}$. Here, the mean is estimated by , and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, $ \displaystyle{V( \theta ) = V ( \overline X ) = \frac {\sigma}{\sqrt n}} $, and this must be estimated by $\displaystyle{ \frac {1}{n} \sum _{i=1}^n X_i = \overline {X}}$, which is obtained here by replacing $\displaystyle{\sigma}$ by its estimate, $\displaystyle{\hat \sigma}$, where $\displaystyle{ \hat \sigma = \frac {1}{n-1} \sum _{i=1}^n \left(X_i - \overline X \right)^2}$.
 
 Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval (D.1) may only be appropriate for large n. For small n, the mean has an interval based on the Student’s t distribution with n-1 degrees of freedom. Essentially, $z_{\alpha/2}$ of (D.1) is replaced with the quantile of this t distribution. That is, the interval is given by $$ \mu \pm t_{\alpha/2,\nu-1}\cdot \frac{\sigma}{\sqrt n} ,\eqno{(D.2)}$$ where again, $\displaystyle{\sigma}$ is replaced by its estimate, $\displaystyle{\hat \sigma}$, as described above.
 
