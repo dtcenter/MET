@@ -274,7 +274,6 @@ void process_adecks(TrackInfoArray& adeck_tracks) {
     process_track_files(files, files_model_suffix, adeck_tracks,
                         false, false);
 
-    ConcatString adeck_track_file("adeck.nc");
     write_tc_tracks(nc_out, track_point_dim, adeck_tracks);
 }
 
