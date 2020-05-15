@@ -336,7 +336,47 @@ Job: Summary
 
 This job produces summary statistics for the column name specified by the -column option. The output of the summary job consists of three rows: "JOB_LIST", which shows the job definition parameters used for this job. "COL_NAME", followed by the summary statistics that are applied. “SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance. The output columns are shown below in Table [table_columnar_output_summary_tc_stat] The -by option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the -by option. 
 
-Columnar output of “summary” job output from the TC-Stat tool.
+Table 21.1 Columnar output of “summary” job output from the TC-Stat tool.
+
+.. list-table:: Columnar output of “summary” job output from the TC-Stat tool.
+  :widths: auto
+  :header-rows: 2
+
+
+  * - 
+    - tc_stat Summary Job Output Options
+  * - Column number
+    - Description
+  * - 1
+    - SUMMARY: (job type)
+  * - 2
+    - Column (dependent parameter)
+  * - 3
+    - Case (storm + valid time)
+  * - 4
+    - Total
+  * - 5
+    - Valid
+  * - 6-8
+    - Mean including normal upper and lower confidence limits
+  * - 9
+    - Standard deviation
+  * - 10
+    - Minimum value
+  * - 11-15
+    - Percentiles (10th, 25th, 50th, 75th, 90th)
+  * - 16
+    - Maximum Value
+  * - 17
+    - Interquartile range (75th - 25th percentile)
+  * - 18
+    - Range (Maximum - Minimum)
+  * - 19
+    - Sum
+  * - 20-21
+    - Independence time
+  * - 22-25
+    - Frequency of superior performance
 
 Job: RIRW
 
