@@ -226,8 +226,284 @@ The watch_warn field specifies the file name and time applied offset to the watc
 
 TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in Table [TCST Header].
 
-Header information for TC-Pairs TCST output.
+Table 20.1 Header information for TC-Pairs TCST output.
 
-Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
+.. list-table:: Header information for TC-Pairs TCST output.
+  :widths: auto
+  :header-rows: 2
 
-Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+  * - 
+    - 
+    - HEADER
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 1
+    - VERSION
+    - Version number
+  * - 2
+    - AMODEL
+    - User provided text string designating model name
+  * - 3
+    - BMODEL
+    - User provided text string designating model name
+  * - 4
+    - STORM_ID
+    - BBCCYYY designation of storm
+  * - 5
+    - BASIN
+    - Basin (BB in STORM_ID)
+  * - 6
+    - CYCLONE
+    - Cyclone number (CC in STORM_ID)
+  * - 7
+    - STORM_NAME
+    - Name of Storm
+  * - 8
+    - INIT
+    - Initialization time of forecast in YYYYMMDD_HHMMSS format.
+  * - 9
+    - LEAD
+    - Forecast lead time in HHMMSS format.
+  * - 10
+    - VALID
+    - Forecast valid time in YYYYMMDD_HHMMSS format.
+  * - 11
+    - INIT_MASK
+    - Initialization time masking grid applied
+  * - 12
+    - VALID_MASK
+    - Valid time masking grid applied
+  * - 13
+    - LINE_TYPE
+    - Output line type (TCMPR or PROBRI)
+
+Table 20.2 Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
+
+.. list-table:: Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - TCMPR OUTPUT FORMAT
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 13
+    - TCMPR
+    - Tropical Cyclone Matched Pair line type
+  * - 14
+    - TOTAL
+    - Total number of pairs in track
+  * - 15
+    - INDEX
+    - Index of the current track pair
+  * - 16
+    - LEVEL
+    - Level of storm classification
+  * - 17
+    - WATCH_WARN
+    - HU or TS watch or warning in effect
+  * - 18
+    - INITIALS
+    - Forecaster initials
+  * - 19
+    - ALAT
+    - Latitude position of adeck model
+  * - 20
+    - ALON
+    - Longitude position of adeck model
+  * - 21
+    - BLAT
+    - Latitude position of bdeck model
+  * - 22
+    - BLON
+    - Longitude position of bdeck model
+  * - 23
+    - TK_ERR
+    - Track error of adeck relative to bdeck (nm)
+  * - 24
+    - X_ERR
+    - X component position error (nm)
+  * - 25
+    - Y_ERR
+    - Y component position error (nm)
+  * - 26
+    - ALTK_ERR
+    - Along track error (nm)
+  * - 27
+    - CRTK_ERR
+    - Cross track error (nm)
+  * - 28
+    - ADLAND
+    - adeck distance to land (nm)
+  * - 29
+    - BDLAND
+    - bdeck distance to land (nm)
+  * - 30
+    - AMSLP
+    - adeck mean sea level pressure
+  * - 31
+    - BMSLP
+    - bdeck mean sea level pressure
+  * - 32
+    - AMAX_WIND
+    - adeck maximum wind speed
+  * - 33
+    - BMAX_WIND
+    - bdeck maximum wind speed
+  * - 34, 35
+    - A/BAL_WIND_34
+    - a/bdeck 34-knot radius winds in full circle
+  * - 36, 37
+    - A/BNE_WIND_34
+    - a/bdeck 34-knot radius winds in NE quadrant
+  * - 38, 39
+    - A/BSE_WIND_34
+    - a/bdeck 34-knot radius winds in SE quadrant
+  * - 40, 41
+    - A/BSW_WIND_34
+    - a/bdeck 34-knot radius winds in SW quadrant
+  * - 42, 43
+    - A/BNW_WIND_34
+    - a/bdeck 34-knot radius winds in NW quadrant
+  * - 44, 45
+    - A/BAL_WIND_50
+    - a/bdeck 50-knot radius winds in full circle
+  * - 46, 47
+    - A/BNE_WIND_50
+    - a/bdeck 50-knot radius winds in NE quadrant
+  * - 48, 49
+    - A/BSE_WIND_50
+    - a/bdeck 50-knot radius winds in SE quadrant
+  * - 50, 51
+    - A/BSW_WIND_50
+    - a/bdeck 50-knot radius winds in SW quadrant
+  * - 52, 53
+    - A/BNW_WIND_50
+    - a/bdeck 50-knot radius winds in NW quadrant
+  * - 54, 55
+    - A/BAL_WIND_64
+    - a/bdeck 64-knot radius winds in full circle
+  * - 56, 57
+    - A/BNE_WIND_64
+    - a/bdeck 64-knot radius winds in NE quadrant
+  * - 58, 59
+    - A/BSE_WIND_64
+    - a/bdeck 64-knot radius winds in SE quadrant
+  * - 60, 61
+    - A/BSW_WIND_64
+    - a/bdeck 64-knot radius winds in SW quadrant
+  * - 62, 63
+    - A/BNW_WIND_64
+    - a/bdeck 64-knot radius winds in NW quadrant
+  * - 64, 65
+    - A/BRADP
+    - pressure in millibars of the last closed isobar, 900 - 1050 mb
+  * - 66, 67
+    - A/BRRP
+    - radius of the last closed isobar in nm, 0 - 9999 nm
+  * - 68, 69
+    - A/BMRD
+    - radius of max winds, 0 - 999 nm
+  * - 70, 71
+    - A/BGUSTS
+    - gusts, 0 through 995 kts
+  * - 72, 73
+    - A/BEYE
+    - eye diameter, 0 through 999 nm
+  * - 74, 75
+    - A/BDIR
+    - storm direction in compass coordinates, 0 - 359 degrees
+  * - 76, 77
+    - A/BSPEED
+    - storm speed, 0 - 999 kts
+  * - 78, 79
+    - A/BDEPTH
+    - system depth, D-deep, M-medium, S-shallow, X-unknown
+
+Table 20.3 Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+
+.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - 
+    - 
+    - PROBRIRW OUTPUT FORMAT
+  * - Column Number
+    - Header Column Name
+    - Description
+  * - 13
+    - PROBRI
+    - Probability of Rapid Intensification line type
+  * - 14
+    - ALAT
+    - Latitude position of edeck model
+  * - 15
+    - ALON
+    - Longitude position of edeck model
+  * - 16
+    - BLAT
+    - Latitude position of bdeck model
+  * - 17
+    - BLON
+    - Longitude position of bdeck model
+  * - 18
+    - INITIALS
+    - Forecaster initials
+  * - 19
+    - TK_ERR
+    - Track error of adeck relative to bdeck (nm)
+  * - 20
+    - X_ERR
+    - X component position error (nm)
+  * - 21
+    - Y_ERR
+    - Y component position error (nm)
+  * - 22
+    - ADLAND
+    - adeck distance to land (nm)
+  * - 23
+    - BDLAND
+    - bdeck distance to land (nm)
+  * - 24
+    - RI_BEG
+    - Start of RI time window in HH format
+  * - 25
+    - RI_END
+    - End of RI time window in HH format
+  * - 26
+    - RI_WINDOW
+    - Width of RI time window in HH format
+  * - 27
+    - AWIND_END
+    - Forecast maximum wind speed at RI end
+  * - 28
+    - BWIND_BEG
+    - Best track maximum wind speed at RI begin
+  * - 29
+    - BWIND_END
+    - Best track maximum wind speed at RI end
+  * - 30
+    - BDELTA
+    - Exact Best track wind speed change in RI window
+  * - 31
+    - BDELTA_MAX
+    - Maximum Best track wind speed change in RI window
+  * - 32
+    - BLEVEL_BEG
+    - Best track storm classification at RI begin
+  * - 33
+    - BLEVEL_END
+    - Best track storm classification at RI end
+  * - 34
+    - N_THRESH
+    - Number of pro-ability thresholds
+  * - 35
+    - THRESH_i
+    - The ith probability threshold value (repeated)
+  * - 36
+    - PROB_i
+    - The ith probability value (repeated)
