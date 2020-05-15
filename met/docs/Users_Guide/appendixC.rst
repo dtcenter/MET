@@ -1,16 +1,53 @@
 .. _appendixC:
 
-stat_equivalency_table.rst
-belongs at the beginning or end of Appendix C  https://app.slack.com/client/TK4G2NW64/CK4G4DL1E
-
-Chapter 1 Which statistics are the same, but with different names?
-
-Statistics in MET and other names they have been published under.
-
-?? Table did not copy over.
-
 Appendix C Verification Measures
 ================================
+
+?? Renumber chapters?
+
+Chapter 1 Which statistics are the same, but with different names?
+__________________________________________________________________
+
+Table C.1 Statistics in MET and other names they have been published under.
+
+.. list-table:: Statistics in MET and other names they have been published under.
+  :widths: auto
+  :header-rows: 1
+
+  * - Statitistic in MET
+    - Other names for the same statistic
+  * - Probability of Detection
+    - Hit Rate
+  * - Probability of False Detection
+    - False Alarm Rate (not Ratio)
+  * - Critical Success Index
+    - Threat Score
+  * - Gilbert Skill Score
+    - Equitable Threat Score
+  * - Hanssen and Kuipers Discriminant
+    - True Skill Statistic, Pierce's Skill Score
+  * - Heidke Skill Score
+    - Cohen's K
+  * - Odds Ratio Skill Score
+    - Yule's Q
+  * - Mean Error
+    - Magnitude Bias
+  * - Mean Error Squared (ME2)
+    - MSE by Mean Difference
+  * - Bias Corrected MSE
+    - MSE by Pattern Variation
+  * - MSESS
+    - Murphy's MSESS
+  * - Pearson Correlation
+    - Anomolous Pattern Correlation
+  * - Anomoly Correlation
+    - Anomolous Correction
+  * - Rank Histogram
+    - Talagrand Diagram
+  * - Reliability Diagram
+    - Attributes Diagram
+  * - Ignorance Score
+    - Logarithmic Scoring Rule
 
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
@@ -18,7 +55,32 @@ C.1 MET verification measures for categorical (dichotomous) variables
 
 The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table C-1. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-1 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}} 
 
-2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The "." symbols in the total cells represent sums across categories.
+Table C.2: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The "." symbols in the total cells represent sums across categories.
+
+.. list-table:: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The "." symbols in the total cells represent sums across categories.
+  :widths: auto
+  :header-rows: 2
+
+  * - Forecast
+    - Observation
+    -  
+    - Total
+  * -  
+    - o = 1 (e.g., "Yes")
+    - o = 0 (e.g., "No")
+    -  
+  * - f = 1 (e.g., "Yes")
+    - n[subscript:11]  ?? fix sub scripting here and below.
+    - n[subscript:10]
+    - n[subscript:1. ]= n[subscript:11] + n[subscript:10]
+  * - f = 0 (e.g., "No")
+    - n[subscript:01]
+    - n[subscript:00]
+    - n[subscript:0.]= n[subscript:01] + n[subscript:00]
+  * - Total
+    - n[subscript:.1] = n[subscript:11] + n[subscript:01]
+    - n[subscript:.0] = n[subscript:10] + n[subscript:00]
+    - T = n[subscript:11 ]+ n[subscript:10 ]+n[subscript:01] + n[subscript:00]
 
 The counts, n11, n10, n01, and n00, are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
 
@@ -494,6 +556,34 @@ The results of the probabilistic verification methods that are included in the P
 
 The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in Table C-2. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-2 are counts of the number of occurrences of all possible combinations of forecasts and observations. \setcounter{table}{0}\renewcommand{\thetable}{C.2} 
 
+?? Fix table numbering
+?? Add formulas into table
+
+.. list-table:: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The ""."" symbols in the total cells represent sums across categories.
+  :widths: auto
+  :header-rows: 1
+
+  * - Forecast
+    -  
+    - Observation
+  * -  
+    - o = 1 (e.g., "Yes")
+    - o = 0 (e.g., "No")
+  * - p₁ = midpoint of (0 and threshold1)
+    - n[subscript:11]
+    - n[subscript:10]
+  * - p₂ = midpoint of (threshold1 and threshold2)
+    - n[subscript:21]
+    - n[subscript:20]
+  * - . . .
+    - . . .
+    - . . .
+  * - p[subscript:j] = midpoint of (thresholdi and 1)
+    - n
+    - n[subscript:i0]
+  * - Total
+    - n_{.1}=\sum n_{i1}
+    - n_{.0}=\sum n_{i0}
 
 
 Reliability 
