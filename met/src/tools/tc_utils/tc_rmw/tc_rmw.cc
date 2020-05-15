@@ -6,6 +6,19 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   tc_rmw.cc
+//
+//   Description:
+//
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    03/15/20  Fillmore       New
+//   001    05/15/20  Halley Gotway  Fix data file list option logic.
+//
+////////////////////////////////////////////////////////////////////////
+
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -129,7 +142,6 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-
     CommandLine cline;
     ConcatString default_config_file;
 
@@ -167,6 +179,9 @@ void process_command_line(int argc, char **argv) {
          << "Config File Default: " << default_config_file << "\n"
          << "Config File User: " << config_file << "\n";
 
+    // Parse the data file list
+    data_files = parse_file_list(data_files);
+
     // Read config files
     conf_info.read_config(default_config_file.c_str(),
                           config_file.c_str());
@@ -180,9 +195,6 @@ void process_command_line(int argc, char **argv) {
 
     // Process the configuration
     conf_info.process_config(ftype);
-
-    // Search for files
-    data_files = parse_file_list(data_files);
 
     return;
 }
