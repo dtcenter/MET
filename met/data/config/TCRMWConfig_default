@@ -7,9 +7,58 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Filter input track data down to a single track
+//
+
+//
 // Model
 //
 model = "GFS";
+
+//
+// Storm identifier
+//
+storm_id = "";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Cyclone number
+//
+cyclone = "";
+
+//
+// Storm name
+//
+storm_name = "";
+
+//
+// Model initialization time
+//
+init_time = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Subset the individual track points
+//
+
+//
+// Subset by the valid time
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Subset by the valid hour and lead time.
+//
+valid_hour = [];
+lead       = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -36,8 +36,23 @@ class TCRMWConfInfo {
         // TCRMW configuration object
         MetConfig Conf;
 
-        int n_range;
-        int n_azimuth;
+        // Track filtering criteria
+        ConcatString Model;
+        StringArray  StormId; // store as array for convenience
+        ConcatString Basin;
+        ConcatString Cyclone;
+        ConcatString StormName;
+        unixtime     InitTime;
+
+        // Subset individual track points
+        unixtime  ValidBeg, ValidEnd;
+        TimeArray ValidInc, ValidExc;
+        NumArray  ValidHour;
+        NumArray  LeadTime;
+
+        // Range/Azimuth information
+        int    n_range;
+        int    n_azimuth;
         double max_range_km;
         double delta_range_km;
         double rmw_scale;

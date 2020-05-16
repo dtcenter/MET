@@ -78,7 +78,7 @@ static const char* default_out_prefix = "";
 
 // Input files
 static StringArray    data_files, found_data_files;
-static StringArray    adeck_source, adeck_model_suffix;
+static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCRMWConfInfo  conf_info;
 static GrdFileType    ftype;
@@ -129,11 +129,11 @@ static map<string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static DataPlane    dp;
-static Grid         latlon_arr;
-static TcrmwData    grid_data;
-static TcrmwGrid    tcrmw_grid;
-static Grid         grid;
+static DataPlane dp;
+static Grid      latlon_arr;
+static TcrmwData grid_data;
+static TcrmwGrid tcrmw_grid;
+static Grid      grid;
 
 // Grid coordinate arrays
 static double* lat_arr;

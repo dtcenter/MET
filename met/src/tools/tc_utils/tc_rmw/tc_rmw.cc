@@ -56,13 +56,15 @@ static void process_command_line(int, char**);
 static GrdFileType get_file_type(const StringArray &, const GrdFileType);
 static bool file_is_ok(const ConcatString &, const GrdFileType);
 
-static void process_decks();
-static void process_adecks(TrackInfoArray&);
+static void process_rmw();
+static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
     const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
-    const StringArray&, TrackInfoArray&, bool, bool);
-static void set_adeck(const StringArray&);
+    const StringArray&, TrackInfoArray&);
+static bool is_keeper(const ATCFLineBase *);
+static void subset_tracks(TrackInfoArray &);
+static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
@@ -97,8 +99,8 @@ int main(int argc, char *argv[]) {
     // Setup NetCDF output
     setup_nc_file();
 
-    // Process deck files
-    process_decks();
+    // Process gridded and track data
+    process_rmw();
 
     return(0);
 }
@@ -111,7 +113,7 @@ void usage() {
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
          << "\t-data file_1 ... file_n | data_file_list\n"
-         << "\t-adeck file\n"
+         << "\t-deck file\n"
          << "\t-config file\n"
          << "\t-out file\n"
          << "\t[-log file]\n"
@@ -121,8 +123,8 @@ void usage() {
          << "specifies the gridded data files or an ASCII file "
          << "containing a list of files to be used (required).\n"
 
-         << "\t\t\"-adeck source\" is the adeck ATCF format data "
-         << "source (required).\n"
+         << "\t\t\"-deck source\" is the ATCF format data source "
+         << "(required).\n"
 
          << "\t\t\"config_file\" is a TCRMWConfig file to be used "
          << "(required).\n"
@@ -162,7 +164,9 @@ void process_command_line(int argc, char **argv) {
 
     // Add function calls for arguments
     cline.add(set_data_files, "-data",   -1);
-    cline.add(set_adeck,      "-adeck",  -1);
+    cline.add(set_deck,       "-deck",   -1);
+    // Queitly support -adeck option for backward compatibility with met-9.0
+    cline.add(set_deck,       "-adeck",  -1);
     cline.add(set_config,     "-config",  1);
     cline.add(set_out,        "-out",     1);
     cline.add(set_logfile,    "-log",     1);
@@ -243,13 +247,14 @@ bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_decks() {
+void process_rmw() {
 
-    // Process ADECK files
-    TrackInfoArray adeck_tracks;
-    process_adecks(adeck_tracks);
+    // Process the track data
+    TrackInfoArray tracks;
+    process_tracks(tracks);
 
-    process_fields(adeck_tracks);
+    // Process the gridded data
+    process_fields(tracks);
 
     // List the output file
     mlog << Debug(1)
@@ -258,23 +263,22 @@ void process_decks() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_adecks(TrackInfoArray& adeck_tracks) {
+void process_tracks(TrackInfoArray& tracks) {
     StringArray files, files_model_suffix;
 
     // Initialize
-    adeck_tracks.clear();
+    tracks.clear();
 
     // Get list of track files
-    get_atcf_files(adeck_source, adeck_model_suffix,
+    get_atcf_files(deck_source, deck_model_suffix,
                    files, files_model_suffix);
 
     mlog << Debug(2)
-         << "Processing " << files.n_elements() << " ADECK file(s).\n";
+         << "Processing " << files.n_elements() << " file(s).\n";
 
-    process_track_files(files, files_model_suffix, adeck_tracks,
-                        false, false);
+    process_track_files(files, files_model_suffix, tracks);
 
-    write_tc_tracks(nc_out, track_point_dim, adeck_tracks);
+    write_tc_tracks(nc_out, track_point_dim, tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -318,11 +322,8 @@ void get_atcf_files(const StringArray& source,
 
 void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
-                         TrackInfoArray& tracks,
-                         bool check_keep,
-                         bool check_anly) {
+                         TrackInfoArray& tracks) {
     int cur_read, cur_add, tot_read, tot_add;
-
     LineDataFile f;
     ConcatString cs;
     ATCFTrackLine line;
@@ -360,8 +361,11 @@ void process_track_files(const StringArray& files,
                 line.set_technique(cs);
             }
 
+            // Check the keep status
+            if(!is_keeper(&line)) continue;
+
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, true, check_anly)) {
+            if(tracks.add(line, true, false)) {
                 cur_add++;
                 tot_add++;
             }
@@ -369,8 +373,8 @@ void process_track_files(const StringArray& files,
 
         // Dump out current number of lines
         mlog << Debug(4)
-             << "[File " << i + 1 << " of " << files.n_elements()
-             << "] " << cur_read
+             << "[File " << i + 1 << " of " << files.n()
+             << "] Used " << cur_add << " of " << cur_read
              << " lines read from file \n\"" << files[i] << "\"\n";
 
         // Close current file
@@ -378,16 +382,137 @@ void process_track_files(const StringArray& files,
 
     } // End loop over files
 
-    // Issue warning if more than one track found
-    if (tracks.n_tracks() > 1) {
-        mlog << Warning << "Found " << tracks.n_tracks() << " tracks.\n";
+    // Filter the tracks using the config file information
+    mlog << Debug(2) << "Subsetting " << tracks.n_tracks()
+         << " tracks based on config file settings.\n";
+    subset_tracks(tracks);
+
+    // Check the number of tracks: exit for 0 and warning for > 1
+    if(tracks.n_tracks() == 0) {
+        mlog << Error << "\nprocess_track_files() -> "
+             << "no tracks retained! Adjust the configuration file "
+             << "filtering options to select a single track.\n\n";
+        exit(1);
     }
+    // Issue warning if more than one track found
+    else if(tracks.n_tracks() > 1) {
+        mlog << Warning << "\nprocess_track_files() -> "
+             << "multiple tracks found (" << tracks.n_tracks()
+             << ")! Using the first one. Adjust the configuration file "
+             << "filtering options to select a single track.\n\n";
+    }
+
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check if the ATCFLineBase should be kept.  Only check those columns
+// that remain constant across the entire track:
+//    model, storm id, basin, cyclone, and init time
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_keeper(const ATCFLineBase * line) {
+   bool keep = true;
+   int m, d, y, h, mm, s;
+
+   // Decompose warning time
+   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
+
+   // Check model
+   if(conf_info.Model.nonempty() &&
+      conf_info.Model != line->technique())
+      keep = false;
+
+   // Check storm id
+   else if(conf_info.StormId.n() > 0 &&
+           !has_storm_id(conf_info.StormId, line->basin(),
+                         line->cyclone_number(), line->warning_time()))
+      keep = false;
+
+   // Check basin
+   else if(conf_info.Basin.nonempty() &&
+           conf_info.Basin != line->basin())
+      keep = false;
+
+   // Check cyclone
+   else if(conf_info.Cyclone.nonempty() &&
+           conf_info.Cyclone != line->cyclone_number())
+      keep = false;
+
+   // Initialization time
+   else if(conf_info.InitTime > 0 &&
+           conf_info.InitTime != line->warning_time())
+      keep = false;
+
+   // Return the keep status
+   return(keep);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adeck(const StringArray& a) {
-    set_atcf_source(a, adeck_source, adeck_model_suffix);
+void subset_tracks(TrackInfoArray &tracks) {
+   int i, j;
+   bool status;
+   TrackInfoArray t = tracks;
+   TrackInfo cur;
+
+   // Initialize
+   tracks.clear();
+
+   // Loop through the tracks and determine which should be retained
+   // The is_keeper() function has already filtered by model, storm id,
+   // basin, cyclone, and initialization time.
+   for(i = 0; i < t.n_tracks(); i++) {
+
+      // Check storm name
+      if(conf_info.StormName.nonempty() &&
+         conf_info.StormName != t[i].storm_name()) {
+         mlog << Debug(4) << "Discarding track " << i+1
+              << " for storm name mismatch (" << t[i].storm_name()
+              << " != " << conf_info.StormName << ").\n";
+         continue;
+      }
+
+      // Subset the track points based on valid and lead times.
+      for(j = 0, cur.clear(); j < t[i].n_points(); j++) {
+
+         // Valid time window
+         if((conf_info.ValidBeg > 0 &&
+             conf_info.ValidBeg > t[i][j].valid())     ||
+            (conf_info.ValidEnd > 0 &&
+             conf_info.ValidEnd < t[i][j].valid())     ||
+            (conf_info.ValidInc.n() > 0 &&
+             !conf_info.ValidInc.has(t[i][j].valid())) ||
+            (conf_info.ValidExc.n() > 0 &&
+             conf_info.ValidExc.has(t[i][j].valid()))) continue;
+
+         // Valid hour and lead time
+         if((conf_info.ValidHour.n() > 0 &&
+             !conf_info.ValidHour.has(t[i][j].valid_hour())) ||
+            (conf_info.LeadTime.n() > 0 &&
+             !conf_info.LeadTime.has(t[i][j].lead()))) continue;
+
+         // Add the current point to the track
+         cur.add(t[i][j]);
+      }
+
+      // Add the current track
+      if(cur.n_points() > 0) {
+         mlog << Debug(3)
+              << "Keeping Track: " << cur.serialize() << "\n";
+         tracks.add(cur);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_deck(const StringArray& a) {
+    set_atcf_source(a, deck_source, deck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
