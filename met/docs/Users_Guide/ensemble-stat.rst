@@ -873,6 +873,9 @@ Table 7 Format information for ORANK (Observation Rank) output line type.
 
 Table 8 Format information for SSVAR (Spread/Skill Variance) output line type.
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
   :header-rows: 2
@@ -923,25 +926,25 @@ Table 8 Format information for SSVAR (Spread/Skill Variance) output line type.
     - OOBAR
     - Average of observation squared
   * - 37-38
-    - FBAR_NCL, FBAR_NCU
+    - FBAR_NCL, :raw-html:`<br />` FBAR_NCU
     - Mean forecast normal upper and lower confidence limits
   * - 39-41
-    - FSTDEV, FSTDEV_NCL, FSTDEV_NCU
+    - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
   * - 42-43
-    - OBAR_NCL, OBAR_NCU
+    - OBAR_NCL, :raw-html:`<br />` OBAR_NCU
     - Mean observation normal upper and lower confidence limits
   * - 44-46
-    - OSTDEV, OSTDEV_NCL, OSTDEV_NCU
+    - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
   * - 47-49
-    - PR_CORR, PR_CORR_NCL, PR_CORR_NCU
+    - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU
     - Pearson correlation coefficient including normal upper and lower confidence limits
   * - 50-52
-    - ME, ME_NCL, ME_NCU
+    - ME, :raw-html:`<br />` ME_NCL, :raw-html:`<br />` ME_NCU
     - Mean error including normal upper and lower confidence limits
   * - 53-55
-    - ESTDEV, ESTDEV_NCL, ESTDEV_NCU
+    - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
   * - 56
     - MBIAS
