@@ -465,7 +465,7 @@ Table 10.5 Variables defined in NetCDF output.
     - Raw values for the observation field specified by “FIELD_LEVEL”
   * - DIFF_FIELD_LEVEL_RAW
     - tile, x, y
-    - Raw values for the difference field (f-o) specified by “FIELD_LEVEL”
+    - Raw values for the difference field (**f-o**) specified by “FIELD_LEVEL”
   * - FCST_FIELD_LEVEL_THRESH
     - tile, scale, x, y
     - Wavelet scale-decomposition of the forecast field specified by “FIELD_LEVEL_THRESH”
