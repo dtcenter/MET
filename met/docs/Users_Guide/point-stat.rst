@@ -641,9 +641,6 @@ Table 7.2
   * - 28
     - O_RATE
     - Observation rate
-  * - 29
-    - FN_ON
-    - Number of forecast no and observation no
 
 Table 7.3 Format information for CTC (Contingency Table Counts) output line type.
 
@@ -651,38 +648,41 @@ Table 7.3 Format information for CTC (Contingency Table Counts) output line type
   :widths: auto
   :header-rows: 2
 
-  * - CTC OUTPUT FORMAT
+  * - 
     - 
-    - 
-  * - CTC Column Name
-    - Description
-    - Column Number
-  * - CTC
-    - Contingency Table Counts line type
+    - CTC OUTPUT FORMAT
+  * - Column Number
     - CTC Column Name
-  * - TOTAL
-    - Total number of matched pairs
     - Description
-  * - FY_OY
-    - Number of forecast yes and observation yes
-    - 24
-  * - FY_ON
-    - Number of forecast yes and observation no
+  * - 24
     - CTC
-  * - FN_OY
-    - Number of forecast no and observation yes
     - Contingency Table Counts line type
-  * - FN_ON
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+  * - 26
+    - FY_OY
+    - Number of forecast yes and observation yes
+  * - 27
+    - FY_ON
+    - Number of forecast yes and observation no
+  * - 28
+    - FN_OY
+    - Number of forecast no and observation yes
+  * - 29
+    - FN_ON
     - Number of forecast no and observation no
-    - 25
 
 Table 4 ?? need link to reference this
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for CTS (Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
-  * - CTC OUTPUT FORMAT
+  * - CTS OUTPUT FORMAT
     - 
     - 
   * - Column Number
@@ -695,81 +695,87 @@ Table 4 ?? need link to reference this
     - TOTAL
     - Total number of matched pairs
   * - 26-30
-    - BASER, BASER_NCL, BASER_NCU, BASER_BCL, BASER_BCU
+    - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU, :raw-html:`<br />` BASER_BCL, :raw-html:`<br />` BASER_BCU
     - Base rate including normal and bootstrap upper and lower confidence limits
   * - 31-35
-    - FMEAN, FMEAN_NCL, FMEAN_NCU, FMEAN_BCL,FMEAN_BCU
+    - FMEAN, :raw-html:`<br />` FMEAN_NCL, :raw-html:`<br />` FMEAN_NCU, :raw-html:`<br />` FMEAN_BCL, :raw-html:`<br />` FMEAN_BCU
     - Forecast mean including normal and bootstrap upper and lower confidence limits
   * - 36-40
-    - ACC, ACC_NCL, ACC_NCU, ACC_BCL, ACC_BCU
+    - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
     - Accuracy including normal and bootstrap upper and lower confidence limits
   * - 41-43
-    - FBIAS, FBIAS_BCL, FBIAS_BCU
+    - FBIAS, :raw-html:`<br />` FBIAS_BCL, :raw-html:`<br />` FBIAS_BCU
     - Frequency Bias including bootstrap upper and lower confidence limits
   * - 44-48
-    - PODY, PODY_NCL, PODY_NCU, PODY_BCL, PODY_BCU
+    - PODY, :raw-html:`<br />` PODY_NCL, :raw-html:`<br />` PODY_NCU, :raw-html:`<br />` PODY_BCL, :raw-html:`<br />` PODY_BCU
     - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
   * - 49-53
-    - PODN, PODN_NCL, PODN_NCU, PODN_BCL, PODN_BCU
+    - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
     - Probability of detecting no including normal and bootstrap upper and lower confidence limits
   * - 54-58
-    - POFD, POFD_NCL, POFD_NCU, POFD_BCL, POFD_BCU       
+    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU       
     - Probability of false detection including normal and bootstrap upper and lower confidence limits
   * - 59-63
-    - FAR, FAR_NCL, FAR_NCU, FAR_BCL, FAR_BCU
+    - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
     - False alarm ratio including normal and bootstrap upper and lower confidence limits
   * - 64-68
-    - CSI, CSI_NCL, CSI_NCU, CSI_BCL, CSI_BCU
+    - CSI, :raw-html:`<br />` CSI_NCL, :raw-html:`<br />` CSI_NCU, :raw-html:`<br />` CSI_BCL, :raw-html:`<br />` CSI_BCU
     - Critical Success Index including normal and bootstrap upper and lower confidence limits
   * - 69-71
-    - GSS, GSS_BCL, GSS_BCU
+    - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
 
 Table 5 need link??
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for CTS (Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 2
 
-  * - CTC OUTPUT FORMAT
+  * - CTS OUTPUT FORMAT
     - 
     - 
   * - Column Number
     - CTS Column Name
     - Description
   * - 72-76
-    - HK, HK_NCL, HK_NCU, HK_BCL, HK_BCU
+    - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
   * - 77-79
-    - HSS, HSS_BCL, HSS_BCU
+    - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score including bootstrap upper and lower confidence limits
   * - 80-84
-    - ODDS, ODDS_NCL, ODDS_NCU, ODDS_BCL, ODDS_BCU
+    - ODDS, :raw-html:`<br />` ODDS_NCL, :raw-html:`<br />` ODDS_NCU, :raw-html:`<br />` ODDS_BCL, :raw-html:`<br />` ODDS_BCU
     - Odds Ratio including normal and bootstrap upper and lower confidence limits
   * - 85-89
-    - LODDS, LODDS_NCL, LODDS_NCU, LODDS_BCL, LODDS_BCU
+    - LODDS, :raw-html:`<br />` LODDS_NCL, :raw-html:`<br />` LODDS_NCU, :raw-html:`<br />` LODDS_BCL, :raw-html:`<br />` LODDS_BCU
     - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
   * - 90-94
-    - ORSS, ORSS _NCL, ORSS _NCU, ORSS _BCL, ORSS _BCU
+    - ORSS, :raw-html:`<br />` ORSS _NCL, :raw-html:`<br />` ORSS _NCU, :raw-html:`<br />` ORSS _BCL, :raw-html:`<br />` ORSS _BCU
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
   * - 95-99
-    - EDS, EDS _NCL, EDS _NCU, EDS _BCL, EDS _BCU
+    - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
     - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 100-104
-    - SEDS, SEDS _NCL, SEDS _NCU, SEDS _BCL, SEDS _BCU
+    - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL, :raw-html:`<br />` SEDS _BCU
     - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 105-109
-    - EDI, EDI _NCL, EDI _NCU, EDI _BCL, EDI _BCU
+    - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
     - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 111-113
-    - SEDI, SEDI _NCL, SEDI _NCU, SEDI _BCL, SEDI _BCU
+    - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL, :raw-html:`<br />` SEDI _BCU
     - Symmetric Extremal Depenency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
-    - BAGSS, BAGSS_BCL, BAGSS_BCU
+    - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
 
 
 Table 6 Format information for CNT(Continuous Statistics) output line type.
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for CNT(Continuous Statistics) output line type.
   :widths: auto
@@ -788,19 +794,19 @@ Table 6 Format information for CNT(Continuous Statistics) output line type.
     - TOTAL
     - Total number of matched pairs
   * - 26-30
-    - FBAR, FBAR_NCL, FBAR_NCU, FBAR_BCL, FBAR_BCU
+    - FBAR, :raw-html:`<br />` FBAR_NCL, :raw-html:`<br />` FBAR_NCU, :raw-html:`<br />` FBAR_BCL, :raw-html:`<br />` FBAR_BCU
     - Forecast mean including normal and bootstrap upper and lower confidence limits
   * - 31-35
-    - FSTDEV, FSTDEV_NCL, FSTDEV_NCU, FSTDEV_BCL, FSTDEV_BCU
+    - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU, :raw-html:`<br />` FSTDEV_BCL, :raw-html:`<br />` FSTDEV_BCU
     - Standard deviation of the forecasts including normal and bootstrap upper and lower confidence limits
   * - 36-40
-    - OBAR, OBAR_NCL, OBAR_NCU, OBAR_BCL, OBAR_BCU
+    - OBAR, :raw-html:`<br />` OBAR_NCL, :raw-html:`<br />` OBAR_NCU, :raw-html:`<br />` OBAR_BCL, :raw-html:`<br />` OBAR_BCU
     - Observation mean including normal and bootstrap upper and lower confidence limits
   * - 41-45
-    - OSTDEV, OSTDEV_NCL, OSTDEV_NCU, OSTDEV_BCL, OSTDEV_BCU
+    - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU, :raw-html:`<br />` OSTDEV_BCL, :raw-html:`<br />` OSTDEV_BCU
     - Standard deviation of the observations including normal and bootstrap upper and lower confidence limits
   * - 46-50
-    - PR_CORR, PR_CORR_NCL, PR_CORR_NCU, PR_CORR_BCL, PR_CORR_BCU
+    - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU, :raw-html:`<br />` PR_CORR_BCL, :raw-html:`<br />` PR_CORR_BCU
     - Pearson correlation coefficient including normal and bootstrap upper and lower confidence limits
   * - 51
     - SP_CORR
@@ -818,13 +824,16 @@ Table 6 Format information for CNT(Continuous Statistics) output line type.
     - ORANK_TIES
     - Number of tied observation ranks used in computing Kendall's tau statistic
   * - 56-60
-    - ME, ME_NCL, ME_NCU, ME_BCL, ME_BCU
+    - ME, :raw-html:`<br />` ME_NCL, :raw-html:`<br />` ME_NCU, :raw-html:`<br />` ME_BCL, :raw-html:`<br />` ME_BCU
     - Mean error (F-O) including normal and bootstrap upper and lower confidence limits
   * - 61-65
-    - ESTDEV, ESTDEV_NCL, ESTDEV_NCU, ESTDEV_BCL, ESTDEV_BCU
+    - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU, :raw-html:`<br />` ESTDEV_BCL, :raw-html:`<br />` ESTDEV_BCU
     - Standard deviation of the error including normal and bootstrap upper and lower confidence limits
       
 Table 7  Format information for CNT(Continuous Statistics) output line type continued from above table
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table::  Format information for CNT(Continuous Statistics) output line type continued from above table
   :widths: auto
@@ -837,43 +846,43 @@ Table 7  Format information for CNT(Continuous Statistics) output line type cont
     - CNT Column Name
     - Description
   * - 66-68
-    - MBIAS, MBIAS_BCL, MBIAS_BCU
+    - MBIAS, :raw-html:`<br />` MBIAS_BCL, :raw-html:`<br />` MBIAS_BCU
     - Multiplicative bias including bootstrap upper and lower confidence limits
   * - 69-71
-    - MAE, MAE_BCL, MAE_BCU
+    - MAE, :raw-html:`<br />` MAE_BCL, :raw-html:`<br />` MAE_BCU
     - Mean absolute error including bootstrap upper and lower confidence limits
   * - 72-74
-    - MSE, MSE_BCL, MSE_BCU
+    - MSE, :raw-html:`<br />` MSE_BCL, :raw-html:`<br />` MSE_BCU
     - Mean squared error including bootstrap upper and lower confidence limits
   * - 75-77
-    - BCMSE, BCMSE_BCL, BCMSE_BCU
+    - BCMSE, :raw-html:`<br />` BCMSE_BCL, :raw-html:`<br />` BCMSE_BCU
     - Bias-corrected mean squared error including bootstrap upper and lower confidence limits
   * - 78-80
-    - RMSE, RMSE_BCL, RMSE_BCU
+    - RMSE, :raw-html:`<br />` RMSE_BCL, :raw-html:`<br />` RMSE_BCU
     - Root mean squared error including bootstrap upper and lower confidence limits
   * - 81-94
-    - E10, E10_BCL, E10_BCU, E25, E25_BCL, E25_BCU, E50, E50_BCL, E50_BCU, E75, E75_BCL, E75_BCU, E90, E90_BCL, E90_BCU
+    - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
   * - 96-98
-    - IQR, IQR _BCL, IQR _BCU
+    - IQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
     - The Interquartile Range including bootstrap upper and lower confidence limits
   * - 99-101
-    - MAD, MAD_BCL, MAD_BCU
+    - MAD, :raw-html:`<br />` MAD_BCL, :raw-html:`<br />` MAD_BCU
     - The Median Absolute Deviation including bootstrap upper and lower confidence limits
   * - 102-106
-    - ANOM_CORR, ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
+    - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
     - The Anomaly Correlation including normal and bootstrap upper and lower confidence limits
   * - 107-109
-    - ME2, ME2_BCL, ME2_BCU
+    - ME2, :raw-html:`<br />` ME2_BCL, :raw-html:`<br />` ME2_BCU
     - The square of the mean error (bias) including bootstrap upper and lower confidence limits
   * - 110-112
-    - MSESS, MSESS_BCL, MSESS_BCU
+    - MSESS, :raw-html:`<br />` MSESS_BCL, :raw-html:`<br />` MSESS_BCU
     - The mean squared error skill score including bootstrap upper and lower confidence limits
   * - 113-115
-    - RMSFA, RMSFA_BCL, RMSFA_BCU
+    - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
   * - 116-118
-    - RMSOA, RMSOA_BCL, RMSOA_BCU
+    - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
      
 
@@ -905,6 +914,9 @@ Table 8 Format information for MCTC (Multi-category Contingency Table Count) out
 
 Table 9 Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
@@ -925,16 +937,16 @@ Table 9 Format information for MCTS (Multi- category Contingency Table Statistic
     - N_CAT
     - The total number of categories in each of dimension of the contingency table. So the total number of cells is N_CAT*N_CAT.
   * - 27-31
-    - ACC, ACC_NCL, ACC_NCU, ACC_BCL, ACC_BCU
+    - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
     - Accuracy, normal confidence limits and bootstrap confidence limits
   * - 32-34
-    - HK, HK_BCL, HK_BCU
+    - HK, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen and Kuipers Discriminant and bootstrap confidence limits
   * - 35-37
-    - HSS, HSS_BCL, HSS_BCU
+    - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score and bootstrap confidence limits
   * - 38-40
-    - GER, GER_BCL, GER_BCU
+    - GER, :raw-html:`<br />` GER_BCL, :raw-html:`<br />` GER_BCU
     - Gerrity Score and bootstrap confidence limits
 
 Table 10 Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
@@ -967,12 +979,15 @@ Table 10 Format information for PCT (Contingency Table Counts for Probabilistic 
   * - 29
     - ON_i
     - Number of observation no when forecast is between the ith and i+1th probability thresholds (repeated)
-  * - *
+  * - \*
     - THRESH_n
     - Last probability threshold value
 
 
 Table 11 Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type.
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
   :widths: auto
@@ -994,7 +1009,7 @@ Table 11 Format information for PSTD (Contingency Table Statistics for Probabili
     - N_THRESH
     - Number of probability thresholds
   * - 27-29
-    - BASER, BASER_NCL, BASER_NCU
+    - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU
     - The Base Rate, including normal upper and lower confidence limits
   * - 30
     - RELIABILITY
@@ -1009,10 +1024,10 @@ Table 11 Format information for PSTD (Contingency Table Statistics for Probabili
     - ROC_AUC
     - Area under the receiver operating characteristic curve
   * - 34-36
-    - BRIER, BRIER_NCL, BRIER_NCU
+    - BRIER, :raw-html:`<br />` BRIER_NCL, :raw-html:`<br />` BRIER_NCU
     - Brier Score including normal upper and lower confidence limits
   * - 37-39
-    - BRIERCL, BRIERCL_NCL, BRIERCL_NCU
+    - BRIERCL, :raw-html:`<br />` BRIERCL_NCL, :raw-html:`<br />` BRIERCL_NCU
     - Climatological Brier Score including upper and lower normal confidence limits
   * - 40
     - BSS
@@ -1066,7 +1081,7 @@ Table 12 Format information for PJC (Joint and Conditional factorization for Pro
   * - 33
     - BASER_i
     - Base rate when forecast is between the ith and i+1th probability thresholds (repeated)
-  * - *
+  * - \*
     - THRESH_n
     - Last probability threshold value
 
