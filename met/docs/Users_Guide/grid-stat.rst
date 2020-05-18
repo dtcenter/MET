@@ -557,6 +557,9 @@ Table 2 Format information for NBRCTC (Neighborhood Contingency Table Counts) ou
 
 Table 3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
@@ -574,37 +577,40 @@ Table 3 Format information for NBRCTS (Neighborhood Contingency Table Statistics
     - TOTAL
     - Total number of matched pairs
   * - 26-30
-    - BASER, BASER_NCL, BASER_NCU, BASER_BCL, BASER_BCU
+    - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU, :raw-html:`<br />` BASER_BCL, :raw-html:`<br />` BASER_BCU
     - Base rate including normal and bootstrap upper and lower confidence limits
   * - 31-35
-    - FMEAN, FMEAN_NCL, FMEAN_NCU, FMEAN_BCL, FMEAN_BCU
+    - FMEAN, :raw-html:`<br />` FMEAN_NCL, :raw-html:`<br />` FMEAN_NCU, :raw-html:`<br />` FMEAN_BCL, :raw-html:`<br />` FMEAN_BCU
     - Forecast mean including normal and bootstrap upper and lower confidence limits
   * - 36-40
-    - ACC, ACC_NCL, ACC_NCU, ACC_BCL, ACC_BCU
+    - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
     - Accuracy including normal and bootstrap upper and lower confidence limits
   * - 41-43
-    - FBIAS, FBIAS_BCL, FBIAS_BCU
+    - FBIAS, :raw-html:`<br />` FBIAS_BCL, :raw-html:`<br />` FBIAS_BCU
     - Frequency Bias including bootstrap upper and lower confidence limits
   * - 44-48
-    - PODY, PODY_NCL, PODY_NCU, PODY_BCL, PODY_BCU
+    - PODY, :raw-html:`<br />` PODY_NCL, :raw-html:`<br />` PODY_NCU, :raw-html:`<br />` PODY_BCL, :raw-html:`<br />` PODY_BCU
     - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
   * - 49-53
-    - PODN, PODN_NCL, PODN_NCU, PODN_BCL, PODN_BCU
+    - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
     - Probability of detecting no including normal and bootstrap upper and lower confidence limits
   * - 54-58
-    - POFD, POFD_NCL, POFD_NCU, POFD_BCL, POFD_BCU
+    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU
     - Probability of false detection including normal and bootstrap upper and lower confidence limits
   * - 59-63
-    - FAR, FAR_NCL, FAR_NCU, FAR_BCL, FAR_BCU
+    - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
     - False alarm ratio including normal and bootstrap upper and lower confidence limits
   * - 64-68
-    - CSI, CSI_NCL, CSI_NCU, CSI_BCL, CSI_BCU
+    - CSI, :raw-html:`<br />` CSI_NCL, :raw-html:`<br />` CSI_NCU, :raw-html:`<br />` CSI_BCL, :raw-html:`<br />` CSI_BCU
     - Critical Success Index including normal and bootstrap upper and lower confidence limits
   * - 69-71
-    - GSS, GSS_BCL, GSS_BCU
+    - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
 
 Table 4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
   :widths: auto
@@ -614,37 +620,40 @@ Table 4 Format information for NBRCTS (Neighborhood Contingency Table Statistics
     - NBRCTS Column Name
     - Description
   * - 72-76
-    - HK, HK_NCL, HK_NCU, HK_BCL, HK_BCU
+    - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
   * - 77-79
-    - HSS, HSS_BCL, HSS_BCU
+    - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score including bootstrap upper and lower confidence limits
   * - 80-84
-    - ODDS, ODDS_NCL, ODDS_NCU, ODDS_BCL, ODDS_BCU
+    - ODDS, :raw-html:`<br />` ODDS_NCL, :raw-html:`<br />` ODDS_NCU, :raw-html:`<br />` ODDS_BCL, :raw-html:`<br />` ODDS_BCU
     - Odds Ratio including normal and bootstrap upper and lower confidence limits
   * - 85-89
-    - LODDS, LODDS_NCL, LODDS_NCU, LODDS_BCL, LODDS_BCU
+    - LODDS, :raw-html:`<br />` LODDS_NCL, :raw-html:`<br />` LODDS_NCU, :raw-html:`<br />` LODDS_BCL, :raw-html:`<br />` LODDS_BCU
     - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
   * - 90-94
-    - ORSS, ORSS _NCL, ORSS _NCU, ORSS _BCL, ORSS _BCU
+    - ORSS, :raw-html:`<br />` ORSS _NCL, :raw-html:`<br />` ORSS _NCU, :raw-html:`<br />` ORSS _BCL, :raw-html:`<br />` ORSS _BCU
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
   * - 95-99
-    - EDS, EDS _NCL, EDS _NCU, EDS _BCL, EDS _BCU
+    - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
     - Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
   * - 100-104
-    - SEDS, SEDS _NCL, SEDS _NCU, SEDS _BCL SEDS _BCU
+    - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL SEDS _BCU
     - Symmetric Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
   * - 105-109
-    - EDI, EDI _NCL, EDI _NCU, EDI _BCL, EDI _BCU
+    - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
     - Extreme Depenency Index including normal and bootstrap upper and lower confidence limits
   * - 110-114
-    - SEDI, SEDI _NCL, SEDI _NCU, SEDI _BCL,SEDI _BCU
+    - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL,SEDI _BCU
     - Symmetric Extremal Depenency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
-    - BAGSS, BAGSS_BCL, BAGSS_BCU
+    - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
       
 Table 5 Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
+
+.. role:: raw-html(raw)
+    :format: html
 
 .. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
   :widths: auto
@@ -663,22 +672,22 @@ Table 5 Format information for NBRCNT(Neighborhood Continuous Statistics) output
     - TOTAL
     - Total number of matched pairs
   * - 26-28
-    - FBS, FBS_BCL, FBS_BCU
+    - FBS, :raw-html:`<br />` FBS_BCL, :raw-html:`<br />` FBS_BCU
     - Fractions Brier Score including bootstrap upper and lower confidence limits
   * - 29-31
-    - FSS, FSS_BCL, FSS_BCU
+    - FSS, :raw-html:`<br />` FSS_BCL, :raw-html:`<br />` FSS_BCU
     - Fractions Skill Score including bootstrap upper and lower confidence limits
   * - 32-34
-    - AFSS, AFSS_BCL, AFSS_BCU
+    - AFSS, :raw-html:`<br />` AFSS_BCL, :raw-html:`<br />` AFSS_BCU
     - Asymptotic Fractions Skill Score including bootstrap upper and lower confidence limits
   * - 35-37
-    - UFSS, UFSS_BCL, UFSS_BCU
+    - UFSS, :raw-html:`<br />` UFSS_BCL, :raw-html:`<br />` UFSS_BCU
     - Uniform Fractions Skill Score including bootstrap upper and lower confidence limits
   * - 38-40
-    - F_RATE, F_RATE _BCL, F_RATE _BCU
+    - F_RATE, :raw-html:`<br />` F_RATE _BCL, :raw-html:`<br />` F_RATE _BCU
     - Forecast event frequency including bootstrap upper and lower confidence limits
   * - 41-43
-    - O_RATE, O _RATE _BCL, O _RATE _BCU
+    - O_RATE, :raw-html:`<br />` O _RATE _BCL, :raw-html:`<br />` O _RATE _BCU
     - Observed event frequency including bootstrap upper and lower confidence limits
 
 Table 6 Format information for GRAD (Gradient Statistics) output line type.
@@ -827,6 +836,9 @@ Table 8 Dimensions defined in NetCDF matched pair output.
 
 Table 9 A selection of variables that can appear in the NetCDF matched pair output.
 
+.. role:: raw-html(raw)
+    :format: html
+
 .. list-table:: A selection of variables that can appear in the NetCDF matched pair output.
   :widths: auto
   :header-rows: 2
@@ -843,7 +855,7 @@ Table 9 A selection of variables that can appear in the NetCDF matched pair outp
   * - OBS_VAR_LVL_MASK  DIFF_FCSTVAR
     - lat, lon
     - For each model variable (VAR), vertical level (LVL), and masking region (MASK), the observation value is listed for each point in the mask .
-  * - DIFF_FCSTVAR  _FCSTLVL  _OBSVAR  _OBSLVL_MASK  _INTERP_MTHD  _INTERP_PNTS
+  * - DIFF_FCSTVAR :raw-html:`<br />` _FCSTLVL :raw-html:`<br />` _OBSVAR :raw-html:`<br />` _OBSLVL_MASK :raw-html:`<br />` _INTERP_MTHD :raw-html:`<br />` _INTERP_PNTS
     - lat, lon
     - For each model variable (VAR), vertical level (LVL), masking region (MASK), and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS), the difference (forecast - observation) is computed for each point in the mask.
   * - FCST_XGRAD_DX  FCST_YGRAD_DX  OBS_XGRAD_DY  OBS_YGRAD_DY
