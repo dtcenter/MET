@@ -650,6 +650,9 @@ The second ASCII file the MODE tool generates contains all of the attributes for
 
 Table 15.2 Object identifier descriptions for MODE object attribute output file.
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. list-table:: Object identifier descriptions for MODE object attribute output file.
   :widths: auto
   :header-rows: 2
@@ -663,13 +666,13 @@ Table 15.2 Object identifier descriptions for MODE object attribute output file.
   * - FNNN, ONNN
     - 1-18,19-39
     - Attributes for simple forecast, observation objects
-  * - FNNN\_   ONNN
+  * - FNNN\_ :raw-html:`<br />`   ONNN
     - 1-18, 40-51
     - Attributes for pairs of simple forecast and observation objects
-  * - CFNNN,   CONNN
+  * - CFNNN, CONNN
     - 1-18,19-39
     - Attributes for merged cluster objects in forecast, observation fields
-  * - CFNNN\_   CONNN
+  * - CFNNN\_ :raw-html:`<br />` CONNN
     - 1-18, 40-51
     - Attributes for pairs of forecast and observation cluster objects
 
@@ -801,6 +804,9 @@ Table 15.3 Format of MODE object attribute output files.
 
 Table 15.4 Format of MODE object attribute output files, continued.
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. list-table:: Format of MODE object attribute output files continued.
   :widths: auto
   :header-rows: 2
@@ -821,7 +827,7 @@ Table 15.4 Format of MODE object attribute output files, continued.
     - BOUNDARY_DIST
     - Minimum distance between the boundaries of two objects (in grid units)
   * - 47
-    - CONVEX_HULL    \_DIST
+    - CONVEX_HULL :raw-html:`<br />` \_DIST
     - Minimum distance between the convex hulls of two objects (in grid units)
   * - 48
     - ANGLE_DIFF
@@ -833,7 +839,7 @@ Table 15.4 Format of MODE object attribute output files, continued.
     - AREA_RATIO
     - Ratio of the areas of two objects defined as the lesser of the two divided by the greater of the two (unitless)
   * - 51
-    - INTERSECTION    \_AREA
+    - INTERSECTION :raw-html:`<br />` \_AREA
     - Intersection area of two objects (in grid squares)
   * - 52
     - UNION_AREA
@@ -842,16 +848,16 @@ Table 15.4 Format of MODE object attribute output files, continued.
     - SYMMETRIC_DIFF
     - Symmetric difference of two objects (in grid squares)
   * - 54
-    - INTERSECTION    \_OVER_AREA
+    - INTERSECTION :raw-html:`<br />`  \_OVER_AREA
     - Ratio of intersection area to the lesser of the forecast and observation object areas (unitless)
   * - 55
-    - CURVATURE    \_RATIO
+    - CURVATURE :raw-html:`<br />` \_RATIO
     - Ratio of the curvature of two objects defined as the lesser of the two divided by the greater of the two (unitless)
   * - 56
-    - COMPLEXITY    \_RATIO
+    - COMPLEXITY :raw-html:`<br />` \_RATIO
     - Ratio of complexities of two objects defined as the lesser of the forecast complexity divided by the observation complexity or its reciprocal (unitless)
   * - 57
-    - PERCENTILE    \_INTENSITY    \_RATIO
+    - PERCENTILE :raw-html:`<br />` \_INTENSITY :raw-html:`<br />` \_RATIO
     - Ratio of the nth percentile (INTENSITY_NN column) of intensity of the two objects defined as the lesser of the forecast intensity divided by the observation intensity or its reciprocal (unitless)
   * - 58
     - INTEREST
@@ -905,6 +911,9 @@ Table 15.5  NetCDF dimensions for MODE output.
 
 Table 15.6  Variables contained in MODE NetCDF output
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto
   :header-rows: 2
@@ -951,10 +960,10 @@ Table 15.6  Variables contained in MODE NetCDF output
   * - obs_conv_radius
     - \-
     - Observation convolution radius
-  * - fcst_conv    \_threshold
+  * - fcst_conv :raw-html:`<br />` \_threshold
     - \-
     - Forecast convolution threshold
-  * - obs_conv    \_threshold
+  * - obs_conv :raw-html:`<br />` \_threshold
     - \-
     - Observation convolution threshold
   * - n_fcst_simp
@@ -969,6 +978,9 @@ Table 15.6  Variables contained in MODE NetCDF output
 
 Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
   :widths: auto
   :header-rows: 2
@@ -979,16 +991,16 @@ Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, conti
   * - NetCDF Variable
     - Dimension
     - Description
-  * - fcst_simp_bdy     \_start
+  * - fcst_simp_bdy :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Boundary Starting Index
-  * - fcst_simp_bdy     \_npts
+  * - fcst_simp_bdy :raw-html:`<br />` \_npts
     - fcst_simp
     - Number of Forecast Simple Boundary Points
-  * - fcst_simp_bdy    \_lat
+  * - fcst_simp_bdy :raw-html:`<br />` \_lat
     - fcst_simp_bdy
     - Forecast Simple Boundary PoLatitude
-  * - fcst_simp_bdy    \_lon
+  * - fcst_simp_bdy :raw-html:`<br />` \_lon
     - fcst_simp_bdy
     - Forecast Simple Boundary PoLongitude
   * - fcst_simp_bdy_x
@@ -997,34 +1009,34 @@ Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, conti
   * - fcst_simp_bdy_y
     - fcst_simp_bdy
     - Forecast Simple Boundary PoY-Coordinate
-  * - fcst_simp_hull    \_start
+  * - fcst_simp_hull :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Convex Hull Starting Index
-  * - fcst_simp_hull    \_npts
+  * - fcst_simp_hull :raw-html:`<br />` \_npts
     - fcst_simp
     - Number of Forecast Simple Convex Hull Points
-  * - fcst_simp_hull    \_lat
+  * - fcst_simp_hull :raw-html:`<br />` \_lat
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Latitude
-  * - fcst_simp_hull    \_lon
+  * - fcst_simp_hull :raw-html:`<br />` \_lon
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Longitude
   * - fcst_simp_hull_x
     - fcst_simp_hull
-    - Forecast Simple Convex Hull Po nt X-Coordinate
+    - Forecast Simple Convex Hull Point X-Coordinate
   * - fcst_simp_hull_y
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Y-Coordinate
-  * - obs_simp_bdy   \_start
+  * - obs_simp_bdy :raw-html:`<br />` \_start
     - obs_simp
     - Observation Simple Boundary Starting Index
   * - obs_simp_bdy    \_npts
     - obs_simp
     - Number of Observation Simple Boundary Points
-  * - obs_simp_bdy   \_lat
+  * - obs_simp_bdy :raw-html:`<br />` \_lat
     - obs_simp_bdy
     - Observation Simple Boundary Point Latitude
-  * - obs_simp_bdy    \_lon
+  * - obs_simp_bdy :raw-html:`<br />` \_lon
     - obs_simp_bdy
     - Observation Simple Boundary Point Longitude
   * - obs_simp_bdy_x
@@ -1033,16 +1045,16 @@ Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, conti
   * - obs_simp_bdy_y
     - obs_simp_bdy
     - Observation Simple Boundary Point Y-Coordinate
-  * - obs_simp_hull    \_start
+  * - obs_simp_hull :raw-html:`<br />` \_start
     - obs_simp
     - Observation Simple Convex Hull Starting Index
-  * - obs_simp_hull    \_npts
+  * - obs_simp_hull :raw-html:`<br />` \_npts
     - obs_simp
     - Number of Observation Simple Convex Hull Points
-  * - obs_simp_hull    \_lat
+  * - obs_simp_hull :raw-html:`<br />` \_lat
     - obs_simp_hull
     - Observation Simple Convex Hull Point Latitude
-  * - obs_simp_hull    \_lon
+  * - obs_simp_hull :raw-html:`<br />` \_lon
     - obs_simp_hull
     - Observation Simple Convex Hull Point Longitude
   * - obs_simp_hull_x
@@ -1055,6 +1067,9 @@ Table 15. 7 Variables contained in MODE NetCDF output - Clustered Objects, conti
 
 Table 15.8 Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
 
+.. role:: raw-html(raw)
+   :format: html
+
 .. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
   :widths: auto
   :header-rows: 2
@@ -1065,16 +1080,16 @@ Table 15.8 Variables contained in MODE NetCDF output - Clustered Objects, contin
   * - NetCDF Variable
     - Dimension
     - Description
-  * - fcst_clus_hull    \_start
+  * - fcst_clus_hull :raw-html:`<br />` \_start
     - fcst_clus
     - Forecast Cluster Convex Hull Starting Index
-  * - fcst_clus_hull    \_npts
+  * - fcst_clus_hull :raw-html:`<br />` \_npts
     - fcst_clus
     - Number of Forecast Cluster Convex Hull Points
-  * - fcst_clus_hull    \_lat
+  * - fcst_clus_hull :raw-html:`<br />` \_lat
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Latitude
-  * - fcst_clus_hull    \_lon
+  * - fcst_clus_hull :raw-html:`<br />` \_lon
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Longitude
   * - fcst_clus_hull_x
@@ -1083,16 +1098,16 @@ Table 15.8 Variables contained in MODE NetCDF output - Clustered Objects, contin
   * - fcst_clus_hull_y
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Y-Coordinate
-  * - obs_clus_hull    \_start
+  * - obs_clus_hull :raw-html:`<br />` \_start
     - obs_clus
     - Observation Cluster Convex Hull Starting Index
-  * - obs_clus_hull    \_npts
+  * - obs_clus_hull :raw-html:`<br />` \_npts
     - obs_clus
     - Number of Observation Cluster Convex Hull Points
-  * - obs_clus_hull    \_lat
+  * - obs_clus_hull :raw-html:`<br />` \_lat
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Latitude
-  * - obs_clus_hull    \_lon
+  * - obs_clus_hull :raw-html:`<br />` \_lon
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Longitude
   * - obs_clus_hull_x
