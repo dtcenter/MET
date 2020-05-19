@@ -295,16 +295,6 @@ int process_command_line(int argc, char **argv) {
             exit(1);
          }
       }
-      
-      if ((RGInfo.method != InterpMthd_Min)
-            && (RGInfo.method != InterpMthd_Max)
-            && (RGInfo.method != InterpMthd_Median)
-            && (RGInfo.method != InterpMthd_UW_Mean)) {
-         mlog << Error << "\n" << method_name << "The Interpolation method \""
-              << interpmthd_to_string(RGInfo.method)
-              << "\" is not supported for GOES data.\n\n";
-         exit(1);
-      }
    }
    
    return obs_type;
