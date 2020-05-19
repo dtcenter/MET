@@ -397,7 +397,7 @@ The user may specify one or more analysis jobs to be performed on the STAT lines
 
 All possible tasks for job_name are listed in Table [Des_components_STAT_analysis_tool].
 
-Table 12.2 ?? formatting problems
+Table 12.2
 
 .. role:: raw-html(raw)
     :format: html
@@ -406,9 +406,6 @@ Table 12.2 ?? formatting problems
   :widths: 15 55 20
   :header-rows: 1
 
-  * - 
-    - 
-    - 
   * - Job Name
     - Job commandDescription
     - Required Arguments
@@ -628,7 +625,7 @@ Table 12.4 Valid combinations of "-line_type" and "-out_line_type" arguments for
   * - MPR
     - CNT, SL1L2, SAL1L2, WDIR
   * - MPR
-    - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "-out_fcst_thresh" and "-out_obs_thresh" arguments)
+    - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
 
 Job: ss_index
 
