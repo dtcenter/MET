@@ -244,7 +244,12 @@ void RegridInfo::validate_point() {
       mlog << Warning << "\nRegridInfo::validate_point() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
-           << interpmthd_uw_mean_str << ".\n\n";
+           << interpmthd_uw_mean_str << ".\n"
+           << "\tAvailable methods: "
+           << interpmthd_to_string(InterpMthd_UW_Mean) << ", "
+           << interpmthd_to_string(InterpMthd_Max) << ", "
+           << interpmthd_to_string(InterpMthd_Min) << ", "
+           << interpmthd_to_string(InterpMthd_Median) << ".\n\n";
       method = InterpMthd_UW_Mean;
    }
 
