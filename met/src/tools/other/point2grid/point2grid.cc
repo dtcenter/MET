@@ -701,7 +701,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             sprintf(grib_code, "%d", var_idx_or_gc);
             if (vname != grib_code) {
                exit_by_field_name_error = true;;
-               error_msg << "Invalid grib code [" << vname << "]\n";
+               error_msg << "Invalid GRIB code [" << vname << "]\n";
             }
             else {
                bool not_found_grib_code = true;
