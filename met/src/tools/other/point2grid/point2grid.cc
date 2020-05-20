@@ -713,7 +713,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
                if (not_found_grib_code) {
                   exit_by_field_name_error = true;;
-                  error_msg << "No data for the grib code [" << vname << "]\n";
+                  error_msg << "No data for the GRIB code [" << vname << "]\n";
                }
             }
          }
