@@ -98,7 +98,7 @@ Base rate
 
 Called "O_RATE" in FHO output ([table_PS_format_info_FHO])
 
-Called "BASER" in CTS output ([table_PS_format_info_CTS])
+Called "BASER" in CTS output :ref:`table_PS_format_info_CTS`
 
 The base rate is defined as $\overline{o}=\displaystyle{{n_{11}+n_{01}}\over {T}}={{n_{.1}}\over {T}}$. This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
 
