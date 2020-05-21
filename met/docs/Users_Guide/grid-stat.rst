@@ -437,11 +437,9 @@ The output ASCII files are named similarly:
 
 grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc, eclv, nbrctc, nbrcts, nbrcnt, dmap, or grad to indicate the line type it contains.
 
-The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
+The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section :ref:`7.3.3 point_stat output<point_stat-output>` for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
 
-Table 1 Header information for each file grid-stat outputs.
-
-.. list-table:: Header information for each file grid-stat outputs.
+.. list-table:: Table 8.1 Header information for each file grid-stat outputs
   :widths: auto
   :header-rows: 2
 
@@ -522,11 +520,10 @@ Table 1 Header information for each file grid-stat outputs.
     - Error percent value used in confidence intervals
   * - 24
     - LINE_TYPE
-    - Various line type options, refer to Section [subsec:point_stat-output] and the tables below.
+    - Various line type options, refer to Section :ref:`7.3.3 point_stat output<point_stat-output>` and the tables below.
 
-Table 2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type.
 
-.. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type.
+.. list-table:: Table 8.2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
   :header-rows: 2
 
@@ -555,12 +552,10 @@ Table 2 Format information for NBRCTC (Neighborhood Contingency Table Counts) ou
     - FN_ON
     - Number of forecast no and observation no
 
-Table 3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
-
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type.
+.. list-table:: Table 8.3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -607,12 +602,10 @@ Table 3 Format information for NBRCTS (Neighborhood Contingency Table Statistics
     - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
 
-Table 4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
-
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above.
+.. list-table:: Table 8.4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 1
 
@@ -650,12 +643,10 @@ Table 4 Format information for NBRCTS (Neighborhood Contingency Table Statistics
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
       
-Table 5 Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
-
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type.
+.. list-table::Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -690,9 +681,8 @@ Table 5 Format information for NBRCNT(Neighborhood Continuous Statistics) output
     - O_RATE, :raw-html:`<br />` O _RATE _BCL, :raw-html:`<br />` O _RATE _BCU
     - Observed event frequency including bootstrap upper and lower confidence limits
 
-Table 6 Format information for GRAD (Gradient Statistics) output line type.
 
-.. list-table:: Format information for GRAD (Gradient Statistics) output line type.
+.. list-table:: Table 8.6 Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -736,9 +726,8 @@ Table 6 Format information for GRAD (Gradient Statistics) output line type.
     - DY
     - Gradient size in the Y-direction
 
-Table 7 Format information for DMAP (Distance Map) output line type.
 
-.. list-table:: Format information for DMAP (Distance Map) output line type.
+.. list-table:: Table 8.7 Format information for DMAP (Distance Map) output line type
   :widths: auto
   :header-rows: 2
 
@@ -817,11 +806,11 @@ Table 7 Format information for DMAP (Distance Map) output line type.
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
-The output NetCDF file contains the dimensions and variables shown in the following Tables [table_GS_Dimensions_NetCDF_matched_pair_out] and [table_GS_var_NetCDF_matched_pair_out].
+The output NetCDF file contains the dimensions and variables shown in the following Tables :ref:`table_GS_Dimensions_NetCDF_matched_pair_out` and :ref:`table_GS_var_NetCDF_matched_pair_out`.
 
-Table 8 Dimensions defined in NetCDF matched pair output.
+.. _table_GS_Dimensions_NetCDF_matched_pair_out:
 
-.. list-table:: Dimensions defined in NetCDF matched pair output.
+.. list-table:: Table 8.8 Dimensions defined in NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 
@@ -834,12 +823,13 @@ Table 8 Dimensions defined in NetCDF matched pair output.
   * - Lon
     - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
 
-Table 9 A selection of variables that can appear in the NetCDF matched pair output.
-
+      
 .. role:: raw-html(raw)
     :format: html
+	     
+.. _table_GS_var_NetCDF_matched_pair_out:
 
-.. list-table:: A selection of variables that can appear in the NetCDF matched pair output.
+.. list-table:: Table 8.9 A selection of variables that can appear in the NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 
