@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0.1 (April 23, 2020)
+Model Evaluation Tools version 9.0.2 (May 22, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -251,6 +251,17 @@ Release Notes
 When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
+
+Version 9.0.2 Release Notes:
+----------------------------
+https://github.com/NCAR/MET/milestone/64?closed=1
+
+- Fix Ensemble-Stat runtime error when requesting only RHIST, PHIST, or RELP
+  output line types (#1342).
+- Fix Grid-Stat to support MAXGAUSS smoothing method (#1335).
+- Check for bad data when computing the Gerrity Score (#1335).
+- Fix ascii2nc to compile without support for Python embedding (#1335).
+- Correct omissions in the MET User's Guide (#1335).
 
 Version 9.0.1 Release Notes:
 ----------------------------

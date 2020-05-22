@@ -153,6 +153,40 @@ Each of these release notes is followed by the GitHub issue number which
 \end_layout
 
 \begin_layout Subsection*
+Bugfixes in v9.0.2: 
+\begin_inset CommandInset href
+LatexCommand href
+name "https://github.com/NCAR/MET/milestone/65?closed=1"
+target "https://github.com/NCAR/MET/milestone/65?closed=1"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Fix Ensemble-Stat runtime error when requesting only RHIST, PHIST, or RELP
+ output line types (#1342).
+\end_layout
+
+\begin_layout Itemize
+Fix Grid-Stat to support MAXGAUSS smoothing method (#1335).
+\end_layout
+
+\begin_layout Itemize
+Check for bad data when computing the Gerrity Score (#1335).
+\end_layout
+
+\begin_layout Itemize
+Fix ascii2nc to compile without support for Python embedding (#1335).
+\end_layout
+
+\begin_layout Itemize
+Correct omissions in the MET User's Guide (#1335).
+\end_layout
+
+\begin_layout Subsection*
 Bugfixes in v9.0.1: 
 \begin_inset CommandInset href
 LatexCommand href
@@ -1138,7 +1172,7 @@ T.
 \begin_inset Newline newline
 \end_inset
 
-The Model Evaluation Tools v9.0.1 (METv9.0.1) User’s Guide.
+The Model Evaluation Tools v9.0.2 (METv9.0.2) User’s Guide.
  Developmental Testbed Center.
 \begin_inset Newline newline
 \end_inset
@@ -1148,7 +1182,7 @@ Available at:
 \end_inset
 
 https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_U
-sers_Guide_v9.0.1.pdf
+sers_Guide_v9.0.2.pdf
 \begin_inset Newline newline
 \end_inset
 
