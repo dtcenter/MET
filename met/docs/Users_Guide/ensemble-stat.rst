@@ -322,7 +322,7 @@ inst_bias_offset = 0.0;
 }
 
 
-The obs_error dictionary controls how observation error information should be handled. This dictionary may be set separately for each obs.field entry. Observation error information can either be specified directly in the configuration file or by parsing information from an external table file. By default, the MET_BASE/data/table_files/obs_error_table.txt file is read but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment variable at runtime.
+The obs_error dictionary controls how observation error information should be handled. This dictionary may be set separately for each obs.field entry. Observation error information can either be specified directly in the configuration file or by parsing information from an external table file. By default, the **MET_BASE/data/table_files/obs_error_table.txt** file is read but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment variable at runtime.
 
 
 The flag entry toggles the observation error logic on (TRUE) and off (FALSE). When flag is TRUE, random observation error perturbations are applied to the ensemble member values. No perturbation is applied to the observation values but the bias scale and offset values, if specified, are applied.
@@ -538,9 +538,9 @@ Ensemble Matched Pair information
 
 The format of the STAT and ASCII output of the Ensemble-Stat tool are described below.
 
-Table 1 Header information for each file ensemble-stat outputs
+.. _table_ES_header_info_es_out:
 
-.. list-table:: Header information for each file ensemble-stat outputs
+.. list-table:: Table 9.1 Header information for each file ensemble-stat outputs
   :widths: auto
   :header-rows: 2
 
@@ -621,11 +621,11 @@ Table 1 Header information for each file ensemble-stat outputs
     - Error percent value used in confidence intervals
   * - 24
     - LINE_TYPE
-    - Output line types are listed in tables [table_ES_header_info_es_out_RHIST] through [table_ES_header_info_es_out_SSVAR].
+    - Output line types are listed in :ref:`table_ES_header_info_es_out_RHIST` through :ref:`table_ES_header_info_es_out_SSVAR`.
 
-Table 2 Format information for ECNT (Ensemble Continuous Statistics) output line type.
+.. _table_ES_header_info_es_out_ECNT:
 
-.. list-table:: Format information for ECNT (Ensemble Continuous Statistics) output line type.
+.. list-table:: Table 9.2 Format information for ECNT (Ensemble Continuous Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -675,9 +675,9 @@ Table 2 Format information for ECNT (Ensemble Continuous Statistics) output line
     - SPREAD_PLUS_OERR
     - The square root of the sum of unperturbed ensemble variance and the observation error variance
 
-Table 3 Format information for RPS (Ranked Probability Score) output line type.
-
-.. list-table:: Format information for RPS (Ranked Probability Score) output line type.
+.. _table_ES_header_info_es_out_RPS:
+      
+.. list-table:: Table 9.3 Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -715,9 +715,9 @@ Table 3 Format information for RPS (Ranked Probability Score) output line type.
     - RPSS_SMPL
     - Ranked Probability Skill Score relative to sample climatology
 
-Table 4 Format information for RHIST (Ranked Histogram) output line type.
-
-.. list-table:: Format information for RHIST (Ranked Histogram) output line type.
+.. _table_ES_header_info_es_out_RHIST:
+      
+.. list-table:: Table 9.4 Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -740,9 +740,9 @@ Table 4 Format information for RHIST (Ranked Histogram) output line type.
     - RANK_i
     - Count of observations with the i-th rank (repeated)
 
-Table 5 Format information for PHIST (Probability Integral Transform Histogram) output line type.
-
-.. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
+.. _table_ES_header_info_es_out_PHIST:
+      
+.. list-table:: Table 9.5 Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -768,10 +768,9 @@ Table 5 Format information for PHIST (Probability Integral Transform Histogram) 
     - BIN_i
     - Count of observations in the ith probability bin (repeated)
 
+.. _table_ES_header_info_es_out_RELP:
 
-Table 6 Format information for RELP (Relative Position) output line type.
-
-.. list-table:: Format information for RELP (Relative Position) output line type.
+.. list-table:: Table 9.6 Format information for RELP (Relative Position) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -794,10 +793,9 @@ Table 6 Format information for RELP (Relative Position) output line type.
     - RELP_i
     - Number of times the i-th ensemble member's value was closest to the observation (repeated). When n members tie, 1/n is assigned to each member.
 
-
-Table 7 Format information for ORANK (Observation Rank) output line type.
-
-.. list-table:: Format information for ORANK (Observation Rank) output line type.
+.. _table_ES_header_info_es_out_ORANK:
+      
+.. list-table:: Table 9.7 Format information for ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -871,12 +869,13 @@ Table 7 Format information for ORANK (Observation Rank) output line type.
     - SPREAD_PLUS_OERR
     - The square root of the sum of the unperturbed ensemble variance and the observation error variance.
 
-Table 8 Format information for SSVAR (Spread/Skill Variance) output line type.
-
+      
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
+.. _table_ES_header_info_es_out_SSVAR:	     
+
+.. list-table:: Table 9.8 Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
   :header-rows: 2
 

@@ -79,9 +79,8 @@ The gsid2mpr tool performs a simple reformatting step and thus requires no confi
 
 The gsid2mpr tool writes the same set of MPR output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the MPR line which depend on the input file type. Those additional columns are described in the following tables.
 
-Table 11.1 Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
 
-.. list-table:: Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
+.. list-table:: Table 11.1  Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -93,7 +92,7 @@ Table 11.1 Format information for GSI Diagnostic Conventional MPR (Matched Pair)
     - Description
   * - 1-37
     - 
-    - Standard MPR columns described in Table [table_PS_format_info_MPR].
+    - Standard MPR columns described in :ref:`table_PS_format_info_MPR`.
   * - 38
     - OBS_PRS
     - Model pressure value at the observation height (hPa)
@@ -119,12 +118,11 @@ Table 11.1 Format information for GSI Diagnostic Conventional MPR (Matched Pair)
     - QC_WGHT
     - Non-linear quality control relative weight
 
-Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
 
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
+.. list-table:: Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -136,7 +134,7 @@ Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) out
     - Description
   * - 1-37
     -  
-    - Standard MPR columns described in Table [table_PS_format_info_MPR].
+    - Standard MPR columns described in :ref:`table_PS_format_info_MPR`.
   * - 38
     - CHAN_USE
     - Channel used (1 for yes, -1 for no)
@@ -318,9 +316,7 @@ The gsidens2orank tool performs a simple reformatting step and thus requires no 
 
 The gsid2mpr tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the gsid2mpr tool. Those additional columns are described in the following tables.
 
-Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
-
-.. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
+.. list-table:: Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -332,7 +328,7 @@ Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation
     - Description
   * - 1-?
     -  
-    - Standard ORANK columns described in Table [table_ES_header_info_es_out_ORANK].
+    - Standard ORANK columns described in :ref:`table_ES_header_info_es_out_ORANK`.
   * - Last-2
     - N_USE
     - Number of members with ANLY_USE = 1
@@ -343,9 +339,8 @@ Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation
     - SETUP_QC
     - Setup quality control
 
-Table 11.4 Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
 
-.. list-table:: Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
+.. list-table:: Table 11.4 Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -357,7 +352,7 @@ Table 11.4 Format information for GSI Diagnostic Radiance ORANK (Observation Ran
     - Description
   * - 1-?
     -  
-    - Standard ORANK columns described in Table [table_ES_header_info_es_out_ORANK].
+    - Standard ORANK columns described in :ref:`table_ES_header_info_es_out_ORANK`.
   * - Last-24
     - N_USE
     - Number of members with OBS_QC = 0

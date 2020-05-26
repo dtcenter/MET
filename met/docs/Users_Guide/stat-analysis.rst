@@ -42,11 +42,11 @@ When aggregating the matched pair line type (MPR) and computing an output contin
 
 12.2.5 Skill Score Index, including GO Index 
 
-The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. The GO Index is a special case of the Skill Score index for which a specific configuration file is provided. The GO index is a weighted average of the RMSE values for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in Table [compute_GO_Index] and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in Table [compute_GO_Index] to compute values for the GO Index. For a general skill score index, the user can specify the weights and variables to use in the calculations in a Stat-Analysis configuration file and run the ss_index job type.
+The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill score indices by weighting scores for different meteorological fields at different pressure levels and for different lead times. The GO Index is a special case of the Skill Score index for which a specific configuration file is provided. The GO index is a weighted average of the RMSE values for wind speed, dew point temperature, temperature, height, and pressure at several levels in the atmosphere. The variables, levels, and lead times included in the index are shown in :ref:`compute_GO_Index` and are defined by a default Stat-Analysis configuration file. The partial sums (SL1L2 lines in the STAT output) for each of these variables at each level and lead time must have been computed in a previous step. The Stat-Analysis tool then uses the weights in :ref:`compute_GO_Index` to compute values for the GO Index. For a general skill score index, the user can specify the weights and variables to use in the calculations in a Stat-Analysis configuration file and run the ss_index job type.
 
-Table 12.1 Variables, levels, and weights used to compute the GO Index.
+.. _compute_GO_Index:
 
-.. list-table:: Variables, levels, and weights used to compute the GO Index.
+.. list-table:: Table 12.1 Variables, levels, and weights used to compute the GO Index.
   :widths: auto
   :header-rows: 2
 
@@ -183,7 +183,7 @@ Usage: stat_analysis
 
 stat_analysis has two required arguments and accepts several optional ones. 
 
-In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs types are described in Table [table_WS_format_info_ISC] and the filtering options are described in Section[subsec:wavelet_stat-configuration-file].
+In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs types are described in :ref:`table_WS_format_info_ISC` and the filtering options are described in Section[subsec:wavelet_stat-configuration-file].
 
 Required arguments for stat_analysis
 
@@ -395,14 +395,14 @@ The user may specify one or more analysis jobs to be performed on the STAT lines
 
 -job job_name REQUIRED and OPTIONAL ARGUMENTS
 
-All possible tasks for job_name are listed in Table [Des_components_STAT_analysis_tool].
-
-Table 12.2
+All possible tasks for job_name are listed in :ref:`Des_components_STAT_analysis_tool`.
 
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
+.. _Des_components_STAT_analysis_tool:
+	 
+.. list-table:: Table 12.2 Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
   :widths: 15 55 20
   :header-rows: 1
 
@@ -548,11 +548,11 @@ The output of this job is the same STAT format described in sections [subsec:poi
 
 Job: summary
 
-This job produces summary statistics for the column name and line type specified by the "-column" and "-line_type" options. The output of this job type consists of three lines. The first line contains "JOB_LIST", followed by a colon, then the filtering and job definition parameters used for this job. The second line contains "COL_NAME", followed by a colon, then the column names for the data in the next line. The third line contains the word "SUMMARY", followed by a colon, then the total, mean with confidence intervals, standard deviation with confidence intervals, minimum value, percentiles (10th, 25th, 50th, 75th, and 90th), the maximum value, the interquartile range, the range, and WMO mean information. The output columns are shown in Table [Columnar_output] below.
+This job produces summary statistics for the column name and line type specified by the "-column" and "-line_type" options. The output of this job type consists of three lines. The first line contains "JOB_LIST", followed by a colon, then the filtering and job definition parameters used for this job. The second line contains "COL_NAME", followed by a colon, then the column names for the data in the next line. The third line contains the word "SUMMARY", followed by a colon, then the total, mean with confidence intervals, standard deviation with confidence intervals, minimum value, percentiles (10th, 25th, 50th, 75th, and 90th), the maximum value, the interquartile range, the range, and WMO mean information. The output columns are shown in :ref:`Columnar_output` below.
 
-Table 12.3 Columnar output of "summary" job output from the Stat-Analysis tool.
+.. _Columnar_output:
 
-.. list-table:: Columnar output of "summary" job output from the Stat-Analysis tool.
+.. list-table:: Table 12.3 Columnar output of "summary" job output from the Stat-Analysis tool.
   :widths: auto
   :header-rows: 1
 
@@ -598,11 +598,11 @@ This job aggregates output from the STAT line type specified using the "-line_ty
 
 Job: aggregate_stat
 
-This job is similar to the "aggregate" job listed above, however the format of its output is determined by the "-out_line_type" argument. Again the output consists of three lines for "JOB_LIST", "COL_NAME", and the name of the output STAT line, as described above. Valid combinations of the "-line_type" and "-out_line_type" arguments are listed in Table [arg_agg_stat_job] below.
+This job is similar to the "aggregate" job listed above, however the format of its output is determined by the "-out_line_type" argument. Again the output consists of three lines for "JOB_LIST", "COL_NAME", and the name of the output STAT line, as described above. Valid combinations of the "-line_type" and "-out_line_type" arguments are listed in :ref:`arg_agg_stat_job` below.
 
-Table 12.4 Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
+.. _arg_agg_stat_job:
 
-.. list-table:: Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
+.. list-table:: Table 12. 4 Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
   :widths: auto
   :header-rows: 1
 

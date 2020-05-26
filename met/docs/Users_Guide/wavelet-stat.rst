@@ -26,27 +26,27 @@ Casati et al (2004) applied the Intensity-Scale verification to preprocessed and
 
 The Intensity Scale approach can be summarized in the following 5 steps:
 
-1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. Figure [NIMROD_3h_fcst] illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold (Table [contingency_table_counts]).
+1. For each threshold, the forecast and observation fields are transformed into binary fields: where the grid-point precipitation value meets the threshold criteria it is assigned 1, where the threshold criteria are not met it is assigned 0. Figure [NIMROD_3h_fcst] illustrates an example of a forecast and observation fields, and their corresponding binary fields for a threshold of 1mm/h. This case shows an intense storm of the scale of 160 km displaced almost its entire length. The displacement error is clearly visible from the binary field difference and the contingency table image obtained for the same threshold :ref:`contingency_table_counts`.
 
 2. The binary forecast and observation fields obtained from the thresholding are then decomposed into the sum of components on different scales, by using a 2D Haar wavelet filter (Figure [NIMROD_binary_fcst]). Note that the scale components are fields, and their sum adds up to the original binary field. For a forecast defined over square domain of 2n x 2n grid-points, the scale components are n+1: n mother wavelet components + the largest father wavelet (or scale-function) component. The n mother wavelet components have resolution equal to 1, 2, 4, ... 2n-1 grid-points. The largest father wavelet component is a constant field over the 2n x 2n grid-point domain with value equal to the field mean. 
 
 Note that the wavelet transform is a linear operator: this implies that the difference of the spatial scale components of the binary forecast and observation fields (Figure [NIMROD_binary_fcst]) are equal to the spatial scale components of the difference of the binary forecast and observation fields (Figure [NIMROD_binary_scale9]), and these scale components also add up to the original binary field difference (Figure [NIMROD_3h_fcst]1). The intensity-scale technique considers thus the spatial scale of the error. For the case illustrated (Figure [NIMROD_3h_fcst] and Figure [NIMROD_binary_scale9]) note the large error associated at the scale of 160 km, due the storm, 160km displaced almost its entire length.
 
-Note also that the means of the binary forecast and observation fields (i.e. their largest father wavelet components) are equal to the proportion of forecast and observed events above the threshold, (a+b)/n and (a+c)/n, evaluated from the contingency table counts (Table [contingency_table_counts]) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This relation is intuitive when observing forecast and observation binary fields and their corresponding contingency table image (Figure [NIMROD_3h_fcst]). The comparison of the largest father wavelet component of binary forecast and observation fields therefore provides feedback on the whole field bias.
+Note also that the means of the binary forecast and observation fields (i.e. their largest father wavelet components) are equal to the proportion of forecast and observed events above the threshold, (a+b)/n and (a+c)/n, evaluated from the contingency table counts :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This relation is intuitive when observing forecast and observation binary fields and their corresponding contingency table image (Figure [NIMROD_3h_fcst]). The comparison of the largest father wavelet component of binary forecast and observation fields therefore provides feedback on the whole field bias.
 
 3. For each threshold (t) and for each scale component (j) of the binary forecast and observation, the Mean Squared Error (MSE) is then evaluated (Figure [MSE_percent_NIMROD]). The error is usually large for small thresholds, and decreases as the threshold increases. This behavior is partially artificial, and occurs because the smaller the threshold the more events will exceed it, and therefore the larger would be the error, since the error tends to be proportional to the amount of events in the binary fields. The artificial effect can be diminished by normalization: because of the wavelet orthogonal properties, the sum of the MSE of the scale components is equal to the MSE of the original binary fields: $\hbox {MSE}(t) = j \hbox{MSE}(t,j)$. Therefore, the percentage that the MSE for each scale contributes to the total MSE may be computed: for a given threshold, t, $ \hbox {MSE\%}(t,j) = \hbox {MSE}(t,j)/ \hbox{MSE}(t)$. The MSE% does not exhibit the threshold dependency, and usually shows small errors on large scales and large errors on small scales, with the largest error associated to the smallest scale and highest threshold. For the NIMROD case illustrated, note the large error at 160 km and between the thresholds of and 4 mm/h, due to the storm, 160km displaced almost its entire length.
 
-Note that the MSE of the original binary fields is equal to the proportion of the counts of misses (c/n) and false alarms (b/n) for the contingency table (Table [contingency_table_counts]) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: $ \hbox {MSE}(t)=(b+c)/n$. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (Figure [sec:MODE_Introduction]).
+Note that the MSE of the original binary fields is equal to the proportion of the counts of misses (c/n) and false alarms (b/n) for the contingency table :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: $ \hbox {MSE}(t)=(b+c)/n$. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (Figure [sec:MODE_Introduction]).
 
-4. The MSE for the random binary forecast and observation fields is estimated by $ \hbox{MSE}(t) \hbox{random}=\hbox {FBI}*\hbox{Br}*(1-\hbox{Br}) + \hbox{Br}*(1- \hbox{FBI}*\hbox{Br})$, where $\hbox{FBI}=(a+b)/(a+c)$ is the frequency bias index and $\hbox{Br}=(a+c)/n$ is the sample climatology from the contingency table (Table [sec:WS_Introduction]) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the Murphy and Winkler (1987) framework, applying the Bayes' theorem to express the joint probabilities b/n and c/n as product of the marginal and conditional probability (e.g. Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that b/n and c/n are equal to the product of the corresponding marginal probabilities solely. 
+4. The MSE for the random binary forecast and observation fields is estimated by $ \hbox{MSE}(t) \hbox{random}=\hbox {FBI}*\hbox{Br}*(1-\hbox{Br}) + \hbox{Br}*(1- \hbox{FBI}*\hbox{Br})$, where $\hbox{FBI}=(a+b)/(a+c)$ is the frequency bias index and $\hbox{Br}=(a+c)/n$ is the sample climatology from the contingency table :ref:`sec:WS_Introduction` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the Murphy and Winkler (1987) framework, applying the Bayes' theorem to express the joint probabilities b/n and c/n as product of the marginal and conditional probability (e.g. Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that b/n and c/n are equal to the product of the corresponding marginal probabilities solely. 
 
 5. For each threshold (t) and scale component (j), the skill score based on the MSE of binary forecast and observation scale components is evaluated (Figure [Intensity_Scale_skill_score_NIMROD]). The standard skill score definition as in Jolliffe and Stephenson (2003) or Wilks (2006) is used, and random chance is used as reference forecast. The MSE for the random binary forecast is equipartitioned on the n+1 scales to evaluate the skill score: $ \hbox{SS} (t,j)=1- \hbox{MSE}(t,j)*(n+1)/ \hbox {MSE}(t) \hbox {random}$
 
 The Intensity-Scale (IS) skill score evaluates the forecast skill as a function of the precipitation intensity and of the spatial scale of the error. Positive values of the IS skill score are associated to a skillful forecast, whereas negative values are associated to no skill. Usually large scales exhibit positive skill (large scale events, such as fronts, are well predicted), whereas small scales exhibit negative skill (small scale events, such as convective showers, are less predictable), and the smallest scale and highest thresholds exhibit the worst skill. For the NIMROD case illustrated note the negative skill associated to the 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced almost its entire length.
 
-Table 10.1 2x2 contingency table in terms of counts. The nij (symbol for lowercase i & j??) values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations.
+.. _contingency_table_counts:
 
-.. list-table:: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. 
+.. list-table:: Table 10.1  2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. 
   :widths: auto
   :header-rows: 1
 
@@ -87,7 +87,7 @@ As for the MSE, the sum of the energy of the scale components is equal to the en
 
 For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast over-estimates the number of large scale events and under-estimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast under-estimates the number of large scale events and over-estimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast over-estimates the percentage of events associated to high occurrence, and under-estimate the percentage of events associated to low occurrence. The En2% for the 64 mm/h thresholds is homogeneously under-estimated for all the scales, since the forecast does not have any event exceeding this threshold. 
 
-Note that the energy squared of the observation binary field is identical to the sample climatology $\hbox {Br}=(a+c)/n$. Similarly, the energy squared of the forecast binary field is equal to $(a+b)/n$. The ratio of the squared energies of the forecast and observation binary fields is equal to the $\hbox {FBI}=(a+b)/(a+c)$FBI=(a+b)/(a+c), for the contingency table (Table [contingency_table_counts]) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtained the binary forecast and observation fields.
+Note that the energy squared of the observation binary field is identical to the sample climatology $\hbox {Br}=(a+c)/n$. Similarly, the energy squared of the forecast binary field is equal to $(a+b)/n$. The ratio of the squared energies of the forecast and observation binary fields is equal to the $\hbox {FBI}=(a+b)/(a+c)$FBI=(a+b)/(a+c), for the contingency table :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtained the binary forecast and observation fields.
 
 
 
@@ -285,9 +285,9 @@ wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indic
 
 The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
 
-Table 10.2 Header information for each file wavelet-stat outputs.
+.. _table_WS_header_info_ws_outputs:
 
-.. list-table:: Header information for each file wavelet-stat outputs.
+.. list-table:: Table 10.2 Header information for each file wavelet-stat outputs.
   :widths: auto
   :header-rows: 2
 
@@ -370,9 +370,9 @@ Table 10.2 Header information for each file wavelet-stat outputs.
     - LINE_TYPE
     - See table below.
 
-Table 10.3 Format information for the ISC (Intensity-Scale) output line type.
-
-.. list-table:: Format information for the ISC (Intensity-Scale) output line type.
+..  _table_WS_format_info_ISC:
+   
+.. list-table:: Table 10.3 Format information for the ISC (Intensity-Scale) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -424,11 +424,11 @@ Table 10.3 Format information for the ISC (Intensity-Scale) output line type.
 
 The Wavelet-Stat tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
 
-The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables [table_NetCDF_dim_Wave_output] and [_table_variables_wave_NetCDF_output].
+The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables :ref:`table_NetCDF_dim_Wave_output` and :ref:`table_variables_wave_NetCDF_output`.
 
-Table 10.4 Dimensions defined in NetCDF output.
+.. _table_NetCDF_dim_Wave_output:
 
-.. list-table:: Dimensions defined in NetCDF output.
+.. list-table:: Table 10.4 Dimensions defined in NetCDF output.
   :widths: auto
   :header-rows: 2
 
@@ -445,9 +445,9 @@ Table 10.4 Dimensions defined in NetCDF output.
   * - tile
     - Dimension for the number of tiles used
 
-Table 10.5 Variables defined in NetCDF output.
-
-.. list-table:: Variables defined in NetCDF output.
+.. _table_variables_wave_NetCDF_output:
+      
+.. list-table:: Table 10.5 Variables defined in NetCDF output.
   :widths: auto
   :header-rows: 2
 
