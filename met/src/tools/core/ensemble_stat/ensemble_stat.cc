@@ -1887,6 +1887,8 @@ void process_grid_scores(int i_vx,
    pd.extend(grid.nx()*grid.ny());
 
    // Climatology flags
+   bool emn_flag = (emn_dp.nx() == obs_dp.nx() &&
+                    emn_dp.ny() == obs_dp.ny());
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
                     cmn_dp.ny() == obs_dp.ny());
    bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
@@ -1925,7 +1927,7 @@ void process_grid_scores(int i_vx,
          pd.add_obs_error_entry(e);
 
          // Add the ensemble mean value for this point
-         pd.mn_na.add(emn_dp(x, y));
+         pd.mn_na.add((emn_flag ? emn_dp(x, y) : bad_data_double));
 
       } // end for y
    } // end for x
