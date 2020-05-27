@@ -439,6 +439,8 @@ grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho, ctc
 
 The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section :ref:`7.3.3 point_stat output<point_stat-output>` for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
 
+.. _table_GS_header_info_gs_outputs:
+
 .. list-table:: Table 8.1 Header information for each file grid-stat outputs
   :widths: auto
   :header-rows: 2
@@ -522,6 +524,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - LINE_TYPE
     - Various line type options, refer to Section :ref:`7.3.3 point_stat output<point_stat-output>` and the tables below.
 
+.. _table_GS_format_info_NBRCTC:
 
 .. list-table:: Table 8.2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
@@ -554,6 +557,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. role:: raw-html(raw)
     :format: html
+
+.. _table_GS_format_info_NBRCTS:
 
 .. list-table:: Table 8.3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
@@ -604,6 +609,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. role:: raw-html(raw)
     :format: html
+.. _table_GS_format_info_NBRCTS_cont:
 
 .. list-table:: Table 8.4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
   :widths: auto
@@ -646,6 +652,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 .. role:: raw-html(raw)
     :format: html
 
+.. _table_GS_format_info_NBRCNT:
+
 .. list-table::Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
   :header-rows: 2
@@ -681,6 +689,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - O_RATE, :raw-html:`<br />` O _RATE _BCL, :raw-html:`<br />` O _RATE _BCU
     - Observed event frequency including bootstrap upper and lower confidence limits
 
+.. _table_GS_format_info_GRAD:
 
 .. list-table:: Table 8.6 Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
@@ -726,6 +735,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - DY
     - Gradient size in the Y-direction
 
+.. _table_GS_format_info_DMAP:
 
 .. list-table:: Table 8.7 Format information for DMAP (Distance Map) output line type
   :widths: auto

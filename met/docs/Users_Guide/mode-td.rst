@@ -289,7 +289,7 @@ weight = {
 
 } 
 
-The weight entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See Table [table_mtd-3D-Pair-Attribute] for a description of each weight option. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
+The weight entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :ref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
 
 
 
@@ -313,7 +313,7 @@ interest_function = {
 
 };
 
-The interest_function entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See Table [table_mtd-3D-Pair-Attribute] for a description of each weight option. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section [sec:MODE_Scientific-and-statistical] for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
+The interest_function entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :ref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section [sec:MODE_Scientific-and-statistical] for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
 
 
 
@@ -363,13 +363,13 @@ Five ASCII output files are created:
 
 Each ASCII file is laid out in tabular format, with the first line consisting of text strings giving names for each column. The first 15 columns of each file are identical, and give information on timestamps, model names, and the convolution radius and threshold used for the forecast and observation input data.
 
-These columns are explained in Table [table_mtd-header-columns]. Each file contains additional columns that come after these. Columns for 2D constant-time attributes are shown in Table [table_mtd-2D-Attributes]. Columns for 3D single and pair attributes are shown in Tables [table_mtd-3D-single-attributes] and [table_mtd-3D-Pair-Attribute] respectively.
+These columns are explained in :ref:`table_mtd-header-columns`. Each file contains additional columns that come after these. Columns for 2D constant-time attributes are shown in :ref:`table_mtd-2D-Attributes`. Columns for 3D single and pair attributes are shown in :ref:`table_mtd-3D-single-attributes` and :ref:`table_mtd-3D-Pair-Attribute` respectively.
 
 The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using the same logic as the MODE tool. In these columns, the F and O prefixes are used to indicate simple forecast and observation objects, respectively. Similarly, the CF and CO prefixes indicate cluster forecast and observation objects, respectively. Each prefix is followed by a 3-digit number, using leading zeros, to indicate the object number (as in F001, O001, CF001, or CO000). Pairs of objects are indicated by listing the forecast object information followed by the observation object information, separated by an underscore (as in F001_O001 or CF001_CO001). The OBJECT_ID column indicates the single object or pair of objects being described in that line. The OBJECT_CAT column indicates the cluster or pair of clusters to which these object(s) belong. A simple object that is not part of a cluster is assigned a cluster number of zero (as in CF000 or CO000). When pairs of objects belong to the same matching cluster, the OBJECT_CAT column indicates the matching cluster number (as in CF001_CO001). When they do not, the OBJECT_CAT column is set to CF000_CO000.
 
-Table 17.1 Text Header Columns
+.. _table_mtd-header-columns:
 
-.. list-table:: Text Header Columns
+.. list-table:: Table 17.1 Text Header Columns
   :widths: auto
   :header-rows: 2
 
@@ -446,9 +446,9 @@ Table 17.1 Text Header Columns
     - OBS_LEV
     - Observation vertical level
 
-Table 17.2 2D Attribute
+.. _table_mtd-2D-Attributes:
 
-.. list-table:: 2D Attribute
+.. list-table:: Table 17.2 2D Attribute
   :widths: auto
   :header-rows: 2
 
@@ -504,9 +504,9 @@ Table 17.2 2D Attribute
     - INTENSITY_*
     - User-specified percentile intensity in time slice
 
-Table 17.3 3D Single Attribute
+.. _table_mtd-3D-single-attributes:
 
-.. list-table:: 3D Single Attribute
+.. list-table:: Table 17.3 3D Single Attribute
   :widths: auto
   :header-rows: 2
 
@@ -577,9 +577,9 @@ Table 17.3 3D Single Attribute
     - INTENSITY_*
     - User-specified percentile intensity inside object
 
-Table 17.4 3D Pair Attribute
+.. _table_mtd-3D-Pair-Attribute:
 
-.. list-table:: 3D Pair Attribute
+.. list-table:: Table 17.4 3D Pair Attribute
   :widths: auto
   :header-rows: 2
 

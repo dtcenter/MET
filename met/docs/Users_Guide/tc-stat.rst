@@ -18,7 +18,7 @@ Filtering options are outlined below in Section[subsec:tc_stat-configuration-fil
 
 21.2.2 Summary statistics for columns
 
-The TC-Stat tool can be used to produce summary information for a single column of data. After the user specifies the specific column of interest, and any other relevant search criteria, summary information is produced from values in that column of data. The summary statistics produced are listed in Table [table_columnar_output_summary_tc_stat].
+The TC-Stat tool can be used to produce summary information for a single column of data. After the user specifies the specific column of interest, and any other relevant search criteria, summary information is produced from values in that column of data. The summary statistics produced are listed in :ref:`table_columnar_output_summary_tc_stat`.
 
 Confidence intervals are computed for the mean of the column of data. Confidence intervals are computed using the assumption of normality for the mean. For further information on computing confidence intervals, refer to Appendix [chap:App_D-Confidence-Intervals] of the MET user's guide.
 
@@ -78,7 +78,7 @@ Usage: tc_stat
 
 TC-Stat has one required argument and accepts optional ones. 
 
-The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in Table [table_columnar_output_summary_tc_stat] and the filtering options are described in Section[subsec:tc_stat-configuration-file].
+The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :ref:`table_columnar_output_summary_tc_stat` and the filtering options are described in Section[subsec:tc_stat-configuration-file].
 
 Required arguments for tc_stat
 
@@ -334,11 +334,11 @@ This job command finds and filters TCST lines down to those meeting the criteria
 
 Job: Summary
 
-This job produces summary statistics for the column name specified by the -column option. The output of the summary job consists of three rows: "JOB_LIST", which shows the job definition parameters used for this job. "COL_NAME", followed by the summary statistics that are applied. “SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance. The output columns are shown below in Table [table_columnar_output_summary_tc_stat] The -by option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the -by option. 
+This job produces summary statistics for the column name specified by the -column option. The output of the summary job consists of three rows: "JOB_LIST", which shows the job definition parameters used for this job. "COL_NAME", followed by the summary statistics that are applied. “SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance. The output columns are shown below in :ref:`table_columnar_output_summary_tc_stat` The -by option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the -by option. 
 
-Table 21.1 Columnar output of “summary” job output from the TC-Stat tool.
+.. _table_columnar_output_summary_tc_stat:
 
-.. list-table:: Columnar output of “summary” job output from the TC-Stat tool.
+.. list-table:: Table 21.1 Columnar output of “summary” job output from the TC-Stat tool.
   :widths: auto
   :header-rows: 2
 

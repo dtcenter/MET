@@ -890,7 +890,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_MCTC:      
       
-.. list-table::Table 7.8  Format information for MCTC (Multi-category Contingency Table Count) output line type.
+.. list-table:: Table 7.8  Format information for MCTC (Multi-category Contingency Table Count) output line type.
   :widths: auto
   :header-rows: 2
 

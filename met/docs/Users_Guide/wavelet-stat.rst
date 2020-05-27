@@ -3,6 +3,8 @@
 Chapter 10 Wavelet-Stat Tool
 ============================
 
+.. _WS_Introduction:
+
 10.1 Introduction
 _________________
 
@@ -38,7 +40,7 @@ Note also that the means of the binary forecast and observation fields (i.e. the
 
 Note that the MSE of the original binary fields is equal to the proportion of the counts of misses (c/n) and false alarms (b/n) for the contingency table :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: $ \hbox {MSE}(t)=(b+c)/n$. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (Figure [sec:MODE_Introduction]).
 
-4. The MSE for the random binary forecast and observation fields is estimated by $ \hbox{MSE}(t) \hbox{random}=\hbox {FBI}*\hbox{Br}*(1-\hbox{Br}) + \hbox{Br}*(1- \hbox{FBI}*\hbox{Br})$, where $\hbox{FBI}=(a+b)/(a+c)$ is the frequency bias index and $\hbox{Br}=(a+c)/n$ is the sample climatology from the contingency table :ref:`sec:WS_Introduction` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the Murphy and Winkler (1987) framework, applying the Bayes' theorem to express the joint probabilities b/n and c/n as product of the marginal and conditional probability (e.g. Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that b/n and c/n are equal to the product of the corresponding marginal probabilities solely. 
+4. The MSE for the random binary forecast and observation fields is estimated by $ \hbox{MSE}(t) \hbox{random}=\hbox {FBI}*\hbox{Br}*(1-\hbox{Br}) + \hbox{Br}*(1- \hbox{FBI}*\hbox{Br})$, where $\hbox{FBI}=(a+b)/(a+c)$ is the frequency bias index and $\hbox{Br}=(a+c)/n$ is the sample climatology from the contingency table :ref:`WS_Introduction` (?? review, is this the correct link?) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the Murphy and Winkler (1987) framework, applying the Bayes' theorem to express the joint probabilities b/n and c/n as product of the marginal and conditional probability (e.g. Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that b/n and c/n are equal to the product of the corresponding marginal probabilities solely. 
 
 5. For each threshold (t) and scale component (j), the skill score based on the MSE of binary forecast and observation scale components is evaluated (Figure [Intensity_Scale_skill_score_NIMROD]). The standard skill score definition as in Jolliffe and Stephenson (2003) or Wilks (2006) is used, and random chance is used as reference forecast. The MSE for the random binary forecast is equipartitioned on the n+1 scales to evaluate the skill score: $ \hbox{SS} (t,j)=1- \hbox{MSE}(t,j)*(n+1)/ \hbox {MSE}(t) \hbox {random}$
 

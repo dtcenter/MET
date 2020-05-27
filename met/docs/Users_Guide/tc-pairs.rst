@@ -224,11 +224,11 @@ The watch_warn field specifies the file name and time applied offset to the watc
 
 20.2.3 tc_pairs output
 
-TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in Table [TCST Header].
+TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :ref:`TCST Header`.
 
-Table 20.1 Header information for TC-Pairs TCST output.
+.. _TCST Header:
 
-.. list-table:: Header information for TC-Pairs TCST output.
+.. list-table:: Table 20.1 Header information for TC-Pairs TCST output.
   :widths: auto
   :header-rows: 2
 
@@ -278,9 +278,9 @@ Table 20.1 Header information for TC-Pairs TCST output.
     - LINE_TYPE
     - Output line type (TCMPR or PROBRI)
 
-Table 20.2 Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
+.. _TCMPR Line Type:
 
-.. list-table:: Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
+.. list-table:: Table 20.2 Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -423,9 +423,9 @@ Table 20.2 Format information for TCMPR (Tropical Cyclone Matched Pairs) output 
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
 
-Table 20.3 Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+.. _PROBRI Line Type:
 
-.. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
+.. list-table:: Table 20.3 Format information for PROBRIRW (Probability of Rapid Intensification) output line type.
   :widths: auto
   :header-rows: 2
 
