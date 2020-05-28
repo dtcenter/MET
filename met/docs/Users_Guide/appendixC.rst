@@ -781,7 +781,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 * Frequency Bias (called "FBIAS" in :ref:`table_GS_format_info_NBRCTS`)
 
-* Probability of Detection (called "PODY" in :ref:`table_GS_format_info_NBRCTS)`
+* Probability of Detection (called "PODY" in :ref:`table_GS_format_info_NBRCTS`)
 
 * Probability of Detection of the non-event (called "PODN" in :ref:`table_GS_format_info_NBRCTS`)
 

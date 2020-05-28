@@ -607,9 +607,10 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
 
+.. _table_GS_format_info_NBRCTS_cont:
+      
 .. role:: raw-html(raw)
     :format: html
-.. _table_GS_format_info_NBRCTS_cont:
 
 .. list-table:: Table 8.4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
   :widths: auto
@@ -648,13 +649,14 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
-      
+
+
 .. role:: raw-html(raw)
     :format: html
 
 .. _table_GS_format_info_NBRCNT:
-
-.. list-table::Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
+	     
+.. list-table:: Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
   :header-rows: 2
 
