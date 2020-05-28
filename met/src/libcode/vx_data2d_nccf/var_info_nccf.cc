@@ -259,14 +259,20 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             else
             {
                // Single level
-               int level = atoi(ptr2);
+               int level;
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);
-                  // Put unix time (from yyyymmdd[_hhmmss])
-                  //if (unix_time > 0) {
-                    level = unix_time;
-                  //}
+                  level = unix_time;
                   as_offset = false;
+               }
+               else if (is_number(ptr2)) {
+                  level = atoi(ptr2);
+               }
+               else {
+                  mlog << Error << "\n" << method_name
+                       << "trouble parsing NetCDF dimension value \""
+                       << ptr2 << "\"!\n\n";
+                  exit(1);
                }
                Dimension.add(level);
             }
