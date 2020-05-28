@@ -295,16 +295,6 @@ int process_command_line(int argc, char **argv) {
             exit(1);
          }
       }
-      
-      if ((RGInfo.method != InterpMthd_Min)
-            && (RGInfo.method != InterpMthd_Max)
-            && (RGInfo.method != InterpMthd_Median)
-            && (RGInfo.method != InterpMthd_UW_Mean)) {
-         mlog << Error << "\n" << method_name << "The Interpolation method \""
-              << interpmthd_to_string(RGInfo.method)
-              << "\" is not supported for GOES data.\n\n";
-         exit(1);
-      }
    }
    
    return obs_type;
@@ -679,6 +669,72 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
+      // Check the variable name
+      ConcatString error_msg;
+      vname = vinfo->name();
+      bool exit_by_field_name_error = false;
+      if (vname == "obs_val" || vname == "obs_lvl" || vname == "obs_hgt") {
+         exit_by_field_name_error = true;
+         error_msg << "The variable \"" << vname
+                   << "\" exists but is not a valid field name.\n";
+      }
+      else {
+         if (use_var_id) {
+            if (!var_names.has(vname, var_idx_or_gc)) {
+               exit_by_field_name_error = true;;
+               error_msg << "The variable \"" << vname << "\" is not available.\n";
+            }
+         }
+         else {
+            char grib_code[128];
+            var_idx_or_gc = atoi(vname.c_str());
+            sprintf(grib_code, "%d", var_idx_or_gc);
+            if (vname != grib_code) {
+               exit_by_field_name_error = true;;
+               error_msg << "Invalid GRIB code [" << vname << "]\n";
+            }
+            else {
+               bool not_found_grib_code = true;
+               for (int idx=0; idx<nobs; idx++) {
+                  if (var_idx_or_gc == obs_ids[idx]) {
+                     not_found_grib_code = false;
+                     break;
+                  }
+               }
+               if (not_found_grib_code) {
+                  exit_by_field_name_error = true;;
+                  error_msg << "No data for the GRIB code [" << vname << "]\n";
+               }
+            }
+         }
+      }
+      
+      if (exit_by_field_name_error) {
+         ConcatString log_msg;
+         if (use_var_id) {
+            for (int idx=0; idx<var_names.n_elements(); idx++) {
+               if (0 < idx) log_msg << ", ";
+               log_msg << var_names[idx];
+            }
+         }
+         else {
+            log_msg << "GRIB codes: ";
+            IntArray grib_codes;
+            for (int idx=0; idx<nobs; idx++) {
+               if (!grib_codes.has(obs_ids[idx])) {
+                  grib_codes.add(obs_ids[idx]);
+                  if (0 < idx) log_msg << ", ";
+                  log_msg << obs_ids[idx];
+               }
+            }
+         }
+         mlog << Error << "\n" << method_name
+              << error_msg
+              << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
+              << "\t" << log_msg <<"\n\n";
+         exit(1);
+      }
+
       // Check the time range. Apply the time window
       bool valid_time_from_config = true;
       unixtime valid_beg_ut, valid_end_ut, obs_time;
@@ -729,16 +785,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       
       var_index_array.clear();
       // Select output variable name
-      vname = vinfo->name();
-      if (use_var_id) {
-         if (!var_names.has(vname, var_idx_or_gc)) {
-            mlog << Error << "\n" << method_name
-                 << "Can not find variable \"" << vname << "\".\n\n";
-            exit(1);
-         }
-      }
-      else var_idx_or_gc = atoi(vname.c_str());
-      
       vname = (VarNameSA.n_elements() == 0)
               ? conf_info.get_var_name(vinfo->name())
               : conf_info.get_var_name(VarNameSA[i]);
@@ -960,11 +1006,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
       if (0 == var_count) {
          if (0 == filtered_count) {
-            mlog << Error << method_name << " No matching variable [" 
-                 << vinfo->name() << ":" << var_idx_or_gc << "]\n";
+            mlog << Error << method_name << " No valid data for the variable [" 
+                 << vinfo->name() << "]\n";
          }
          else {
-            mlog << Error << method_name << " No valid data ater filtering.\n\t"
+            mlog << Error << method_name << " No valid data after filtering.\n\t"
                  << log_msg << ".\n";
          }
          exit(1);
