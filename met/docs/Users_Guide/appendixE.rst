@@ -1,4 +1,7 @@
+.. _appendixE:
+
 Appendix E WWMCA Tools
+======================
 
 There are two WWMCA tools available. The {\tt wwmca\_plot} tool makes a PostScript plot of one or more WWMCA cloud percent files and the {\tt wwmca\_regrid} tool regrids WWMCA cloud percent files and reformats them into netCDF files that the other MET tools can read.
 

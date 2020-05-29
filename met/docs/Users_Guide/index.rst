@@ -44,6 +44,9 @@ We thank the the National Science Foundation (NSF) along with three organization
 
 The National Center for Atmospheric Research (NCAR) is sponsored by NSF.  The DTC is sponsored by the National Oceanic and Atmospheric Administration (NOAA), the United States Air Force, and the National Science Foundation (NSF).  NCAR is sponsored by the National Science Foundation (NSF).
 
+.. role:: underline
+	  :class: underline
+		  
 .. toctree::
    :titlesonly:
    :numbered: 4
@@ -58,7 +61,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF.  The DT
    grid-stat
    ensemble-stat
    wavelet-stat
-   gsI-tools
+   gsi-tools
    stat-analysis
    series-analysis
    grid-diag
