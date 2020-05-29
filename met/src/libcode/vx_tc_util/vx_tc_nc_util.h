@@ -24,9 +24,6 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-// extern void write_tc_tracks(const ConcatString&,
-//     const TrackInfoArray&);
-
 extern void write_tc_tracks(NcFile*,
     const NcDim&, const TrackInfoArray&);
 

@@ -12,38 +12,23 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// void write_tc_tracks(const ConcatString& track_nc_file,
-//     const TrackInfoArray& tracks) {
-
 void write_tc_tracks(NcFile* nc_out,
     const NcDim& track_point_dim,
     const TrackInfoArray& tracks) {
-
-    // mlog << Debug(2) << "Writing " << track_nc_file << "\n";
 
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
     mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
-         << track_lines.n_elements() << "\n";
+         << track_lines.n() << "\n";
 
     mlog << Debug(4) << track.serialize() << "\n";
 
-    for(int i = 0; i < track_lines.n_elements(); i++) {
+    for(int i = 0; i < track_lines.n(); i++) {
         mlog << Debug(4) << track_lines[i] << "\n";
     }
 
-    // NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
-
-    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
-    // NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-
-    // if (IS_INVALID_NC_P(nc_out)) {
-    //     mlog << Error << "\nwrite_nc_tracks() -> "
-    //          << "unable to open NetCDF file " 
-    //          << track_nc_file << "\n\n";
-    //     exit(1);
-    // }
+    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
     NcVar track_lines_var = nc_out->addVar(
         "TrackLines", ncString, track_line_dim);
@@ -81,7 +66,7 @@ void write_tc_tracks(NcFile* nc_out,
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    for(int i = 0; i < track_lines.n_elements(); i++) {
+    for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
         offsets.push_back(i);
         counts.clear();
@@ -105,8 +90,6 @@ void write_tc_tracks(NcFile* nc_out,
     delete[] track_lat_data;
     delete[] track_lon_data;
     delete[] track_mrd_data;
-
-    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
