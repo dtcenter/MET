@@ -21,7 +21,7 @@
 
 # Constants
 GIT_REPO="https://github.com/NCAR/MET"
-FORTIFY_BIN=/d3/projects/Fortify/Fortify_SCA_and_Apps_18.10/bin
+FORTIFY_BIN=/d3/projects/Fortify/19.2.0/Fortify_SCA_and_Apps_19.2.0/bin
 
 function usage {
         echo
