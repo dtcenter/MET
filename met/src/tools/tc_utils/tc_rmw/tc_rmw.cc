@@ -274,7 +274,7 @@ void process_tracks(TrackInfoArray& tracks) {
                    files, files_model_suffix);
 
     mlog << Debug(2)
-         << "Processing " << files.n_elements() << " file(s).\n";
+         << "Processing " << files.n() << " file(s).\n";
 
     process_track_files(files, files_model_suffix, tracks);
 
@@ -292,7 +292,7 @@ void get_atcf_files(const StringArray& source,
 
     StringArray cur_source, cur_files;
 
-    if(source.n_elements() != model_suffix.n_elements()) {
+    if(source.n() != model_suffix.n()) {
         mlog << Error
              << "\nget_atcf_files() -> "
              << "the source and suffix arrays must be equal length!\n\n";
@@ -304,12 +304,12 @@ void get_atcf_files(const StringArray& source,
     files_model_suffix.clear();
 
     // Build list of files from all sources
-    for(int i = 0; i < source.n_elements(); i++) {
+    for(int i = 0; i < source.n(); i++) {
         cur_source.clear();
         cur_source.add(source[i]);
         cur_files = get_filenames(cur_source, NULL, atcf_suffix);
 
-        for(int j = 0; j < cur_files.n_elements(); j++) {
+        for(int j = 0; j < cur_files.n(); j++) {
             files.add(cur_files[j]);
             files_model_suffix.add(model_suffix[i]);
         }
@@ -335,7 +335,7 @@ void process_track_files(const StringArray& files,
     tot_read = tot_add = 0;
 
     // Process input ATCF files
-    for(int i = 0; i < files.n_elements(); i++) {
+    for(int i = 0; i < files.n(); i++) {
 
         // Open current file
         if(!f.open(files[i].c_str())) {
@@ -524,11 +524,11 @@ void set_atcf_source(const StringArray& a,
     ConcatString cs, suffix;
 
     // Check for optional suffix sub-argument
-    for(int i = 0; i < a.n_elements(); i++) {
+    for(int i = 0; i < a.n(); i++) {
         if(a[i] == "suffix") {
             cs = a[i];
             sa = cs.split("=");
-            if(sa.n_elements() != 2) {
+            if(sa.n() != 2) {
                 mlog << Error
                      << "\nset_atcf_source() -> "
                      << "the model suffix must be specified as "
@@ -541,7 +541,7 @@ void set_atcf_source(const StringArray& a,
     }
 
     // Parse remaining sources
-    for(int i = 0; i < a.n_elements(); i++) {
+    for(int i = 0; i < a.n(); i++) {
         if( a[i] == "suffix" ) continue;
         source.add(a[i]);
         model_suffix.add(suffix);
