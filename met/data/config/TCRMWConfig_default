@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Filter input track data down to a single track
+// Filter input data down to a single storm track
 //
 
 //
@@ -31,7 +31,7 @@ basin = "";
 cyclone = "";
 
 //
-// Storm name
+// Storm name (only for BEST tracks)
 //
 storm_name = "";
 
@@ -43,7 +43,7 @@ init_time = "";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Subset the individual track points
+// Subset the single track down to individual points
 //
 
 //
@@ -105,7 +105,7 @@ regrid = {
 }
 
 //
-// Range-Azimuth grid parameters 
+// Range-Azimuth grid parameters
 //
 n_range        = 100;
 n_azimuth      = 180;
