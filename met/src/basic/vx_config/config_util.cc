@@ -1326,7 +1326,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    conf_value = interp_dict->lookup_double(conf_key_gaussian_radius, false);
    info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
    conf_value = interp_dict->lookup_double(conf_key_trunc_factor, false);
-   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
