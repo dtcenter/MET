@@ -36,6 +36,7 @@ GaussianInfo::GaussianInfo() {
    weights = (double *) 0;
    clear();
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::clear() {
@@ -51,34 +52,17 @@ void GaussianInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//GaussianInfo & GaussianInfo::operator=(const GaussianInfo &other) {
-//   weight_sum = other.weight_sum;
-//   max_r = other.max_r;
-//   weight_cnt = other.weight_cnt;
-//   radius = other.radius;
-//   dx = other.dx;
-//   trunc_factor = other.trunc_factor;
-//   if (weights) delete weights;
-//   
-//   int g_nx = max_r * 2 + 1;
-//   weights = new double[g_nx*g_nx];
-//   for(int idx=0; idx<(g_nx*g_nx); idx++)
-//      weights[idx] = other.weights[idx];
-//}
-
-///////////////////////////////////////////////////////////////////////////////
-
 int GaussianInfo::compute_max_r() {
    max_r = nint(radius / dx * trunc_factor);
    return max_r;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 //
 // Compute the Gaussian filter
 // g(x,y) = (1 / (2 * pi * sigma**2)) * exp(-(x**2 + y**2) / (2 * sigma**2))
 //
+///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::compute() {
    double weight, distance_sq;
@@ -87,11 +71,11 @@ void GaussianInfo::compute() {
    const double f_sigma_exp_divider = (2 * g_sigma_sq);
    const double f_sigma_divider = (2 * M_PI * g_sigma_sq);
    const double max_r_sq = pow((g_sigma * trunc_factor), 2);
-   
+
    validate();
    if (0 < max_r && weights) delete weights;
    compute_max_r();
-   
+
    int index = 0;
    int g_nx = max_r * 2 + 1;
    weight_cnt = 0;
@@ -107,8 +91,9 @@ void GaussianInfo::compute() {
             weight_sum += weight;
          }
          weights[index++] = weight;
-      } // end for y
-   } // end for x
+      } // end for idx_y
+   } // end for idx_x
+
    mlog << Debug(7) << "GaussianInfo::compute() max_r: "  << max_r << "\n";
 }
 
@@ -138,7 +123,7 @@ void RegridInfo::clear() {
    width = bad_data_int;
    gaussian.clear();
    shape = GridTemplateFactory::GridTemplate_None;
-   convert_fx.clear(); 
+   convert_fx.clear();
    censor_thresh.clear();
    censor_val.clear();
 }
@@ -219,7 +204,7 @@ void RegridInfo::validate() {
          exit(1);
       }
    }
-   
+
    // Check for equal number of censor thresholds and values
    if(censor_thresh.n() != censor_val.n()) {
       mlog << Error << "\nRegridInfo::validate() -> "
@@ -1354,7 +1339,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    conf_value = interp_dict->lookup_double(conf_key_gaussian_radius, false);
    info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
    conf_value = interp_dict->lookup_double(conf_key_trunc_factor, false);
-   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
+   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
@@ -1418,7 +1403,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
             info.width.add(width);
 
          } // end for k
-         
+
          if(method == InterpMthd_Gaussian || method == InterpMthd_MaxGauss) {
             info.gaussian.compute();
          }
