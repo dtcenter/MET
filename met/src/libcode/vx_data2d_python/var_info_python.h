@@ -75,16 +75,8 @@ class VarInfoPython : public VarInfo
 
 inline GrdFileType VarInfoPython::file_type() const { return(Type); }
 
-inline bool VarInfoPython::is_precipitation()     const { return ( false ); }
-inline bool VarInfoPython::is_specific_humidity() const { return ( false ); }
-inline bool VarInfoPython::is_u_wind()            const { return ( false ); }
-inline bool VarInfoPython::is_v_wind()            const { return ( false ); }
-inline bool VarInfoPython::is_wind_speed()        const { return ( false ); }
-inline bool VarInfoPython::is_wind_direction()    const { return ( false ); }
-
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif  // __VAR_INFO_PYTHON_H__
 
 ///////////////////////////////////////////////////////////////////////////////
-

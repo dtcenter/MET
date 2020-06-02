@@ -416,6 +416,14 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_precipitation() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsPrecipitation)) {
+      return(SetAttrsIsPrecipitation != 0);
+   }
+
    return Discipline == 0 &&
           ParmCat    == 1 &&
           (
@@ -430,6 +438,14 @@ bool VarInfoGrib2::is_precipitation() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_specific_humidity() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsSpecificHumidity)) {
+      return(SetAttrsIsSpecificHumidity != 0);
+   }
+
    return Discipline == 0 &&
           ParmCat    == 1 &&
           Parm       == 0;
@@ -438,6 +454,14 @@ bool VarInfoGrib2::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsUWind)) {
+      return(SetAttrsIsUWind != 0);
+   }
+
    return(ReqName == ugrd_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
@@ -447,6 +471,14 @@ bool VarInfoGrib2::is_u_wind() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_v_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsVWind)) {
+      return(SetAttrsIsVWind != 0);
+   }
+
    return(ReqName == vgrd_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
@@ -456,6 +488,14 @@ bool VarInfoGrib2::is_v_wind() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_speed() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindSpeed)) {
+      return(SetAttrsIsWindSpeed != 0);
+   }
+
    return(ReqName == wind_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
@@ -465,6 +505,14 @@ bool VarInfoGrib2::is_wind_speed() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindDirection)) {
+      return(SetAttrsIsWindDirection != 0);
+   }
+
    return(ReqName == wdir_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&

@@ -241,6 +241,13 @@ void VarInfoNcMet::set_dict(Dictionary &dict){
 bool VarInfoNcMet::is_precipitation() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsPrecipitation)) {
+      return(SetAttrsIsPrecipitation != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any precipitation variables.
    //
@@ -254,6 +261,13 @@ bool VarInfoNcMet::is_precipitation() const {
 bool VarInfoNcMet::is_specific_humidity() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsSpecificHumidity)) {
+      return(SetAttrsIsSpecificHumidity != 0);
+   }
+
+   //
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any specific humidity variables.
    //
@@ -265,24 +279,56 @@ bool VarInfoNcMet::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsUWind)) {
+      return(SetAttrsIsUWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, ugrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_v_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsVWind)) {
+      return(SetAttrsIsVWind != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, vgrd_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_wind_speed() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindSpeed)) {
+      return(SetAttrsIsWindSpeed != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wind_grib_code));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcMet::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindDirection)) {
+      return(SetAttrsIsWindDirection != 0);
+   }
+
    return(is_grib_code_abbr_match(Name, wdir_grib_code));
 }
 

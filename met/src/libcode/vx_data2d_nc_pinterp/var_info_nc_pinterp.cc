@@ -238,13 +238,20 @@ void VarInfoNcPinterp::set_dict(Dictionary & dict) {
    set_magic(dict.lookup_string("name"),
              dict.lookup_string("level"));
    set_req_name( dict.lookup_string("name").c_str() );
-   
+
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcPinterp::is_precipitation() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsPrecipitation)) {
+      return(SetAttrsIsPrecipitation != 0);
+   }
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -260,6 +267,13 @@ bool VarInfoNcPinterp::is_precipitation() const {
 bool VarInfoNcPinterp::is_specific_humidity() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsSpecificHumidity)) {
+      return(SetAttrsIsSpecificHumidity != 0);
+   }
+
+   //
    // Check to see if the VarInfo name matches any of expected Pinterp
    // specific humidity variables.
    //
@@ -271,6 +285,13 @@ bool VarInfoNcPinterp::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcPinterp::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsUWind)) {
+      return(SetAttrsIsUWind != 0);
+   }
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
@@ -286,6 +307,13 @@ bool VarInfoNcPinterp::is_u_wind() const {
 bool VarInfoNcPinterp::is_v_wind() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsVWind)) {
+      return(SetAttrsIsVWind != 0);
+   }
+
+   //
    // Check to see if the VarInfo name matches any of expected Pinterp
    // V-component of wind variables.
    //
@@ -299,6 +327,13 @@ bool VarInfoNcPinterp::is_v_wind() const {
 bool VarInfoNcPinterp::is_wind_speed() const {
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindSpeed)) {
+      return(SetAttrsIsWindSpeed != 0);
+   }
+
+   //
    // Check to see if the VarInfo name matches any of expected Pinterp
    // wind speed variables.
    //
@@ -310,6 +345,14 @@ bool VarInfoNcPinterp::is_wind_speed() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoNcPinterp::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsWindDirection)) {
+      return(SetAttrsIsWindDirection != 0);
+   }
+
    return(false);
 }
 

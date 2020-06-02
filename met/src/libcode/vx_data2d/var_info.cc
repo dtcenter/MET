@@ -614,7 +614,15 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_prob(){
+bool VarInfo::is_prob() {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrsIsProb)) {
+      return(SetAttrsIsProb != 0);
+   }
+
    return(PFlag && !PAsScalar);
 }
 

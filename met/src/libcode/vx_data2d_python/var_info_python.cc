@@ -126,9 +126,7 @@ void VarInfoPython::dump(ostream &out) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_file_type(const GrdFileType t)
-
-{
+void VarInfoPython::set_file_type(const GrdFileType t) {
 
    if ( is_python_grdfiletype(t) ) {
 
@@ -187,3 +185,98 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+bool VarInfoPython::is_precipitation() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsPrecipitation)) {
+     return(SetAttrsIsPrecipitation != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_specific_humidity() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsSpecificHumidity)) {
+     return(SetAttrsIsSpecificHumidity != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_u_wind() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsUWind)) {
+    return(SetAttrsIsUWind != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_v_wind() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsVWind)) {
+    return(SetAttrsIsVWind != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_wind_speed() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsWindSpeed)) {
+    return(SetAttrsIsWindSpeed != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool VarInfoPython::is_wind_direction() const {
+
+  //
+  // Check set_attrs entry
+  //
+  if(!is_bad_data(SetAttrsIsWindDirection)) {
+    return(SetAttrsIsWindDirection != 0);
+  }
+
+  return ( false );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
