@@ -1,4 +1,7 @@
+.. _refs:
+
 References
+==========
 
 Alberson, S.D., 1998: Five-day Tropical cyclone track forecasts in the North Atlantic Basin. Weather & Forecasting,  13, 1005-1015.
 
