@@ -2,14 +2,61 @@
 //
 // TC-RMW configuration file.
 //
-// For additional information, see the MET_BASE/config/README_TC file.
-//
 ////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filter input data down to a single storm track
+//
 
 //
 // Model
 //
 model = "GFS";
+
+//
+// Storm identifier
+//
+storm_id = "";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Cyclone number
+//
+cyclone = "";
+
+//
+// Storm name (only for BEST tracks)
+//
+storm_name = "";
+
+//
+// Model initialization time
+//
+init_time = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Subset the single track down to individual points
+//
+
+//
+// Subset by the valid time
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Subset by the valid hour and lead time.
+//
+valid_hour = [];
+lead       = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +93,7 @@ regrid = {
 }
 
 //
-// Range-Azimuth grid parameters 
+// Range-Azimuth grid parameters
 //
 n_range        = 100;
 n_azimuth      = 180;
