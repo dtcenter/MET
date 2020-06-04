@@ -14,8 +14,8 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000   04/18/19  Fillmore  New
-//   001    05/15/20  Halley Gotway  Fix data file list option logic.
+//   000   04/18/19  Fillmore        New
+//   001   05/15/20  Halley Gotway   Fix data file list option logic.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -274,7 +274,7 @@ void process_tracks(TrackInfoArray& tracks) {
                    files, files_model_suffix);
 
     mlog << Debug(2)
-         << "Processing " << files.n() << " file(s).\n";
+         << "Processing " << files.n() << " track data file(s).\n";
 
     process_track_files(files, files_model_suffix, tracks);
 
@@ -293,8 +293,7 @@ void get_atcf_files(const StringArray& source,
     StringArray cur_source, cur_files;
 
     if(source.n() != model_suffix.n()) {
-        mlog << Error
-             << "\nget_atcf_files() -> "
+        mlog << Error << "\nget_atcf_files() -> "
              << "the source and suffix arrays must be equal length!\n\n";
         exit(1);
     }
@@ -337,10 +336,11 @@ void process_track_files(const StringArray& files,
     // Process input ATCF files
     for(int i = 0; i < files.n(); i++) {
 
+        mlog << Debug(3) << "Reading track file: " << files[i] << "\n";
+
         // Open current file
         if(!f.open(files[i].c_str())) {
-            mlog << Error
-                 << "\nprocess_track_files() -> "
+            mlog << Error << "\nprocess_track_files() -> "
                  << "unable to open file \"" << files[i] << "\"\n\n";
             exit(1);
         }
@@ -383,8 +383,8 @@ void process_track_files(const StringArray& files,
     } // End loop over files
 
     // Filter the tracks using the config file information
-    mlog << Debug(2) << "Subsetting " << tracks.n_tracks()
-         << " tracks based on config file settings.\n";
+    mlog << Debug(3) << "Subsetting " << tracks.n_tracks()
+         << " track(s) based on config file settings.\n";
     subset_tracks(tracks);
 
     // Check the number of tracks: exit for 0 and warning for > 1
@@ -401,6 +401,9 @@ void process_track_files(const StringArray& files,
              << ")! Using the first one. Adjust the configuration file "
              << "filtering options to select a single track.\n\n";
     }
+
+    mlog << Debug(2) << "Processing 1 track consisting of "
+         << tracks[0].n_points() << " points.\n";
 
     return;
 }
@@ -426,9 +429,8 @@ bool is_keeper(const ATCFLineBase * line) {
       keep = false;
 
    // Check storm id
-   else if(conf_info.StormId.n() > 0 &&
-           !has_storm_id(conf_info.StormId, line->basin(),
-                         line->cyclone_number(), line->warning_time()))
+   else if(conf_info.StormId.nonempty() &&
+           conf_info.StormId != line->storm_id())
       keep = false;
 
    // Check basin
@@ -441,9 +443,9 @@ bool is_keeper(const ATCFLineBase * line) {
            conf_info.Cyclone != line->cyclone_number())
       keep = false;
 
-   // Initialization time
-   else if(conf_info.InitTime > 0 &&
-           conf_info.InitTime != line->warning_time())
+   // Check initialization time
+   else if(conf_info.InitInc != (unixtime) 0 &&
+           conf_info.InitInc != line->warning_time())
       keep = false;
 
    // Return the keep status
@@ -529,8 +531,7 @@ void set_atcf_source(const StringArray& a,
             cs = a[i];
             sa = cs.split("=");
             if(sa.n() != 2) {
-                mlog << Error
-                     << "\nset_atcf_source() -> "
+                mlog << Error << "\nset_atcf_source() -> "
                      << "the model suffix must be specified as "
                      << "\"suffix=string\".\n\n";
             }
@@ -607,8 +608,9 @@ void setup_nc_file() {
         exit(1);
     }
 
-    mlog << Debug(4) << tcrmw_grid.range_n() << "\n";
-    mlog << Debug(4) << tcrmw_grid.azimuth_n() << "\n";
+    mlog << Debug(4)
+         << "Range = " << tcrmw_grid.range_n()
+         << ", Azimuth = " << tcrmw_grid.azimuth_n() << "\n";
 
     // Define dimensions
     range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
@@ -627,10 +629,7 @@ void setup_nc_file() {
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
-        mlog << Debug(4) << "data_info->name():"
-             << data_info->name().c_str() << "\n";
-        mlog << Debug(4) << "data_info->level_name():"
-             << data_info->level_name().c_str() << "\n";
+        mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
         variable_levels[data_info->name()].push_back(
             data_info->level_name());
         variable_long_names[data_info->name()]
@@ -722,8 +721,8 @@ void process_fields(const TrackInfoArray& tracks) {
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
         long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
-        mlog << Debug(4)
-             << "(" << point.lat() << ", " << point.lon() << ")\n";
+        mlog << Debug(4) << "Track point (lat, lon) = ("
+             << point.lat() << ", " << point.lon() << ")\n";
 
         // Set grid center
         grid_data.lat_center = point.lat();

@@ -38,11 +38,11 @@ class TCRMWConfInfo {
 
         // Track filtering criteria
         ConcatString Model;
-        StringArray  StormId; // store as array for convenience
+        ConcatString StormId;
         ConcatString Basin;
         ConcatString Cyclone;
         ConcatString StormName;
-        unixtime     InitTime;
+        unixtime     InitInc;
 
         // Subset individual track points
         unixtime  ValidBeg, ValidEnd;

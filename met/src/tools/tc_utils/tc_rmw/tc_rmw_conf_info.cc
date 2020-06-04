@@ -59,8 +59,8 @@ void TCRMWConfInfo::clear() {
     Basin.clear();
     Cyclone.clear();
     StormName.clear();
-    InitTime = (unixtime) 0;
 
+    InitInc = (unixtime) 0;
     ValidBeg = ValidEnd = (unixtime) 0;
     ValidInc.clear();
     ValidExc.clear();
@@ -122,7 +122,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     Model = Conf.lookup_string(conf_key_model);
 
     // Conf: storm_id
-    StormId = Conf.lookup_string_array(conf_key_storm_id);
+    StormId = Conf.lookup_string(conf_key_storm_id);
 
     // Conf: basin
     Basin = Conf.lookup_string(conf_key_basin);
@@ -133,8 +133,8 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: storm_name
     StormName = Conf.lookup_string(conf_key_storm_name);
 
-    // Conf: init_time
-    InitTime = Conf.lookup_unixtime(conf_key_init_time);
+    // Conf: init_inc
+    InitInc = Conf.lookup_unixtime(conf_key_init_inc);
 
     // Conf: valid_beg, valid_end
     ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
@@ -142,22 +142,22 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: valid_inc
     sa = Conf.lookup_string_array(conf_key_valid_inc);
-    for(i = 0; i < sa.n(); i++)
+    for(i=0; i<sa.n(); i++)
        ValidInc.add(timestring_to_unix(sa[i].c_str()));
 
     // Conf: valid_exc
     sa = Conf.lookup_string_array(conf_key_valid_exc);
-    for(i = 0; i < sa.n(); i++)
+    for(i=0; i<sa.n(); i++)
        ValidExc.add(timestring_to_unix(sa[i].c_str()));
 
     // Conf: valid_hour
     sa = Conf.lookup_string_array(conf_key_valid_hour);
-    for(i = 0; i < sa.n(); i++)
+    for(i=0; i<sa.n(); i++)
        ValidHour.add(timestring_to_sec(sa[i].c_str()));
 
     // Conf: lead
     sa = Conf.lookup_string_array(conf_key_lead);
-    for(i = 0; i < sa.n(); i++) {
+    for(i=0; i<sa.n(); i++) {
         LeadTime.add(timestring_to_sec(sa[i].c_str()));
     }
 
@@ -196,12 +196,12 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     data_info = new VarInfo*[n_data];
 
     // Initialize pointers
-    for(i = 0; i < n_data; i++) {
+    for(i=0; i<n_data; i++) {
         data_info[i] = (VarInfo*) 0;
     }
 
     // Parse data field information
-    for(int i = 0; i < n_data; i++) {
+    for(i=0; i<n_data; i++) {
 
         // Allocate new VarInfo objects
         data_info[i] = info_factory.new_var_info(ftype);
@@ -211,8 +211,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
         // Set current dictionary
         data_info[i]->set_dict(i_fdict);
-
-        mlog << Debug(2) << data_info[i]->magic_str() << "\n";
 
         // Dump contents of current VarInfo
         if(mlog.verbosity_level() >=5) {
