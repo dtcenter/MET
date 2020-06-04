@@ -336,7 +336,7 @@ void process_track_files(const StringArray& files,
     // Process input ATCF files
     for(int i = 0; i < files.n(); i++) {
 
-        mlog << Debug(3) << "Reading track file: " << files[i] << "\n";
+        mlog << Debug(1) << "Reading track file: " << files[i] << "\n";
 
         // Open current file
         if(!f.open(files[i].c_str())) {
