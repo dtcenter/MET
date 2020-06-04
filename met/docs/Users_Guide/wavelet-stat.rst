@@ -73,11 +73,27 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     - b+d
     - a+b+c+d
 
-NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
+.. figure:: figure/wavelett-stat_fig1.png
 
+	    Figure 10.1 NIMROD 3h lead-time forecast and corresponding verifying analysis field (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast and analysis binary fields obtained for a threshold of 1mm/h, the binary field difference has their corresponding Contingency Table Image (see Table [contingency_table_counts]). The forecast shows a storm of 160 km displaced almost its entire length.
 
+.. figure:: figure/wavelett-stat_fig2a.png
 
+.. figure:: figure/wavelett-stat_fig2b.png
 
+	    Figure 10.2 NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
+
+.. figure:: figure/wavelett-stat_fig3.png
+
+	    Figure 10.3 NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost of its entire length.
+
+.. figure:: figure/wavelett-stat_fig4.png
+
+	    Figure 10.4 MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated to the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated to the displaced storm.
+
+.. figure:: figure/wavelett-stat_fig5.png
+
+	    Figure 10.5 Intensity-Scale skill score for the NIMROD forecast and analysis shown in Figure [NIMROD_3h_fcst]. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated to the scale 6 = 160 km, for the thresholds to 4 mm/h, associated to the displaced storm.
 
 
 
@@ -97,6 +113,10 @@ Note that the energy squared of the observation binary field is identical to the
 
 The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of 2n x 2n grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions 2n x 2n over the input domain in the following ways:
 
+.. figure:: figure/wavelett-stat_fig6.png
+	    
+	    Figure 10.6 Energy squared and energy squared perentages, for each threshold and sale, for the NIMROD foreast and analysis, and foreast and analysis En2 and En2% relative differences.  ?? This figure is no longer in the lyx documentation MET_Users_Guide_Master.lyx but it's still showing up on the old web page, page 261.  Should it be removed? https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf  ??
+	    
 1. User-Defined Tiling: The user may define one or more tiles of size 2n x 2n over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
 
 2. Automated Tiling: This tiling method is essentially the same as the user-defined tiling method listed above except that the tool automatically selects the location and size of the tile(s) to be applied. It figures out the maximum tile of dimension 2n x 2n that fits within the domain and places the tile at the center of the domain. For domains that are very elongated in one direction, it defines as many of these tiles as possible that fit within the domain.

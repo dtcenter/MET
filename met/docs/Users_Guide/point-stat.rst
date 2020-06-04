@@ -22,13 +22,17 @@ This section provides information about the various methods available in MET to 
 
 In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to SURFACE in the message_type_group_map configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. 
 
-To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. Figure [MET_interpolation_methods] provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
+To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. Figure 7.1  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
 
 This section describes the options for interpolation in the horizontal.
 
-Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
+.. figure:: figure/point_stat_fig1.png
 
-Illustration of some matching and interpolation methods used in MET. See text for explanation.
+	    Figure 7.1 Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
+
+.. figure:: figure/point_stat_fig2.jpg
+
+	    Figure 7.2 Illustration of some matching and interpolation methods used in MET. See text for explanation.
 
 
 
@@ -84,9 +88,9 @@ The forecast value at P is the median of the forecast values in the interpolatio
 
 Least-Squares Fit
 
-To perform least squares interpolation of a gridded field at a location P, MET uses an WxW subgrid centered (as closely as possible) at P. Figure [MET_interpolation_methods] shows the case where N = 5.
+To perform least squares interpolation of a gridded field at a location P, MET uses an WxW subgrid centered (as closely as possible) at P. Figure 7.1 shows the case where N = 5.
 
-If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in Figure [Fig_Interpolation_Methods], P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form $z=\alpha (x) + \beta (y) + \gamma$ over the subgrid. The values of $\alpha, \beta, \gamma$ are calculated from the data values at the vertices. Finally, the coordinates (x,y) of P are substituted into this expression to give z, our least squares interpolated data value at P.
+If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in Figure 7.1 ??(please confirm figure number), P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form $z=\alpha (x) + \beta (y) + \gamma$ over the subgrid. The values of $\alpha, \beta, \gamma$ are calculated from the data values at the vertices. Finally, the coordinates (x,y) of P are substituted into this expression to give z, our least squares interpolated data value at P.
 
 
 
@@ -113,9 +117,11 @@ The Point-Stat tool has been enhanced to include the High Resolution Assessment 
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated. 
 
-Figure1.3 shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner. 
+Figure 7.3 shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
 
+.. figure:: figure/point_stat_fig3.png
 
+	    Figure 7.3 Example showing how HiRA proportions are calculated.
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined. 
 

@@ -37,8 +37,7 @@ The major components of the MET package are represented in Figure [Fig_Overview_
 The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC, Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble-Stat tools. The PB2NC tool is used to create NetCDF files from input PrepBUFR files containing point observations. Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII point observations. Many types of data from the MADIS network can be formatted for use in MET by the MADIS2NC tool. MODIS and WWMCA files are regridded and formatted into NetCDF files by their respective tools. These NetCDF files are then used in the statistical analysis step. The Gen-Vx-Mask and Pcp-Combine tools are optional. The Gen-Vx-Mask tool will create a bitmapped masking area in a variety of ways. The output mask can then be used to efficiently limit verification to the interior of a user specified region. The Pcp-Combine tool can be used to add, subtract, or derive fields across multiple time steps. Often it is run to accumulate precipitation amounts into the time interval selected by the user - if a user would like to verify over a different time interval than is included in their forecast or observational dataset. The Ensemble-Stat tool will combine many forecasts into an ensemble mean or probability forecast. Additionally, if gridded or point observations are included, ensemble verification statistics are produced.
 
 .. _label:
-
-.. figure:: figure/MET_flowchart_v9.0.png
+.. figure:: figure/overview_fig1.png
 
 	    Figure 1.1 Basic representation of current MET structure and modules. Gray areas represent input and output files. Dark green areas represent reformatting and pre-processing tools. Light green areas represent plotting utilities. Blue areas represent statistical tools. Yellow areas represent aggregation and analysis tools.
 
