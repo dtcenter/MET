@@ -17,7 +17,7 @@
   <test name="tc_rmw_PRESSURE_LEV_OUT">
     <exec>&MET_BIN;/tc_rmw</exec>
     <param> \
-      -adeck &DATA_DIR;/adeck/aal142016_short.dat \
+      -deck &DATA_DIR;/adeck/aal142016_short.dat \
       -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
       -config &CONFIG_DIR;/TCRMWConfig_pressure_lev_out \
       -out &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.nc \
