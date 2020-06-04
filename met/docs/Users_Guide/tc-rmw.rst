@@ -61,7 +61,7 @@ cyclone = "";
 
 storm_name = "";
 
-init_time = "";
+init_inc = "";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 These options are used to filter input data down to a single storm track.
