@@ -19,14 +19,7 @@ void write_tc_tracks(NcFile* nc_out,
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
-    mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
-         << track_lines.n() << "\n";
-
     mlog << Debug(4) << track.serialize() << "\n";
-
-    for(int i = 0; i < track_lines.n(); i++) {
-        mlog << Debug(4) << track_lines[i] << "\n";
-    }
 
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
@@ -48,9 +41,6 @@ void write_tc_tracks(NcFile* nc_out,
     add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
     add_att(&track_mrd_var, "units", "nautical_miles");
     add_att(&track_mrd_var, "standard_name", "radius_max_wind");
-
-    mlog << Debug(2) << "write_tc_tracks:n_points:"
-         << track.n_points() << "\n";
 
     double* track_lat_data = new double[track.n_points()];
     double* track_lon_data = new double[track.n_points()];
@@ -101,7 +91,6 @@ set<string> get_pressure_level_strings(
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
@@ -123,7 +112,6 @@ set<double> get_pressure_levels(
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
