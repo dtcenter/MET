@@ -402,9 +402,6 @@ void process_track_files(const StringArray& files,
              << "filtering options to select a single track.\n\n";
     }
 
-    mlog << Debug(2) << "Processing 1 track consisting of "
-         << tracks[0].n_points() << " points.\n";
-
     return;
 }
 
@@ -501,11 +498,7 @@ void subset_tracks(TrackInfoArray &tracks) {
       }
 
       // Add the current track
-      if(cur.n_points() > 0) {
-         mlog << Debug(3)
-              << "Keeping Track: " << cur.serialize() << "\n";
-         tracks.add(cur);
-      }
+      if(cur.n_points() > 0) tracks.add(cur);
    }
 
    return;
@@ -715,18 +708,26 @@ void process_fields(const TrackInfoArray& tracks) {
     // Take only first track
     TrackInfo track = tracks[0];
 
+    mlog << Debug(2) << "Processing 1 track consisting of "
+         << track.n_points() << " points.\n";
+
     // Loop over track points
     for(int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
         long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
-        mlog << Debug(4) << "Track point (lat, lon) = ("
-             << point.lat() << ", " << point.lon() << ")\n";
+
+        mlog << Debug(3) << "[" << i_point+1 << " of "
+             << track.n_points()  << "] Processing track point valid at "
+             << unix_to_yyyymmdd_hhmmss(valid_time)
+             << " with center (lat, lon) = (" << point.lat() << ", "
+             << point.lon() << ").\n";
 
         // Set grid center
         grid_data.lat_center = point.lat();
-        grid_data.lon_center = - point.lon(); // internal sign change
+        grid_data.lon_center = -1.0*point.lon(); // internal sign change
+
         // RMW is same as mrd()
         grid_data.range_max_km = conf_info.rmw_scale *
             point.mrd() * tc_km_per_nautical_miles * conf_info.n_range;
@@ -747,22 +748,29 @@ void process_fields(const TrackInfoArray& tracks) {
             valid_time_var, valid_yyyymmddhh);
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-            // Get variable info
+
+            // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
+            data_info->set_valid(valid_time);
+
+            // Find data for this track point
             get_series_entry(i_point, data_info,
                 data_files, ftype, found_data_files,
                 data_dp, latlon_arr);
+
             // Check data range
             double data_min, data_max;
             data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
+
             // Regrid data
             data_dp = met_regrid(data_dp,
                 latlon_arr, grid, data_info->regrid());
             data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
+
             // Write data
             if (variable_levels[data_info->name()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
