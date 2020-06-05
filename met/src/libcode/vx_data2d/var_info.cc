@@ -30,6 +30,10 @@ using namespace std;
 #include "vx_log.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+
+int parse_set_attrs_flag(Dictionary *dict, const char *key);
+
+///////////////////////////////////////////////////////////////////////////////
 //
 //  Code for class VarInfo
 //
@@ -81,36 +85,56 @@ void VarInfo::init_from_scratch() {
 void VarInfo::assign(const VarInfo &v) {
 
    // Copy
-   MagicStr  = v.magic_str();
-   ReqName   = v.req_name();
-   Name      = v.name();
-   LongName  = v.long_name();
-   Units     = v.units();
-   Level     = v.level();
+   MagicStr  = v.MagicStr;
+   ReqName   = v.ReqName;
+   Name      = v.Name;
+   Units     = v.Units;
+   Level     = v.Level;
+   LongName  = v.LongName;
+   Ensemble  = v.Ensemble;
 
-   PFlag     = v.p_flag();
-   PName     = v.p_name();
-   PUnits    = v.p_units();
-   PThreshLo = v.p_thresh_lo();
-   PThreshHi = v.p_thresh_hi();
-   PAsScalar = v.p_as_scalar();
+   PFlag     = v.PFlag;
+   PName     = v.PName;
+   PUnits    = v.PUnits;
+   PThreshLo = v.PThreshLo;
+   PThreshHi = v.PThreshHi;
+   PAsScalar = v.PAsScalar;
 
-   UVIndex   = v.uv_index();
+   UVIndex   = v.UVIndex;
 
-   Init      = v.init();
-   Valid     = v.valid();
-   Lead      = v.lead();
-   Ensemble  = v.ens ();
+   Init      = v.Init;
+   Valid     = v.Valid;
+   Lead      = v.Lead;
 
    ConvertFx = v.ConvertFx;
 
-   CensorThresh = v.censor_thresh();
-   CensorVal    = v.censor_val();
+   CensorThresh = v.CensorThresh;
+   CensorVal    = v.CensorVal;
 
-   nBins = v.n_bins();
-   Range = v.range();
+   nBins = v.nBins;
+   Range = v.Range;
 
-   Regrid    = v.Regrid;
+   Regrid = v.Regrid;
+
+   SetAttrsName = v.SetAttrsName;
+   SetAttrsUnits = v.SetAttrsUnits;
+   SetAttrsLevel = v.SetAttrsLevel;
+   SetAttrsLongName = v.SetAttrsLongName;
+   SetAttrsEnsemble = v.SetAttrsEnsemble;
+   SetAttrsGrid = v.SetAttrsGrid;
+
+   SetAttrsInit = v.SetAttrsInit;
+   SetAttrsValid = v.SetAttrsValid;
+   SetAttrsLead = v.SetAttrsLead;
+
+   SetAttrsIsPrecipitation = v.SetAttrsIsPrecipitation;
+   SetAttrsIsSpecificHumidity = v.SetAttrsIsSpecificHumidity;
+   SetAttrsIsUWind = v.SetAttrsIsUWind;
+   SetAttrsIsVWind = v.SetAttrsIsVWind;
+   SetAttrsIsGridRelative = v.SetAttrsIsGridRelative;
+   SetAttrsIsWindSpeed = v.SetAttrsIsWindSpeed;
+   SetAttrsIsWindDirection = v.SetAttrsIsWindDirection;
+   SetAttrsIsProb = v.SetAttrsIsProb;
 
    return;
 }
@@ -150,6 +174,26 @@ void VarInfo::clear() {
    Range.clear();
 
    Regrid.clear();
+
+   SetAttrsName.clear();
+   SetAttrsUnits.clear();
+   SetAttrsLevel.clear();
+   SetAttrsLongName.clear();
+   SetAttrsEnsemble.clear();
+   SetAttrsGrid.clear();
+
+   SetAttrsInit = (unixtime) 0;
+   SetAttrsValid = (unixtime) 0;
+   SetAttrsLead = bad_data_int;
+
+   SetAttrsIsPrecipitation = bad_data_int;
+   SetAttrsIsSpecificHumidity = bad_data_int;
+   SetAttrsIsUWind = bad_data_int;
+   SetAttrsIsVWind = bad_data_int;
+   SetAttrsIsGridRelative = bad_data_int;
+   SetAttrsIsWindSpeed = bad_data_int;
+   SetAttrsIsWindDirection = bad_data_int;
+   SetAttrsIsProb = bad_data_int;
 
    return;
 }
@@ -380,10 +424,11 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_dict(Dictionary &dict) {
+   Dictionary * attrs_dict = (Dictionary *) 0;
    ThreshArray ta;
    NumArray na;
    ConcatString s;
-   bool f;
+   bool b;
    int n;
 
    // Set init time, if present
@@ -405,8 +450,8 @@ void VarInfo::set_dict(Dictionary &dict) {
    }
 
    // Parse prob_as_scalar, if present
-   f = dict.lookup_bool(conf_key_prob_as_scalar, false);
-   if(dict.last_lookup_status()) set_p_as_scalar(f);
+   b = dict.lookup_bool(conf_key_prob_as_scalar, false);
+   if(dict.last_lookup_status()) set_p_as_scalar(b);
 
    // Lookup conversion function, if present
    ConvertFx.set(dict.lookup(conf_key_convert));
@@ -439,6 +484,52 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);
+
+   // Parse set_attrs dictionary, if present
+   attrs_dict = dict.lookup_dictionary(conf_key_set_attrs, false);
+
+   if(attrs_dict) {
+
+      // Parse strings
+      SetAttrsName =
+         attrs_dict->lookup_string(conf_key_set_name, false);
+      SetAttrsUnits =
+         attrs_dict->lookup_string(conf_key_set_units, false);
+      SetAttrsLevel =
+         attrs_dict->lookup_string(conf_key_set_level, false);
+      SetAttrsLongName =
+         attrs_dict->lookup_string(conf_key_set_long_name, false);
+      SetAttrsEnsemble =
+         attrs_dict->lookup_string(conf_key_set_ensemble, false);
+      SetAttrsGrid =
+         attrs_dict->lookup_string(conf_key_set_grid, false);
+
+      // Parse times
+      s = attrs_dict->lookup_string(conf_key_set_init, false);
+      if(attrs_dict->last_lookup_status()) SetAttrsInit  = timestring_to_unix(s.c_str());
+      s = attrs_dict->lookup_string(conf_key_set_valid, false);
+      if(attrs_dict->last_lookup_status()) SetAttrsValid = timestring_to_unix(s.c_str());
+      s = attrs_dict->lookup_string(conf_key_set_lead, false);
+      if(attrs_dict->last_lookup_status()) SetAttrsLead  = timestring_to_sec(s.c_str());
+
+      // Parse flags
+      SetAttrsIsPrecipitation =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_precipitation);
+      SetAttrsIsSpecificHumidity =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_specific_humidity);
+      SetAttrsIsUWind =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_u_wind);
+      SetAttrsIsVWind =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_v_wind);
+      SetAttrsIsGridRelative =
+        parse_set_attrs_flag(attrs_dict, conf_key_is_grid_relative);
+      SetAttrsIsWindSpeed =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_wind_speed);
+      SetAttrsIsWindDirection =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_wind_direction);
+      SetAttrsIsProb =
+         parse_set_attrs_flag(attrs_dict, conf_key_is_prob);
+   }
 
    return;
 }
@@ -624,6 +715,14 @@ bool VarInfo::is_prob() {
    }
 
    return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int parse_set_attrs_flag(Dictionary *dict, const char *key) {
+   if(!dict) return(bad_data_int);
+   bool b = dict->lookup_bool(key, false);
+   return(dict->last_lookup_status() ? (int) b : bad_data_int);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

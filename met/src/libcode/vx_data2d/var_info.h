@@ -64,15 +64,18 @@ class VarInfo
       ConcatString  SetAttrsLevel;
       ConcatString  SetAttrsLongName; 
       ConcatString  SetAttrsEnsemble; 
+
+      ConcatString  SetAttrsGrid;
+
       unixtime      SetAttrsInit;
       unixtime      SetAttrsValid;
       int           SetAttrsLead;
-      ConcatString  SetAttrsGrid;
 
       int           SetAttrsIsPrecipitation;
       int           SetAttrsIsSpecificHumidity;
       int           SetAttrsIsUWind;
       int           SetAttrsIsVWind;
+      int           SetAttrsIsGridRelative;
       int           SetAttrsIsWindSpeed;
       int           SetAttrsIsWindDirection;
       int           SetAttrsIsProb;

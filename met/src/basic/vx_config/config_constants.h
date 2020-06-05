@@ -618,6 +618,28 @@ static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 
 //
+// Entries for set_attrs dictionary
+//
+static const char conf_key_set_attrs[]         = "set_attrs";
+static const char conf_key_set_name[]          = "set_name";
+static const char conf_key_set_units[]         = "set_units";
+static const char conf_key_set_level[]         = "set_level";
+static const char conf_key_set_long_name[]     = "set_long_name";
+static const char conf_key_set_ensemble[]      = "set_ensemble";
+static const char conf_key_set_grid[]          = "set_grid";
+static const char conf_key_set_init[]          = "set_init";
+static const char conf_key_set_valid[]         = "set_valid";
+static const char conf_key_set_lead[]          = "set_lead";
+static const char conf_key_is_precipitation[]  = "is_precipitation";
+static const char conf_key_is_specific_humidity[] = "is_specific_humidity";
+static const char conf_key_is_u_wind[]         = "is_u_wind";
+static const char conf_key_is_v_wind[]         = "is_v_wind";
+static const char conf_key_is_grid_relative[]  = "is_grid_relative";
+static const char conf_key_is_wind_speed[]     = "is_wind_speed";
+static const char conf_key_is_wind_direction[] = "is_wind_direction";
+static const char conf_key_is_prob[]           = "is_prob";
+
+//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
