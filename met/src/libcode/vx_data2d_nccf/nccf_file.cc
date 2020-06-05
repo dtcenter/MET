@@ -2771,29 +2771,28 @@ bool NcCfFile::get_grid_from_dimensions()
     // The lat/lon dimensions are identified by their units
 
     dim_name = _dims[dim_num]->getName().c_str();
-    coord_var = get_nc_var(_ncFile, dim_name.c_str());
-    if (IS_INVALID_NC(coord_var)) {
-       if ( dim_lat_nt ==dim_name) {
-          dim_name = var_lat_nt;
-          coord_var = get_nc_var(_ncFile, dim_name.c_str());
-       }
-       else if (dim_lon_nt == dim_name) {
-          dim_name = var_lon_nt;
-          coord_var = get_nc_var(_ncFile, dim_name.c_str());
-       }
+    if (!has_var(_ncFile, dim_name.c_str())) {
+      if ( dim_lat_nt == dim_name) {
+        dim_name = var_lat_nt;
+      }
+      else if (dim_lon_nt == dim_name) {
+        dim_name = var_lon_nt;
+      }
+      
+      if (!has_var(_ncFile, dim_name.c_str())) {
+        mlog << Debug(4) << method_name << " -> " << "The coordinate variable \""
+             << _dims[dim_num]->getName() << "\" does not exist.\n";
+        continue;
+      }
     }
+
+    coord_var = get_nc_var(_ncFile, dim_name.c_str());
     if (IS_INVALID_NC(coord_var))
       continue;
 
     if (!get_att_value_string(&coord_var, (string)"units", dim_units))
       continue;
 
-    //dim_units = get_att_value_chars(units_att);
-    ////dim_units = dim_units_str.c_str();
-    //if (dim_units.length() == 0)
-    //  continue;
-
-    //dim_units = dim_units_str.c_str();
     // See if this is a lat or lon dimension
 
     if (is_nc_unit_latitude(dim_units.c_str()))
