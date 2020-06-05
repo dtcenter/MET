@@ -1256,7 +1256,7 @@ void process_point_scores() {
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
 
       // Store the observation variable units
-      shc.set_obs_units(na_string);
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
