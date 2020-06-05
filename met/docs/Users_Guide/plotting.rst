@@ -156,7 +156,9 @@ plotMODEconfig mode_120000L_20050807_120000V_000000A_obj.nc
 
 In this example, the plot_mode_field tool will plot simple objects from an observed precipitation field using parameters from the configuration file plotMODEconfig and objects from the MODE output file mode_120000L_20050807_120000V_000000A_obj.nc. An example plot showing twelve simple observed precipitation objects is shown below. 
 
-Simple observed precipitation objects
+.. figure:: figure/plotting_fig1.png
+	    
+	    Figure 25.1 Simple observed precipitation objects
 
 Once MET has been applied to forecast and observed fields (or observing locations), and the output has been sorted through the Analysis Tool, numerous graphical and summary analyses can be performed depending on a specific user's needs. Here we give some examples of graphics and summary scores that one might wish to compute with the given output of MET and MET-TC. Any computing language could be used for this stage; some scripts will be provided on the MET users web page (https://dtcenter.org/community-code/model-evaluation-tools-met) as examples to assist users.
 
@@ -166,7 +168,9 @@ Once MET has been applied to forecast and observed fields (or observing location
 
 The plots in Figure [Gilbert_skill_score] show time series of frequency bias and Gilbert Skill Score, stratified according to time of day. This type of figure is particularly useful for diagnosing problems that are tied to the diurnal cycle. In this case, two of the models (green dash-dotted and black dotted lines) show an especially high Bias (near 3) during the afternoon (15-21 UTC; left panel), while the skill (GSS; right panel) appears to be best for the models represented by the solid black line and green dashed lines in the morning (09-15 UTC). Note that any judgment of skill based on GSS should be restricted to times when the Bias is close to one. 
 
-Time series of forecast area bias and Gilbert Skill Score for four model configurations (different lines) stratified by time-of-day.
+.. figure:: figure/plotting_fig2.gif
+
+	    Figure 25.2 Time series of forecast area bias and Gilbert Skill Score for four model configurations (different lines) stratified by time-of-day.
 
 25.2.2 MODE tool examples
 
@@ -174,11 +178,15 @@ When using the MODE tool, it is possible to think of matched objects as hits and
 
 Figure [verification] gives an example of two traditional verification scores (Bias and CSI) along with bar plots showing the total numbers of objects for the forecast and observed fields, as well as bar plots showing their total areas. These data are from the same set of 13-km WRF model runs analyzed in Figure [verification]. The model runs were initialized at 0 UTC and cover the period 15 July to 15 August 2005. For the forecast evaluation, we compared 3-hour accumulated precipitation for lead times of 3-24 hours to Stage II radar-gauge precipitation. Note that for the 3-hr lead time, indicated as the 0300 UTC valid time in Figure [Gilbert_skill_score], the Bias is significantly larger than the other lead times. This is evidenced by the fact that there are both a larger number of forecast objects, and a larger area of forecast objects for this lead time, and only for this lead time. Dashed lines show about 2 bootstrap standard deviations from the estimate.
 
+.. figure:: figure/plotting_fig3.gif
 
+	    Figure 25.3 Traditional verification scores applied to output of the MODE tool, computed by defining matched observed objects to be hits, unmatched observed objects to be misses, and unmatched forecast objects to be false alarms; weighted by object area. Bar plots show numbers (penultimate row) and areas (bottom row) of observed and forecast objects, respectively.
 
 In addition to the traditional scores, MODE output allows more information to be gleaned about forecast performance. It is even useful when computing the traditional scores to understand how much the forecasts are displaced in terms of both distance and direction. Figure [histogram], for example, shows circle histograms for matched objects. The petals show the percentage of times the forecast object centroids are at a given angle from the observed object centroids. In Figure [histogram] (top diagram) about 25% of the time the forecast object centroids are west of the observed object centroids, whereas in Figure [histogram] (bottom diagram) there is less bias in terms of the forecast objects' centroid locations compared to those of the observed objects, as evidenced by the petals' relatively similar lengths, and their relatively even dispersion around the circle. The colors on the petals represent the proportion of centroid distances within each colored bin along each direction. For example, Figure [histogram] (top row) shows that among the forecast object centroids that are located to the West of the observed object centroids, the greatest proportion of the separation distances (between the observed and forecast object centroids) is greater than 20 grid squares.
 
-
+.. figure:: figure/plotting_fig4.jpg
+	    
+	    Figure 25.4 Circle histograms showing object centroid angles and distances (see text for explanation).
 
 25.2.3 TC-Stat tool example
 
@@ -187,3 +195,11 @@ There is a basic R script located in the MET installation, share/met/Rscripts/pl
 In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the MET_INSTALL_DIR/share/met directory. In addition, the tc_stat tool under MET_INSTALL_DIR/bin must be in your system path.
 
 The supplied R script can generate a number of different plot types including boxplots, mean, median, rank, and relative performance. Pairwise differences can be plotted for the boxplots, mean, and median. Normal confidence intervals are applied to all figures unless the no_ci option is set to TRUE. Below are two example plots generated from the tools.
+
+.. figure:: figure/plotting_fig5.jpg
+
+	    Figure 25.5 Example boxplot from plot_tcmpr.R. Track error distributions by lead time for three operational models GFNI, GHMI, HFWI.
+
+.. figure:: figure/plotting_fig6.jpg
+
+	    Figure 25.6 Example mean intensity error with confidence intervals at 95% from plot_tcmpr.R. Raw intensity error by lead time for a homogeneous comparison of two operational models GHMI, HWFI.
