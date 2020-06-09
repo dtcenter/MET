@@ -129,7 +129,10 @@ Install the required libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to included the path to the library files.
 
-?? This needs to be underlined ?? Set Environment Variables
+.. role:: raw-html(raw)
+    :format: html  
+
+:raw-html:`<u>Set Environment Variables</u>`
 
 The MET build uses environment variables to specify the locations of the needed external libraries. For each library, there is a set of three environment variables to describe the locations: $MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
 
