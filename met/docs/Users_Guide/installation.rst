@@ -129,10 +129,8 @@ Install the required libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to included the path to the library files.
 
-.. role:: raw-html(raw)
-    :format: html  
-
-:raw-html:`<u>Set Environment Variables</u>`
+Set Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The MET build uses environment variables to specify the locations of the needed external libraries. For each library, there is a set of three environment variables to describe the locations: $MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
 
@@ -168,11 +166,8 @@ For more information about Python support in MET, please refer to [chap:App_F_Py
 
 For ease of use, you should define these in your .cshrc or equivalent file.
 
-.. role:: raw-html(raw)
-    :format: html  
-
-:raw-html:`<u>Configure and execute the build</u>`
-
+Configure and execute the build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
 
@@ -287,10 +282,8 @@ Disable use of BLOCK4 in the compilation. Use this if you have trouble using Pre
 
 Run the configure script with the --help argument to see the full list of configuration options.
 
-.. role:: raw-html(raw)
-    :format: html  
-
-:raw-html:`<u>Make Targets</u>`
+Make Targets
+~~~~~~~~~~~~
 
 The autoconf utility provides some standard make targets for the users. In MET, the following standard targets have been implemented and tested:
 
