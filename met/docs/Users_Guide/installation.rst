@@ -168,7 +168,11 @@ For more information about Python support in MET, please refer to [chap:App_F_Py
 
 For ease of use, you should define these in your .cshrc or equivalent file.
 
-?? underline?? Configure and execute the build
+.. role:: raw-html(raw)
+    :format: html  
+
+:raw-html:`<u>Configure and execute the build</u>`
+
 
 Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
 
@@ -283,7 +287,10 @@ Disable use of BLOCK4 in the compilation. Use this if you have trouble using Pre
 
 Run the configure script with the --help argument to see the full list of configuration options.
 
-??Underline?? Make Targets
+.. role:: raw-html(raw)
+    :format: html  
+
+:raw-html:`<u>Make Targets</u>`
 
 The autoconf utility provides some standard make targets for the users. In MET, the following standard targets have been implemented and tested:
 
