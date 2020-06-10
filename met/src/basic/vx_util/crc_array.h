@@ -123,8 +123,8 @@ class CRC_Array {
          //  do stuff
          //
 
-      bool has(const T &) const;
-      bool has(const T &, int & index) const;
+      bool has(const T &, bool forward=true) const;
+      bool has(const T &, int & index, bool forward=true) const;
 
       void add(const T &);
       void add(const CRC_Array <T> &);
@@ -444,19 +444,30 @@ return ( e[i] );
 
 template <typename T>
 
-bool CRC_Array<T>::has(const T & k) const
+bool CRC_Array<T>::has(const T & k, bool forward) const
 
 {
 
 int j;
-
-for (j=0; j<Nelements; ++j)  {
-
-   if ( e[j] == k )  return ( true );
-
+bool found = false;
+if (forward) {
+   for (j=0; j<Nelements; ++j)  {
+      if ( e[j] == k ) {
+          found = true;
+          break;
+      }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j)  {
+      if ( e[j] == k ) {
+          found = true;
+          break;
+      }
+   }
 }
 
-return ( false );
+return ( found );
 
 }
 
@@ -466,21 +477,27 @@ return ( false );
 
 template <typename T>
 
-bool CRC_Array<T>::has(const T & k, int & index) const
+bool CRC_Array<T>::has(const T & k, int & index, bool forward) const
 
 {
 
 int j;
+bool found = false;
 
 index = -1;
 
-for (j=0; j<Nelements; ++j)  {
-
-   if ( e[j] == k )  { index = j;  return ( true ); }
-
+if (forward) {
+   for (j=0; j<Nelements; ++j)  {
+      if ( e[j] == k )  { index = j; found = true; break; }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j)  {
+      if ( e[j] == k )  { index = j; found = true; break; }
+   }
 }
 
-return ( false );
+return ( found );
 
 }
 
