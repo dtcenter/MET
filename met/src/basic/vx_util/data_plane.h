@@ -71,6 +71,7 @@ class DataPlane {
       void set_size(int Nx, int Ny);
 
       void set(double, int, int);   //  x, y
+      void set_block(double *, int, int);   //  nx, ny
 
       void set_constant(double);
 
