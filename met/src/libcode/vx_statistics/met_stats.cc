@@ -1891,10 +1891,12 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
       }
 
       //
-      // If FSS cannot be aggregated numerically, just keep its current value
+      // If FSS cannot be aggregated numerically, just keep its current value.
+      // Or in the case of bad data, use the input FSS value.
       //
       if(is_bad_data(den) || is_eq(den, 0.0)) {
-         n_info.fss.v = fss.v;
+         n_info.fss.v = (is_bad_data(fss.v) ? c.fss.v : fss.v);
+
       }
       else {
          n_info.fss.v = 1.0 - n_info.fbs.v / den;
