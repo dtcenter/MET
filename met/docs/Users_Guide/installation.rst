@@ -299,6 +299,8 @@ MET also has the following non-standard targets:
 
 5. **test** - runs the scripts/test_all.sh script. You must run "make install" before using this target.
 
+.. _Sample Test cases:
+   
 Sample test cases
 _________________
 

@@ -257,14 +257,14 @@ Many of the MET tools use a configuration file to set parameters. This prevents 
 
 Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the chapters for those tools. In addition, these configuration settings are described in the share/met/config/README file and the share/met/config/README-TC file for the MET-Tropical Cyclone tools.
 
-
+.. _Data IO MET Configuration File Options:
 
 MET Configuration File Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The information listed below may also be found in the data/config/README file.
 
-
+.. _Data IO MET-TC Configuration File Options:
 
 MET-TC Configuration File Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
