@@ -212,6 +212,7 @@ class TrackPoint {
 
       const QuadInfo & operator[](int) const;
       unixtime         valid()         const;
+      int              valid_hour()    const;
       int              lead()          const;
       double           lat()           const;
       double           lon()           const;
@@ -260,6 +261,7 @@ inline void TrackPoint::set_warm_core(bool v)           { WarmCore  = v; }
 inline void TrackPoint::set_watch_warn(WatchWarnType t) { WatchWarn = t; }
 
 inline unixtime      TrackPoint::valid()      const { return(ValidTime); }
+inline int           TrackPoint::valid_hour() const { return(unix_to_sec_of_day(ValidTime)); }
 inline int           TrackPoint::lead()       const { return(LeadTime);  }
 inline double        TrackPoint::lat()        const { return(Lat);       }
 inline double        TrackPoint::lon()        const { return(Lon);       }

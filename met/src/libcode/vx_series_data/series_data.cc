@@ -30,9 +30,9 @@ void get_series_entry(int i_series, VarInfo* data_info,
    const StringArray& search_files, const GrdFileType type,
    StringArray& found_files, DataPlane& dp, Grid& grid) {
 
-   mlog << Debug(2)
+   mlog << Debug(3)
         << "Processing series entry " << i_series + 1 << ": "
-        << data_info->name() << ": " << data_info->magic_str() << "\n";
+        << data_info->magic_str() << "\n";
 
    ConcatString filename;
    filename = search_files[i_series];
