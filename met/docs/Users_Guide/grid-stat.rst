@@ -91,23 +91,31 @@ The following methods can all be computed efficiently by utilizing fast algorith
 
 Because these methods rely on the distance map, it is helpful to understand precisely what such maps do. Figure [Fig1_Grid-Stat] demonstrates the path of the shortest distance to the nearest event point in the event area A marked by the gray rectangle in the diagram. Note that the arrows all point to a grid point on the boundary of the event area A as it would be a longer distance to any point in its interior. Figure [Fig2_Grid-Stat] demonstrates the shortest distances from every grid point inside a second event area marked by the gray circle labeled B to the same event area A as in Figure [Fig1_Grid-Stat]. Note that all of the distances are to points on a small subsection (indicated by the yellow stretch) of the subset A.
 
+.. _grid-stat_fig1
+
 .. figure:: figure/grid-stat_fig1.png
 
-	    Figure 8.1 The above diagram depicts how a distance map is formed. From every grid point in the domain (depicted by the larger rectangle), the shortest distance from that grid to the nearest non-zero grid point (event; depicted by the gray rectangle labeled as A) is calculated (a sample of grid points with arrows indicate the path of the shortest distance with the length of the arrow equal to this distance. In a distance map, the value at each grid point is this distance. For example, grid points within the rectangle A will all have value zero in the distance map.
+   The above diagram depicts how a distance map is formed. From every grid point in the domain (depicted by the larger rectangle), the shortest distance from that grid to the nearest non-zero grid point (event; depicted by the gray rectangle labeled as A) is calculated (a sample of grid points with arrows indicate the path of the shortest distance with the length of the arrow equal to this distance. In a distance map, the value at each grid point is this distance. For example, grid points within the rectangle A will all have value zero in the distance map.
+
+.. _grid-stat_fig2
 
 .. figure:: figure/grid-stat_fig2.png
 
-	    Figure 8.2 Diagram depicting the shortest distances from one event area to another. The yellow bar indicates the part of the event area A to where all of the shortest distances from B are calculated. That is, the shortest distances from every point inside the set B to the set A all point to a point along the yellow bar.
+   Diagram depicting the shortest distances from one event area to another. The yellow bar indicates the part of the event area A to where all of the shortest distances from B are calculated. That is, the shortest distances from every point inside the set B to the set A all point to a point along the yellow bar.
 
 While Figure [Fig1_Grid-Stat] and Figure [Fig2_Grid-Stat] are helpful in illustrating the idea of a distance map, Figure [Fig3_Grid-Stat] shows an actual distance map calculated for binary fields consisting of circular event areas, where one field has two circular event areas labeled A, and the second has one circular event area labeled B. Notice that the values of the distance map inside the event areas are all zero (dark blue) and the distances grow larger in the pattern of concentric circles around these event areas as grid cells move further away. Finally, Figure [Fig4_Grid-Stat] depicts special situations from which the distance map measures to be discussed are calculated. In particular, the top left panel shows the absolute difference between the two distance maps presented in the bottom row of Figure [Fig3_Grid-Stat]. The top right panel shows the portion of the distance map for A that falls within the event area of B, and the bottom left depicts the portion of the distance map for B that falls within the event area A. That is, the first shows the shortest distances from every grid point in the set B to the nearest grid point in the event area A, and the latter shows the shortest distance from every grid point in A to the nearest grid point in B.
 
+.. _grid-stat_fig3
+
 .. figure:: figure/grid-stat_fig3.png
 
-	    Figure 8.3 Binary fields (top) with event areas A (consisting of two circular event areas) and a second field with event area B (single circular area) with their respective distance maps (bottom).
+   Binary fields (top) with event areas A (consisting of two circular event areas) and a second field with event area B (single circular area) with their respective distance maps (bottom).
+
+.. _grid-stat_fig4
 
 .. figure:: figure/grid-stat_fig4.png
 
-	    Figure 8.4 The absolute difference between the distance maps in the bottom row of Figure [Fig3_Grid-Stat] (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
+   The absolute difference between the distance maps in the bottom row of Figure [Fig3_Grid-Stat] (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
 The statistics derived from these distance maps are described in Appendix [sec:App_C-distance_maps]. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 

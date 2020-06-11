@@ -38,6 +38,8 @@ The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC, Pcp-
 
 .. _overview-figure:
 
+.. _overview_fig1
+
 .. figure:: figure/overview_fig1.png
 
    Basic representation of current MET structure and modules. Gray areas represent input and output files. Dark green areas represent reformatting and pre-processing tools. Light green areas represent plotting utilities. Blue areas represent statistical tools. Yellow areas represent aggregation and analysis tools.

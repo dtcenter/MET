@@ -455,10 +455,11 @@ modisfile
 
 In this example, the modis_regrid tool will process the Cloud_Fraction field from modisfile and write it out to the output NetCDF file t2.nc on the grid specified in grid_file using the appropriate scale, offset and fill values.
 
-.. _label:
+.. _reformat_grid_fig1
+
 .. figure:: figure/reformat_grid_fig1.png
 
-	    Figure 5.1 Example plot showing surface temperature from a MODIS file.
+   Example plot showing surface temperature from a MODIS file.
 
 5.5 WWMCA Tool Documentation
 
@@ -498,10 +499,11 @@ Optional arguments for wwmca_plot
 
 5. The -v level option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-.. _label:
+.. _reformat_grid_fig2
+
 .. figure:: figure/reformat_grid_fig2.png
 	    
-	    Figure 5.2 Example output of {\tt wwmca\_plot} tool.
+   Example output of {\tt wwmca\_plot} tool.
 
 5.5.2 wwmca_regrid usage
 
