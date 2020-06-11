@@ -32,13 +32,13 @@ ENV F77 /usr/bin/gfortran
 # Define package URL's.
 #
 ENV HDF4_URL       http://www.hdfgroup.org/ftp/HDF/releases/HDF4.2r3/src/HDF4.2r3.tar.gz
-ENV HDFEOS_URL     http://www.dtcenter.org/met/users/support/online_tutorial/docker_data/HDF-EOS2.16v1.00.tar.Z
+ENV HDFEOS_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/HDF-EOS2.16v1.00.tar.Z
 
 ENV NETCDF4C_URL   https://github.com/Unidata/netcdf-c/archive/v4.4.1.1.zip
 ENV NETCDF4CXX_URL https://github.com/Unidata/netcdf-cxx4/archive/v4.3.0.tar.gz
 
-ENV BUFRLIB_URL    http://www.dtcenter.org/met/users/support/online_tutorial/docker_data/BUFRLIB_v10-2-3.tar
-ENV GSFONT_URL     http://www.dtcenter.org/met/users/support/online_tutorial/docker_data/ghostscript-fonts-std-8.11.tar.gz
+ENV BUFRLIB_URL    https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/BUFRLIB_v10-2-3.tar
+ENV GSFONT_URL     https://dtcenter.ucar.edu/dfiles/code/METplus/MET/docker_data/ghostscript-fonts-std-8.11.tar.gz
 
 #
 # Install the required packages.

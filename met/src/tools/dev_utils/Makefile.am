@@ -16,11 +16,11 @@ else
 BLIB_NAME = -lbufr
 endif
 
-#SUBDIRS	=shapefiles
+SUBDIRS	= shapefiles
 
 # The programs
 
-bin_PROGRAMS    = chk4copyright \
+bin_PROGRAMS = chk4copyright \
 	reformat_map_data \
 	reformat_county_data \
 	pbtime  \
