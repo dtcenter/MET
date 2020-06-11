@@ -3,7 +3,7 @@
 Re-Formatting of Point Observations
 ===================================
 
-There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in Figure [Fig_Overview_MET_Overview_Flowchart]. The software tools used to reformat point data are described in this chapter.
+There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in :numref:`overview-figure`. The software tools used to reformat point data are described in this chapter.
 
 .. _PB2NC tool:
 

@@ -875,7 +875,7 @@ The Baddeley's \Delta Metric is given by
 
 where d(s,\cdot)is the distance map for the respective event area, w(\cdot) is an optional concave function (i.e., w(t+u)\leq w(t)+w(u)) that is strictly increasing at zero with w(t)=0 if and only if t=0, N is the size of the domain, and p is a user chosen parameter for the L_{p} norm. The default choice of p=2 corresponds to a Euclidean average, p=1 is a simple average of the difference in distance maps, and the limiting case of p=\infty gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as H(A,B), and is the metric that motivated the development of Baddeley’s \Delta metric. A typical choice, and the only available with MET, for w(\cdot) is w(t)=\min\{t,c\}, where c is a user-chosen constant with c=\infty meaning that w(\cdot) is not applied. This choice of w(\cdot) provides a cutoff for distances beyond the pre-specified amount given by c. 
 
-In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in Figure [Fig4_Grid-Stat] provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of Figure [Fig3_Grid-Stat] would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of Figure [Fig4_Grid-Stat]. 
+In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in :numref:`grid_stat_fig4` provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of :numref:`grid_stat_fig3` would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of :numref:`grid_stat_fig4`. 
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -895,7 +895,7 @@ Unlike Baddeley’s \Delta metric, the MED is not a mathematical metric because 
 
 \begin{eqnarray*}
 
-\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in Figure [Fig4_Grid-Stat] (top right), and MED(B,A) is the average of the values in Figure [Fig4_Grid-Stat] (bottom left). Note that the average is only over the circular regions depicted in the figure. 
+\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in :numref:`grid_stat_fig4` (top right), and MED(B,A) is the average of the values in :numref:`grid_stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
 
 The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -909,7 +909,7 @@ Pratt’s Figure of Merit (FOM) is given by
 
 where n_{A} and n_{B} are the number of events within event areas A and B, respectively, d(s,A) is the distance map related to the event area A, and \alpha is a user-defined scaling constant. The default, and usual choice, is \alpha=\frac{1}{9} when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
 
-Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of Figure [Fig4_Grid-Stat]. 
+Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of :numref:`grid_stat_fig4`. 
 
 The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 

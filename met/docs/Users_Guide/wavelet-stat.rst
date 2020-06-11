@@ -73,37 +73,37 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     - b+d
     - a+b+c+d
 
-.. _wavelett-stat_fig1
+.. _wavelet-stat_fig1
 
-.. figure:: figure/wavelett-stat_fig1.png
+.. figure:: figure/wavelet-stat_fig1.png
 
    NIMROD 3h lead-time forecast and corresponding verifying analysis field (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast and analysis binary fields obtained for a threshold of 1mm/h, the binary field difference has their corresponding Contingency Table Image (see Table [contingency_table_counts]). The forecast shows a storm of 160 km displaced almost its entire length.
 
-.. _wavelett-stat_fig2a
+.. _wavelet-stat_fig2a
 
-.. figure:: figure/wavelett-stat_fig2a.png
+.. figure:: figure/wavelet-stat_fig2a.png
 
-.. _wavelett-stat_fig2b
+.. _wavelet-stat_fig2b
 
-.. figure:: figure/wavelett-stat_fig2b.png
+.. figure:: figure/wavelet-stat_fig2b.png
 
    NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
 
-.. _wavelett-stat_fig3
+.. _wavelet-stat_fig3
 
-.. figure:: figure/wavelett-stat_fig3.png
+.. figure:: figure/wavelet-stat_fig3.png
 
    NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost of its entire length.
 
-.. _wavelett-stat_fig4
+.. _wavelet-stat_fig4
 
-.. figure:: figure/wavelett-stat_fig4.png
+.. figure:: figure/wavelet-stat_fig4.png
 
    MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated to the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated to the displaced storm.
 
-.. _wavelett-stat_fig5
+.. _wavelet-stat_fig5
 
-.. figure:: figure/wavelett-stat_fig5.png
+.. figure:: figure/wavelet-stat_fig5.png
 
    Intensity-Scale skill score for the NIMROD forecast and analysis shown in Figure [NIMROD_3h_fcst]. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated to the scale 6 = 160 km, for the thresholds to 4 mm/h, associated to the displaced storm.
 
@@ -125,9 +125,9 @@ Note that the energy squared of the observation binary field is identical to the
 
 The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of 2n x 2n grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions 2n x 2n over the input domain in the following ways:
 
-.. _wavelett-stat_fig6
+.. _wavelet-stat_fig6
 
-.. figure:: figure/wavelett-stat_fig6.png
+.. figure:: figure/wavelet-stat_fig6.png
 	    
    Energy squared and energy squared perentages, for each threshold and sale, for the NIMROD foreast and analysis, and foreast and analysis En2 and En2% relative differences.  ?? This figure is no longer in the lyx documentation MET_Users_Guide_Master.lyx but it's still showing up on the old web page, page 261.  Should it be removed? https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf  ??
 	    
