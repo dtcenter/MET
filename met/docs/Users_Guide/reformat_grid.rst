@@ -3,7 +3,7 @@
 Chapter 5 Re-Formatting of Gridded Fields
 =========================================
 
-Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in :numref:`overview-figure`.
+Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in ::numref:`overview`.
 
 5.1 Pcp-Combine tool
 ____________________

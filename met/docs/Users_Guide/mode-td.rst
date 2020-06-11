@@ -11,13 +11,13 @@ _________________
 
 MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method in inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
 
-.. _mode-td_fig1
+.. _mtd-3d_color
 
-.. figure:: figure/mode-td_fig1.png
+.. figure:: figure/mtd-3d_color.png
 	    
    MTD Spacetime Objects
 
-A plot of some MTD precipitation objects is shown over the United States in Figure [MTD_3d_color_fig]. The colors indicate longitude, with red in the east moving through the spectrum to blue in the west. Time increases vertically in this plot (and in most of the spacetime diagrams in this users' guide). A few things are worthy of note in this figure. First, the tendency of storm systems to move from west to east over time shows up clearly. Second, tracking of storm objects over time is easily done: if we want to know if a storm at one time is a later version of a storm at an earlier time, we need only see if they are part of the same 3D spacetime object. Lastly, storms splitting up or merging over time are handled easily by this method.
+A plot of some MTD precipitation objects is shown over the United States in :numref:`mtd-3d_color`. The colors indicate longitude, with red in the east moving through the spectrum to blue in the west. Time increases vertically in this plot (and in most of the spacetime diagrams in this users' guide). A few things are worthy of note in this figure. First, the tendency of storm systems to move from west to east over time shows up clearly. Second, tracking of storm objects over time is easily done: if we want to know if a storm at one time is a later version of a storm at an earlier time, we need only see if they are part of the same 3D spacetime object. Lastly, storms splitting up or merging over time are handled easily by this method.
 
 The 2D (or traditional) MODE approach to object-base verification enabled users to analyze forecasts in terms of location errors, intensity errors and shape, size and orientation errors. MTD retains all of that capability, and adds new classes of forecast errors involving time information: speed and direction errors, buildup and decay errors, and timing and duration errors. This opens up new ways of analyzing forecast quality.
 
@@ -43,7 +43,7 @@ First, MTD typically reads in several planes of data for each data field—one p
 
 Because of this, the developers decided to make several changes in the way convolution was performed in MTD. Most of the differences come from the need to make the convolution step as fast as possible.
 
-The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted $R$, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is $(2 R + 1) \times (2 R + 1)$, as shown in Figure [MTD_two_r_plus_one].
+The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted $R$, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is $(2 R + 1) \times (2 R + 1)$, as shown in :numref:`mtd-two_r_plus_one`.
 
 .. _mode-td_fig2
 
@@ -59,21 +59,21 @@ MTD calculates several 3D attributes for single objects. The object could come f
 
 A 3D spacetime {\bf centroid} $(\overline{x}, \overline{y}, \overline{t})$ is calculated. There are no statistical overtones here. The number $\overline{x}$, for example, is just the average value of the $x$ coordinate over the object.
 
-The vector {\bf velocity} $(v_x, v_y)$ is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See Figure [MTD_velocity] for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the {\bf speed} and {\bf direction} of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
+The vector {\bf velocity} $(v_x, v_y)$ is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the {\bf speed} and {\bf direction} of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
 
-.. _mode-td_fig3
+.. _mtd-velocity
 
-.. figure:: figure/mode-td_fig3.png
+.. figure:: figure/mtd-velocity.png
 	    
    Velocity
 
 The spatial orientation of a object (what traditional MODE calls the axis angle of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
 
-Figure [MTD_axis_3d] gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, i.e., axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
+:numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, i.e., axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
 
-.. _mode-td_fig4
+.. _mtd-axis_3d
 
-.. figure:: figure/mode-td_fig4.png
+.. figure:: figure/mtd-axis_3d.png
 
    3D axis
 
@@ -97,7 +97,7 @@ $$
 
 The {\bf time centroid delta} is the difference between the time coordinates of the centroid. Since this is a simple difference, it can be either positive or negative.
 
-The {\bf axis difference} is smaller of the two angles that the two spatial axis planes make with each other. Figure [MTD_axis_diff] shows the idea. In the figure, the axis angle would be reported as angle $\alpha$, not angle $\beta$.
+The {\bf axis difference} is smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle $\alpha$, not angle $\beta$.
 
 {\bf Speed delta} and {\bf direction difference} are obtained from the velocity vectors of the two objects. Speed delta is the difference in the lengths of the vectors, and direction difference is the angle that the two vectors make with each other.
 
@@ -111,9 +111,9 @@ The {\bf axis difference} is smaller of the two angles that the two spatial axis
 
 Finally, the {\bf total interest}  gives the result of the fuzzy-logic matching and merging calculation for this pair of objects. Note that this is provided only for simple objects, not for clusters.
 
-.. _mode-td_fig5
+.. _mtd-axis_diff
 
-.. figure:: figure/mode-td_fig5.png
+.. figure:: figure/mtd-axis_diff.png
 
    Axis Angle Difference
 
@@ -122,7 +122,7 @@ Finally, the {\bf total interest}  gives the result of the fuzzy-logic matching 
 
 The final category of object attributes calculated by MTD are two-dimensional spatial attributes for horizontal (i.e., constant-time) slices of a spacetime object. This is so that the behavior of these attributes over time can be examined. These 2D constant-time attributes are written out for both simple and cluster objects.
 
-For example, in our earlier discussion relating to Figure [MTD_axis_3d], we mentioned that for simplicity, the object in the figure was not allowed to rotate as it moved. But what if the object (a hurricane, for example) is rotating over time? In that case, it's probably not meaningful to assign a single spatial orientation to the object over its entire lifetime. If we had a spatial axis angle at each time, however, then we could fit a model such as $\theta = \theta_0 + \omega t$ to the angles and test the goodness of fit.
+For example, in our earlier discussion relating to :numref:`mtd-axis_3d`, we mentioned that for simplicity, the object in the figure was not allowed to rotate as it moved. But what if the object (a hurricane, for example) is rotating over time? In that case, it's probably not meaningful to assign a single spatial orientation to the object over its entire lifetime. If we had a spatial axis angle at each time, however, then we could fit a model such as $\theta = \theta_0 + \omega t$ to the angles and test the goodness of fit.
 
 For such reasons, having 2D spatial attributes (as in MODE) for each object at each time step can be useful. The list of the 2D attributes calculated is:
 
@@ -138,19 +138,19 @@ For such reasons, having 2D spatial attributes (as in MODE) for each object at e
 
 Matching and merging operations in MTD are done in a simpler fashion than in MODE. In order to understand this operation, it is necessary to discuss some very basic notions of graph theory.
 
-A {\bf graph} is a finite set of {\bf vertices} (also called {\bf nodes}) and {\bf edges}, with each edge connecting two vertices. Conceptually, it is enough for our purposes to think of vertices as points and edges as lines connecting them. See Figure [MTD_basic_graph] for an illustration. In the figure we see a collection of 11 nodes, indicated by the small circles, together with some edges indicated by straight line segments. A {\bf path} is a sequence of vertices $(v_1, v_2, \ldots, v_n)$ such that for each $1 \leq i < n$ there is an edge connecting $v_i$ to $v_{i + 1}$. For example, in Figure [MTD_basic_graph], there is no edge connecting vertices #6 and #7, but there is a path connecting them. In illustrations, graph vertices are often labelled with identifying information, such as the numbers in Figure [MTD_basic_graph].
+A {\bf graph} is a finite set of {\bf vertices} (also called {\bf nodes}) and {\bf edges}, with each edge connecting two vertices. Conceptually, it is enough for our purposes to think of vertices as points and edges as lines connecting them. See :numref:`mtd-basic_graph` for an illustration. In the figure we see a collection of 11 nodes, indicated by the small circles, together with some edges indicated by straight line segments. A {\bf path} is a sequence of vertices $(v_1, v_2, \ldots, v_n)$ such that for each $1 \leq i < n$ there is an edge connecting $v_i$ to $v_{i + 1}$. For example, in :numref:`mtd-basic_graph`, there is no edge connecting vertices #6 and #7, but there is a path connecting them. In illustrations, graph vertices are often labelled with identifying information, such as the numbers in :numref:`mtd-basic_graph`.
 
-If we consider two distinct nodes in a graph to be related if there is a path connecting them, then it's easy to see that this defines an equivalence relation on the set of nodes, partitioning the graph into equivalence classes. Any node, such as #10 in Figure [MTD_basic_graph], that has no edges emanating from it is in a class by itself.
+If we consider two distinct nodes in a graph to be related if there is a path connecting them, then it's easy to see that this defines an equivalence relation on the set of nodes, partitioning the graph into equivalence classes. Any node, such as #10 in :numref:`mtd-basic_graph`, that has no edges emanating from it is in a class by itself.
 
-.. _mode-td_fig6
+.. _mtd-basic_graph
 
-.. figure:: figure/mode-td_fig6.png
+.. figure:: figure/mtd-basic_graph.png
 
    Basic Graph Example
 
 We have barely scratched the surface of the enormous subject of graph theory, but this will suffice for our purposes. How does MTD use graphs? Essentially the simple forecast and observed objects become nodes in a graph. Each pair of objects that have sufficiently high total interest (as determined by the fuzzy logic engine) generates an edge connecting the two corresponding nodes in the graph. The graph is then partitioned into equivalence classes using path connectivity (as explained above), and the resulting equivalence classes determine the matches and merges.
 
-An example will hopefully make this clear. In parts (a) and (b) of Figure [MTD_2d_example] we indicate the objects in the forecast and observed field for this simple example. We have used 2D rather than 3D objects in this example for simplicity. Also, to help distinguish the objects in each field, the forecast objects are labelled by numbers and the observed object by letters. Each forecast and each observed object become nodes in a graph as indicated in part (c) of the figure.
+An example will hopefully make this clear. In parts (a) and (b) of :numref:`mtd-2d_example` we indicate the objects in the forecast and observed field for this simple example. We have used 2D rather than 3D objects in this example for simplicity. Also, to help distinguish the objects in each field, the forecast objects are labelled by numbers and the observed object by letters. Each forecast and each observed object become nodes in a graph as indicated in part (c) of the figure.
 
 For the purposes of this example, suppose that the MTD fuzzy engine reports that observed simple object B and forecast simple object 4 together have a total interest higher than the total interest threshold specified in the config file. Also, observed simple object C and forecast simple object 4 have high enough interest to pass the threshold. Furthermore, forecast simple objects 2 and 3 both have sufficiently high interest when paired with observed simple object A.
 
@@ -162,9 +162,9 @@ Forecast cluster object #3 consists solely of forecast simple object 1. It is no
 
 To summarize: Any forecast simple objects that find themselves in the same equivalence class are merged. Similarly, any observed objects in the same class are merged. Any forecast and observed objects in the same class are matched. 
 
-.. _mode-td_fig7
+.. _mtd-2d_example
 
-.. figure:: figure/mode-td_fig7.png
+.. figure:: figure/mtd-2d_example.png
 
    Match & Merge Example
 

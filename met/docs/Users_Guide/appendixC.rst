@@ -685,9 +685,9 @@ The reliability diagram is a plot of the observed frequency of events versus the
 
 The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.\arabic{figure}} 
 
-.. _appendixC_fig1
+.. _appendixC-rel_diag
 
-.. figure:: figure/appendixC_fig1.jpg
+.. figure:: figure/appendixC-rel_diag.jpg
 	    
 	    Figure C.1 Example of Reliability Diagram
 
@@ -699,9 +699,9 @@ An ROC plot is shown for an example set of forecasts, with a solid line connecti
 
 An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.2} 
 
-.. _appendixC_fig2
+.. _appendixC-roc_example
 
-.. figure:: figure/appendixC_fig2.jpg
+.. figure:: figure/appendixC-roc_example.jpg
 	    
 	    Figure C.2 Example of ROC Curve
 

@@ -12,7 +12,7 @@ The following chapters provide an overview of MET-TC and its components, as well
 
 18.2 MET-TC components
 
-The MET tools used in the verification of Tropical Cyclones are referred to as MET-TC. These tools are shown across the bottom of the flowchart in :numref:`overview-figure`. The MET-TC tools are described in more detail in later chapters.
+The MET tools used in the verification of Tropical Cyclones are referred to as MET-TC. These tools are shown across the bottom of the flowchart in ::numref:`overview`. The MET-TC tools are described in more detail in later chapters.
 
 The TC-Dland tool is used to generate a gridded file that determines the location of coastlines and islands, and is used as input to the TC-Pairs tool to determine the distance from land of a particular track point. The TC-Pairs tool matches pairs of input model data and BEST track (or any reference forecast) and calculates position errors. The TC-Stat tool uses the TC-Pairs output to perform filter and summary jobs over the matched pair dataset. The TC-Gen tool performs a categorical analysis for tropical cyclone genesis forecasts. The TC-RMW tool performs a coordinate transformation of gridded model data, centered on the storm's location. The RMW-Analysis tool aggregates TC-RMW output across multiple cases.
 
