@@ -1,21 +1,21 @@
 .. _grid-stat:
 
-Chapter 8 Grid-Stat Tool
-========================
+Grid-Stat Tool
+==============
 
-8.1 Introduction
-________________
+Introduction
+____________
 
 The Grid-Stat tool provides verification statistics for a matched forecast and observation grid. All of the forecast grid points in the region of interest are matched to observation grid points on the same grid. All the matched grid points are used to compute the verification statistics. The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that no interpolation is required because the forecasts and observations are on the same grid. However, the interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this chapter, followed by practical details regarding usage and output from the tool.
 
-8.2 Scientific and statistical aspects
-______________________________________
+Scientific and statistical aspects
+__________________________________
 
 
-8.2.1 Statistical measures
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Statistical measures
+~~~~~~~~~~~~~~~~~~~~
 
 The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in Appendix [chap:App_C-Verification-Measures]. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2012), and on the world-wide web at
 
@@ -24,16 +24,19 @@ http://www.cawcr.gov.au/projects/verification/verif_web_page.html.
 In addition to these verification measures, the Grid-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in Appendix [chap:App_C-Verification-Measures].
 
 Measures for categorical variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. Grid-Stat computes both 2x2 and multi-category contingency tables and their associated statistics, similar to Point-Stat. See Appendix [chap:App_C-Verification-Measures] for more information.
 
 Measures for continuous variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See Appendix [chap:App_C-Verification-Measures] for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See Appendix [chap:App_C-Verification-Measures] for specific information.
 
@@ -42,25 +45,27 @@ Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 
 In METv6.0, when the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities.For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
 Use of a climatology field for comparative verification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Grid-Stat tool allows evaluation of model forecasts compared with a user-supplied climatology. Prior to calculation of statistics, the climatology must be put on the same grid as the forecasts and observations. In particular, the anomaly correlation and mean squared error skill score provide a measure of the forecast skill versus the climatology. For more details about climatological comparisons and reference forecasts, see the relevant section in the Point-Stat Chapter, Section [subsec:Climatology]
 
 Use of analysis fields for verification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Grid-Stat tool allows evaluation of model forecasts using model analysis fields. However, users are cautioned that an analysis field is not independent of its parent model; for this reason verification of model output using an analysis field from the same model is generally not recommended and is not likely to yield meaningful information about model performance.
 
-8.2.2 Statistical confidence intervals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Statistical confidence intervals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., Efron 2007). See Appendix [chap:App_D-Confidence-Intervals] for details regarding confidence intervals provided by MET.
 
-8.2.3 Grid weighting
-~~~~~~~~~~~~~~~~~~~~
+Grid weighting
+~~~~~~~~~~~~~~
 
 When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See [subsec:IO_General-MET-Config-Options]for more information.
 
-8.2.4 Neighborhood methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Neighborhood methods
+~~~~~~~~~~~~~~~~~~~~
 
 MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as “fuzzy” verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
 
@@ -68,8 +73,8 @@ There are several ways to present the results of the neighborhood approaches, su
 
 The user must specify several parameters in the grid_stat configuration file to utilize the neighborhood approach, such as the interpolation method, size of the smoothing window, and required fraction of valid data points within the smoothing window. For FSS-specific results, the user must specify the size of the neighborhood window, the required fraction of valid data points within the window, and the fractional coverage threshold from which the contingency tables are defined. These parameters are described further in the practical information section below.
 
-8.2.5 Fourier Decomposition
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fourier Decomposition
+~~~~~~~~~~~~~~~~~~~~~
 
 The MET software will compute the full one-dimensional Fourier transform, then do a partial inverse transform based on the two user-defined wave numbers. These two wave numbers define a band pass filter in the Fourier domain. This process is conceptually similar to the operation of projecting onto subspace in linear algebra. If one were to sum up all possible wave numbers the result would be to simply reproduce the raw data.
 
@@ -77,15 +82,15 @@ Decomposition via Fourier transform allows the user to evaluate the model separa
 
 Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (Casati et al, 2004; Weniger et al 2016). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
-8.2.6 Gradient Statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Gradient Statistics
+~~~~~~~~~~~~~~~~~~~
 
 The S1 score has been in historical use for verification of forecasts, particularly for variables such as pressure and geopotential height. This score compares differences between adjacent grid points in the forecast and observed fields. When the adjacent points in both forecast and observed fields exhibit the same differences, the S1 score will be the perfect value of 0. Larger differences will result in a larger score.
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
-8.2.7 Distance Maps
-~~~~~~~~~~~~~~~~~~~
+Distance Maps
+~~~~~~~~~~~~~
 
 The following methods can all be computed efficiently by utilizing fast algorithms developed for calculating distance maps. A distance map results from calculating the shortest distance from every grid point, s=(x,y), in the domain, D, to the nearest one-valued grid point. In each of the following, it is understood that they are calculated between event areas A, from one field and observation event areas B from another. If the measure is applied to a feature within a field, then the distance map is still calculated over the entire original domain. Some of the distance map statistics are computed over the entire distance map, while others use only parts of it.
 
@@ -111,15 +116,15 @@ While Figure [Fig1_Grid-Stat] and Figure [Fig2_Grid-Stat] are helpful in illustr
 
 The statistics derived from these distance maps are described in Appendix [sec:App_C-distance_maps]. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 
-8.3 Practical information
-_________________________
+Practical information
+_____________________
 
 This section contains information about configuring and running the Grid-Stat tool. The Grid-Stat tool verifies gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported file formats. The requirement of having all gridded fields using the same grid specification was removed in METv5.1. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded observation data may be a gridded analysis based on observations such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used.
 
 The Grid-Stat tool provides the capability of verifying one or more model variables/levels using multiple thresholds for each model variable/level. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. The interpolation parameters may be used to perform a smoothing operation on the forecast field prior to verifying it to investigate how the scale of the forecast affects the verification statistics. The Grid-Stat tool computes a number of continuous statistics for the forecast minus observation differences, discrete statistics once the data have been thresholded, or statistics for probabilistic forecasts. All types of statistics can incorporate a climatological reference.
 
-8.3.1 grid_stat usage
-~~~~~~~~~~~~~~~~~~~~~
+grid_stat usage
+~~~~~~~~~~~~~~~
 
 The usage statement for the Grid-Stat tool is listed below:
 
@@ -142,6 +147,7 @@ Usage: grid_stat
 grid_stat has three required arguments and accepts several optional ones.
 
 Required arguments for grid_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The fcst_file argument indicates the gridded file containing the model data to be verified.
 
@@ -149,7 +155,8 @@ Required arguments for grid_stat
 
 3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-   Optional arguments for grid_stat
+Optional arguments for grid_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The -outdir path indicates the directory where output files should be written.
 
@@ -179,12 +186,14 @@ GridStatConfig
 
 In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
 
-8.3.2 grid_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+grid_stat configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed share/met/config directory. Other versions of the configuration file are included in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
 Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
+
+__________________________
 
 model          = "WRF";
 
@@ -232,6 +241,8 @@ version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
+___________________________
+
 nbrhd = {
 
 field      = BOTH;
@@ -255,6 +266,8 @@ The vld_thresh entry contains a number between 0 and 1. When performing neighbor
 
 The cov_thresh entry contains a comma separated list of thresholds to be applied to the neighborhood coverage field. The coverage is the proportion of forecast points in the neighborhood that exceed the forecast threshold. For example, if 10 of the 25 forecast grid points contain values larger than a threshold of 2, then the coverage is 10/25 = 0.4. If the coverage threshold is set to 0.5, then this neighborhood is considered to be a “No” forecast.
 
+___________________
+
 fourier = {
 
 wave_1d_beg = [ 0, 4, 10 ];
@@ -268,6 +281,8 @@ The fourier entry is a dictionary which specifies the application of the Fourier
 
 The wave_1d_beg entry is an array of integers specifying the first wave number to be included. The wave_1d_end entry is an array of integers specifying the last wave number to be included.
 
+_____________________
+
 grad = {
 
 dx = [ 1 ];
@@ -279,6 +294,8 @@ dy = [ 1 ];
 
 
 The gradient entry is a dictionary which specifies the number and size of gradients to be computed. The dx and dy entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. dx and dy are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each obs.field entry.
+
+____________________
 
 distance_map = {
 
@@ -293,6 +310,8 @@ zhu_weight        = 0.5;
                }
 
 The distance_map entry is a dictionary containing options related to the distance map statistics in the DMAP output line type. The baddeley_p entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley \Delta metric. The baddeley_max_dist entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of NA indicates that no maximum distance value should be used. The fom_alpha entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The zhu_weight specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each obs.field entry.
+
+_____________________
 
  output_flag = {
 
@@ -389,6 +408,7 @@ The output_flag array controls the type of output that the Grid-Stat tool genera
 
 Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section [subsec:grid_stat-output].
 
+_____________________
 
 nc_pairs_flag = {
 
@@ -419,21 +439,23 @@ The nc_pairs_flag entry may either be set to a boolean value or a dictionary spe
 
 Setting the climo_cdp entry to TRUE enables the creation of an output variable for each climatological distribution percentile (CDP) threshold requested in the configuration file. Note that enabling nbrhd output may lead to very large output files. The gradient entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The distance_map entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The apply_mask entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
 
+______________________
+
 nc_pairs_var_name = "";
 
 
 The nc_pairs_var_name entry specifies a string for each verification task. This string is parsed from each obs.field dictionary entry and is used to construct variable names for the NetCDF matched pairs output file. The default value of an empty string indicates that the name and level strings of the input data should be used. If the input data level string changes for each run of Grid-Stat, using this option to define a constant string may make downstream processing more convenient.
 
 
-
+_____________________
 
 nc_pairs_var_suffix = "";
 
 
 The nc_pairs_var_suffix entry is similar to the nc_pairs_var_name entry. It is also parsed from each obs.field dictionary entry. However, it defines a suffix to be appended to the output variable name. This enables the output variable names to be made unique. For example, when verifying height for multiple level types but all with the same level value, use this option to customize the output variable names. This option was previously named nc_pairs_var_str which is now deprecated.
 
-8.3.3 grid_stat output
-~~~~~~~~~~~~~~~~~~~~~~
+grid_stat output
+~~~~~~~~~~~~~~~~
 
 grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 

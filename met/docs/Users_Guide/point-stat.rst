@@ -3,8 +3,8 @@
 Point-Stat Tool
 ===============
 
-7.1 Introduction
-________________
+Introduction
+____________
 
 The Point-Stat tool provides verification statistics for forecasts at observation points (as opposed to over gridded analyses). The Point-Stat tool matches gridded forecasts to point observation locations and supports several different interpolation options. The tool then computes continuous, categorical, spatial, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
@@ -15,8 +15,8 @@ __________________________________
 
 The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, Section [subsec:PS_Interpolation/matching-methods] discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in Section [subsec:PS_Statistical-measures] and in more detail in Appendix [chap:App_C-Verification-Measures]. Section [subsec:PS_Statistical-confidence-intervals] describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in Appendix [chap:App_D-Confidence-Intervals].
 
-7.2.1 Interpolation/matching methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Interpolation/matching methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
@@ -34,19 +34,19 @@ This section describes the options for interpolation in the horizontal.
 
 	    Figure 7.2 Illustration of some matching and interpolation methods used in MET. See text for explanation.
 
-
+____________________
 
 Nearest Neighbor
 
 The forecast value at P is assigned the value at the nearest grid point. No interpolation is performed. Here, "nearest" means spatially closest in horizontal grid coordinates. This method is used by default when the interpolation width, W, is set to 1.
 
-
+_____________________
 
 Geography Match
 
 The forecast value at P is assigned the value at the nearest grid point in the interpolation area where the land/sea mask and topography criteria are satisfied.
 
-
+_____________________
 
 Gaussian
 
@@ -54,37 +54,37 @@ The forecast value at P is a weighted sum of the values in the interpolation are
 
 When used for regridding, with the regrid configuration option, or smoothing, with the interp configuration option in grid-to-grid comparisons, the Gaussian method is named MAXGAUSS and is implemented as a 2-step process. First, the data is regridded or smoothed using the maximum value interpolation method described below, where the width and shape define the interpolation area. Second, the Gaussian smoother, defined by the gaussian_dx and gaussian_radius configuration options, is applied.
 
-
+_____________________
 
 Minimum value
 
 The forecast value at P is the minimum of the values in the interpolation area.
 
-
+_____________________
 
 Maximum value
 
 The forecast value at P is the maximum of the values in the interpolation area.
 
-
+______________________
 
 Distance-weighted mean
 
 The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point is the reciprocal of the square of the distance (in grid coordinates) from P. The weighted sum of forecast values is normalized by dividing by the sum of the weights. 
 
-
+_______________________
 
 Unweighted mean
 
 This method is similar to the distance-weighted mean, except all the weights are equal to 1. The distance of any point from P is not considered.
 
-
+_____________________
 
 Median
 
 The forecast value at P is the median of the forecast values in the interpolation area.
 
-
+_____________________
 
 Least-Squares Fit
 
@@ -92,26 +92,26 @@ To perform least squares interpolation of a gridded field at a location P, MET u
 
 If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in Figure 7.1 ??(please confirm figure number), P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form $z=\alpha (x) + \beta (y) + \gamma$ over the subgrid. The values of $\alpha, \beta, \gamma$ are calculated from the data values at the vertices. Finally, the coordinates (x,y) of P are substituted into this expression to give z, our least squares interpolated data value at P.
 
-
+_______________________
 
 Bilinear Interpolation
 
 This method is performed using the four closest grid squares. The forecast values are interpolated linearly first in one dimension and then the other to the location of the observation.
 
-
+________________________
 
 Upper Left, Upper Right, Lower Left, Lower Right Interpolation
 
 This method is performed using the four closest grid squares. The forecast values are interpolated to the specified grid point.
 
-
+_______________________
 
 Best Interpolation
 
 The forecast value at P is the chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
-7.2.2 HiRA framework
-~~~~~~~~~~~~~~~~~~~~
+HiRA framework
+~~~~~~~~~~~~~~
 
 The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (Mittermaier, 2014). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the output_flag dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
 
@@ -125,8 +125,8 @@ Figure 7.3 shows a couple of examples of how the HiRA proportion is derived at a
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined. 
 
-7.2.3 Statistical measures
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Statistical measures
+~~~~~~~~~~~~~~~~~~~~
 
 The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in Appendix [chap:App_C-Verification-Measures]. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2003), and on the world-wide web at
 
@@ -135,16 +135,19 @@ http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html.
 In addition to these verification measures, the Point-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in Appendix [chap:App_C-Verification-Measures].
 
 Measures for categorical variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. If the original forecast is continuous, the user may specify one or more threhsolds in the configuration file to divide the continuous measure into categories. Currently, Point-Stat computes categorical statistics for variables in two or more categories. The special case of dichotomous (i.e., 2-category) variables has several types of statistics calculated from the resulting contingency table and are available in the CTS output line type. For multi-category variables, fewer statistics can be calculated so these are available separately, in line type MCTS. Categorical variables can be intrinsic (e.g., rain/no-rain) or they may be formed by applying one or more thresholds to a continuous variable (e.g., temperature < 273.15 K or cloud coverage percentages in 10% bins). See Appendix [chap:App_C-Verification-Measures] for more information.
 
 Measures for continuous variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See Appendix [chap:App_C-Verification-Measures] for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference). 
 
 Measures for probabilistic forecasts and dichotomous outcomes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See Appendix [chap:App_C-Verification-Measures] for specific information.
 
@@ -153,13 +156,14 @@ Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 
 When the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities. For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
 Measures for comparison against climatology
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
 
 Often, the sample climatology is used as a reference by a skill score. The sample climatology is the average over all included observations and may be transparent to the user. This is the case in most categorical skill scores. The sample climatology will probably prove more difficult to improve upon than a long term climatology, since it will be from the same locations and time periods as the forecasts. This may mask legitimate forecast skill. However, a more general climatology, perhaps covering many years, is often easier to improve upon and is less likely to mask real forecast skill.
 
-7.2.4 Statistical confidence intervals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Statistical confidence intervals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A single summary score gives an indication of the forecast performance, but it is a single realization from a random process that neglects uncertainty in the score's estimate. That is, it is possible to obtain a good score, but it may be that the "good" score was achieved by chance and does not reflect the "true" score. Therefore, when interpreting results from a verification analysis, it is imperative to analyze the uncertainty in the realized scores. One good way to do this is to utilize confidence intervals. A confidence interval indicates that if the process were repeated many times, say 100, then the true score would fall within the interval $100(1-\alpha)\%$ of the time. Typical values of $\alpha$ are 0.01, 0.05, and 0.10. The Point-Stat tool allows the user to select one or more specific $\alpha$-values to use.
 
@@ -227,13 +231,13 @@ MET provides non-parametric bootstrap confidence intervals for many categorical 
 
 For more information on confidence intervals pertaining to verification measures, see Wilks (2011), Jolliffe and Stephenson (2003), and Bradley (2008).
 
-7.3 Practical information
-_________________________
+Practical information
+_____________________
 
 The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter [chap:Re-Formatting-of-Point]. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in Section [subsec:PS_Interpolation/matching-methods]. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
-7.3.1 point_stat usage
-~~~~~~~~~~~~~~~~~~~~~~
+point_stat usage
+~~~~~~~~~~~~~~~~
 
 The usage statement for the Point-Stat tool is shown below:
 
@@ -260,6 +264,7 @@ Usage: point_stat
 point_stat has three required arguments and can take many optional ones.
 
 Required arguments for point_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The fcst_file argument names the gridded file in either GRIB or NetCDF containing the model data to be verified.
 
@@ -268,6 +273,7 @@ Required arguments for point_stat
 3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for point_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The -point_obs file may be used to pass additional NetCDF point observation files to be used in the verification. 
 
@@ -291,14 +297,14 @@ PointStatConfig
 
 In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the PointStatConfig file.
 
-7.3.2 point_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+point_stat configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the Point-Stat tool named PointStatConfig_default can be found in the installed share/met/config directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
 
-
+________________________
 
 model          = "WRF";
 
@@ -364,7 +370,7 @@ version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
-
+_________________________
 
 Setting up the fcst and obs dictionaries of the configuration file is described in Section [subsec:IO_General-MET-Config-Options]. The following are some special consideration for the Point-Stat tool.
 
@@ -372,7 +378,7 @@ The obs dictionary looks very similar to the fcst dictionary. When the forecast 
 
 The message_type entry, defined in the obs dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm for a list of the possible types. If using obs = fcst;, it can be defined in the forecast dictionary and the copied into the observation dictionary.
 
-
+______________________
 
 land_mask = {
 
@@ -390,7 +396,7 @@ land_mask = {
 
 The land_mask dictionary defines the land/sea mask field which is used when verifying at the surface. For point observations whose message type appears in the LANDSF entry of the message_type_group_map setting, only use forecast grid points where land = TRUE. For point observations whose message type appears in the WATERSF entry of the message_type_group_map setting, only use forecast grid points where land = FALSE. The flag entry enables/disables this logic. If the file_name is left empty, then the land/sea is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain. Lastly, the thresh entry is the threshold which defines land (threshold is true) and water (threshold is false).
 
-
+__________________________
 
 topo_mask = {
 
@@ -410,7 +416,7 @@ topo_mask = {
 
 The topo_mask dictionary defines the model topography field which is used when verifying at the surface. This logic is applied to point observations whose message type appears in the SURFACE entry of the message_type_group_map setting. Only use point observations where the topo - station elevation difference meets the use_obs_thresh threshold entry. For the observations kept, when interpolating forecast data to the observation location, only use forecast grid points where the topo - station difference meets the interp_fcst_thresh threshold entry. The flag entry enables/disables this logic. If the file_name is left empty, then the topography data is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain.
 
-
+____________________________
 
 hira = {
 
@@ -430,7 +436,7 @@ hira = {
 
 The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section [subsec:PS_HiRA_framework]. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
 
-
+________________________
 
 output_flag = {
 
@@ -522,8 +528,8 @@ If all line types corresponding to a particular verification method are set to N
 
 .. _point_stat-output:
 
-7.3.3 point_stat output
-~~~~~~~~~~~~~~~~~~~~~~~
+point_stat output
+~~~~~~~~~~~~~~~~~
 
 point_stat produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files will be written to the default output directory or the directory specified using the "-outdir" command line option.
 

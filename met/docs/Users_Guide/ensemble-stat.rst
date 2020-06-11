@@ -1,18 +1,18 @@
 .. _ensemble-stat:
 
-Chapter 9 Ensemble-Stat Tool
-============================
+Ensemble-Stat Tool
+==================
 
-9.1 Introduction
-________________
+Introduction
+____________
 
 The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. A climatology file may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in Appendix C [sec:App_C-ensemble].
 
-9.2 Scientific and statistical aspects
-______________________________________
+Scientific and statistical aspects
+__________________________________
 
-9.2.1 Ensemble forecasts derived from a set of deterministic ensemble members
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ensemble forecasts derived from a set of deterministic ensemble members
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 
@@ -22,7 +22,8 @@ The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble pr
 
 The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
-9.2.2 Ensemble statistics
+Ensemble statistics
+~~~~~~~~~~~~~~~~~~~
 
 Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (Hamill, 2001). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
 
@@ -32,7 +33,8 @@ The relative position (RELP) is a count of the number of times each ensemble mem
 
 The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. (Gneiting et al, 2004). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
-9.2.3 Ensemble observation error
+Ensemble observation error
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in Candile and Talagrand (2008) can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (e.g. Candille and Talagrand, 2008; Saetra et al., 2004; Santos and Ghelli, 2012). Generally, perturbation make verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
@@ -40,12 +42,13 @@ Normal and uniform are common choices for the observation error distribution. Th
 
 Observation errors differ according to instrument, temporal and spatial representation, and variable type. Unfortunately, many observation errors have not been examined or documented in the literature. Those that have usually lack information regarding their distributions and approximate parameters. Instead, a range or typical value of observation error is often reported and these are often used as an estimate of the standard deviation of some distribution. Where possible, it is recommended to use the appropriate type and size of perturbation for the observation to prevent spurious results.
 
-9.3 Practical Information
+Practical Information
+_____________________
 
 This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology file must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter [chap:Re-Formatting-of-Point].
 
-9.3.1 ensemble_stat usage
-~~~~~~~~~~~~~~~~~~~~~~~~~
+ensemble_stat usage
+~~~~~~~~~~~~~~~~~~~
 
 The usage statement for the Ensemble Stat tool is shown below:
 
@@ -76,6 +79,7 @@ Usage: ensemble_stat
 ensemble_stat has three required arguments and accepts several optional ones.
 
 Required arguments ensemble_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The n_ens ens_file_1 ... ens_file_n is the number of ensemble members followed by a list of ensemble member file names. This argument is not required when ensemble files are specified in the ens_file_list, detailed below.
 
@@ -83,7 +87,8 @@ Required arguments ensemble_stat
 
 3. The config_file is an EnsembleStatConfig file containing the desired configuration settings.
 
-	 Optional arguments for ensemble_stat
+Optional arguments for ensemble_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. To produce ensemble statistics using gridded observations, use the -grid_obs file option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
 
@@ -121,13 +126,14 @@ An example of the ensemble_stat calling sequence is shown below:
 
 In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and used to ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
-9.3.2 ensemble_stat configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ensemble_stat configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the Ensemble-Stat tool named EnsembleStatConfig_default can be found in the installed share/met/config directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
 
+____________________
 
 model          = "WRF";
 
@@ -172,6 +178,8 @@ version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
+_____________________
+
 ens = {
 
 ens_thresh = 1.0;
@@ -205,6 +213,8 @@ When summarizing the ensemble, for each grid point compute a ratio of the number
 
 For each field listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g. a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
 
+_______________________
+
 nbrhd_prob = {
 
 width      = [ 5 ];
@@ -225,7 +235,7 @@ The neighborhood shape is a SQUARE or CIRCLE centered on the current point, and 
 
 If ensemble_flag.nep is set to TRUE, NEP output is created for each combination of the categorical threshold (cat_thresh) and neighborhood width specified.
 
-
+_____________________
 
 
 nmep_smooth = {
@@ -261,20 +271,21 @@ Similar to the interp dictionary, the nmep_smooth dictionary includes a type arr
 
 If ensemble_flag.nmep is set to TRUE, NMEP output is created for each combination of the categorical threshold (cat_thresh), neighborhood width (nbrhd_prob.width), and smoothing method(nmep_smooth.type) specified.
 
+_____________________
 
 obs_thresh = [ NA ];
 
 
 The obs_thresh entry is an array of thresholds for filtering observation values prior to applying ensemble verification logic. The default setting of NA means that no observations should be filtered out. Verification output will be computed separately for each threshold specified. This option may be set separately for each obs.field entry.
 
-
+____________________
 
 skip_const = FALSE;
 
 
 Setting skip_const to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each obs.field entry. When set to false, constant points are and the observation rank is chosen at random.
 
-
+____________________
 
 
 ens_ssvar_bin_size = 1.0;
@@ -300,6 +311,7 @@ The ens_ssvar_bin_size and ens_phist_bin_size specify the width of the categoric
 
 The prob_cat_thresh entry is an array of thresholds to be applied in the computation of the RPS line type. Since these thresholds can change for each variable, they can be specified separately for each fcst.field entry. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead. If not climatology data is provide, and the RPS output line type is requested, then the prob_cat_thresh array must be defined.
 
+__________________
 
 obs_error = {
 
@@ -338,6 +350,8 @@ The inst_bias_scale and inst_bias_offset entries specify bias scale and offset v
 
 
 Defining the observation error information in the configuration file is convenient but limited. The random perturbations for all points in the current verification task are drawn from the same distribution. Specifying an observation error table file instead (by setting dist_type = NONE;) provides much finer control, enabling the user to define observation error distribution information and bias-correction logic separately for each observation variable name, message type, PrepBUFR report type, input report type, instrument type, station ID, range of heights, range of pressure levels, and range of values.
+
+_________________
 
 output_flag = {
 
@@ -383,7 +397,10 @@ The output_flag array controls the type of output that is generated. Each flag c
 
 7. RELP for Relative Position Counts
 
-   
+_____________________
+
+.. code-block:: none
+		
      ensemble_flag = {
           latlon    = TRUE;
 	  mean      = TRUE;
@@ -398,7 +415,8 @@ The output_flag array controls the type of output that is generated. Each flag c
 	  nep       = FALSE;
 	  nmep      = FALSE;
 	  rank      = TRUE;
-	  weight    = FALSE;									 }
+	  weight    = FALSE;
+      }
 
 The ensemble_flag specifies which derived ensemble fields should be calculated and output. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
 
@@ -430,22 +448,22 @@ The ensemble_flag specifies which derived ensemble fields should be calculated a
 
 14. The grid area weights applied are written to the Observation Rank output file.
 
+__________________
 
-
-
+.. code-block:: none
+		
     nc_var_str = "";
 
 
 The nc_var_str entry specifies a string for each ensemble field and verification task. This string is parsed from each ens.field and obs.field dictionary entry and is used to customize the variable names written to theNetCDF output file. The default is an empty string, meaning that no customization is applied to the output variable names. When the Ensemble-Stat config file contains two fields with the same name and level value, this entry is used to make the resulting variable names unique.
 
+________________
 
-rng = {
+.. code-block:: none
 
+  rng = {
      type = "mt19937";
-
      seed = "";
-
-
      }
 
 
@@ -458,8 +476,8 @@ The seed variable may be set to a specific value to make the assignment of ranks
 Refer to the description of the boot entry in Section [subsec:IO_General-MET-Config-Options] for more details on the random number generator.
 
 
-9.3.3 ensemble_stat output
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+ensemble_stat output
+~~~~~~~~~~~~~~~~~~~~
 
 ensemble_stat can produce output in STAT, ASCII, and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 
