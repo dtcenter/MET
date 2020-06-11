@@ -26,13 +26,13 @@ To match forecasts and observations in the horizontal plane, the user can select
 
 This section describes the options for interpolation in the horizontal.
 
-.. _point_stat_fig1
+.. _point_stat_fig1:
 
 .. figure:: figure/point_stat_fig1.png
 
    Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
 
-.. _point_stat_fig2
+.. _point_stat_fig2:
 
 .. figure:: figure/point_stat_fig2.jpg
 
@@ -123,7 +123,7 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
 
    shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
 
-.. _point_stat_fig3
+.. _point_stat_fig3:
 
 .. figure:: figure/point_stat_fig3.png
 

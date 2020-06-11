@@ -156,7 +156,7 @@ plotMODEconfig mode_120000L_20050807_120000V_000000A_obj.nc
 
 In this example, the plot_mode_field tool will plot simple objects from an observed precipitation field using parameters from the configuration file plotMODEconfig and objects from the MODE output file mode_120000L_20050807_120000V_000000A_obj.nc. An example plot showing twelve simple observed precipitation objects is shown below. 
 
-.. _plotting_fig1
+.. _plotting_fig1:
 
 .. figure:: figure/plotting_fig1.png
 	    
@@ -170,7 +170,7 @@ Once MET has been applied to forecast and observed fields (or observing location
 
 The plots in :numref:`plotting_Gilbert_skill_score` show time series of frequency bias and Gilbert Skill Score, stratified according to time of day. This type of figure is particularly useful for diagnosing problems that are tied to the diurnal cycle. In this case, two of the models (green dash-dotted and black dotted lines) show an especially high Bias (near 3) during the afternoon (15-21 UTC; left panel), while the skill (GSS; right panel) appears to be best for the models represented by the solid black line and green dashed lines in the morning (09-15 UTC). Note that any judgment of skill based on GSS should be restricted to times when the Bias is close to one. 
 
-.. _plotting_Gilbert_skill_score
+.. _plotting_Gilbert_skill_score:
 
 .. figure:: figure/plotting_Gilbert_skill_score.gif
 
@@ -182,7 +182,7 @@ When using the MODE tool, it is possible to think of matched objects as hits and
 
 :numref:`plotting_verification` gives an example of two traditional verification scores (Bias and CSI) along with bar plots showing the total numbers of objects for the forecast and observed fields, as well as bar plots showing their total areas. These data are from the same set of 13-km WRF model runs analyzed in :numref:`plotting_verification`. The model runs were initialized at 0 UTC and cover the period 15 July to 15 August 2005. For the forecast evaluation, we compared 3-hour accumulated precipitation for lead times of 3-24 hours to Stage II radar-gauge precipitation. Note that for the 3-hr lead time, indicated as the 0300 UTC valid time in :numref:`plotting_Gilbert_skill_score`, the Bias is significantly larger than the other lead times. This is evidenced by the fact that there are both a larger number of forecast objects, and a larger area of forecast objects for this lead time, and only for this lead time. Dashed lines show about 2 bootstrap standard deviations from the estimate.
 
-.. _plotting_verification
+.. _plotting_verification:
 
 .. figure:: figure/plotting_verification.gif
 
@@ -190,7 +190,7 @@ When using the MODE tool, it is possible to think of matched objects as hits and
 
 In addition to the traditional scores, MODE output allows more information to be gleaned about forecast performance. It is even useful when computing the traditional scores to understand how much the forecasts are displaced in terms of both distance and direction. :numref:`plotting_histogram`, for example, shows circle histograms for matched objects. The petals show the percentage of times the forecast object centroids are at a given angle from the observed object centroids. In :numref:`plotting_histogram` (top diagram) about 25% of the time the forecast object centroids are west of the observed object centroids, whereas in :numref:`plotting_histogram` (bottom diagram) there is less bias in terms of the forecast objects' centroid locations compared to those of the observed objects, as evidenced by the petals' relatively similar lengths, and their relatively even dispersion around the circle. The colors on the petals represent the proportion of centroid distances within each colored bin along each direction. For example, :numref:`plotting_histogram` (top row) shows that among the forecast object centroids that are located to the West of the observed object centroids, the greatest proportion of the separation distances (between the observed and forecast object centroids) is greater than 20 grid squares.
 
-.. _plotting_histogram
+.. _plotting_histogram:
 
 .. figure:: figure/plotting_histogram.jpg
 	    
@@ -204,13 +204,13 @@ In order to run this script, the MET_INSTALL_DIR environment variable must be se
 
 The supplied R script can generate a number of different plot types including boxplots, mean, median, rank, and relative performance. Pairwise differences can be plotted for the boxplots, mean, and median. Normal confidence intervals are applied to all figures unless the no_ci option is set to TRUE. Below are two example plots generated from the tools.
 
-.. _plotting_fig5
+.. _plotting_fig5:
 
 .. figure:: figure/plotting_fig5.jpg
 
    Example boxplot from plot_tcmpr.R. Track error distributions by lead time for three operational models GFNI, GHMI, HFWI.
 
-.. _plotting_fig6
+.. _plotting_fig6:
 
 .. figure:: figure/plotting_fig6.jpg
 

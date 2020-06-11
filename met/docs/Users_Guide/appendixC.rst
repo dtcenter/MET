@@ -685,7 +685,7 @@ The reliability diagram is a plot of the observed frequency of events versus the
 
 The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.\arabic{figure}} 
 
-.. _appendixC-rel_diag
+.. _appendixC-rel_diag:
 
 .. figure:: figure/appendixC-rel_diag.jpg
 	    
@@ -699,7 +699,7 @@ An ROC plot is shown for an example set of forecasts, with a solid line connecti
 
 An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.2} 
 
-.. _appendixC-roc_example
+.. _appendixC-roc_example:
 
 .. figure:: figure/appendixC-roc_example.jpg
 	    
@@ -875,7 +875,7 @@ The Baddeley's \Delta Metric is given by
 
 where d(s,\cdot)is the distance map for the respective event area, w(\cdot) is an optional concave function (i.e., w(t+u)\leq w(t)+w(u)) that is strictly increasing at zero with w(t)=0 if and only if t=0, N is the size of the domain, and p is a user chosen parameter for the L_{p} norm. The default choice of p=2 corresponds to a Euclidean average, p=1 is a simple average of the difference in distance maps, and the limiting case of p=\infty gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as H(A,B), and is the metric that motivated the development of Baddeley’s \Delta metric. A typical choice, and the only available with MET, for w(\cdot) is w(t)=\min\{t,c\}, where c is a user-chosen constant with c=\infty meaning that w(\cdot) is not applied. This choice of w(\cdot) provides a cutoff for distances beyond the pre-specified amount given by c. 
 
-In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in :numref:`grid_stat_fig4` provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of :numref:`grid_stat_fig3` would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of :numref:`grid_stat_fig4`. 
+In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in :numref:`grid-stat_fig4` provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -895,7 +895,7 @@ Unlike Baddeley’s \Delta metric, the MED is not a mathematical metric because 
 
 \begin{eqnarray*}
 
-\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in :numref:`grid_stat_fig4` (top right), and MED(B,A) is the average of the values in :numref:`grid_stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
+\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in :numref:`grid-stat_fig4` (top right), and MED(B,A) is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
 
 The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -909,7 +909,7 @@ Pratt’s Figure of Merit (FOM) is given by
 
 where n_{A} and n_{B} are the number of events within event areas A and B, respectively, d(s,A) is the distance map related to the event area A, and \alpha is a user-defined scaling constant. The default, and usual choice, is \alpha=\frac{1}{9} when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
 
-Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of :numref:`grid_stat_fig4`. 
+Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of :numref:`grid-stat_fig4`. 
 
 The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 

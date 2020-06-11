@@ -17,7 +17,7 @@ Here, {\tt wwmca\_cloud\_pct\_file\_list} represents one or more WWMCA cloud per
 
 The optional {\tt -outdir} argument specifies a directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory. Figure [Wplotfig] shows an example of the {\tt wwmca\_plot} output.
 
-.. _reformat_grid_fig2
+.. _reformat_grid_fig2:
 
 .. figure:: figure/reformat_grid_fig2.png
 

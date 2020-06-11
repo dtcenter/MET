@@ -455,7 +455,7 @@ modisfile
 
 In this example, the modis_regrid tool will process the Cloud_Fraction field from modisfile and write it out to the output NetCDF file t2.nc on the grid specified in grid_file using the appropriate scale, offset and fill values.
 
-.. _reformat_grid_fig1
+.. _reformat_grid_fig1:
 
 .. figure:: figure/reformat_grid_fig1.png
 
@@ -499,7 +499,7 @@ Optional arguments for wwmca_plot
 
 5. The -v level option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-.. _reformat_grid_fig2
+.. _reformat_grid_fig2:
 
 .. figure:: figure/reformat_grid_fig2.png
 	    

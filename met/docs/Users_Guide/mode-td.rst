@@ -11,7 +11,7 @@ _________________
 
 MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method in inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
 
-.. _mtd-3d_color
+.. _mtd-3d_color:
 
 .. figure:: figure/mtd-3d_color.png
 	    
@@ -45,9 +45,9 @@ Because of this, the developers decided to make several changes in the way convo
 
 The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted $R$, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is $(2 R + 1) \times (2 R + 1)$, as shown in :numref:`mtd-two_r_plus_one`.
 
-.. _mode-td_fig2
+.. _mtd-two_r_plus_one:
 
-.. figure:: figure/mode-td_fig2.png
+.. figure:: figure/mtd-two_r_plus_one.png
 	    
    Convolution Region
 
@@ -61,7 +61,7 @@ A 3D spacetime {\bf centroid} $(\overline{x}, \overline{y}, \overline{t})$ is ca
 
 The vector {\bf velocity} $(v_x, v_y)$ is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the {\bf speed} and {\bf direction} of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
 
-.. _mtd-velocity
+.. _mtd-velocity:
 
 .. figure:: figure/mtd-velocity.png
 	    
@@ -71,7 +71,7 @@ The spatial orientation of a object (what traditional MODE calls the axis angle 
 
 :numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, i.e., axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
 
-.. _mtd-axis_3d
+.. _mtd-axis_3d:
 
 .. figure:: figure/mtd-axis_3d.png
 
@@ -111,7 +111,7 @@ The {\bf axis difference} is smaller of the two angles that the two spatial axis
 
 Finally, the {\bf total interest}  gives the result of the fuzzy-logic matching and merging calculation for this pair of objects. Note that this is provided only for simple objects, not for clusters.
 
-.. _mtd-axis_diff
+.. _mtd-axis_diff:
 
 .. figure:: figure/mtd-axis_diff.png
 
@@ -142,7 +142,7 @@ A {\bf graph} is a finite set of {\bf vertices} (also called {\bf nodes}) and {\
 
 If we consider two distinct nodes in a graph to be related if there is a path connecting them, then it's easy to see that this defines an equivalence relation on the set of nodes, partitioning the graph into equivalence classes. Any node, such as #10 in :numref:`mtd-basic_graph`, that has no edges emanating from it is in a class by itself.
 
-.. _mtd-basic_graph
+.. _mtd-basic_graph:
 
 .. figure:: figure/mtd-basic_graph.png
 
@@ -162,7 +162,7 @@ Forecast cluster object #3 consists solely of forecast simple object 1. It is no
 
 To summarize: Any forecast simple objects that find themselves in the same equivalence class are merged. Similarly, any observed objects in the same class are merged. Any forecast and observed objects in the same class are matched. 
 
-.. _mtd-2d_example
+.. _mtd-2d_example:
 
 .. figure:: figure/mtd-2d_example.png
 

@@ -73,35 +73,35 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     - b+d
     - a+b+c+d
 
-.. _wavelet-stat_NIMROD_3h_fcst
+.. _wavelet-stat_NIMROD_3h_fcst:
 
 .. figure:: figure/wavelet-stat_NIMROD_3h_fcst.png
 
    NIMROD 3h lead-time forecast and corresponding verifying analysis field (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast and analysis binary fields obtained for a threshold of 1mm/h, the binary field difference has their corresponding Contingency Table Image (see Table [contingency_table_counts]). The forecast shows a storm of 160 km displaced almost its entire length.
 
-.. _wavelet-stat_fig2a
+.. _wavelet-stat_fig2a:
 
 .. figure:: figure/wavelet-stat_fig2a.png
 
-.. _wavelet-stat_NIMROD_binary_scale9
+.. _wavelet-stat_NIMROD_binary_scale9:
 
 .. figure:: figure/wavelet-stat_NIMROD_binary_scale9.png
 
    NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
 
-.. _wavelet-stat_NIMROD_binary_fcst
+.. _wavelet-stat_NIMROD_binary_fcst:
 
 .. figure:: figure/wavelet-stat_NIMROD_binary_fcst.png
 
    NIMROD binary field difference spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution). Note the large error at the scale 6 = 160 km, due to the storm, 160 km displaced almost of its entire length.
 
-.. _wavelet-stat_MSE_percent_NIMROD
+.. _wavelet-stat_MSE_percent_NIMROD:
 
 .. figure:: figure/wavelet-stat_MSE_percent_NIMROD.png
 
    MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated to the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated to the displaced storm.
 
-.. _wavelet-stat_Intensity_Scale_skill_score_NIMROD
+.. _wavelet-stat_Intensity_Scale_skill_score_NIMROD:
 
 .. figure:: figure/wavelet-stat_Intensity_Scale_skill_score_NIMROD.png
 
@@ -125,7 +125,7 @@ Note that the energy squared of the observation binary field is identical to the
 
 The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of 2n x 2n grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions 2n x 2n over the input domain in the following ways:
 
-.. _wavelet-stat_energy_squared_NIMROD
+.. _wavelet-stat_energy_squared_NIMROD:
 
 .. figure:: figure/wavelet-stat_energy_squared_NIMROD.png
 	    

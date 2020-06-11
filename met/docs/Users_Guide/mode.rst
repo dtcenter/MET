@@ -44,9 +44,9 @@ $$F(x,y)=M(x,y)f(x,y).$$
 
 Thus, two parameters — the radius of influence $R$, and the threshold $T$ — control the entire process of resolving objects in the raw data field.
 
-An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. :numref:`mode-object_id`a shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id`d shows the objects once the original precipitation values have been restored to the interiors of the objects.
+An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. :numref:`mode-object_id` shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
-.. _mode-object_id
+.. _mode-object_id:
 
 .. figure:: figure/mode-object_id.png
 
