@@ -798,13 +798,6 @@ DataPlane distance_map(const DataPlane &dp) {
             }
          }
          
-         //if (debug_scan) {
-         //   cout << " DEBUG: iy: " << iy << "  s:";
-         //   for (ix=0; ix<nx; ix++) cout << " " << s[ix];
-         //   cout << "  t:";
-         //   for (ix=0; ix<nx; ix++) cout << " " << t[ix];
-         //   cout << "\n";
-         //}
          // Meijster Scan 4
          for (ix=nx-1; ix>=0; ix--) {
             distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
@@ -818,21 +811,21 @@ DataPlane distance_map(const DataPlane &dp) {
    if(mlog.verbosity_level() >= debug_level) {
       if (debug_g_distance) {
          for (ix=0; ix<nx; ix++) {
-            ostringstream message;
+            ConcatString message;
             message << " g_distance: " ;
             for (iy = 0; iy<ny; iy++) {
                message << "  " << g_distance.get(ix, iy);
             }
-            mlog << Debug(debug_level) << message.str() << "\n";
+            mlog << Debug(debug_level) << message << "\n";
          }
       }
       for (ix=0; ix<nx; ix++) {
-         ostringstream message;
+         ConcatString message;
          message << " distance: " ;
          for (iy = 0; iy<ny; iy++) {
             message << "  " << dm.get(ix, iy);
          }
-         mlog << Debug(debug_level) << message.str() << "\n";
+         mlog << Debug(debug_level) << message << "\n";
       }
    }
 

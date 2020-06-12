@@ -796,7 +796,6 @@ int LineDataFile::operator>>(DataLine & a)
 
 {
 
-int j;
 int status;
 
 do {
@@ -810,11 +809,6 @@ do {
    ++Last_Line_Number;
 
    if ( a.is_header() ) set_header(a);
-
-   // cout << "  LineDataFile::operator>>(DataLine &) -> a.is_header() = " << (a.is_header()) << "\n" << flush;
-   // cout << "  LineDataFile::operator>>(DataLine &) -> a.is_ok()     = " << (a.is_ok()) << "\n" << flush;
-   // cout << "  LineDataFile::operator>>(DataLine &) -> a.n_items()   = " << (a.n_items()) << "\n\n" << flush;
-   // for (j=0; j<(a.n_items()); ++j)  cout << " ... " << (a[j]) << '\n' << flush;
 
 } while ( !(a.is_ok()) );
 

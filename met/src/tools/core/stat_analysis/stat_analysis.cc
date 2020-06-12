@@ -588,11 +588,6 @@ void process_python(const STATAnalysisJob & job)
 
 {
 
-// cout << "  in process_python():\n";
-// cout << "  user_script_path = \"" << user_script_path << "\"\n";
-// user_script_args.dump(cout, 1);
-// cout.flush();
-
 int j = 0;
 STATLine line;
 LineDataFile * f = 0;
@@ -616,28 +611,17 @@ open_temps();
 
 while((*f) >> line) {
 
-   // if ( (++j) < 3)  {
-   //   cout << "stat_analysis dump:\n" << flush;
-   //   line.DataLine::dump(cout, 1);
-   //   // line.dump(cout, 1);
-   //   cout.flush();
-   // }
-
       //
       // Continue if the line is not a valid STAT line.
       //
 
    if(line.type() == no_stat_line_type) continue;
 
-   // if(!line.is_header()) n_read++;
-
       //
       // Pass header lines through to the output
       //
 
    if(line.is_header() || job.is_keeper(line)) {
-
-      // if(!line.is_header()) n_keep++;
 
       tmp_out << line;
    }
@@ -649,6 +633,8 @@ while((*f) >> line) {
    //
 
 f->close();
+
+if(pldf) { delete pldf; pldf = (PyLineDataFile *) 0; }
 
 return;
 
@@ -844,14 +830,16 @@ void set_tmp_dir(const StringArray & a) {
    tmp_dir << a[0];
    DIR * dp = 0;
 
-   if((dp = met_opendir(tmp_dir.c_str())) == NULL) {
+   dp = met_opendir(tmp_dir.c_str());
+   if(!dp) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
    }
-
-   if(dp) met_closedir(dp);
+   else {
+      met_closedir(dp);
+   }
 
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }

@@ -723,7 +723,8 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    // Find the files matching the specified regular expression with
    // the correct valid and accumulation times.
    //
-   if((dp = met_opendir(cur_dir)) == NULL ) {
+   dp = met_opendir(cur_dir);
+   if(!dp) {
       mlog << Error << "\nsearch_pcp_dir() -> "
            << "cannot open search directory: " << cur_dir << "\n\n";
       exit(1);

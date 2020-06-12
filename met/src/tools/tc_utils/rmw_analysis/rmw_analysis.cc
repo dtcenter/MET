@@ -41,6 +41,7 @@ static void setup();
 static void process_files();
 static void normalize_stats();
 static void write_stats();
+static void clean_up();
 static void process_track_file(const ConcatString&,
     TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase*);
@@ -66,6 +67,8 @@ int main(int argc, char *argv[]) {
     normalize_stats();
 
     write_stats();
+
+    clean_up();
 
     return(0);
 }
@@ -209,7 +212,7 @@ void setup() {
 
     mlog << Debug(2)
          << "(n_range, n_azimuth, n_level) = ("
-         << n_range << ", " << n_azimuth << ", " << n_level << ")\n"; 
+         << n_range << ", " << n_azimuth << ", " << n_level << ")\n";
 
     // Get dimension coordinates
     vector<size_t> start;
@@ -256,6 +259,7 @@ void setup() {
 
     // Initialize statistical data cube lists
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
+
         // Size data cubes
         DataCube* data_count_2d = new DataCube();
         DataCube* data_count_3d = new DataCube();
@@ -360,52 +364,52 @@ void process_files() {
 
         if (adeck_tracks.n_tracks() > 0) {
 
-        for(int i_var = 0; i_var < data_names.size(); i_var++) {
-            NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
-            mlog << Debug(2) << "Processing "
-                 << data_names[i_var] << "\n";
+            for(int i_var = 0; i_var < data_names.size(); i_var++) {
+                NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
+                mlog << Debug(2) << "Processing "
+                     << data_names[i_var] << "\n";
 
-            for(int i_track = 0; i_track < n_track_point; i_track++) {
-                if (data_n_dims[i_var] == 2) {
-                    start_2d[2] = i_track;
-                    mlog << Debug(4) << data_names[i_var] << i_track << "\n";
-                    var.getVar(start_2d, count_2d, data_2d.data());
+                for(int i_track = 0; i_track < n_track_point; i_track++) {
+                    if (data_n_dims[i_var] == 2) {
+                        start_2d[2] = (size_t) i_track;
+                        mlog << Debug(4) << data_names[i_var] << i_track << "\n";
+                        var.getVar(start_2d, count_2d, data_2d.data());
 
-                    // Update partial sums
-                    data_2d_sq = data_2d;
-                    data_2d_sq.square();
-                    data_counts[i_var]->increment();
-                    mlog << Debug(4) << i_track << " "
-                         << data_counts[i_var]->data()[0] << "\n";
-                    mlog << Debug(4) << i_track << " "
-                         << data_2d.data()[0] << "\n";
-                    data_means[i_var]->add_assign(data_2d);
-                    mlog << Debug(4) << i_track << " "
-                         << data_means[i_var]->data()[0] << "\n";
-                    data_stdevs[i_var]->add_assign(data_2d_sq);
-                    data_mins[i_var]->min_assign(data_2d);
-                    mlog << Debug(4) << i_track << " "
-                         << data_mins[i_var]->data()[0] << "\n";
-                    data_maxs[i_var]->max_assign(data_2d);
-                    mlog << Debug(4) << i_track << " "
-                         << data_maxs[i_var]->data()[0] << "\n";
-                }
-                if (data_n_dims[i_var] == 3) {
-                    mlog << Debug(4) << data_names[i_var] << i_track << "\n";
-                    start_3d[3] = i_track;
-                    var.getVar(start_3d, count_3d, data_3d.data());
+                        // Update partial sums
+                        data_2d_sq = data_2d;
+                        data_2d_sq.square();
+                        data_counts[i_var]->increment();
+                        mlog << Debug(4) << i_track << " "
+                             << data_counts[i_var]->data()[0] << "\n";
+                        mlog << Debug(4) << i_track << " "
+                             << data_2d.data()[0] << "\n";
+                        data_means[i_var]->add_assign(data_2d);
+                        mlog << Debug(4) << i_track << " "
+                             << data_means[i_var]->data()[0] << "\n";
+                        data_stdevs[i_var]->add_assign(data_2d_sq);
+                        data_mins[i_var]->min_assign(data_2d);
+                        mlog << Debug(4) << i_track << " "
+                             << data_mins[i_var]->data()[0] << "\n";
+                        data_maxs[i_var]->max_assign(data_2d);
+                        mlog << Debug(4) << i_track << " "
+                             << data_maxs[i_var]->data()[0] << "\n";
+                    }
+                    if (data_n_dims[i_var] == 3) {
+                        mlog << Debug(4) << data_names[i_var] << i_track << "\n";
+                        start_3d[3] = (size_t) i_track;
+                        var.getVar(start_3d, count_3d, data_3d.data());
 
-                    // Update partial sums
-                    data_3d_sq = data_3d;
-                    data_3d_sq.square();
-                    data_counts[i_var]->increment();
-                    data_means[i_var]->add_assign(data_3d);
-                    data_stdevs[i_var]->add_assign(data_3d_sq);
-                    data_mins[i_var]->min_assign(data_3d);
-                    data_maxs[i_var]->max_assign(data_3d);
-                }
-            } // end loop over track points
-        } // end loop over variables
+                        // Update partial sums
+                        data_3d_sq = data_3d;
+                        data_3d_sq.square();
+                        data_counts[i_var]->increment();
+                        data_means[i_var]->add_assign(data_3d);
+                        data_stdevs[i_var]->add_assign(data_3d_sq);
+                        data_mins[i_var]->min_assign(data_3d);
+                        data_maxs[i_var]->max_assign(data_3d);
+                    }
+                } // end loop over track points
+            } // end loop over variables
         } // end if have tracks
     } // end loop over files
 }
@@ -573,6 +577,19 @@ void write_stats() {
     }
 
     nc_out->close();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clean_up() {
+
+    // Delete allocated memory
+    int i;
+    for(i=0; i<data_counts.size(); i++) delete data_counts[i];
+    for(i=0; i<data_means.size();  i++) delete data_means[i];
+    for(i=0; i<data_stdevs.size(); i++) delete data_stdevs[i];
+    for(i=0; i<data_mins.size();   i++) delete data_mins[i];
+    for(i=0; i<data_maxs.size();   i++) delete data_maxs[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
