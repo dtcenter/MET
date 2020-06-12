@@ -32,7 +32,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int imin(int a, int b)  { return ( (a < b) ? a : b ); } 
+inline int imin(int a, int b)  { return ( (a < b) ? a : b ); }
 
 static const char *separator = "===================================================";
 
@@ -288,7 +288,7 @@ void GribRecord::extend_data(int n)
 {
     if (data.capacity() >= n)
         return;
-        
+
     data.reserve(n);
 }
 
@@ -300,7 +300,7 @@ void GribRecord::extend_bitmap(int n)
 {
     if (bitmap.capacity() >= n)
         return;
-        
+
     bitmap.reserve(n);
 }
 
@@ -531,7 +531,11 @@ file_start = (long) -1;
 
 name = (char *) 0;
 
-referenceCount = buf_size = n_alloc = n_records = issue = lead = 0;
+referenceCount = n_alloc = issue = lead = 0;
+
+buf_size = (size_t) 0;
+
+n_records = (unsigned int) 0;
 
 buf = (unsigned char *) 0;
 
@@ -892,11 +896,11 @@ g.record_lseek_offset = file_pos;
 if ( s > (rep->buf_size) )  rep->realloc_buf(s);
 
 // if ( s > (rep->buf_size) )  {
-// 
+//
 //    mlog << Error << "\nGribFile::read_record(GribRecord &) -> "
 //         << "found a grib record larger than the buffer size.\n\n"
 //         << "  Increase the buffer to at least " << s << " bytes.\n\n\n";
-// 
+//
 //    exit ( 1 );
 
 //   char temp_str[max_temp_str_length];
@@ -1017,7 +1021,7 @@ if ( pds_ptr->flag & 64 )  {
    g.bitmap.clear();
    unsigned char *begin = rep->buf + bytes_processed + 6;
    g.bitmap.assign(begin, begin+s);
-   
+
    // mlog << Debug(1) << "\n\n  reading " << s << " bytes into bitmap at file location " << (bytes_processed + 6) << "\n\n";
 
    bytes_processed += char3_to_int(g.bms->length);
@@ -2064,7 +2068,3 @@ return ( multiplier*pp1 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
