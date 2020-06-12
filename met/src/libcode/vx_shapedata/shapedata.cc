@@ -1001,7 +1001,7 @@ Polyline ShapeData::single_boundary_offset(double d) const {
 Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
                                            double d) const {
    Polyline boundary, temp;
-   int i, x, y, x0, y0, xn, yn;
+   int x, y, x0, y0, xn, yn;
    int direction, new_direction;
    bool found;
 
