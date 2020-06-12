@@ -16,6 +16,7 @@ using namespace std;
 
 #include <iostream>
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
 #include <cmath>
 
@@ -91,13 +92,16 @@ void increase_one_month(int &year, int &month) {
 unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
-  bool debug = false;
+  const char *ptr = getenv("MET_DEBUG");
+  bool debug = (NULL != ptr && 0 < strlen(ptr));
+  
   if (!no_leap || sec_per_unit != 86400) {
     ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
   }
   else {
     int day_offset;
     int month, day, year, hour, minute, second;
+    double time_fraction = time_value - (int)time_value;
     
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
     day_offset = day + (int)time_value;
@@ -116,9 +120,10 @@ unixtime add_to_unixtime(unixtime base_unixtime,
     day = day_offset;
     if (day == 0) day == 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    ut += (time_fraction * sec_per_unit);
     if (debug) {
       cout << "add_to_unixtime() -> " << unix_to_yyyymmdd_hhmmss(base_unixtime)
-           << " plus " << (int)time_value << " days = "
+           << " plus " << time_value << " days = "
            << unix_to_yyyymmdd_hhmmss(ut) << "\n";
     }
   }
