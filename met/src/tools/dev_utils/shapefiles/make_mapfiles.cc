@@ -327,7 +327,7 @@ DbfSubRecord * r                = 0;
    //  get the country names (and admin names, if they're there) from the dbf file
    //
 
-if ( (fd = open(dbf_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(dbf_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": get_record_infos() -> unable to open dbf file \""
         << dbf_filename << "\"\n\n";
@@ -457,7 +457,7 @@ ShxRecord rx;
    //  get the offsets and record lengths from the shx file
    //
 
-if ( (fd = open(shx_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shx_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": get_record_infos() -> unable to open shx file \""
         << shx_filename << "\"\n\n";
@@ -589,7 +589,7 @@ if ( ! f )  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": make_one_file() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
@@ -685,7 +685,7 @@ for (j=0; j<n_records; ++j)  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": make_separate_files() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
