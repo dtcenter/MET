@@ -352,13 +352,13 @@ void StringArray::insert(int i, const char * text)
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text) const
+bool StringArray::has(const std::string text, bool forward) const
 
 {
 
   int index;
 
-  return ( has(text, index) );
+  return ( has(text, index, forward) );
 
 }
 
@@ -366,41 +366,73 @@ bool StringArray::has(const std::string text) const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text, int & index) const
+bool StringArray::has(const std::string text, int & index, bool forward) const
 
 {
-
+  bool found = false;
   index = -1;
 
-  std::string str = text;
-
-  std::vector<std::string>::const_iterator it;
-  int count = 0;
-
-  for(it = s.begin(); it != s.end(); it++, count++) {
-    if ( IgnoreCase ) {
-      std::string lower_s = *it;
-      transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
-      std::string lower_text = text;
-      transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
-      if ( lower_s == lower_text) {
-	//      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
-        index = count;
-	break;
+  if (!s.empty()) {
+    int count;
+    std::string lower_text = text;
+    std::vector<std::string>::const_iterator it;
+    if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+    
+    if (forward) {
+      count = 0;
+      for(it = s.begin(); it != s.end(); it++, count++) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          if ( lower_s == lower_text) {
+            //      if ( strcasecmp((*it).c_str(), text.c_str()) ) {
+            found = true;
+            break;
+          }
+        }
+        else {
+          if ( *it == text ) {
+            found = true;
+            break;
+          }
+        }
       }
     }
     else {
-      if ( *it == text ) {
-        index = count;
-	break;
+      count = s.size() - 1;
+      it = s.end();
+      for(it--; it != s.begin(); it--, count--) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          if ( lower_s == lower_text) {
+            found = true;
+            break;
+          }
+        }
+        else {
+          if ( *it == text ) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found && it == s.begin()) {
+        if ( IgnoreCase ) {
+          std::string lower_s = *it;
+          transform(lower_s.begin(), lower_s.end(), lower_s.begin(), ::tolower);
+          found = ( lower_s == lower_text );
+        }
+        else found = ( *it == text );
       }
     }
+    if (found) index = count;
   }
+  //mlog << Debug(9) << " StringArray::has() size=" << s.size()
+  //     << " for " << text << ", found: " << (found ? "true" : "false")
+  //     << ", forward: " << (forward ? "yes" : "no") << "\n";
 
-  if (it != s.end()) {
-    return true;
-  }
-  return false;
+  return found;
 
 }
 

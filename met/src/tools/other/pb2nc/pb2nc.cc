@@ -999,8 +999,8 @@ void process_pbfile(int i_pb) {
 
    bool has_pbl_data;
    bool do_pbl = false;
-   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
-   bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
+   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code, false);
+   bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code, false);
 
    bool     is_same_header;
    unixtime prev_hdr_vld_ut = (unixtime) 0;
@@ -1206,7 +1206,7 @@ void process_pbfile(int i_pb) {
          max_msg_ut = hdr_vld_ut;
       }
       if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
-         if (!filtered_times.has(hdr_vld_ut)) {
+         if (!filtered_times.has(hdr_vld_ut, false)) {
             filtered_times.add(hdr_vld_ut);
          }
          rej_vld++;
@@ -1311,7 +1311,7 @@ void process_pbfile(int i_pb) {
       if (nlev > mxr8lv) {
          buf_nlev = mxr8lv;
          for(kk=0; kk<mxr8vt; kk++) {
-            if (!variables_big_nlevels.has(bufr_obs_name_arr[kk])) {
+            if (!variables_big_nlevels.has(bufr_obs_name_arr[kk], false)) {
                mlog << Warning << "\n" << method_name << " -> "
                     << "Too many vertical levels (" << nlev
                     << ") for " << bufr_obs_name_arr[kk]
@@ -1539,7 +1539,7 @@ void process_pbfile(int i_pb) {
       
                   // Only derive PRMSL for surface message
                   if(derive_gc[i] == prmsl_grib_code &&
-                     !conf_info.surface_message_types.has(hdr_typ))
+                     !conf_info.surface_message_types.has(hdr_typ, false))
                      continue;
       
                   // Store the grib code to be derived
@@ -1724,14 +1724,14 @@ void process_pbfile(int i_pb) {
             var_name = bufr_obs_name_arr[vIdx];
             var_name_len = var_name.length();
             if (is_prepbufr &&
-                  (prepbufr_vars.has(var_name)
+                  (prepbufr_vars.has(var_name, false)
                    || prepbufr_event_members.has(var_name)
                    || prepbufr_derive_vars.has(var_name))) continue;
 
             isDegC = false;
             isMgKg = false;
             isMilliBar = false;
-            if (var_names.has(var_name, var_index)) {
+            if (var_names.has(var_name, var_index, false)) {
                if ("DEG C" == var_units[var_index]) {
                   isDegC = true;
                }
@@ -1750,7 +1750,7 @@ void process_pbfile(int i_pb) {
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
-               if (!variables_big_nlevels.has(var_name)) {
+               if (!variables_big_nlevels.has(var_name, false)) {
                   mlog << Warning << "\n" << method_name << " -> "
                        << "Too many vertical levels (" << nlev2
                        << ") for " << var_name
@@ -2163,7 +2163,7 @@ void process_pbfile_metadata(int i_pb) {
             tmp_hdr_array.clear();
             tmp_hdr_array.parse_wsss(prepbufr_hdrs_str);
             for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-               if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+               if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
             }
          }
          else {
@@ -2177,7 +2177,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found station id: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2195,7 +2195,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found  longitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2206,7 +2206,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found   latitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2215,9 +2215,9 @@ void process_pbfile_metadata(int i_pb) {
             }
             else {
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
-               if (!bufr_hdr_name_arr.has(default_lon_name)) hdr_name_str.add(default_lon_name);
+               if (!bufr_hdr_name_arr.has(default_lon_name, false)) hdr_name_str.add(default_lon_name);
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
-               if (!bufr_hdr_name_arr.has(default_lat_name)) hdr_name_str.add(default_lat_name);
+               if (!bufr_hdr_name_arr.has(default_lat_name, false)) hdr_name_str.add(default_lat_name);
             }
 
             ConcatString time_hdr_names;
@@ -2229,7 +2229,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
             else {
@@ -2237,7 +2237,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_ymd_name);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
 
@@ -2247,7 +2247,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
             else if (event_names.has("HHMM", index)) {
@@ -2256,7 +2256,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
                if (!bufr_hdr_name_arr.has("SECO")) bufr_hdr_name_arr.add("SECO");
             }
@@ -2265,7 +2265,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_hms_name);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
 
@@ -2284,7 +2284,7 @@ void process_pbfile_metadata(int i_pb) {
          if (check_all) {
             // Remove variables for headers
             for (index=0; index<bufr_hdr_name_arr.n_elements(); index++) {
-               if (unchecked_var_list.has(bufr_hdr_name_arr[index], var_index)) {
+               if (unchecked_var_list.has(bufr_hdr_name_arr[index], var_index, false)) {
                   unchecked_var_list.shift_down(var_index, 1);
                }
             }
@@ -2297,7 +2297,7 @@ void process_pbfile_metadata(int i_pb) {
                        << bufr_var_name <<"\" does not exist at BUFR file\n\n";
                   exit(1);
                }
-               if (!tmp_bufr_obs_name_arr.has(bufr_var_name)) {
+               if (!tmp_bufr_obs_name_arr.has(bufr_var_name, false)) {
                   tmp_bufr_obs_name_arr.add(bufr_var_name);
                }
             }
@@ -2339,7 +2339,8 @@ void process_pbfile_metadata(int i_pb) {
          }  //end for lv
          
          if (has_valid_data) {
-            if (!tmp_bufr_obs_name_arr.has(var_name) && !bufr_hdr_name_arr.has(var_name)) {
+            if (!tmp_bufr_obs_name_arr.has(var_name, false)
+                && !bufr_hdr_name_arr.has(var_name, false)) {
                tmp_bufr_obs_name_arr.add(var_name);
             }
             if (do_all_vars) {
@@ -2349,7 +2350,7 @@ void process_pbfile_metadata(int i_pb) {
             else {
                StringArray typeArray;
                if (0 < variableTypeMap.count(var_name)) typeArray = variableTypeMap[var_name];
-               if (!typeArray.has(hdr_typ)) {
+               if (!typeArray.has(hdr_typ, false)) {
                   typeArray.add(hdr_typ);
                   variableTypeMap[var_name] = typeArray;
                }
@@ -2365,7 +2366,7 @@ void process_pbfile_metadata(int i_pb) {
    bufr_obs_name_arr.clear();
    for (index=0; index<prepbufr_vars.n_elements(); index++) {
       tmp_var_name = prepbufr_vars[index].c_str();
-      if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
+      if (do_all_vars || bufr_target_variables.has(tmp_var_name, false)) {
          if (tableB_vars.has(tmp_var_name)) {
             bufr_obs_name_arr.add(tmp_var_name);
             bufr_var_code[index] = bufr_var_index;
@@ -2388,7 +2389,7 @@ void process_pbfile_metadata(int i_pb) {
       }
    }
    for (i=0; i<tmp_bufr_obs_name_arr.n_elements(); i++) {
-      if (!bufr_obs_name_arr.has(tmp_bufr_obs_name_arr[i])) {
+      if (!bufr_obs_name_arr.has(tmp_bufr_obs_name_arr[i], false)) {
          bufr_obs_name_arr.add(tmp_bufr_obs_name_arr[i]);
       }
    }
@@ -2493,7 +2494,7 @@ void write_netcdf_hdr_data() {
 
       unit_str = "";
       var_name = bufr_obs_name_arr[i];
-      if (var_names.has(var_name, var_index)) {
+      if (var_names.has(var_name, var_index, false)) {
          unit_str = var_units[var_index];
          if (0 == strcmp("DEG C", unit_str.c_str())) {
             unit_str = "KELVIN";
@@ -2711,7 +2712,7 @@ bool keep_message_type(const char *mt_str) {
    bool keep = false;
 
    keep = conf_info.message_type.n_elements() == 0 ||
-          conf_info.message_type.has(mt_str);
+          conf_info.message_type.has(mt_str, false);
 
    return(keep);
 }
@@ -2721,7 +2722,7 @@ bool keep_message_type(const char *mt_str) {
 bool keep_station_id(const char *sid_str) {
 
    return(conf_info.station_id.n_elements() == 0 ||
-          conf_info.station_id.has(sid_str));
+          conf_info.station_id.has(sid_str, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2751,21 +2752,21 @@ bool keep_valid_time(const unixtime ut,
 bool keep_pb_report_type(int type) {
 
    return(conf_info.pb_report_type.n_elements() == 0 ||
-          conf_info.pb_report_type.has(type));
+          conf_info.pb_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_in_report_type(int type) {
    return(conf_info.in_report_type.n_elements() == 0 ||
-          conf_info.in_report_type.has(type));
+          conf_info.in_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_instrument_type(int type) {
    return(conf_info.instrument_type.n_elements() == 0 ||
-          conf_info.instrument_type.has(type));
+          conf_info.instrument_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2779,7 +2780,7 @@ bool keep_bufr_obs_index(int code) {
 
 bool keep_level_category(int category) {
    return(conf_info.level_category.n_elements() == 0 ||
-          conf_info.level_category.has(category));
+          conf_info.level_category.has(category, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2867,7 +2868,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
 
    mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
-      if (all_vars.has(hdr_arr[i], index)) {
+      if (all_vars.has(hdr_arr[i], index, false)) {
          description = all_descs[index];
       }
       else {
@@ -2881,7 +2882,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
         << ")  Name: Description                       Types:\n";
 
    for(i=0; i<obs_arr.n_elements(); i++) {
-      if (all_vars.has(obs_arr[i], index)) {
+      if (all_vars.has(obs_arr[i], index, false)) {
          description = all_descs[index];
       }
       else {

@@ -68,8 +68,8 @@ class NumArray {
       const double * vals() const;
       double * buf() const;
 
-      int has(int)    const;
-      int has(double) const;
+      int has(int, bool forward=true)    const;
+      int has(double, bool forward=true) const;
 
       void add(int);
       void add(double);
