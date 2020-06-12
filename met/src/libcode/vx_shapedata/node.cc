@@ -165,7 +165,7 @@ void Node::add_child(const Polyline * poly) {
          mlog << Error << "\nNode::add_child() -> "
               << "memory allocation error\n\n";
 
-         delete n_ptr;  n_ptr = 0;   //  shouldn't be needed
+         delete n_ptr;
 
          exit(1);
       }
