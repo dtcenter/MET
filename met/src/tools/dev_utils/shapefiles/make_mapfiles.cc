@@ -574,7 +574,7 @@ output_filename << s << "_data";
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
@@ -758,7 +758,7 @@ ofstream f;
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
