@@ -2438,13 +2438,8 @@ void write_netcdf_hdr_data() {
    if(dim_count <= 0) {
       mlog << Error << method_name << " -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
-
       // Delete the NetCDF file
-      if(remove(ncfile.c_str()) != 0) {
-         mlog << Error << method_name << " -> "
-              << "can't remove output NetCDF file \"" << ncfile
-              << "\"\n\n";
-      }
+      remove_temp_file(ncfile);
       exit(1);
    }
 
