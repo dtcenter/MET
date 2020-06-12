@@ -1089,7 +1089,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       temp = boundary;
       boundary.clear();
 
-      for(i=temp.n_points-1; i>=0; i--) {
+      for(int i=temp.n_points-1; i>=0; i--) {
 
          boundary.add_point(temp.u[i], temp.v[i]);
       }

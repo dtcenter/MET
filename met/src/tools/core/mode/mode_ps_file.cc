@@ -777,6 +777,7 @@ void ModePsFile::draw_polyline(Polyline & poly, const Color & c, bool latlon)
 if ( poly.n_points <= 0 ) return;
 
 int i;
+double lat, lon;
 double grid_x_prev, grid_y_prev, grid_x_cur, grid_y_cur;
 double page_x, page_y;
 

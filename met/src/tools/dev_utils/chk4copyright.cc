@@ -231,7 +231,7 @@ void process_directory(const char * dir_name)
          //
          // the TMPDIR environment variable is not set so check if /tmp exists
          //
-      dir = met_opendir(tmp_directory.c_str();
+      dir = met_opendir(tmp_directory.c_str());
       if (!dir)
       {
          mlog << Error << "\nprocess_directory() -> the directory \"/tmp\" does not exist.\n\n";
