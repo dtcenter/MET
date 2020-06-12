@@ -206,7 +206,6 @@ void DataPlane::set(double v, int x, int y) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::set_block(double *v, int nx, int ny) {
-   int n;
    const char *method_name = "DataPlane::set_block() -> ";
    
    if (nx > Nx) {
