@@ -422,7 +422,7 @@ for (j=0; j<(hd.n_records); ++j)  {
    }
    else  {
       s << cs_erase << "REC" << j+1;
-   } 
+   }
 
    records[j].country = s;
 
@@ -446,7 +446,7 @@ for (j=0; j<(hd.n_records); ++j)  {
    //  done with the dbf file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    ///////////////////////////////////////////
 
@@ -505,7 +505,7 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
    //  done with shx file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    //
    //  done
@@ -645,7 +645,7 @@ for (j=0; j<n_records; ++j)  {
 
 f.close();
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -733,7 +733,7 @@ for (k=0; k<(names.n()); ++k)  {
    //  done
    //
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -865,5 +865,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
