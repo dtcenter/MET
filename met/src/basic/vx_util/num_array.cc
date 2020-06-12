@@ -1038,7 +1038,6 @@ double NumArray::mean_sqrt() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
@@ -1056,7 +1055,6 @@ double NumArray::mean_fisher() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
