@@ -115,7 +115,6 @@ void GenesisInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void GenesisInfo::assign(const GenesisInfo &g) {
-   int i;
 
    clear();
 
@@ -246,7 +245,6 @@ ConcatString GenesisInfo::serialize() const {
 ConcatString GenesisInfo::serialize_r(int n, int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
-   int i;
 
    s << prefix << "[" << n << "] " << serialize();
 
