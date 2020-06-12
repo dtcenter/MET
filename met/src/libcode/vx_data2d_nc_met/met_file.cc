@@ -757,8 +757,8 @@ plane.set_size(Nx, Ny);
 
    }   //  switch
 
+   nc_time = clock();
    if (mlog.verbosity_level() >= 7) {
-      nc_time = clock();
       double duration_sec = (double)(nc_time - clock_time)/CLOCKS_PER_SEC;
       check_nc_data_2d(data_array, Nx, Ny, missing_value);
       mlog << Debug(7) << method_name_short << "took " << duration_sec
