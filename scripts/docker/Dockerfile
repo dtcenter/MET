@@ -80,7 +80,7 @@ RUN mkdir -p /met/logs \
  && mkdir -p /met/external_libs/BUFRLIB \
  && cd /met/external_libs/BUFRLIB \
  && echo "Downloading BUFRLIB from ${BUFRLIB_URL}" \
- && curl -SL ${BUFRLIB_URL} | tar xC /met/external_libs/BUFRLIB \
+ && curl -SL --insecure ${BUFRLIB_URL} | tar xC /met/external_libs/BUFRLIB \
  && cat preproc.sh | sed 's/cpp /cpp -traditional-cpp /g' > preproc_patch.sh \
  && chmod +x preproc_patch.sh \
  && LOG_FILE=/met/logs/BUFRLIB_build.log \
@@ -138,7 +138,7 @@ RUN echo "Downloading HDF4.2r3 from ${HDF4_URL}" \
  && echo "Compiling HDF4.2r3 and writing log file ${LOG_FILE}" \
  && make install > ${LOG_FILE} \
  && echo "Downloading hdfeos from ${HDFEOS_URL}" \
- && curl -SL ${HDFEOS_URL} | tar zxC /met/external_libs \
+ && curl -SL --insecure ${HDFEOS_URL} | tar zxC /met/external_libs \
  && cd /met/external_libs/hdfeos \
  && LOG_FILE=/met/logs/hdfeos_configure.log \
  && echo "Configuring hdfeos and writing log file ${LOG_FILE}" \
@@ -174,5 +174,5 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && make test > ${LOG_FILE} 2>&1 \
  && if [[ $MET_GIT_NAME == "met-"* ]]; then cd /met; rm -rf MET-*; fi \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL}" \
- && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
+ && curl -SL --insecure ${GSFONT_URL} | tar zxC /usr/local/share/met
 
