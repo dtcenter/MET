@@ -792,10 +792,10 @@ void open_netcdf() {
    obs_vars.attr_pb2nc = true;
 
    if (!obs_to_vector) {
-      int deflate_level = compress_level;
-      if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-      create_nc_obs_vars(obs_vars, f_out, deflate_level);
+      create_nc_obs_vars(obs_vars, f_out,
+                         (compress_level >= 0 ? compress_level :
+                          conf_info.conf.nc_compression()));
 
       // Add global attributes
       write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -1016,8 +1016,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      strncpy(prev_hdr_typ, not_assigned, sizeof(not_assigned));
-      strncpy(prev_hdr_sid, not_assigned, sizeof(not_assigned));
+      strncpy(prev_hdr_typ, not_assigned, strlen(not_assigned));
+      strncpy(prev_hdr_sid, not_assigned, strlen(not_assigned));
    }
 
    IMM = JMM =1;
@@ -2462,7 +2462,6 @@ void write_netcdf_hdr_data() {
    else {
       if (do_summary) {
          // Write out the summary data
-         //write_nc_observations(obs_vars, summary_obs->getSummaries(), false);
          if (save_summary_only) reset_header_buffer(pb_hdr_count, true);
          write_nc_observations(obs_vars, summary_obs->getSummaries());
          mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
@@ -2472,7 +2471,9 @@ void write_netcdf_hdr_data() {
               << " summary header count: " << (dim_count-pb_hdr_count) << "\n";
 
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
-         if (summaryInfo.flag) write_summary_attributes(f_out, summaryInfo);
+         if (summaryInfo.flag) {
+            write_summary_attributes(f_out, summaryInfo);
+         }
       }
 
       create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
@@ -2484,8 +2485,6 @@ void write_netcdf_hdr_data() {
          // Write out the remaining header data
          write_nc_buf_headers(obs_vars);
       }
-
-      //write_nc_table_vars(obs_vars);
    }
 
    StringArray nc_var_name_arr;
@@ -2572,8 +2571,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       if (!save_summary_only)
           write_nc_observation(obs_vars, obs_arr, obs_qty.text());
       if (do_summary) {
-         int var_index = obs_arr[1];
-         string var_name = bufr_obs_name_arr[var_index];
+         string var_name = bufr_obs_name_arr[(obs_arr[1])];
          conf_info.getSummaryInfo();
          summary_obs->addObservation(
                hdr_typ.text(),
@@ -2581,7 +2579,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                hdr_vld,
                hdr_lat, hdr_lon, hdr_elv,
                obs_qty.text(),
-               var_index, obs_arr[2], obs_arr[3], obs_arr[4],
+               obs_arr[1], obs_arr[2], obs_arr[3], obs_arr[4],
                var_name);
       }
    }
@@ -2927,7 +2925,6 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
-   int offset;
    int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
@@ -3278,7 +3275,7 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
 
    float cur_pres, next_pres;
    float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
-   float *pqtzuv_merged, *pqtzuv_tq, *pqtzuv_uv;
+   float *pqtzuv_merged;
    std::map<float,float*>::iterator it_pivot, it_aux;
    static const char *method_name = "merge_records() ";
 
