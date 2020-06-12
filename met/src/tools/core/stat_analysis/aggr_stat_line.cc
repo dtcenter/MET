@@ -2653,7 +2653,6 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrRPSInfo aggr;
    RPSInfo cur;
    ConcatString key;
-   double rps_fcst, rps_climo, v;
    map<ConcatString, AggrRPSInfo>::iterator it;
 
    //
