@@ -107,6 +107,7 @@ class ATCFLineBase : public DataLine {
       double        lat             () const; // degrees, + north, - south
       double        lon             () const; // degrees, + west, - east
       unixtime      valid           () const; // WarningTime + ForecastPeriod
+      int           valid_hour      () const;
       int           lead            () const; // seconds
 
       ConcatString  storm_id        () const;

@@ -63,7 +63,6 @@ static void get_atcf_files(const StringArray&,
 static void process_track_files(const StringArray&,
     const StringArray&, TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase *);
-static void subset_tracks(TrackInfoArray &);
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&,
     StringArray&, StringArray&);
@@ -382,11 +381,6 @@ void process_track_files(const StringArray& files,
 
     } // End loop over files
 
-    // Filter the tracks using the config file information
-    mlog << Debug(3) << "Subsetting " << tracks.n_tracks()
-         << " track(s) based on config file settings.\n";
-    subset_tracks(tracks);
-
     // Check the number of tracks: exit for 0 and warning for > 1
     if(tracks.n_tracks() == 0) {
         mlog << Error << "\nprocess_track_files() -> "
@@ -407,18 +401,12 @@ void process_track_files(const StringArray& files,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check if the ATCFLineBase should be kept.  Only check those columns
-// that remain constant across the entire track:
-//    model, storm id, basin, cyclone, and init time
+// Check if the ATCFLineBase should be kept.
 //
 ////////////////////////////////////////////////////////////////////////
 
 bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
-   int m, d, y, h, mm, s;
-
-   // Decompose warning time
-   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
 
    // Check model
    if(conf_info.Model.nonempty() &&
@@ -445,63 +433,29 @@ bool is_keeper(const ATCFLineBase * line) {
            conf_info.InitInc != line->warning_time())
       keep = false;
 
+   // Check valid time
+   else if((conf_info.ValidBeg > 0 &&
+            conf_info.ValidBeg > line->valid())    ||
+           (conf_info.ValidEnd > 0 &&
+            conf_info.ValidEnd < line->valid())    ||
+           (conf_info.ValidInc.n() > 0 &&
+           !conf_info.ValidInc.has(line->valid())) ||
+           (conf_info.ValidExc.n() > 0 &&
+            conf_info.ValidExc.has(line->valid())))
+      keep = false;
+
+   // Check valid hour
+   else if (conf_info.ValidHour.n() > 0 &&
+           !conf_info.ValidHour.has(line->valid_hour()))
+      keep = false;
+
+   // Check lead time
+   else if(conf_info.LeadTime.n() > 0 &&
+          !conf_info.LeadTime.has(line->lead()))
+      keep = false;
+
    // Return the keep status
    return(keep);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void subset_tracks(TrackInfoArray &tracks) {
-   int i, j;
-   bool status;
-   TrackInfoArray t = tracks;
-   TrackInfo cur;
-
-   // Initialize
-   tracks.clear();
-
-   // Loop through the tracks and determine which should be retained
-   // The is_keeper() function has already filtered by model, storm id,
-   // basin, cyclone, and initialization time.
-   for(i = 0; i < t.n_tracks(); i++) {
-
-      // Check storm name
-      if(conf_info.StormName.nonempty() &&
-         conf_info.StormName != t[i].storm_name()) {
-         mlog << Debug(4) << "Discarding track " << i+1
-              << " for storm name mismatch (" << t[i].storm_name()
-              << " != " << conf_info.StormName << ").\n";
-         continue;
-      }
-
-      // Subset the track points based on valid and lead times.
-      for(j = 0, cur.clear(); j < t[i].n_points(); j++) {
-
-         // Valid time window
-         if((conf_info.ValidBeg > 0 &&
-             conf_info.ValidBeg > t[i][j].valid())     ||
-            (conf_info.ValidEnd > 0 &&
-             conf_info.ValidEnd < t[i][j].valid())     ||
-            (conf_info.ValidInc.n() > 0 &&
-             !conf_info.ValidInc.has(t[i][j].valid())) ||
-            (conf_info.ValidExc.n() > 0 &&
-             conf_info.ValidExc.has(t[i][j].valid()))) continue;
-
-         // Valid hour and lead time
-         if((conf_info.ValidHour.n() > 0 &&
-             !conf_info.ValidHour.has(t[i][j].valid_hour())) ||
-            (conf_info.LeadTime.n() > 0 &&
-             !conf_info.LeadTime.has(t[i][j].lead()))) continue;
-
-         // Add the current point to the track
-         cur.add(t[i][j]);
-      }
-
-      // Add the current track
-      if(cur.n_points() > 0) tracks.add(cur);
-   }
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

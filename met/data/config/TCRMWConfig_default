@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Filter input data down to a single storm track
+// Filter input track data lines.
 //
 
 //
@@ -29,20 +29,9 @@ basin = "";
 cyclone = "";
 
 //
-// Storm name (only for BEST tracks)
-//
-storm_name = "";
-
-//
 // Model initialization time
 //
 init_inc = "";
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Subset the single track down to individual points
-//
 
 //
 // Subset by the valid time
