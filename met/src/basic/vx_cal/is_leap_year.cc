@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_cal.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,7 +94,6 @@ unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
   const char *ptr = getenv("MET_DEBUG");
-  bool debug = (NULL != ptr && 0 < strlen(ptr));
   
   if (!no_leap || sec_per_unit != 86400) {
     ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
@@ -121,11 +121,10 @@ unixtime add_to_unixtime(unixtime base_unixtime,
     if (day == 0) day == 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
     ut += (time_fraction * sec_per_unit);
-    if (debug) {
-      cout << "add_to_unixtime() -> " << unix_to_yyyymmdd_hhmmss(base_unixtime)
-           << " plus " << time_value << " days = "
-           << unix_to_yyyymmdd_hhmmss(ut) << "\n";
-    }
+    mlog << Debug(5) << "add_to_unixtime() -> "
+         << unix_to_yyyymmdd_hhmmss(base_unixtime)
+         << " plus " << time_value << " days = "
+         << unix_to_yyyymmdd_hhmmss(ut) << "\n";
   }
   
   return ut;
