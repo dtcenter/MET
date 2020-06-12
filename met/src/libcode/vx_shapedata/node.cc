@@ -163,7 +163,7 @@ void Node::add_child(const Polyline * poly) {
       if(!n_ptr->sibling) {
 
          mlog << Error << "\nNode::add_child() -> "
-	      << "memory allocation error\n\n";
+              << "memory allocation error\n\n";
 
          delete n_ptr;  n_ptr = 0;   //  shouldn't be needed
 
