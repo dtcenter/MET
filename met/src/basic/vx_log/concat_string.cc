@@ -44,7 +44,7 @@ static bool is_empty(const char *);
 
 
 ConcatString::ConcatString()
-
+: Precision(0)
 {
 
 init_from_scratch();
@@ -58,7 +58,7 @@ set_alloc_inc(default_cs_alloc_inc);
 
 
 ConcatString::ConcatString(int _alloc_inc)
-
+: Precision(0)
 {
 
 init_from_scratch();
@@ -350,12 +350,13 @@ if ( (k < 0) || (k > concat_string_max_precision) )  {
 
 }
 
+if (Precision != k) {
+   Precision = k;
 
-Precision = k;
+   memset(FloatFormat, 0, sizeof(FloatFormat));
 
-memset(FloatFormat, 0, sizeof(FloatFormat));
-
-snprintf(FloatFormat, sizeof(FloatFormat), "%%.%df", Precision);
+   snprintf(FloatFormat, sizeof(FloatFormat), "%%.%df", Precision);
+}
 
 return;
 
