@@ -844,14 +844,16 @@ void set_tmp_dir(const StringArray & a) {
    tmp_dir << a[0];
    DIR * dp = 0;
 
-   if((dp = met_opendir(tmp_dir.c_str())) == NULL) {
+   dp = met_opendir(tmp_dir.c_str();
+   if(!dp) {
       mlog << Error << "\nparse_command_line() -> "
            << "Cannot access the tmp_dir temporary directory: "
            << tmp_dir << "\n\n";
       exit(1);
    }
-
-   if(dp) met_closedir(dp);
+   else {
+      met_closedir(dp);
+   }
 
    setenv("MET_TMP_DIR", tmp_dir.c_str(), 1);
 }
