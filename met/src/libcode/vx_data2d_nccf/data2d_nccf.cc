@@ -538,6 +538,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                  << " (0 <= offset < " << time_dim_size << ")";
       }
       else if (error_code == error_code_missing_time_value) {
+         long time_value = (time_as_value ? dim_offset : -1);
          log_msg << "does not have the matching time "
                  << unix_to_yyyymmdd_hhmmss(time_value) << " ["
                  << unix_to_yyyymmdd_hhmmss(_file->ValidTime.min()) << " and "
