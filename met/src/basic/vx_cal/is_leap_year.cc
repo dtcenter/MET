@@ -93,7 +93,6 @@ void increase_one_month(int &year, int &month) {
 unixtime add_to_unixtime(unixtime base_unixtime,
     int sec_per_unit, double time_value, bool no_leap) {
   unixtime ut;
-  const char *ptr = getenv("MET_DEBUG");
   
   if (!no_leap || sec_per_unit != 86400) {
     ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
