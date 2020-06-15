@@ -3,8 +3,10 @@
 Chapter 15 MODE Tool
 ====================
 
-15.1 Introduction
-_________________
+.. _MODE_Introduction:
+
+Introduction
+____________
 
 This chapter provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in Davis {\it et al.} (2006a, b), Brown {\it et al.} (2007) and Bullock {\it et al.} (2016). 
 
