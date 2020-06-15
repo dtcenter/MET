@@ -115,7 +115,7 @@ void copy_nc_data_as_double(double *to_array, const T *from_array,
 
 void check_nc_data_2d(const double *from_array, const int nx, const int ny,
                       const double missing_value) {
-   int count_zero, count_missing, count_valid, offset;
+   int count_zero, count_missing, count_valid;
    count_zero = count_missing = count_valid = 0;
    for (int y=0; y<ny; ++y) {
       int start_offset = y * nx;
@@ -586,8 +586,6 @@ if ( dimCount >= max_met_args )  {
 
 
 int j, count;
-int x, y;
-double value;
 bool found = false;
 NcVarInfo * var = (NcVarInfo *) 0;
 const int Nx = grid.nx();
@@ -689,7 +687,7 @@ plane.set_size(Nx, Ny);
    //  get the data
    //
    clock_t clock_time;
-   double time_taken, nc_time;
+   double nc_time;
    float add_offset   = 0.f;
    float scale_factor = 1.f;
    NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
@@ -710,7 +708,6 @@ plane.set_size(Nx, Ny);
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
 
-   int start_offset;
    int *int_array = (int *)0;
    short *short_array = (short *)0;
    float *float_array = (float *)0;
@@ -760,8 +757,8 @@ plane.set_size(Nx, Ny);
 
    }   //  switch
 
+   nc_time = clock();
    if (mlog.verbosity_level() >= 7) {
-      nc_time = clock();
       double duration_sec = (double)(nc_time - clock_time)/CLOCKS_PER_SEC;
       check_nc_data_2d(data_array, Nx, Ny, missing_value);
       mlog << Debug(7) << method_name_short << "took " << duration_sec

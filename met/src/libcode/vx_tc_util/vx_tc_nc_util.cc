@@ -19,8 +19,6 @@ void write_tc_tracks(NcFile* nc_out,
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
-    mlog << Debug(4) << track.serialize() << "\n";
-
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
     NcVar track_lines_var = nc_out->addVar(
@@ -56,13 +54,15 @@ void write_tc_tracks(NcFile* nc_out,
     vector<size_t> offsets;
     vector<size_t> counts;
 
+    mlog << Debug(2) << "Writing " << track_lines.n() << " track lines.\n";
+
     for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
         offsets.push_back(i);
         counts.clear();
         counts.push_back(1);
         string line = track_lines[i];
-        mlog << Debug(2) << line << "\n";
+        mlog << Debug(3) << line << "\n";
         const char* str = line.c_str();
         track_lines_var.putVar(offsets, counts, &str);
     }

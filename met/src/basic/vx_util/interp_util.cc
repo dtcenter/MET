@@ -541,9 +541,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 
 void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    int idx_x, idx_y;
-   int weight_cnt;
    double value;
-   double weight_sum;
    int max_r = gaussian.max_r;
    int g_nx = max_r * 2 + 1;
    int nx = dp.nx();

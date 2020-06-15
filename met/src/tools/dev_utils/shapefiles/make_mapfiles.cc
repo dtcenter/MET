@@ -327,7 +327,7 @@ DbfSubRecord * r                = 0;
    //  get the country names (and admin names, if they're there) from the dbf file
    //
 
-if ( (fd = open(dbf_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(dbf_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": get_record_infos() -> unable to open dbf file \""
         << dbf_filename << "\"\n\n";
@@ -422,7 +422,7 @@ for (j=0; j<(hd.n_records); ++j)  {
    }
    else  {
       s << cs_erase << "REC" << j+1;
-   } 
+   }
 
    records[j].country = s;
 
@@ -446,7 +446,7 @@ for (j=0; j<(hd.n_records); ++j)  {
    //  done with the dbf file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    ///////////////////////////////////////////
 
@@ -457,7 +457,7 @@ ShxRecord rx;
    //  get the offsets and record lengths from the shx file
    //
 
-if ( (fd = open(shx_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shx_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": get_record_infos() -> unable to open shx file \""
         << shx_filename << "\"\n\n";
@@ -505,7 +505,7 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
    //  done with shx file
    //
 
-close(fd);  fd = -1;
+close(fd);
 
    //
    //  done
@@ -574,7 +574,7 @@ output_filename << s << "_data";
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
@@ -589,7 +589,7 @@ if ( ! f )  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": make_one_file() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
@@ -645,7 +645,7 @@ for (j=0; j<n_records; ++j)  {
 
 f.close();
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -685,7 +685,7 @@ for (j=0; j<n_records; ++j)  {
    //  open shp file
    //
 
-if ( (fd = open(shp_filename, O_RDONLY)) < 0 )  {
+if ( (fd = met_open(shp_filename, O_RDONLY)) < 0 )  {
 
    cerr << "\n  " << program_name << ": make_separate_files() -> unable to open shp file \""
         << shp_filename << "\"\n\n";
@@ -733,7 +733,7 @@ for (k=0; k<(names.n()); ++k)  {
    //  done
    //
 
-close(fd);  fd = -1;
+close(fd);
 
 return;
 
@@ -758,7 +758,7 @@ ofstream f;
    //  open output file
    //
 
-f.open(output_filename);
+met_open(f, output_filename.c_str());
 
 if ( ! f )  {
 
@@ -865,5 +865,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

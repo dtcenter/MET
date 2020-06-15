@@ -279,6 +279,12 @@ unixtime ATCFLineBase::valid() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ATCFLineBase::valid_hour() const {
+   return(unix_to_sec_of_day(valid()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int ATCFLineBase::lead() const {
    double fp = forecast_period();
    int    s  = bad_data_int;

@@ -175,4 +175,3 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && if [[ $MET_GIT_NAME == "met-"* ]]; then cd /met; rm -rf MET-*; fi \
  && echo "Downloading GhostScript fonts from ${GSFONT_URL}" \
  && curl -SL ${GSFONT_URL} | tar zxC /usr/local/share/met
-

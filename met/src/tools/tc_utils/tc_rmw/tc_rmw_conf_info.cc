@@ -58,7 +58,6 @@ void TCRMWConfInfo::clear() {
     StormId.clear();
     Basin.clear();
     Cyclone.clear();
-    StormName.clear();
 
     InitInc = (unixtime) 0;
     ValidBeg = ValidEnd = (unixtime) 0;
@@ -129,9 +128,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: cyclone
     Cyclone = Conf.lookup_string(conf_key_cyclone);
-
-    // Conf: storm_name
-    StormName = Conf.lookup_string(conf_key_storm_name);
 
     // Conf: init_inc
     InitInc = Conf.lookup_unixtime(conf_key_init_inc);
