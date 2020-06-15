@@ -84,11 +84,13 @@ In this example, the Series-Analysis tool will process the list of forecast and 
 
 13.2.2 series_analysis output
 
-The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the plot_data_plane tool can be used to visualize the output. An example of Series-Analysis output is shown in Figure [Glibert_precip] below. 
+The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the plot_data_plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
 
-.. figure:: figure/series-analysis_fig1.png
+.. _series-analysis_Glibert_precip:
 
-	    Figure 13.1 An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
+.. figure:: figure/series-analysis_Glibert_precip.png
+
+   An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
 
 13.2.3 series_analysis configuration file
 

@@ -26,13 +26,17 @@ To match forecasts and observations in the horizontal plane, the user can select
 
 This section describes the options for interpolation in the horizontal.
 
+.. _point_stat_fig1:
+
 .. figure:: figure/point_stat_fig1.png
 
-	    Figure 7.1 Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
+   Diagram illustrating matching and interpolation methods used in MET. See text for explanation.
+
+.. _point_stat_fig2:
 
 .. figure:: figure/point_stat_fig2.jpg
 
-	    Figure 7.2 Illustration of some matching and interpolation methods used in MET. See text for explanation.
+   Illustration of some matching and interpolation methods used in MET. See text for explanation.
 
 ____________________
 
@@ -117,11 +121,13 @@ The Point-Stat tool has been enhanced to include the High Resolution Assessment 
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated. 
 
-Figure 7.3 shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
+   shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
+
+.. _point_stat_fig3:
 
 .. figure:: figure/point_stat_fig3.png
 
-	    Figure 7.3 Example showing how HiRA proportions are calculated.
+   Example showing how HiRA proportions are calculated.
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined. 
 

@@ -44,11 +44,13 @@ $$F(x,y)=M(x,y)f(x,y).$$
 
 Thus, two parameters — the radius of influence $R$, and the threshold $T$ — control the entire process of resolving objects in the raw data field.
 
-An example of the steps involved in resolving objects is shown in Figure [Fig_MODE_object_id]. Figure [Fig_MODE_object_id]a shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, Figure [Fig_MODE_object_id]d shows the objects once the original precipitation values have been restored to the interiors of the objects.
+An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. :numref:`mode-object_id` shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
-.. figure:: figure/mode_fig1.png
+.. _mode-object_id:
 
-	    Figure 15.1 Example of an application of the MODE object identification process to a model precipitation field.  ?? The lyx document, MET_Users_Guide_Master.lyx and the web page don't have figure 15.1 in the same location.
+.. figure:: figure/mode-object_id.png
+
+   Example of an application of the MODE object identification process to a model precipitation field.  ?? The lyx document, MET_Users_Guide_Master.lyx and the web page don't have figure 15.1 in the same location.
 Web: above 15.2.3 Fuzzy Logic: https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf page 307.
 Lyx: Just above 15.2.2 Attributes.  Where does it belong??
 
