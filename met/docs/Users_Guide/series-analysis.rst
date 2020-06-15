@@ -1,14 +1,15 @@
 .. _series-analysis:
 
-Chapter 13 Series-Analysis Tool
-===============================
+Series-Analysis Tool
+====================
 
-13.1 Introduction
-_________________
+Introduction
+____________
 
 The Series-Analysis Tool accumulates statistics separately for each horizontal grid location over a series. Often, this series is over time or height, though any type of series is possible. This differs from the Grid-Stat tool in that Grid-Stat verifies all grid locations together as a group. Thus, the Series-Analysis Tool can be used to find verification information specific to certain locations or see how model performance varies over the domain. 
 
-13.2 Practical Information
+Practical Information
+_____________________
 
 This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in the Chapter [chap:The-Grid-Stat-Tool]. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
 
@@ -20,11 +21,14 @@ To define a time series of forecasts that all have the same valid time, set the 
 
 To define a series of vertical levels all contained in a single input file, set the forecast and observation fields to a list of the vertical levels to be used. Pass the tool single forecast and observation files containing the vertical level data. The tool will loop over the forecast field entries, extract that field from the input forecast file, and then search the observation file for a matching record.
 
-13.2.1 series_analysis usage
+series_analysis usage
+~~~~~~~~~~~~~~~~~~~~~
 
 The usage statement for the Series-Analysis tool is shown below:
 
-Usage: series_analysis
+.. code-block:: none
+
+  Usage: series_analysis
 
 {\hskip 0.5in}-fcst  file_1 ... file_n | fcst_file_list
 
@@ -47,6 +51,7 @@ Usage: series_analysis
 series_analysis has four required arguments and accepts several optional ones. 
 
 Required arguments series_stat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The -fcst file_1 ... file_n | fcst_file_list options specify the gridded forecast files or ASCII files containing lists of file names to be used.
 
@@ -57,6 +62,7 @@ Required arguments series_stat
 4. The -config file is a Series-Analysis Configuration file containing the desired settings.
 
 Optional arguments for series_analysis
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. To set both the forecast and observations to the same set of files, use the optional -both file_1 ... file_n | both_file_list option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
 
@@ -70,19 +76,18 @@ Optional arguments for series_analysis
 
 An example of the series_analysis calling sequence is shown below:
 
-series_analysis \
+.. code-block:: none
 
--fcst   myfcstfilelist.txt \
-
--obs    myobsfilelist.txt \
-
--config SeriesAnalysisConfig \
-
--out    out/my_series_statistics.nc
+  series_analysis \
+  -fcst   myfcstfilelist.txt \
+  -obs    myobsfilelist.txt \
+  -config SeriesAnalysisConfig \
+  -out    out/my_series_statistics.nc
 
 In this example, the Series-Analysis tool will process the list of forecast and observation files specified in the text file lists into statistics for each grid location using settings specified in the configuration file. Series-Analysis will create an output NetCDF file containing requested statistics. 
 
-13.2.2 series_analysis output
+series_analysis output
+~~~~~~~~~~~~~~~~~~~~~~
 
 The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the plot_data_plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
 
@@ -92,87 +97,70 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
    An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
 
-13.2.3 series_analysis configuration file
-
+series_analysis configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The default configuration file for the Series-Analysis tool named SeriesAnalysisConfig_default can be found in the installed share/met/config directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
 
+____________________
 
+.. code-block:: none
 
-model          = "WRF";
-
-desc           = "NA";
-
-obtype         = "ANALYS";
-
-regrid         = { ... }
-
-fcst           = { ... }
-
-obs            = { ... }
-
-climo_mean     = { ... }
-
-climo_stdev    = { ... }
-
-ci_alpha       = [ 0.05 ];
-
-boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-
-                   rng = "mt19937"; seed = ""; }
-
-mask           = { grid = [ "FULL" ]; poly = []; }
-
-rank_corr_flag = TRUE;
-
-tmp_dir        = "/tmp";
-
-version        = "VN.N";
+  model          = "WRF";
+  desc           = "NA";
+  obtype         = "ANALYS";
+  regrid         = { ... }
+  fcst           = { ... }
+  obs            = { ... }
+  climo_mean     = { ... }
+  climo_stdev    = { ... }
+  ci_alpha       = [ 0.05 ];
+  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                     rng = "mt19937"; seed = ""; }
+  mask           = { grid = [ "FULL" ]; poly = []; }
+  rank_corr_flag = TRUE;
+  tmp_dir        = "/tmp";
+  version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
+____________________
 
+.. code-block:: none
 
-block_size = 1024;
+  block_size = 1024;
 
 Number of grid points to be processed concurrently. Set smaller to use less memory but increase the number of passes through the data. The amount of memory the Series-Analysis tool consumes is determined by the size of the grid, the length of the series, and the block_size entry defined above. The larger this entry is set the faster the tool will run, subject to the amount of memory available on the machine.
 
 
+____________________
 
-vld_thresh = 1.0;
+.. code-block:: none
+
+  vld_thresh = 1.0;
 
 Ratio of valid matched pairs for the series of values at each grid point required to compute statistics. Set to a lower proportion to allow some missing values. Setting it to 1.0 requires that every data point be valid over the series to compute statistics.
 
 
+____________________
 
-output_stats = {
+.. code-block:: none
 
-   fho    = [];
-
-   ctc    = [];
-
-   cts    = [];
-
-   mctc   = [];
-
-   mcts   = [];
-
-   cnt    = ["RMSE", "FBAR", "OBAR"];
-
-   sl1l2  = [];
-
-   sal1l2 = [];
-
-   pct    = [];
-
-   pstd   = [];
-
-   pjc    = [];
-
-   prc    = [];
-
-}
+  output_stats = {
+     fho    = [];
+     ctc    = [];
+     cts    = [];
+     mctc   = [];
+     mcts   = [];
+     cnt    = ["RMSE", "FBAR", "OBAR"];
+     sl1l2  = [];
+     sal1l2 = [];
+     pct    = [];
+     pstd   = [];
+     pjc    = [];
+     prc    = [];
+  }
 
 The output_stats array controls the type of output that the Series-Analysis tool generates. Each flag corresponds to an output line type in the STAT file and is used to specify the comma-separated list of statistics to be computed. Use the column names from the tables listed below to specify the statistics. The output flags correspond to the following types of output line types:
 

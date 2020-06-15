@@ -1,10 +1,10 @@
 .. _mode:
 
-Chapter 15 MODE Tool
-====================
+MODE Tool
+=========
 
-15.1 Introduction
-_________________
+Introduction
+____________
 
 This chapter provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in Davis {\it et al.} (2006a, b), Brown {\it et al.} (2007) and Bullock {\it et al.} (2016). 
 
@@ -14,11 +14,13 @@ MODE is only one of a number of different approaches that have been developed in
 
 MODE may be used in a generalized way to compare any two fields. For simplicity, field1 may be thought of in this chapter as ``the forecast,'' while field2 may be thought of as ``the observation'', which is usually a gridded analysis of some sort. The convention of field1/field2 is also used in :ref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call ``regions of interest.'' Object attributes are calculated and compared, and are used to associate (``merge'') objects within a single field, as well as to ``match'' objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
 
-15.2 Scientific and statistical aspects
+Scientific and statistical aspects
+__________________________________
 
 The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
 
-15.2.1 Resolving objects
+Resolving objects
+~~~~~~~~~~~~~~~~~
 
 The process used for resolving objects in a raw data field is called convolution thresholding. The raw data field is first convolved with a simple filter function as follows:
 
@@ -55,7 +57,8 @@ Web: above 15.2.3 Fuzzy Logic: https://dtcenter.org/sites/default/files/communit
 Lyx: Just above 15.2.2 Attributes.  Where does it belong??
 
 
-15.2.2 Attributes
+Attributes
+~~~~~~~~~~
 
 Object attributes are defined both for single objects and for object pairs. One of the objects in a pair is from the forecast field and the other is taken from the observed field. 
 
@@ -75,7 +78,8 @@ All the attributes discussed so far are defined for single objects. Once these a
 
 Several area measures are also used for pair attributes. {\bf Union Area} is the total area that is in either one (or both) of the two objects. {\bf Intersection Area} is the area that is inside both objects simultaneously. {\bf Symmetric Difference} is the area inside at least one object, but not inside both.
 
-15.2.3 Fuzzy logic
+Fuzzy logic
+~~~~~~~~~~~
 
 Once object attributes \alpha_{1},\alpha_{2},\ldots,\alpha_{n} are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. Merging refers to grouping together objects in a single field, while matching refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps I_{i} are applied to the individual attributes \alpha_{i} to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (e.g., intersection area), low values indicate low interest, and high values indicate more interest.
 
@@ -89,21 +93,26 @@ This total interest value is then thresholded, and pairs of objects that have to
 
 Another merging method is available in MODE, which can be used instead of, or along with, the fuzzy logic based merging just described. Recall that the convolved field is thresholded to produce the mask field. A second (lower) threshold can be specified so that objects that are separated at the higher threshold but joined at the lower threshold are merged.
 
-15.2.4 Summary statistics
+Summary statistics
+~~~~~~~~~~~~~~~~~~
 
 Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to Section [subsec:MODE-output] for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
-15.3 Practical information
+Practical information
+_____________________
 
 This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. The requirement of having all gridded fields using the same grid specification has been removed with METv5.1. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
 
 MODE provides the capability to select a single model variable/level from which to derive objects to be analyzed. MODE was developed and tested using accumulated precipitation. However, the code has been generalized to allow the use of any gridded model and observation field. Based on the options specified in the configuration file, MODE will define a set of simple objects in the model and observation fields. It will then compute an interest value for each pair of objects across the fields using a fuzzy engine approach. Those interest values are thresholded, and any pairs of objects above the threshold will be matched/merged. Through the configuration file, MODE offers a wide range of flexibility in how the objects are defined, processed, matched, and merged.
 
-15.3.1 mode usage
+mode usage
+~~~~~~~~~~
 
 The usage statement for the MODE tool is listed below:
 
-Usage: mode
+.. code-block:: none
+
+  Usage: mode
 
 {\hskip 0.5in}fcst_file
 
@@ -124,6 +133,7 @@ Usage: mode
 The MODE tool has three required arguments and can accept several optional arguments.
 
 Required arguments for mode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The fcst_file argument indicates the gridded file containing the model field to be verified.
 
@@ -132,6 +142,7 @@ Required arguments for mode
 3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for mode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The -config_merge merge_config_file option indicates the name of a second configuration file to be used when performing fuzzy engine merging by comparing the model or observation field to itself. The MODE tool provides the capability of performing merging within a single field by comparing the field to itself. Interest values are computed for each object and all of its neighbors. If an object and its neighbor have an interest value above some threshold, they are merged. The merge_config_file controls the settings of the fuzzy engine used to perform this merging step. If a merge_config_file is not provided, the configuration specified by the config_file in the previous argument will be used.
 
@@ -145,61 +156,63 @@ Optional arguments for mode
 
 An example of the MODE calling sequence is listed below:
 
-Example 1:
+**Example 1:**
 
-mode sample_fcst.grb \
+.. code-block:: none
 
-sample_obs.grb \
-
-MODEConfig_grb
+  mode sample_fcst.grb \
+  sample_obs.grb \
+  MODEConfig_grb
 
 In Example 1, the MODE tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the MODEConfig_grb file.
 
 A second example of the MODE calling sequence is presented below:
 
-Example 2:
+**Example 2:**
 
-mode sample_fcst.nc \
+.. code-block:: none
 
-sample_obs.nc \
-
-MODEConfig_nc
+  mode sample_fcst.nc \
+  sample_obs.nc \
+  MODEConfig_nc
 
 In Example 2, the MODE tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine using the observations in the sample_obs.nc NetCDF output of pcp_combine, using the configuration options specified in the MODEConfig_nc file. Since the model and observation files contain only a single field of accumulated precipitation, the MODEConfig_nc file should specify that accumulated precipitation be verified.
 
-15.3.2 mode configuration file
+mode configuration file
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the MODE tool, MODEConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of MODEConfig_default and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
 Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
 
+_____________________
 
+.. code-block:: none
 
-model          = "WRF";
-
-desc           = "NA";
-
-obtype         = "ANALYS";
-
-regrid         = { ... }
-
-met_data_dir   = "MET_BASE";
-
-output_prefix  = "";
-
-version        = "VN.N";
+  model          = "WRF";
+  desc           = "NA";
+  obtype         = "ANALYS";
+  regrid         = { ... }
+  met_data_dir   = "MET_BASE";
+  output_prefix  = "";
+  version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
 
 
+_____________________
 
-grid_res = 4;
+.. code-block:: none
+
+  grid_res = 4;
 
 The grid_res entry is the nominal spacing for each grid square in kilometers. This entry is not used directly in the code, but subsequent entries in the configuration file are defined in terms of it. Therefore, setting this appropriately will help ensure that appropriate default values are used for these entries.
 
+_____________________
 
+.. code-block:: none
 
-quilt = FALSE;
+  quilt = FALSE;
 
 The quilt entry indicates whether all permutations of convolution radii and thresholds should be run.
 
@@ -207,39 +220,26 @@ The quilt entry indicates whether all permutations of convolution radii and thre
 
 • If TRUE, the number of forecast and observation convolution radii must match and the number of forecast and observation convolution thresholds must match. For N radii and M thresholds, NxM configurations of MODE will be run.
 
+_____________________
 
+.. code-block:: none
 
-fcst = {
-
-   field = {
-
-      name = "APCP";
-
-      level = "A03";
-
-   }
-
-   censor_thresh      = [];
-
-   censor_val         = [];
-
-   conv_radius        = 60.0/grid_res; // in grid squares
-
-   conv_thresh        = >=5.0;
-
-   vld_thresh         = 0.5;
-
-   filter_attr_name   = [];
-
-   filter_attr_thresh = [];
-
-   merge_thresh       = >=1.25;
-
-   merge_flag         = THRESH;
-
-}
-
-obs = fcst; 
+  fcst = {
+     field = {
+        name = "APCP";
+        level = "A03";
+     }
+     censor_thresh      = [];
+     censor_val         = [];
+     conv_radius        = 60.0/grid_res; // in grid squares
+     conv_thresh        = >=5.0;
+     vld_thresh         = 0.5;
+     filter_attr_name   = [];
+     filter_attr_thresh = [];
+     merge_thresh       = >=1.25;
+     merge_flag         = THRESH;
+  }
+  obs = fcst; 
 
 The field entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in Section [subsec:IO_General-MET-Config-Options]. In the above example, the forecast settings are copied into the observation dictionary using obs = fcst;.
 
@@ -275,9 +275,11 @@ The merge_flag entry controls what type of merging techniques will be applied to
 
 By default, the double thresholding merging technique is applied.
 
+_____________________
 
+.. code-block:: none
 
-mask_missing_flag = NONE;
+  mask_missing_flag = NONE;
 
 The mask_missing_flag entry specifies how missing data in the raw model and observation fields will be treated. 
 
@@ -292,8 +294,11 @@ The mask_missing_flag entry specifies how missing data in the raw model and obse
 Prior to defining objects, it is recommended that the raw fields be made to look similar to each other by assigning a value of BOTH to this parameter. However, by default no masking is performed.
 
 
+_____________________
 
-match_flag = MERGE_BOTH;
+.. code-block:: none
+
+  match_flag = MERGE_BOTH;
 
 The match_flag entry controls how matching will be performed when comparing objects from the forecast field to objects from the observation field. An interest value is computed for each possible pair of forecast/observation objects. The interest values are then thresholded to define which objects match. If two objects in one field happen to match the same object in the other field, then those two objects could be merged. The match_flag entry controls what type of merging is allowed in this context. 
 
@@ -307,25 +312,24 @@ The match_flag entry controls how matching will be performed when comparing obje
 
 By default, additional merging is allowed in both fields.
 
+_____________________
 
+.. code-block:: none
 
-max_centroid_dist = 800/grid_res;
+  max_centroid_dist = 800/grid_res;
 
 Computing the attributes for all possible pairs of objects can take some time depending on the numbers of objects. The max_centroid_dist entry is used to specify how far apart objects should be in order to conclude that they have no chance of matching. No pairwise attributes are computed for pairs of objects whose centroids are farther away than this distance, defined in terms of grid units. Setting this entry to a reasonable value will improve the execution time of the MODE tool. By default, the maximum centroid distance is defined in terms of the previously defined grid_res entry.
 
+_____________________
 
+.. code-block:: none
 
-mask = {
-
-   grid = "";
-
-   grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-
-   poly = "";
-
-   poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-
-}
+  mask = {
+     grid = "";
+     grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+     poly = "";
+     poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+  }
 
 Defining a grid and poly masking region is described in Section [subsec:IO_General-MET-Config-Options]. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
 
@@ -342,120 +346,97 @@ The grid_flag and poly_flag entries specify how the grid and polyline masking sh
 By default, no masking grid or polyline is applied.
 
 
+_____________________
 
-weight = {
+.. code-block:: none
 
-   centroid_dist    = 2.0;
-
-   boundary_dist    = 4.0;
-
-   convex_hull_dist = 0.0;
-
-   angle_diff       = 1.0;
-
-   aspect_diff      = 0.0;
-
-   area_ratio       = 1.0;
-
-   int_area_ratio   = 2.0;
-
-   curvature_ratio  = 0.0;
-
-   complexity_ratio = 0.0;
-
-   inten_perc_ratio = 0.0;
-
-   inten_perc_value = 50;
-
-} 
+  weight = {
+     centroid_dist    = 2.0;
+     boundary_dist    = 4.0;
+     convex_hull_dist = 0.0;
+     angle_diff       = 1.0;
+     aspect_diff      = 0.0;
+     area_ratio       = 1.0;
+     int_area_ratio   = 2.0;
+     curvature_ratio  = 0.0;
+     complexity_ratio = 0.0;
+     inten_perc_ratio = 0.0;
+     inten_perc_value = 50;
+  } 
 
 The weight entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. The weights listed above correspond to the centroid distance between the objects, the boundary distance (or minimum distance), the convex hull distance (or minimum distance between the convex hulls of the objects), the orientation angle difference, the aspect ratio difference, the object area ratio (minimum area divided by maximum area), the intersection divided by the minimum object area ratio, the curvature ratio, the complexity ratio, and the intensity ratio. The weights need not sum to any particular value. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
 
 The inten_perc_value entry corresponds to the inten_perc_ratio. The inten_perc_value should be set between 0 and 102 to define which percentile of intensity should be compared for pairs of objects. 101 and 102 specify the intensity mean and sum, respectively. By default, the 50th percentile, or median value, is chosen.
 
+_____________________
 
+.. code-block:: none
 
-interest_function = {
-
-   centroid_dist      = ( ... );
-
-   boundary_dist      = ( ... );
-
-   convex_hull_dist   = ( ... );
-
-   angle_diff         = ( ... );
-
-   aspect_diff        = ( ... );
-
-   corner             = 0.8;
-
-   ratio_if           = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
-
-   area_ratio         = ratio_if;
-
-   int_area_ratio     = ( ... );
-
-   curvature_ratio    = ratio_if;
-
-   complexity_ratio   = ratio_if;
-
-   inten_perc_ratio   = ratio_if;
-
-}
+  interest_function = {
+     centroid_dist      = ( ... );
+     boundary_dist      = ( ... );
+     convex_hull_dist   = ( ... );
+     angle_diff         = ( ... );
+     aspect_diff        = ( ... );
+     corner             = 0.8;
+     ratio_if           = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
+     area_ratio         = ratio_if;
+     int_area_ratio     = ( ... );
+     curvature_ratio    = ratio_if;
+     complexity_ratio   = ratio_if;
+     inten_perc_ratio   = ratio_if;
+  }
 
 The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section [sec:MODE_A-Scientific-and-statistical]for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
 
 
+_____________________
 
-total_interest_thresh = 0.7;
+.. code-block:: none
+
+  total_interest_thresh = 0.7;
 
 The total_interest_thresh entry should be set between 0 and 1. This threshold is applied to the total interest values computed for each pair of objects. Object pairs that have an interest value that is above this threshold will be matched, while those with an interest value that is below this threshold will remain unmatched. Increasing the threshold will decrease the number of matches while decreasing the threshold will increase the number of matches. By default, the total interest threshold is set to 0.7.
 
 
+_____________________
 
-print_interest_thresh = 0.0;
+.. code-block:: none
+
+  print_interest_thresh = 0.0;
 
 The print_interest_thresh entry determines which pairs of object attributes will be written to the output object attribute ASCII file. The user may choose to set the print_interest_thresh to the same value as the total_interest_thresh, meaning that only object pairs that actually match are written to the output file. By default, the print interest threshold is set to zero, meaning that all object pair attributes will be written as long as the distance between the object centroids is less than the max_centroid_dist entry.
 
+_____________________
 
+.. code-block:: none
 
-fcst_raw_plot = {
-
-   color_table = "MET_BASE/colortables/met_default.ctable";
-
-   plot_min = 0.0;
-
-   plot_max = 0.0;
-
-   colorbar_spacing = 1;
-
-}
-
-obs_raw_plot = {
-
-   color_table = "MET_BASE/colortables/met_default.ctable";
-
-   plot_min = 0.0;
-
-   plot_max = 0.0;
-
-   colorbar_spacing = 1;
-
-}
-
-object_plot = {
-
-   color_table = "MET_BASE/colortables/mode_obj.ctable";
-
-}
+  fcst_raw_plot = {
+     color_table = "MET_BASE/colortables/met_default.ctable";
+     plot_min = 0.0;
+     plot_max = 0.0;
+     colorbar_spacing = 1;
+  }
+  obs_raw_plot = {
+     color_table = "MET_BASE/colortables/met_default.ctable";
+     plot_min = 0.0;
+     plot_max = 0.0;
+     colorbar_spacing = 1;
+  }
+  object_plot = {
+     color_table = "MET_BASE/colortables/mode_obj.ctable";
+  }
 
 Specifying dictionaries to define the color_table, plot_min, and plot_max entries are described in Section [subsec:IO_General-MET-Config-Options].
 
 The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The colorbar_spacing entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
 
 
+_____________________
 
-plot_valid_flag = FALSE;
+.. code-block:: none
+
+  plot_valid_flag = FALSE;
 
 When applied, the plot_valid_flag entry indicates that only the region containing valid data after masking is applied should be plotted. 
 
@@ -466,50 +447,55 @@ When applied, the plot_valid_flag entry indicates that only the region containin
 The default value of this flag is FALSE.
 
 
+_____________________
 
-plot_gcarc_flag = FALSE;
+.. code-block:: none
+
+  plot_gcarc_flag = FALSE;
 
 When applied, the plot_gcarc_flag entry indicates that the edges of polylines should be plotted using great circle arcs as opposed to straight lines in the grid. The default value of this flag is FALSE.
 
 
+_____________________
 
-ps_plot_flag  = TRUE;
+.. code-block:: none
 
-ct_stats_flag = TRUE;
+  ps_plot_flag  = TRUE;
+  ct_stats_flag = TRUE;
 
 These flags can be set to TRUE or FALSE to produce additional output, in the form of PostScript plots and contingency table counts and statistics, respectively.
 
 
+_____________________
 
-nc_pairs_flag = {
+.. code-block:: none
 
-   latlon     = TRUE;
-
-   raw        = TRUE;
-
-   object_raw = TRUE;
-
-   object_id  = TRUE;
-
-   cluster_id = TRUE;
-
-   polylines  = TRUE;
-
-}
+  nc_pairs_flag = {
+     latlon     = TRUE;
+     raw        = TRUE;
+     object_raw = TRUE;
+     object_id  = TRUE;
+     cluster_id = TRUE;
+     polylines  = TRUE;
+  }
 
 Each component of the pairs information in the NetCDF file can be turned on or off. The old syntax is still supported: TRUE means accept the defaults, FALSE means no NetCDF output is generated. NetCDF output can also be turned off by setting all the individual dictionary flags to false.
 
 
+_____________________
 
-shift_right = 0;
+.. code-block:: none
+
+  shift_right = 0;
 
 When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the ``cut'' longitude to be separated into two objects. Shifting the grid by integer number of grid units enables the user to control where that longitude cut line occurs.
 
-15.3.3 mode output
+mode output
+~~~~~~~~~~~
 
 MODE produces output in ASCII, NetCDF, and PostScript formats.
 
-ASCII output
+**ASCII output**
 
 The MODE tool creates two ASCII output files. The first ASCII file contains contingency table counts and statistics for comparing the forecast and observation fields. This file consists of 4 lines. The first is a header line containing column names. The second line contains data comparing the two raw fields after any masking of bad data or based on a grid or lat/lon polygon has been applied. The third contains data comparing the two fields after any raw thresholds have been applied. The fourth, and last, line contains data comparing the derived object fields scored using traditional measures.
 
@@ -1125,7 +1111,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Y-Coordinate
       
-Postscript File
+**Postscript File**
 
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the ps_plot_flag configuration file option.
 
