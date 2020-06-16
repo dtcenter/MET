@@ -1,16 +1,17 @@
 .. _tc-dland:
 
-Chapter 19 TC-Dland Tool
-========================
+19 TC-Dland Tool
+================
 
-19.1 Introduction
-_________________
+Introduction
+____________
 
 Many filtering criteria within the MET-TC tools depend on the distinction between when a storm is over land or water. The TC-dland tool was developed to aid in quickly parsing data for filter jobs that only verify over water, threshold verification based on distance to land, and exclusion of forecasts outside a specified time window of landfall. For each grid point in the user-specified grid, it computes the great circle arc distance to the nearest coast line. Great circle arc distances are more accurate but take considerably longer to compute than a simple Euclidean distance. Grid points over land have distances greater than zero while point over land have distances less than zero.
 
 While the TC-dland tool is available to be run, most users will find the pre-computed distance to land files distributed with the release sufficient. Therefore, the typical user will not actually need to run this tool.
 
-19.2 Input/output format
+Input/output format
+___________________
 
 The input for the TC-dland tool is a file containing the longitude (degrees east) and latitude (degrees north) of all the coastlines and islands considered to be a significant landmass. The default input is to use all three land data files (aland.dat, shland.dat, wland.dat) found in the installed share/met/tc_data/ directory. The use of all three files produces a global land data file. The aland.dat file contains the longitude and latitude distinctions used by NHC for the Atlantic and eastern North Pacific basins, the shland.dat contains longitude and latitude distinctions for the Southern Hemisphere (south Pacific and South Indian Ocean), and the wland.dat contains the remainder of the Northern Hemisphere (western North Pacific and North Indian Ocean). Users may supply their own input file in order to refine the definition of coastlines and a significant landmass.
 
@@ -20,13 +21,17 @@ dland_nw_hem_tenth_degree.nc: TC-dland output from aland.dat using a 1/10th degr
 
 dland_global_tenth_degree.nc: TC-dland output from all three land data files (global coverage) using a 1/10th degree grid.
 
-19.3 Practical information
+Practical information
+_____________________
 
 This section briefly describes how to run tc_dland. The default grid is set to 1/10th degree NW hemisphere grid.
 
-19.3.1 tc_dland usage
+tc_dland usage
+~~~~~~~~~~~~~~
 
-Usage: tc_dland
+.. code-block:: none
+
+  Usage: tc_dland
 
 {\hskip 0.5in}out_file
 
@@ -45,10 +50,12 @@ Usage: tc_dland
 tc_dland has one required arguments and accepts several optional ones.
 
 Required arguments for tc_dland
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The out_file argument indicates indicates the NetCDF output file containing the computed distances to land.
 
 Optional arguments for tc_dland
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2. The -grid spec argument overrides the default grid (1/10th NH grid). Spec = lat_ll lon_ll delta_lat delta_lon n_lat n_lon
 

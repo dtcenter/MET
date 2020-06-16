@@ -1,9 +1,9 @@
-.. _appendixC:
+m.. _appendixC:
 
 Appendix C Verification Measures
 ================================
 
-?? Renumber chapters?
+
 
 Which statistics are the same, but with different names?
 ________________________________________________________
@@ -715,7 +715,8 @@ The area under the curve can be estimated in a variety of ways. In MET, the simp
 
 .. _App_C-ensemble:
 
-C.4 MET verification measures for ensemble forecasts
+MET verification measures for ensemble forecasts
+________________________________________________
 
 CRPS
 
@@ -851,7 +852,8 @@ The overall proportion of grid points with observed events to total grid points 
 
 .. _App_C-distance_maps:
 
-C.6 MET verification measures for distance map methods
+C MET verification measures for distance map methods
+____________________________________________________
 
 The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 

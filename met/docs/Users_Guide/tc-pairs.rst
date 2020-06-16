@@ -1,22 +1,26 @@
 .. _tc-pairs:
 
-Chapter 20 TC-Pairs Tool
-========================
+TC-Pairs Tool
+=============
 
-20.1 Introduction
-_________________
+Introduction
+____________
 
 The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in Section :ref:`TC-Pairs_Practical-information`. 
 
-20.2 Practical information
+Practical information
+_____________________
 
 This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run tc_pairs on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
 
-20.2.1 tc_pairs usage
+tc_pairs usage
+~~~~~~~~~~~~~~
 
 The usage statement for tc_pairs is shown below:
 
-Usage: tc_pairs
+.. code-block:: none
+
+  Usage: tc_pairs
 
 {\hskip 0.5in}-adeck source and/or -edeck source
 
@@ -33,6 +37,7 @@ Usage: tc_pairs
 tc_pairs has required arguments and can accept several optional arguments.
 
 Required arguments for tc_pairs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The -adeck source argument indicates the adeck ATCF format data source containing tropical cyclone model forecast (output from tracker) data to be verified. It specifies the name of an ATCF format file or top-level directory containing ATCF format files ending in “.dat” to be processed. The -adeck or -edeck option must be used at least once.
 
@@ -43,6 +48,7 @@ Required arguments for tc_pairs
 4. The -config file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for tc_pairs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The -out base argument indicates the path of the output file base. This argument overrides the default output file base (./out_tcmpr)
 
@@ -54,7 +60,9 @@ MET version 6.0 supports only the rapid intensification (RI) edeck probability t
 
 An example of the tc_pairs calling sequence is shown below:
 
-tc_pairs -adeck aal092010.dat -bdeck bal092010.dat -config TCPairsConfig
+.. code-block:: none
+
+  tc_pairs -adeck aal092010.dat -bdeck bal092010.dat -config TCPairsConfig
 
 In this example, the TC-Pairs tool matches the model track (aal092010.dat) and the best track analysis (bal092010.dat) for the 9th Atlantic Basin storm in 2010. The track matching and subsequent error information is generated with configuration options specified in the TCPairsConfig file.
 
@@ -74,45 +82,33 @@ The TC-Pairs tool implements the following logic:
 
 • For each edeck/bdeck pair, write paired edeck probabilities and matching bdeck values to output PROBRIRW lines.
 
-20.2.2 tc_pairs configuration file
+tc_pairs configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the TC-Pairs tool named 'TCPairsConfig_default' can be found in the installed share/met/config/ directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 The contents of the tc_pairs configuration file are described below.
 
+____________________
 
+.. code-block:: none
 
-storm_id     = [];
-
-basin        = [];
-
-cyclone      = [];
-
-storm_name   = [];
-
-init_beg     = "";
-
-init_end     = "";
-
-init_inc     = [];
-
-init_exc     = [];
-
-valid_beg    = "";
-
-valid_end    = "";
-
-init_hour    = [];
-
-init_mask    = [];
-
-lead_req     = [];
-
-valid_mask   = [];
-
-match_points = TRUE;
-
-version      = "VN.N";
+  storm_id     = [];
+  basin        = [];
+  cyclone      = [];
+  storm_name   = [];
+  init_beg     = "";
+  init_end     = "";
+  init_inc     = [];
+  init_exc     = [];
+  valid_beg    = "";
+  valid_end    = "";
+  init_hour    = [];
+  init_mask    = [];
+  lead_req     = [];
+  valid_mask   = [];
+  match_points = TRUE;
+  version      = "VN.N";
 
 The configuration options listed above are common to multiple MET tools and are described in Section :ref:`Data IO MET-TC Configuration File Options`.
 
