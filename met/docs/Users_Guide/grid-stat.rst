@@ -47,7 +47,7 @@ In METv6.0, when the "prob" entry is set as a dictionary to define the field of 
 Use of a climatology field for comparative verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Grid-Stat tool allows evaluation of model forecasts compared with a user-supplied climatology. Prior to calculation of statistics, the climatology must be put on the same grid as the forecasts and observations. In particular, the anomaly correlation and mean squared error skill score provide a measure of the forecast skill versus the climatology. For more details about climatological comparisons and reference forecasts, see the relevant section in the Point-Stat Chapter, Section [subsec:Climatology]
+The Grid-Stat tool allows evaluation of model forecasts compared with a user-supplied climatology. Prior to calculation of statistics, the climatology must be put on the same grid as the forecasts and observations. In particular, the anomaly correlation and mean squared error skill score provide a measure of the forecast skill versus the climatology. For more details about climatological comparisons and reference forecasts, see the relevant section in the Point-Stat Chapter: :ref:`Climatology`.
 
 Use of analysis fields for verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,7 +62,7 @@ The confidence intervals for the Grid-Stat tool are the same as those provided f
 Grid weighting
 ~~~~~~~~~~~~~~
 
-When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See [subsec:IO_General-MET-Config-Options]for more information.
+When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`for more information.
 
 Neighborhood methods
 ~~~~~~~~~~~~~~~~~~~~
@@ -122,7 +122,7 @@ While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illus
 
    The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
-The statistics derived from these distance maps are described in Appendix [sec:App_C-distance_maps]. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+The statistics derived from these distance maps are described in Appendix :ref:`App_C-distance_maps`. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 
 Practical information
 _____________________
@@ -194,12 +194,14 @@ GridStatConfig
 
 In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
 
+.. _grid_stat-configuration-file:
+
 grid_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the Grid-Stat tool, named GridStatConfig_default, can be found in the installed share/met/config directory. Other versions of the configuration file are included in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
-Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
 __________________________
 
@@ -247,7 +249,7 @@ output_prefix  = "";
 
 version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 ___________________________
 
@@ -414,7 +416,7 @@ The output_flag array controls the type of output that the Grid-Stat tool genera
 21. DMAP for Distance Map Statistics
 
 
-Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section [subsec:grid_stat-output].
+Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section :ref:`grid_stat-output`.
 
 _____________________
 
@@ -461,6 +463,8 @@ nc_pairs_var_suffix = "";
 
 
 The nc_pairs_var_suffix entry is similar to the nc_pairs_var_name entry. It is also parsed from each obs.field dictionary entry. However, it defines a suffix to be appended to the output variable name. This enables the output variable names to be made unique. For example, when verifying height for multiple level types but all with the same level value, use this option to customize the output variable names. This option was previously named nc_pairs_var_str which is now deprecated.
+
+.. _grid_stat-output:
 
 grid_stat output
 ~~~~~~~~~~~~~~~~

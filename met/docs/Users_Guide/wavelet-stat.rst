@@ -40,7 +40,7 @@ Note also that the means of the binary forecast and observation fields (i.e. the
 
 3. For each threshold (t) and for each scale component (j) of the binary forecast and observation, the Mean Squared Error (MSE) is then evaluated (:numref:`wavelet-stat_MSE_percent_NIMROD`). The error is usually large for small thresholds, and decreases as the threshold increases. This behavior is partially artificial, and occurs because the smaller the threshold the more events will exceed it, and therefore the larger would be the error, since the error tends to be proportional to the amount of events in the binary fields. The artificial effect can be diminished by normalization: because of the wavelet orthogonal properties, the sum of the MSE of the scale components is equal to the MSE of the original binary fields: $\hbox {MSE}(t) = j \hbox{MSE}(t,j)$. Therefore, the percentage that the MSE for each scale contributes to the total MSE may be computed: for a given threshold, t, $ \hbox {MSE\%}(t,j) = \hbox {MSE}(t,j)/ \hbox{MSE}(t)$. The MSE% does not exhibit the threshold dependency, and usually shows small errors on large scales and large errors on small scales, with the largest error associated to the smallest scale and highest threshold. For the NIMROD case illustrated, note the large error at 160 km and between the thresholds of and 4 mm/h, due to the storm, 160km displaced almost its entire length.
 
-Note that the MSE of the original binary fields is equal to the proportion of the counts of misses (c/n) and false alarms (b/n) for the contingency table :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: $ \hbox {MSE}(t)=(b+c)/n$. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (Figure [sec:MODE_Introduction]).
+Note that the MSE of the original binary fields is equal to the proportion of the counts of misses (c/n) and false alarms (b/n) for the contingency table :ref:`contingency_table_counts` obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields: $ \hbox {MSE}(t)=(b+c)/n$. This relation is intuitive when comparing the forecast and observation binary field difference and their corresponding contingency table image (:ref:`MODE Introduction <MODE_Introduction>`).
 
 4. The MSE for the random binary forecast and observation fields is estimated by $ \hbox{MSE}(t) \hbox{random}=\hbox {FBI}*\hbox{Br}*(1-\hbox{Br}) + \hbox{Br}*(1- \hbox{FBI}*\hbox{Br})$, where $\hbox{FBI}=(a+b)/(a+c)$ is the frequency bias index and $\hbox{Br}=(a+c)/n$ is the sample climatology from the contingency table :ref:`WS_Introduction` (?? review, is this the correct link?) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields. This formula follows by considering the Murphy and Winkler (1987) framework, applying the Bayes' theorem to express the joint probabilities b/n and c/n as product of the marginal and conditional probability (e.g. Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for a random forecast the conditional probability is equal to the unconditional one, so that b/n and c/n are equal to the product of the corresponding marginal probabilities solely. 
 
@@ -207,11 +207,12 @@ WaveletStatConfig
 
 In the example, the Wavelet-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the WaveletStatConfig file.
 
+.. _wavelet_stat-configuration-file:
 
 wavelet_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section[subsec:pb2nc-configuration-file] for the PB2NC tool.
+The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc-configuration-file` for the PB2NC tool.
 
 _______________________
 
@@ -245,7 +246,7 @@ output_prefix     = "";
 
 version           = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _______________________
 
@@ -315,7 +316,9 @@ nc_pairs_flag = {
 
 }
 
-The nc_pairs_flag is described in Section [subsec:grid_stat-configuration-file]
+The nc_pairs_flag is described in Section :ref:`grid_stat-configuration-file`
+
+.. _wavelet_stat-output:
 
 wavelet_stat output
 ~~~~~~~~~~~~~~~~~~~
@@ -330,7 +333,7 @@ The output ASCII files are named similarly:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indicate that this is an intensity-scale line type.
 
-The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
+The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section :ref:`point_stat-output` for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
 
 .. _table_WS_header_info_ws_outputs:
 

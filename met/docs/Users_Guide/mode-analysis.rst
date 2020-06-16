@@ -8,6 +8,8 @@ ____________
 
 Users may wish to summarize multiple ASCII files produced by MODE across many cases. The MODE output files contain many output columns making it very difficult to interpret the results by simply browsing the files. Furthermore, for particular applications some data fields in the MODE output files may not be of interest. The MODE-Analysis tool provide a simple way to compute basic summary statistics and filtering capabilities for these files. Users who are not proficient at writing scripts can use the tool directly, and even those using their own scripts can use this tool as a filter, to extract only the MODE output lines that are relevant for their application.
 
+.. _MODE_A-Scientific-and-statistical:
+
 Scientific and statistical aspects
 __________________________________
 
@@ -19,6 +21,8 @@ Practical information
 _____________________
 
 The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the mode_analysis usage statement, required arguments, and optional arguments.
+
+.. _mode_analysis-usage:
 
 mode_analysis usage
 ~~~~~~~~~~~~~~~~~~~
@@ -58,7 +62,7 @@ Required arguments for mode_analysis:
 
 2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified. 
 
-Specifying -summary will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the -column option. Column names are not case sensitive. The column names are the same as described in Section [subsec:MODE-output]. More information about this option is provided in subsequent sections.
+Specifying -summary will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the -column option. Column names are not case sensitive. The column names are the same as described in Section :ref:`MODE-output`. More information about this option is provided in subsequent sections.
 
 Specifying -bycase will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
 
@@ -78,7 +82,7 @@ ____________________
 
   -config filename
 
-This option gives the name of a configuration file to be read. The contents of the configuration file are described in Section [subsec:mode_analysis-configuration-file].
+This option gives the name of a configuration file to be read. The contents of the configuration file are described in Section :ref:`mode_analysis-configuration-file`.
 
 ____________________
 
@@ -332,7 +336,7 @@ _____________________
 Floating-point max/min options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to Chapter [subsec:MODE-output] for a description of these attributes as needed.
+Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to Chapter :ref:`MODE-output` for a description of these attributes as needed.
 
 
 ____________________
@@ -590,12 +594,12 @@ ____________________
 
 This option prints the usage message.
 
-
+.. _mode_analysis-configuration-file:
 
 mode_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in Section[subsec:mode_analysis-usage].
+To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in :ref:`mode_analysis-usage`.
 
 The parameters that are set in the configuration file either add to or override parameters that are set on the command line. For the “set string” and “set integer type” options enclosed in brackets, the values specified in the configuration file are added to any values set on the command line. For the “toggle” and “min/max type” options, the values specified in the configuration file override those set on the command line.
 

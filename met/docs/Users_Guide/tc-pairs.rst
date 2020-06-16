@@ -6,7 +6,7 @@ Chapter 20 TC-Pairs Tool
 20.1 Introduction
 _________________
 
-The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in Section [sec:TC-Pairs_Practical-information]. 
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in Section :ref:`TC-Pairs_Practical-information`. 
 
 20.2 Practical information
 
@@ -114,7 +114,7 @@ match_points = TRUE;
 
 version      = "VN.N";
 
-The configuration options listed above are common to multiple MET tools and are described in Section [subsec:IO_MET-TC-Config-Options].
+The configuration options listed above are common to multiple MET tools and are described in Section :ref:`Data IO MET-TC Configuration File Options`.
 
 
 
@@ -221,6 +221,8 @@ watch_warn = {
 }
 
 The watch_warn field specifies the file name and time applied offset to the watch_warn flag. The file_name string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named wwpts_us.txt, which is found in the installed share/met/tc_data/ directory within the MET build. The time_offset string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
+
+.. _tc_pairs-output:
 
 20.2.3 tc_pairs output
 

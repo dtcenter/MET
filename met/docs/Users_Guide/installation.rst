@@ -35,10 +35,12 @@ The MET package consists of a group of command line utilities that are compiled 
 
 In order to control the desired flow through MET, users are encouraged to run the tools via a script or consider using the METplus package (https://dtcenter.org/community-code/metplus). Some sample scripts are provided in the distribution; these examples are written in the Bourne shell. However, users are free to adapt these sample scripts to any scripting language desired.
 
+.. _Install_Required-libraries-and:
+
 Required libraries and optional utilities
 _________________________________________
 
-Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in Section [sec:Installation-of-required] :
+Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in Section :ref:`Installation-of-required` :
 
 1. NCEP's BUFRLIB is used by MET to decode point-based observation datasets in PrepBUFR format. BUFRLIB is distributed and supported by NCEP and is freely available for download from NCEP's website at https://www.emc.ncep.noaa.gov/index.php?branch=BUFRLIB. BUFRLIB requires C and Fortran-90 compilers that should be from the same family of compilers used when building MET.
 
@@ -54,10 +56,12 @@ Two additional utilities are strongly recommended for use with MET:
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB version 1 format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. While earlier versions of MET required that all gridded data be placed on a common grid, MET version 5.1 added support for automated re-gridding on the fly. After version 5.1, users have the option of running copygb to regrid their GRIB1 data ahead of time or leveraging the automated regridding capability within MET. 
 
+.. _Installation-of-required:
+
 Installation of required libraries
 __________________________________
 
-As described in Section [sec:Install_Required-libraries-and], some external libraries are required for building the MET:
+As described in Section :ref:`Install_Required-libraries-and`, some external libraries are required for building the MET:
 
 1.
 NCEP's BUFRLIB is used by the MET to decode point-based observation datasets in PrepBUFR format. Once you have downloaded and unpacked the BUFRLIB tarball, refer to the README_BUFRLIB file. When compiling the library using the GNU C and Fortran compilers, users are strongly encouraged to use the -DUNDERSCORE and -fno-second-underscore options. Compiling the BUFRLIB using the GNU compilers consists of the following 3 steps:
@@ -90,6 +94,8 @@ In the directions above, the static library file that is created will be named l
 
 6. The MODE-Graphics utility requires Cairo and FreeType. Thus, users who wish to compile this utility must install both libraries, available from (http://cairographics.org/releases) and (http://www.freetype.org/download.html). In addition, users will need to download Ghostscript font data required at runtime (http://sourceforge.net/projects/gs-fonts).
 
+.. _Installation-of-optional:
+
 Installation of optional utilities
 __________________________________
 
@@ -102,7 +108,7 @@ As described in the introduction to this chapter, two additional utilities are s
 MET directory structure
 _______________________
 
-The top-level MET directory consists of a README file, Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in Section [sec:Install_Building-the-MET].
+The top-level MET directory consists of a README file, Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in Section :ref:`Install_Building-the-MET`.
 
 When MET has been successfully built and installed, the installation directory contains two subdirectories. The bin/ directory contains executables for each module of MET as well as several plotting utilities. The share/met/ directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The colortables/, map/, and ps/ subdirectories contain data used in creating PostScript plots for several MET tools. The poly/ subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in Appendix B. The config/ directory contains default configuration files for the MET tools. The table_files/ and tc_data/ subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The Rscripts/ subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET scripts/Rscripts directory, other than it is the installed location.
 
@@ -116,7 +122,9 @@ The src/ directory contains the source code for each of the tools in MET.
 
 The scripts/ directory contains test scripts that are run by make test after MET has been successfully built, and a directory of sample configuration files used in those tests located in the scripts/config/ subdirectory. The output from the test scripts in this directory will be written to the out/ directory. Users are encouraged to copy sample configuration files to another location and modify them for their own use.
 
-The share/met/Rscripts directory contains a handful of sample R scripts, include plot_tcmpr.R, which provides graphic utilities for MET-TC. For more information on the graphics capabilities, see Section [subsec:TC-Stat-tool-example] of this User's Guide.
+The share/met/Rscripts directory contains a handful of sample R scripts, include plot_tcmpr.R, which provides graphic utilities for MET-TC. For more information on the graphics capabilities, see Section :ref:`TC-Stat-tool-example` of this User's Guide.
+
+.. _Install_Building-the-MET:
 
 Building the MET package
 ________________________
@@ -125,7 +133,7 @@ Building the MET package consists of three main steps: (1) install the required 
 
 Install the required libraries.
 
-• Please refer to Section [sec:Installation-of-required] and [sec:Installation-of-optional] on how to install the required and optional libraries.
+• Please refer to Sections :ref:`Installation-of-required` and :ref:`Installation-of-optional` on how to install the required and optional libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to included the path to the library files.
 

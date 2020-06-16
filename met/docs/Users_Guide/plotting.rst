@@ -58,6 +58,8 @@ plot_point_obs sample_pb.nc sample_data.ps
 
 In this example, the plot_point_obs tool will process the input sample_pb.nc file write a postscript file containing a plot to a file named sample_pb.ps.
 
+.. _plot_data_plane-usage:
+
 25.1.2 plot_data_plane usage
 
 The usage statement for the plot_data_plane utility is shown below:
@@ -195,6 +197,8 @@ In addition to the traditional scores, MODE output allows more information to be
 .. figure:: figure/plotting_histogram.jpg
 	    
    Circle histograms showing object centroid angles and distances (see text for explanation).
+
+.. _TC-Stat-tool-example:
 
 25.2.3 TC-Stat tool example
 

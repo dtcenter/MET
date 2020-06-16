@@ -64,7 +64,7 @@ data  = {
 
 }
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 
 
@@ -90,7 +90,7 @@ valid_mask = "";
 
 version    = "VN.N";
 
-The track filter options available in rmw_analysis and listed above are described in Section [subsec:IO_MET-TC-Config-Options].
+The track filter options available in rmw_analysis and listed above are described in Section :ref:`Data IO MET-TC Configuration File Options`.
 
 
 
