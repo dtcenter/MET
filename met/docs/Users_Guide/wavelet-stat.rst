@@ -207,11 +207,12 @@ WaveletStatConfig
 
 In the example, the Wavelet-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the WaveletStatConfig file.
 
+.. _wavelet_stat-configuration-file:
 
 wavelet_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section[subsec:pb2nc-configuration-file] for the PB2NC tool.
+The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc-configuration-file` for the PB2NC tool.
 
 _______________________
 
@@ -245,7 +246,7 @@ output_prefix     = "";
 
 version           = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _______________________
 
@@ -315,7 +316,9 @@ nc_pairs_flag = {
 
 }
 
-The nc_pairs_flag is described in Section [subsec:grid_stat-configuration-file]
+The nc_pairs_flag is described in Section :ref:`grid_stat-configuration-file`
+
+.. _wavelet_stat-output:
 
 wavelet_stat output
 ~~~~~~~~~~~~~~~~~~~
@@ -330,7 +333,7 @@ The output ASCII files are named similarly:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indicate that this is an intensity-scale line type.
 
-The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section [subsec:point_stat-output] for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
+The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to the format of the STAT and ASCII output of the Point-Stat tool. Please refer to the tables in Section :ref:`point_stat-output` for a description of the common output for STAT files types. The information contained in the STAT and isc files are identical. However, for consistency with the STAT files produced by other tools, the STAT file will only have column headers for the first 21 fields. The isc file contains all headers. The format of the ISC line type is explained in the following table.
 
 .. _table_WS_header_info_ws_outputs:
 

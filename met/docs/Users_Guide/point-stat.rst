@@ -8,12 +8,14 @@ ____________
 
 The Point-Stat tool provides verification statistics for forecasts at observation points (as opposed to over gridded analyses). The Point-Stat tool matches gridded forecasts to point observation locations and supports several different interpolation options. The tool then computes continuous, categorical, spatial, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
-Scientific and statistical aspects of the Point-Stat tool are discussed in the following section. Practical aspects of the Point-Stat tool are described in Section[sec:Practical-information].
+Scientific and statistical aspects of the Point-Stat tool are discussed in the following section. Practical aspects of the Point-Stat tool are described in Section :ref:`tc-stat_practical-information`.
 
 Scientific and statistical aspects
 __________________________________
 
-The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, Section [subsec:PS_Interpolation/matching-methods] discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in Section [subsec:PS_Statistical-measures] and in more detail in Appendix [chap:App_C-Verification-Measures]. Section [subsec:PS_Statistical-confidence-intervals] describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in Appendix [chap:App_D-Confidence-Intervals].
+The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, Section :ref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in Section :ref:`PS_Statistical-measures` and in more detail in Appendix [chap:App_C-Verification-Measures]. Section :ref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in Appendix [chap:App_D-Confidence-Intervals].
+
+.. _matching-methods:
 
 Interpolation/matching methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,6 +116,8 @@ Best Interpolation
 
 The forecast value at P is the chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
+.. _PS_HiRA_framework:
+
 HiRA framework
 ~~~~~~~~~~~~~~
 
@@ -130,6 +134,8 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
    Example showing how HiRA proportions are calculated.
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined. 
+
+.. _PS_Statistical-measures:
 
 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~
@@ -161,12 +167,16 @@ Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 
 
 When the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities. For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
+.. _Climatology:
+
 Measures for comparison against climatology
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
 
 Often, the sample climatology is used as a reference by a skill score. The sample climatology is the average over all included observations and may be transparent to the user. This is the case in most categorical skill scores. The sample climatology will probably prove more difficult to improve upon than a long term climatology, since it will be from the same locations and time periods as the forecasts. This may mask legitimate forecast skill. However, a more general climatology, perhaps covering many years, is often easier to improve upon and is less likely to mask real forecast skill.
+
+.. _PS_Statistical-confidence-intervals:
 
 Statistical confidence intervals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,10 +247,12 @@ MET provides non-parametric bootstrap confidence intervals for many categorical 
 
 For more information on confidence intervals pertaining to verification measures, see Wilks (2011), Jolliffe and Stephenson (2003), and Bradley (2008).
 
+.. _tc-stat_practical-information:
+
 Practical information
 _____________________
 
-The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter [chap:Re-Formatting-of-Point]. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in Section [subsec:PS_Interpolation/matching-methods]. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
+The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter [chap:Re-Formatting-of-Point]. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in Section :ref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
 point_stat usage
 ~~~~~~~~~~~~~~~~
@@ -308,7 +320,7 @@ point_stat configuration file
 
 The default configuration file for the Point-Stat tool named PointStatConfig_default can be found in the installed share/met/config directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
 ________________________
 
@@ -374,11 +386,11 @@ output_prefix  = "";
 
 version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _________________________
 
-Setting up the fcst and obs dictionaries of the configuration file is described in Section [subsec:IO_General-MET-Config-Options]. The following are some special consideration for the Point-Stat tool.
+Setting up the fcst and obs dictionaries of the configuration file is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Point-Stat tool.
 
 The obs dictionary looks very similar to the fcst dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using obs = fcst;. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the fcst and obs dictionaries separately. The number of fields specified in the fcst and obs dictionaries must match.
 
@@ -440,7 +452,7 @@ hira = {
 
 }
 
-The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section [subsec:PS_HiRA_framework]. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
+The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :ref:`PS_HiRA_framework`. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
 
 ________________________
 
@@ -526,7 +538,7 @@ The output_flag array controls the type of output that the Point-Stat tool gener
 
 19. MPR for Matched Pair data
 
-Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in Section [subsec:point_stat-output].
+Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in Section :ref:`point_stat-output`.
 
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 

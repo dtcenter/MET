@@ -530,6 +530,8 @@ An example of the **ascii2nc** calling sequence is shown below:
 
 In this example, the ASCII2NC tool will reformat the input **sample_ascii_obs.txt file** into NetCDF format and write the output to a file named **sample_ascii_obs.nc**.
 
+.. _ascii2nc-pyembed:
+
 Python Embedding for Point Observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

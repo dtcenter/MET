@@ -6,7 +6,9 @@ Chapter 21 TC-Stat Tool
 21.1 Introduction
 _________________
 
-The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See Section[subsec:TC_Pairs-output] of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The filter job stratifies the TCST data using various conditions and thresholds described in Section[subsec:tc_stat-configuration-file]. The summary job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The rirw job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The probrirwjob process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in Section[sec:Statistical-aspects], and practical use information for the TC-Stat tool is described in Section[sec:Practical-information-1].
+The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See Section :ref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The filter job stratifies the TCST data using various conditions and thresholds described in Section :ref:`tc_stat-configuration-file`. The summary job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The rirw job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The probrirwjob process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in Section :ref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in Section :ref:`Practical-information-1`.
+
+.. _Statistical-aspects:
 
 21.2 Statistical aspects
 
@@ -14,7 +16,7 @@ The TC-Stat tool ties together results from the TC-Pairs tool by providing summa
 
 The TC-Stat tool can be used to simply filter specific lines of the TCST file based on user-defined filtering criteria. All of the TCST lines that are retained from one or more files are written out to a single output file. The output file is also in TCST format.
 
-Filtering options are outlined below in Section[subsec:tc_stat-configuration-file] (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
+Filtering options are outlined below in Section :ref:`tc_stat-configuration-file` (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
 
 21.2.2 Summary statistics for columns
 
@@ -56,6 +58,8 @@ The TC-Stat tool can be used to accumulate multiple PROBRIRW lines and derive pr
 
 Users may specify several job command options to configure the behavior of this job. The TC-Stat tools reads the input PROBI lines, applies the configurable options to extract a forecast probability value and BEST track event, and bins those probabilistic pairs into an Nx2 contingency table. This job writes up to four probabilistic output line types summarizing the performance.
 
+.. _Practical-information-1:
+
 21.3 Practical information
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_stat.
@@ -78,13 +82,13 @@ Usage: tc_stat
 
 TC-Stat has one required argument and accepts optional ones. 
 
-The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :ref:`table_columnar_output_summary_tc_stat` and the filtering options are described in Section[subsec:tc_stat-configuration-file].
+The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :ref:`table_columnar_output_summary_tc_stat` and the filtering options are described in :ref:`tc_stat-configuration-file`.
 
 Required arguments for tc_stat
 
 1. The -lookin source argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (*).
 
-2. Either a configuration file must be specified with the -config option, or a JOB COMMAND LINE must be denoted. The JOB COMMAND LINE options are described in Section [subsec:tc_stat-configuration-file],
+2. Either a configuration file must be specified with the -config option, or a JOB COMMAND LINE must be denoted. The JOB COMMAND LINE options are described in Section :ref:`tc_stat-configuration-file`,
 
 Optional arguments for tc_stat
 
@@ -100,7 +104,9 @@ An example of the tc_stat calling sequence is shown below:
 
 tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the TCStatConfig file. Further, using flags (e.g. -basin, -column, -storm_name, etc...) option within the job command lines may further refine these selections. See Section [subsec:tc_stat-configuration-file] for options available for job command line and [subsec:IO_MET-TC-Config-Options] for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the TCStatConfig file. Further, using flags (e.g. -basin, -column, -storm_name, etc...) option within the job command lines may further refine these selections. See Section :ref:`tc_stat-configuration-file` for options available for job command line and :ref:`Data IO MET-TC Configuration File Options` for how to use them.
+
+.. _tc_stat-configuration-file:
 
 21.3.2 tc_stat configuration file
 
@@ -142,7 +148,7 @@ match_points = TRUE;
 
 version      = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_MET-TC-Config-Options].
+The configuration options listed above are common to many MET tools and are described in Section :ref:`Data IO MET-TC Configuration File Options`.
 
 Note that the options specified in the first section of the configuration file, prior to the job list, will be applied to every job specified in the joblist. However, if an individual job specifies an option listed above, it will be applied to that job. For example, if model = [ "GFSI", "LGEM", "DSHP" ]; is set at the top, but the job in the joblist sets the -model option to "LGEM", that job will only run using the LGEM model data.
 
@@ -322,7 +328,7 @@ e.g.: -job filter  -line_type TCMPR  -amodel HWFI   -dump_row ./tc_filter_job.tc
 
                     -probri_thresh 30 -probri_prob_thresh ==0.25
 
-
+.. _tc_stat-output:
 
 21.3.3 tc_stat output
 

@@ -16,6 +16,8 @@ MODE is only one of a number of different approaches that have been developed in
 
 MODE may be used in a generalized way to compare any two fields. For simplicity, field1 may be thought of in this chapter as ``the forecast,'' while field2 may be thought of as ``the observation'', which is usually a gridded analysis of some sort. The convention of field1/field2 is also used in :ref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call ``regions of interest.'' Object attributes are calculated and compared, and are used to associate (``merge'') objects within a single field, as well as to ``match'' objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
 
+.. _MODE_Scientific-and-statistical:
+
 15.2 Scientific and statistical aspects
 
 The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
@@ -93,7 +95,7 @@ Another merging method is available in MODE, which can be used instead of, or al
 
 15.2.4 Summary statistics
 
-Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to Section [subsec:MODE-output] for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
+Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to Section :ref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
 15.3 Practical information
 
@@ -169,11 +171,13 @@ MODEConfig_nc
 
 In Example 2, the MODE tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine using the observations in the sample_obs.nc NetCDF output of pcp_combine, using the configuration options specified in the MODEConfig_nc file. Since the model and observation files contain only a single field of accumulated precipitation, the MODEConfig_nc file should specify that accumulated precipitation be verified.
 
+.. _MODE-configuration-file:
+
 15.3.2 mode configuration file
 
 The default configuration file for the MODE tool, MODEConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of MODEConfig_default and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
-Note that environment variables may be used when editing configuration files, as described in Section [subsec:pb2nc-configuration-file] for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
 
 
@@ -191,7 +195,7 @@ output_prefix  = "";
 
 version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 
 
@@ -243,9 +247,9 @@ fcst = {
 
 obs = fcst; 
 
-The field entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in Section [subsec:IO_General-MET-Config-Options]. In the above example, the forecast settings are copied into the observation dictionary using obs = fcst;.
+The field entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. In the above example, the forecast settings are copied into the observation dictionary using obs = fcst;.
 
-The censor_thresh and censor_val entries are used to censor the raw data as described in Section [subsec:IO_General-MET-Config-Options]. Their functionality replaces the raw_thresh entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
+The censor_thresh and censor_val entries are used to censor the raw data as described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Their functionality replaces the raw_thresh entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
 The conv_radius entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined grid_res entry. Multiple convolution radii may be specified as an array (e.g. conv_radius = [ 5, 10, 15 ];).
 
@@ -329,7 +333,7 @@ mask = {
 
 }
 
-Defining a grid and poly masking region is described in Section [subsec:IO_General-MET-Config-Options]. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
+Defining a grid and poly masking region is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
 
 The grid_flag and poly_flag entries specify how the grid and polyline masking should be applied:
 
@@ -405,7 +409,7 @@ interest_function = {
 
 }
 
-The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section [sec:MODE_A-Scientific-and-statistical]for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
+The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
 
 
 
@@ -451,7 +455,7 @@ object_plot = {
 
 }
 
-Specifying dictionaries to define the color_table, plot_min, and plot_max entries are described in Section [subsec:IO_General-MET-Config-Options].
+Specifying dictionaries to define the color_table, plot_min, and plot_max entries are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The colorbar_spacing entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
 
@@ -506,6 +510,8 @@ Each component of the pairs information in the NetCDF file can be turned on or o
 shift_right = 0;
 
 When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the ``cut'' longitude to be separated into two objects. Shifting the grid by integer number of grid units enables the user to control where that longitude cut line occurs.
+
+.. _MODE-output:
 
 15.3.3 mode output
 

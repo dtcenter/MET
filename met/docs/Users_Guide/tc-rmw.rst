@@ -61,7 +61,7 @@ cyclone = "";
 
 init_inc = "";
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 These options are used to filter input data down to a single storm track.
 
 
@@ -77,7 +77,7 @@ valid_hour = [];
 
 lead       = [];
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 These options are used to subset a single storm track down to individual points. The tropical cyclone model data corresponding to these track points will be processed.
 
 
@@ -127,7 +127,7 @@ data  = {
 
 regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 
 

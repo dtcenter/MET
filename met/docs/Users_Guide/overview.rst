@@ -20,6 +20,8 @@ MET has been developed, and will be maintained and enhanced, by the Developmenta
 
 The MET package will also be available to DTC visitors and to the WRF modeling community for testing and evaluation of new model capabilities, applications in new environments, and so on.
 
+.. _MET-goals:
+
 MET goals and design philosophy
 _______________________________
 

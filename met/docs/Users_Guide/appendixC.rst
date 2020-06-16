@@ -713,6 +713,8 @@ The area under the receiver operating characteristic (ROC) curve is often used a
 
 The area under the curve can be estimated in a variety of ways. In MET, the simplest trapezoid method is used to calculate the area. AUC is calculated from the series of hit rate (POD) and false alarm rate (POFD) values (see the ROC entry below) for each user-specified threshold.$$\hbox{AUC}=\frac{1}{2}\sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}-POFD_i)$$
 
+.. _App_C-ensemble:
+
 C.4 MET verification measures for ensemble forecasts
 
 CRPS
@@ -846,6 +848,8 @@ Observation Rate
 Called "O_rate" in NBRCNT output :ref:`table_GS_format_info_NBRCNT`
 
 The overall proportion of grid points with observed events to total grid points in the domain. The forecast rate will match the observation rate in unbiased forecasts. This quantity is sometimes referred to as the base rate.
+
+.. _App_C-distance_maps:
 
 C.6 MET verification measures for distance map methods
 
