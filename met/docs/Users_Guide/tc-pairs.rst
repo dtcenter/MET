@@ -8,6 +8,8 @@ ____________
 
 The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in Section :ref:`TC-Pairs_Practical-information`. 
 
+.. _TC-Pairs_Practical-information:
+
 Practical information
 _____________________
 
@@ -112,55 +114,59 @@ ____________________
 
 The configuration options listed above are common to multiple MET tools and are described in Section :ref:`Data IO MET-TC Configuration File Options`.
 
+____________________
 
+.. code-block:: none
 
-model = [ "DSHP", "LGEM", "HWRF" ];
+  model = [ "DSHP", "LGEM", "HWRF" ];
 
 The model variable contains a list of comma-separated models to be used. The models are identified with an ATCF ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed.
 
+____________________
 
+.. code-block:: none
 
-check_dup = FALSE;
+  check_dup = FALSE;
 
 The check_dup flag expects either TRUE and FALSE, indicating whether the code should check for duplicate ATCF lines when building tracks. Setting check_dup to TRUE will check for duplicated lines, and produce output information regarding the duplicate. The duplicated ATCF line will not be processed in the tc_pairs output. Setting check_dup to FALSE, will still exclude tracks that decrease with time, and will overwrite repeated lines, but specific duplicate log information will not be output. Setting check_dup to FALSE will make parsing the track quicker.
 
+____________________
 
+.. code-block:: none
 
-interp12 = NONE;
+  interp12 = NONE;
 
 The interp12 flag expects the entry NONE, FILL, or REPLACE, indicating whether special processing should be performed for interpolated forecasts. The NONE option indicates no changes are made to the interpolated forecasts. The FILL and REPLACE (default) options determine when the 12-hour interpolated forecast (normally indicated with a "2" or "3" at the end of the ATCF ID) will be renamed with the 6-hour interpolated ATCF ID (normally indicated with the letter "I" at the end of the ATCF ID). The FILL option renames the 12-hour interpolated forecasts with the 6-hour interpolated forecast ATCF ID only when the 6-hour interpolated forecasts is missing (in the case of a 6-hour interpolated forecast which only occurs every 12-hours (e.g. EMXI, EGRI), the 6-hour interpolated forecasts will be "filled in" with the 12-hour interpolated forecasts in order to provide a record every 6-hours). The REPLACE option renames all 12-hour interpolated forecasts with the 6-hour interpolated forecasts ATCF ID regardless of whether the 6-hour interpolated forecast exists. The original 12-hour ATCF ID will also be retained in the output file (all modified ATCF entries will appear at the end of the TC-Pairs output file). This functionality expects both the 12-hour and 6-hour early (interpolated) ATCF IDs are listed in the model field.
 
+____________________
 
+.. code-block:: none
 
-consensus = [
-
-   {
-
-      name     = "CON1";
-
-      members  = [ "MOD1", "MOD2", "MOD3" ];
-
-      required = [   true,  false, false  ];
-
-      min_req  = 2;
-
-   }
-
-];
+  consensus = [
+     {
+        name     = "CON1";
+        members  = [ "MOD1", "MOD2", "MOD3" ];
+        required = [   true,  false, false  ];
+        min_req  = 2;
+     }
+  ];
 
 The consensus field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the model field (1st entry in TCPairsConfig_default). The name field is the desired consensus model name. The members field is a comma-separated list of model IDs that make up the members of the consensus. The required field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The min_req field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
 
+____________________
 
+.. code-block:: none
 
-lag_time = [ “06”, “12” ];
+  lag_time = [ “06”, “12” ];
 
 The lag_time field is a comma-separated list of forecast lag times to be used in HH[MMSS] format. For each adeck track identified, a lagged track will be derived for each entry. In the tc_pairs output, the original adeck record will be retained, with the lagged entry listed as the adeck name with "_LAG_HH" appended.
 
+____________________
 
+.. code-block:: none
 
-best_technique = [ "BEST" ];
-
-best_baseline  = [ "BCLP", "BCD5", "BCLA" ];
+  best_technique = [ "BEST" ];
+  best_baseline  = [ "BCLP", "BCD5", "BCLA" ];
 
 The best_technique field specifies a comma-separated list of technique name(s) to be interpreted as BEST track data. The default value (BEST) should suffice for most users. The best_baseline field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts to be derived from the best tracks. Specifying multiple best_technique values and at least one best_baseline value results in a warning since the derived baseline forecast technique names may be used multiple times.
 
@@ -172,11 +178,12 @@ BTCLIP5: 5-day CLIPER (Aberson, 1998)/SHIFOR (DeMaria and Knaff, 2001) in best t
 
 BTCLIPA: Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track mode. Used for Atlantic basin only. Specify model as BCLA.
 
+____________________
 
+.. code-block:: none
 
-oper_technique = [ "CARQ" ];
-
-oper_baseline  = [ "OCLP", "OCS5", "OCD5" ];
+  oper_technique = [ "CARQ" ];
+  oper_baseline  = [ "OCLP", "OCS5", "OCD5" ];
 
 The oper_technique field specifies a comma-separated list of technique name(s) to be interpreted as operational track data. The default value (CARQ) should suffice for most users. The oper_baseline field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts to be derived from the operational tracks. Specifying multiple oper_technique values and at least one oper_baseline value results in a warning since the derived baseline forecast technique names may be used multiple times.
 
@@ -188,39 +195,45 @@ OCLIP5: 5-day CLIPER (Aberson, 1998)/ SHIFOR (DeMaria and Knaff, 2001) in operat
 
 OCLIPD5: 5-day CLIPER (Aberson, 1998)/ DECAY-SHIFOR (DeMaria and Knaff, 2001). Specify model as OCD5.
 
+____________________
 
+.. code-block:: none
 
-anly_track = BDECK;
+  anly_track = BDECK;
 
 Analysis tracks consist of multiple track points with a lead time of zero for the same storm. An analysis track may be generated by running model analysis fields through a tracking algorithm. The anly_track field specifies which datasets should be searched for analysis track data and may be set to NONE, ADECK, BDECK, or BOTH. Use BOTH to create pairs using two different analysis tracks.
 
+____________________
 
+.. code-block:: none
 
-match_points = TRUE;
+  match_points = TRUE;
 
 The match_points field specifies whether only those track points common to both the adeck and bdeck tracks should be written out. If match_points is selected as FALSE, the union of the adeck and bdeck tracks will be written out, with "NA" listed for unmatched data.
 
+____________________
 
+.. code-block:: none
 
-dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
+  dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 
 The dland_file string specifies the path of the NetCDF format file (default file: dland_global_tenth_degree.nc) to be used for the distance to land check in the tc_pairs code. This file is generated using tc_dland (default file provided in installed share/met/tc_data directory).
 
+____________________
 
+.. code-block:: none
 
-watch_warn = {
-
-   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
-
-   time_offset = -14400;
-
-}
+ watch_warn = {
+     file_name   = "MET_BASE/tc_data/wwpts_us.txt";
+     time_offset = -14400;
+  }
 
 The watch_warn field specifies the file name and time applied offset to the watch_warn flag. The file_name string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named wwpts_us.txt, which is found in the installed share/met/tc_data/ directory within the MET build. The time_offset string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
 .. _tc_pairs-output:
 
-20.2.3 tc_pairs output
+tc_pairs output
+~~~~~~~~~~~~~~~
 
 TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :ref:`TCST Header`.
 
