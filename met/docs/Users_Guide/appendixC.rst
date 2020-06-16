@@ -1,4 +1,4 @@
-m.. _appendixC:
+.. _appendixC:
 
 Appendix C Verification Measures
 ================================
@@ -49,7 +49,8 @@ ________________________________________________________
 
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
-C.1 MET verification measures for categorical (dichotomous) variables
+MET verification measures for categorical (dichotomous) variables
+_________________________________________________________________
 
 The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table C-2. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table C-2 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}} 
 
@@ -852,8 +853,8 @@ The overall proportion of grid points with observed events to total grid points 
 
 .. _App_C-distance_maps:
 
-C MET verification measures for distance map methods
-____________________________________________________
+MET verification measures for distance map methods
+__________________________________________________
 
 The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 
