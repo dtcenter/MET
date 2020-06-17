@@ -14,7 +14,7 @@ MODE was developed in response to a need for verification methods that can provi
 
 MODE is only one of a number of different approaches that have been developed in recent years to meet these needs. In the future, we expect that the MET package will include additional methods. References for many of these methods are provided at http://www.rap.ucar.edu/projects/icp/index.html.
 
-MODE may be used in a generalized way to compare any two fields. For simplicity, field1 may be thought of in this chapter as ``the forecast,'' while field2 may be thought of as ``the observation'', which is usually a gridded analysis of some sort. The convention of field1/field2 is also used in :ref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call ``regions of interest.'' Object attributes are calculated and compared, and are used to associate (``merge'') objects within a single field, as well as to ``match'' objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
+MODE may be used in a generalized way to compare any two fields. For simplicity, field1 may be thought of in this chapter as "the forecast", while field2 may be thought of as "the observation", which is usually a gridded analysis of some sort. The convention of field1/field2 is also used in :ref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call "regions of interest". Object attributes are calculated and compared, and are used to associate ("merge") objects within a single field, as well as to "match" objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
 
 .. _MODE_Scientific-and-statistical:
 
@@ -28,27 +28,27 @@ Resolving objects
 
 The process used for resolving objects in a raw data field is called convolution thresholding. The raw data field is first convolved with a simple filter function as follows:
 
-$$C(x,y)=\sum_{u, v} \phi (u,v) \, f(x-u, y-v).$$
+.. math:: C(x,y)=\sum_{u, v}\phi(u,v)\ f(x-u, y-v)
 
-In this formula, $f$ is the raw data field, $\phi$ is the filter function, and $C$ is the resulting convolved field. The variables $(x, y)$ and $(u, v)$ are grid coordinates. The filter function $\phi$ is a simple circular filter determined by a radius of influence $R$, and a height $H$:
+In this formula, :math:`f` is the raw data field, :math:`\phi` is the filter function, and :math:`C` is the resulting convolved field. The variables :math:`(x, y)` and :math:`(u, v)` are grid coordinates. The filter function :math:`\phi` is a simple circular filter determined by a radius of influence :math:`R` , and a height :math:`H` :
 
-$$
+.. math:: \phi (x,y) = \begin{eqnarray}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
 
-The parameters $R$ and $H$ are not independent. They are related by the requirement that the integral of $\phi$ over the grid be unity: 
+The parameters :math:`R` and :math:`H` are not independent. They are related by the requirement that the integral of :math:`\phi` over the grid be unity: 
 
-$$\pi R^2 H=1.$$
+.. math:: \pi R^2 H\text{ = 1.}
 
-Thus, the radius of influence $R$ is the only tunable parameter in the convolution process. Once $R$ is chosen, $H$ is determined by the above equation.
+Thus, the radius of influence :math:`R` is the only tunable parameter in the convolution process. Once :math:`R` is chosen, :math:`H` is determined by the above equation.
 
-Once the convolved field $C$ is in hand, it is thresholded to create a mask field $M$:
+Once the convolved field :math:`C` is in hand, it is thresholded to create a mask field :math:`M` :
 
-$$
+.. math:: M(x,y) = \begin{eqnarray}\begin{cases} 1 &\text{if } C(x,y)\ge T\\ 0 &\text{otherwise.} \end{cases}\end{eqnarray}
 
-where $T$ is the threshold. The objects are the connected regions where $M = 1$. Finally, the raw data are restored to object interiors to obtain the object field $F$:
+where :math:`T` is the threshold. The objects are the connected regions where :math:`M = 1` . Finally, the raw data are restored to object interiors to obtain the object field :math:`F` :
 
-$$F(x,y)=M(x,y)f(x,y).$$
+.. math:: F(x,y)=M(x,y)f(x,y).
 
-Thus, two parameters — the radius of influence $R$, and the threshold $T$ — control the entire process of resolving objects in the raw data field.
+Thus, two parameters — the radius of influence :math:`R`, and the threshold :math:`T` — control the entire process of resolving objects in the raw data field.
 
 An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. :numref:`mode-object_id` shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
@@ -72,7 +72,7 @@ Moments are used in the calculation of several object attributes. If we define \
 
 Higher order moments are similarly defined and are used in the calculation of some of the other attributes. For example, the {\bf centroid} is a kind of geometric center of an object, and can be calculated from first moments. It allows one to assign a single point location to what may be a large, extended object. 
 
-{\bf Axis Angle}, denoted by \theta, is calculated from the second-order moments. It gives information on the orientation or ``tilt'' of an object. {\bf Curvature} is another attribute that uses moments in its calculation, specifically, third-order moments.
+{\bf Axis Angle}, denoted by \theta, is calculated from the second-order moments. It gives information on the orientation or "tilt" of an object. {\bf Curvature} is another attribute that uses moments in its calculation, specifically, third-order moments.
 
 {\bf Aspect Ratio} is computed by fitting a rectangle around an object. The rectangle is aligned so that it has the same axis angle as the object, and the length and width are chosen so as to just enclose the object. We make no claim that the rectangle so obtained is the smallest possible rectangle enclosing the given object. However, this rectangle is much easier to calculate than a smallest enclosing rectangle and serves our purposes just as well. Once the rectangle is determined, the aspect ratio of the object is defined to be the width of the fitted rectangle divided by its length.
 
@@ -154,7 +154,7 @@ Optional arguments for mode
 
 6. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-7. The -v level option indicates the desired level of verbosity. The contents of ``level'' will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The -v level option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 8. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
@@ -494,7 +494,7 @@ _____________________
 
   shift_right = 0;
 
-When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the ``cut'' longitude to be separated into two objects. Shifting the grid by integer number of grid units enables the user to control where that longitude cut line occurs.
+When MODE is run on global grids, this parameter specifies how many grid squares to shift the grid to the right. MODE does not currently connect objects from one side of a global grid to the other, potentially causing objects straddling the "cut" longitude to be separated into two objects. Shifting the grid by integer number of grid units enables the user to control where that longitude cut line occurs.
 
 .. _MODE-output:
 
