@@ -1,14 +1,15 @@
 .. _tc-gen:
 
-Chapter 22 TC-Gen Tool
-======================
+TC-Gen Tool
+===========
 
-22.1 Introduction
-_________________
+Introduction
+____________
 
 The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlines in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
 
-22.2 Statistical aspects
+Statistical aspects
+___________________
 
 The TC-Gen tool populates a contingency table with hits, misses, and false alarms. As with other extreme events (where the event occurs much less frequently than the non-event), the correct negative category is not computed the non-events would dominate the contingency table. Therefore, only statistics that do not include correct negatives should be considered for this tool. The following CTS statistics are relevant: Base rate (BASER), Mean forecast (FMEAN), Frequency Bias (FBIAS), Probability of Detection (PODY), False Alarm Ratio (FAR), Critical Success Index (CSI), Gilbert Skill Score (GSS), Extreme Dependency Score (EDS), Symmetric Extreme Dependency Score (SEDS), Bias Adjusted Gilbert Skill Score (BAGSS). 
 
@@ -16,15 +17,19 @@ Other considerations for interpreting the output of the TC-Gen tool involve the 
 
 Care should be taken when interpreting the statistics for filtered data. In some cases, variables (e.g. storm name) are only available in either the forecast or reference datasets, rather than both. When filtering on a field that is only present in one dataset, the contingency table counts will be impacted. Similarly, the initialization field only impacts the model forecast data. If the valid time (which will impact the reference dataset) isn't also specified, the forecasts will be filtered and matched such that the number of misses will erroneously increase. See section 1.3.2 for more detail.
 
-22.3 Practical information
+Practical information
+_____________________
 
 This section describes how to configure and run the TC-Gen tool. The TC-Gen tool identifies tropical cyclone genesis events in both genesis forecasts and ATCF track datasets. It applies configurable logic to process the forecast and observed genesis events, classify them, and populate a contingency table with hits, misses, and false alarms. It writes the categorical counts and statistics to the output file(s). The tool can be configured to apply one or more sets of filtering criteria in a single run. The following sections describe the usage statement, required arguments, and optional arguments for tc_gen.
 
-22.3.1 tc_gen usage
+tc_gen usage
+~~~~~~~~~~~~
 
 The usage statement for tc_gen is shown below:
 
-Usage: tc_gen
+.. code-block:: none
+
+  Usage: tc_gen
 
 {\hskip 0.5in}-genesis path
 
@@ -41,6 +46,7 @@ Usage: tc_gen
 TC-Gen has three required arguments and accepts optional ones.
 
 Required arguments for tc_gen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The -genesis path argument specifies an ATCF forecast genesis file or top-level directory containing them, with files matching the regular expression “atcf_gen”. The -genesis option must be used at least once.
 
@@ -49,6 +55,7 @@ Required arguments for tc_gen
 3. The -config file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for tc_gen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The -out base argument indicates the path of the output file base. This argument overrides the default output file base (./tc_gen)
 
@@ -72,179 +79,183 @@ The TC-Gen tool implements the following logic:
 
 • Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter.
 
-22.3.2 tc_gen configuration file
+tc_gen configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the TC-Gen tool named TCGenConfig_default can be found in the installed share/met/config directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The tc_gen configuration file is divided into three main sections: criteria to define genesis events, options to subset and filter those events, and options to control the output. The contents of this configuration file are described below.
 
+______________________
 
+.. code-block:: none
 
-init_freq = 6;
+  init_freq = 6;
 
 The init_freq variable is an integer specifying the model initialization frequency in hours, starting at 00Z. The default value of 6 indicates that the model is initialized every day at 00Z, 06Z, 12Z, and 18Z. The same frequency is applied to all models processed. Models initialized at different frequencies should be processed with separate calls to tc_gen. The initialization frequency is used when defining the model opportunities to forecast the BEST track genesis events.
 
+______________________
 
+.. code-block:: none
 
-lead_window = {
-
-   beg = 24;
-
-   end = 120;
-
-}
+  lead_window = {
+     beg = 24;
+     end = 120;
+  }
 
 The lead_window option is a dictionary defining the beginning (beg) and ending (end) model forecast hours to be searched for genesis events. Model genesis events occurring outside of this window are ignored. This lead window is also used when defining the model opportunities to forecast the BEST track genesis events.
 
+______________________
 
+.. code-block:: none
 
-min_duration = 12;
+  min_duration = 12;
 
 The min_duration variable is an integer specifying the minimum number of hours a track must persist for its initial point to be counted as a genesis event. Some models spin up many short-lived storms, and this setting enables them to be excluded from the analysis.
 
+______________________
 
+.. code-block:: none
 
-fcst_genesis = {
-
-   vmax_thresh = NA;
-
-   mslp_thresh = NA;
-
-}
+  fcst_genesis = {
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
 
 The fcst_genesis dictionary defines the conditions required for a model track's genesis point to be included in the analysis. Thresholds for the maximum wind speed (vmax_thresh) and minimum sea level pressure (mslp_thresh) may be defined. These conditions must be satisfied for at least one track point for the genesis event to be included in the analysis. The default thresholds (NA) always evaluate to true.
 
+______________________
 
+.. code-block:: none
 
-best_genesis = {
-
-   technique   = "BEST";
-
-   category    = [ "TD", "TS" ];
-
-   vmax_thresh = NA;
-
-   mslp_thresh = NA;
-
-}
-
-oper_genesis = {
-
-   technique   = "CARQ";
-
-   category    = [ "DB", "LO", "WV" ];
-
-   vmax_thresh = NA;
-
-   mslp_thresh = NA;
-
-}
+  best_genesis = {
+     technique   = "BEST";
+     category    = [ "TD", "TS" ];
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
+  oper_genesis = {
+     technique   = "CARQ";
+     category    = [ "DB", "LO", "WV" ];
+     vmax_thresh = NA;
+     mslp_thresh = NA;
+  }
 
 The best_genesis and oper_genesis dictionaries defines genesis criteria for the BEST and operational tracks, respectively. Like the fcst_genesis dictionary, the vmax_thresh and mslp_thresh thresholds define required genesis criteria. In addition, the category array defines the ATCF storm categories that should qualify as genesis events. The technique string defines the ATCF ID for the BEST and operational tracks.
 
+______________________
 
+.. code-block:: none
 
-filter = [];
+  filter = [];
 
 The filter entry is an array of dictionaries defining genesis filtering criteria to be applied. Each of the entries listed below (from desc to genesis_radius) may be specified separately within each filter dictionary. If left empty, the default setting, a single filter is applied using the top-level filtering criteria. If multiple filtering dictionaries are defined, the desc entry must be specified for each to differentiate the output data. Output is written for each combination of filter dictionary and model ATCF ID encountered in the data.
 
+______________________
 
+.. code-block:: none
 
-desc = "NA";
+  desc = "NA";
 
 The desc configuration option is common to many MET tools and is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
+______________________
 
+.. code-block:: none
 
-model = [];
+  model = [];
 
 The model entry is an array defining the model ATCF ID's for which output should be computed. If left empty, the default setting, output will be computed for each model encountered in the data. Otherwise, output will be computed only for the ATCF ID's listed.
 
+______________________
 
+.. code-block:: none
 
-storm_id   = [];
-
-storm_name = [];
+  storm_id   = [];
+  storm_name = [];
 
 The storm_id and storm_name entries are arrays indicating the ATCF storm ID's and storm names to be processed. If left empty, all tracks will be processed. Otherwise, only those tracks which meet these criteria will be included. Note that these strings only appear in the BEST and operational tracks, not the forecast genesis data. Therefore, these filters only apply to the BEST and operational tracks. Care should be given when interpreting the contingency table results for filtered data.
 
+______________________
 
+.. code-block:: none
 
-init_beg = "";
-
-init_end = "";
+  init_beg = "";
+  init_end = "";
 
 The init_beg and init_end entries are strings in YYYYMMDD[_HH[MMSS]] format which defining which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
+______________________
 
+.. code-block:: none
 
-valid_beg = "";
-
-valid_end = "";
+  valid_beg = "";
+  valid_end = "";
 
 The valid_beg and valid_end entries are similar to init_beg and init_end, described above. However, they are applied to all genesis data sources. Only those tracks falling completely inside this window are included in the analysis.
 
+______________________
 
+.. code-block:: none
 
-init_hour = [];
-
-lead      = [];
+  init_hour = [];
+  lead      = [];
 
 The init_hour and lead entries are arrays of strings in HH[MMSS] format defining which forecast and operational tracks should be included. If left empty, all tracks will be used. Otherwise, only those forecast and operational tracks whose initialization hour and lead times appear in the list will be used. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
+______________________
 
+.. code-block:: none
 
-vx_mask = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
-
-           { 'name=\”basin\”;level=\”(*,*)\”; } ==1";
+  vx_mask = "MET_BASE/tc_data/basin_global_tenth_degree.nc \
+             { 'name=\”basin\”;level=\”(*,*)\”; } ==1";
 
 The vx_mask entry is a string defining the path to a Lat/Lon polyline file or a gridded data file that MET can read to subset the results spatially. If specified, only those genesis events whose Lat/Lon location falls within the specified area will be included. The MET code includes the file basin_global_tenth_degree.nc, which contains a global definition of the Regional Specialized Meteorology Centers (RSMC) and hurricane basin regions. The above example uses this file to stratify genesis results for the Atlantic Basin, where the basin variable equals ones.
 
+______________________
 
+.. code-block:: none
 
-dland_thresh = NA;
+  dland_thresh = NA;
 
 The dland_thresh entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (NA) always evaluate to true.
 
+______________________
 
+.. code-block:: none
 
-genesis_window = {
-
-   beg = -24;
-
-   end =  24;
-
-}
+  genesis_window = {
+     beg = -24;
+     end =  24;
+  }
 
 The genesis_window entry defines a matching time window, in hours, relative to the forecast genesis time. When searching for a match, only those BEST/operational genesis events which occur within this time window will be considered. Increasing this time window should lead to an increase in hits.
 
+______________________
 
+.. code-block:: none
 
-genesis_radius = 300;
+  genesis_radius = 300;
 
 The genesis_radius entry defines a search radius, in km, relative to the forecast genesis location. When searching for a match, only those BEST/operational genesis events which occur within this radius will be considered. Increasing this search radius should lead to an increase in hits.
 
+______________________
 
+.. code-block:: none
 
-ci_alpha = 0.05;
-
-output_flag = {
-
-   fho = BOTH;
-
-   ctc = BOTH;
-
-   cts = BOTH;
-
-}
-
-dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
-
-version    = "V9.0";
+  ci_alpha = 0.05;
+  output_flag = {
+     fho = BOTH;
+     ctc = BOTH;
+     cts = BOTH;
+  }
+  dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
+  version    = "V9.0";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Note that TC-Gen writes output for 2x2 contingency tables to the FHO, CTC, and CTS line types.
 
-22.3.3 tc_gen output
+tc_gen output
+~~~~~~~~~~~~~
 
 TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the -out command line argument. The default output base name, “./tc_gen” writes output files in the current working directory named “tc_gen.stat” and, optionally, “tc_gen_fho.txt”, “tc_gen_ctc.txt”, and “tc_gen_cts.txt”. The contents of these output files are described in section :ref:`point_stat-output`.
 
