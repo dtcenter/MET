@@ -1,5 +1,7 @@
 .. _appendixD:
 
+.. _App_D-Confidence-Intervals:
+
 Appendix D Confidence Intervals
 ===============================
 
