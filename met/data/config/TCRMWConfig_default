@@ -11,7 +11,7 @@
 //
 // Model
 //
-model = "GFS";
+model = "";
 
 //
 // Storm identifier
