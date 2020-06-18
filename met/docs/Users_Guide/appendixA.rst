@@ -3,8 +3,8 @@
 Appendix A FAQs & How do I ... ?
 ================================
 
-A.1 Frequently Asked Questions
-______________________________
+Frequently Asked Questions
+__________________________
 
 Q. Why was the MET written largely in C++ instead of FORTRAN?
 
@@ -36,7 +36,7 @@ A. No - it will not. In the future, we may add options to allow additional model
 
 Q. How do I get help if my questions are not answered in the User's Guide?
 
-A. First, look on our website https://dtcenter.org/community-code/model-evaluation-tools-met. If that doesn't answer your question, then email: [||met_help@ucar.edu].
+A. First, look on our website https://dtcenter.org/community-code/model-evaluation-tools-met. If that doesn't answer your question, then email: met_help@ucar.edu.
 
 Q. Where are the graphics?
 
@@ -50,13 +50,14 @@ Q. What are MET's conventions for latitude, longitude, azimuth and bearing angle
 
 A. MET considers north latitude and east longitude positive. Latitudes have range from $-90^\circ$ to $+90^\circ$. Longitudes have range from $-180^\circ$ to $+180^\circ$. Plane angles such as azimuths and bearing (example: horizontal wind direction) have range $0^\circ$ to $360^\circ$ and are measured clockwise from north.
 
-A.2 Troubleshooting
+Troubleshooting
+_______________
 
 The first place to look for help with individual commands is this user's guide or the usage statements that are provided with the tools. Usage statements for the individual MET tools are available by simply typing the name of the executable in MET's bin/ directory. Example scripts available in the MET's scripts/ directory show examples of how one might use these commands on example datasets. Here are suggestions on other things to check if you are having problems installing or running MET.
 
 MET won't compile
 
-* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET_ environment variables prior to running configure?
+* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET\_ environment variables prior to running configure?
 
 * Have these libraries been compiled and installed using the same set of compilers used to build MET?
 
@@ -88,10 +89,12 @@ General troubleshooting
 
 * Try rerunning with a higher verbosity level. Increasing the verbosity level to 4 or 5 prints much more diagnostic information to the screen. 
 
-A.3 Where to get help
+Where to get help
+_________________
 
-If none of the above suggestions have helped solve your problem, help is available through: [||met_help@ucar.edu]
+If none of the above suggestions have helped solve your problem, help is available through: met_help@ucar.edu
 
-A.4 How to contribute code
+How to contribute code
+______________________
 
-If you have code you would like to contribute, we will gladly consider your contribution. Please send email to: [||met_help@ucar.edu]
+If you have code you would like to contribute, we will gladly consider your contribution. Please send email to: met_help@ucar.edu
