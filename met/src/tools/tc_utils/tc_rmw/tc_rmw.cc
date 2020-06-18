@@ -473,7 +473,7 @@ bool is_keeper(const ATCFLineBase * line) {
    }
 
    if(!keep) {
-      mlog << Debug(3) << "Skipping track line for " << cs << ":\n"
+      mlog << Debug(4) << "Skipping track line for " << cs << ":\n"
            << line->get_line() << "\n";
    }
 
