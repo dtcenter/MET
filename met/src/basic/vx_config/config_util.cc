@@ -1889,8 +1889,9 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
            << tmp_dir_path << "\n\n";
       exit(1);
    }
-
-   if(odir) met_closedir(odir);
+   else {
+      met_closedir(odir);
+   }
 
    return(tmp_dir_path);
 }

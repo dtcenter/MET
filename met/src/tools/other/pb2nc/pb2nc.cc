@@ -792,10 +792,10 @@ void open_netcdf() {
    obs_vars.attr_pb2nc = true;
 
    if (!obs_to_vector) {
-      int deflate_level = compress_level;
-      if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-      create_nc_obs_vars(obs_vars, f_out, deflate_level);
+      create_nc_obs_vars(obs_vars, f_out,
+                         (compress_level >= 0 ? compress_level :
+                          conf_info.conf.nc_compression()));
 
       // Add global attributes
       write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -999,8 +999,8 @@ void process_pbfile(int i_pb) {
 
    bool has_pbl_data;
    bool do_pbl = false;
-   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code);
-   bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code);
+   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code, false);
+   bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code, false);
 
    bool     is_same_header;
    unixtime prev_hdr_vld_ut = (unixtime) 0;
@@ -1016,8 +1016,8 @@ void process_pbfile(int i_pb) {
    if (cal_pbl) {
       is_same_header = false;
       prev_hdr_vld_ut = -1;
-      strncpy(prev_hdr_typ, not_assigned, sizeof(not_assigned));
-      strncpy(prev_hdr_sid, not_assigned, sizeof(not_assigned));
+      strncpy(prev_hdr_typ, not_assigned, strlen(not_assigned));
+      strncpy(prev_hdr_sid, not_assigned, strlen(not_assigned));
    }
 
    IMM = JMM =1;
@@ -1206,7 +1206,7 @@ void process_pbfile(int i_pb) {
          max_msg_ut = hdr_vld_ut;
       }
       if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
-         if (!filtered_times.has(hdr_vld_ut)) {
+         if (!filtered_times.has(hdr_vld_ut, false)) {
             filtered_times.add(hdr_vld_ut);
          }
          rej_vld++;
@@ -1311,7 +1311,7 @@ void process_pbfile(int i_pb) {
       if (nlev > mxr8lv) {
          buf_nlev = mxr8lv;
          for(kk=0; kk<mxr8vt; kk++) {
-            if (!variables_big_nlevels.has(bufr_obs_name_arr[kk])) {
+            if (!variables_big_nlevels.has(bufr_obs_name_arr[kk], false)) {
                mlog << Warning << "\n" << method_name << " -> "
                     << "Too many vertical levels (" << nlev
                     << ") for " << bufr_obs_name_arr[kk]
@@ -1539,7 +1539,7 @@ void process_pbfile(int i_pb) {
       
                   // Only derive PRMSL for surface message
                   if(derive_gc[i] == prmsl_grib_code &&
-                     !conf_info.surface_message_types.has(hdr_typ))
+                     !conf_info.surface_message_types.has(hdr_typ, false))
                      continue;
       
                   // Store the grib code to be derived
@@ -1724,14 +1724,14 @@ void process_pbfile(int i_pb) {
             var_name = bufr_obs_name_arr[vIdx];
             var_name_len = var_name.length();
             if (is_prepbufr &&
-                  (prepbufr_vars.has(var_name)
+                  (prepbufr_vars.has(var_name, false)
                    || prepbufr_event_members.has(var_name)
                    || prepbufr_derive_vars.has(var_name))) continue;
 
             isDegC = false;
             isMgKg = false;
             isMilliBar = false;
-            if (var_names.has(var_name, var_index)) {
+            if (var_names.has(var_name, var_index, false)) {
                if ("DEG C" == var_units[var_index]) {
                   isDegC = true;
                }
@@ -1750,7 +1750,7 @@ void process_pbfile(int i_pb) {
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
-               if (!variables_big_nlevels.has(var_name)) {
+               if (!variables_big_nlevels.has(var_name, false)) {
                   mlog << Warning << "\n" << method_name << " -> "
                        << "Too many vertical levels (" << nlev2
                        << ") for " << var_name
@@ -2163,7 +2163,7 @@ void process_pbfile_metadata(int i_pb) {
             tmp_hdr_array.clear();
             tmp_hdr_array.parse_wsss(prepbufr_hdrs_str);
             for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-               if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+               if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
             }
          }
          else {
@@ -2177,7 +2177,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found station id: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2195,7 +2195,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found  longitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2206,7 +2206,7 @@ void process_pbfile_metadata(int i_pb) {
                for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
-                     if (!bufr_hdr_name_arr.has(var_name)) bufr_hdr_name_arr.add(var_name);
+                     if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
                      mlog << Debug(10) << "found   latitude: " << var_name << "=" << bufr_obs[0][index] << "\n";
                   }
                }
@@ -2215,9 +2215,9 @@ void process_pbfile_metadata(int i_pb) {
             }
             else {
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
-               if (!bufr_hdr_name_arr.has(default_lon_name)) hdr_name_str.add(default_lon_name);
+               if (!bufr_hdr_name_arr.has(default_lon_name, false)) hdr_name_str.add(default_lon_name);
                if (0 < hdr_name_str.length()) hdr_name_str.add(" ");
-               if (!bufr_hdr_name_arr.has(default_lat_name)) hdr_name_str.add(default_lat_name);
+               if (!bufr_hdr_name_arr.has(default_lat_name, false)) hdr_name_str.add(default_lat_name);
             }
 
             ConcatString time_hdr_names;
@@ -2229,7 +2229,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
             else {
@@ -2237,7 +2237,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_ymd_name);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
 
@@ -2247,7 +2247,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
             else if (event_names.has("HHMM", index)) {
@@ -2256,7 +2256,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
                if (!bufr_hdr_name_arr.has("SECO")) bufr_hdr_name_arr.add("SECO");
             }
@@ -2265,7 +2265,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_hms_name);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
-                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index])) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
+                  if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
 
@@ -2284,7 +2284,7 @@ void process_pbfile_metadata(int i_pb) {
          if (check_all) {
             // Remove variables for headers
             for (index=0; index<bufr_hdr_name_arr.n_elements(); index++) {
-               if (unchecked_var_list.has(bufr_hdr_name_arr[index], var_index)) {
+               if (unchecked_var_list.has(bufr_hdr_name_arr[index], var_index, false)) {
                   unchecked_var_list.shift_down(var_index, 1);
                }
             }
@@ -2297,7 +2297,7 @@ void process_pbfile_metadata(int i_pb) {
                        << bufr_var_name <<"\" does not exist at BUFR file\n\n";
                   exit(1);
                }
-               if (!tmp_bufr_obs_name_arr.has(bufr_var_name)) {
+               if (!tmp_bufr_obs_name_arr.has(bufr_var_name, false)) {
                   tmp_bufr_obs_name_arr.add(bufr_var_name);
                }
             }
@@ -2339,7 +2339,8 @@ void process_pbfile_metadata(int i_pb) {
          }  //end for lv
          
          if (has_valid_data) {
-            if (!tmp_bufr_obs_name_arr.has(var_name) && !bufr_hdr_name_arr.has(var_name)) {
+            if (!tmp_bufr_obs_name_arr.has(var_name, false)
+                && !bufr_hdr_name_arr.has(var_name, false)) {
                tmp_bufr_obs_name_arr.add(var_name);
             }
             if (do_all_vars) {
@@ -2349,7 +2350,7 @@ void process_pbfile_metadata(int i_pb) {
             else {
                StringArray typeArray;
                if (0 < variableTypeMap.count(var_name)) typeArray = variableTypeMap[var_name];
-               if (!typeArray.has(hdr_typ)) {
+               if (!typeArray.has(hdr_typ, false)) {
                   typeArray.add(hdr_typ);
                   variableTypeMap[var_name] = typeArray;
                }
@@ -2365,7 +2366,7 @@ void process_pbfile_metadata(int i_pb) {
    bufr_obs_name_arr.clear();
    for (index=0; index<prepbufr_vars.n_elements(); index++) {
       tmp_var_name = prepbufr_vars[index].c_str();
-      if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
+      if (do_all_vars || bufr_target_variables.has(tmp_var_name, false)) {
          if (tableB_vars.has(tmp_var_name)) {
             bufr_obs_name_arr.add(tmp_var_name);
             bufr_var_code[index] = bufr_var_index;
@@ -2388,7 +2389,7 @@ void process_pbfile_metadata(int i_pb) {
       }
    }
    for (i=0; i<tmp_bufr_obs_name_arr.n_elements(); i++) {
-      if (!bufr_obs_name_arr.has(tmp_bufr_obs_name_arr[i])) {
+      if (!bufr_obs_name_arr.has(tmp_bufr_obs_name_arr[i], false)) {
          bufr_obs_name_arr.add(tmp_bufr_obs_name_arr[i]);
       }
    }
@@ -2438,13 +2439,8 @@ void write_netcdf_hdr_data() {
    if(dim_count <= 0) {
       mlog << Error << method_name << " -> "
            << "No PrepBufr messages retained.  Nothing to write.\n\n";
-
       // Delete the NetCDF file
-      if(remove(ncfile.c_str()) != 0) {
-         mlog << Error << method_name << " -> "
-              << "can't remove output NetCDF file \"" << ncfile
-              << "\"\n\n";
-      }
+      remove_temp_file(ncfile);
       exit(1);
    }
 
@@ -2462,7 +2458,6 @@ void write_netcdf_hdr_data() {
    else {
       if (do_summary) {
          // Write out the summary data
-         //write_nc_observations(obs_vars, summary_obs->getSummaries(), false);
          if (save_summary_only) reset_header_buffer(pb_hdr_count, true);
          write_nc_observations(obs_vars, summary_obs->getSummaries());
          mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
@@ -2472,7 +2467,9 @@ void write_netcdf_hdr_data() {
               << " summary header count: " << (dim_count-pb_hdr_count) << "\n";
 
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
-         if (summaryInfo.flag) write_summary_attributes(f_out, summaryInfo);
+         if (summaryInfo.flag) {
+            write_summary_attributes(f_out, summaryInfo);
+         }
       }
 
       create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
@@ -2484,8 +2481,6 @@ void write_netcdf_hdr_data() {
          // Write out the remaining header data
          write_nc_buf_headers(obs_vars);
       }
-
-      //write_nc_table_vars(obs_vars);
    }
 
    StringArray nc_var_name_arr;
@@ -2499,7 +2494,7 @@ void write_netcdf_hdr_data() {
 
       unit_str = "";
       var_name = bufr_obs_name_arr[i];
-      if (var_names.has(var_name, var_index)) {
+      if (var_names.has(var_name, var_index, false)) {
          unit_str = var_units[var_index];
          if (0 == strcmp("DEG C", unit_str.c_str())) {
             unit_str = "KELVIN";
@@ -2572,8 +2567,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       if (!save_summary_only)
           write_nc_observation(obs_vars, obs_arr, obs_qty.text());
       if (do_summary) {
-         int var_index = obs_arr[1];
-         string var_name = bufr_obs_name_arr[var_index];
+         string var_name = bufr_obs_name_arr[(obs_arr[1])];
          conf_info.getSummaryInfo();
          summary_obs->addObservation(
                hdr_typ.text(),
@@ -2581,7 +2575,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                hdr_vld,
                hdr_lat, hdr_lon, hdr_elv,
                obs_qty.text(),
-               var_index, obs_arr[2], obs_arr[3], obs_arr[4],
+               obs_arr[1], obs_arr[2], obs_arr[3], obs_arr[4],
                var_name);
       }
    }
@@ -2718,7 +2712,7 @@ bool keep_message_type(const char *mt_str) {
    bool keep = false;
 
    keep = conf_info.message_type.n_elements() == 0 ||
-          conf_info.message_type.has(mt_str);
+          conf_info.message_type.has(mt_str, false);
 
    return(keep);
 }
@@ -2728,7 +2722,7 @@ bool keep_message_type(const char *mt_str) {
 bool keep_station_id(const char *sid_str) {
 
    return(conf_info.station_id.n_elements() == 0 ||
-          conf_info.station_id.has(sid_str));
+          conf_info.station_id.has(sid_str, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2758,21 +2752,21 @@ bool keep_valid_time(const unixtime ut,
 bool keep_pb_report_type(int type) {
 
    return(conf_info.pb_report_type.n_elements() == 0 ||
-          conf_info.pb_report_type.has(type));
+          conf_info.pb_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_in_report_type(int type) {
    return(conf_info.in_report_type.n_elements() == 0 ||
-          conf_info.in_report_type.has(type));
+          conf_info.in_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_instrument_type(int type) {
    return(conf_info.instrument_type.n_elements() == 0 ||
-          conf_info.instrument_type.has(type));
+          conf_info.instrument_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2786,7 +2780,7 @@ bool keep_bufr_obs_index(int code) {
 
 bool keep_level_category(int category) {
    return(conf_info.level_category.n_elements() == 0 ||
-          conf_info.level_category.has(category));
+          conf_info.level_category.has(category, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2874,7 +2868,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
 
    mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
-      if (all_vars.has(hdr_arr[i], index)) {
+      if (all_vars.has(hdr_arr[i], index, false)) {
          description = all_descs[index];
       }
       else {
@@ -2888,7 +2882,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
         << ")  Name: Description                       Types:\n";
 
    for(i=0; i<obs_arr.n_elements(); i++) {
-      if (all_vars.has(obs_arr[i], index)) {
+      if (all_vars.has(obs_arr[i], index, false)) {
          description = all_descs[index];
       }
       else {
@@ -2927,7 +2921,6 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
-   int offset;
    int common_count = 0;
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
@@ -3278,7 +3271,7 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
 
    float cur_pres, next_pres;
    float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
-   float *pqtzuv_merged, *pqtzuv_tq, *pqtzuv_uv;
+   float *pqtzuv_merged;
    std::map<float,float*>::iterator it_pivot, it_aux;
    static const char *method_name = "merge_records() ";
 

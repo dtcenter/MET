@@ -256,8 +256,7 @@ ConcatString PyLineDataFile::make_data_line()
 
 {
 
-int j, k;
-double v;
+int j;
 ConcatString line;
 ConcatString a;
 PyObject * sublist = 0;
@@ -287,9 +286,6 @@ if ( ! PyList_Check(sublist) )  {
    mlog << Error
         << "\n\n  PyLineDataFile::make_data_line() -> python object is not a list!\n\n";
 
-   // cout << "sublist   = " << sublist   << "\n" << flush;
-   // cout << "main_list = " << main_list << "\n" << flush;
-
    exit ( 1 );
 
 }
@@ -314,9 +310,6 @@ for (j=0; j<N; ++j)  {
    line << ' ' << a;
 
 }
-
-// cout << "PyLineDataFile::make_data_line() -> line = \"" << line << "\"\n" << flush;
-
 
    //
    //  done

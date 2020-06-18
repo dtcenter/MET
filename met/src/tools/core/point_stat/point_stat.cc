@@ -1407,7 +1407,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    bool do_cnt      = (vx_opt.output_flag[i_cnt]    != STATOutputType_None);
    bool precip_flag = (vx_opt.vx_pd.fcst_info->is_precipitation() &&
                        vx_opt.vx_pd.obs_info->is_precipitation());
-   
+
    // Allocate memory
    cnt_info   = new CNTInfo   [n_bin];
    sl1l2_info = new SL1L2Info [n_bin];
@@ -1444,7 +1444,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             sl1l2_info[j].fthresh = vx_opt.fcnt_ta[i];
             sl1l2_info[j].othresh = vx_opt.ocnt_ta[i];
             sl1l2_info[j].logic   = vx_opt.cnt_logic;
-            
+
             // Compute partial sums
             sl1l2_info[j].set(pd);
 
@@ -1502,7 +1502,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             }
 
             // Write out CNT
-            if((n_bin == 1 || vx_opt.cdf_info.write_bins) && 
+            if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
                vx_opt.output_flag[i_cnt] != STATOutputType_None &&
                cnt_info[j].n > 0) {
 
@@ -1512,17 +1512,17 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             }
          } // end if do_cnt
       } // end for j (n_bin)
-      
+
       // Write the mean of the climo CDF bins
       if(n_bin > 1) {
-         
+
          // Compute SL1L2 climo CDF bin means
          if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
             vx_opt.output_flag[i_sal1l2] != STATOutputType_None) {
-         
+
             SL1L2Info sl1l2_mean;
             compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
-         
+
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None &&
                sl1l2_mean.scount > 0) {
@@ -1546,10 +1546,10 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Compute CNT climo CDF bin means
          if(vx_opt.output_flag[i_cnt] != STATOutputType_None) {
-            
+
             CNTInfo cnt_mean;
             compute_cnt_mean(cnt_info, n_bin, cnt_mean);
-            
+
             if(cnt_mean.n > 0) {
 
                write_cnt_row(shc, cnt_mean,
@@ -1615,7 +1615,7 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
    PCTInfo *pct_info = (PCTInfo *) 0;
-   
+
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
@@ -1657,8 +1657,8 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          // Compute the probabilistic counts and statistics
          compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
 
-         // Check for no matched pairs to process	
-         if(pd.n_obs == 0) continue; 
+         // Check for no matched pairs to process
+         if(pd.n_obs == 0) continue;
 
          // Write out PCT
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
@@ -1852,7 +1852,8 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             mlog << Debug(3) << "Skipping HiRA RPS output since no "
                  << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
-                 << "\" dictionary.\n";
+                 << "\" dictionary.\n";     
+            if(gt) { delete gt; gt = 0; }
             break;
          }
 
@@ -2192,4 +2193,3 @@ void set_verbosity(const StringArray & a)
 }
 
 ////////////////////////////////////////////////////////////////////////
-

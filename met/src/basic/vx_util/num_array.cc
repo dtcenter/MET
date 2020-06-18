@@ -289,11 +289,11 @@ return ( e[i] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int NumArray::has(int k) const
+int NumArray::has(int k, bool forward) const
 
 {
 
-return(has((double) k));
+return(has((double) k, forward));
 
 }
 
@@ -301,19 +301,31 @@ return(has((double) k));
 ////////////////////////////////////////////////////////////////////////
 
 
-int NumArray::has(double d) const
+int NumArray::has(double d, bool forward) const
 
 {
 
 int j;
+int found = 0;
 
-for (j=0; j<Nelements; ++j)  {
-
-   if ( is_eq(e[j], d) )  return ( 1 );
-
+if (forward) {
+   for (j=0; j<Nelements; ++j) {
+      if ( is_eq(e[j], d) ) {
+          found = 1;
+          break;
+      }
+   }
+}
+else {
+   for (j=Nelements-1; j>=0; --j) {
+      if ( is_eq(e[j], d) ) {
+          found = 1;
+          break;
+      }
+   }
 }
 
-return ( 0 );
+return ( found );
 
 }
 
@@ -1038,7 +1050,6 @@ double NumArray::mean_sqrt() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
@@ -1056,7 +1067,6 @@ double NumArray::mean_fisher() const
 
 {
 
-int j;
 NumArray wgt;
 
 // for simple mean, call weighted mean with constant weight
