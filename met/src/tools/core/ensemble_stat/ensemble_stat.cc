@@ -364,7 +364,7 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(etype, otype, grid_obs_flag, point_obs_flag, use_var_id);
-   
+
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
@@ -503,7 +503,7 @@ void process_grid(const Grid &fcst_grid) {
          mlog << Error << "\nprocess_grid() -> "
               << "attempting to regrid to the observation grid, but no "
               << "gridded observations provided!\n\n";
-         exit(1); 
+         exit(1);
       }
 
       DataPlane dp;
@@ -1244,22 +1244,22 @@ void process_point_scores() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(0);
@@ -1460,13 +1460,13 @@ void process_grid_vx() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1584,13 +1584,13 @@ void process_grid_vx() {
       }
 
       // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units());
+      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -2008,10 +2008,10 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 
    // Write the mean of the climo CDF bins
    if(n_bin > 1) {
-         
+
       // Compute ECNT climo CDF bin means
       if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
-         
+
          ECNTInfo ecnt_mean;
          compute_ecnt_mean(ecnt_info, n_bin, ecnt_mean);
 
@@ -2027,14 +2027,14 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
    // Dealloate memory
    if(ecnt_info) { delete [] ecnt_info; ecnt_info = (ECNTInfo *) 0; }
 
-   return;    
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void do_rps(const EnsembleStatVxOpt &vx_opt,
             const SingleThresh &othresh,
-            const PairDataEnsemble *pd_ptr) {    
+            const PairDataEnsemble *pd_ptr) {
    RPSInfo rps_info;
 
    // Check for valid pointer
@@ -2051,7 +2051,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
       pd_ptr->csd_na.n_valid()   > 0 &&
       vx_opt.cdf_info.cdf_ta.n() > 0) {
       rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
-   }  
+   }
 
    // Compute ensemble RPS statistics
    rps_info.set(*pd_ptr);
@@ -2064,7 +2064,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
                     txt_at[i_rps], i_txt_row[i_rps]);
    }
 
-   return;    
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2175,13 +2175,13 @@ void track_counts(int i_vx, const DataPlane &dp) {
             fractional_coverage(dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape,
-               ThreshBuf[i], conf_info.nbrhd_prob.vld_thresh); 
+               ThreshBuf[i], conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
             const double *Frac = frac_dp.data();
             for(k=0; k<nxy; k++) {
                if(Frac[k] > 0) thresh_nbrhd_count_na[i][j].inc(k, 1);
-            } // end for k 
+            } // end for k
 
          } // end for j
       } // end for i
@@ -2578,7 +2578,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
          snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
                   conf_info.ens_ta[i_ens][i].get_abbr_str().contents().c_str());
 
-         // Compute the ensemble relative frequency 
+         // Compute the ensemble relative frequency
          for(j=0; j<count_na.n(); j++) {
 
             // Check for too much missing data
@@ -2626,7 +2626,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                write_ens_var_float(i_ens, ens_prob, dp,
                                    type_str,
                                    "Neighborhood Ensemble Probability");
-               
+
             } // end for j
          } // end if do_nep
       } // end for i
@@ -2646,7 +2646,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
             // Initialize
             prob_dp.erase();
 
-            // Compute the neighborhood maximum ensemble probability 
+            // Compute the neighborhood maximum ensemble probability
             for(k=0; k<count_na.n(); k++) {
 
                // Check for too much missing data
@@ -2684,7 +2684,7 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                                    type_str,
                                    "Neighborhood Maximum Ensemble Probability");
 
-            } // end for k 
+            } // end for k
          } // end for j
       } // end for i
    } // end if do_nep

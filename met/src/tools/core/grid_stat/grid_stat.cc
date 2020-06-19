@@ -721,22 +721,22 @@ void process_scores() {
       shc.set_desc(conf_info.vx_opt[i].desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name());
+      shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].fcst_info->units());
+      shc.set_fcst_units(conf_info.vx_opt[i].fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].fcst_info->level_name().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].obs_info->name());
+      shc.set_obs_var(conf_info.vx_opt[i].obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].obs_info->units());
+      shc.set_obs_units(conf_info.vx_opt[i].obs_info->units_attr());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].obs_info->level_name().c_str());
+      shc.set_obs_lev(conf_info.vx_opt[i].obs_info->level_attr().c_str());
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1028,10 +1028,10 @@ void process_scores() {
                } // end for m
 
                // Reset the forecast variable name
-               shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name());
+               shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name_attr());
 
                // Reset the observation variable name
-               shc.set_obs_var(conf_info.vx_opt[i].obs_info->name());
+               shc.set_obs_var(conf_info.vx_opt[i].obs_info->name_attr());
 
             } // end Compute VL1L2
 
@@ -1741,10 +1741,10 @@ void process_scores() {
                } // end for m
 
                // Reset the forecast variable name
-               shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name());
+               shc.set_fcst_var(conf_info.vx_opt[i].fcst_info->name_attr());
 
                // Reset the observation variable name
-               shc.set_obs_var(conf_info.vx_opt[i].obs_info->name());
+               shc.set_obs_var(conf_info.vx_opt[i].obs_info->name_attr());
 
             } // end Compute VL1L2
 
@@ -1976,7 +1976,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             sl1l2_info[j].fthresh = vx_opt.fcnt_ta[i];
             sl1l2_info[j].othresh = vx_opt.ocnt_ta[i];
             sl1l2_info[j].logic   = vx_opt.cnt_logic;
-            
+
             // Compute partial sums
             sl1l2_info[j].set(pd);
 
@@ -2034,7 +2034,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             }
 
             // Write out CNT
-            if((n_bin == 1 || vx_opt.cdf_info.write_bins) && 
+            if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
                vx_opt.output_flag[i_cnt] != STATOutputType_None &&
                cnt_info[j].n > 0) {
 
@@ -2047,14 +2047,14 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
       // Write the mean of the climo CDF bins
       if(n_bin > 1) {
-         
+
          // Compute SL1L2 climo CDF bin means
          if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
             vx_opt.output_flag[i_sal1l2] != STATOutputType_None) {
-         
+
             SL1L2Info sl1l2_mean;
             compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
-         
+
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None &&
                sl1l2_mean.scount > 0) {
@@ -2081,7 +2081,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             CNTInfo cnt_mean;
             compute_cnt_mean(cnt_info, n_bin, cnt_mean);
-            
+
             if(cnt_mean.n > 0) {
 
                write_cnt_row(shc, cnt_mean,
@@ -2146,7 +2146,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
    PCTInfo *pct_info = (PCTInfo *) 0;
-   
+
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
@@ -2419,7 +2419,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                     << conf_info.vx_opt[i_vx].obs_info->level_name();
       fcst_obs_name << fcst_name << "_" << obs_name;
    }
-   
+
    // Append nc_pairs_var_suffix config file entry
    if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {
       var_suffix << "_" << conf_info.vx_opt[i_vx].var_suffix;

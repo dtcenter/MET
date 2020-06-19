@@ -361,22 +361,22 @@ void process_scores() {
       shc.set_desc(conf_info.desc[i].c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.fcst_info[i]->name());
+      shc.set_fcst_var(conf_info.fcst_info[i]->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.fcst_info[i]->units());
+      shc.set_fcst_units(conf_info.fcst_info[i]->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.fcst_info[i]->level_name().c_str());
+      shc.set_fcst_lev(conf_info.fcst_info[i]->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.obs_info[i]->name());
+      shc.set_obs_var(conf_info.obs_info[i]->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.obs_info[i]->units());
+      shc.set_obs_units(conf_info.obs_info[i]->units_attr());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.obs_info[i]->level_name().c_str());
+      shc.set_obs_lev(conf_info.obs_info[i]->level_attr().c_str());
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing " << conf_info.fcst_info[i]->magic_str()
