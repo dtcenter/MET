@@ -179,92 +179,54 @@ Configure and execute the build
 
 Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
 
-?? change to code font??
+.. code-block:: none
 
-1. ./configure --prefix=`pwd` --enable-grib2 --enable-python \
-
-               --enable-modis --enable-mode_graphics --enable-lidar2nc
-
-2. Type 'make install >& make_install.log &'
-
-3. Type 'tail -f make_install.log' to view the execution of the make.
-
-4. When make is finished, type 'CNTRL-C' to quit the tail.
+  1. ./configure --prefix=`pwd` --enable-grib2 --enable-python \
+                 --enable-modis --enable-mode_graphics --enable-lidar2nc
+  2. Type 'make install >& make_install.log &'
+  3. Type 'tail -f make_install.log' to view the execution of the make.
+  4. When make is finished, type 'CNTRL-C' to quit the tail.
 
 If all tools are enabled and the build is successful, the "<prefix>/bin" directory (where <prefix> is the prefix you specified on your configure command line) will contain 36 executables:
-?? change to code font??
 
-   \- ascii2nc
+.. code-block:: none
 
-   \- ensemble_stat
-
-   \- gen_vx_mask
-
-   \- grid_stat
-
-   \- gis_dump_dbf
-
-   \- gis_dump_shp
-
-   \- gis_dump_shx
-
-   \- grid_diag
-
-   \- gsid2mpr
-
-   \- gsidens2orank
-
-   \- lidar2nc
-
-   \- madis2nc
-
-   \- mode
-
-   \- mode_analysis
-
-   \- modis_regrid
-
-   \- mtd
-
-   \- pb2nc
-
-   \- pcp_combine
-
-   \- plot_data_plane
-
-   \- plot_mode_field
-
-   \- plot_point_obs
-
-   \- point2grid
-
-   \- point_stat
-
-   \- rmw_analysis
-
-   \- regrid_data_plane
-
-   \- series_analysis
-
-   \- shift_data_plane
-
-   \- stat_analysis
-
-   \- tc_dland
-
-   \- tc_gen
-
-   \- tc_pairs
-
-   \- tc_rmw
-
-   \- tc_stat
-
-   \- wavelet_stat
-
-   \- wwmca_plot
-
-   \- wwmca_regrid
+   - ascii2nc
+   - ensemble_stat
+   - gen_vx_mask
+   - grid_stat
+   - gis_dump_dbf
+   - gis_dump_shp
+   - gis_dump_shx
+   - grid_diag
+   - gsid2mpr
+   - gsidens2orank
+   - lidar2nc
+   - madis2nc
+   - mode
+   - mode_analysis
+   - modis_regrid
+   - mtd
+   - pb2nc
+   - pcp_combine
+   - plot_data_plane
+   - plot_mode_field
+   - plot_point_obs
+   - point2grid
+   - point_stat
+   - rmw_analysis
+   - regrid_data_plane
+   - series_analysis
+   - shift_data_plane
+   - stat_analysis
+   - tc_dland
+   - tc_gen
+   - tc_pairs
+   - tc_rmw
+   - tc_stat
+   - wavelet_stat
+   - wwmca_plot
+   - wwmca_regrid
 
 NOTE: Several compilation warnings may occur which are expected. If any errors occur, please refer to the appendix on troubleshooting for common problems. 
 
