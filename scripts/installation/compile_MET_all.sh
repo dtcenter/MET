@@ -633,10 +633,10 @@ if [ $COMPILE_MET -eq 1 ]; then
   cd ${MET_DIR}
   # If using source from a tar file remove everything and unpack the tar file
   # FALSE = compiling from github repo and we don't want to overwrite the files
-  #if [ ${USE_MET_TAR_FILE} == "TRUE" ]; then
+  if [ ${USE_MET_TAR_FILE} == "TRUE" ]; then
     rm -rf met*
     tar -xzf ${MET_TARBALL}
-  #fi
+  fi
   cd met*
 
   if [ -z ${MET_BUFRLIB} ]; then
