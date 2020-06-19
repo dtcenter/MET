@@ -157,7 +157,9 @@ wavelet_stat usage
 
 The usage statement for the Wavelet-Stat tool is shown below:
 
-Usage: wavelet_stat
+.. code-block:: none
+
+  Usage: wavelet_stat
 
 {\hskip 0.5in}fcst_file
 
@@ -197,13 +199,12 @@ Optional arguments for wavelet_stat
 
 An example of the wavelet_stat calling sequence is listed below:
 
-wavelet_stat \
+.. code-block:: none
 
-sample_fcst.grb \
-
-sample_obs.grb \
-
-WaveletStatConfig
+  wavelet_stat \
+  sample_fcst.grb \
+  sample_obs.grb \
+  WaveletStatConfig
 
 In the example, the Wavelet-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the WaveletStatConfig file.
 
@@ -216,51 +217,36 @@ The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_defa
 
 _______________________
 
-model             = "WRF";
+.. code-block:: none
 
-desc              = "NA";
-
-obtype            = "ANALYS";
-
-fcst              = { ... }
-
-obs               = { ... }
-
-regrid            = { ... }
-
-mask_missing_flag = NONE;
-
-met_data_dir      = "MET_BASE";
-
-ps_plot_flag      = TRUE;
-
-fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable”;
-
-                      plot_min = 0.0; plot_max = 0.0; }
-
-obs_raw_plot      = { ... }
-
-wvlt_plot         = { ... }
-
-output_prefix     = "";
-
-version           = "VN.N";
+  model             = "WRF";
+  desc              = "NA";
+  obtype            = "ANALYS";
+  fcst              = { ... }
+  obs               = { ... }
+  regrid            = { ... }
+  mask_missing_flag = NONE;
+  met_data_dir      = "MET_BASE";
+  ps_plot_flag      = TRUE;
+  fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable”;
+                        plot_min = 0.0; plot_max = 0.0; }
+  obs_raw_plot      = { ... }
+  wvlt_plot         = { ... }
+  output_prefix     = "";
+  version           = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _______________________
 
-grid_decomp_flag = AUTO;
+.. code-block:: none
 
-
-
-tile = {
-
-   width    = 0;
-
-   location = [ { x_ll = 0; y_ll = 0; } ];
-
-}
+  grid_decomp_flag = AUTO;
+  
+  tile = {
+     width    = 0;
+     location = [ { x_ll = 0; y_ll = 0; } ];
+  }
 
 The grid_decomp_flag variable specifies how tiling should be performed: 
 
@@ -274,13 +260,12 @@ The width and location variables allow users to manually define the tiles of dim
 
 _______________________
 
-wavelet = {
+.. code-block:: none
 
-   type   = HAAR;
-
-   member = 2;
-
-}
+  wavelet = {
+     type   = HAAR;
+     member = 2;
+  }
 
 The wavelet_flag and wavelet_k variables specify the type and shape of the wavelet to be used for the scale decomposition. The Casati et al. (2004) method uses a Haar wavelet which is a good choice for discontinuous fields like precipitation. However, users may choose to apply any wavelet family/shape that is available in the GNU Scientific Library. Values for the wavelet_flag variable, and associated choices for k, are described below:
 
@@ -298,23 +283,22 @@ The wavelet_flag and wavelet_k variables specify the type and shape of the wavel
 
 _______________________
 
-output_flag = {
+.. code-block:: none
 
-   isc = BOTH;
-
-}
+  output_flag = {
+     isc = BOTH;
+  }
 
 The output_flag array controls the type of output that the Wavelet-Stat tool generates. This flags is set similarly to the output flags of the other MET tools, with possible values of NONE, STAT, and BOTH. The ISC line type is the only one available for Intensity-Scale STAT lines.
 
 _______________________
 
-nc_pairs_flag = {
+.. code-block:: none
 
-   latlon = TRUE;
-
-   raw    = TRUE;
-
-}
+  nc_pairs_flag = {
+     latlon = TRUE;
+     raw    = TRUE;
+  }
 
 The nc_pairs_flag is described in Section :ref:`grid_stat-configuration-file`
 
