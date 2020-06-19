@@ -67,30 +67,30 @@ The verification statistics for dichotomous variables are formulated using a con
     - o = 0 (e.g., "No")
     -  
   * - f = 1 (e.g., "Yes")
-    - n[subscript:11]  ?? fix sub scripting here and below.
-    - n[subscript:10]
-    - n[subscript:1. ]= n[subscript:11] + n[subscript:10]
+    - :math:`\mathbf{n}_{11}`
+    - :math:`\mathbf{n}_{10}`
+    - :math:`\mathbf{n}_{1.} = \mathbf{n}_{11} + \mathbf{n}_{10}`
   * - f = 0 (e.g., "No")
-    - n[subscript:01]
-    - n[subscript:00]
-    - n[subscript:0.]= n[subscript:01] + n[subscript:00]
+    - :math:`\mathbf{n}_{01}`
+    - :math:`\mathbf{n}_{00}`
+    - :math:`\mathbf{n}_{0.} = \mathbf{n}_{01} + \mathbf{n}_{00}`
   * - Total
-    - n[subscript:.1] = n[subscript:11] + n[subscript:01]
-    - n[subscript:.0] = n[subscript:10] + n[subscript:00]
-    - T = n[subscript:11 ]+ n[subscript:10 ]+n[subscript:01] + n[subscript:00]
+    - :math:`\mathbf{n}_{.1} = \mathbf{n}_{11} + \mathbf{n}_{01}`
+    - :math:`\mathbf{n}_{.0} = \mathbf{n}_{10} + \mathbf{n}_{00}`
+    - :math:`T = \mathbf{n}_{11} + \mathbf{n}_{10} + \mathbf{n}_{01} + \mathbf{n}_{00}`
 
-The counts, n11, n10, n01, and n00, are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
+The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and} n_{00},` are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
 
-By dividing the counts in the cells by the overall total, T, the joint proportions, p11, p10, p01, and p00 can be computed. Note that p11 + p10 + p01 + p00 = 1. Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
+By dividing the counts in the cells by the overall total, T, the joint proportions, :math:`\mathbf{p}_{11}, \mathbf{p}_{10}, \mathbf{p}_{01}, \text{and } \mathbf{p}_{00}` can be computed. Note that :math:`\mathbf{p}_{11} + \mathbf{p}_{10} + \mathbf{p}_{01} + \mathbf{p}_{00} = 1.` Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
 
-The values in Table 29.2 can also be used to compute the F, O, and H relative frequencies that are produced by the NCEP Verification System, and the Point-Stat tool provides an option to produce the statistics in this form. In terms of the other statistics computed by the Point-Stat tool, F is equivalent to the Mean Forecast; H is equivalent to POD; and O is equivalent to the Base Rate. All of these statistics are defined in the subsections below. The Point-Stat tool also provides the total number of observations, T.
+The values in Table 29.2 can also be used to compute the F, O, and H relative frequencies that are produced by the NCEP Verification System, and the Point-Stat tool provides an option to produce the statistics in this form. In terms of the other statistics computed by the Point-Stat tool, F is equivalent to the Mean Forecast; H is equivalent to POD; and O is equivalent to the Base Rate. All of these statistics are defined in the subsections below. The Point-Stat tool also provides the total number of observations, **T**.
 
 The categorical verification measures produced by the Point-Stat and Grid-Stat tools are described in the following subsections. They are presented in the order shown in :ref:`table_PS_format_info_FHO` through :ref:`table_PS_format_info_CTS_cont`.
 
 TOTAL
 ~~~~~
 
-The total number of forecast-observation pairs, T.
+The total number of forecast-observation pairs, **T**.
 
 Base rate
 ~~~~~~~~~
@@ -99,7 +99,7 @@ Called "O_RATE" in FHO output :ref:`table_PS_format_info_FHO`
 
 Called "BASER" in CTS output :ref:`table_PS_format_info_CTS`
 
-The base rate is defined as $\overline{o}=\displaystyle{{n_{11}+n_{01}}\over {T}}={{n_{.1}}\over {T}}$. This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
+The base rate is defined as :math:`\bar{o} = \frac{n_{11} + n_{01}}{T} = \frac{n_{.1}}{T}.` This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
 
 Mean forecast
 ~~~~~~~~~~~~~
@@ -108,25 +108,29 @@ Called "F_RATE" in FHO output :ref:`table_PS_format_info_FHO`
 
 Called "FMEAN" in CTS output :ref:`table_PS_format_info_CTS`
 
-The mean forecast value is defined as $\overline{f}=\displaystyle{{n_{11}+n_{10}}\over {T}}={{n_{1.}}\over {T}}$. 
+The mean forecast value is defined as :math:`\bar{f} = \frac{n_{11} + n_{10}}{T} = \frac{n_{1.}}{T}.`
 
-This statistic is comparable to the base rate and is the relative frequency of occurrence of a forecast of the event (i.e., f = 1). The mean forecast is equivalent to the "F" value computed by the NCEP Verification System.
+This statistic is comparable to the base rate and is the relative frequency of occurrence of a forecast of the event (i.e., **f = 1**). The mean forecast is equivalent to the "F" value computed by the NCEP Verification System.
 
 Accuracy
 ~~~~~~~~
 
 Called "ACC" in CTS output :ref:`table_PS_format_info_CTS`
 
-Accuracy for a 2x2 contingency table is defined as $$\hbox{ACC}={{n_{11}+n_{00}}\over{T}}.$$
+Accuracy for a 2x2 contingency table is defined as 
 
-That is, it is the proportion of forecasts that were either hits or correct rejections - the fraction that were correct. Accuracy ranges from 0 to 1; a perfect forecast would have an accuracy value of 1. Accuracy should be used with caution, especially for rare events, because it can be strongly influenced by large values of n00.
+.. math:: \text{ACC } = \frac{n_{11} + n_{00}}{T}.
+
+That is, it is the proportion of forecasts that were either hits or correct rejections - the fraction that were correct. Accuracy ranges from 0 to 1; a perfect forecast would have an accuracy value of 1. Accuracy should be used with caution, especially for rare events, because it can be strongly influenced by large values of :math:`\mathbf{n_{00}}`.
 
 Frequency Bias
 ~~~~~~~~~~~~~~
 
 Called "FBIAS" in CTS output :ref:`table_PS_format_info_CTS`
 
-Frequency Bias is the ratio of the total number of forecasts of an event to the total number of observations of the event. It is defined as $$\hbox{Bias}={{n_{11}+n_{10}}\over {n_{11}+n_{01}}}={{n_{1.}}\over {n_1}}.$$
+Frequency Bias is the ratio of the total number of forecasts of an event to the total number of observations of the event. It is defined as
+
+.. math:: \text{Bias } = \frac{n_{11} + n_{10}}{n_{11} + n_{01}} = \frac{n_{1.}}{n_1}.
 
 A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates the event was forecasted too frequently and a value less than 1 indicates the event was not forecasted frequently enough. 
 
@@ -137,7 +141,9 @@ Called "H_RATE" in FHO output :ref:`table_PS_format_info_FHO`
 
 Called "PODY" in CTS output :ref:`table_PS_format_info_CTS`
 
-POD is defined as $$\hbox{POD}={{n_{11}\over{n_{11}+n_{01}}}}={n_{11}\over{n_{1}}}.$$ 
+POD is defined as 
+
+.. math:: \text{POD } = \frac{n_{11}}{n_{11} + n_{01}} = \frac{n_{11}}{n_1}.
 
 It is the fraction of events that were correctly forecasted to occur. POD is equivalent to the H value computed by the NCEP verification system and is also known as the hit rate. POD ranges from 0 to 1; a perfect forecast would have POD = 1.
 
@@ -146,7 +152,9 @@ Probability of False Detection (POFD)
 
 Called "POFD" in CTS output :ref:`table_PS_format_info_CTS`
 
-POFD is defined as $$\hbox{POFD}={{n_{10}\over{n_{10}+n_{00}}}}={n_{10}\over{n_{.0}}}.$$ 
+POFD is defined as 
+
+.. math:: \text{POFD } = \frac{n_{10}}{n_{10} + n_{00}} = \frac{n_{10}}{n_{.0}}.
 
 It is the proportion of non-events that were forecast to be events. POFD is also often called the False Alarm Rate. POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 
@@ -155,7 +163,9 @@ Probability of Detection of the non-event (PODn)
 
 Called "PODN" in CTS output :ref:`table_PS_format_info_CTS`
 
-PODn is defined as $$\hbox{PODN}={{n_{00}\over{n_{10}+n_{00}}}}={n_{00}\over{n_{.0}}}.$$ 
+PODn is defined as 
+
+.. math:: \text{PODN } = \frac{n_{00}}{n_{10} + n_{00}} = \frac{n_{00}}{n_{.0}}.
 
 It is the proportion of non-events that were correctly forecasted to be non-events. Note that PODn = 1 - POFD. PODn ranges from 0 to 1. Like POD, a perfect forecast would have PODn = 1.
 
@@ -164,7 +174,9 @@ False Alarm Ratio (FAR)
 
 Called "FAR" in CTS output :ref:`table_PS_format_info_CTS`
 
-FAR is defined as $$\hbox{FAR}={{n_{10}\over{n_{10}+n_{11}}}}={n_{10}\over{n_{1.}}}.$$ 
+FAR is defined as 
+
+.. math:: \text{FAR } = \frac{n_{10}}{n_{10} + n_{11}} = \frac{n_{10}}{n_{1.}}.
 
 It is the proportion of forecasts of the event occurring for which the event did not occur. FAR ranges from 0 to 1; a perfect forecast would have FAR = 0. 
 
@@ -173,16 +185,24 @@ Critical Success Index (CSI)
 
 Called "CSI" in CTS output :ref:`table_PS_format_info_CTS`
 
-CSI is defined as $$\hbox{CSI}={{n_{11}\over{n_{11}+n_{10}+n_{01}}}}.$$ 
+CSI is defined as 
 
-It is the ratio of the number of times the event was correctly forecasted to occur to the number of times it was either forecasted or occurred. CSI ignores the "correct rejections" category (i.e., n00). CSI is also known as the Threat Score (TS). CSI can also be written as a nonlinear combination of POD and FAR, and is strongly related to Frequency Bias and the Base Rate.
+.. math:: \text{CSI } = \frac{n_{11}}{n_{11} + n_{10} + n_{01}}.
+
+It is the ratio of the number of times the event was correctly forecasted to occur to the number of times it was either forecasted or occurred. CSI ignores the "correct rejections" category (i.e., :math:`\mathbf{n_{00}}`). CSI is also known as the Threat Score (TS). CSI can also be written as a nonlinear combination of POD and FAR, and is strongly related to Frequency Bias and the Base Rate.
 
 Gilbert Skill Score (GSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "GSS" in CTS output :ref:`table_PS_format_info_CTS`
 
-GSS is based on the CSI, corrected for the number of hits that would be expected by chance. In particular, $$\hbox{GSS}=\displaystyle{{{n_{11}-C_1}\over{n_{11}+n_{10}+n_{01}-C_1}}},$$ where $$C=\displaystyle{{(n_{11}+n_{10})(n_{11}+n_{01})}\over{T}}.$$
+GSS is based on the CSI, corrected for the number of hits that would be expected by chance. In particular, 
+
+.. math:: \text{GSS } = \frac{n_{11} - C_1}{n_{11} + n_{10} + n_{01} - C_1},
+
+where
+
+.. math:: C = \frac{(n_{11} + n_{10}) (n_{11} + n_{01})}{T}.
 
 GSS is also known as the Equitable Threat Score (ETS). GSS values range from -1/3 to 1. A no-skill forecast would have GSS = 0; a perfect forecast would have GSS = 1.
 
@@ -191,9 +211,11 @@ Hanssen-Kuipers Discriminant (H-K)
 
 Called "HK" in CTS output :ref:`table_PS_format_info_CTS`
 
-H-K is defined as $$\hbox{H-K}={{n_{11}n_{00}-n_{10}n_{01}}\over{(n_{11}+n_{01})(n_{10}+n_{00})}}.$$
+H-K is defined as 
 
-More simply, $\hbox{H-K}=\hbox{POD}-\hbox{POFD}.$
+.. math:: \text{H-K } = \frac{n_{11} n_{00} - n_{10} n_{01}}{(n_{11} + n_{01}) (n_{10} + n_{00})}.
+
+More simply, H-K = POD :math:`-` POFD.
 
 H-K is also known as the True Skill Statistic (TSS) and less commonly (although perhaps more properly) as the Peirce Skill Score. H-K measures the ability of the forecast to discriminate between (or correctly classify) events and non-events. H-K values range between -1 and 1. A value of 0 indicates no skill; a perfect forecast would have H-K = 1.
 
@@ -202,7 +224,13 @@ Heidke Skill Score (HSS)
 
 Called "HSS" in CTS output :ref:`table_PS_format_info_CTS`
 
-HSS is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular, $$\hbox{HSS}=\displaystyle{{{n_{11}+n_{00}-C_2}\over{T-C_2}}},$$ where $$C_2=\displaystyle{{(n_{11}+n_{10})(n_{11}+n_{01})+(n_{01}+n_{00})(n_{10}+n_{00})}\over{T}}.$$
+HSS is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular, 
+
+.. math:: \text{HSS } = \frac{n_{11} + n_{00} - C_2}{T - C_2},
+
+where
+
+.. math:: C_2 = \frac{(n_{11} + n_{10}) (n_{11} + n_{01}) + (n_{01} + n_{00}) (n_{10} + n_{00})}{T}.
 
 HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
 
@@ -211,23 +239,27 @@ Odds Ratio (OR)
 
 Called "ODDS" in CTS output :ref:`table_PS_format_info_CTS`
 
-OR measures the ratio of the odds of a forecast of the event being correct to the odds of a forecast of the event being wrong. OR is defined as $$\hbox{OR}={{n_{11}\times n_{00}}\over{n_{10}\times n_{01}}}={{\biggl({\hbox{POD} \over {\hbox{1-POD}}}\biggr)} \over {\biggl({\hbox{POFD}\over {\hbox{1-POFD}}}\biggr)}}.$$
+OR measures the ratio of the odds of a forecast of the event being correct to the odds of a forecast of the event being wrong. OR is defined as 
 
-OR can range from 0 to \infty. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (Stephenson 2000).
+.. math:: \text{OR } = \frac{n_{11} \times n_{00}}{n_{10} \times n_{01}} = \frac{(\frac{\text{POD}}{1 - \text{POD}})}{(\frac{\text{POFD}}{1 - \text{POFD}})}.
+
+OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (Stephenson 2000).
 
 Logarithm of the Odds Ratio (LODDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "LODDS" in CTS output :ref:`table_PS_format_info_CTS`
 
-LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (Stephenson 2000). However, it can take values of \pm\inftywhen any of the contingency table counts is 0. LODDS is defined as $\hbox{LODDS}=ln(OR)$.
+LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (Stephenson 2000). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
 
 Odds Ratio Skill Score (ORSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "ORSS" in CTS output :ref:`table_PS_format_info_CTS`
 
-ORSS is a skill score based on the odds ratio. ORSS is defined as $$\hbox{ORSS}={{OR-1}\over{OR+1}}.$$
+ORSS is a skill score based on the odds ratio. ORSS is defined as 
+
+.. math:: \text{ORSS } = \frac{OR - 1}{OR + 1}.
 
 ORSS is sometime also referred to as Yule's Q. (Stephenson 2000).
 
@@ -236,7 +268,9 @@ Extreme Dependency Score (EDS)
 
 Called "EDS" in CTS output :ref:`table_PS_format_info_CTS`
 
-The extreme dependency score measures the association between forecast and observed rare events. EDS is defined as $$\hbox{EDS}={{{2\ln \biggl({n_{11}+n_{01} \over T}\biggr) }\over {\ln \biggl({n_{11}\over T}\biggr)}}-1}.$$
+The extreme dependency score measures the association between forecast and observed rare events. EDS is defined as
+
+.. math:: \text{EDS } = \frac{2 ln(\frac{n_{11} + n_{01}}{T})}{ln(\frac{n_{11}}{T})} - 1.
 
 EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (Stephenson et al, 2008).
 
@@ -245,29 +279,37 @@ Extreme Dependency Index (EDI)
 
 Called "EDI" in CTS output :ref:`table_PS_format_info_CTS`
 
-The extreme dependency index measures the association between forecast and observed rare events. EDI is defined as , where and are the Hit Rate and False Alarm Rate, respectively. 
+The extreme dependency index measures the association between forecast and observed rare events. EDI is defined as
 
-EDI can range from -\infty to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (Ferro and Stephenson, 2011).
+.. math:: \text{EDI } = \frac{\log F - \log H}{\log F + \log H},
+
+where *H* and *F* are the Hit Rate and False Alarm Rate, respectively. 
+
+EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (Ferro and Stephenson, 2011).
 
 Symmetric Extreme Dependency Score (SEDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "SEDS" in CTS output :ref:`table_PS_format_info_CTS`
 
-The symmetric extreme dependency score measures the association between forecast and observed rare events. SEDS is defined as $$\hbox{SEDS}={{{2\ln \biggl[{(n_{11}+n_{01})(n_{11}+n_{10}) \over T^2}\biggr] }\over {\ln \biggl({n_{11}\over T}\biggr)}}-1}.$$
+The symmetric extreme dependency score measures the association between forecast and observed rare events. SEDS is defined as 
 
-SEDS can range from -\infty to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (Ferro and Stephenson, 2011).
+.. math:: \text{SEDS } = \frac{2 \ln [\frac{(n_{11} + n_{01}) (n_{11} + n_{10})}{T^2}]}{\ln (\frac{n_{11}}{T})} - 1.
+
+SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (Ferro and Stephenson, 2011).
 
 Symmetric Extremal Dependency Index (SEDI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "SEDI" in CTS output :ref:`table_PS_format_info_CTS`
 
-The symmetric extremal dependency index measures the association between forecast and observed rare events. SEDI is defined as $$\hbox{SEDI}={{\ln F-\ln H +\ln (1-H)-\ln (1-F)}\over{\ln F+\ln H + \ln (1-H)+\ln (1-F)}},$$
+The symmetric extremal dependency index measures the association between forecast and observed rare events. SEDI is defined as 
 
-where $\displaystyle {H={n_{11}\over{n_{11}+n_{01}}}}$ and $\displaystyle{F={n_{10}\over{n_{00}+n_{10}}}}$are the Hit Rate and False Alarm Rate, respectively. 
+.. math:: \text{SEDI } = \frac{\ln F - \ln H + \ln (1 - H) - \ln (1 - F)}{\ln F + \ln H + \ln (1 - H) + \ln (1 - F)}, 
 
-SEDI can range from -\infty to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (Ferro and Stephenson, 2011).
+where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively. 
+
+SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (Ferro and Stephenson, 2011).
 
 Bias Adjusted Gilbert Skill Score (GSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,16 +325,20 @@ Included in ECLV output :ref:`table_PS_format_info_ECLV`
 
 The Economic Cost Loss Relative Value (ECLV) applies a weighting to the contingency table counts to determine the relative value of a forecast based on user-specific information. The cost is incurred to protect against an undesirable outcome, whether that outcome occurs or not. No cost is incurred if no protection is undertaken. Then, if the event occurs, the user sustains a loss. If the event does not occur, there is neither a cost nor a loss. The maximum forecast value is achieved when the cost/loss ratio equals the climatological probability. When this occurs, the ECLV is equal to the Hanssen and Kuipers discriminant. The Economic Cost Loss Relative Value is defined differently depending on whether the cost / loss ratio is lower than the base rate or higher. The ECLV is a function of the cost / loss ratio (cl), the hit rate (h), the false alarm rate (f), the miss rate (m), and the base rate (b). 
 
-For cost / loss ratio below the base rate, the ECLV is defined as: $$ \hbox{ECLV}={
+For cost / loss ratio below the base rate, the ECLV is defined as: 
 
-For cost / loss ratio above the base rate, the ECLV is defined as: $$ \hbox{ECLV}={
+.. math:: \text{ECLV } = \frac{(cl \ast (h + f - 1)) + m}{cl \ast (b - 1)}.
+
+For cost / loss ratio above the base rate, the ECLV is defined as: 
+
+.. math:: \text{ECLV } = \frac{(cl \ast (h + f)) + m - b}{b \ast (cl - 1)}.
 
 MET verification measures for continuous variables
 __________________________________________________
 
-For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
+For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
-The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, f represents the forecasts, o represents the observation, and n is the number of forecast-observation pairs.
+The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
 Mean forecast
 ~~~~~~~~~~~~~
@@ -301,7 +347,7 @@ Called "FBAR" in CNT output :ref:`table_PS_format_info_CNT`
 
 Called "FBAR" in SL1L2 output :ref:`table_PS_format_info_SL1L2`
 
-The sample mean forecast, FBAR, is defined as $\overline f={1\over{n}}\sum_{i=1}^nf_i$.
+The sample mean forecast, FBAR, is defined as :math:`\bar{f} = \frac{1}{n} \sum_{i=1}^{n} f_i`.
 
 Mean observation
 ~~~~~~~~~~~~~~~~
