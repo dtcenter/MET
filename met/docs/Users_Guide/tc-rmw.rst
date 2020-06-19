@@ -60,8 +60,8 @@ The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' c
 _______________________
 
 .. code-block:: none
-
-  model = "GFS";
+		
+  model = "";
   storm_id = "";
   basin = "";
   cyclone = "";
