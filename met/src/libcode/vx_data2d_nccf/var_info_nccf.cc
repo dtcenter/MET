@@ -259,7 +259,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             else
             {
                // Single level
-               int level;
+               int level = 0;
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);
                   level = unix_time;

@@ -37,7 +37,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
    int j, k, bms_flag, accum, lower, upper;
    int ptv, center, subcenter;
-   int vinfo_ptv, vinfo_tri, vinfo_center, vinfo_subcenter;
+   int vinfo_ptv, vinfo_center, vinfo_subcenter;
    int ens_application, ens_type, ens_number, vinfo_ens_type;
    int vinfo_ens_number;
    unixtime ut, init_ut, valid_ut;

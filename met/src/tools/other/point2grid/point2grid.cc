@@ -625,410 +625,398 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    if (success_to_read)
       success_to_read = get_nc_data_string_array(
             nc_in, nc_var_obs_qty_tbl, &qc_tables);
-   if (!success_to_read) {
-      delete [] obs_ids;
-      delete [] obs_hids;
-      delete [] hdr_lats;
-      delete [] hdr_lons;
-      delete [] obs_lvls;
-      delete [] obs_hgts;
-      delete [] obs_vals;
-      delete [] hdr_typ_ids;
-      delete [] hdr_vld_ids;
-      delete [] obs_qty_ids;
-      exit(1);
-   }
-   
-   bool has_qc_flags = (qc_flags.n_elements() > 0);
-   IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
-
-   // Initialize configuration object
-
-   nx = to_grid.nx();
-   ny = to_grid.ny();
-   to_dp.set_size(nx, ny);
-   cnt_dp.set_size(nx, ny);
-   mask_dp.set_size(nx, ny);
-   if (has_prob_thresh || do_gaussian_filter) {
-      prob_dp.set_size(nx, ny);
-      prob_mask_dp.set_size(nx, ny);
-   }
-
-   // Loop through the requested fields
-   int obs_count_zero_to, obs_count_non_zero_to;
-   int obs_count_zero_from, obs_count_non_zero_from;
-   
-   obs_count_zero_to = obs_count_non_zero_to = 0;
-   obs_count_zero_from = obs_count_non_zero_from = 0;
-   for(int i=0; i<FieldSA.n_elements(); i++) {
-      var_idx_or_gc = -1;
-      // Initialize
-      vinfo->clear();
+   if (success_to_read) {
+      bool has_qc_flags = (qc_flags.n_elements() > 0);
+      IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
       
-      // Populate the VarInfo object using the config string
-      config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
-
-      // Check the variable name
-      ConcatString error_msg;
-      vname = vinfo->name();
-      bool exit_by_field_name_error = false;
-      if (vname == "obs_val" || vname == "obs_lvl" || vname == "obs_hgt") {
-         exit_by_field_name_error = true;
-         error_msg << "The variable \"" << vname
-                   << "\" exists but is not a valid field name.\n";
+      // Initialize configuration object
+      
+      nx = to_grid.nx();
+      ny = to_grid.ny();
+      to_dp.set_size(nx, ny);
+      cnt_dp.set_size(nx, ny);
+      mask_dp.set_size(nx, ny);
+      if (has_prob_thresh || do_gaussian_filter) {
+         prob_dp.set_size(nx, ny);
+         prob_mask_dp.set_size(nx, ny);
       }
-      else {
-         if (use_var_id) {
-            if (!var_names.has(vname, var_idx_or_gc)) {
-               exit_by_field_name_error = true;;
-               error_msg << "The variable \"" << vname << "\" is not available.\n";
-            }
+      
+      // Loop through the requested fields
+      int obs_count_zero_to, obs_count_non_zero_to;
+      int obs_count_zero_from, obs_count_non_zero_from;
+      
+      obs_count_zero_to = obs_count_non_zero_to = 0;
+      obs_count_zero_from = obs_count_non_zero_from = 0;
+      for(int i=0; i<FieldSA.n_elements(); i++) {
+         var_idx_or_gc = -1;
+         // Initialize
+         vinfo->clear();
+         
+         // Populate the VarInfo object using the config string
+         config.read_string(FieldSA[i].c_str());
+         vinfo->set_dict(config);
+      
+         // Check the variable name
+         ConcatString error_msg;
+         vname = vinfo->name();
+         bool exit_by_field_name_error = false;
+         if (vname == "obs_val" || vname == "obs_lvl" || vname == "obs_hgt") {
+            exit_by_field_name_error = true;
+            error_msg << "The variable \"" << vname
+                      << "\" exists but is not a valid field name.\n";
          }
          else {
-            char grib_code[128];
-            var_idx_or_gc = atoi(vname.c_str());
-            sprintf(grib_code, "%d", var_idx_or_gc);
-            if (vname != grib_code) {
-               exit_by_field_name_error = true;;
-               error_msg << "Invalid GRIB code [" << vname << "]\n";
+            if (use_var_id) {
+               if (!var_names.has(vname, var_idx_or_gc)) {
+                  exit_by_field_name_error = true;;
+                  error_msg << "The variable \"" << vname << "\" is not available.\n";
+               }
             }
             else {
-               bool not_found_grib_code = true;
-               for (int idx=0; idx<nobs; idx++) {
-                  if (var_idx_or_gc == obs_ids[idx]) {
-                     not_found_grib_code = false;
-                     break;
-                  }
-               }
-               if (not_found_grib_code) {
+               char grib_code[128];
+               var_idx_or_gc = atoi(vname.c_str());
+               sprintf(grib_code, "%d", var_idx_or_gc);
+               if (vname != grib_code) {
                   exit_by_field_name_error = true;;
-                  error_msg << "No data for the GRIB code [" << vname << "]\n";
+                  error_msg << "Invalid GRIB code [" << vname << "]\n";
+               }
+               else {
+                  bool not_found_grib_code = true;
+                  for (int idx=0; idx<nobs; idx++) {
+                     if (var_idx_or_gc == obs_ids[idx]) {
+                        not_found_grib_code = false;
+                        break;
+                     }
+                  }
+                  if (not_found_grib_code) {
+                     exit_by_field_name_error = true;;
+                     error_msg << "No data for the GRIB code [" << vname << "]\n";
+                  }
                }
             }
          }
-      }
-      
-      if (exit_by_field_name_error) {
-         ConcatString log_msg;
-         if (use_var_id) {
-            for (int idx=0; idx<var_names.n_elements(); idx++) {
-               if (0 < idx) log_msg << ", ";
-               log_msg << var_names[idx];
-            }
-         }
-         else {
-            log_msg << "GRIB codes: ";
-            IntArray grib_codes;
-            for (int idx=0; idx<nobs; idx++) {
-               if (!grib_codes.has(obs_ids[idx])) {
-                  grib_codes.add(obs_ids[idx]);
+         
+         if (exit_by_field_name_error) {
+            ConcatString log_msg;
+            if (use_var_id) {
+               for (int idx=0; idx<var_names.n_elements(); idx++) {
                   if (0 < idx) log_msg << ", ";
-                  log_msg << obs_ids[idx];
+                  log_msg << var_names[idx];
                }
             }
-         }
-         mlog << Error << "\n" << method_name
-              << error_msg
-              << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
-              << "\t" << log_msg <<"\n\n";
-         exit(1);
-      }
-
-      // Check the time range. Apply the time window
-      bool valid_time_from_config = true;
-      unixtime valid_beg_ut, valid_end_ut, obs_time;
-      
-      valid_time_array.clear();
-      valid_time = vinfo->valid();
-      if (valid_time == 0) valid_time = conf_info.valid_time;
-      requested_valid_time = valid_time;
-      if (0 < valid_time) {
-         valid_beg_ut = valid_end_ut = valid_time;
-         if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-         if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
-         for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
-            obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
-            if (valid_beg_ut <= obs_time and obs_time <= valid_end_ut) {
-               valid_time_array.add(idx);
-               mlog << Debug(4) << method_name << "The obs time "
-                    << hdr_valid_times[idx] << " was included\n";
-            }
-         }
-         valid_time_array.add(bad_data_int);    // added dummy entry
-      }
-      else {
-         valid_time_from_config = false;
-         // Set the latest available valid time
-         valid_time = 0;
-         for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
-            obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
-            if (obs_time > valid_time) valid_time = obs_time;
-         }
-      }
-      mlog << Debug(3) << method_name << " valid_time from "
-           << (valid_time_from_config ? "config" : "input data") << ": "
-           << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
-     
-      to_dp.set_init(valid_time);
-      to_dp.set_valid(valid_time);
-      cnt_dp.set_init(valid_time);
-      cnt_dp.set_valid(valid_time);
-      mask_dp.set_init(valid_time);
-      mask_dp.set_valid(valid_time);
-      if (has_prob_thresh || do_gaussian_filter) {
-         prob_dp.set_init(valid_time);
-         prob_dp.set_valid(valid_time);
-         prob_mask_dp.set_init(valid_time);
-         prob_mask_dp.set_valid(valid_time);
-      }
-      
-      var_index_array.clear();
-      // Select output variable name
-      vname = (VarNameSA.n_elements() == 0)
-              ? conf_info.get_var_name(vinfo->name())
-              : conf_info.get_var_name(VarNameSA[i]);
-      mlog << Debug(4) << method_name
-           << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
-      
-      var_count = var_count2 = to_count = 0;
-      filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
-      for (idx=0; idx < nobs; idx++) {
-         if (var_idx_or_gc == obs_ids[idx]) {
-            var_count2++;
-            hdr_idx = obs_hids[idx];
-            if (0 < valid_time_array.n_elements() &&
-                  !valid_time_array.has(hdr_vld_ids[hdr_idx])) {
-               filtered_by_time++;
-               continue;
-            }
-     
-            if(!keep_message_type(hdr_typ_ids[hdr_idx])) {
-               filtered_by_msg_type++;
-               continue;
-            }
-            
-            //Filter by QC flag
-            if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
-               filtered_by_qc++;
-               continue;
-            }
-            
-            var_index_array.add(idx);
-            var_count++;
-            if (is_eq(obs_vals[idx], 0.)) obs_count_zero_from++;
-            else obs_count_non_zero_from++;
-         }
-      }
-      if (cellMapping) {
-         delete [] cellMapping;
-         cellMapping = (IntArray *)0;
-      }
-      cellMapping = new IntArray[nx * ny];
-      if (get_grid_mapping(to_grid, cellMapping, var_index_array,
-            obs_hids, hdr_lats, hdr_lons)) {
-         int from_index;
-         IntArray cellArray;
-         NumArray dataArray;
-         int offset = 0;
-         int valid_count = 0;
-         int absent_count = 0;
-         int censored_count = 0;
-         int qc_filtered_count = 0;
-         int adp_qc_filtered_count = 0;
-         float data_value;
-         float from_min_value =  10e10;
-         float from_max_value = -10e10;
-
-         to_count = 0;
-         to_dp.set_constant(bad_data_double);
-         cnt_dp.set_constant(0);
-         mask_dp.set_constant(0);
-         if (has_prob_thresh || do_gaussian_filter) {
-            prob_dp.set_constant(0);
-            prob_mask_dp.set_constant(0);
-         }
-         
-         for (int x_idx = 0; x_idx<nx; x_idx++) {
-            for (int y_idx = 0; y_idx<ny; y_idx++) {
-               offset = to_dp.two_to_one(x_idx,y_idx);
-               cellArray = cellMapping[offset];
-               int prob_cnt = 0;
-               int prob_value_sum = 0;
-               if (0 < cellArray.n_elements()) {
-                  //cnt_dp.set(cellArray.n_elements(), x_idx, y_idx);
-                  //mask_dp.set(1, x_idx, y_idx);
-                  valid_count = 0;
-                  dataArray.clear();
-                  for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
-                     from_index = cellArray[dIdx];
-                     data_value = obs_vals[from_index];
-                     if (is_eq(data_value, bad_data_float)) continue;
-               
-                     if(mlog.verbosity_level() >= 4) {
-                        if (from_min_value > data_value) from_min_value = data_value;
-                        if (from_max_value < data_value) from_max_value = data_value;
-                     }
-                     
-                     for(int ic=0; ic<vinfo->censor_thresh().n_elements(); ic++) {
-                        // Break out after the first match.
-                        if(vinfo->censor_thresh()[ic].check(data_value)) {
-                           data_value = vinfo->censor_val()[ic];
-                           censored_count++;
-                           break;
-                        }
-                     }
-                     
-                     dataArray.add(data_value);
-                     valid_count++;
-                  }
-                  if (0 < valid_count) to_count++;
-                  
-                  int data_count = dataArray.n_elements();
-                  if (0 < data_count) {
-                     float to_value;
-                     if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-                     else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-                     else if (RGInfo.method == InterpMthd_Median) {
-                        cellArray.sort_increasing();
-                        to_value = dataArray[data_count/2];
-                        if (0 == data_count % 2)
-                           to_value = (to_value + dataArray[(data_count/2)+1])/2;
-                     }
-                     else to_value = dataArray.sum() / data_count;
-                     
-                     if (is_eq(to_value, 0.)) obs_count_zero_to++;
-                     else obs_count_non_zero_to++;
-
-                     cnt_dp.set(data_count, x_idx, y_idx);
-                     mask_dp.set(1, x_idx, y_idx);
-                     to_dp.set(to_value, x_idx, y_idx);
-                     if ((has_prob_thresh && prob_cat_thresh.check(to_value))
-                         || (do_gaussian_filter && !has_prob_thresh)) {
-                        prob_dp.set(1, x_idx, y_idx);
-                        prob_mask_dp.set(1, x_idx, y_idx);
-                     }
-                     
-                     if (1 < data_count) {
-                        mlog << Debug(9) << method_name
-                             << " to_value:" << to_value
-                             << " at " << x_idx << "," << y_idx
-                             << ", max: " << dataArray.max()
-                             << ", min: " << dataArray.min()
-                             << ", mean: " << dataArray.sum()/data_count
-                             << " from " << data_count << " data values.\n";
-                     }
-                     mlog << Debug(8) << method_name << " data at " << x_idx << "," << y_idx
-                          << ", value: " << to_value << "\n";
+            else {
+               log_msg << "GRIB codes: ";
+               IntArray grib_codes;
+               for (int idx=0; idx<nobs; idx++) {
+                  if (!grib_codes.has(obs_ids[idx])) {
+                     grib_codes.add(obs_ids[idx]);
+                     if (0 < idx) log_msg << ", ";
+                     log_msg << obs_ids[idx];
                   }
                }
             }
+            mlog << Error << "\n" << method_name
+                 << error_msg
+                 << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
+                 << "\t" << log_msg <<"\n\n";
+            exit(1);
          }
-      }
-
-      // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
       
-      vname_cnt = vname;
-      vname_cnt << "_cnt";
-      vname_mask = vname;
-      vname_mask << "_mask";
-
-      ConcatString tmp_long_name;
-      ConcatString var_long_name = vinfo->long_name();
-      ConcatString dim_string = "(*,*)";
-      
-      tmp_long_name = vname_cnt;
-      tmp_long_name << dim_string;
-      vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
-      
-      tmp_long_name = vname_mask;
-      tmp_long_name << dim_string;
-      vinfo->set_long_name(tmp_long_name.c_str());
-      write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
-      
-      if (has_prob_thresh || do_gaussian_filter) {
-         ConcatString vname_prob = vname;
-         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
-         ConcatString vname_prob_mask = vname_prob;
-         vname_prob_mask << "_mask";
-
-         if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
+         // Check the time range. Apply the time window
+         bool valid_time_from_config = true;
+         unixtime valid_beg_ut, valid_end_ut, obs_time;
          
-         tmp_long_name = vname_prob;
-         tmp_long_name << dim_string;
-         vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if (do_gaussian_filter) {
-            NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-            if (IS_VALID_NC(prob_var)) {
-               add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-               add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-               add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+         valid_time_array.clear();
+         valid_time = vinfo->valid();
+         if (valid_time == 0) valid_time = conf_info.valid_time;
+         requested_valid_time = valid_time;
+         if (0 < valid_time) {
+            valid_beg_ut = valid_end_ut = valid_time;
+            if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+            if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+            for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
+               obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
+               if (valid_beg_ut <= obs_time and obs_time <= valid_end_ut) {
+                  valid_time_array.add(idx);
+                  mlog << Debug(4) << method_name << "The obs time "
+                       << hdr_valid_times[idx] << " was included\n";
+               }
             }
-         }
-         
-         tmp_long_name = vname_prob_mask;
-         tmp_long_name << dim_string;
-         vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
-      }
-      vinfo->set_long_name(var_long_name.c_str());
-      
-      mlog << Debug(7) << method_name << " obs_count_zero_to: " << obs_count_zero_to
-           << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
-
-      ConcatString log_msg;
-      log_msg << "Filtered by time: " << filtered_by_time;
-      if (0 < requested_valid_time) {
-         log_msg << " [" << unix_to_yyyymmdd_hhmmss(requested_valid_time) << "]";
-      }
-      log_msg << ", by msg_type: " << filtered_by_msg_type;
-      if (0 < filtered_by_msg_type) {
-         log_msg << " [";
-         for(idx=0; idx<conf_info.message_type.n_elements(); idx++) {
-            if (idx > 0) log_msg << ",";
-            log_msg << conf_info.message_type[idx];
-         }
-         log_msg << "]";
-      }
-      log_msg << ", by QC: " << filtered_by_qc;
-      if (0 < filtered_by_qc) {
-         log_msg << " [";
-         for(idx=0; idx<qc_flags.n_elements(); idx++) {
-            if (idx > 0) log_msg << ",";
-            log_msg << qc_flags[idx];
-         }
-         log_msg << "]";
-      }
-      log_msg << ", out of " << var_count2;
-      int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
-      if (0 == var_count) {
-         if (0 == filtered_count) {
-            mlog << Error << method_name << " No valid data for the variable [" 
-                 << vinfo->name() << "]\n";
+            valid_time_array.add(bad_data_int);    // added dummy entry
          }
          else {
-            mlog << Error << method_name << " No valid data after filtering.\n\t"
-                 << log_msg << ".\n";
+            valid_time_from_config = false;
+            // Set the latest available valid time
+            valid_time = 0;
+            for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
+               obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
+               if (obs_time > valid_time) valid_time = obs_time;
+            }
          }
-         exit(1);
+         mlog << Debug(3) << method_name << " valid_time from "
+              << (valid_time_from_config ? "config" : "input data") << ": "
+              << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
+        
+         to_dp.set_init(valid_time);
+         to_dp.set_valid(valid_time);
+         cnt_dp.set_init(valid_time);
+         cnt_dp.set_valid(valid_time);
+         mask_dp.set_init(valid_time);
+         mask_dp.set_valid(valid_time);
+         if (has_prob_thresh || do_gaussian_filter) {
+            prob_dp.set_init(valid_time);
+            prob_dp.set_valid(valid_time);
+            prob_mask_dp.set_init(valid_time);
+            prob_mask_dp.set_valid(valid_time);
+         }
+         
+         var_index_array.clear();
+         // Select output variable name
+         vname = (VarNameSA.n_elements() == 0)
+                 ? conf_info.get_var_name(vinfo->name())
+                 : conf_info.get_var_name(VarNameSA[i]);
+         mlog << Debug(4) << method_name
+              << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
+         
+         var_count = var_count2 = to_count = 0;
+         filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
+         for (idx=0; idx < nobs; idx++) {
+            if (var_idx_or_gc == obs_ids[idx]) {
+               var_count2++;
+               hdr_idx = obs_hids[idx];
+               if (0 < valid_time_array.n_elements() &&
+                     !valid_time_array.has(hdr_vld_ids[hdr_idx])) {
+                  filtered_by_time++;
+                  continue;
+               }
+        
+               if(!keep_message_type(hdr_typ_ids[hdr_idx])) {
+                  filtered_by_msg_type++;
+                  continue;
+               }
+               
+               //Filter by QC flag
+               if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
+                  filtered_by_qc++;
+                  continue;
+               }
+               
+               var_index_array.add(idx);
+               var_count++;
+               if (is_eq(obs_vals[idx], 0.)) obs_count_zero_from++;
+               else obs_count_non_zero_from++;
+            }
+         }
+         if (cellMapping) {
+            delete [] cellMapping;
+            cellMapping = (IntArray *)0;
+         }
+         cellMapping = new IntArray[nx * ny];
+         if (get_grid_mapping(to_grid, cellMapping, var_index_array,
+               obs_hids, hdr_lats, hdr_lons)) {
+            int from_index;
+            IntArray cellArray;
+            NumArray dataArray;
+            int offset = 0;
+            int valid_count = 0;
+            int absent_count = 0;
+            int censored_count = 0;
+            int qc_filtered_count = 0;
+            int adp_qc_filtered_count = 0;
+            float data_value;
+            float from_min_value =  10e10;
+            float from_max_value = -10e10;
+      
+            to_count = 0;
+            to_dp.set_constant(bad_data_double);
+            cnt_dp.set_constant(0);
+            mask_dp.set_constant(0);
+            if (has_prob_thresh || do_gaussian_filter) {
+               prob_dp.set_constant(0);
+               prob_mask_dp.set_constant(0);
+            }
+            
+            for (int x_idx = 0; x_idx<nx; x_idx++) {
+               for (int y_idx = 0; y_idx<ny; y_idx++) {
+                  offset = to_dp.two_to_one(x_idx,y_idx);
+                  cellArray = cellMapping[offset];
+                  int prob_cnt = 0;
+                  int prob_value_sum = 0;
+                  if (0 < cellArray.n_elements()) {
+                     //cnt_dp.set(cellArray.n_elements(), x_idx, y_idx);
+                     //mask_dp.set(1, x_idx, y_idx);
+                     valid_count = 0;
+                     dataArray.clear();
+                     for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
+                        from_index = cellArray[dIdx];
+                        data_value = obs_vals[from_index];
+                        if (is_eq(data_value, bad_data_float)) continue;
+                  
+                        if(mlog.verbosity_level() >= 4) {
+                           if (from_min_value > data_value) from_min_value = data_value;
+                           if (from_max_value < data_value) from_max_value = data_value;
+                        }
+                        
+                        for(int ic=0; ic<vinfo->censor_thresh().n_elements(); ic++) {
+                           // Break out after the first match.
+                           if(vinfo->censor_thresh()[ic].check(data_value)) {
+                              data_value = vinfo->censor_val()[ic];
+                              censored_count++;
+                              break;
+                           }
+                        }
+                        
+                        dataArray.add(data_value);
+                        valid_count++;
+                     }
+                     if (0 < valid_count) to_count++;
+                     
+                     int data_count = dataArray.n_elements();
+                     if (0 < data_count) {
+                        float to_value;
+                        if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
+                        else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
+                        else if (RGInfo.method == InterpMthd_Median) {
+                           cellArray.sort_increasing();
+                           to_value = dataArray[data_count/2];
+                           if (0 == data_count % 2)
+                              to_value = (to_value + dataArray[(data_count/2)+1])/2;
+                        }
+                        else to_value = dataArray.sum() / data_count;
+                        
+                        if (is_eq(to_value, 0.)) obs_count_zero_to++;
+                        else obs_count_non_zero_to++;
+      
+                        cnt_dp.set(data_count, x_idx, y_idx);
+                        mask_dp.set(1, x_idx, y_idx);
+                        to_dp.set(to_value, x_idx, y_idx);
+                        if ((has_prob_thresh && prob_cat_thresh.check(to_value))
+                            || (do_gaussian_filter && !has_prob_thresh)) {
+                           prob_dp.set(1, x_idx, y_idx);
+                           prob_mask_dp.set(1, x_idx, y_idx);
+                        }
+                        
+                        if (1 < data_count) {
+                           mlog << Debug(9) << method_name
+                                << " to_value:" << to_value
+                                << " at " << x_idx << "," << y_idx
+                                << ", max: " << dataArray.max()
+                                << ", min: " << dataArray.min()
+                                << ", mean: " << dataArray.sum()/data_count
+                                << " from " << data_count << " data values.\n";
+                        }
+                        mlog << Debug(8) << method_name << " data at " << x_idx << "," << y_idx
+                             << ", value: " << to_value << "\n";
+                     }
+                  }
+               }
+            }
+         }
+      
+         // Write the regridded data
+         write_nc(to_dp, to_grid, vinfo, vname.c_str());
+         
+         vname_cnt = vname;
+         vname_cnt << "_cnt";
+         vname_mask = vname;
+         vname_mask << "_mask";
+      
+         ConcatString tmp_long_name;
+         ConcatString var_long_name = vinfo->long_name();
+         ConcatString dim_string = "(*,*)";
+         
+         tmp_long_name = vname_cnt;
+         tmp_long_name << dim_string;
+         vinfo->set_long_name(tmp_long_name.c_str());
+         write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
+         
+         tmp_long_name = vname_mask;
+         tmp_long_name << dim_string;
+         vinfo->set_long_name(tmp_long_name.c_str());
+         write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
+         
+         if (has_prob_thresh || do_gaussian_filter) {
+            ConcatString vname_prob = vname;
+            vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
+            ConcatString vname_prob_mask = vname_prob;
+            vname_prob_mask << "_mask";
+      
+            if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
+            
+            tmp_long_name = vname_prob;
+            tmp_long_name << dim_string;
+            vinfo->set_long_name(tmp_long_name.c_str());
+            write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
+            if (do_gaussian_filter) {
+               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
+               if (IS_VALID_NC(prob_var)) {
+                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
+                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
+                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+               }
+            }
+            
+            tmp_long_name = vname_prob_mask;
+            tmp_long_name << dim_string;
+            vinfo->set_long_name(tmp_long_name.c_str());
+            write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
+         }
+         vinfo->set_long_name(var_long_name.c_str());
+         
+         mlog << Debug(7) << method_name << " obs_count_zero_to: " << obs_count_zero_to
+              << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
+      
+         ConcatString log_msg;
+         log_msg << "Filtered by time: " << filtered_by_time;
+         if (0 < requested_valid_time) {
+            log_msg << " [" << unix_to_yyyymmdd_hhmmss(requested_valid_time) << "]";
+         }
+         log_msg << ", by msg_type: " << filtered_by_msg_type;
+         if (0 < filtered_by_msg_type) {
+            log_msg << " [";
+            for(idx=0; idx<conf_info.message_type.n_elements(); idx++) {
+               if (idx > 0) log_msg << ",";
+               log_msg << conf_info.message_type[idx];
+            }
+            log_msg << "]";
+         }
+         log_msg << ", by QC: " << filtered_by_qc;
+         if (0 < filtered_by_qc) {
+            log_msg << " [";
+            for(idx=0; idx<qc_flags.n_elements(); idx++) {
+               if (idx > 0) log_msg << ",";
+               log_msg << qc_flags[idx];
+            }
+            log_msg << "]";
+         }
+         log_msg << ", out of " << var_count2;
+         int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
+         if (0 == var_count) {
+            if (0 == filtered_count) {
+               mlog << Error << method_name << " No valid data for the variable [" 
+                    << vinfo->name() << "]\n";
+            }
+            else {
+               mlog << Error << method_name << " No valid data after filtering.\n\t"
+                    << log_msg << ".\n";
+            }
+            exit(1);
+         }
+         else {
+            mlog << Debug(2) << method_name << " var_count=" << var_count
+                 << ", grid: " << to_count << " out of " << (nx * ny) << "  "
+                 << (0 < filtered_count ? log_msg.c_str() : " ")
+                 //<< ",    Obs_value] zero: " << obs_count_zero_from
+                 //<< ", non_zero: " <<obs_count_non_zero_from 
+                 << "\n";
+         }
+      } // end for i
+      
+      if (cellMapping) {
+         delete [] cellMapping;   cellMapping = (IntArray *)0;
       }
-      else {
-         mlog << Debug(2) << method_name << " var_count=" << var_count
-              << ", grid: " << to_count << " out of " << (nx * ny) << "  "
-              << (0 < filtered_count ? log_msg.c_str() : " ")
-              //<< ",    Obs_value] zero: " << obs_count_zero_from
-              //<< ", non_zero: " <<obs_count_non_zero_from 
-              << "\n";
-      }
-   } // end for i
-
-   if (cellMapping) {
-      delete [] cellMapping;   cellMapping = (IntArray *)0;
    }
-
+   
    delete [] obs_ids;
    delete [] obs_hids;
    delete [] hdr_lats;

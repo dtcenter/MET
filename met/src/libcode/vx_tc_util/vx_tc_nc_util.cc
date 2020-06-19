@@ -12,38 +12,14 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// void write_tc_tracks(const ConcatString& track_nc_file,
-//     const TrackInfoArray& tracks) {
-
 void write_tc_tracks(NcFile* nc_out,
     const NcDim& track_point_dim,
     const TrackInfoArray& tracks) {
 
-    // mlog << Debug(2) << "Writing " << track_nc_file << "\n";
-
     TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
-    mlog << Debug(4) << "write_tc_tracks:n_track_lines:"
-         << track_lines.n_elements() << "\n";
-
-    mlog << Debug(4) << track.serialize() << "\n";
-
-    for(int i = 0; i < track_lines.n_elements(); i++) {
-        mlog << Debug(4) << track_lines[i] << "\n";
-    }
-
-    // NcFile* nc_out = open_ncfile(track_nc_file.c_str(), true);
-
-    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n_elements());
-    // NcDim track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-
-    // if (IS_INVALID_NC_P(nc_out)) {
-    //     mlog << Error << "\nwrite_nc_tracks() -> "
-    //          << "unable to open NetCDF file " 
-    //          << track_nc_file << "\n\n";
-    //     exit(1);
-    // }
+    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
     NcVar track_lines_var = nc_out->addVar(
         "TrackLines", ncString, track_line_dim);
@@ -64,9 +40,6 @@ void write_tc_tracks(NcFile* nc_out,
     add_att(&track_mrd_var, "units", "nautical_miles");
     add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
-    mlog << Debug(2) << "write_tc_tracks:n_points:"
-         << track.n_points() << "\n";
-
     double* track_lat_data = new double[track.n_points()];
     double* track_lon_data = new double[track.n_points()];
     double* track_mrd_data = new double[track.n_points()];
@@ -81,13 +54,15 @@ void write_tc_tracks(NcFile* nc_out,
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    for(int i = 0; i < track_lines.n_elements(); i++) {
+    mlog << Debug(2) << "Writing " << track_lines.n() << " track lines.\n";
+
+    for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
         offsets.push_back(i);
         counts.clear();
         counts.push_back(1);
         string line = track_lines[i];
-        mlog << Debug(2) << line << "\n";
+        mlog << Debug(3) << line << "\n";
         const char* str = line.c_str();
         track_lines_var.putVar(offsets, counts, &str);
     }
@@ -105,8 +80,6 @@ void write_tc_tracks(NcFile* nc_out,
     delete[] track_lat_data;
     delete[] track_lon_data;
     delete[] track_mrd_data;
-
-    // nc_out->close();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,7 +91,6 @@ set<string> get_pressure_level_strings(
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
@@ -140,7 +112,6 @@ set<double> get_pressure_levels(
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
-        mlog << Debug(3) << i->first << " ";
         vector<string> levels = variable_levels[i->first];
         for (int j = 0; j < levels.size(); j++) {
             string label = levels[j].substr(0, 1);
@@ -229,6 +200,7 @@ void def_tc_pressure(NcFile* nc_out,
     add_att(&pressure_var, "long_name", "pressure");
     add_att(&pressure_var, "units", "millibars");
     add_att(&pressure_var, "standard_name", "pressure");
+    add_att(&pressure_var, "_FillValue", bad_data_double);
 
     // Extract pressure coordinates
     int k = pressure_levels.size() - 1;
@@ -266,9 +238,12 @@ void def_tc_range_azimuth(NcFile* nc_out,
     add_att(&range_var, "long_name", "range");
     add_att(&range_var, "units", "fraction of RMW");
     add_att(&range_var, "standard_name", "range");
+    add_att(&range_var, "_FillValue", bad_data_double);
+
     add_att(&azimuth_var, "long_name", "azimuth");
     add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
     add_att(&azimuth_var, "standard_name", "azimuth");
+    add_att(&azimuth_var, "_FillValue", bad_data_double);
 
     // Compute grid coordinates
     for (int i = 0; i < grid.range_n(); i++) {
@@ -310,9 +285,11 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&lat_var, "long_name", "latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude");
+
     add_att(&lon_var, "long_name", "longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude");
+
     add_att(&valid_time_var, "long_name", "valid_time");
     add_att(&valid_time_var, "units", "yyyymmddhh");
     add_att(&valid_time_var, "standard_name", "valid_time");
@@ -371,11 +348,13 @@ void def_tc_variables(NcFile* nc_out,
                 var_name, ncDouble, dims_3d);
             add_att(&data_var, "long_name", long_name);
             add_att(&data_var, "units", units);
+            add_att(&data_var, "_FillValue", bad_data_double);
         } else {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims);
             add_att(&data_var, "long_name", long_name);
             add_att(&data_var, "units", units);
+            add_att(&data_var, "_FillValue", bad_data_double);
         }
         data_vars[var_name] = data_var;
     }
@@ -403,6 +382,7 @@ void def_tc_data(NcFile* nc_out,
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
     add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -424,6 +404,7 @@ void def_tc_data_3d(NcFile* nc_out,
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
     add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -447,6 +428,7 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     // Set attributes
     add_att(&data_var, "long_name", data_info->long_name());
     add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "_FillValue", bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////

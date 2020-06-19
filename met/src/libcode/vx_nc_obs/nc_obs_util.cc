@@ -56,13 +56,13 @@ bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid,
    // Can't filter duplicated one because header index was
    // assigned before checking
    int hdr_index;
-   if (!hdr_data.typ_array.has(hdr_typ, hdr_index)) {
+   if (!hdr_data.typ_array.has(hdr_typ, hdr_index, false)) {
       hdr_index = hdr_data.typ_array.n_elements();
       hdr_data.typ_array.add(hdr_typ);          // Message type
    }
    hdr_data.typ_idx_array.add(hdr_index);       // Index of Message type
    
-   if (!hdr_data.sid_array.has(hdr_sid, hdr_index)) {
+   if (!hdr_data.sid_array.has(hdr_sid, hdr_index, false)) {
       hdr_index = hdr_data.sid_array.n_elements();
       hdr_data.sid_array.add(hdr_sid);          // Station ID
    }
@@ -77,7 +77,7 @@ bool add_nc_header_to_array (const char *hdr_typ, const char *hdr_sid,
       hdr_data.max_vld_time = hdr_vld;
       new_vld = true;
    }
-   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index)) {
+   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index, false)) {
       hdr_index = hdr_data.vld_array.n_elements();
       hdr_data.vld_array.add(unix_to_yyyymmdd_hhmmss(hdr_vld)); // Valid time
       hdr_data.vld_num_array.add(hdr_vld);   // Valid time
@@ -1160,14 +1160,14 @@ void write_nc_header (const NetcdfObsVars &obs_vars,
    int hdr_data_idx = nc_data_buffer.hdr_data_idx;
 
    // Message type
-   if (!hdr_data.typ_array.has(hdr_typ, hdr_index)) {
+   if (!hdr_data.typ_array.has(hdr_typ, hdr_index, false)) {
       hdr_index = hdr_data.typ_array.n_elements();
       hdr_data.typ_array.add(hdr_typ);
    }
    nc_data_buffer.hdr_typ_buf[hdr_data_idx] = hdr_index;
    
    // Station ID
-   if (!hdr_data.sid_array.has(hdr_sid, hdr_index)) {
+   if (!hdr_data.sid_array.has(hdr_sid, hdr_index, false)) {
       hdr_index = hdr_data.sid_array.n_elements();
       hdr_data.sid_array.add(hdr_sid);
    }
@@ -1184,7 +1184,7 @@ void write_nc_header (const NetcdfObsVars &obs_vars,
       new_vld = true;
    }
    
-   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index)) {
+   if (new_vld || !hdr_data.vld_num_array.has(hdr_vld, hdr_index, false)) {
       hdr_index = hdr_data.vld_array.n_elements();
       hdr_data.vld_array.add(unix_to_yyyymmdd_hhmmss(hdr_vld));
       hdr_data.vld_num_array.add(hdr_vld);
@@ -1223,7 +1223,7 @@ void write_nc_observation(const NetcdfObsVars &obs_vars,
 {
    int qty_index;
    int obs_data_idx = nc_data_buffer.obs_data_idx;
-   if (!nc_data_buffer.qty_data_array.has(obs_qty, qty_index)) {
+   if (!nc_data_buffer.qty_data_array.has(obs_qty, qty_index, false)) {
       qty_index = nc_data_buffer.qty_data_array.n_elements();
       nc_data_buffer.qty_data_array.add(obs_qty);
    }

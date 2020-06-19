@@ -18,7 +18,7 @@ Usage: tc_rmw
 
 {\hskip 0.5in}-data file_1 ... file_n | data_file_list
 
-{\hskip 0.5in}-adeck file
+{\hskip 0.5in}-deck file
 
 {\hskip 0.5in}-config file
 
@@ -34,7 +34,7 @@ Required arguments for tc_rmw
 
 1. The -data file_1 ... file_n | data_file_list options specify the gridded data files or an ASCII file containing a list of files to be used.
 
-2. The -adeck source argument is the adeck ATCF format data source.
+2. The -deck source argument is the ATCF format data source.
 
 3. The -config file argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -42,7 +42,7 @@ Required arguments for tc_rmw
 
 Optional arguments for tc_rmw
 
-5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 6. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
@@ -51,8 +51,35 @@ Optional arguments for tc_rmw
 The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' can be found in the installed share/met/config/ directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 
+model = "";
 
-model         = "GFS";
+storm_id = "";
+
+basin = "";
+
+cyclone = "";
+
+init_inc = "";
+
+The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+These options are used to filter input data down to a single storm track.
+
+
+valid_beg = "";
+
+valid_end = "";
+
+valid_inc = [];
+
+valid_exc = [];
+
+valid_hour = [];
+
+lead       = [];
+
+The configuration options listed above are common to many MET tools and are described in Section [subsec:IO_General-MET-Config-Options].
+These options are used to subset a single storm track down to individual points. The tropical cyclone model data corresponding to these track points will be processed.
+
 
 censor_thresh = [];
 
@@ -144,4 +171,4 @@ The NetCDF output file contains the following dimensions:
 
 4. track_point - the track points corresponding to the model output valid times
 
-For each data variable specified in the data variable list, a corresponding NetCDF variable will be created with the same name and units. 
+For each data variable specified in the data variable list, a corresponding NetCDF variable will be created with the same name and units.

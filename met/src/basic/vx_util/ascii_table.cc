@@ -13,11 +13,12 @@
 using namespace std;
 
 #include <cstdio>
+#include <cmath>
 #include <iostream>
-#include <unistd.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cmath>
+#include <unistd.h>
 
 #include "vx_log.h"
 #include "vx_cal.h"
@@ -1268,10 +1269,19 @@ void AsciiTable::line_up_decimal_points()
 
 {
 
-int r, c, n, k;
-int max_left, max_right;
+if ( Nrows < 0 || Nrows >= INT_MAX )  {
+
+   mlog << Error << "\nAsciiTable::line_up_decimal_points() -> "
+        << "invalid number of rows ... " << Nrows << "\n\n";
+
+   exit ( 1 );
+}
+
 int left[Nrows];
 int right[Nrows];
+
+int r, c, n, k;
+int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
