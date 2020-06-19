@@ -95,7 +95,7 @@ Next, scalar weights :math:`\boldsymbol{w}_i` are assigned to each attribute, re
 
 Finally, all these ingredients are collected into a single number called the total interest, :math:`\boldsymbol{T}`, given by:
 
-.. math:: T(\alpha)=\frac{\sum_{i}w_i C_i(\alpha)I_i(\alpha_i)}{\sum_{i}w_i C_i(\alpha).
+.. math:: T(\alpha)=\frac{\sum_{i}w_i C_i(\alpha)I_i(\alpha_i)}{\sum_{i}w_i C_i(\alpha)}
 
 This total interest value is then thresholded, and pairs of objects that have total interest values above the threshold are merged (if they are in the same field) or matched (if they are in different fields).
 
