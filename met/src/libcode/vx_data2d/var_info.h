@@ -53,7 +53,7 @@ class VarInfo
       ThreshArray   CensorThresh; // Censoring thesholds
       NumArray      CensorVal;    // and replacement values
 
-      int           nBins;     // Number of pdf bins 
+      int           nBins;     // Number of pdf bins
       NumArray      Range;     // Range of pdf bins
 
       RegridInfo    Regrid;    // Regridding logic
@@ -62,8 +62,8 @@ class VarInfo
       ConcatString  SetAttrsName;
       ConcatString  SetAttrsUnits;
       ConcatString  SetAttrsLevel;
-      ConcatString  SetAttrsLongName; 
-      ConcatString  SetAttrsEnsemble; 
+      ConcatString  SetAttrsLongName;
+      ConcatString  SetAttrsEnsemble;
 
       ConcatString  SetAttrsGrid;
 
@@ -129,10 +129,21 @@ class VarInfo
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
 
-      int n_bins()     const;
-      NumArray range() const;
+      int          n_bins()         const;
+      NumArray     range()          const;
 
       RegridInfo   regrid()         const;
+
+      ConcatString name_attr()      const;
+      ConcatString units_attr()     const;
+      ConcatString level_attr()     const;
+      ConcatString long_name_attr() const;
+      ConcatString ensemble_attr()  const;
+
+      ConcatString set_attr_grid()  const;
+      unixtime     set_attr_init()  const;
+      unixtime     set_attr_valid() const;
+      int          set_attr_lead()  const;
 
          //
          // set stuff
@@ -196,13 +207,13 @@ inline void VarInfo::add_grib_code(Dictionary &d)   { return;                   
 
 inline ConcatString VarInfo::magic_str()      const { return(MagicStr);         }
 inline ConcatString VarInfo::req_name()       const { return(ReqName);          }
-inline ConcatString VarInfo::name()           const { return(SetAttrsName.empty()     ? Name         : SetAttrsName);     }
-inline ConcatString VarInfo::units()          const { return(SetAttrsUnits.empty()    ? Units        : SetAttrsUnits);    }
+inline ConcatString VarInfo::name()           const { return(Name);             }
+inline ConcatString VarInfo::units()          const { return(Units);            }
 inline LevelInfo    VarInfo::level()          const { return(Level);            }
 inline ConcatString VarInfo::req_level_name() const { return(Level.req_name()); }
-inline ConcatString VarInfo::level_name()     const { return(SetAttrsLevel.empty()    ? Level.name() : SetAttrsLevel);    }
-inline ConcatString VarInfo::long_name()      const { return(SetAttrsLongName.empty() ? LongName     : SetAttrsLongName); }
-inline ConcatString VarInfo::ens()            const { return(SetAttrsEnsemble.empty() ? Ensemble     : SetAttrsEnsemble); }
+inline ConcatString VarInfo::level_name()     const { return(Level.name());     }
+inline ConcatString VarInfo::long_name()      const { return(LongName);         }
+inline ConcatString VarInfo::ens()            const { return(Ensemble);         }
 
 inline bool         VarInfo::p_flag()         const { return(PFlag);            }
 inline ConcatString VarInfo::p_name()         const { return(PName);            }
@@ -213,9 +224,9 @@ inline bool         VarInfo::p_as_scalar()    const { return(PAsScalar);        
 
 inline int          VarInfo::uv_index()       const { return(UVIndex);          }
 
-inline unixtime     VarInfo::init()           const { return(SetAttrsInit  == 0        ? Init  : SetAttrsInit);  }
-inline unixtime     VarInfo::valid()          const { return(SetAttrsValid == 0        ? Valid : SetAttrsValid); }
-inline int          VarInfo::lead()           const { return(is_bad_data(SetAttrsLead) ? Lead  : SetAttrsLead);  }
+inline unixtime     VarInfo::init()           const { return(Init);             }
+inline unixtime     VarInfo::valid()          const { return(Valid);            }
+inline int          VarInfo::lead()           const { return(Lead);             }
 
 inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
 inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
@@ -224,6 +235,17 @@ inline int          VarInfo::n_bins()         const { return(nBins);            
 inline NumArray     VarInfo::range()          const { return(Range);            }
 
 inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
+
+inline ConcatString VarInfo::name_attr()      const { return(SetAttrsName.empty()      ? name()       : SetAttrsName);     }
+inline ConcatString VarInfo::units_attr()     const { return(SetAttrsUnits.empty()     ? units()      : SetAttrsUnits);    }
+inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty()     ? level_name() : SetAttrsLevel);    }
+inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty()  ? long_name()  : SetAttrsLongName); }
+inline ConcatString VarInfo::ensemble_attr()  const { return(SetAttrsEnsemble.empty()  ? ens()        : SetAttrsEnsemble); }
+
+inline ConcatString VarInfo::set_attr_grid()  const { return(SetAttrsGrid);     }
+inline unixtime     VarInfo::set_attr_init()  const { return(SetAttrsInit);     }
+inline unixtime     VarInfo::set_attr_valid() const { return(SetAttrsValid);    }
+inline int          VarInfo::set_attr_lead()  const { return(SetAttrsLead);     }
 
 ///////////////////////////////////////////////////////////////////////////////
 
