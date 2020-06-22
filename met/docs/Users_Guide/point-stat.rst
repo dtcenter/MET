@@ -13,7 +13,7 @@ Scientific and statistical aspects of the Point-Stat tool are discussed in the f
 Scientific and statistical aspects
 __________________________________
 
-The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, Section :ref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in Section :ref:`PS_Statistical-measures` and in more detail in Appendix [chap:App_C-Verification-Measures]. Section :ref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in Appendix [chap:App_D-Confidence-Intervals].
+The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, Section :ref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in Section :ref:`PS_Statistical-measures` and in more detail in Appendix ??fix broken link chap:?? :ref:`App_C-Verification-Measures`. Section :ref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in Appendix :ref:`App_D-Confidence-Intervals`.
 
 .. _matching-methods:
 
@@ -252,7 +252,7 @@ For more information on confidence intervals pertaining to verification measures
 Practical information
 _____________________
 
-The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter [chap:Re-Formatting-of-Point]. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in Section :ref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
+The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter :ref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in Section :ref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
 point_stat usage
 ~~~~~~~~~~~~~~~~
