@@ -265,7 +265,7 @@ The Stat-Analysis tool actually performs a two step process when reading input d
 
 This two step process enables the Stat-Analysis tool to run more efficiently when many jobs are defined in the configuration file. If only operating on a small subset of the input data, the common filtering criteria can be applied once rather than re-applying it for each job. In general, filtering criteria common to all tasks defined in the jobs entry should be moved to the top section of the configuration file.
 
-As described above, filtering options specified in the first section of the configuration file will be applied to every task in the jobs entry. However, if an individual job specifies a particular option that was specified above, it will be applied for that job. For example, if the model[] option is set at the top to ["Run 1", "Run2"], but a job in the joblist sets the -model option as "Run1", that job will be performed only on "Run1" data. Also note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc-configuration-file` for the PB2NC tool.
+As described above, filtering options specified in the first section of the configuration file will be applied to every task in the jobs entry. However, if an individual job specifies a particular option that was specified above, it will be applied for that job. For example, if the model[] option is set at the top to ["Run 1", "Run2"], but a job in the joblist sets the -model option as "Run1", that job will be performed only on "Run1" data. Also note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc configuration file` for the PB2NC tool.
 
 ________________________
 
@@ -555,7 +555,7 @@ The example above reads MPR lines, stratifies the data by forecast variable name
   -mask_poly file
   -mask_sid  file|list
 
-When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The -mask_sid option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :ref:`IO_General-MET-Config-Options`.
+When processing input MPR lines, these options may be used to define a masking grid, polyline, or list of station ID's to filter the matched pair data geographically prior to computing statistics. The -mask_sid option is a station ID masking file or a comma-separated list of station ID's for filtering the matched pairs spatially. See the description of the “sid” entry in :ref:`Data IO MET Configuration File Options`.
 
 .. code-block:: none
 

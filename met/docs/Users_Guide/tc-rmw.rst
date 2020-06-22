@@ -1,20 +1,24 @@
 .. _tc-rmw:
 
-Chapter 23 TC-RMW Tool
-======================
+TC-RMW Tool
+===========
 
-23.1 Introduction
-_________________
+Introduction
+____________
 
 The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
 
-23.2 Practical information
+Practical information
+_____________________
 
-23.2.1 tc_rmw usage
+tc_rmw usage
+~~~~~~~~~~~~
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_rmw.
 
-Usage: tc_rmw
+.. code-block:: none
+
+  Usage: tc_rmw
 
 {\hskip 0.5in}-data file_1 ... file_n | data_file_list
 
@@ -31,6 +35,7 @@ Usage: tc_rmw
 tc_rmw has required arguments and can accept several optional arguments.
 
 Required arguments for tc_rmw
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The -data file_1 ... file_n | data_file_list options specify the gridded data files or an ASCII file containing a list of files to be used.
 
@@ -41,125 +46,116 @@ Required arguments for tc_rmw
 4. The -out argument is the NetCDF output file to be written.
 
 Optional arguments for tc_rmw
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 6. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-23.2.2 tc_rmw configuration file
+tc_rmw configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' can be found in the installed share/met/config/ directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
+_______________________
 
-model = "GFS";
-
-storm_id = "";
-
-basin = "";
-
-cyclone = "";
-
-init_inc = "";
+.. code-block:: none
+		
+  model = "";
+  storm_id = "";
+  basin = "";
+  cyclone = "";
+  init_inc = "";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 These options are used to filter input data down to a single storm track.
 
+_______________________
 
-valid_beg = "";
+.. code-block:: none
 
-valid_end = "";
-
-valid_inc = [];
-
-valid_exc = [];
-
-valid_hour = [];
-
-lead       = [];
+  valid_beg = "";
+  valid_end = "";
+  valid_inc = [];
+  valid_exc = [];
+  valid_hour = [];
+  lead       = [];
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 These options are used to subset a single storm track down to individual points. The tropical cyclone model data corresponding to these track points will be processed.
 
+_______________________
 
-censor_thresh = [];
+.. code-block:: none
 
-censor_val    = [];
-
-data  = {
-
-   field = [
-
-        {
-
-           name = "PRMSL";
-
-           level = ["L0"];
-
-        },
-
-        {
-
-           name = "TMP";
-
-           level = ["P1000", "P500"];
-
-        },
-
-        {
-
-           name = "UGRD";
-
-           level = ["P1000", "P500"];
-
-        },
-
-        {
-
-           name = "VGRD";
-
-           level = ["P1000", "P500"];
-
-        }
-
-    ];
-
-}
-
-regrid = { ... }
+  censor_thresh = [];
+  censor_val    = [];
+  data  = {
+     field = [
+          {
+             name = "PRMSL";
+             level = ["L0"];
+          },
+          {
+             name = "TMP";
+             level = ["P1000", "P500"];
+          },
+          {
+             name = "UGRD";
+             level = ["P1000", "P500"];
+          },
+          {
+             name = "VGRD";
+             level = ["P1000", "P500"];
+          }
+      ];
+  }
+  regrid = { ... }
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
+_______________________
 
+.. code-block:: none
 
-n_range = 100;
+  n_range = 100;
 
 The n_range parameter is the number of equally spaced range intervals in the range-azimuth grid.
 
+_______________________
 
+.. code-block:: none
 
-n_azimuth = 180;
+  n_azimuth = 180;
 
 The n_azimuth parameter is the number of equally spaced azimuth intervals in the range-azimuth grid. The azimuthal grid spacing is 360 / n_azimuth degrees.
 
+_______________________
 
+.. code-block:: none
 
-max_range_km = 100.0;
+  max_range_km = 100.0;
 
 The max_range_km parameter specifies the maximum range of the range-azimuth grid, in kilometers. If this parameter is specified and not rmw_scale, the radial grid spacing will be max_range_km / n_range.
 
+_______________________
 
+.. code-block:: none
 
-delta_range_km = 10.0;
+  delta_range_km = 10.0;
 
 The delta_range_km parameter specifies the spacing of the range rings, in kilometers.
 
+_______________________
 
+.. code-block:: none
 
-rmw_scale = 0.2;
+  rmw_scale = 0.2;
 
 The rmw_scale parameter overrides the max_range_km parameter. When this is set the radial grid spacing will be rmw_scale in units of the RMW, which varies along the storm track.
 
-23.2.3 tc_rmw output file
+tc_rmw output file
+~~~~~~~~~~~~~~~~~~
 
 The NetCDF output file contains the following dimensions:
 

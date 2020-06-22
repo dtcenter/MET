@@ -33,7 +33,7 @@ __________________________________
 Attributes
 ~~~~~~~~~~
 
-Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidian/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no metric) there. Given two points in this spacetime, say $(x_1, y_1, t_1)$ and $(x_2, y_2, t_2)$, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
+Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidian/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no metric) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
 
 This means that some care must be taken both in determining how to generalize the calculation of a geometric attribute to three-dimensional spacetime, and also in interpreting the attributes even in the case where the generalization is straightforward. 
 
@@ -46,7 +46,7 @@ First, MTD typically reads in several planes of data for each data field—one p
 
 Because of this, the developers decided to make several changes in the way convolution was performed in MTD. Most of the differences come from the need to make the convolution step as fast as possible.
 
-The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted $R$, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is $(2 R + 1) \times (2 R + 1)$, as shown in :numref:`mtd-two_r_plus_one`.
+The most basic change is to use a square convolution filter rather than the circular one that MODE uses. The overall “size” of the filter is still determined by one parameter (denoted :math:`R`, as in MODE), but this should not be thought of as a radius. Instead, the size of the square is :math:`(2 R + 1) \times (2 R + 1)`, as shown in :numref:`mtd-two_r_plus_one`.
 
 .. _mtd-two_r_plus_one:
 
@@ -61,9 +61,9 @@ Another change is that we do not allow any bad data in thee convolution square. 
 
 MTD calculates several 3D attributes for single objects. The object could come from either the forecast field or the observed field.
 
-A 3D spacetime {\bf centroid} $(\overline{x}, \overline{y}, \overline{t})$ is calculated. There are no statistical overtones here. The number $\overline{x}$, for example, is just the average value of the $x$ coordinate over the object.
+A 3D spacetime **centroid** :math:`(\bar{x}, \bar{y}, \bar{t})` is calculated. There are no statistical overtones here. The number :math:`\bar{x}`, for example, is just the average value of the :math:`x` coordinate over the object.
 
-The vector {\bf velocity} $(v_x, v_y)$ is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the {\bf speed} and {\bf direction} of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
+The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the **speed** and **direction** of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
 
 .. _mtd-velocity:
 
@@ -81,40 +81,40 @@ The spatial orientation of a object (what traditional MODE calls the axis angle 
 
    3D axis
 
-A simple integer count of the number of grid squares in an object for all of it's lifetime gives the {\bf volume} of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., ${\hbox{km}}^3$.
+A simple integer count of the number of grid squares in an object for all of it's lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
 
-The {\bf start time} and {\bf end time} of an object are attributes as well. This is an integer telling which time step an object starts and ends at. These values are zero-based, so for example, if an object comes into existence at the $3^{\hbox{rd}}$ time step and lasts until the $9^{\hbox{th}}$ time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
+The **start time** and **end time** of an object are attributes as well. This is an integer telling which time step an object starts and ends at. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
 
-{\bf Centroid distance travelled} is the total great circle distance, in kilometers, travelled by the 2D spatial centroid over the lifetime of the object. In other words, at each time $t$ for which the 3D object exists, the set of points in the object also have that value of $t$ will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as $t$ varies. This attribute represents this total 2D centroid movement over time.
+**Centroid distance travelled** is the total great circle distance, in kilometers, travelled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of *t* will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as *t* varies. This attribute represents this total 2D centroid movement over time.
 
-Finally, MTD calculates several {\bf intensity percentiles} of the raw data values inside each object. Not all of the the attributes are purely geometrical.
+Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the the attributes are purely geometrical.
 
 3D Pair Attributes
 ~~~~~~~~~~~~~~~~~~
 
 The next category of spatial attributes is for pairs of objects — one of the pair coming from the collection of forecast objects, the other coming from the observation objects.
 
-Note: whenever a pair attribute is described below as a delta, that means it's a simple difference of two single-object attributes. The difference is always taken as “forecast minus observed”.
+Note: whenever a pair attribute is described below as a *delta*, that means it's a simple difference of two single-object attributes. The difference is always taken as “forecast minus observed”.
 
-The {\bf spatial centroid distance} is the purely spatial part of the centroid separation of two objects. If one centroid is at $(\overline{x}_1, \overline{y}_1, \overline{t}_1)$ and the other is at $(\overline{x}_2, \overline{y}_2, \overline{t}_2)$ then the distance is calculated as
+The **spatial centroid distance** is the purely spatial part of the centroid separation of two objects. If one centroid is at :math:`(\bar{x}_1, \bar{y}_1, \bar{t}_1)` and the other is at :math:`(\bar{x}_2, \bar{y}_2, \bar{t}_2)` then the distance is calculated as
 
-$$
+.. math:: \sqrt{(\bar{x_1} - \bar{x_2})^2 + (\bar{y_1} - \bar{y_2})^2 }
 
-The {\bf time centroid delta} is the difference between the time coordinates of the centroid. Since this is a simple difference, it can be either positive or negative.
+The **time centroid delta** is the difference between the time coordinates of the centroid. Since this is a simple difference, it can be either positive or negative.
 
-The {\bf axis difference} is smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle $\alpha$, not angle $\beta$.
+The **axis difference** is smaller of the two angles that the two spatial axis planes make with each other. :numref:`mtd-axis_diff` shows the idea. In the figure, the axis angle would be reported as angle :math:`\alpha`, not angle :math:`\beta`.
 
-{\bf Speed delta} and {\bf direction difference} are obtained from the velocity vectors of the two objects. Speed delta is the difference in the lengths of the vectors, and direction difference is the angle that the two vectors make with each other.
+**Speed delta** and **direction difference** are obtained from the velocity vectors of the two objects. Speed delta is the difference in the lengths of the vectors, and direction difference is the angle that the two vectors make with each other.
 
-{\bf Volume ratio} is volume of the forecast object divided by the volume of the observed object. Note that any 3D object must necessarily have a nonzero volume, so there's no chance of zeros in the denominator.
+**Volume ratio** is volume of the forecast object divided by the volume of the observed object. Note that any 3D object must necessarily have a nonzero volume, so there's no chance of zeros in the denominator.
 
-{\bf Start time delta} and {\bf end time delta} are the differences in the corresponding time steps associated with the two objects and are computed as ``forecast minus obs''.
+**Start time delta** and **end time delta** are the differences in the corresponding time steps associated with the two objects and are computed as "forecast minus obs".
 
-{\bf Intersection volume} measures the overlap of two objects. If the two objects do not overlap, then this will be zero.
+**Intersection volume** measures the overlap of two objects. If the two objects do not overlap, then this will be zero.
 
-{\bf Duration difference} is the difference in the lifetimes of the two objects constituting the pair, in the sense of ``forecast minus obs''. For example, if the forecast object of the pair has a lifetime of 5 time steps, and the observed object has a lifetime of 3 time steps, then this attribute has the value 2. Note that we do not take absolute values of the difference, so this attribute can be positive, negative, or zero.
+**Duration difference** is the difference in the lifetimes of the two objects constituting the pair, in the sense of "forecast minus obs". For example, if the forecast object of the pair has a lifetime of 5 time steps, and the observed object has a lifetime of 3 time steps, then this attribute has the value 2. Note that we do not take absolute values of the difference, so this attribute can be positive, negative, or zero.
 
-Finally, the {\bf total interest}  gives the result of the fuzzy-logic matching and merging calculation for this pair of objects. Note that this is provided only for simple objects, not for clusters.
+Finally, the **total interest**  gives the result of the fuzzy-logic matching and merging calculation for this pair of objects. Note that this is provided only for simple objects, not for clusters.
 
 .. _mtd-axis_diff:
 
@@ -126,13 +126,13 @@ Finally, the {\bf total interest}  gives the result of the fuzzy-logic matching 
 2D Constant-Time Attributes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The final category of object attributes calculated by MTD are two-dimensional spatial attributes for horizontal (i.e., constant-time) slices of a spacetime object. This is so that the behavior of these attributes over time can be examined. These 2D constant-time attributes are written out for both simple and cluster objects.
+The final category of object attributes calculated by MTD are two-dimensional spatial attributes for horizontal (*i.e.*, constant-time) slices of a spacetime object. This is so that the behavior of these attributes over time can be examined. These 2D constant-time attributes are written out for both simple and cluster objects.
 
-For example, in our earlier discussion relating to :numref:`mtd-axis_3d`, we mentioned that for simplicity, the object in the figure was not allowed to rotate as it moved. But what if the object (a hurricane, for example) is rotating over time? In that case, it's probably not meaningful to assign a single spatial orientation to the object over its entire lifetime. If we had a spatial axis angle at each time, however, then we could fit a model such as $\theta = \theta_0 + \omega t$ to the angles and test the goodness of fit.
+For example, in our earlier discussion relating to :numref:`mtd-axis_3d`, we mentioned that for simplicity, the object in the figure was not allowed to rotate as it moved. But what if the object (a hurricane, for example) is rotating over time? In that case, it's probably not meaningful to assign a single spatial orientation to the object over its entire lifetime. If we had a spatial axis angle at each time, however, then we could fit a model such as :math:`\theta = \theta_0 + \omega t` to the angles and test the goodness of fit.
 
 For such reasons, having 2D spatial attributes (as in MODE) for each object at each time step can be useful. The list of the 2D attributes calculated is:
 
-◦ Centroid $(x, y)$
+◦ Centroid :math:`(x, y)`
 
 ◦ Centroid latitude and longitude
 
@@ -145,7 +145,7 @@ Matching and Merging
 
 Matching and merging operations in MTD are done in a simpler fashion than in MODE. In order to understand this operation, it is necessary to discuss some very basic notions of graph theory.
 
-A {\bf graph} is a finite set of {\bf vertices} (also called {\bf nodes}) and {\bf edges}, with each edge connecting two vertices. Conceptually, it is enough for our purposes to think of vertices as points and edges as lines connecting them. See :numref:`mtd-basic_graph` for an illustration. In the figure we see a collection of 11 nodes, indicated by the small circles, together with some edges indicated by straight line segments. A {\bf path} is a sequence of vertices $(v_1, v_2, \ldots, v_n)$ such that for each $1 \leq i < n$ there is an edge connecting $v_i$ to $v_{i + 1}$. For example, in :numref:`mtd-basic_graph`, there is no edge connecting vertices #6 and #7, but there is a path connecting them. In illustrations, graph vertices are often labelled with identifying information, such as the numbers in :numref:`mtd-basic_graph`.
+A **graph** is a finite set of **vertices** (also called **nodes**) and **edges**, with each edge connecting two vertices. Conceptually, it is enough for our purposes to think of vertices as points and edges as lines connecting them. See :numref:`mtd-basic_graph` for an illustration. In the figure we see a collection of 11 nodes, indicated by the small circles, together with some edges indicated by straight line segments. A **path** is a sequence of vertices :math:`(v_1, v_2, \ldots, v_n)` such that for each :math:`1 \leq i < n` there is an edge connecting :math:`v_i` to :math:`v_{i + 1}`. For example, in :numref:`mtd-basic_graph`, there is no edge connecting vertices #6 and #7, but there is a path connecting them. In illustrations, graph vertices are often labelled with identifying information, such as the numbers in :numref:`mtd-basic_graph`.
 
 If we consider two distinct nodes in a graph to be related if there is a path connecting them, then it's easy to see that this defines an equivalence relation on the set of nodes, partitioning the graph into equivalence classes. Any node, such as #10 in :numref:`mtd-basic_graph`, that has no edges emanating from it is in a class by itself.
 
@@ -297,7 +297,7 @@ ______________________
 
   min_volume = 2000;
 
-The {\bf min\_volume} entry tell MTD to throw away objects whose ``volume'' (as described elsewhere in this chapter) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10{,}000. If this seems rather large, consider the following example: Suppose the user is running MTD on a $600 \times 400$ grid, using $24$ time steps. Then the volume of the whole data field is $600 \times 400 \times 24 = 5{,}760{,}000$ cells. An object of volume 10{,}000 represents only $10{,}000/5{,}760{,}000 = 1/576$ of the total data field. Setting {\tt min\_volume} too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in Section :ref:`MODE-configuration-file`.
+The {\bf min\_volume} entry tell MTD to throw away objects whose "volume" (as described elsewhere in this chapter) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10{,}000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting {\tt min\_volume} too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in Section :ref:`MODE-configuration-file`.
 
 ______________________
 
@@ -504,19 +504,19 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Angle that the axis makes with the grid x direction
   * - 32
     - INTENSITY_10
-    - ?? missing code block percentile intensity in time slice
+    - :math:`\text{10}^{th}` percentile intensity in time slice
   * - 33
     - INTENSITY_25
-    - ?? missing code block percentile intensity in time slice
+    - :math:`\text{25}^{th}` percentile intensity in time slice
   * - 34
     - INTENSITY_50
-    - ?? missing code block percentile intensity in time slice
+    - :math:`\text{60}^{th}` percentile intensity in time slice
   * - 35
     - INTENSITY_75
-    - ?? missing code block percentile intensity in time slice
+    - :math:`\text{75}^{th}` percentile intensity in time slice
   * - 36
     - INTENSITY_90
-    - ?? missing code block percentile intensity in time slice
+    - :math:`\text{90}^{th}` percentile intensity in time slice
   * - 37
     - INTENSITY_*
     - User-specified percentile intensity in time slice
@@ -577,19 +577,19 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object
   * - 37
     - INTENSITY_10
-    - ?? missing code block.  percentile intensity inside object
+    - :math:`\text{10}^{th}` percentile intensity inside object
   * - 38
     - INTENSITY_25
-    - ?? missing code block.  percentile intensity inside object
+    - :math:`\text{25}^{th}` percentile intensity inside object
   * - 39
     - INTENSITY_50
-    - ?? missing code block.  percentile intensity inside object
+    - :math:`\text{50}^{th}` percentile intensity inside object
   * - 40
     - INTENSITY_75
-    - ?? missing code block.  percentile intensity inside object
+    - :math:`\text{75}^{th}` percentile intensity inside object
   * - 41
     - INTENSITY_90
-    - ?? missing code block.  percentile intensity inside object
+    - :math:`\text{90}^{th}` percentile intensity inside object
   * - 42
     - INTENSITY_*
     - User-specified percentile intensity inside object
@@ -614,10 +614,10 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Object category
   * - 25
     - SPACE_CENTROID_DIST
-    - Spatial distance between ?? missing code box coordinates of object spacetime centroid
+    - Spatial distance between :math:`(x,y)` coordinates of object spacetime centroid
   * - 26
     - TIME_CENTROID_DELTA
-    - Difference in ?? missing code box. index of object spacetime centroid
+    - Difference in *t* index of object spacetime centroid
   * - 27
     - AXIS_DIFF
     - Difference in spatial axis plane angles

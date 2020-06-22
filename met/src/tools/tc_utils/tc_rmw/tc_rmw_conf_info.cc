@@ -154,7 +154,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: lead
     sa = Conf.lookup_string_array(conf_key_lead);
     for(i=0; i<sa.n(); i++) {
-        LeadTime.add(timestring_to_sec(sa[i].c_str()));
+       LeadTime.add(timestring_to_sec(sa[i].c_str()));
     }
 
     // Conf: n_range

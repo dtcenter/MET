@@ -407,31 +407,43 @@ void process_track_files(const StringArray& files,
 
 bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
+   ConcatString cs;
 
    // Check model
    if(conf_info.Model.nonempty() &&
-      conf_info.Model != line->technique())
+      conf_info.Model != line->technique()) {
+      cs << "model " << line->technique() << " != " << conf_info.Model;
       keep = false;
+   }
 
    // Check storm id
    else if(conf_info.StormId.nonempty() &&
-           conf_info.StormId != line->storm_id())
+           conf_info.StormId != line->storm_id()) {
+      cs << "storm_id " << line->storm_id() << " != " << conf_info.StormId;
       keep = false;
+   }
 
    // Check basin
    else if(conf_info.Basin.nonempty() &&
-           conf_info.Basin != line->basin())
+           conf_info.Basin != line->basin()) {
+      cs << "basin " << line->basin() << " != " << conf_info.Basin;
       keep = false;
+   }
 
    // Check cyclone
    else if(conf_info.Cyclone.nonempty() &&
-           conf_info.Cyclone != line->cyclone_number())
+           conf_info.Cyclone != line->cyclone_number()) {
+      cs << "cyclone " << line->cyclone_number() << " != " << conf_info.Cyclone;
       keep = false;
+   }
 
    // Check initialization time
    else if(conf_info.InitInc != (unixtime) 0 &&
-           conf_info.InitInc != line->warning_time())
+           conf_info.InitInc != line->warning_time()) {
+      cs << "init_inc " << unix_to_yyyymmddhh(line->warning_time())
+         << " != " << unix_to_yyyymmdd_hhmmss(conf_info.InitInc);
       keep = false;
+   }
 
    // Check valid time
    else if((conf_info.ValidBeg > 0 &&
@@ -441,18 +453,29 @@ bool is_keeper(const ATCFLineBase * line) {
            (conf_info.ValidInc.n() > 0 &&
            !conf_info.ValidInc.has(line->valid())) ||
            (conf_info.ValidExc.n() > 0 &&
-            conf_info.ValidExc.has(line->valid())))
-      keep = false;
+            conf_info.ValidExc.has(line->valid()))) {
+       cs << "valid_time " << unix_to_yyyymmddhh(line->valid());
+       keep = false;
+    }
 
-   // Check valid hour
-   else if (conf_info.ValidHour.n() > 0 &&
-           !conf_info.ValidHour.has(line->valid_hour()))
-      keep = false;
+    // Check valid hour
+    else if(conf_info.ValidHour.n() > 0 &&
+           !conf_info.ValidHour.has(line->valid_hour())) {
+       cs << "valid_hour " << line->valid_hour();
+       keep = false;
+    }
 
    // Check lead time
    else if(conf_info.LeadTime.n() > 0 &&
-          !conf_info.LeadTime.has(line->lead()))
+          !conf_info.LeadTime.has(line->lead())){
+      cs << "lead_time " << sec_to_hhmmss(line->lead());
       keep = false;
+   }
+
+   if(!keep) {
+      mlog << Debug(4) << "Skipping track line for " << cs << ":\n"
+           << line->get_line() << "\n";
+   }
 
    // Return the keep status
    return(keep);
