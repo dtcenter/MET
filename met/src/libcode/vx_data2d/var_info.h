@@ -70,6 +70,7 @@ class VarInfo
       unixtime      SetAttrsInit;
       unixtime      SetAttrsValid;
       int           SetAttrsLead;
+      int           SetAttrsAccum;
 
       int           SetAttrsIsPrecipitation;
       int           SetAttrsIsSpecificHumidity;
@@ -140,10 +141,11 @@ class VarInfo
       ConcatString long_name_attr() const;
       ConcatString ensemble_attr()  const;
 
-      ConcatString set_attr_grid()  const;
-      unixtime     set_attr_init()  const;
-      unixtime     set_attr_valid() const;
-      int          set_attr_lead()  const;
+      ConcatString grid_attr()      const;
+      unixtime     init_attr()      const;
+      unixtime     valid_attr()     const;
+      int          lead_attr()      const;
+      int          accum_attr()     const;
 
          //
          // set stuff
@@ -242,10 +244,11 @@ inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty
 inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty()  ? long_name()  : SetAttrsLongName); }
 inline ConcatString VarInfo::ensemble_attr()  const { return(SetAttrsEnsemble.empty()  ? ens()        : SetAttrsEnsemble); }
 
-inline ConcatString VarInfo::set_attr_grid()  const { return(SetAttrsGrid);     }
-inline unixtime     VarInfo::set_attr_init()  const { return(SetAttrsInit);     }
-inline unixtime     VarInfo::set_attr_valid() const { return(SetAttrsValid);    }
-inline int          VarInfo::set_attr_lead()  const { return(SetAttrsLead);     }
+inline ConcatString VarInfo::grid_attr()      const { return(SetAttrsGrid);     }
+inline unixtime     VarInfo::init_attr()      const { return(SetAttrsInit);     }
+inline unixtime     VarInfo::valid_attr()     const { return(SetAttrsValid);    }
+inline int          VarInfo::lead_attr()      const { return(SetAttrsLead);     }
+inline int          VarInfo::accum_attr()     const { return(SetAttrsAccum);    }
 
 ///////////////////////////////////////////////////////////////////////////////
 

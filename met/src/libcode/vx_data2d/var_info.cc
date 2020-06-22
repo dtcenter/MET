@@ -126,6 +126,7 @@ void VarInfo::assign(const VarInfo &v) {
    SetAttrsInit = v.SetAttrsInit;
    SetAttrsValid = v.SetAttrsValid;
    SetAttrsLead = v.SetAttrsLead;
+   SetAttrsAccum = v.SetAttrsAccum;
 
    SetAttrsIsPrecipitation = v.SetAttrsIsPrecipitation;
    SetAttrsIsSpecificHumidity = v.SetAttrsIsSpecificHumidity;
@@ -185,6 +186,7 @@ void VarInfo::clear() {
    SetAttrsInit = (unixtime) 0;
    SetAttrsValid = (unixtime) 0;
    SetAttrsLead = bad_data_int;
+   SetAttrsAccum = bad_data_int;
 
    SetAttrsIsPrecipitation = bad_data_int;
    SetAttrsIsSpecificHumidity = bad_data_int;
@@ -511,6 +513,8 @@ void VarInfo::set_dict(Dictionary &dict) {
       if(attrs_dict->last_lookup_status()) SetAttrsValid = timestring_to_unix(s.c_str());
       s = attrs_dict->lookup_string(conf_key_set_lead, false);
       if(attrs_dict->last_lookup_status()) SetAttrsLead  = timestring_to_sec(s.c_str());
+      s = attrs_dict->lookup_string(conf_key_set_accum, false);
+      if(attrs_dict->last_lookup_status()) SetAttrsAccum  = timestring_to_sec(s.c_str());
 
       // Parse flags
       SetAttrsIsPrecipitation =

@@ -630,6 +630,7 @@ static const char conf_key_set_grid[]          = "set_grid";
 static const char conf_key_set_init[]          = "set_init";
 static const char conf_key_set_valid[]         = "set_valid";
 static const char conf_key_set_lead[]          = "set_lead";
+static const char conf_key_set_accum[]         = "set_accum";
 static const char conf_key_is_precipitation[]  = "is_precipitation";
 static const char conf_key_is_specific_humidity[] = "is_specific_humidity";
 static const char conf_key_is_u_wind[]         = "is_u_wind";
