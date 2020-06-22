@@ -15,7 +15,9 @@ gen_vx_mask usage
 
 The usage statement for the Gen-Vx-Mask tool is shown below:
 
-Usage: gen_vx_mask
+.. code-block:: none
+
+  Usage: gen_vx_mask
 
 {\hskip 0.5in}input_grid
 
@@ -165,13 +167,14 @@ This three step process enables the Gen-Vx-Mask tool to be run iteratively on it
 
 • Rerun the Gen-Vx-Mask tool passing in the output of the first call and applying polyline masking to define the geographic area of interest. 
 
-– Use the -intersection option to only select grid points whose value is non-zero in both the input field and the current mask.
+  – Use the -intersection option to only select grid points whose value is non-zero in both the input field and the current mask.
 
 An example of the gen_vx_mask calling sequence is shown below:
 
-gen_vx_mask sample_fcst.grb \
+.. code-block:: none
 
-CONUS.poly CONUS_poly.nc
+  gen_vx_mask sample_fcst.grb \
+  CONUS.poly CONUS_poly.nc
 
 In this example, the Gen-Vx-Mask tool will read the ASCII Lat/Lon file named CONUS.poly and apply the default polyline masking method to the domain on which the data in the file sample_fcst.grib resides. It will create a NetCDF file containing a bitmap for the domain with a value of 1 for all grid points inside the CONUS polyline and a value of 0 for all grid points outside. It will write an output NetCDF file named CONUS_poly.nc.
 
