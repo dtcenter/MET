@@ -18,40 +18,23 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
 .. code-block:: none
 
   Usage: gen_vx_mask
-
-{\hskip 0.5in}input_grid
-
-{\hskip 0.5in}mask_file
-
-{\hskip 0.5in}out_file
-
-{\hskip 0.5in}[-type str]
-
-{\hskip 0.5in}[-input_field string]
-
-{\hskip 0.5in}[-mask_field string]
-
-{\hskip 0.5in}[-complement]
-
-{\hskip 0.5in}[-union | -intersection | -symdiff]
-
-{\hskip 0.5in}[-thresh string]
-
-{\hskip 0.5in}[-height n]
-
-{\hskip 0.5in}[-width n]
-
-{\hskip 0.5in}[-shapeno n]
-
-{\hskip 0.5in}[-value n]
-
-{\hskip 0.5in}[-name string]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+         input_grid
+         mask_file
+         out_file
+         [-type str]
+         [-input_field string]
+         [-mask_field string]
+         [-complement]
+         [-union | -intersection | -symdiff]
+         [-thresh string]
+         [-height n]
+         [-width n]
+         [-shapeno n]
+         [-value n]
+         [-name string]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 gen_vx_mask has three required arguments and can take optional ones.
 
