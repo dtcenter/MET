@@ -16,7 +16,7 @@ Ensemble forecasts derived from a set of deterministic ensemble members
 
 Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
 
-The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. MET will create the ensemble relative frequency as the proportion of ensemble members forecasting some event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be $5/10$=0.5. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
+The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. MET will create the ensemble relative frequency as the proportion of ensemble members forecasting some event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be 5/10=0.5. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
 
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in Schwartz and Sobash (2017). They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
 
@@ -52,7 +52,9 @@ ensemble_stat usage
 
 The usage statement for the Ensemble Stat tool is shown below:
 
-Usage: ensemble_stat
+.. code-block:: none
+
+  Usage: ensemble_stat
 
 {\hskip 0.5in}n_ens ens_file_1 ... ens_file_n | ens_file_list
 
@@ -112,16 +114,13 @@ Optional arguments for ensemble_stat
 
 An example of the ensemble_stat calling sequence is shown below:
 
+.. code-block:: none
+
      ensemble_stat \
-
      6 sample_fcst/2009123112/*gep*/d01_2009123112_02400.grib \
-
      config/EnsembleStatConfig \
-
      -grid_obs sample_obs/ST4/ST4.2010010112.24h \
-
      -point_obs out/ascii2nc/precip24_2010010112.nc \
-
      -outdir out/ensemble_stat -v 2
 
 In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and used to ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
@@ -135,73 +134,47 @@ Note that environment variables may be used when editing configuration files, as
 
 ____________________
 
-model          = "WRF";
+.. code-block:: none
 
-desc           = "NA";
-
-obtype         = "ANALYS";
-
-regrid         = { ... }
-
-climo_mean     = { ... }
-
-climo_stdev    = { ... }
-
-climo_cdf      = { ... }
-
-obs_window     = { beg = -5400; end =  5400; }
-
-mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
-
-ci_alpha       = [ 0.05 ];
-
-interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-                    type = [ { method = NEAREST; width = 1; } ]; }
-		    
-sid_inc        = [];
-
-sid_exc        = [];
-
-duplicate_flag = NONE;
-
-obs_quality    = [];
-
-obs_summary    = NONE;
-
-obs_perc_value = 50;
-
-message_type_group_map = [...];
-
-output_prefix  = "";
-
-version        = "VN.N";
+  model          = "WRF";
+  desc           = "NA";
+  obtype         = "ANALYS";
+  regrid         = { ... }
+  climo_mean     = { ... }
+  climo_stdev    = { ... }
+  climo_cdf      = { ... }
+  obs_window     = { beg = -5400; end =  5400; }
+  mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
+  ci_alpha       = [ 0.05 ];
+  interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+                     type = [ { method = NEAREST; width = 1; } ]; }
+  sid_inc        = [];
+  sid_exc        = [];
+  duplicate_flag = NONE;
+  obs_quality    = [];
+  obs_summary    = NONE;
+  obs_perc_value = 50;
+  message_type_group_map = [...];
+  output_prefix  = "";
+  version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _____________________
 
-ens = {
+.. code-block:: none
 
-ens_thresh = 1.0;
-
-vld_thresh = 1.0;
-
-field = [
-
-       {
-
-
-name = "APCP";
-
-level = "A03";
-
-cat_thresh = [ >0.0, >=5.0 ];
-
-}
-
-];
-
-}
+  ens = {
+  ens_thresh = 1.0;
+  vld_thresh = 1.0;
+  field = [
+           {
+            name = "APCP";
+            level = "A03";
+            cat_thresh = [ >0.0, >=5.0 ];
+           }
+         ];
+       }
 
 The ens dictionary defines which ensemble fields should be processed.
 
@@ -215,16 +188,13 @@ For each field listed in the forecast field, give the name and vertical or accum
 
 _______________________
 
-nbrhd_prob = {
+.. code-block:: none
 
-width      = [ 5 ];
-
-shape      = CIRCLE;
-
-vld_thresh = 0.0;
-
-
-}
+  nbrhd_prob = {
+     width      = [ 5 ];
+     shape      = CIRCLE;
+     vld_thresh = 0.0;
+  }
 
 
 The nbrhd_prob dictionary defines the neighborhoods used to compute NEP and NMEP output.
@@ -237,33 +207,20 @@ If ensemble_flag.nep is set to TRUE, NEP output is created for each combination 
 
 _____________________
 
+.. code-block:: none
 
-nmep_smooth = {
-
-vld_thresh      = 0.0;
-
-shape           = CIRCLE;
-
-gaussian_dx     = 81.27;
-
-gaussian_radius = 120;
-
-type = [
-
-{
-
-method = GAUSSIAN;
-
-
-width  = 1;
-
-}
-
-
-];
-
-
-}
+  nmep_smooth = {
+     vld_thresh      = 0.0;
+     shape           = CIRCLE;
+     gaussian_dx     = 81.27;
+     gaussian_radius = 120;
+     type = [
+        {
+          method = GAUSSIAN;
+          width  = 1;
+        }
+    ];
+  }
 
 
 Similar to the interp dictionary, the nmep_smooth dictionary includes a type array of dictionaries to define one or more methods for smoothing the NMEP data. Setting the interpolation method to nearest neighbor (NEAREST) effectively disables this smoothing step.
@@ -273,28 +230,29 @@ If ensemble_flag.nmep is set to TRUE, NMEP output is created for each combinatio
 
 _____________________
 
-obs_thresh = [ NA ];
+.. code-block:: none
+
+  obs_thresh = [ NA ];
 
 
 The obs_thresh entry is an array of thresholds for filtering observation values prior to applying ensemble verification logic. The default setting of NA means that no observations should be filtered out. Verification output will be computed separately for each threshold specified. This option may be set separately for each obs.field entry.
 
 ____________________
 
-skip_const = FALSE;
+.. code-block:: none
+
+  skip_const = FALSE;
 
 
 Setting skip_const to true tells Ensemble-Stat to exclude pairs where all the ensemble members and the observation have a constant value. For example, exclude points with zero precipitation amounts from all output line types. This option may be set separately for each obs.field entry. When set to false, constant points are and the observation rank is chosen at random.
 
 ____________________
 
+.. code-block:: none
 
-ens_ssvar_bin_size = 1.0;
-
-
-ens_phist_bin_size = 0.05;
-
-
-prob_cat_thresh    = [];
+  ens_ssvar_bin_size = 1.0;
+  ens_phist_bin_size = 0.05;
+  prob_cat_thresh    = [];
 
 
 Setting up the fcst and obs dictionaries of the configuration file is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Ensemble-Stat tool.
@@ -313,25 +271,15 @@ The prob_cat_thresh entry is an array of thresholds to be applied in the computa
 
 __________________
 
-obs_error = {
+.. code-block:: none
 
-
-flag             = FALSE;
-
-
-dist_type        = NONE;
-
-
-dist_parm        = [];
-
-
-inst_bias_scale  = 1.0;
-
-
-inst_bias_offset = 0.0;
-
-
-}
+  obs_error = {
+  flag             = FALSE;
+  dist_type        = NONE;
+  dist_parm        = [];
+  inst_bias_scale  = 1.0;
+  inst_bias_offset = 0.0;
+  }
 
 
 The obs_error dictionary controls how observation error information should be handled. This dictionary may be set separately for each obs.field entry. Observation error information can either be specified directly in the configuration file or by parsing information from an external table file. By default, the **MET_BASE/data/table_files/obs_error_table.txt** file is read but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment variable at runtime.
@@ -353,31 +301,17 @@ Defining the observation error information in the configuration file is convenie
 
 _________________
 
-output_flag = {
+.. code-block:: none
 
-
-ecnt  = NONE;
-
-
-rps   = NONE;
-
-
-rhist = NONE;
-
-
-phist = NONE;
-
-
-orank = NONE;
-
-
-ssvar = NONE;
-
-
-relp  = NONE;
-
-
-}
+  output_flag = {
+  ecnt  = NONE;
+  rps   = NONE;
+  rhist = NONE;
+  phist = NONE;
+  orank = NONE;
+  ssvar = NONE;
+  relp  = NONE;
+  }
 
 
 The output_flag array controls the type of output that is generated. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:

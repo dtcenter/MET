@@ -181,9 +181,9 @@ Often, the sample climatology is used as a reference by a skill score. The sampl
 Statistical confidence intervals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A single summary score gives an indication of the forecast performance, but it is a single realization from a random process that neglects uncertainty in the score's estimate. That is, it is possible to obtain a good score, but it may be that the "good" score was achieved by chance and does not reflect the "true" score. Therefore, when interpreting results from a verification analysis, it is imperative to analyze the uncertainty in the realized scores. One good way to do this is to utilize confidence intervals. A confidence interval indicates that if the process were repeated many times, say 100, then the true score would fall within the interval $100(1-\alpha)\%$ of the time. Typical values of $\alpha$ are 0.01, 0.05, and 0.10. The Point-Stat tool allows the user to select one or more specific $\alpha$-values to use.
+A single summary score gives an indication of the forecast performance, but it is a single realization from a random process that neglects uncertainty in the score's estimate. That is, it is possible to obtain a good score, but it may be that the "good" score was achieved by chance and does not reflect the "true" score. Therefore, when interpreting results from a verification analysis, it is imperative to analyze the uncertainty in the realized scores. One good way to do this is to utilize confidence intervals. A confidence interval indicates that if the process were repeated many times, say 100, then the true score would fall within the interval  ??please add correct symbols??  $100(1-\alpha)\%$ of the time. Typical values of $\alpha$ are 0.01, 0.05, and 0.10. The Point-Stat tool allows the user to select one or more specific $\alpha$-values to use.
 
-For continuous fields (e.g., temperature), it is possible to estimate confidence intervals for some measures of forecast performance based on the assumption that the data, or their errors, are normally distributed. The Point-Stat tool computes confidence intervals for the following summary measures: forecast mean and standard deviation, observation mean and standard deviation, correlation, mean error, and the standard deviation of the error. In the case of the respective means, the central limit theorem suggests that the means are normally distributed, and this assumption leads to the usual $100(1-\alpha)\%$ confidence intervals for the mean. For the standard deviations of each field, one must be careful to check that the field of interest is normally distributed, as this assumption is necessary for the interpretation of the resulting confidence intervals.
+For continuous fields (e.g., temperature), it is possible to estimate confidence intervals for some measures of forecast performance based on the assumption that the data, or their errors, are normally distributed. The Point-Stat tool computes confidence intervals for the following summary measures: forecast mean and standard deviation, observation mean and standard deviation, correlation, mean error, and the standard deviation of the error. In the case of the respective means, the central limit theorem suggests that the means are normally distributed, and this assumption leads to the usual ??add symbol??  $100(1-\alpha)\%$ confidence intervals for the mean. For the standard deviations of each field, one must be careful to check that the field of interest is normally distributed, as this assumption is necessary for the interpretation of the resulting confidence intervals.
 
 For the measures relating the two fields (i.e., mean error, correlation and standard deviation of the errors), confidence intervals are based on either the joint distributions of the two fields (e.g., with correlation) or on a function of the two fields. For the correlation, the underlying assumption is that the two fields follow a bivariate normal distribution. In the case of the mean error and the standard deviation of the mean error, the assumption is that the errors are normally distributed, which for continuous variables, is usually a reasonable assumption, even for the standard deviation of the errors.
 
@@ -191,7 +191,7 @@ Bootstrap confidence intervals for any verification statistic are available in M
 
 Confidence intervals can be calculated from the sample of verification statistics obtained through the bootstrap algorithm. The most intuitive method is to simply take the appropriate quantiles of the sample of statistic(s). For example, if one wants a 95% CI, then one would take the 2.5 and 97.5 percentiles of the resulting sample. This method is called the percentile method, and has some nice properties. However, if the original sample is biased and/or has non-constant variance, then it is well known that this interval is too optimistic. The most robust, accurate, and well-behaved way to obtain accurate CIs from bootstrapping is to use the bias corrected and adjusted percentile method (or BCa). If there is no bias, and the variance is constant, then this method will yield the usual percentile interval. The only drawback to the approach is that it is computationally intensive. Therefore, both the percentile and BCa methods are available in MET, with the considerably more efficient percentile method being the default.
 
-The only other option associated with bootstrapping currently available in MET is to obtain replicated samples smaller than the original sample (i.e., to sample $m<n$ points at each replicate). Ordinarily, one should use $m=n$, and this is the default. However, there are cases where it is more appropriate to use a smaller value of m (e.g., when making inference about high percentiles of the original sample). See Gilleland (2008) for more information and references about this topic.
+The only other option associated with bootstrapping currently available in MET is to obtain replicated samples smaller than the original sample (i.e., to sample *m<n* points at each replicate). Ordinarily, one should use *m=n*, and this is the default. However, there are cases where it is more appropriate to use a smaller value of m (e.g., when making inference about high percentiles of the original sample). See Gilleland (2008) for more information and references about this topic.
 
 MET provides parametric confidence intervals based on assumptions of normality for the following categorical statistics:
 
@@ -259,7 +259,9 @@ point_stat usage
 
 The usage statement for the Point-Stat tool is shown below:
 
-Usage: point_stat
+.. code-block:: none
+
+  Usage: point_stat
 
 {\hskip 0.5in}fcst_file
 
@@ -307,11 +309,11 @@ Optional arguments for point_stat
 
 An example of the point_stat calling sequence is shown below:
 
-point_stat sample_fcst.grb \
+.. code-block:: none
 
-sample_pb.nc \
-
-PointStatConfig
+  point_stat sample_fcst.grb \
+  sample_pb.nc \
+  PointStatConfig
 
 In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the PointStatConfig file.
 
@@ -324,67 +326,35 @@ Note that environment variables may be used when editing configuration files, as
 
 ________________________
 
-model          = "WRF";
+.. code-block:: none
 
-desc           = "NA";
-
-regrid         = { ... }
-
-climo_mean     = { ... }
-
-climo_stdev    = { ... }
-
-climo_cdf      = { ... }
-
-obs_window     = { beg = -5400; end =  5400; }
-
-mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
-
-ci_alpha       = [ 0.05 ];
-
-boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-
-                   rng = "mt19937"; seed = ""; }
-
-interp         = { vld_thresh = 1.0; shape = SQUARE;
-
-                   type = [ { method = NEAREST; width = 1; } ]; }
-
-
-
-censor_thresh  = [];
-
-censor_val     = [];
-
-eclv_points    = 0.05;
-
-rank_corr_flag = TRUE;
-
-
-
-sid_inc        = [];
-
-sid_exc        = [];
-
-duplicate_flag = NONE;
-
-obs_quality    = [];
-
-obs_summary    = NONE;
-
-obs_perc_value = 50;
-
-
-
-message_type_group_map = [...];
-
-
-
-tmp_dir        = "/tmp";
-
-output_prefix  = "";
-
-version        = "VN.N";
+  model          = "WRF";
+  desc           = "NA";
+  regrid         = { ... }
+  climo_mean     = { ... }
+  climo_stdev    = { ... }
+  climo_cdf      = { ... }
+  obs_window     = { beg = -5400; end =  5400; }
+  mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
+  ci_alpha       = [ 0.05 ];
+  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                     rng = "mt19937"; seed = ""; }
+  interp         = { vld_thresh = 1.0; shape = SQUARE;
+                     type = [ { method = NEAREST; width = 1; } ]; }
+  censor_thresh  = [];
+  censor_val     = [];
+  eclv_points    = 0.05;
+  rank_corr_flag = TRUE;
+  sid_inc        = [];
+  sid_exc        = [];
+  duplicate_flag = NONE;
+  obs_quality    = [];
+  obs_summary    = NONE;
+  obs_perc_value = 50;
+  message_type_group_map = [...];
+  tmp_dir        = "/tmp";
+  output_prefix  = "";
+  version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
@@ -398,105 +368,73 @@ The message_type entry, defined in the obs dictionary, contains a comma-separate
 
 ______________________
 
-land_mask = {
+.. code-block:: none
 
-   flag      = FALSE;
-
-   file_name = [];
-
-   field     = { name = "LAND"; level = "L0"; }
-
-   regrid    = { method = NEAREST; width = 1; }
-
-   thresh = eq1;
-
-}
+  land_mask = {
+     flag      = FALSE;
+     file_name = [];
+     field     = { name = "LAND"; level = "L0"; }
+     regrid    = { method = NEAREST; width = 1; }
+     thresh = eq1;
+  }
 
 The land_mask dictionary defines the land/sea mask field which is used when verifying at the surface. For point observations whose message type appears in the LANDSF entry of the message_type_group_map setting, only use forecast grid points where land = TRUE. For point observations whose message type appears in the WATERSF entry of the message_type_group_map setting, only use forecast grid points where land = FALSE. The flag entry enables/disables this logic. If the file_name is left empty, then the land/sea is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain. Lastly, the thresh entry is the threshold which defines land (threshold is true) and water (threshold is false).
 
 __________________________
 
-topo_mask = {
+.. code-block:: none
 
-   flag               = FALSE;
-
-   file_name          = [];
-
-   field              = { name = "TOPO"; level = "L0"; }
-
-   regrid             = { method = BILIN; width = 2; }
-
-   use_obs_thresh     = ge-100&&le100;
-
-   interp_fcst_thresh = ge-50&&le50;
-
-}
+  topo_mask = {
+     flag               = FALSE;
+     file_name          = [];
+     field              = { name = "TOPO"; level = "L0"; }
+     regrid             = { method = BILIN; width = 2; }
+     use_obs_thresh     = ge-100&&le100;
+     interp_fcst_thresh = ge-50&&le50;
+  }
 
 The topo_mask dictionary defines the model topography field which is used when verifying at the surface. This logic is applied to point observations whose message type appears in the SURFACE entry of the message_type_group_map setting. Only use point observations where the topo - station elevation difference meets the use_obs_thresh threshold entry. For the observations kept, when interpolating forecast data to the observation location, only use forecast grid points where the topo - station difference meets the interp_fcst_thresh threshold entry. The flag entry enables/disables this logic. If the file_name is left empty, then the topography data is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain.
 
 ____________________________
 
-hira = {
+.. code-block:: none
 
-   flag            = FALSE;
-
-   width           = [ 2, 3, 4, 5 ]
-
-   vld_thresh      = 1.0;
-
-   cov_thresh      = [ ==0.25 ];
-
-   shape           = SQUARE;
-
-   prob_cat_thresh = [];
-
-}
+  hira = {
+     flag            = FALSE;
+     width           = [ 2, 3, 4, 5 ]
+     vld_thresh      = 1.0;
+     cov_thresh      = [ ==0.25 ];
+     shape           = SQUARE;
+     prob_cat_thresh = [];
+  }
 
 The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :ref:`PS_HiRA_framework`. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
 
 ________________________
 
-output_flag = {
+.. code-block:: none
 
-   fho    = BOTH;
-
-   ctc    = BOTH;
-
-   cts    = BOTH;
-
-   mctc   = BOTH;
-
-   mcts   = BOTH;
-
-   cnt    = BOTH;
-
-   sl1l2  = BOTH;
-
-   sal1l2 = BOTH;
-
-   vl1l2  = BOTH;
-
-   vcnt   = BOTH;
-
-   val1l2 = BOTH;
-
-   pct    = BOTH;
-
-   pstd   = BOTH;
-
-   pjc    = BOTH;
-
-   prc    = BOTH;
-
-   ecnt   = BOTH;  // Only for HiRA
-
-   rps    = BOTH;  // Only for HiRA
-
-   eclv   = BOTH;
-
-   mpr    = BOTH;
-
-}
+  output_flag = {
+     fho    = BOTH;
+     ctc    = BOTH;
+     cts    = BOTH;
+     mctc   = BOTH;
+     mcts   = BOTH;
+     cnt    = BOTH;
+     sl1l2  = BOTH;
+     sal1l2 = BOTH;
+     vl1l2  = BOTH;
+     vcnt   = BOTH;
+     val1l2 = BOTH;
+     pct    = BOTH;
+     pstd   = BOTH;
+     pjc    = BOTH;
+     prc    = BOTH;
+     ecnt   = BOTH;  // Only for HiRA
+     rps    = BOTH;  // Only for HiRA
+     eclv   = BOTH;
+     mpr    = BOTH;
+  }
 
 The output_flag array controls the type of output that the Point-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
 

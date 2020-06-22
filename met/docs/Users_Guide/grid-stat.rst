@@ -136,7 +136,9 @@ grid_stat usage
 
 The usage statement for the Grid-Stat tool is listed below:
 
-Usage: grid_stat
+.. code-block:: none
+
+  Usage: grid_stat
 
 {\hskip 0.5in}fcst_file
 
@@ -178,9 +180,11 @@ An example of the grid_stat calling sequence is listed below:
 
 Example 1:
 
-grid_stat sample_fcst.grb \
-sample_obs.grb \
-GridStatConfig
+.. code-block:: none
+
+  grid_stat sample_fcst.grb \
+  sample_obs.grb \
+  GridStatConfig
 
 In Example 1, the Grid-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the GridStatConfig file.
 
@@ -188,9 +192,11 @@ A second example of the grid_stat calling sequence is listed below:
 
 Example 2:
 
-grid_stat sample_fcst.nc
-sample_obs.nc
-GridStatConfig
+.. code-block:: none
+
+  grid_stat sample_fcst.nc
+  sample_obs.nc
+  GridStatConfig
 
 In the second example, the Grid-Stat tool will verify the model data in the sample_fcst.nc NetCDF output of pcp_combine, using the observations in the sample_obs.nc NetCDF output of pcp_combine, and applying the configuration options specified in the GridStatConfig file. Because the model and observation files contain only a single field of accumulated precipitation, the GridStatConfig file should be configured to specify that only accumulated precipitation be verified.
 
@@ -205,67 +211,44 @@ Note that environment variables may be used when editing configuration files, as
 
 __________________________
 
-model          = "WRF";
+.. code-block:: none
 
-desc           = "NA";
-
-obtype         = "ANALYS";
-
-fcst           = { ... }
-
-obs            = { ... }
-
-regrid         = { ... }
-
-climo_mean     = { ... }
-
-climo_stdev    = { ... }
-
-climo_cdf      = { ... }
-
-mask           = { grid = [ "FULL" ]; poly = []; }
-
-ci_alpha       = [ 0.05 ];
-
-boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-
-                   rng = "mt19937"; seed = ""; }
-
-interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-
-type = [ { method = NEAREST; width = 1; } ]; }
-
-censor_thresh  = [];
-
-censor_val     = [];
-
-eclv_points    = 0.05;
-
-rank_corr_flag = TRUE;
-
-tmp_dir        = "/tmp";
-
-output_prefix  = "";
-
-version        = "VN.N";
+  model          = "WRF";
+  desc           = "NA";
+  obtype         = "ANALYS"; 
+  fcst           = { ... }
+  obs            = { ... }
+  regrid         = { ... }
+  climo_mean     = { ... }
+  climo_stdev    = { ... }
+  climo_cdf      = { ... }
+  mask           = { grid = [ "FULL" ]; poly = []; }
+  ci_alpha       = [ 0.05 ];
+  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                     rng = "mt19937"; seed = ""; }
+  interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+                     type = [ { method = NEAREST; width = 1; } ]; }
+  censor_thresh  = [];
+  censor_val     = [];
+  eclv_points    = 0.05;
+  rank_corr_flag = TRUE;
+  tmp_dir        = "/tmp";
+  output_prefix  = "";
+  version        = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 ___________________________
 
-nbrhd = {
+.. code-block:: none
 
-field      = BOTH;
-
-vld_thresh = 1.0;
-
-shape      = SQUARE;
-
-width      = [ 1 ];
-
-cov_thresh = [ >=0.5 ];
-
-         }
+  nbrhd = {
+     field      = BOTH;
+     vld_thresh = 1.0;
+     shape      = SQUARE;
+     width      = [ 1 ];
+     cov_thresh = [ >=0.5 ];
+   }
 
 	 
 The nbrhd dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood shape is a SQUARE or CIRCLE centered on the current point, and the width value specifies the width of the square or diameter of the circle as an odd integer.
@@ -278,13 +261,12 @@ The cov_thresh entry contains a comma separated list of thresholds to be applied
 
 ___________________
 
-fourier = {
+.. code-block:: none
 
-wave_1d_beg = [ 0, 4, 10 ];
-
-wave_1d_end = [ 3, 9, 20 ];
-
-           }
+  fourier = {
+     wave_1d_beg = [ 0, 4, 10 ];
+     wave_1d_end = [ 3, 9, 20 ];
+  }
 
 
 The fourier entry is a dictionary which specifies the application of the Fourier decomposition method. It consists of two arrays of the same length which define the beginning and ending wave numbers to be included. If the arrays have length zero, no Fourier decomposition is applied. For each array entry, the requested Fourier decomposition is applied to the forecast and observation fields. The beginning and ending wave numbers are indicated in the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves 0 to 3 or WV1_10 for only wave 10). This 1-dimensional Fourier decomposition is computed along the Y-dimension only (i.e. the columns of data). It is applied to the forecast and observation fields as well as the climatological mean field, if specified. It is only defined when each grid point contains valid data. If any input field contains missing data, no Fourier decomposition is computed. The available wave numbers start at 0 (the mean across each row of data) and end at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the verification grid.
@@ -293,13 +275,12 @@ The wave_1d_beg entry is an array of integers specifying the first wave number t
 
 _____________________
 
-grad = {
+.. code-block:: none
 
-dx = [ 1 ];
-
-dy = [ 1 ];
-
-       }
+  grad = {
+     dx = [ 1 ];
+     dy = [ 1 ];
+   }
 
 
 
@@ -307,67 +288,44 @@ The gradient entry is a dictionary which specifies the number and size of gradie
 
 ____________________
 
-distance_map = {
+.. code-block:: none
 
-baddeley_p        = 2;
-
-baddeley_max_dist = NA;
-
-fom_alpha         = 0.1;
-
-zhu_weight        = 0.5;
-
-               }
+  distance_map = {
+     baddeley_p        = 2;
+     baddeley_max_dist = NA;
+     fom_alpha         = 0.1;
+     zhu_weight        = 0.5;
+  }
 
 The distance_map entry is a dictionary containing options related to the distance map statistics in the DMAP output line type. The baddeley_p entry is an integer specifying the exponent used in the Lp-norm when computing the Baddeley \Delta metric. The baddeley_max_dist entry is a floating point number specifying the maximum allowable distance for each distance map. Any distances larger than this number will be reset to this constant. A value of NA indicates that no maximum distance value should be used. The fom_alpha entry is a floating point number specifying the scaling constant to be used when computing Pratt's Figure of Merit. The zhu_weight specifies a value between 0 and 1 to define the importance of the RMSE of the binary fields (i.e. amount of overlap) versus the mean-error distance (MED). The default value of 0.5 gives equal weighting. This configuration option may be set separately in each obs.field entry.
 
 _____________________
 
- output_flag = {
+.. code-block:: none
 
- 	     fho    = BOTH;
-
-	     ctc    = BOTH;
-
-cts    = BOTH;
-
-mctc   = BOTH;
-
-mcts   = BOTH;
-
-cnt    = BOTH;
-
-sl1l2  = BOTH;
-
-sal1l2 = NONE;
-
-vl1l2  = BOTH;
-
-val1l2 = NONE;
-
-vcnt   = BOTH;
-
-pct    = BOTH;
-
-pstd   = BOTH;
-
-pjc    = BOTH;
-
-prc    = BOTH;
-
-eclv   = BOTH;
-
-nbrctc = BOTH;
-
-nbrcts = BOTH;
-
-nbrcnt = BOTH;
-
-grad   = BOTH;
-
-dmap   = BOTH;
-
-       	 }
+  output_flag = {
+     fho    = BOTH;
+     ctc    = BOTH;
+     cts    = BOTH;
+     mctc   = BOTH;
+     mcts   = BOTH;
+     cnt    = BOTH;
+     sl1l2  = BOTH;
+     sal1l2 = NONE;
+     vl1l2  = BOTH;
+     val1l2 = NONE;
+     vcnt   = BOTH;
+     pct    = BOTH;
+     pstd   = BOTH;
+     pjc    = BOTH;
+     prc    = BOTH;
+     eclv   = BOTH;
+     nbrctc = BOTH;
+     nbrcts = BOTH;
+     nbrcnt = BOTH;
+     grad   = BOTH;
+     dmap   = BOTH;
+  }
 
 
 The output_flag array controls the type of output that the Grid-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data are grouped by line type. These output flags correspond to the following types of output line types:
@@ -420,29 +378,20 @@ Note that the first two line types are easily derived from one another. The user
 
 _____________________
 
-nc_pairs_flag = {
+.. code-block:: none
 
-	      latlon       = TRUE;
-
-	      raw          = TRUE;
-
-	      diff         = TRUE;
-
-	      climo        = TRUE;
-
-	      climo_cdp    = TRUE;
-
-	      weight       = FALSE;
-
-	      nbrhd        = FALSE;
-
-	      gradient     = FALSE;
-
-	      distance_map = FALSE;
-
-	      apply_mask   = TRUE;
-
-                                     }
+  nc_pairs_flag = {
+     latlon       = TRUE;
+     raw          = TRUE;
+     diff         = TRUE;
+     climo        = TRUE;
+     climo_cdp    = TRUE;
+     weight       = FALSE;
+     nbrhd        = FALSE;
+     gradient     = FALSE;
+     distance_map = FALSE;
+     apply_mask   = TRUE;
+  }
 
 
 The nc_pairs_flag entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if output_flag dictionary indicates any statistics should be computed. The latlon, raw, and diff entries control the creation of output variables for the latitude and longitude, the raw forecast and observed fields, and the forecast minus observation difference fields. The climo, weight, and nbrhd entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
@@ -451,7 +400,9 @@ Setting the climo_cdp entry to TRUE enables the creation of an output variable f
 
 ______________________
 
-nc_pairs_var_name = "";
+.. code-block:: none
+
+  nc_pairs_var_name = "";
 
 
 The nc_pairs_var_name entry specifies a string for each verification task. This string is parsed from each obs.field dictionary entry and is used to construct variable names for the NetCDF matched pairs output file. The default value of an empty string indicates that the name and level strings of the input data should be used. If the input data level string changes for each run of Grid-Stat, using this option to define a constant string may make downstream processing more convenient.
@@ -459,7 +410,9 @@ The nc_pairs_var_name entry specifies a string for each verification task. This 
 
 _____________________
 
-nc_pairs_var_suffix = "";
+.. code-block:: none
+
+  nc_pairs_var_suffix = "";
 
 
 The nc_pairs_var_suffix entry is similar to the nc_pairs_var_name entry. It is also parsed from each obs.field dictionary entry. However, it defines a suffix to be appended to the output variable name. This enables the output variable names to be made unique. For example, when verifying height for multiple level types but all with the same level value, use this option to customize the output variable names. This option was previously named nc_pairs_var_str which is now deprecated.
