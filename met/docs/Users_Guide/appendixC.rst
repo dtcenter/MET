@@ -356,34 +356,40 @@ Called "OBAR" in CNT output :ref:`table_PS_format_info_CNT`
 
 Called "OBAR" in SL1L2 output :ref:`table_PS_format_info_SL1L2`
 
-The sample mean observation is defined as $\overline o={1\over{n}}\sum_{i=1}^no_i$.
+The sample mean observation is defined as :math:`\bar{o} = \frac{1}{n} \sum_{i=1}^{n} o_i`.
 
 Forecast standard deviation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "FSTDEV" in CNT output :ref:`table_PS_format_info_CNT`
 
-The sample variance of the forecasts is defined as $$s_f^2={1\over{T-1}}\sum_{i=1}^T(f_i-\overline f)^2.$$
+The sample variance of the forecasts is defined as 
 
-The forecast standard deviation is defined as $s_f=\sqrt{s_f^2}$.
+.. math:: s_o^2 = \frac{1}{T - 1} \sum_{i=1}^T (f_i - \bar{f})^2 .
+
+The forecast standard deviation is defined as :math:`s_f = \sqrt{s_f^2}`.
 
 Observation standard deviation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "OSTDEV" in CNT output :ref:`table_PS_format_info_CNT`
 
-The sample variance of the observations is defined as $$s_o^2={1\over{T-1}}\sum_{i=1}^T(o_i-\overline o)^2.$$
+The sample variance of the observations is defined as 
 
-The observed standard deviation is defined as $s_o=\sqrt{s_o^2}$.
+.. math:: s_o^2 = \frac{1}{T-1} \sum_{i=1}^T (o_i - \bar{o})^2 .
+
+The observed standard deviation is defined as :math:`s_o = \sqrt{s_o^2}`.
 
 Pearson Correlation Coefficient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "PR_CORR" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Pearson correlation coefficient, r, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as: $$r={{\sum_{i=1}^T(f_i-\overline f)(o_i-\overline o)}\over{\sqrt{\sum(f_i-\overline f)^2}\sqrt{\sum(o_i-\overline o)^2}}}$$ 
+The Pearson correlation coefficient, **r**, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as: 
 
-r can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
+.. math:: r = \frac{\sum_{i=1}^T (f_i - \bar{f})(o_i - \bar{o})}{\sqrt{\sum(f_i - \bar{f})^2} \sqrt{\sum(o_i - \bar{o})^2 }}
+
+**r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 ?? Please fix title below.  It needs a P lower case s in parentheses.  Other titles need attention too.
 
@@ -392,29 +398,35 @@ Spearman rank correlation coefficient (\rho_{s})
 
 Called "SP_CORR" in CNT :ref:`table_PS_format_info_CNT`
 
-The Spearman rank correlation coefficient (\rho_{s}) is a robust measure of association that is based on the ranks of the forecast and observed values rather than the actual values. That is, the forecast and observed samples are ordered from smallest to largest and rank values (from 1 to n, where n is the total number of pairs) are assigned. The pairs of forecast-observed ranks are then used to compute a correlation coefficient, analogous to the Pearson correlation coefficient, r.
+The Spearman rank correlation coefficient (:math:`\rho_{s}`) is a robust measure of association that is based on the ranks of the forecast and observed values rather than the actual values. That is, the forecast and observed samples are ordered from smallest to largest and rank values (from 1 to **n**, where **n** is the total number of pairs) are assigned. The pairs of forecast-observed ranks are then used to compute a correlation coefficient, analogous to the Pearson correlation coefficient, **r**.
 
-A simpler formulation of the Spearman-rank correlation is based on differences between the each of the pairs of ranks (denoted as d_{i}):$$\rho_s={6\over{n(n^2-1)}}\sum_{i=1}^{n}d_i^2$$
+A simpler formulation of the Spearman-rank correlation is based on differences between the each of the pairs of ranks (denoted as :math:`d_{i}`):
 
-Like r, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
+.. math:: \rho_{s} = \frac{6}{n(n^2 - 1)} \sum_{i=1}^n d_i^2
 
-Kendall's Tau statistic (\tau)
+Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
+
+Kendall's Tau statistic ( :math:`\tau`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "KT_CORR" in CNT output :ref:`table_PS_format_info_CNT`
 
-Kendall's Tau statistic (\tau) is a robust measure of the level of association between the forecast and observation pairs. It is defined as $\tau={\displaystyle{N_c-N_p}\over\displaystyle{n(n-1)/2}}$.
+Kendall's Tau statistic ( :math:`\tau`) is a robust measure of the level of association between the forecast and observation pairs. It is defined as 
 
-where NC is the number of "concordant" pairs and ND is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the (f_{i}, o_{i}) pairs according to f_{i}, in which case the o_{i} values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of oi for the current pair is exceeded (that is, pairs for which the values of f and o are both larger than the value for the current pair). Once this is done, Nc is computed by summing the counts for all pairs. The total number of possible pairs is ; thus, the number of discordant pairs is .
+.. math:: \tau = \frac{N_C - N_D}{n(n - 1) / 2}
 
-Like r and \rho_{s}, Kendall's Tau (\tau) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated. 
+where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`N_C`; thus, the number of discordant pairs is :math:`N_D`.
+
+Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated. 
 
 Mean Error (ME)
 ~~~~~~~~~~~~~~~
 
 Called "ME" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as $\hbox{ME}=\frac{1}{n}\sum_{i=1}^{n}(f_i-o_i)={\overline{f}-\overline{o}}$.
+The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as 
+
+.. math:: \text{ME} = \frac{1}{n} \sum_{i=1}^n (f_i - o_i) = \bar{f} - \bar{o} .
 
 A perfect forecast has ME = 0.
 
@@ -423,7 +435,7 @@ Mean Error Squared (ME2)
 
 Called "ME2" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Mean Error Squared, ME2, is provided to give a complete breakdown of MSE in terms of squared Bias plus estimated variance of the error, as detailed below in the section on BCMSE. It is defined as $\hbox{ME2}=\hbox{ME}^2$.
+The Mean Error Squared, ME2, is provided to give a complete breakdown of MSE in terms of squared Bias plus estimated variance of the error, as detailed below in the section on BCMSE. It is defined as :math:`\text{ME2} = \text{ME}^2`.
 
 A perfect forecast has ME2 = 0.
 
@@ -432,23 +444,24 @@ Multiplicative Bias
 
 Called "MBIAS" in CNT output :ref:`table_PS_format_info_CNT`
 
-Multiplicative bias is simply the ratio of the means of the forecasts and the observations: $\hbox{MBIAS}={\overline{f}}/{\overline{o}}$
+Multiplicative bias is simply the ratio of the means of the forecasts and the observations: :math:`\text{MBIAS} = \bar{f} / \bar{o}`
 
 Mean-squared error (MSE)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "MSE" in CNT output :ref:`table_PS_format_info_CNT`
 
-MSE measures the average squared error of the forecasts. Specifically, MSE=\frac{1}{n}\sum\left(f_{i}-o_{i}\right)^{2}.
+MSE measures the average squared error of the forecasts. Specifically, :math:`\text{MSE} = \frac{1}{n}\sum (f_{i} - o_{i})^{2}`.
 
 Root-mean-squared error (RMSE)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "RMSE" in CNT output :ref:`table_PS_format_info_CNT`
 
-RMSE is simply the square root of the MSE, RMSE=\sqrt{MSE}. 
+RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`. 
 
 Standard deviation of the error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "ESTDEV" in CNT output :ref:`table_PS_format_info_CNT`
 
@@ -459,9 +472,9 @@ Called "BCMSE" in CNT output :ref:`table_PS_format_info_CNT`
 
 MSE and RMSE are strongly impacted by large errors. They also are strongly impacted by large bias (ME) values. MSE and RMSE can range from 0 to infinity. A perfect forecast would have MSE = RMSE = 0.
 
-MSE can be re-written as $MSE=(\overline{f}-\overline{o})^{2}+s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}$, where $\overline{f}-\overline{o}=ME$ and $s^2_f+s^2_o-2s_fs_or_{fo}$ is the estimated variance of the error, $s^2_{fo}$. Thus, $MSE=ME^2+s^2_{f-o}$. To understand the behavior of MSE, it is important to examine both of the terms of MSE, rather than examining MSE alone. Moreover, MSE can be strongly influenced by ME, as shown by this decomposition.
+MSE can be re-written as :math:`\text{MSE} = (\bar{f} - \bar{o})^{2} + s_{f}^{2} + s_{o}^{2} - 2s_{f} s_{o} r_{fo}`, where :math:`\bar{f} - \bar{o} = \text{ME}` and :math:`s_f^2 + s_o^2 - 2 s_f s_o r_{fo}` is the estimated variance of the error, :math:`s_{fo}^2`. Thus, :math:`\text{MSE} = \text{ME}^2 + s_{f-o}^2`. To understand the behavior of MSE, it is important to examine both of the terms of MSE, rather than examining MSE alone. Moreover, MSE can be strongly influenced by ME, as shown by this decomposition.
 
-The standard deviation of the error, s_{f-o}, is s_{f-o}=\sqrt{s_{f-o}^{2}}=\sqrt{s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}}. 
+The standard deviation of the error, :math:`s_{f-o}`, is :math:`s_{f-o} = \sqrt{s_{f-o}^{2}} = \sqrt{s_{f}^{2} + s_{o}^{2} - 2 s_{f} s_{o} r_{fo}}`. 
 
 Note that the square of the standard deviation of the error (ESTDEV2) is sometimes called the "Bias-corrected MSE" (BCMSE) because it removes the effect of overall bias from the forecast-observation squared differences.
 
@@ -470,7 +483,7 @@ Mean Absolute Error (MAE)
 
 Called "MAE" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Mean Absolute Error (MAE) is defined as MAE=\frac{1}{n}\sum|f{}_{i}-o_{i}|.
+The Mean Absolute Error (MAE) is defined as :math:`\text{MAE} = \frac{1}{n} \sum|f_{i} - o_{i}|`.
 
 MAE is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAE = 0.
 
@@ -479,7 +492,7 @@ Inter Quartile Range of the Errors (IQR)
 
 Called "IQR" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Inter Quartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as $\hbox{IQR}=p_{75}(f_i-o_i)-p_{25}(f_i-o_i)$.
+The Inter Quartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as :math:`\text{IQR} = p_{75} (f_i - o_i) - p_{25} (f_i - o_i)`.
 
 IQR is another estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have IQR = 0.
 
@@ -488,7 +501,7 @@ Median Absolute Deviation (MAD)
 
 Called "MAD" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Median Absolute Deviation (MAD) is defined as $\hbox{MAD}=\hbox{median}|f_i-o_i|$.
+The Median Absolute Deviation (MAD) is defined as :math:`text{MAD} = \text{median}|f_i - o_i|`.
 
 MAD is an estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAD = 0.
 
@@ -499,21 +512,21 @@ Called "MSESS" in CNT output :ref:`table_PS_format_info_CNT`
 
 The Mean Squared Error Skill Score is one minus the ratio of the forecast MSE to some reference MSE, usually climatology. It is sometimes referred to as Murphy's Mean Squared Error Skill Score. 
 
-$\hbox{MSESS}=1-{{\displaystyle{\hbox{MSE}_f}}\over{\displaystyle{\hbox{MSE}_r}}}$
+.. math:: \text{MSESS} = 1 - \frac{\text{MSE}_f}{\text{MSE}_r}
 
 Root-mean-squared Forecast Anomaly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "RMSFA" in CNT output :ref:`table_PS_format_info_CNT`
 
-RMSFA is the square root of the average squared forecast anomaly. Specifically, RMSFA=\sqrt{\frac{1}{n}\sum\left(f_{i}-c_{i}\right)^{2}}.
+RMSFA is the square root of the average squared forecast anomaly. Specifically, :math:`\text{RMSFA} = \sqrt{\frac{1}{n} \sum(f_{i} - c_{i})^2}`.
 
 Root-mean-squared Observation Anomaly
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "RMSOA" in CNT output :ref:`table_PS_format_info_CNT`
 
-RMSOA is the square root of the average squared observation anomaly. Specifically, RMSOA=\sqrt{\frac{1}{n}\sum\left(o_{i}-c_{i}\right)^{2}}.
+RMSOA is the square root of the average squared observation anomaly. Specifically, :math:`\text{RMSOA} = \sqrt{\frac{1}{n} \sum(o_{i} - c_{i})^2}`.
 
 Percentiles of the errors
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -526,7 +539,9 @@ Anomaly Correlation Coefficient
 
 Called "ANOM_CORR" in CNT output :ref:`table_PS_format_info_CNT`
 
-The Anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (c) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The Anomaly correlation coefficient is defined as: $$ \hbox{Anomoly Correlation}={ 
+The Anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (**c**) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The Anomaly correlation coefficient is defined as: 
+
+.. math:: \text{Anomaly Correlation} = \frac{\sum(f_i - c)(o_i - c)}{\sqrt{\sum(f_i - c)^2} \sqrt{\sum(o_i -c)^2}} .
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated. 
 
@@ -537,7 +552,7 @@ Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 
 The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance. 
 
-The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are sufficient for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (Mood et al, 1974). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance. 
+The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (Mood et al, 1974). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance. 
 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
@@ -548,15 +563,15 @@ Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output :ref:`table
 
 These statistics are simply the 1st and 2nd moments of the forecasts, observations and errors:
 
-$\hbox{FBAR}=\hbox{Mean}(f)=\overline{f}=\frac{1}{n}\sum_{i=1}^nf_i$
+.. math:: \text{FBAR} = \text{Mean}(f) = \bar{f} = \frac{1}{n} \sum_{i=1}^n f_i
 
-$\hbox{OBAR}=\hbox{Mean}(o)=\overline{o}=\frac{1}{n}\sum_{i=1}^no_i$
+ \text{OBAR} = \text{Mean}(o) = \bar{o} = \frac{1}{n} \sum_{i=1}^n o_i
 
-$\hbox{FOBAR}=\hbox{Mean}(fo)=\overline{fo}=\frac{1}{n}\sum_{i=1}^nf_io_i$
+ \text{FOBAR} = \text{Mean}(fo) = \bar{fo} = \frac{1}{n} \sum_{i=1}^n f_i o_i
 
-$\hbox{FFBAR}=\hbox{Mean}(f^2)=\overline{f}^2=\frac{1}{n}\sum_{i=1}^nf^2_i$
+ \text{FFBAR} = \text{Mean}(f^2) = \bar{f}^2 = \frac{1}{n} \sum_{i=1}^n f_i^2
 
-$\hbox{OOBAR}=\hbox{Mean}(o^2)=\overline{o}^2=\frac{1}{n}\sum_{i=1}^no^2_i$
+ \text{OOBAR} = \text{Mean}(o^2) = \bar{o}^2 = \frac{1}{n} \sum_{i=1}^n o_i^2
 
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be derived from these moments.
 
@@ -567,84 +582,84 @@ Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output :ref:`tab
 
 Computation of these statistics requires a climatological value, c. These statistics are the 1st and 2nd moments of the scalar anomalies. The moments are defined as:
 
-$\hbox{FABAR}=\hbox{Mean}(f-c)=\overline{f-c}=\frac{1}{n}\sum_{i=1}^n(f_i-c)$
+.. math:: \text{FABAR} = \text{Mean}(f - c) = \bar{f - c} = \frac{1}{n} \sum_{i=1}^n (f_i - c)
 
-$\hbox{OABAR}=\hbox{Mean}(o-c)=\overline{o-c}=\frac{1}{n}\sum_{i=1}^n(o_i-c)$
+ \text{OABAR} = \text{Mean}(o - c) = \bar{o - c} = \frac{1}{n} \sum_{i=1}^n (o_i - c)
 
-$\hbox{FOABAR}=\hbox{Mean}[(f-c)(o-c)]=\overline{(f-c)(o-c)}=\frac{1}{n}\sum_{i=1}^n(f_i-c)(o_i-c)$
+ \text{FOABAR} = \text{Mean}[(f - c)(o - c)] = \bar{(f - c)(o - c)} = \frac{1}{n} \sum_{i=1}^n (f_i - c)(o_i - c)
 
-$\hbox{FFABAR}=\hbox{Mean}[(f-c)^2]=\overline{(f-c)}^2=\frac{1}{n}\sum_{i=1}^n(f_i-c)^2$
+ \text{FFABAR} = \text{Mean}[(f - c)^2] = \bar{(f - c)}^2 = \frac{1}{n} \sum_{i=1}^n (f_i - c)^2
 
-$\hbox{OOABAR}=\hbox{Mean}[(o-c)^2]=\overline{(o-c)}^2=\frac{1}{n}\sum_{i=1}^n(o_i-c)^2$
+ \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
 
 Vector L1 and L2 values
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR" in VL1L2 output :ref:`table_PS_format_info_VL1L2`
 
-These statistics are the moments for wind vector values, where u is the E-W wind component and v is the N-S wind component (uf is the forecast E-W wind component; uo is the observed E-W wind component; vf is the forecast N-S wind component; and vo is the observed N-S wind component). The following measures are computed:
+These statistics are the moments for wind vector values, where **u** is the E-W wind component and **v** is the N-S wind component ( :math:`u_f` is the forecast E-W wind component; :math:`u_o` is the observed E-W wind component; :math:`v_f` is the forecast N-S wind component; and :math:`v_o` is the observed N-S wind component). The following measures are computed:
 
-$\hbox{UFBAR}=\hbox{Mean}(u_f)=\overline{u}_f=\frac{1}{n}\sum_{i=1}^nu_{fi}$
+.. math:: \text{UFBAR} = \text{Mean}(u_f) = \bar{u}_f = \frac{1}{n} \sum_{i=1}^n u_{fi}
 
-$\hbox{VFBAR}=\hbox{Mean}(v_f)=\overline{v}_f=\frac{1}{n}\sum_{i=1}^nv_{fi}$
+ \text{VFBAR} = \text{Mean}(v_f) = \bar{v}_f = \frac{1}{n} \sum_{i=1}^n v_{fi}
 
-$\hbox{UOBAR}=\hbox{Mean}(u_o)=\overline{u}_o=\frac{1}{n}\sum_{i=1}^nu_{oi}$
+ \text{UOBAR} = \text{Mean}(u_o) = \bar{u}_o = \frac{1}{n} \sum_{i=1}^n u_{oi}
 
-$\hbox{VOBAR}=\hbox{Mean}(v_o)=\overline{v}_o=\frac{1}{n}\sum_{i=1}^nv_{oi}$
+ \text{VOBAR} = \text{Mean}(v_o) = \bar{v}_o = \frac{1}{n} \sum_{i=1}^n v_{oi}
 
-$\hbox{UVFOBAR}=\hbox{Mean}(u_fu_o+v_fv_o)=\frac{1}{n}\sum_{i=1}^n(u_{fi}u_{oi}+v_{fi}v_{oi})$
+ \text{UVFOBAR} = \text{Mean}(u_f u_o + v_f v_o) = \frac{1}{n} \sum_{i=1}^n (u_{fi} u_{oi} + v_{fi} v_{oi})
 
-$\hbox{UVFFBAR}=\hbox{Mean}(u_f^2+v_f^2)=\frac{1}{n}\sum_{i=1}^n(u_{fi}^2+v_{fi}^2)$
+ \text{UVFFBAR} = \text{Mean}(u_f^2 + v_f^2) = \frac{1}{n} \sum_{i=1}^n (u_{fi}^2 + v_{fi}^2)
 
-$\hbox{UVOOBAR}=\hbox{Mean}(u_o^2+v_o^2)=\frac{1}{n}\sum_{i=1}^n(u_{oi}^2+v_{oi}^2)$
+ \text{UVOOBAR} = \text{Mean}(u_o^2 + v_o^2) = \frac{1}{n} \sum_{i=1}^n (u_{oi}^2 + v_{oi}^2)
 
 Vector anomaly L1 and L2 values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR" in VAL1L2 output :ref:`table_PS_format_info_VAL1L2`
 
-These statistics require climatological values for the wind vector components, uc and vc. The measures are defined below:
+These statistics require climatological values for the wind vector components, :math:`u_c \text{and} v_c`. The measures are defined below:
 
-$\hbox{UFABAR}=\hbox{Mean}(u_f-u_c)=\frac{1}{n}\sum_{i=1}^n(u_{fi}-u_c)$
+.. math:: \text{UFABAR} = \text{Mean}(u_f - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c)
 
-$\hbox{VFBAR}=\hbox{Mean}(v_f-v_c)=\frac{1}{n}\sum_{i=1}^n(v_{fi}-v_c)$
+ \text{VFBAR} = \text{Mean}(v_f - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{fi} - v_c)
 
-$\hbox{UOABAR}=\hbox{Mean}(u_o-u_c)=\frac{1}{n}\sum_{i=1}^n(u_{oi}-u_c)$
+ \text{UOABAR} = \text{Mean}(u_o - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{oi} - u_c)
 
-$\hbox{VOABAR}=\hbox{Mean}(v_o-v_c)=\frac{1}{n}\sum_{i=1}^n(v_{oi}-v_c)$
+ \text{VOABAR} = \text{Mean}(v_o - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{oi} - v_c)
 
-$\hbox{UVFOABAR}=\hbox{Mean}[(u_f-u_c)(u_o-u_c)+(v_f-v_c)(v_o-v_c)]=\frac{1}{n}\sum_{i=1}^n(u_{fi}-u_c)+(u_{oi}-u_c)+(v_{fi}-v_c)(v_{oi}-v_c))$
+ \text{UVFOABAR} = \text{Mean}[(u_f - u_c)(u_o - u_c) + (v_f - v_c)(v_o - v_c)] = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c) + (u_{oi} - u_c) + (v_{fi} - v_c)(v_{oi} - v_c)
 
-$\hbox{UVFFABAR}=\hbox{Mean}[(u_f-u_c)^2+(v_f-v_c)^2]=\frac{1}{n}\sum_{i=1}^n((u_{fi}-u_c)^2+(v_{fi}-v_c)^2))$
+ \text{UVFFABAR} = \text{Mean}[(u_f - u_c)^2 + (v_f - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{fi} - u_c)^2 + (v_{fi} - v_c)^2)
 
-$\hbox{UVOOABAR}=\hbox{Mean}[(u_o-u_c)^2+(v_o-v_c)^2]=\frac{1}{n}\sum_{i=1}^n((u_{oi}-u_c)^2+(v_{oi}-v_c)^2))$
+ \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
 
 Gradient values
 ~~~~~~~~~~~~~~~
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :ref:`table_GS_format_info_GRAD`
 
-These statistics are only computed by the Grid_Stat tool and require vectors. Here $\nabla$ is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
+These statistics are only computed by the Grid_Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
-$\hbox{FGBAR}=\hbox{Mean}
+.. math:: \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
 
-$\hbox{OGBAR}=\hbox{Mean}
+ \text{OGBAR} = \text{Mean}|\nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla o_i|
 
-$\hbox{MGBAR}=\displaystyle{
+ \text{MGBAR} = \text{Max(FGBAR, OGBAR)}
 
-$\hbox{EGBAR}=\hbox{Mean}
+ \text{EGBAR} = \text{Mean}|\nabla f - \nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i - \nabla o_i|
 
-$\hbox{S1}=100\displaystyle{ 
+ \text{S1} = 100 \frac{\sum_{i=1}^n (w_i (e_g))}{\sum_{i=1}^n (w_i (G_L))} ,
 
-where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the $S1$ equation are as follows: 
+where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the :math:`S1` equation are as follows: 
 
-$\hspace{36 pt}
+.. math:: e_g = (| \frac{\delta}{\delta x}(f - o)| + | \frac{\delta}{\delta y}(f - o)|)
 
-$\hspace{36 pt}
+ G_L = \text{max}(| \frac{\delta f}{\delta x}|,| \frac{\delta o}{\delta x}|) + \text{max}(| \frac{\delta f}{\delta y}|,| \frac{\delta o}{\delta y}|)
 
-$\hbox{S1\_OG}={\displaystyle{
+ \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
-$\hbox{FGOG\_RATIO}={\displaystyle{
+ \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 MET verification measures for probabilistic forecasts
 _____________________________________________________
@@ -655,31 +670,38 @@ The verification statistics for probabilistic forecasts of dichotomous variables
 
 ?? Add formulas into table
 
-.. list-table::  2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The ""."" symbols in the total cells represent sums across categories.
+.. list-table::  2x2 contingency table in terms of counts. The :math:`\mathbf{n_{ij}}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. The ""."" symbols in the total cells represent sums across categories.
   :widths: auto
   :header-rows: 1
 
   * - Forecast
-    -  
     - Observation
+    -
+    - Total
   * -  
-    - o = 1 (e.g., "Yes")
-    - o = 0 (e.g., "No")
-  * - p₁ = midpoint of (0 and threshold1)
-    - n[subscript:11]
-    - n[subscript:10]
-  * - p₂ = midpoint of (threshold1 and threshold2)
-    - n[subscript:21]
-    - n[subscript:20]
+    - **o = 1** (e.g., "Yes")
+    - **o = 0** (e.g., "No")
+    -
+  * - :math:`p_1` = midpoint of (0 and threshold1)
+    - :math:`n_{11}`
+    - :math:`n_{10}`
+    - :math:`n_{1.} = n_{11} + n_{10}`
+  * - :math:`p_2` = midpoint of (threshold1 and threshold2)
+    - :math:`n_{21}`
+    - :math:`n_{20}`
+    - :math:`n_{2.} = n_{21} + n_{20}`
   * - . . .
     - . . .
     - . . .
-  * - p[subscript:j] = midpoint of (thresholdi and 1)
-    - n
-    - n[subscript:i0]
+    - . . .
+  * - :math:`p_j` = midpoint of (threshold **i** and 1)
+    - **n**
+    - :math:`n_{i0}`
+    - :math:`n_j = n_{j1} + n_{j0}`
   * - Total
-    - n_{.1}=\sum n_{i1}
-    - n_{.0}=\sum n_{i0}
+    - :math:`n_{.1} = \sum n_{i1}`
+    - :math:`n_{.0} = \sum n_{i0}`
+    - :math:`\mathbf{T} = \sum n_i`
 
 
 Reliability
@@ -689,7 +711,7 @@ Called "RELIABILITY" in PSTD output :ref:`table_PS_format_info_PSTD`
 
 A component of the Brier score. Reliability measures the average difference between forecast probability and average observed frequency. Ideally, this measure should be zero as larger numbers indicate larger differences. For example, on occasions when rain is forecast with 50% probability, it should actually rain half the time.
 
-$$\hbox{Reliability}=\frac{1}{T}\sum{n_i(p_i-\overline o_i)^2}$$
+.. math:: \text{Reliability} = \frac{1}{T} \sum n_i (p_i - \bar{o}_i)^2
 
 Resolution
 ~~~~~~~~~~
@@ -697,7 +719,7 @@ Called "RESOLUTION" in PSTD output :ref:`table_PS_format_info_PSTD`
 
 A component of the Brier score that measures how well forecasts divide events into subsets with different outcomes. Larger values of resolution are best since it is desirable for event frequencies in the subsets to be different than the overall event frequency. 
 
-$$\hbox{Resolution}=\frac{1}{T}n_{i.}(\overline o_i-\overline o)^2$$
+.. math:: \text{Resolution} = \frac{1}{T} n_{i.}(\bar{o}_i - \bar{o})^2
 
 Uncertainty
 ~~~~~~~~~~~
@@ -706,22 +728,22 @@ Called "UNCERTAINTY" in PSTD output :ref:`table_PS_format_info_PSTD`
 
 A component of the Brier score. For probabilistic forecasts, uncertainty is a function only of the frequency of the event. It does not depend on the forecasts, thus there is no ideal or better value. Note that uncertainty is equivalent to the variance of the event occurrence.
 
-$$\hbox{Uncertainty}=\frac{n_{.1}}{T}(1-\frac{n_{.1}}{T})$$
+.. math:: \text{Uncertainty} = \frac{n_{.1}}{T}(1 - \frac{n_{.1}}{T})
 
 Brier score
 ~~~~~~~~~~~
 
 Called "BRIER" in PSTD output :ref:`table_PS_format_info_PSTD`
 
-The Brier score is the mean squared probability error. In MET, the Brier Score (BS) is calculated from the nx2 contingency table via the following equation:
+The Brier score is the mean squared probability error. In MET, the Brier Score (BS) is calculated from the **nx2** contingency table via the following equation:
 
-$$BS={1 \over T}\sum_{i=1}^K \left[ n_{i1} (1 - p_i)^2 + n_{i0} \, p_i^2 \right]$$ 
+.. math:: \text{BS} = \frac{1}{T} \sum_{i=1}^K [n_{i1} (1 - p_i)^2 + n_{i0} p_i^2]
 
-The equation you will most often see in references uses the individual probability forecasts (\rho_{i}) and the corresponding observations (o_{i}), and is given as $BS=\frac{1}{T}\sum(p_i-o_i)^2$. This equation is equivalent when the midpoints of the binned probability values are used as the pi . 
+The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` . 
 
 BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (Murphy, 1973).
 
-$$BS=\frac{1}{T}\sum_i(p_i-o_i)^2=\frac{1}{T}\sum n_{i.}(p_i-\overline o_i)^2-\frac{1}{T}\sum n_{i.}(\overline o_i-\overline o)^2+\overline o(1-\overline o)$$
+.. math:: \text{BS} = \frac{1}{T} \sum_i (p_i - o_i)^2 = \frac{1}{T} \sum n_{i.} (p_i - \bar{o}_i)^2 - \frac{1}{T} \sum n_{i.} (\bar{o}_i - \bar{o})^2 + \bar{o}(1 - \bar{o})
 
 This score is sensitive to the base rate or climatological frequency of the event. Forecasts of rare events can have a good BS without having any actual skill. Since Brier score is a measure of error, smaller values are better. 
 
@@ -730,7 +752,9 @@ Brier Skill Score (BSS)
 
 Called "BSS" and "BSS_SMPL" in PSTD output :ref:`table_PS_format_info_PSTD`
 
-BSS is a skill score based on the Brier Scores of the forecast and a reference forecast, such as climatology. BSS is defined as $${\hbox{BSS}=1-\frac{\hbox{BS}_{fcst}}{\hbox{BS}_{ref}}}.$$
+BSS is a skill score based on the Brier Scores of the forecast and a reference forecast, such as climatology. BSS is defined as 
+
+.. math:: \text{BSS} = 1 - \frac{\text{BS}_{fcst}}{\text{BS}_{ref}}.
 
 BSS is computed using the climatology specified in the configuration file while BSS_SMPL is computed using the sample climatology of the current set of observations.
 
@@ -739,27 +763,27 @@ OY_TP - Observed Yes Total Proportion
 
 Called "OY_TP" in PJC output :ref:`table_PS_format_info_PJC`
 
-This is the cell probability for row i, column j=1 (observed event), a part of the joint distribution (Wilks, 2011). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values. 
+This is the cell probability for row **i**, column **j=1** (observed event), a part of the joint distribution (Wilks, 2011). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values. 
 
-$$OYTP(i)=\frac{n_{i1}}{T}=\hbox{probability}(o_{i1})$$
+.. math:: \text{OYTP}(i) = \frac{n_{i1}}{T} = \text{probability}(o_{i1})
 
 ON_TP - Observed No Total Proportion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "ON_TP" in PJC output :ref:`table_PS_format_info_PJC`
 
-This is the cell probability for row i, column j=0 (observed non-event), a part of the joint distribution (Wilks, 2011). Along with OY_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
+This is the cell probability for row **i**, column **j=0** (observed non-event), a part of the joint distribution (Wilks, 2011). Along with OY_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
 
-$$ONTP(i)=\frac{n_{i0}}{T}=\hbox{probability}(o_{i0})$$
+.. math:: \text{ONTP}(i) = \frac{n_{i0}}{T} = \text{probability}(o_{i0})
 
 Calibration
 ~~~~~~~~~~~
 
 Called "CALIBRATION" in PJC output :ref:`table_PS_format_info_PJC`
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the nx2 contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in Wilks (2011). A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa. 
+Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in Wilks (2011). A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa. 
 
-$$\hbox{Calibration}(i)=\frac{n_{i1}}{n_{1.}}=\hbox{probability}(o_1|p_i)$$
+.. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
 Refinement
 ~~~~~~~~~~
@@ -768,7 +792,7 @@ Called "REFINEMENT" in PJC output :ref:`table_PS_format_info_PJC`
 
 The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by Wilks (2011). 
 
-$$\hbox{Refinement}(i)=\frac{n_{i.}}{T}=\hbox{probability}(p_i)$$
+.. math:: \text{Refinement}(i) = \frac{n_{i.}}{T} = \text{probability}(p_i)
 
 Likelihood
 ~~~~~~~~~~
@@ -777,7 +801,7 @@ Called "LIKELIHOOD" in PJC output :ref:`table_PS_format_info_PJC`
 
 Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see Wilks (2011) for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts. 
 
-$$\hbox{Likelihood}(i)=\frac{n_{i1}}{n_{.1}}=\hbox{probability}(p_i|o_1)$$
+.. math:: \text{Likelihood}(i) = \frac{n_{i1}}{n_{.1}} = \text{probability}(p_i|o_1)
 
 Likelihood values are also used to create "discrimination" plots that compare the distribution of forecast values for events to the distribution of forecast values for non-events. These plots show how well the forecasts categorize events and non-events. The distribution of forecast values for non-events can be derived from the POFD values computed by MET for the user-specified thresholds.
 
@@ -786,9 +810,9 @@ Base Rate
 
 Called "BASER" in PJC output :ref:`table_PS_format_info_PJC`
 
-This is the probability of an event for each forecast category pi (row), i.e. the conditional base rate. This set of measures if paired with likelihood in the likelihood-base rate factorization, see Wilks (2011) for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
+This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures if paired with likelihood in the likelihood-base rate factorization, see Wilks (2011) for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
 
-$$\hbox{Base Rate}(i)=\frac{n_{i1}}{n_{i.}}=\hbox{probability}(o_{i1})$$
+.. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
 Reliability diagram
 ~~~~~~~~~~~~~~~~~~~
