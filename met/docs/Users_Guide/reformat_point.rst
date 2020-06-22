@@ -81,8 +81,8 @@ An example of the pb2nc calling sequence is shown below:
 
 .. code-block:: none
 		
-		pb2nc sample_pb.blk \\
-		sample_pb.nc \\
+		pb2nc sample_pb.blk \
+		sample_pb.nc \
 		PB2NCConfig
 
 In this example, the PB2NC tool will process the input **sample_pb.blk** file applying the configuration specified in the **PB2NCConfig** file and write the output to a file named **sample_pb.nc**.
