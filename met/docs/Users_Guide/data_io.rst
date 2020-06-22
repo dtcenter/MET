@@ -58,7 +58,6 @@ The following is a summary of the input and output formats for each of the tools
    \* **Input**: One PrepBUFR point observation file and one configuration file.
 
    \* **Output**: One NetCDF file containing the observations that have been retained.
-   
 
 2. **ASCII2NC Tool**
 
@@ -264,6 +263,11 @@ MET Configuration File Options
 
 The information listed below may also be found in the data/config/README file.
 
+??Not sure what to do about the red text, which seems to happen when there is an apostrophe in the README file...??
+
+.. highlight:: bash
+.. literalinclude:: ../../data/config/README
+
 .. _Data IO MET-TC Configuration File Options:
 
 MET-TC Configuration File Options
@@ -271,3 +275,5 @@ MET-TC Configuration File Options
 
 The information listed below may also be found in the data/config/README_TC file.
 
+.. highlight:: bash
+.. literalinclude:: ../../data/config/README_TC
