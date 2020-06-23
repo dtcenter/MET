@@ -353,7 +353,7 @@ The output generated from the TC-Stat tool contains statistics produced by the a
 
 **Job: Filter**
 
-This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the -dump_row option. The TCST output from this job follows the TCST output description in Chapters [chap:TC-Dland-tool] and [chap:TC-Pairs-tool].
+This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the -dump_row option. The TCST output from this job follows the TCST output description in Chapters :ref:`tc-dland` and :ref:`tc-pairs`.
 
 **Job: Summary**
 

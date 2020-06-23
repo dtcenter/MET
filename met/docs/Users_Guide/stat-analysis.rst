@@ -242,14 +242,14 @@ The example below uses Python embedding.
   -job aggregate_stat -line_type MPR -out_line_type CNT \
   -by FCST_VAR,FCST_LEV
 
-In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.py Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input. Please refer to Appendix [chap:App_F_Python_Embedding] for more details about Python embedding in MET.
+In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.py Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input. Please refer to :ref:`appendixF` for more details about Python embedding in MET.
 
 .. _stat_analysis-configuration-file:
 
 stat_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Stat-Analysis tool named STATAnalysisConfig_default can be found in the installed share/met/config directory. The version used for the example run in Chapter [chap:Software-Installation/Getting-St] is also available in scripts/config. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
+The default configuration file for the Stat-Analysis tool named STATAnalysisConfig_default can be found in the installed share/met/config directory. The version used for the example run in Chapter :ref:`installation` is also available in scripts/config. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
 
 The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
 
