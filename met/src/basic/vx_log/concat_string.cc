@@ -85,6 +85,7 @@ delete s;
 
 
 ConcatString::ConcatString(const ConcatString & c)
+: Precision(0)
 
 {
 
@@ -99,6 +100,7 @@ assign(c);
 
 
 ConcatString::ConcatString(const std::string & Text)
+: Precision(0)
 
 {
 
@@ -113,6 +115,7 @@ add(Text);
 
 
 ConcatString::ConcatString(const char * Text)
+: Precision(0)
 
 {
 
