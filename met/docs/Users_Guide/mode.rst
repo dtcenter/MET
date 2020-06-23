@@ -121,22 +121,14 @@ The usage statement for the MODE tool is listed below:
 .. code-block:: none
 
   Usage: mode
-
-{\hskip 0.5in}fcst_file
-
-{\hskip 0.5in}obs_file
-
-{\hskip 0.5in}config_file
-
-{\hskip 0.5in}[-config_merge merge_config_file]
-
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+         fcst_file
+         obs_file
+         config_file
+         [-config_merge merge_config_file]
+         [-outdir path]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 The MODE tool has three required arguments and can accept several optional arguments.
 
