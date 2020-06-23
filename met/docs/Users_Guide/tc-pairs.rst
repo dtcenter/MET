@@ -23,18 +23,12 @@ The usage statement for tc_pairs is shown below:
 .. code-block:: none
 
   Usage: tc_pairs
-
-{\hskip 0.5in}-adeck source and/or -edeck source
-
-{\hskip 0.5in}-bdeck source
-
-{\hskip 0.5in}-config file
-
-{\hskip 0.5in}[-out base]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+ -adeck source and/or -edeck source
+ -bdeck source
+ -config file
+ [-out base]
+ [-log file]
+ [-v level]
 
 tc_pairs has required arguments and can accept several optional arguments.
 
