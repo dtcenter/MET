@@ -112,6 +112,7 @@ class Met2dDataFile : public Met2dData {
          //
 
       void set_shift_right(int);
+      void set_grid(const Grid &);
 
          //
          //  get stuff
