@@ -407,7 +407,7 @@ A simpler formulation of the Spearman-rank correlation is based on differences b
 Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
 Kendall's Tau statistic ( :math:`\tau`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "KT_CORR" in CNT output :ref:`table_PS_format_info_CNT`
 
