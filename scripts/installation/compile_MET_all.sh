@@ -96,6 +96,10 @@ COMPILE_FREETYPE=0
 COMPILE_CAIRO=0
 COMPILE_MET=1
 
+if [ -z ${USE_MET_TAR_FILE} ]; then    
+    export USE_MET_TAR_FILE=TRUE
+fi
+
 echo
 echo "Compiling libraries into: ${LIB_DIR}"
 
@@ -627,8 +631,12 @@ if [ $COMPILE_MET -eq 1 ]; then
   echo
   echo "Compiling MET at `date`"
   cd ${MET_DIR}
-  rm -rf met*
-  tar -xzf ${MET_TARBALL}
+  # If using source from a tar file remove everything and unpack the tar file
+  # FALSE = compiling from github repo and we don't want to overwrite the files
+  if [ ${USE_MET_TAR_FILE} == "TRUE" ]; then
+    rm -rf met*
+    tar -xzf ${MET_TARBALL}
+  fi
   cd met*
 
   if [ -z ${MET_BUFRLIB} ]; then

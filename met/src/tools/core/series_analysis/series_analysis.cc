@@ -2294,6 +2294,12 @@ void set_log_file(const StringArray & a) {
 
 void set_verbosity(const StringArray & a) {
    mlog.set_verbosity_level(atoi(a[0].c_str()));
+
+   if(mlog.verbosity_level() >= 3) {
+      mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
+           << "produces excessive log output and can slow the runtime "
+           << "considerably.\n\n"; 
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
