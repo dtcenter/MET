@@ -32,13 +32,20 @@ tc_dland usage
 .. code-block:: none
 
   Usage: tc_dland
- out_file
- [-grid spec]
- [-noll]
- [-land file]
- [-log file]
- [-v level]
- [-compress level]
+
+{\hskip 0.5in}out_file
+
+{\hskip 0.5in}[-grid spec]
+
+{\hskip 0.5in}[-noll]
+
+{\hskip 0.5in}[-land file]
+
+{\hskip 0.5in}[-log file]
+
+{\hskip 0.5in}[-v level]
+
+{\hskip 0.5in}[-compress level]
 
 tc_dland has one required arguments and accepts several optional ones.
 

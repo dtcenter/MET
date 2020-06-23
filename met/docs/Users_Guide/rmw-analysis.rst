@@ -21,11 +21,16 @@ _______________________
 .. code-block:: none
 		
   Usage: rmw_analysis
- -data file_1 ... file_n | data_file_list
- -config file
- -out file
- [-log file]
- [-v level]
+
+{\hskip 0.5in}-data file_1 ... file_n | data_file_list
+
+{\hskip 0.5in}-config file
+
+{\hskip 0.5in}-out file
+
+{\hskip 0.5in}[-log file]
+
+{\hskip 0.5in}[-v level]
 
 rmw_analysis has required arguments and can accept several optional arguments.
 

@@ -30,12 +30,18 @@ The usage statement for tc_gen is shown below:
 .. code-block:: none
 
   Usage: tc_gen
- -genesis path
- -track path
- -config file
- [-out base]
- [-log file]
- [-v level]
+
+{\hskip 0.5in}-genesis path
+
+{\hskip 0.5in}-track path
+
+{\hskip 0.5in}-config file
+
+{\hskip 0.5in}[-out base]
+
+{\hskip 0.5in}[-log file]
+
+{\hskip 0.5in}[-v level]
 
 TC-Gen has three required arguments and accepts optional ones.
 

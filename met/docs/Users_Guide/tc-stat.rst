@@ -80,11 +80,16 @@ The usage statement for tc_stat is shown below:
 .. code-block:: none
 
   Usage: tc_stat
- -lookin source
- [-out file]
- [-log file]
- [-v level]
- [-config file] | [JOB COMMAND LINE]
+
+{\hskip 0.5in}-lookin source
+
+{\hskip 0.5in}[-out file]
+
+{\hskip 0.5in}[-log file]
+
+{\hskip 0.5in}[-v level]
+
+{\hskip 0.5in}[-config file] | [JOB COMMAND LINE]
 
 TC-Stat has one required argument and accepts optional ones. 
 
