@@ -1,0 +1,59 @@
+#Find the directory this script is called from
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+#Required
+#Directory that is the root of the compile
+export TEST_BASE=$DIR/../
+
+#Required
+#Compiler options = gnu, intel, ics, ips, PrgEnv-intel, or pgi
+#Compiler+version can be used for machines using modules e.g. gnu_6.3.0
+export COMPILER=gnu
+
+#Required
+#Root directory for creating/untaring met source code - usually same as TEST_BASE
+export MET_SUBDIR=${TEST_BASE}
+
+#Required
+#The name of the met tarbal usually downloaded with version from dtcenter.org and includes a version
+# example - met-9.0.1.20200423.tar.gz
+#met.tar.gz is used for compiling from cloned github repo
+export MET_TARBALL=met.tar.gz
+
+#Required
+#Specifiy if machine useds modules for loading software
+export USE_MODULES=FALSE
+
+#Root directory of your python install
+export PYTHON_LOC="$(python3-config --prefix)"
+
+#Directory of your python executable
+export MET_PYTHON=${PYTHON_LOC}/bin
+
+#Python ldflags created using python3-config
+export MET_PYTHON_LD="$(python3-config --ldflags)"
+
+#Python cflags created using python3-config
+export MET_PYTHON_CC="$(python3-config --cflags)"
+
+#64 bit machine or not
+export SET_D64BIT=FALSE
+
+#General CFLAGS
+export CFLAGS="-Wall -g"
+
+#General CXXLAGS
+export CXXFLAGS="-Wall -g"
+
+#Normally should be omitted or set to TRUE - only used if building from github repo
+export USE_MET_TAR_FILE=FALSE
+
+#If you've already compiled these and don't need to compile them again, set the following
+#export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lgrib2c
+#export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
+#export BUFRLIB_NAME=-lbufr
+#export MET_NETCDF=${EXTERNAL_LIBS}/lib
+# Also, don't forget to set the following options to zero within the compile script if you've already compiled those libraries as well: COMPILE_GSL, COMPILE_HDF, COMPILE_HDFEOS, COMPILE_CAIRO, COMPILE_FREETYPE
