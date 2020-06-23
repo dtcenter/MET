@@ -8,7 +8,7 @@ MODE Tool
 Introduction
 ____________
 
-This chapter provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in Davis {\it et al.} (2006a, b), Brown {\it et al.} (2007) and Bullock {\it et al.} (2016). 
+This chapter provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in Davis *et al.* (2006a, b), Brown *et al.* (2007) and Bullock *et al.* (2016). 
 
 MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (e.g., clouds, convection).
 
@@ -26,7 +26,7 @@ The methods used by the MODE tool to identify and match forecast and observed ob
 Resolving objects
 ~~~~~~~~~~~~~~~~~
 
-The process used for resolving objects in a raw data field is called convolution thresholding. The raw data field is first convolved with a simple filter function as follows:
+The process used for resolving objects in a raw data field is called *convolution thresholding*. The raw data field is first convolved with a simple filter function as follows:
 
 .. math:: C(x,y)=\sum_{u, v}\phi(u,v)\ f(x-u, y-v)
 
@@ -87,7 +87,7 @@ Several area measures are also used for pair attributes. **Union Area** is the t
 Fuzzy logic
 ~~~~~~~~~~~
 
-Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. Merging refers to grouping together objects in a single field, while matching refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (e.g., intersection area), low values indicate low interest, and high values indicate more interest.
+Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (e.g., intersection area), low values indicate low interest, and high values indicate more interest.
 
 The next step is to define confidence maps :math:`C_i` for each attribute. These maps (again with values ranging from zero to one) reflect how confident we are in the calculated value of an attribute. The confidence maps generally are functions of the entire attribute vector :math:`\alpha = (\alpha_1, \alpha_2, \ldots, \alpha_n)`, in contrast to the interest maps, where each :math:`I_i` is a function only of :math:`\alpha_i`. To see why this is necessary, imagine an electronic anemometer that outputs a stream of numerical values of wind speed and direction. It is typically the case for such devices that when the wind speed becomes small enough, the wind direction is poorly resolved. The wind must be at least strong enough to overcome friction and turn the anemometer. Thus, in this case, our confidence in one attribute (wind direction) is dependent on the value of another attribute (wind speed). In MODE, all of the confidence maps except the map for axis angle are set to a constant value of 1. The axis angle confidence map is a function of aspect ratio, with values near one having low confidence, and values far from one having high confidence.
 
@@ -135,24 +135,24 @@ The MODE tool has three required arguments and can accept several optional argum
 Required arguments for mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The fcst_file argument indicates the gridded file containing the model field to be verified.
+1. The **fcst_file** argument indicates the gridded file containing the model field to be verified.
 
-2. The obs_file argument indicates the gridded file containing the gridded observations to be used for the verification of the model.
+2. The **obs_file** argument indicates the gridded file containing the gridded observations to be used for the verification of the model.
 
-3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+3. The **config_file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -config_merge merge_config_file option indicates the name of a second configuration file to be used when performing fuzzy engine merging by comparing the model or observation field to itself. The MODE tool provides the capability of performing merging within a single field by comparing the field to itself. Interest values are computed for each object and all of its neighbors. If an object and its neighbor have an interest value above some threshold, they are merged. The merge_config_file controls the settings of the fuzzy engine used to perform this merging step. If a merge_config_file is not provided, the configuration specified by the config_file in the previous argument will be used.
+4. The **-config_merge merge_config_file** option indicates the name of a second configuration file to be used when performing fuzzy engine merging by comparing the model or observation field to itself. The MODE tool provides the capability of performing merging within a single field by comparing the field to itself. Interest values are computed for each object and all of its neighbors. If an object and its neighbor have an interest value above some threshold, they are merged. The **merge_config_file** controls the settings of the fuzzy engine used to perform this merging step. If a **merge_config_file** is not provided, the configuration specified by the config_file in the previous argument will be used.
 
-5. The -outdir path option indicates the directory where output files should be written.
+5. The **-outdir path** option indicates the directory where output files should be written.
 
-6. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-7. The -v level option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-8. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the MODE calling sequence is listed below:
 
@@ -208,7 +208,7 @@ _____________________
 
   grid_res = 4;
 
-The grid_res entry is the nominal spacing for each grid square in kilometers. This entry is not used directly in the code, but subsequent entries in the configuration file are defined in terms of it. Therefore, setting this appropriately will help ensure that appropriate default values are used for these entries.
+The **grid_res** entry is the nominal spacing for each grid square in kilometers. This entry is not used directly in the code, but subsequent entries in the configuration file are defined in terms of it. Therefore, setting this appropriately will help ensure that appropriate default values are used for these entries.
 
 _____________________
 
@@ -216,11 +216,11 @@ _____________________
 
   quilt = FALSE;
 
-The quilt entry indicates whether all permutations of convolution radii and thresholds should be run.
+The **quilt** entry indicates whether all permutations of convolution radii and thresholds should be run.
 
-• If FALSE, the number of forecast and observation convolution radii and thresholds must all match. One configuration of MODE will be run for each group of settings in those lists.
+• If **FALSE**, the number of forecast and observation convolution radii and thresholds must all match. One configuration of MODE will be run for each group of settings in those lists.
 
-• If TRUE, the number of forecast and observation convolution radii must match and the number of forecast and observation convolution thresholds must match. For N radii and M thresholds, NxM configurations of MODE will be run.
+• If **TRUE**, the number of forecast and observation convolution radii must match and the number of forecast and observation convolution thresholds must match. For N radii and M thresholds, NxM configurations of MODE will be run.
 
 _____________________
 
@@ -243,37 +243,37 @@ _____________________
   }
   obs = fcst; 
 
-The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. In the above example, the forecast settings are copied into the observation dictionary using **obs** = **fcst;.**
+The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
 
 The **censor_thresh** and **censor_val** entries are used to censor the raw data as described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Their functionality replaces the **raw_thresh** entry, which is deprecated in met-6.1. Prior to defining objects, it is recommended that the raw fields should be made to look similar to each other. For example, if the model only predicts values for a variable above some threshold, the observations should be thresholded at that same level. The censor thresholds can be specified using symbols. By default, no censor thresholding is applied.
 
-The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined grid_res entry. Multiple convolution radii may be specified as an array (e.g. conv_radius = [ 5, 10, 15 ];).
+The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
 
 The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh** = [ >=5.0, >=10.0, >=15.0 ];).
 
 Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.
 
-The **vld_thresh** entry must be set between 0 and 1. When performing the circular convolution step if the proportion of bad data values in the convolution area is greater than or equal to this threshold, the resulting convolved value will be bad data. If the proportion is less than this threshold, the convolution will be performed on only the valid data. By default, the vld_thresh is set to 0.5.
+The **vld_thresh** entry must be set between 0 and 1. When performing the circular convolution step if the proportion of bad data values in the convolution area is greater than or equal to this threshold, the resulting convolved value will be bad data. If the proportion is less than this threshold, the convolution will be performed on only the valid data. By default, the **vld_thresh** is set to 0.5.
 
 The **filter_attr_name** and **filter_attr_thresh** entries are arrays of the same length which specify object filtering criteria. By default, no object filtering criteria is defined.
 
-The **filter_attr_name** entry is an array of strings specifying the MODE output header column names for the object attributes of interest, such as AREA, LENGTH, WIDTH, and INTENSITY_50. In addition, ASPECT_RATIO specifies the aspect ratio (width/length), INTENSITY_101 specifies the mean intensity value, and INTENSITY_102 specifies the sum of the intensity values.
+The **filter_attr_name** entry is an array of strings specifying the MODE output header column names for the object attributes of interest, such as **AREA, LENGTH, WIDTH**, and **INTENSITY_50**. In addition, **ASPECT_RATIO** specifies the aspect ratio (width/length), **INTENSITY_101** specifies the mean intensity value, and INTENSITY_102 specifies the sum of the intensity values.
 
-The filter_attr_thresh entry is an array of thresholds for these object attributes. Any simple objects not meeting all of the filtering criteria are discarded.
+The **filter_attr_thresh** entry is an array of thresholds for these object attributes. Any simple objects not meeting all of the filtering criteria are discarded.
 
-Note that the area_thresh and inten_perc_thresh entries from earlier versions of MODE are replaced by these options and are now deprecated. 
+Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated. 
 
-The merge_thresh entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. merge_thresh = [ >=1.0, >=2.0, >=3.0 ];). The number of merge_thresh entries must match the number of conv_thresh entries.
+The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of merge_thresh entries must match the number of conv_thresh entries.
 
-The merge_flag entry controls what type of merging techniques will be applied to the objects defined in each field. 
+The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field. 
 
-• NONE indicates that no merging should be applied. 
+• **NONE** indicates that no merging should be applied. 
 
-• THRESH indicates that the double thresholding merging technique should be applied. 
+• **THRESH** indicates that the double thresholding merging technique should be applied. 
 
-• ENGINE indicates that objects in each field should be merged by comparing the objects to themselves using a fuzzy engine approach. 
+• **ENGINE** indicates that objects in each field should be merged by comparing the objects to themselves using a fuzzy engine approach. 
 
-• BOTH indicates that both techniques should be used. 
+• **BOTH** indicates that both techniques should be used. 
 
 By default, the double thresholding merging technique is applied.
 
@@ -283,15 +283,15 @@ _____________________
 
   mask_missing_flag = NONE;
 
-The mask_missing_flag entry specifies how missing data in the raw model and observation fields will be treated. 
+The **mask_missing_flag** entry specifies how missing data in the raw model and observation fields will be treated. 
 
-• NONE indicates no additional processing is to be done. 
+• **NONE** indicates no additional processing is to be done. 
 
-• FCST indicates missing data in the observation field should be used to mask the forecast field. 
+• **FCST** indicates missing data in the observation field should be used to mask the forecast field. 
 
-• OBS indicates missing data in the forecast field should be used to mask the observation field. 
+• **OBS** indicates missing data in the forecast field should be used to mask the observation field. 
 
-• BOTH indicates masking should be performed in both directions (i.e., mask the forecast field with the observation field and vice-versa).
+• **BOTH** indicates masking should be performed in both directions (i.e., mask the forecast field with the observation field and vice-versa).
 
 Prior to defining objects, it is recommended that the raw fields be made to look similar to each other by assigning a value of BOTH to this parameter. However, by default no masking is performed.
 
@@ -302,15 +302,15 @@ _____________________
 
   match_flag = MERGE_BOTH;
 
-The match_flag entry controls how matching will be performed when comparing objects from the forecast field to objects from the observation field. An interest value is computed for each possible pair of forecast/observation objects. The interest values are then thresholded to define which objects match. If two objects in one field happen to match the same object in the other field, then those two objects could be merged. The match_flag entry controls what type of merging is allowed in this context. 
+The **match_flag** entry controls how matching will be performed when comparing objects from the forecast field to objects from the observation field. An interest value is computed for each possible pair of forecast/observation objects. The interest values are then thresholded to define which objects match. If two objects in one field happen to match the same object in the other field, then those two objects could be merged. The **match_flag** entry controls what type of merging is allowed in this context. 
 
-• NONE indicates that no matching should be performed between the fields at all. 
+• **NONE** indicates that no matching should be performed between the fields at all. 
 
-• MERGE_BOTH indicates that additional merging is allowed in both fields. 
+• **MERGE_BOTH** indicates that additional merging is allowed in both fields. 
 
-• MERGE_FCST indicates that additional merging is allowed only in the forecast field. 
+• **MERGE_FCST** indicates that additional merging is allowed only in the forecast field. 
 
-• NO_MERGE indicates that no additional merging is allowed in either field, meaning that each object will match at most one object in the other field. 
+• **NO_MERGE** indicates that no additional merging is allowed in either field, meaning that each object will match at most one object in the other field. 
 
 By default, additional merging is allowed in both fields.
 
@@ -320,7 +320,7 @@ _____________________
 
   max_centroid_dist = 800/grid_res;
 
-Computing the attributes for all possible pairs of objects can take some time depending on the numbers of objects. The max_centroid_dist entry is used to specify how far apart objects should be in order to conclude that they have no chance of matching. No pairwise attributes are computed for pairs of objects whose centroids are farther away than this distance, defined in terms of grid units. Setting this entry to a reasonable value will improve the execution time of the MODE tool. By default, the maximum centroid distance is defined in terms of the previously defined grid_res entry.
+Computing the attributes for all possible pairs of objects can take some time depending on the numbers of objects. The **max_centroid_dist** entry is used to specify how far apart objects should be in order to conclude that they have no chance of matching. No pairwise attributes are computed for pairs of objects whose centroids are farther away than this distance, defined in terms of grid units. Setting this entry to a reasonable value will improve the execution time of the MODE tool. By default, the maximum centroid distance is defined in terms of the previously defined **grid_res** entry.
 
 _____________________
 
@@ -333,17 +333,17 @@ _____________________
      poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
   }
 
-Defining a grid and poly masking region is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
+Defining a **grid** and **poly** masking region is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Applying a masking region when running MODE sets all grid points falling outside of that region to missing data, effectively limiting the area of which objects should be defined.
 
-The grid_flag and poly_flag entries specify how the grid and polyline masking should be applied:
+The **grid_flag** and **poly_flag** entries specify how the grid and polyline masking should be applied:
 
-• NONE indicates that the masking grid should not be applied. 
+• **NONE** indicates that the masking grid should not be applied. 
 
-• FCST indicates that the masking grid should be applied to the forecast field. 
+• **FCST** indicates that the masking grid should be applied to the forecast field. 
 
-• OBS indicates that the masking grid should be applied to the observation field. 
+• **OBS** indicates that the masking grid should be applied to the observation field. 
 
-• BOTH indicates that the masking grid should be applied to both fields. 
+• **BOTH** indicates that the masking grid should be applied to both fields. 
 
 By default, no masking grid or polyline is applied.
 
@@ -366,9 +366,9 @@ _____________________
      inten_perc_value = 50;
   } 
 
-The weight entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. The weights listed above correspond to the centroid distance between the objects, the boundary distance (or minimum distance), the convex hull distance (or minimum distance between the convex hulls of the objects), the orientation angle difference, the aspect ratio difference, the object area ratio (minimum area divided by maximum area), the intersection divided by the minimum object area ratio, the curvature ratio, the complexity ratio, and the intensity ratio. The weights need not sum to any particular value. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
+The **weight** entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. The weights listed above correspond to the **centroid distance** between the objects, the **boundary distance** (or minimum distance), the **convex hull distance** (or minimum distance between the convex hulls of the objects), the **orientation angle** difference, the **aspect ratio** difference, the **object area ratio** (minimum area divided by maximum area), the **intersection divided by the minimum object area ratio**, the **curvature ratio**, the **complexity ratio**, and the **intensity ratio**. The weights need not sum to any particular value. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
 
-The inten_perc_value entry corresponds to the inten_perc_ratio. The inten_perc_value should be set between 0 and 102 to define which percentile of intensity should be compared for pairs of objects. 101 and 102 specify the intensity mean and sum, respectively. By default, the 50th percentile, or median value, is chosen.
+The **inten_perc_value** entry corresponds to the **inten_perc_ratio**. The **inten_perc_value** should be set between 0 and 102 to define which percentile of intensity should be compared for pairs of objects. 101 and 102 specify the intensity mean and sum, respectively. By default, the 50th percentile, or median value, is chosen.
 
 _____________________
 
@@ -389,7 +389,7 @@ _____________________
      inten_perc_ratio   = ratio_if;
   }
 
-The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
+The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
 
 
 _____________________
@@ -398,7 +398,7 @@ _____________________
 
   total_interest_thresh = 0.7;
 
-The total_interest_thresh entry should be set between 0 and 1. This threshold is applied to the total interest values computed for each pair of objects. Object pairs that have an interest value that is above this threshold will be matched, while those with an interest value that is below this threshold will remain unmatched. Increasing the threshold will decrease the number of matches while decreasing the threshold will increase the number of matches. By default, the total interest threshold is set to 0.7.
+The **total_interest_thresh** entry should be set between **0** and **1**. This threshold is applied to the total interest values computed for each pair of objects. Object pairs that have an interest value that is above this threshold will be matched, while those with an interest value that is below this threshold will remain unmatched. Increasing the threshold will decrease the number of matches while decreasing the threshold will increase the number of matches. By default, the total interest threshold is set to 0.7.
 
 
 _____________________
@@ -407,7 +407,7 @@ _____________________
 
   print_interest_thresh = 0.0;
 
-The print_interest_thresh entry determines which pairs of object attributes will be written to the output object attribute ASCII file. The user may choose to set the print_interest_thresh to the same value as the total_interest_thresh, meaning that only object pairs that actually match are written to the output file. By default, the print interest threshold is set to zero, meaning that all object pair attributes will be written as long as the distance between the object centroids is less than the max_centroid_dist entry.
+The **print_interest_thres**h entry determines which pairs of object attributes will be written to the output object attribute ASCII file. The user may choose to set the **print_interest_thresh** to the same value as the **total_interest_thresh**, meaning that only object pairs that actually match are written to the output file. By default, the print interest threshold is set to zero, meaning that all object pair attributes will be written as long as the distance between the object centroids is less than the **max_centroid_dist** entry.
 
 _____________________
 
@@ -429,9 +429,9 @@ _____________________
      color_table = "MET_BASE/colortables/mode_obj.ctable";
   }
 
-Specifying dictionaries to define the color_table, plot_min, and plot_max entries are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+Specifying dictionaries to define the **color_table, plot_min**, and **plot_max** entries are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
-The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The colorbar_spacing entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
+The MODE tool generates a color bar to represent the contents of the colortable that was used to plot a field of data. The number of entries in the color bar matches the number of entries in the color table. The values defined for each color in the color table are also plotted next to the color bar. The **colorbar_spacing** entry is used to define the frequency with which the color table values should be plotted. Setting this entry to 1, as shown above, indicates that every color table value should be plotted. Setting it to an integer, n > 1, indicates that only every n-th color table value should be plotted.
 
 
 _____________________
@@ -440,11 +440,11 @@ _____________________
 
   plot_valid_flag = FALSE;
 
-When applied, the plot_valid_flag entry indicates that only the region containing valid data after masking is applied should be plotted. 
+When applied, the **plot_valid_flag entry** indicates that only the region containing valid data after masking is applied should be plotted. 
 
-• FALSE indicates the entire domain should be plotted.
+• **FALSE** indicates the entire domain should be plotted.
 
-• TRUE indicates only the region containing valid data after masking should be plotted.
+• **TRUE** indicates only the region containing valid data after masking should be plotted.
 
 The default value of this flag is FALSE.
 
@@ -455,7 +455,7 @@ _____________________
 
   plot_gcarc_flag = FALSE;
 
-When applied, the plot_gcarc_flag entry indicates that the edges of polylines should be plotted using great circle arcs as opposed to straight lines in the grid. The default value of this flag is FALSE.
+When applied, the **plot_gcarc_flag** entry indicates that the edges of polylines should be plotted using great circle arcs as opposed to straight lines in the grid. The default value of this flag is FALSE.
 
 
 _____________________
@@ -481,7 +481,7 @@ _____________________
      polylines  = TRUE;
   }
 
-Each component of the pairs information in the NetCDF file can be turned on or off. The old syntax is still supported: TRUE means accept the defaults, FALSE means no NetCDF output is generated. NetCDF output can also be turned off by setting all the individual dictionary flags to false.
+Each component of the pairs information in the NetCDF file can be turned on or off. The old syntax is still supported: **TRUE** means accept the defaults, **FALSE** means no NetCDF output is generated. NetCDF output can also be turned off by setting all the individual dictionary flags to false.
 
 
 _____________________
@@ -643,7 +643,7 @@ This first file uses the following naming convention:  ?? missing code
 
 $$where {\tt PREFIX} indicates the user-defined output prefix, {\tt FCST\_VAR\_LVL} is the forecast variable and vertical level being used, {\tt OBS\_VAR\_LVL} is the observation variable and vertical level being used, {\tt HHMMSSL} indicates the forecast lead time, {\tt YYYYMMDD\_HHMMSSV} indicates the forecast valid time, and {\tt HHMMSSA} indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the {\tt ct\_stats\_flag} option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :ref:`CTS_output`.
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the OBJECT_ID column. The OBJECT_ID can take the following 6 forms: FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN. In each case, NNN is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for OBJECT_ID can be divided into two types - one for single objects and one for pairs of objects. The single object lines (FNN, ONN, CFNNN, and CONNN) contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in :ref:`MODE_object_attribute`. 
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The OBJECT_ID can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NN**N is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN, and CONNN**) contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in :ref:`MODE_object_attribute`. 
 
 
 .. role:: raw-html(raw)
@@ -863,7 +863,7 @@ The contents of the columns in this ASCII file are summarized in :ref:`MODE_obje
 
 NetCDF Output
 
-The MODE tool creates a NetCDF output file containing the object fields that are defined. The NetCDF file contains gridded fields including indices for the simple forecast objects, indices for the simple observation objects, indices for the matched cluster forecast objects, and indices for the matched cluster observation objects. The NetCDF file also contains lat/lon and x/y data for the vertices of the polygons for the boundaries of the simple forecast and observation objects. The generation of this file can be disabled using the nc_pairs_flag configuration file option.
+The MODE tool creates a NetCDF output file containing the object fields that are defined. The NetCDF file contains gridded fields including indices for the simple forecast objects, indices for the simple observation objects, indices for the matched cluster forecast objects, and indices for the matched cluster observation objects. The NetCDF file also contains lat/lon and x/y data for the vertices of the polygons for the boundaries of the simple forecast and observation objects. The generation of this file can be disabled using the **nc_pairs_flag** configuration file option.
 
 The dimensions and variables included in the mode NetCDF files are described in :ref:`NetCDF_dimensions_for_MODE_output`, :ref:`Variables_contained_in_MODE_NetCDF_output` and :ref:`Variables_contained_in_MODE_NetCDF_output_part_2`.  ?? should Variables_contained_in_MODE_NetCDF_output_part_3 be referenced too?
 
@@ -1117,7 +1117,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
       
 **Postscript File**
 
-Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the ps_plot_flag configuration file option.
+Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 
 The PostScript plot will contain 5 summary pages at a minimum, but the number of pages will depend on the merging options chosen. Additional pages will be created if merging is performed using the double thresholding or fuzzy engine merging techniques for the forecast and/or observation fields. Examples of the PostScript plots can be obtained by running the example cases provided with the MET tarball.
 
