@@ -16,22 +16,14 @@ The usage statement for the plot_point_obs utility is shown below:
 .. code-block:: none
 		
   Usage: plot_point_obs
-
-{\hskip 0.5in}nc_file
-
-{\hskip 0.5in}ps_file
-
-{\hskip 0.5in}[-gc code]
-
-{\hskip 0.5in}[-msg_typ name]
-
-{\hskip 0.5in}[-data_file name]
-
-{\hskip 0.5in}[-dotsize val]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+ nc_file
+ ps_file
+ [-gc code]
+ [-msg_typ name]
+ [-data_file name]
+ [-dotsize val]
+ [-log file]
+ [-v level]
 
 plot_point_obs has two required arguments and can take optional ones. 
 
@@ -75,22 +67,14 @@ The usage statement for the plot_data_plane utility is shown below:
 .. code-block:: none
 		
   Usage: plot_data_plane
-
-{\hskip 0.5in}input_filename
-
-{\hskip 0.5in}output_filename
-
-{\hskip 0.5in}field_string
-
-{\hskip 0.5in}[-color_table color_table_name]
-
-{\hskip 0.5in}[-plot_range min max]
-
-{\hskip 0.5in}[-title title_string]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+ input_filename
+ output_filename
+ field_string
+ [-color_table color_table_name]
+ [-plot_range min max]
+ [-title title_string]
+ [-log file]
+ [-v level]
 
 plot_data_plane has two required arguments and can take optional ones. 
 
@@ -138,18 +122,12 @@ The usage statement for the plot_mode_field utility is shown below:
 .. code-block:: none
 		
   Usage: plot_mode_field
-
-{\hskip 0.5in}mode_nc_file_list
-
-{\hskip 0.5in}-raw | -simple | -cluster
-
-{\hskip 0.5in}-obs | -fcst
-
-{\hskip 0.5in}-config file
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+ mode_nc_file_list
+ -raw | -simple | -cluster
+ -obs | -fcst
+ -config file
+ [-log file]
+ [-v level]
 
 plot_mode_field has four required arguments and can take optional ones. 
 
