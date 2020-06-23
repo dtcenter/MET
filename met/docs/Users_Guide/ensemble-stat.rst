@@ -55,28 +55,17 @@ The usage statement for the Ensemble Stat tool is shown below:
 .. code-block:: none
 
   Usage: ensemble_stat
-
-{\hskip 0.5in}n_ens ens_file_1 ... ens_file_n | ens_file_list
-
-{\hskip 0.5in}config_file
-
-{\hskip 0.5in}[-grid_obs file]
-
-{\hskip 0.5in}[-point_obs file]
-
-{\hskip 0.5in}[-ens_mean file]
-
-{\hskip 0.5in}[-obs_valid_beg time]
-
-{\hskip 0.5in}[-obs_valid_end time]
-
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+         n_ens ens_file_1 ... ens_file_n | ens_file_list
+         config_file
+         [-grid_obs file]
+         [-point_obs file]
+         [-ens_mean file]
+         [-obs_valid_beg time]
+         [-obs_valid_end time]
+         [-outdir path]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 ensemble_stat has three required arguments and accepts several optional ones.
 
