@@ -121,6 +121,7 @@ void VarInfo::assign(const VarInfo &v) {
    SetAttrsLevel = v.SetAttrsLevel;
    SetAttrsLongName = v.SetAttrsLongName;
    SetAttrsEnsemble = v.SetAttrsEnsemble;
+
    SetAttrsGrid = v.SetAttrsGrid;
 
    SetAttrsInit = v.SetAttrsInit;
@@ -181,6 +182,7 @@ void VarInfo::clear() {
    SetAttrsLevel.clear();
    SetAttrsLongName.clear();
    SetAttrsEnsemble.clear();
+
    SetAttrsGrid.clear();
 
    SetAttrsInit = (unixtime) 0;
@@ -503,8 +505,33 @@ void VarInfo::set_dict(Dictionary &dict) {
          attrs_dict->lookup_string(conf_key_set_long_name, false);
       SetAttrsEnsemble =
          attrs_dict->lookup_string(conf_key_set_ensemble, false);
-      SetAttrsGrid =
-         attrs_dict->lookup_string(conf_key_set_grid, false);
+
+      // Parse grid
+      s = attrs_dict->lookup_string(conf_key_set_grid, false);
+      if(s.nonempty()) {
+
+         // Parse as a white-space separated string
+         StringArray sa;
+         sa.parse_wsss(s);
+
+         // Search for a named grid
+         if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrsGrid)) {
+            mlog << Debug(3)
+                 << "Use the grid named \"" << sa[0] << "\".\n";
+         }
+         // Parse grid definition
+         else if(sa.n() > 1 && parse_grid_def(sa, SetAttrsGrid)) {
+            mlog << Debug(3)
+                 << "Use the grid defined by string \"" << s << "\".\n";
+         }
+         else {
+            mlog << Warning << "\nVarInfo::set_dict() -> "
+                 << "unsupported " << conf_key_set_grid
+                 << " definition string (" << s
+                 << ") in the " << conf_key_set_attrs
+                 << "dictionary!\n\n";
+         }
+      }
 
       // Parse times
       s = attrs_dict->lookup_string(conf_key_set_init, false);

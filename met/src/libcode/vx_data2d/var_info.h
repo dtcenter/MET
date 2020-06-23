@@ -18,6 +18,7 @@
 #include "threshold.h"
 #include "vx_cal.h"
 #include "vx_config.h"
+#include "vx_grid.h"
 
 #include "data_file_type.h"
 
@@ -65,7 +66,7 @@ class VarInfo
       ConcatString  SetAttrsLongName;
       ConcatString  SetAttrsEnsemble;
 
-      ConcatString  SetAttrsGrid;
+      Grid          SetAttrsGrid;
 
       unixtime      SetAttrsInit;
       unixtime      SetAttrsValid;
@@ -141,7 +142,7 @@ class VarInfo
       ConcatString long_name_attr() const;
       ConcatString ensemble_attr()  const;
 
-      ConcatString grid_attr()      const;
+      Grid         grid_attr()      const;
       unixtime     init_attr()      const;
       unixtime     valid_attr()     const;
       int          lead_attr()      const;
@@ -244,7 +245,8 @@ inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty
 inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty()  ? long_name()  : SetAttrsLongName); }
 inline ConcatString VarInfo::ensemble_attr()  const { return(SetAttrsEnsemble.empty()  ? ens()        : SetAttrsEnsemble); }
 
-inline ConcatString VarInfo::grid_attr()      const { return(SetAttrsGrid);     }
+inline Grid         VarInfo::grid_attr()      const { return(SetAttrsGrid);     }
+
 inline unixtime     VarInfo::init_attr()      const { return(SetAttrsInit);     }
 inline unixtime     VarInfo::valid_attr()     const { return(SetAttrsValid);    }
 inline int          VarInfo::lead_attr()      const { return(SetAttrsLead);     }
