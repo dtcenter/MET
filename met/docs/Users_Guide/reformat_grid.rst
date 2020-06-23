@@ -27,57 +27,42 @@ pcp_combine usage
 
 The usage statement for the Pcp-Combine tool is shown below:
 
-Usage: pcp_combine
+.. code-block:: none
 
-{\hskip 0.5in}[-sum] sum_args |
-
-{\hskip 0.5in}-add input_files |
-
-{\hskip 0.5in}-subtract input_files |
-
-{\hskip 0.5in}-derive stat_list input_files
-
-{\hskip 0.5in}out_file
-
-{\hskip 0.5in}[-field string]
-
-{\hskip 0.5in}[-name list]
-
-{\hskip 0.5in}[-vld_thresh n]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+  Usage: pcp_combine
+         [-sum] sum_args |
+         -add input_files |
+         -subtract input_files |
+         -derive stat_list input_files
+         out_file
+         [-field string]
+         [-name list]
+         [-vld_thresh n]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 The arguments to pcp_combine vary depending on the run command. Listed below are the arguments for the sum command:
 
-SUM_ARGS:
+.. code-block:: none
 
-{\hskip 0.5in}init_time
-
-{\hskip 0.5in}in_accum
-
-{\hskip 0.5in}valid_time
-
-{\hskip 0.5in}out_accum
-
-{\hskip 0.5in}out_file
-
-{\hskip 0.5in}[-pcpdir path]
-
-{\hskip 0.5in}[-pcprx reg_exp]
+  SUM_ARGS:
+        init_time
+        in_accum
+        valid_time
+        out_accum
+        out_file
+        [-pcpdir path]
+        [-pcprx reg_exp]
 
 The add, subtract, and derive commands all require that the input files be explicitly listed:
 
-INPUT_FILES:
+.. code-block:: none
 
-{\hskip 0.5in}file_1 config_str_1 ... file_n config_str_n |
-
-{\hskip 0.5in}file_1 ... file_n |
-
-{\hskip 0.5in}input_file_list
+  INPUT_FILES:
+         file_1 config_str_1 ... file_n config_str_n |
+         file_1 ... file_n |
+         input_file_list
 
 Required arguments for the pcp_combine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -136,17 +121,15 @@ The input files for the add, subtract, and derive command can be specified in on
 
 An example of the pcp_combine calling sequence is presented below:
 
-Example 1:
+**Example 1:**
 
-pcp_combine -sum \
+.. code-block:: none
 
-20050807_000000 3 \
-
-20050808_000000 24 \
-
-sample_fcst.nc \
-
--pcpdir ../data/sample_fcst/2005080700
+  pcp_combine -sum \
+  20050807_000000 3 \
+  20050808_000000 24 \
+  sample_fcst.nc \
+  -pcpdir ../data/sample_fcst/2005080700
 
 In Example 1, the Pcp-Combine tool will sum the values in model files initialized at 2005/08/07 00Z and containing 3-hourly accumulation intervals of precipitation. The requested valid time is 2005/08/08 00Z with a requested total accumulation interval of 24 hours. The output file is to be named sample_fcst.nc, and the Pcp-Combine tool is to search the directory indicated for the input files.
 
@@ -154,25 +137,25 @@ The Pcp-Combine tool will search for 8 files containing 3-hourly accumulation in
 
 A second example of the pcp_combine calling sequence is presented below:
 
-Example 2:
+**Example 2:**
 
-pcp_combine -sum \
+.. code-block:: none
 
-00000000_000000 1 \
-
-20050808_000000 24 \
-
-sample_obs.nc \
-
--pcpdir ../data/sample_obs/ST2ml
+  pcp_combine -sum \
+  00000000_000000 1 \
+  20050808_000000 24 \
+  sample_obs.nc \
+  -pcpdir ../data/sample_obs/ST2ml
 
 Example 2 shows an example of using the Pcp-Combine tool to sum observation data. The “init_time” has been set to all zeros to indicate that when searching through the files in precipitation directory, the initialization time should be ignored. The “in_accum” has been changed from 3 to 1 to indicate that the input observation files contain 1-hourly accumulations of precipitation. Lastly, -pcpdir provides a different directory to be searched for the input files.
 
 The Pcp-Combine tool will search for 24 files containing 1-hourly accumulation intervals which meet the criteria specified. It will write out a single NetCDF file containing that 24 hours of accumulation.
 
-Example 3:
+**Example 3:**
 
-pcp_combine -add input_pinterp.nc 'name="TT"; level="(0,*,*)";' tt_10.nc 
+.. code-block:: none
+
+  pcp_combine -add input_pinterp.nc 'name="TT"; level="(0,*,*)";' tt_10.nc 
 
 This command would grab the first level of the TT variable from a pinterp NetCDF file and write it to the output tt_10.nc file.
 
@@ -228,35 +211,23 @@ regrid_data_plane usage
 
 The usage statement for the regrid_data_plane utility is shown below:
 
-Usage: regrid_data_plane 
+.. code-block:: none
 
-{\hskip 0.5in}input_filename 
-
-{\hskip 0.5in}to_grid 
-
-{\hskip 0.5in}output_filename 
-
-{\hskip 0.5in}-field string
-
-{\hskip 0.5in}[-method type] 
-
-{\hskip 0.5in}[-width n]
-
-{\hskip 0.5in}[-gaussian_dx n] 
-
-{\hskip 0.5in}[-gaussian_radius n]
-
-{\hskip 0.5in}[-shape type] 
-
-{\hskip 0.5in}[-vld_thresh n] 
-
-{\hskip 0.5in}[-name list]
-
-{\hskip 0.5in}[-log file] 
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+  Usage: regrid_data_plane 
+         input_filename 
+         to_grid 
+         output_filename 
+         -field string
+         [-method type] 
+         [-width n]
+         [-gaussian_dx n] 
+         [-gaussian_radius n]
+         [-shape type] 
+         [-vld_thresh n] 
+         [-name list]
+         [-log file] 
+         [-v level]
+         [-compress level]
 
 Required arguments for regrid_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -294,25 +265,18 @@ Optional arguments for regrid_data_plane
 
 For more details on setting the to_grid, -method, -width, and -vld_thresh options, see the regrid entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the regrid_data_plane calling sequence is shown below:
 
-regrid_data_plane \
+.. code-block:: none
 
-input.grb \
-
-togrid.grb \
-
-regridded.nc \
-
--field 'name="APCP"; level="A6";'
-
--field 'name="TMP";  level="Z2";' \
-
--field 'name="UGRD"; level="Z10";' \
-
--field 'name="VGRD"; level="Z10";' \
-
--field 'name="HGT";  level="P500";' \
-
--method BILIN -width 2 -v 1
+  regrid_data_plane \
+  input.grb \
+  togrid.grb \
+  regridded.nc \
+  -field 'name="APCP"; level="A6";'
+  -field 'name="TMP";  level="Z2";' \
+  -field 'name="UGRD"; level="Z10";' \
+  -field 'name="VGRD"; level="Z10";' \
+  -field 'name="HGT";  level="P500";' \
+  -method BILIN -width 2 -v 1
 
 In this example, the regrid_data_plane tool will regrid data from the input.grb file to the grid on which the first record of the togrid.grb file resides using Bilinear Interpolation with a width of 2 and write the output in NetCDF format to a file named regridded.nc. The variables in regridded.nc will include 6-hour accumulated precipitation, 2m temperature, 10m U and V components of the wind, and the 500mb geopotential height.
 
@@ -331,27 +295,19 @@ shift_data_plane usage
 
 The usage statement for the shift_data_plane utility is shown below:
 
-Usage: shift_data_plane
+.. code-block:: none
 
-{\hskip 0.5in}input_filename
-
-{\hskip 0.5in}output_filename
-
-{\hskip 0.5in}field_string
-
-{\hskip 0.5in}-from lat lon
-
-{\hskip 0.5in}-to lat lon
-
-{\hskip 0.5in}[-method type]
-
-{\hskip 0.5in}[-width n]
-
-{\hskip 0.5in}[-log file] 
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+  Usage: shift_data_plane
+         input_filename
+         output_filename
+         field_string
+         -from lat lon
+         -to lat lon
+         [-method type]
+         [-width n]
+         [-log file] 
+         [-v level]
+         [-compress level]
 
 shift_data_plane has five required arguments and can also take optional ones. 
 
@@ -383,19 +339,15 @@ Optional arguments for shift_data_plane
 
 For more details on setting the -method and -width options, see the regrid entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the shift_data_plane calling sequence is shown below:
 
-shift_data_plane \
+.. code-block:: none
 
-nam.grib \
-
-nam_shift_APCP_12.nc \
-
-'name = "APCP"; level = "A12";' \
-
--from 38.6272  -90.1978 \
-
--to   40.1717 -105.1092 \
-
--v 2
+  shift_data_plane \
+  nam.grib \
+  nam_shift_APCP_12.nc \
+  'name = "APCP"; level = "A12";' \
+  -from 38.6272  -90.1978 \
+  -to   40.1717 -105.1092 \
+  -v 2
 
 In this example, the shift_data_plane tool reads 12-hour accumulated precipitation from the nam.grb file, applies a rigid shift defined by (38.6272, -90.1978) to (40.1717, -105.1092) and writes the output in NetCDF format to a file named nam_shift_APCP_12.nc. These -from and -to locations result in a grid shift of -108.30 units in the x-direction and 16.67 units in the y-direction.
 
@@ -409,25 +361,18 @@ modis_regrid usage
 
 The usage statement for the modis_regrid utility is shown below:
 
-Usage: modis_regrid
+.. code-block:: none
 
-{\hskip 0.5in}-data_file path
-
-{\hskip 0.5in}-field name
-
-{\hskip 0.5in}-out path
-
-{\hskip 0.5in}-scale value
-
-{\hskip 0.5in}-offset value
-
-{\hskip 0.5in}-fill value
-
-{\hskip 0.5in}[-units text]
-
-{\hskip 0.5in}[-compress level]
-
-{\hskip 0.5in}modis_file
+  Usage: modis_regrid
+         -data_file path
+         -field name
+         -out path
+         -scale value
+         -offset value
+         -fill value
+         [-units text]
+         [-compress level]
+         modis_file
 
 modis_regrid has some required arguments and can also take optional ones. 
 
@@ -457,21 +402,16 @@ Optional arguments for modis_regrid
 
 An example of the modis_regrid calling sequence is shown below:
 
-modis_regrid -field Cloud_Fraction \
+.. code-block:: none
 
--data_file grid_file \
-
--out t2.nc \
-
--units percent \
-
--scale 0.01 \
-
--offset 0 \
-
--fill 127 \
-
-modisfile
+  modis_regrid -field Cloud_Fraction \
+  -data_file grid_file \
+  -out t2.nc \
+  -units percent \
+  -scale 0.01 \
+  -offset 0 \
+  -fill 127 \
+  modisfile
 
 In this example, the modis_regrid tool will process the Cloud_Fraction field from modisfile and write it out to the output NetCDF file t2.nc on the grid specified in grid_file using the appropriate scale, offset and fill values.
 
@@ -493,17 +433,14 @@ wwmca_plot usage
 
 The usage statement for the WWMCA-Plot tool is shown below:
 
-Usage: wwmca_plot
+.. code-block:: none
 
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-max max_minutes]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}wwmca_cloud_pct_file_list
+  Usage: wwmca_plot
+         [-outdir path]
+         [-max max_minutes]
+         [-log file]
+         [-v level]
+         wwmca_cloud_pct_file_list
 
 wmmca_plot has some required arguments and can also take optional ones. 
 
@@ -534,21 +471,16 @@ wwmca_regrid usage
 
 The usage statement for the WWMCA-Regrid tool is shown below:
 
-Usage: wwmca_regrid
+.. code-block:: none
 
-{\hskip 0.5in}-out filename
-
-{\hskip 0.5in}-config filename
-
-{\hskip 0.5in}-nh filename [pt_filename]
-
-{\hskip 0.5in}-sh filename [pt_filename]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+  Usage: wwmca_regrid
+         -out filename
+         -config filename
+         -nh filename [pt_filename]
+         -sh filename [pt_filename]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 wmmca_regrid has some required arguments and can also take optional ones.
 
@@ -583,39 +515,39 @@ Note that environment variables may be used when editing configuration files, as
 
 ____________________________
 
-regrid = { ... }
+.. code-block:: none
+
+  regrid = { ... }
 
 See the regrid entry in Section :ref:`Configuration File Details` for a description of the configuration file entries that control regridding.
 
 ____________________________
 
+.. code-block:: none
 
-variable_name = "Cloud_Pct";
-
-units         = "percent";
-
-long_name     = "cloud cover percent";
-
-level         = "SFC"; 
+  variable_name = "Cloud_Pct";
+  units         = "percent";
+  long_name     = "cloud cover percent";
+  level         = "SFC"; 
 
 The settings listed above are strings which control the output netCDF variable name and specify attributes for that variable.
 
 ___________________________
 
-init_time  = "";
+.. code-block:: none
 
-valid_time = "";
-
-accum_time = "01";
+  init_time  = "";
+  valid_time = "";
+  accum_time = "01";
 
 The settings listed above are strings which specify the timing information for the data being processed. The accumulation time is specified in HH[MMSS] format and, by default, is set to a value of 1 hour. The initialization and valid time strings are specified in YYYYMMDD[_HH[MMSS]] format. However, by default they are set to empty strings. If empty, the timing information parsed from the filename will be used. If not empty, these values override the times parsed from the filename.
 
 __________________________
 
-max_minutes     = 120;
+.. code-block:: none
 
-swap_endian     = TRUE;
-
-write_pixel_age = FALSE;
+  max_minutes     = 120;
+  swap_endian     = TRUE;
+  write_pixel_age = FALSE;
 
 The settings listed above are control the processing of the WWMCA pixel age data. This data is stored in binary data files in 4-byte blocks. The swap_endian option indicates whether the endian-ness of the data should be swapped after reading. The max_minutes option specifies a maximum allowed age for the cloud data in minutes. Any data values older than this value are set to bad data in the output. The write_pixel_age option writes the pixel age data, in minutes, to the output file instead of the cloud data.

@@ -19,16 +19,11 @@ The following sections describe the usage statement, required arguments, and opt
 .. code-block:: none
 
   Usage: grid_diag
-
-{\hskip 0.5in}-data file_1 ... file_n | data_file_list
-
-{\hskip 0.5in}-out file
-
-{\hskip 0.5in}-config file
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+         -data file_1 ... file_n | data_file_list
+         -out file
+         -config file
+         [-log file]
+         [-v level]
 
 grid_diag has required arguments and can accept several optional arguments.
 

@@ -262,24 +262,15 @@ The usage statement for the Point-Stat tool is shown below:
 .. code-block:: none
 
   Usage: point_stat
-
-{\hskip 0.5in}fcst_file
-
-{\hskip 0.5in}obs_file
-
-{\hskip 0.5in}config_file
-
-{\hskip 0.5in}[-point_obs file]
-
-{\hskip 0.5in}[-obs_valid_beg time]
-
-{\hskip 0.5in}[-obs_valid_end time]
-
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+         fcst_file
+         obs_file
+         config_file
+         [-point_obs file]
+         [-obs_valid_beg time]
+         [-obs_valid_end time]
+         [-outdir path]
+         [-log file]
+         [-v level]
 
 point_stat has three required arguments and can take many optional ones.
 

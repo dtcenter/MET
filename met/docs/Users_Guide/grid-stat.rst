@@ -139,20 +139,13 @@ The usage statement for the Grid-Stat tool is listed below:
 .. code-block:: none
 
   Usage: grid_stat
-
-{\hskip 0.5in}fcst_file
-
-{\hskip 0.5in}obs_file
-
-{\hskip 0.5in}config_file
-
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+         fcst_file
+         obs_file
+         config_file
+         [-outdir path]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 grid_stat has three required arguments and accepts several optional ones.
 

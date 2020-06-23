@@ -24,24 +24,15 @@ The usage statement for the gsid2mpr tool is shown below:
 .. code-block:: none
 		
   Usage: gsid2mpr
-
-{\hskip 0.5in}gsi_file_1 [gsi_file_2 ... gsi_file_n]
-
-{\hskip 0.5in}[-swap]
-
-{\hskip 0.5in}[-no_check_dup]
-
-{\hskip 0.5in}[-channel n]
-
-{\hskip 0.5in}[-set_hdr col_name value]
-
-{\hskip 0.5in}[-suffix string]
-
-{\hskip 0.5in}[-outdir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+         gsi_file_1 [gsi_file_2 ... gsi_file_n]
+         [-swap]
+         [-no_check_dup]
+         [-channel n]
+         [-set_hdr col_name value]
+         [-suffix string]
+         [-outdir path]
+         [-log file]
+         [-v level]
 
 gsid2mpr has one required argument and and accepts several optional ones.
 
@@ -264,24 +255,15 @@ The usage statement for the gsidens2orank tool is shown below:
 .. code-block:: none
 		
   Usage: gsidens2orank
-
-{\hskip 0.5in}ens_file_1 ... ens_file_n | ens_file_list
-
-{\hskip 0.5in}-out path
-
-{\hskip 0.5in}[-ens_mean path]
-
-{\hskip 0.5in}[-swap]
-
-{\hskip 0.5in}[-rng_name str]
-
-{\hskip 0.5in}[-rng_seed str]
-
-{\hskip 0.5in}[-set_hdr col_name value]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
+         ens_file_1 ... ens_file_n | ens_file_list
+         -out path
+         [-ens_mean path]
+         [-swap]
+         [-rng_name str]
+         [-rng_seed str]
+         [-set_hdr col_name value]
+         [-log file]
+         [-v level]
 
 gsidens2orank has three required arguments and accept several optional ones.
 

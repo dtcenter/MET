@@ -29,24 +29,15 @@ The usage statement for the Series-Analysis tool is shown below:
 .. code-block:: none
 
   Usage: series_analysis
-
-{\hskip 0.5in}-fcst  file_1 ... file_n | fcst_file_list
-
-{\hskip 0.5in}-obs   file_1 ... file_n | obs_file_list
-
-{\hskip 0.5in}[-both file_1 ... file_n | both_file_list]
-
-{\hskip 0.5in}[-paired]
-
-{\hskip 0.5in}-out file
-
-{\hskip 0.5in}-config file
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-compress level]
+         -fcst  file_1 ... file_n | fcst_file_list
+         -obs   file_1 ... file_n | obs_file_list
+         [-both file_1 ... file_n | both_file_list]
+         [-paired]
+         -out file
+         -config file
+         [-log file]
+         [-v level]
+         [-compress level]
 
 series_analysis has four required arguments and accepts several optional ones. 
 

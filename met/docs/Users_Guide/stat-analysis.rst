@@ -188,18 +188,12 @@ The usage statement for the Stat-Analysis tool is shown below:
 .. code-block:: none
 
   Usage: stat_analysis
-
-{\hskip 0.5in}-lookin path
-
-{\hskip 0.5in}[-out file]
-
-{\hskip 0.5in}[-tmp_dir path]
-
-{\hskip 0.5in}[-log file]
-
-{\hskip 0.5in}[-v level]
-
-{\hskip 0.5in}[-config config_file] | [JOB COMMAND LINE]
+         -lookin path
+         [-out file]
+         [-tmp_dir path]
+         [-log file]
+         [-v level]
+         [-config config_file] | [JOB COMMAND LINE]
 
 stat_analysis has two required arguments and accepts several optional ones. 
 
