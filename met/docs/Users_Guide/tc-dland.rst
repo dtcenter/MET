@@ -32,13 +32,13 @@ tc_dland usage
 .. code-block:: none
 
   Usage: tc_dland
- out_file
- [-grid spec]
- [-noll]
- [-land file]
- [-log file]
- [-v level]
- [-compress level]
+         out_file
+         [-grid spec]
+         [-noll]
+         [-land file]
+         [-log file]
+         [-v level]
+         [-compress level]
 
 tc_dland has one required arguments and accepts several optional ones.
 

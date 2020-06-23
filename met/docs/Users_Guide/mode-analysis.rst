@@ -32,16 +32,16 @@ The usage statement for the MODE-Analysis tool is shown below:
 .. code-block:: none
 
   Usage: mode_analysis
- -lookin path
- -summary | -bycase
- [-column name]
- [-dump_row filename]
- [-out filename]
- [-log file]
- [-v level]
- [-help]
- [MODE FILE LIST]
- [-config config_file] | [MODE LINE OPTIONS]
+         -lookin path
+         -summary | -bycase
+         [-column name]
+         [-dump_row filename]
+         [-out filename]
+         [-log file]
+         [-v level]
+         [-help]
+         [MODE FILE LIST]
+         [-config config_file] | [MODE LINE OPTIONS]
 
 The MODE-Analysis tool has two required arguments and can accept several optional arguments.
 

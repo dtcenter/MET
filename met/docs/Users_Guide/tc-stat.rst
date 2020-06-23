@@ -80,11 +80,11 @@ The usage statement for tc_stat is shown below:
 .. code-block:: none
 
   Usage: tc_stat
- -lookin source
- [-out file]
- [-log file]
- [-v level]
- [-config file] | [JOB COMMAND LINE]
+         -lookin source
+         [-out file]
+         [-log file]
+         [-v level]
+         [-config file] | [JOB COMMAND LINE]
 
 TC-Stat has one required argument and accepts optional ones. 
 

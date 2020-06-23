@@ -19,12 +19,12 @@ The following sections describe the usage statement, required arguments, and opt
 .. code-block:: none
 
   Usage: tc_rmw
- -data file_1 ... file_n | data_file_list
- -deck file
- -config file
- -out file
- [-log file]
- [-v level]
+         -data file_1 ... file_n | data_file_list
+         -deck file
+         -config file
+         -out file
+         [-log file]
+         [-v level]
 
 tc_rmw has required arguments and can accept several optional arguments.
 

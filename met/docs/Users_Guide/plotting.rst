@@ -16,14 +16,14 @@ The usage statement for the plot_point_obs utility is shown below:
 .. code-block:: none
 		
   Usage: plot_point_obs
- nc_file
- ps_file
- [-gc code]
- [-msg_typ name]
- [-data_file name]
- [-dotsize val]
- [-log file]
- [-v level]
+         nc_file
+         ps_file
+         [-gc code]
+         [-msg_typ name]
+         [-data_file name]
+         [-dotsize val]
+         [-log file]
+         [-v level]
 
 plot_point_obs has two required arguments and can take optional ones. 
 
@@ -67,14 +67,14 @@ The usage statement for the plot_data_plane utility is shown below:
 .. code-block:: none
 		
   Usage: plot_data_plane
- input_filename
- output_filename
- field_string
- [-color_table color_table_name]
- [-plot_range min max]
- [-title title_string]
- [-log file]
- [-v level]
+         input_filename
+         output_filename
+         field_string
+         [-color_table color_table_name]
+         [-plot_range min max]
+         [-title title_string]
+         [-log file]
+         [-v level]
 
 plot_data_plane has two required arguments and can take optional ones. 
 
@@ -122,12 +122,12 @@ The usage statement for the plot_mode_field utility is shown below:
 .. code-block:: none
 		
   Usage: plot_mode_field
- mode_nc_file_list
- -raw | -simple | -cluster
- -obs | -fcst
- -config file
- [-log file]
- [-v level]
+         mode_nc_file_list
+         -raw | -simple | -cluster
+         -obs | -fcst
+         -config file
+         [-log file]
+         [-v level]
 
 plot_mode_field has four required arguments and can take optional ones. 
 
