@@ -303,7 +303,7 @@ void set_attrs(const VarInfo *info, DataPlane &dp) {
    }
 
    // lead_time
-   if(info->lead_attr() != (unixtime) 0) {
+   if(!is_bad_data(info->lead_attr())) {
       mlog << Debug(3) << "Resetting lead time from "
            << sec_to_hhmmss(dp.lead()) << " to "
            << sec_to_hhmmss(info->lead_attr()) << ".\n";
@@ -311,7 +311,7 @@ void set_attrs(const VarInfo *info, DataPlane &dp) {
    }
 
    // accum_time
-   if(info->accum_attr() != (unixtime) 0) {
+   if(!is_bad_data(info->accum_attr())) {
       mlog << Debug(3) << "Resetting accumulation interval from "
            << sec_to_hhmmss(dp.accum()) << " to "
            << sec_to_hhmmss(info->accum_attr()) << ".\n";

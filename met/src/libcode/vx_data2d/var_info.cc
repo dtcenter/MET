@@ -31,7 +31,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int parse_set_attrs_flag(Dictionary *dict, const char *key);
+ConcatString parse_set_attrs_string(Dictionary *dict, const char *key);
+int          parse_set_attrs_flag  (Dictionary *dict, const char *key);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -496,18 +497,18 @@ void VarInfo::set_dict(Dictionary &dict) {
 
       // Parse strings
       SetAttrsName =
-         attrs_dict->lookup_string(conf_key_set_name, false);
+         parse_set_attrs_string(attrs_dict, conf_key_set_name);
       SetAttrsUnits =
-         attrs_dict->lookup_string(conf_key_set_units, false);
+         parse_set_attrs_string(attrs_dict, conf_key_set_units);
       SetAttrsLevel =
-         attrs_dict->lookup_string(conf_key_set_level, false);
+         parse_set_attrs_string(attrs_dict, conf_key_set_level);
       SetAttrsLongName =
-         attrs_dict->lookup_string(conf_key_set_long_name, false);
+         parse_set_attrs_string(attrs_dict, conf_key_set_long_name);
       SetAttrsEnsemble =
-         attrs_dict->lookup_string(conf_key_set_ensemble, false);
+         parse_set_attrs_string(attrs_dict, conf_key_set_ensemble);
 
       // Parse grid
-      s = attrs_dict->lookup_string(conf_key_set_grid, false);
+      s = parse_set_attrs_string(attrs_dict, conf_key_set_grid);
       if(s.nonempty()) {
 
          // Parse as a white-space separated string
@@ -516,32 +517,28 @@ void VarInfo::set_dict(Dictionary &dict) {
 
          // Search for a named grid
          if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrsGrid)) {
-            mlog << Debug(3)
-                 << "Use the grid named \"" << sa[0] << "\".\n";
          }
          // Parse grid definition
          else if(sa.n() > 1 && parse_grid_def(sa, SetAttrsGrid)) {
-            mlog << Debug(3)
-                 << "Use the grid defined by string \"" << s << "\".\n";
          }
          else {
             mlog << Warning << "\nVarInfo::set_dict() -> "
                  << "unsupported " << conf_key_set_grid
                  << " definition string (" << s
                  << ") in the " << conf_key_set_attrs
-                 << "dictionary!\n\n";
+                 << " dictionary!\n\n";
          }
       }
 
       // Parse times
-      s = attrs_dict->lookup_string(conf_key_set_init, false);
-      if(attrs_dict->last_lookup_status()) SetAttrsInit  = timestring_to_unix(s.c_str());
-      s = attrs_dict->lookup_string(conf_key_set_valid, false);
-      if(attrs_dict->last_lookup_status()) SetAttrsValid = timestring_to_unix(s.c_str());
-      s = attrs_dict->lookup_string(conf_key_set_lead, false);
-      if(attrs_dict->last_lookup_status()) SetAttrsLead  = timestring_to_sec(s.c_str());
-      s = attrs_dict->lookup_string(conf_key_set_accum, false);
-      if(attrs_dict->last_lookup_status()) SetAttrsAccum  = timestring_to_sec(s.c_str());
+      s = parse_set_attrs_string(attrs_dict, conf_key_set_init);
+      if(s.nonempty()) SetAttrsInit  = timestring_to_unix(s.c_str());
+      s = parse_set_attrs_string(attrs_dict, conf_key_set_valid);
+      if(s.nonempty()) SetAttrsValid = timestring_to_unix(s.c_str());
+      s = parse_set_attrs_string(attrs_dict, conf_key_set_lead);
+      if(s.nonempty()) SetAttrsLead  = timestring_to_sec(s.c_str());
+      s = parse_set_attrs_string(attrs_dict, conf_key_set_accum);
+      if(s.nonempty()) SetAttrsAccum = timestring_to_sec(s.c_str());
 
       // Parse flags
       SetAttrsIsPrecipitation =
@@ -750,10 +747,35 @@ bool VarInfo::is_prob() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConcatString parse_set_attrs_string(Dictionary *dict, const char *key) {
+   ConcatString cs;
+
+   if(!dict) return(cs);
+
+   cs = dict->lookup_string(key, false);
+   if(cs.nonempty()) {
+      mlog << Debug(3) << "Parsed " << conf_key_set_attrs << " " << key
+           << " = \"" << cs << "\"\n";
+   }
+
+   return(cs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 int parse_set_attrs_flag(Dictionary *dict, const char *key) {
-   if(!dict) return(bad_data_int);
+   int v = bad_data_int;
+
+   if(!dict) return(v);
+
    bool b = dict->lookup_bool(key, false);
-   return(dict->last_lookup_status() ? (int) b : bad_data_int);
+   if(dict->last_lookup_status()) {
+      mlog << Debug(3) << "Parsed " << conf_key_set_attrs << " " << key
+           << " = \"" << bool_to_string(b) << "\"\n";
+      v = (int) b;
+   }
+
+   return(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
