@@ -66,21 +66,21 @@ As described in Section :ref:`Install_Required-libraries-and`, some external lib
 1.
 NCEP's BUFRLIB is used by the MET to decode point-based observation datasets in PrepBUFR format. Once you have downloaded and unpacked the BUFRLIB tarball, refer to the README_BUFRLIB file. When compiling the library using the GNU C and Fortran compilers, users are strongly encouraged to use the -DUNDERSCORE and -fno-second-underscore options. Compiling the BUFRLIB using the GNU compilers consists of the following 3 steps:
 
-   | \* gcc -c -DUNDERSCORE *.c
-   | \* gfortran -c -DUNDERSCORE -fno-second-underscore *.f *.F
-   | \* ar crv libbufr.a *.o
+   | \* gcc -c -DUNDERSCORE \*.c
+   | \* gfortran -c -DUNDERSCORE -fno-second-underscore \*.f \*.F
+   | \* ar crv libbufr.a \*.o
 
 Compiling the BUFRLIB using the PGI C and Fortran-90 compilers consists of the following 3 steps:
 
-   | \* pgcc -c -DUNDERSCORE *.c
-   | \* pgf90 -c -DUNDERSCORE -Mnosecond_underscore *.f *.F
-   | \* ar crv libbufr.a *.o
+   | \* pgcc -c -DUNDERSCORE \*.c
+   | \* pgf90 -c -DUNDERSCORE -Mnosecond_underscore \*.f \*.F
+   | \* ar crv libbufr.a \*.o
 
 Compiling the BUFRLIB using the Intel icc and ifort compilers consists of the following 3 steps:
 
-   | \* icc -c -DUNDERSCORE *.c
-   | \* ifort -c -DUNDERSCORE *.f *.F
-   | \* ar crv libbufr.a *.o
+   | \* icc -c -DUNDERSCORE \*.c
+   | \* ifort -c -DUNDERSCORE \*.f \*.F
+   | \* ar crv libbufr.a \*.o
 
 In the directions above, the static library file that is created will be named libbufr.a. MET will check for the library file named libbufr.a, however in some cases (e.g. where the BUFRLIB is already available on a system) the library file may be named differently (e.g. libbufr_v11.3.0_4_64.a). If the library is named anything other than libbufr.a, users will need to tell MET what library to link with by passing the BUFRLIB_NAME option to MET when running configure (e.g. BUFRLIB_NAME=-lbufr_v11.3.0_4_64).
 
