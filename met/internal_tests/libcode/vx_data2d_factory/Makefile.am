@@ -38,6 +38,7 @@ test_factory_LDADD = -lvx_data2d_factory \
 	-lvx_gsl_prob \
 	-lvx_util \
 	-lvx_math \
+	-lvx_color \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
