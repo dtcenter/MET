@@ -31,8 +31,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary *dict, const char *key);
-int          parse_set_attrs_flag  (Dictionary *dict, const char *key);
+ConcatString parse_set_attrs_string(Dictionary &dict, const char *key);
+int          parse_set_attrs_flag  (Dictionary &dict, const char *key);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -429,7 +429,6 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_dict(Dictionary &dict) {
-   Dictionary * attrs_dict = (Dictionary *) 0;
    ThreshArray ta;
    NumArray na;
    ConcatString s;
@@ -490,74 +489,68 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);
 
-   // Parse set_attrs dictionary, if present
-   attrs_dict = dict.lookup_dictionary(conf_key_set_attrs, false);
+   // Parse set_attrs strings
+   SetAttrsName =
+      parse_set_attrs_string(dict, conf_key_set_name);
+   SetAttrsUnits =
+      parse_set_attrs_string(dict, conf_key_set_units);
+   SetAttrsLevel =
+      parse_set_attrs_string(dict, conf_key_set_level);
+   SetAttrsLongName =
+      parse_set_attrs_string(dict, conf_key_set_long_name);
+   SetAttrsEnsemble =
+      parse_set_attrs_string(dict, conf_key_set_ensemble);
 
-   if(attrs_dict) {
+   // Parse set_attrs grid
+   s = parse_set_attrs_string(dict, conf_key_set_grid);
+   if(s.nonempty()) {
 
-      // Parse strings
-      SetAttrsName =
-         parse_set_attrs_string(attrs_dict, conf_key_set_name);
-      SetAttrsUnits =
-         parse_set_attrs_string(attrs_dict, conf_key_set_units);
-      SetAttrsLevel =
-         parse_set_attrs_string(attrs_dict, conf_key_set_level);
-      SetAttrsLongName =
-         parse_set_attrs_string(attrs_dict, conf_key_set_long_name);
-      SetAttrsEnsemble =
-         parse_set_attrs_string(attrs_dict, conf_key_set_ensemble);
+      // Parse as a white-space separated string
+      StringArray sa;
+      sa.parse_wsss(s);
 
-      // Parse grid
-      s = parse_set_attrs_string(attrs_dict, conf_key_set_grid);
-      if(s.nonempty()) {
-
-         // Parse as a white-space separated string
-         StringArray sa;
-         sa.parse_wsss(s);
-
-         // Search for a named grid
-         if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrsGrid)) {
-         }
-         // Parse grid definition
-         else if(sa.n() > 1 && parse_grid_def(sa, SetAttrsGrid)) {
-         }
-         else {
-            mlog << Warning << "\nVarInfo::set_dict() -> "
-                 << "unsupported " << conf_key_set_grid
-                 << " definition string (" << s
-                 << ") in the " << conf_key_set_attrs
-                 << " dictionary!\n\n";
-         }
+      // Search for a named grid
+      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrsGrid)) {
       }
-
-      // Parse times
-      s = parse_set_attrs_string(attrs_dict, conf_key_set_init);
-      if(s.nonempty()) SetAttrsInit  = timestring_to_unix(s.c_str());
-      s = parse_set_attrs_string(attrs_dict, conf_key_set_valid);
-      if(s.nonempty()) SetAttrsValid = timestring_to_unix(s.c_str());
-      s = parse_set_attrs_string(attrs_dict, conf_key_set_lead);
-      if(s.nonempty()) SetAttrsLead  = timestring_to_sec(s.c_str());
-      s = parse_set_attrs_string(attrs_dict, conf_key_set_accum);
-      if(s.nonempty()) SetAttrsAccum = timestring_to_sec(s.c_str());
-
-      // Parse flags
-      SetAttrsIsPrecipitation =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_precipitation);
-      SetAttrsIsSpecificHumidity =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_specific_humidity);
-      SetAttrsIsUWind =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_u_wind);
-      SetAttrsIsVWind =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_v_wind);
-      SetAttrsIsGridRelative =
-        parse_set_attrs_flag(attrs_dict, conf_key_is_grid_relative);
-      SetAttrsIsWindSpeed =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_wind_speed);
-      SetAttrsIsWindDirection =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_wind_direction);
-      SetAttrsIsProb =
-         parse_set_attrs_flag(attrs_dict, conf_key_is_prob);
+      // Parse grid definition
+      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrsGrid)) {
+      }
+      else {
+         mlog << Warning << "\nVarInfo::set_dict() -> "
+              << "unsupported " << conf_key_set_grid
+              << " definition string (" << s
+              << ") in the " << conf_key_set_attrs
+              << " dictionary!\n\n";
+      }
    }
+
+   // Parse set_attrs times
+   s = parse_set_attrs_string(dict, conf_key_set_init);
+   if(s.nonempty()) SetAttrsInit = timestring_to_unix(s.c_str());
+   s = parse_set_attrs_string(dict, conf_key_set_valid);
+   if(s.nonempty()) SetAttrsValid = timestring_to_unix(s.c_str());
+   s = parse_set_attrs_string(dict, conf_key_set_lead);
+   if(s.nonempty()) SetAttrsLead = timestring_to_sec(s.c_str());
+   s = parse_set_attrs_string(dict, conf_key_set_accum);
+   if(s.nonempty()) SetAttrsAccum = timestring_to_sec(s.c_str());
+
+   // Parse set_attrs flags
+   SetAttrsIsPrecipitation =
+      parse_set_attrs_flag(dict, conf_key_is_precipitation);
+   SetAttrsIsSpecificHumidity =
+      parse_set_attrs_flag(dict, conf_key_is_specific_humidity);
+   SetAttrsIsUWind =
+      parse_set_attrs_flag(dict, conf_key_is_u_wind);
+   SetAttrsIsVWind =
+      parse_set_attrs_flag(dict, conf_key_is_v_wind);
+   SetAttrsIsGridRelative =
+      parse_set_attrs_flag(dict, conf_key_is_grid_relative);
+   SetAttrsIsWindSpeed =
+      parse_set_attrs_flag(dict, conf_key_is_wind_speed);
+   SetAttrsIsWindDirection =
+      parse_set_attrs_flag(dict, conf_key_is_wind_direction);
+   SetAttrsIsProb =
+      parse_set_attrs_flag(dict, conf_key_is_prob);
 
    return;
 }
@@ -747,31 +740,31 @@ bool VarInfo::is_prob() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary *dict, const char *key) {
-   ConcatString cs;
+ConcatString parse_set_attrs_string(Dictionary &dict, const char *key) {
+   ConcatString search, result;
 
-   if(!dict) return(cs);
+   search << conf_key_set_attrs << "." << key;
 
-   cs = dict->lookup_string(key, false);
-   if(cs.nonempty()) {
-      mlog << Debug(3) << "Parsed " << conf_key_set_attrs << " " << key
-           << " = \"" << cs << "\"\n";
+   result = dict.lookup_string(search.c_str(), false);
+   if(result.nonempty()) {
+      mlog << Debug(3) << "Parsed " << search << " = \"" << result << "\"\n";
    }
 
-   return(cs);
+   return(result);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int parse_set_attrs_flag(Dictionary *dict, const char *key) {
+int parse_set_attrs_flag(Dictionary &dict, const char *key) {
+   ConcatString search;
    int v = bad_data_int;
 
-   if(!dict) return(v);
+   search << conf_key_set_attrs << "." << key;
 
-   bool b = dict->lookup_bool(key, false);
-   if(dict->last_lookup_status()) {
-      mlog << Debug(3) << "Parsed " << conf_key_set_attrs << " " << key
-           << " = \"" << bool_to_string(b) << "\"\n";
+   bool b = dict.lookup_bool(search.c_str(), false);
+   if(dict.last_lookup_status()) {
+      mlog << Debug(3) << "Parsed " << search << " = \""
+           << bool_to_string(b) << "\"\n";
       v = (int) b;
    }
 
