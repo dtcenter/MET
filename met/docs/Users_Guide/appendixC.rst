@@ -849,7 +849,9 @@ Called "ROC_AUC" in PSTD output :ref:`table_PS_format_info_PSTD`
 
 The area under the receiver operating characteristic (ROC) curve is often used as a single summary measure. A larger AUC is better. A perfect forecast has AUC=1. Though the minimum value is 0, an AUC of 0.5 indicates no skill. 
 
-The area under the curve can be estimated in a variety of ways. In MET, the simplest trapezoid method is used to calculate the area. AUC is calculated from the series of hit rate (POD) and false alarm rate (POFD) values (see the ROC entry below) for each user-specified threshold.$$\hbox{AUC}=\frac{1}{2}\sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}-POFD_i)$$
+The area under the curve can be estimated in a variety of ways. In MET, the simplest trapezoid method is used to calculate the area. AUC is calculated from the series of hit rate (POD) and false alarm rate (POFD) values (see the ROC entry below) for each user-specified threshold.
+
+.. math:: \text{AUC} = \frac{1}{2} \sum_{i=1}^{Nthresh} (\text{POD}_{i+1} + \text{POD}_i)(\text{POFD}_{i+1} - \text{POFD}_i)
 
 .. _App_C-ensemble:
 
@@ -867,11 +869,11 @@ WARNING: The normal distribution is probably a good fit for temperature and pres
 
 Closed form expressions for the CRPS are difficult to define when using data rather than distribution functions. However, if a normal distribution can be assumed, then the following equation gives the CRPS for each individual observation (denoted by a lowercase crps) and the corresponding distribution of forecasts.
 
-$$crps_i(N(\mu,\sigma^2),y)=\sigma\biggl({{y-\mu}\over{\sigma}}\biggl(2\Phi\biggl({{y-\mu} \over\sigma} \biggr)-1 \biggr)+2\phi\biggl({{y-\mu} \over\sigma}\biggr)-{1\over{\sqrt\pi}}\biggr)$$
+.. math:: \text{crps}_i (N( \mu, \sigma^2),y) = \sigma ( \frac{y - \mu}{\sigma} (2 \Phi (\frac{y - \mu}{\sigma}) -1) + 2 \phi (\frac{y - \mu}{\sigma}) - \frac{1}{\sqrt{\pi}})
 
-In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts (\mu and \sigma) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by \phi and the cumulative distribution function (CDF), denoted in the above equation by \phi. 
+In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`. 
 
-The overall CRPS is calculated as the average of the individual measures. In equation form: $\hbox{CRPS}=\hbox{average(crps)}=\frac{1}{N}\sum_i^Ncrps_i$ .
+The overall CRPS is calculated as the average of the individual measures. In equation form: :math:`\text{CRPS} = \text{average(crps) } = \frac{1}{N} \sum_i^N \text{crps}_i`.
 
 The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS. 
 
@@ -882,16 +884,16 @@ Called "CRPSS" in ECNT output :ref:`table_ES_header_info_es_out_ECNT`
 
 The continuous ranked probability skill score (CRPSS) is similar to the MSESS and the BSS, in that it compares its namesake score to that of a reference forecast to produce a positively oriented score between 0 and 1. 
 
-$$\hbox{CRPSS}=1-\frac{\hbox{CRPS}_{fcst}}{ \hbox{CRPS}_{ref} }$$
+.. math:: \text{CRPSS} = 1 - \frac{\text{CRPS}_{fcst}}{ \text{CRPS}_{ref}}
 
 IGN
 ~~~
 
 Called "IGN" in ECNT output :ref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (Gneiting et al, 2004). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution N with parameters \mu and \sigma, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (Gneiting et al, 2004). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{and } \sigma`, the ignorance score is
 
-$$\hbox{ign}(N(\mu,\sigma),y)=\frac{1}{2}ln\bigl(2\pi\sigma^2\bigr)+{{(y-\mu)^2} \over\sigma^2}.$$
+.. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{\sigma^2}.
 
 Accumulation of the ignorance score for many forecasts is via the average of individual ignorance scores. This average ignorance score is the value output by the MET software. Like many error statistics, the IGN is negatively oriented, so smaller numbers indicate better forecasts. 
 
@@ -964,14 +966,18 @@ Fractions Brier Score
 
 Called "FBS" in NBRCNT output :ref:`table_GS_format_info_NBRCNT`
 
-The Fractions Brier Score (FBS) is defined as $\hbox{FBS}=\frac{1}{N}\sum_N[\langle P_f\rangle_s-\langle P_o\rangle_s]^2$, where N is the number of neighborhoods; \left\langle P_{f}\right\rangle _{s}is the proportion of grid boxes within a forecast neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have forecast events); and $\left\langle P_{o}\right\rangle _{s}$ is the proportion of grid boxes within an observed neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have observed events).
+The Fractions Brier Score (FBS) is defined as :math:`\text{FBS} = \frac{1}{N} \sum_N [\langle P_f\rangle_s - \langle P_o\rangle_s]^2`, where N is the number of neighborhoods; :math:`\langle P_{f} \rangle_{s}` is the proportion of grid boxes within a forecast neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have forecast events); and :math:`\langle P_{o}\rangle_{s}` is the proportion of grid boxes within an observed neighborhood where the prescribed threshold was exceeded (i.e., the proportion of grid boxes that have observed events).
 
 Fractions Skill Score
 ~~~~~~~~~~~~~~~~~~~~~
 
 Called "FSS" in NBRCNT output :ref:`table_GS_format_info_NBRCNT`
 
-The Fractions Skill Score (FSS) is defined as $$\hbox{FSS}=1-{\hbox{FBS}\over{\frac{1}{N}\biggl[\sum_N\langle P_f\rangle_s^2+\sum_N\left\langle P_o\right\rangle _s^2\biggr]}}$$, where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
+The Fractions Skill Score (FSS) is defined as
+
+.. math:: \text{FSS} = 1 - \frac{\text{FBS}}{\frac{1}{N} [\sum_N \langle P_f \rangle_s^2 + \sum_N \langle P_o \rangle_s^2 ]} , 
+
+where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
 
 Asymptotic Fractions Skill Score
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1006,36 +1012,34 @@ The overall proportion of grid points with observed events to total grid points 
 MET verification measures for distance map methods
 __________________________________________________
 
-The distance map statistics include Baddeley's \Delta Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
+The distance map statistics include Baddeley's :math:`\Delta` Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
 
-A mathematical metric, m(A,B)\geq0, must have the following three properties:
+A mathematical metric, :math:`m(A,B)\geq 0`, must have the following three properties:
 
-1. Identity: m(A,B)=0 if and only if A=B.
+1. Identity: :math:`m(A,B)=0` if and only if :math:`A = B`.
 
-2. Symmetry: m(A,B)=m(B,A)
+2. Symmetry: :math:`m(A,B) = m(B,A)`
 
-3. Triangle inequality: m(A,C)\leq m(A,B)+m(B,C)
+3. Triangle inequality: :math:`m(A,C) \leq m(A,B) + m(B,C)`
 
-The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if C is closer to A than B is to A, then m(A,C)<M(A,B).
+The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < M(A,B)`.
 
 It has been argued in Gilleland (2017) that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
-The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's \Delta Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
+The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's :math:`\Delta` Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 
-?? Below needs a triangle in the name
-
-Baddeley's \Delta Metric and Hausdorff Distance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Baddeley's :math:`\Delta` Metric and Hausdorff Distance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called “BADDELEY” and “HAUSDORFF” in the DMAP output :ref:`table_GS_format_info_DMAP`
 
-The Baddeley's \Delta Metric is given by
+The Baddeley's :math:`\Delta` Metric is given by
 
-\begin{eqnarray*}
+.. math:: \Delta_{p,w} (A,B) = [ \frac{1}{N} \sum_{s \in D} | w(d(s,A)) - w(d(s,B))|]^{\frac{1}{P}}
 
-where d(s,\cdot)is the distance map for the respective event area, w(\cdot) is an optional concave function (i.e., w(t+u)\leq w(t)+w(u)) that is strictly increasing at zero with w(t)=0 if and only if t=0, N is the size of the domain, and p is a user chosen parameter for the L_{p} norm. The default choice of p=2 corresponds to a Euclidean average, p=1 is a simple average of the difference in distance maps, and the limiting case of p=\infty gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as H(A,B), and is the metric that motivated the development of Baddeley’s \Delta metric. A typical choice, and the only available with MET, for w(\cdot) is w(t)=\min\{t,c\}, where c is a user-chosen constant with c=\infty meaning that w(\cdot) is not applied. This choice of w(\cdot) provides a cutoff for distances beyond the pre-specified amount given by c. 
+where :math:`d(s,\cdot)` is the distance map for the respective event area, :math:`w(\cdot)` is an optional concave function (i.e., :math:`w( t + u) \leq w(t)+w(u))` that is strictly increasing at zero with :math:`w(t)=0` if and only if :math:`t=0`, *N* is the size of the domain, and *p* is a user chosen parameter for the :math:`L_{p}` norm. The default choice of :math:`p = 2` corresponds to a Euclidean average, :math:`p = 1` is a simple average of the difference in distance maps, and the limiting case of :math:`p= \infty` gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as :math:`H(A,B)`, and is the metric that motivated the development of Baddeley’s :math:`\Delta` metric. A typical choice, and the only available with MET, for :math:`w(\cdot) \text{ is } w(t)= \min\{t,c\}`, where *c* is a user-chosen constant with :math:`c = \infty` meaning that :math:`w(\cdot)` is not applied. This choice of :math:`w(\cdot)` provides a cutoff for distances beyond the pre-specified amount given by *c*. 
 
-In terms of distance maps, Baddeley’s \Delta is the L_{p} norm of the top left panel in :numref:`grid-stat_fig4` provided c=\infty. If 0<c<\infty, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by c wherever they would otherwise exceed c before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
+In terms of distance maps, Baddeley’s :math:`\Delta` is the :math:`L_{p}` norm of the top left panel in :numref:`grid-stat_fig4` provided :math:`c= \infty`. If :math:`0<c< \infty`, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by *c* wherever they would otherwise exceed *c* before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1046,17 +1050,19 @@ Called “MED_FO”, “MED_OF”, “MED_MIN”, “MED_MAX”, and “MED_MEAN
 
 The mean-error distance (MED) is given by
 
-\begin{eqnarray*}
+.. math:: \text{MED }(A,B) = \frac{1}{n_B} \sum_{s \in B}d(x,A)
 
-where n_{B} is the number of non-zero grid points that fall in the event set B. That is, it is the average of the distance map for the event set A calculated only over those grid points that fall inside the event set B. It gives the average shortest-distance from every point in B to the nearest point in A.
+where :math:`n_{B}` is the number of non-zero grid points that fall in the event set *B*. That is, it is the average of the distance map for the event set *A* calculated only over those grid points that fall inside the event set *B*. It gives the average shortest-distance from every point in *B* to the nearest point in *A*.
 
-Unlike Baddeley’s \Delta metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
+Unlike Baddeley’s :math:`\Delta` metric, the MED is not a mathematical metric because it fails the symmetry property. However, if a metric is desired, then any of the following modifications, which are metrics, can be employed instead, and all are available through MET.
 
-\begin{eqnarray*}
+.. math:: min \text{MED}(A,B) = min( \text{MED}(A,B),\text{MED}(B,A))
 
-\begin{eqnarray*}
+ max \text{MED}(A,B) = max( \text{MED}(A,B), \text{MED}(B,A))
 
-\begin{eqnarray*}From the distance map perspective, MED(A,B) is the average of the values in :numref:`grid-stat_fig4` (top right), and MED(B,A) is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
+ mean \text{MED}(A,B) = \frac{1}{2}(\text{MED}(A,B) + \text{MED}(B,A))
+
+From the distance map perspective, MED *(A,B)* is the average of the values in :numref:`grid-stat_fig4` (top right), and MED *(B,A)* is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
 
 The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1067,11 +1073,11 @@ Called “FOM_FO”, “FOM_OF”, “FOM_MIN”, “FOM_MAX”, and “FOM_MEAN
 
 Pratt’s Figure of Merit (FOM) is given by
 
-\begin{eqnarray*}
+.. math:: \text{FOM }(A,B) = \frac{1}{max(n_A , n_B)} \sum_{s \in B} \frac{1}{1 + \alpha d(s,A)^2 }
 
-where n_{A} and n_{B} are the number of events within event areas A and B, respectively, d(s,A) is the distance map related to the event area A, and \alpha is a user-defined scaling constant. The default, and usual choice, is \alpha=\frac{1}{9} when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
+where :math:`n_{A} \text{and } n_{B}` are the number of events within event areas *A* and *B*, respectively, :math:`d(s,A)` is the distance map related to the event area *A*, and :math:`\alpha` is a user-defined scaling constant. The default, and usual choice, is :math:`\alpha = \frac{1}{9}` when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
 
-Note that d(s,A) in the denominator is summed only over the grid squares falling within the event set B. That is, it represents the circular area in the top right panel of :numref:`grid-stat_fig4`. 
+Note that :math:`d(s,A)` in the denominator is summed only over the grid squares falling within the event set *B*. That is, it represents the circular area in the top right panel of :numref:`grid-stat_fig4`. 
 
 The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 
@@ -1082,9 +1088,9 @@ Called “ZHU_FO”, “ZHU_OF”, “ZHU_MIN”, “ZHU_MAX”, and “ZHU_MEAN
 
 Another measure incorporates the amount of actual overlap between the event sets across the fields in addition to the MED from above and was proposed by Zhu et al. (2011). Their main proposed measure was a comparative forecast performance measure of two competing forecasts against the same observation, which is not included here, but as defined is a true mathematical metric. They also proposed a similar measure of only the forecast against the observation, which is included in MET. It is simply 
 
-\begin{eqnarray*}
+.. math:: Z(A,B) = \lambda \sqrt{ \frac{1}{N} \sum_{s \in D} (I_F (s) - I_O (s))^2} + (1 - \lambda ) \cdot \text{MED} (A,B)
 
-where MED(A,B) is as in the Mean-error distance, N is the total number of grid squares as in Baddeley's\Delta metric, I_{F}(s) ((I_{O}(s)) is the binary field derived from the forecast (observation), and \lambda is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight (\lambda=\frac{1}{2}) is sufficient. In Zhu et al (2011), they actually only consider Z(F,O) and not Z(O,F), but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience. 
+where MED *(A,B)* is as in the Mean-error distance, *N* is the total number of grid squares as in Baddeley's :math:`\Delta` metric, :math:`I_{F}(s) ((I_{O}(s))` is the binary field derived from the forecast (observation), and :math:`\lambda` is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight :math:`(\lambda=\frac{1}{2})` is sufficient. In Zhu et al (2011), they actually only consider :math:`Z(F,O)` and not :math:`Z(O,F)`, but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience. 
 
 The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1093,12 +1099,14 @@ _______________________
 
 Several of the MET tools make use of percentiles in one way or another. Percentiles can be used as part of the internal computations of a tool, or can be written out as elements of some of the standard verification statistics. There are several widely-used conventions for calculating percentiles however, so in this section we describe how percentiles are calculated in MET.
 
-The explanation makes use of the floor function. The floor of a real number $x$, denoted $\lfloor x \rfloor$, is defined to be the greatest integer $\leq x$. For example, $\lfloor 3.01 \rfloor = 3$, $\lfloor 3.99 \rfloor = 3$, $\lfloor -3.01 \rfloor = -4$, $\lfloor -3.99 \rfloor = -4$. These examples show that the floor function does not simply round its argument to the nearest integer. Note also that $\lfloor x \rfloor = x$ if and only if $x$ is an integer.
+The explanation makes use of the *floor* function. The floor of a real number *x*, denoted :math:`\lfloor x \rfloor`, is defined to be the greatest integer :math:`\leq x`. For example, :math:`\lfloor 3.01 \rfloor = 3, \lfloor 3.99 \rfloor = 3, \lfloor -3.01 \rfloor = -4, \lfloor -3.99 \rfloor = -4`. These examples show that the floor function does not simply round its argument to the nearest integer. Note also that :math:`\lfloor x \rfloor = x` if and only if *x* is an integer.
 
-Suppose now that we have a collection of $N$ data points $x_i$ for $i = 0, 1, 2, \ldots, N - 1$. (Note that we're using the C/C++ convention here, where array indices start at zero by default.) We will assume that the data are sorted in increasing (strictly speaking, nondecreasing) order, so that $i \leq j$ implies $x_i \leq x_j$. Suppose also that we wish to calculate the $t$ percentile of the data, where $0 \leq t < 1$. For example, $t = 0.25$ for the 25th percentile of the data. Define
+Suppose now that we have a collection of *N* data points :math:`x_i \text{for } i = 0, 1, 2, \ldots, N - 1`. (Note that we're using the C/C++ convention here, where array indices start at zero by default.) We will assume that the data are sorted in increasing (strictly speaking, nondecreasing) order, so that :math:`i \leq j \text{ implies } x_i \leq x_j`. Suppose also that we wish to calculate the *t* percentile of the data, where :math:`0 \leq t < 1`. For example, :math:`t = 0.25` for the 25th percentile of the data. Define
 
-\begin{eqnarray*}
+.. math:: I = \lfloor (N - 1)t \rfloor
 
-Then the value $p$ of the percentile is 
+ \Delta = (N - 1)t - I
 
-\begin{displaymath}
+Then the value *p* of the percentile is 
+
+.. math:: p = (1 - \Delta) x_I + \Delta x_{I+1}
