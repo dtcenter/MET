@@ -2195,8 +2195,8 @@ void track_counts(int i_vx, const DataPlane &dp) {
 ConcatString get_ens_mn_var_name(int i_vx) {
    ConcatString cs;
 
-   cs << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name() << "_"
-      << conf_info.vx_opt[i_vx].vx_pd.fcst_info->level_name()
+   cs << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr() << "_"
+      << conf_info.vx_opt[i_vx].vx_pd.fcst_info->level_attr()
       << "_ENS_MEAN";
       cs.replace(",", "_",   false);
       cs.replace("*", "all", false);
@@ -2717,8 +2717,8 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_ens]->name() << "_"
-                << conf_info.ens_info[i_ens]->level_name()
+                << conf_info.ens_info[i_ens]->name_attr() << "_"
+                << conf_info.ens_info[i_ens]->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -2736,11 +2736,11 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
    //
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
-               << conf_info.ens_info[i_ens]->name();
+               << conf_info.ens_info[i_ens]->name_attr();
    }
    else {
       name_str << cs_erase
-               << conf_info.ens_info[i_ens]->name() << "_"
+               << conf_info.ens_info[i_ens]->name_attr() << "_"
                << type_str;
    }
 
@@ -2773,8 +2773,8 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_ens]->name() << "_"
-                << conf_info.ens_info[i_ens]->level_name()
+                << conf_info.ens_info[i_ens]->name_attr() << "_"
+                << conf_info.ens_info[i_ens]->level_attr()
                 << var_str << "_" << type_str;
 
    // Skip variable names that have already been written
@@ -2789,7 +2789,7 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.ens_info[i_ens]->name() << "_"
+            << conf_info.ens_info[i_ens]->name_attr() << "_"
             << type_str;
 
    // Add the variable attributes
@@ -2897,14 +2897,14 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Build the orank variable name
    var_name << cs_erase
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_name()
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_attr()
             << var_str << "_" << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr() << "_"
             << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
@@ -2962,14 +2962,14 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Build the orank variable name
    var_name << cs_erase
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_name()
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_attr()
             << var_str << "_" << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr() << "_"
             << type_str << "_"
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
@@ -3011,15 +3011,15 @@ void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
 
    // Construct the long name
    att_str << cs_erase
-           << info->name() << " at "
-           << info->level_name() << " "
+           << info->name_attr() << " at "
+           << info->level_attr() << " "
            << long_name_str;
 
    // Add variable attributes
    add_att(nc_var, "name", name_str);
    add_att(nc_var, "long_name", (string)att_str);
-   add_att(nc_var, "level", (string)info->level_name());
-   add_att(nc_var, "units", (string)info->units());
+   add_att(nc_var, "level", (string)info->level_attr());
+   add_att(nc_var, "units", (string)info->units_attr());
 
    if(is_int) add_att(nc_var, "_FillValue", bad_data_int);
    else       add_att(nc_var, "_FillValue", bad_data_float);
