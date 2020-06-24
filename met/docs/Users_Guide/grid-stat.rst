@@ -754,7 +754,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Frequency Bias
   * - 29
     - BADDELEY
-    - Baddeley's ?? (triangle here)\Delta Metric
+    - Baddeley's :math:`\Delta` Metric
   * - 30
     - HAUSDORFF
     - Hausdorff Distance
