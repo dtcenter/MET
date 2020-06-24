@@ -1392,7 +1392,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               conf_info.fcst_info[i_vx]->name_attr().text(),
               conf_info.fcst_info[i_vx]->level_attr().text(),
               conf_info.obs_info[i_vx]->name_attr().text(),
-              conf_info.obs_info[i_vx]->level_atrr().text());
+              conf_info.obs_info[i_vx]->level_attr().text());
 
    }
 
