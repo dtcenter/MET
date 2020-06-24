@@ -121,7 +121,6 @@ void VarInfo::assign(const VarInfo &v) {
    SetAttrsUnits = v.SetAttrsUnits;
    SetAttrsLevel = v.SetAttrsLevel;
    SetAttrsLongName = v.SetAttrsLongName;
-   SetAttrsEnsemble = v.SetAttrsEnsemble;
 
    SetAttrsGrid = v.SetAttrsGrid;
 
@@ -182,7 +181,6 @@ void VarInfo::clear() {
    SetAttrsUnits.clear();
    SetAttrsLevel.clear();
    SetAttrsLongName.clear();
-   SetAttrsEnsemble.clear();
 
    SetAttrsGrid.clear();
 
@@ -498,8 +496,6 @@ void VarInfo::set_dict(Dictionary &dict) {
       parse_set_attrs_string(dict, conf_key_set_level, true);
    SetAttrsLongName =
       parse_set_attrs_string(dict, conf_key_set_long_name);
-   SetAttrsEnsemble =
-      parse_set_attrs_string(dict, conf_key_set_ensemble);
 
    // Parse set_attrs grid
    s = parse_set_attrs_string(dict, conf_key_set_grid);

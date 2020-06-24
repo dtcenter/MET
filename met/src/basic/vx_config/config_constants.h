@@ -625,7 +625,6 @@ static const char conf_key_set_name[]          = "set_name";
 static const char conf_key_set_units[]         = "set_units";
 static const char conf_key_set_level[]         = "set_level";
 static const char conf_key_set_long_name[]     = "set_long_name";
-static const char conf_key_set_ensemble[]      = "set_ensemble";
 static const char conf_key_set_grid[]          = "set_grid";
 static const char conf_key_set_init[]          = "set_init";
 static const char conf_key_set_valid[]         = "set_valid";

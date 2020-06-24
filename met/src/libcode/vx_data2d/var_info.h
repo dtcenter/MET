@@ -64,7 +64,6 @@ class VarInfo
       ConcatString  SetAttrsUnits;
       ConcatString  SetAttrsLevel;
       ConcatString  SetAttrsLongName;
-      ConcatString  SetAttrsEnsemble;
 
       Grid          SetAttrsGrid;
 
@@ -239,11 +238,10 @@ inline NumArray     VarInfo::range()          const { return(Range);            
 
 inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
 
-inline ConcatString VarInfo::name_attr()      const { return(SetAttrsName.empty()      ? name()       : SetAttrsName);     }
-inline ConcatString VarInfo::units_attr()     const { return(SetAttrsUnits.empty()     ? units()      : SetAttrsUnits);    }
-inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty()     ? level_name() : SetAttrsLevel);    }
-inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty()  ? long_name()  : SetAttrsLongName); }
-inline ConcatString VarInfo::ensemble_attr()  const { return(SetAttrsEnsemble.empty()  ? ens()        : SetAttrsEnsemble); }
+inline ConcatString VarInfo::name_attr()      const { return(SetAttrsName.empty()     ? name()       : SetAttrsName);     }
+inline ConcatString VarInfo::units_attr()     const { return(SetAttrsUnits.empty()    ? units()      : SetAttrsUnits);    }
+inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty()    ? level_name() : SetAttrsLevel);    }
+inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty() ? long_name()  : SetAttrsLongName); }
 
 inline Grid         VarInfo::grid_attr()      const { return(SetAttrsGrid);     }
 
