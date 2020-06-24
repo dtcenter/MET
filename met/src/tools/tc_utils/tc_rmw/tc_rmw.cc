@@ -751,7 +751,7 @@ void process_fields(const TrackInfoArray& tracks) {
             // Write data
             if (variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                    pressure_level_indices, data_info->level_attr()),
+                    pressure_level_indices, data_info->level_attr(),
                     i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             } else {
                 write_tc_data_rev(nc_out, tcrmw_grid, i_point,
