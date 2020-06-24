@@ -391,8 +391,6 @@ The Pearson correlation coefficient, **r**, measures the strength of linear asso
 
 **r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
-?? Please fix title below.  It needs a P lower case s in parentheses.  Other titles need attention too.
-
 Spearman rank correlation coefficient (\rho_{s})
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -667,8 +665,6 @@ _____________________________________________________
 The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced. 
 
 The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in Table 29.3. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table 29.3 are counts of the number of occurrences of all possible combinations of forecasts and observations. \setcounter{table}{0}\renewcommand{\thetable}{29.3} 
-
-?? Add formulas into table
 
 .. list-table::  2x2 contingency table in terms of counts. The :math:`\mathbf{n_{ij}}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. The ""."" symbols in the total cells represent sums across categories.
   :widths: auto
@@ -957,7 +953,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 * Odds Ratio (called "ODDS" in :ref:`table_GS_format_info_NBRCTS`)
 
-All of these measures are defined in Section 29.2 of Appendix C.  ?? Please verify this is the correct section.
+All of these measures are defined in Section 29.2 of Appendix C.
 
 In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in Ebert (2008) and Roberts and Lean (2008). Roberts and Lean (2008) also present an application of the methodology.
 
