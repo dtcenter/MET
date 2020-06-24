@@ -1376,23 +1376,23 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    if ( nc_info.do_raw)  {
       fcst_var_name.format("FCST_%s_%s_%s_%s_RAW",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text());
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_attr().text());
       obs_var_name.format("OBS_%s_%s_%s_%s_RAW",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text());
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_attr().text());
    }
 
    if ( nc_info.do_diff )  {
       diff_var_name.format("DIFF_%s_%s_%s_%s_RAW",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text());
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_atrr().text());
 
    }
 
@@ -1416,11 +1416,11 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          add_var_att_local(&obs_var, "type", "Observation");
          add_var_att_local(&obs_var, "name", shc.get_obs_var().c_str());
          val.format("%s at %s",
-                 conf_info.obs_info[i_vx]->name().text(),
-                 conf_info.obs_info[i_vx]->level_name().text());
+                 conf_info.obs_info[i_vx]->name_attr().text(),
+                 conf_info.obs_info[i_vx]->level_attr().text());
          add_var_att_local(&obs_var, "long_name", val.c_str());
          add_var_att_local(&obs_var, "level", shc.get_obs_lev().c_str());
-         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units_attr().text());
          add_att(&obs_var, "_FillValue", bad_data_float);
          write_netcdf_var_times(&obs_var,
             shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
@@ -1431,11 +1431,11 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          add_var_att_local(&fcst_var, "type", "Forecast");
          add_var_att_local(&fcst_var, "name", shc.get_fcst_var().c_str());
          val.format("%s at %s",
-                 conf_info.fcst_info[i_vx]->name().text(),
-                 conf_info.fcst_info[i_vx]->level_name().text());
+                 conf_info.fcst_info[i_vx]->name_attr().text(),
+                 conf_info.fcst_info[i_vx]->level_attr().text());
          add_var_att_local(&fcst_var, "long_name", val.c_str());
          add_var_att_local(&fcst_var, "level", shc.get_fcst_lev().c_str());
-         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units_attr().text());
          add_att(&fcst_var, "_FillValue", bad_data_float);
          write_netcdf_var_times(&fcst_var,
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
@@ -1453,18 +1453,18 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                  shc.get_obs_var().text());
          add_var_att_local(&diff_var, "name", val.c_str());
          val.format("%s at %s and %s at %s",
-                 conf_info.fcst_info[i_vx]->name().text(),
-                 conf_info.fcst_info[i_vx]->level_name().text(),
-                 conf_info.obs_info[i_vx]->name().text(),
-                 conf_info.obs_info[i_vx]->level_name().text());
+                 conf_info.fcst_info[i_vx]->name_attr().text(),
+                 conf_info.fcst_info[i_vx]->level_attr().text(),
+                 conf_info.obs_info[i_vx]->name_attr().text(),
+                 conf_info.obs_info[i_vx]->level_attr().text());
          add_var_att_local(&diff_var, "long_name", val.c_str());
          val.format("%s and %s",
                  shc.get_fcst_lev().text(),
                  shc.get_obs_lev().text());
          add_var_att_local(&diff_var, "level", val.c_str());
          val.format("%s and %s",
-                 conf_info.fcst_info[i_vx]->units().text(),
-                 conf_info.obs_info[i_vx]->units().text());
+                 conf_info.fcst_info[i_vx]->units_attr().text(),
+                 conf_info.obs_info[i_vx]->units_attr().text());
          add_var_att_local(&diff_var, "units", val.c_str());
          add_att(&diff_var, "_FillValue", bad_data_float);
          write_netcdf_var_times(&diff_var,
@@ -1595,29 +1595,29 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
       // Build the variable names
       fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
               fcst_thresh_str.text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_attr().text(),
               obs_thresh_str.text());
       obs_var_name.format("OBS_%s_%s_%s_%s_%s_%s",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
               fcst_thresh_str.text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_attr().text(),
               obs_thresh_str.text());
    }
 
    if ( nc_info.do_diff )  {
 
       diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
-              conf_info.fcst_info[i_vx]->name().text(),
-              conf_info.fcst_info[i_vx]->level_name().text(),
+              conf_info.fcst_info[i_vx]->name_attr().text(),
+              conf_info.fcst_info[i_vx]->level_attr().text(),
               fcst_thresh_str.text(),
-              conf_info.obs_info[i_vx]->name().text(),
-              conf_info.obs_info[i_vx]->level_name().text(),
+              conf_info.obs_info[i_vx]->name_attr().text(),
+              conf_info.obs_info[i_vx]->level_attr().text(),
               obs_thresh_str.text());
 
    }
@@ -1646,11 +1646,11 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          add_var_att_local(&obs_var, "type", "Observation");
          add_var_att_local(&obs_var, "name", shc.get_obs_var().c_str());
          val.format("%s at %s",
-                 conf_info.obs_info[i_vx]->name().text(),
-                 conf_info.obs_info[i_vx]->level_name().text());
+                 conf_info.obs_info[i_vx]->name_attr().text(),
+                 conf_info.obs_info[i_vx]->level_attr().text());
          add_var_att_local(&obs_var, "long_name", val.c_str());
          add_var_att_local(&obs_var, "level", shc.get_obs_lev().c_str());
-         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units_attr().text());
          add_var_att_local(&obs_var, "threshold", fcst_thresh_str.c_str());
          add_var_att_local(&obs_var, "scale_0", "binary");
          add_var_att_local(&obs_var, "scale_n", "scale 2^(n-1)");
@@ -1664,11 +1664,11 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
          add_var_att_local(&fcst_var, "type", "Forecast");
          add_var_att_local(&fcst_var, "name", shc.get_fcst_var().c_str());
          val.format("%s at %s",
-                 conf_info.fcst_info[i_vx]->name().text(),
-                 conf_info.fcst_info[i_vx]->level_name().text());
+                 conf_info.fcst_info[i_vx]->name_attr().text(),
+                 conf_info.fcst_info[i_vx]->level_attr().text());
          add_var_att_local(&fcst_var, "long_name", val.c_str());
          add_var_att_local(&fcst_var, "level", shc.get_fcst_lev().c_str());
-         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units_attr().text());
          add_var_att_local(&fcst_var, "threshold", fcst_thresh_str.c_str());
          add_var_att_local(&fcst_var, "scale_0", "binary");
          add_var_att_local(&fcst_var, "scale_n", "scale 2^(n-1)");
@@ -1689,18 +1689,18 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                  shc.get_obs_var().text());
          add_var_att_local(&diff_var, "name", val.c_str());
          val.format("%s at %s and %s at %s",
-                 conf_info.fcst_info[i_vx]->name().text(),
-                 conf_info.fcst_info[i_vx]->level_name().text(),
-                 conf_info.obs_info[i_vx]->name().text(),
-                 conf_info.obs_info[i_vx]->level_name().text());
+                 conf_info.fcst_info[i_vx]->name_attr().text(),
+                 conf_info.fcst_info[i_vx]->level_attr().text(),
+                 conf_info.obs_info[i_vx]->name_attr().text(),
+                 conf_info.obs_info[i_vx]->level_attr().text());
          add_var_att_local(&diff_var, "long_name", val.c_str());
          val.format("%s and %s",
                  shc.get_fcst_lev().text(),
                  shc.get_obs_lev().text());
          add_var_att_local(&diff_var, "level", val.c_str());
          val.format("%s and %s",
-                 conf_info.fcst_info[i_vx]->units().text(),
-                 conf_info.obs_info[i_vx]->units().text());
+                 conf_info.fcst_info[i_vx]->units_attr().text(),
+                 conf_info.obs_info[i_vx]->units_attr().text());
          add_var_att_local(&diff_var, "units", val.c_str());
          val.format("%s and %s",
                  fcst_thresh_str.text(),
