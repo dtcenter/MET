@@ -600,12 +600,12 @@ void setup_nc_file() {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-        variable_levels[data_info->name()].push_back(
-            data_info->level_name());
-        variable_long_names[data_info->name()]
-            = data_info->long_name();
-        variable_units[data_info->name()]
-            = data_info->units();
+        variable_levels[data_info->name_attr()].push_back(
+            data_info->level_attr());
+        variable_long_names[data_info->name_attr()]
+            = data_info->long_name_attr();
+        variable_units[data_info->name_attr()]
+            = data_info->units_attr();
     }
 
     // Define pressure levels
@@ -749,13 +749,13 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
             // Write data
-            if (variable_levels[data_info->name()].size() > 1) {
+            if (variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                    pressure_level_indices, data_info->level().name(),
-                    i_point, data_3d_vars[data_info->name()], data_dp.data());
+                    pressure_level_indices, data_info->level_attr()),
+                    i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             } else {
                 write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-                    data_3d_vars[data_info->name()], data_dp.data());
+                    data_3d_vars[data_info->name_attr()], data_dp.data());
             }
         }
     } // Close loop over track points

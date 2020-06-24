@@ -469,10 +469,10 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    mask_dp.threshold(st);
 
    // Store the mask name
-   mask_name = info->name();
+   mask_name = info->name_attr();
 
    // Append level info
-   if(append_level) mask_name << "_" << info->level_name();
+   if(append_level) mask_name << "_" << info->level_attr();
 
    // Append threshold info
    if(append_thresh) mask_name << st.get_str();
