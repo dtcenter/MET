@@ -538,6 +538,41 @@ regrid = {
 //          censor_thresh = [ >12000 ];
 //          censor_val    = [ 12000 ];
 //
+//      - The "set_attrs" entry is a dictionary which, when specified, overrides
+//        the metadata read from the input file. The elements which can be set
+//        are shown below:
+//
+//          set_attrs = {
+//
+//             // Data attributes
+//             set_name      = "string";
+//             set_level     = "string";
+//             set_units     = "string";
+//             set_long_name = "string";
+//
+//             // Time attributes
+//             set_init  = "YYYYMMDD[_HH[MMSS]]";
+//             set_valid = "YYYYMMDD[_HH[MMSS]]";
+//             set_lead  = "HH[MMSS]";
+//             set_accum = "HH[MMSS]";
+//
+//             // Grid definition (must match the data dimensions)
+//             set_grid  = "named grid or grid specification string";
+//
+//             // Flags
+//             is_precipiation      = boolean;
+//             is_specific_humidity = boolean;
+//             is_u_wind            = boolean;
+//             is_v_wind            = boolean;
+//             is_grid_relative     = boolean;
+//             is_wind_speed        = boolean;
+//             is_wind_direction    = boolean;
+//             is_prob              = boolean;
+//          }
+//
+//        In practice, the set_attrs dictionary should only contain entries
+//        for the subset of elements that need to be overridden.
+//
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //
