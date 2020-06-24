@@ -31,7 +31,7 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary &dict, const char *key);
+ConcatString parse_set_attrs_string(Dictionary &dict, const char *key, bool check_ws=false);
 int          parse_set_attrs_flag  (Dictionary &dict, const char *key);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -491,11 +491,11 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Parse set_attrs strings
    SetAttrsName =
-      parse_set_attrs_string(dict, conf_key_set_name);
+      parse_set_attrs_string(dict, conf_key_set_name, true);
    SetAttrsUnits =
-      parse_set_attrs_string(dict, conf_key_set_units);
+      parse_set_attrs_string(dict, conf_key_set_units, true);
    SetAttrsLevel =
-      parse_set_attrs_string(dict, conf_key_set_level);
+      parse_set_attrs_string(dict, conf_key_set_level, true);
    SetAttrsLongName =
       parse_set_attrs_string(dict, conf_key_set_long_name);
    SetAttrsEnsemble =
@@ -740,7 +740,8 @@ bool VarInfo::is_prob() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary &dict, const char *key) {
+ConcatString parse_set_attrs_string(Dictionary &dict, const char *key,
+                                    bool check_ws) {
    ConcatString search, result;
 
    search << conf_key_set_attrs << "." << key;
@@ -748,6 +749,12 @@ ConcatString parse_set_attrs_string(Dictionary &dict, const char *key) {
    result = dict.lookup_string(search.c_str(), false);
    if(result.nonempty()) {
       mlog << Debug(3) << "Parsed " << search << " = \"" << result << "\"\n";
+      if(check_ws && check_reg_exp(ws_reg_exp, result.c_str())) {
+         mlog << Error << "\nparse_set_attrs_string() -> "
+              << "the \"" << search << "\" config file entry (" << result
+              << ") cannot contain embedded whitespace!\n\n";
+         exit(1);
+      }
    }
 
    return(result);
