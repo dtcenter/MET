@@ -79,6 +79,24 @@ bool GenesisInfo::operator==(const GenesisInfo & g) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Check for matching technique name/number, timing information, and
+// location information. Do not check the basin and storm number.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfo::is_storm(const GenesisInfo & g) const {
+
+   return(Technique       == g.Technique       &&
+          TechniqueNumber == g.TechniqueNumber &&
+          GenesisTime     == g.GenesisTime     &&
+          InitTime        == g.InitTime        &&
+          LeadTime        == g.LeadTime        &&
+          is_eq(Lat, g.Lat)                    &&
+          is_eq(Lon, g.Lon));
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void GenesisInfo::clear() {
 
@@ -503,8 +521,20 @@ bool GenesisInfoArray::add(const TrackInfo &t) {
    // Attempt to create a genesis object
    if(!g.set(t)) return(false);
 
-   // Check for duplicates
-   if(has(g)) return(false);
+   // Ignore true duplicates
+   if(has(g)) {
+      mlog << Warning << "\nGenesisInfoArray::add() -> "
+           << "Skipping duplicate genesis event:\n" << g.serialize()
+           << "\n\n";
+      return(false);
+   }
+
+   // Print warning for matches
+   if(has_storm(g)) {
+      mlog << Warning << "\nGenesisInfoArray::add() -> "
+           << "Including multiple genesis events for the same storm:\n"
+           << g.serialize() << "\n\n";
+   }
 
    // Store the genesis object
    add(g);
@@ -518,6 +548,17 @@ bool GenesisInfoArray::has(const GenesisInfo &g) {
 
    for(int i=0; i<Genesis.size(); i++) {
       if(g == Genesis[i]) return(true);
+   }
+
+   return(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GenesisInfoArray::has_storm(const GenesisInfo &g) {
+
+   for(int i=0; i<Genesis.size(); i++) {
+      if(g.is_storm(Genesis[i])) return(true);
    }
 
    return(false);

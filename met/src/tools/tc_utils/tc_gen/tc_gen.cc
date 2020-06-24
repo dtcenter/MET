@@ -479,8 +479,10 @@ void process_track_files(const StringArray &files,
 
    // Analysis ATCF ID's
    if(is_anly) {
-      atcf_ids << conf_info.BestEventInfo.Technique << " or "
-               << conf_info.OperEventInfo.Technique << " analysis";
+      atcf_ids << conf_info.BestEventInfo.Technique;
+      if(conf_info.OperEventInfo.Technique.nonempty()) {
+         atcf_ids << " or " << conf_info.OperEventInfo.Technique << " analysis";
+      }
    }
    // Forecast ATCF ID's
    else {
