@@ -643,10 +643,10 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 MTD writes a NetCDF file containing various types of information as specified in the configuration file. The possible output data are:
 
-• {\bf Latitude} and {\bf longitude} of all the points in the 2D grid. Useful for geolocating points or regions given by grid coordinates.
+• **Latitude** and **longitude** of all the points in the 2D grid. Useful for geolocating points or regions given by grid coordinates.
 
-• {\bf Raw data} from the input data files. This can be useful if the input data were grib format, since NetCDF is often easier to read.
+• **Raw data** from the input data files. This can be useful if the input data were grib format, since NetCDF is often easier to read.
 
-• {\bf Object ID} numbers, giving for each grid point the number of the simple object (if any) that covers that point. These numbers are one-based. A value of zero means that this point is not part of any object.
+• **Object ID** numbers, giving for each grid point the number of the simple object (if any) that covers that point. These numbers are one-based. A value of zero means that this point is not part of any object.
 
-• {\bf Cluster ID} numbers. As above, only for cluster objects rather than simple objects.
+• **Cluster ID** numbers. As above, only for cluster objects rather than simple objects.
