@@ -36,12 +36,12 @@ class GenesisInfo {
       void assign(const GenesisInfo &);
 
       // Storm and model identification
-      
+
       bool         IsSet;
       bool         IsBestTrack;
       bool         IsOperTrack;
       bool         IsAnlyTrack;
-      
+
       ConcatString StormId;
       ConcatString Basin;
       ConcatString Cyclone;
@@ -74,6 +74,7 @@ class GenesisInfo {
       GenesisInfo(const GenesisInfo &);
       GenesisInfo & operator=(const GenesisInfo &);
       bool          operator==(const GenesisInfo &) const;
+      bool          is_storm(const GenesisInfo &) const;
 
       void         clear();
       void         dump(ostream &, int = 0)  const;
@@ -192,6 +193,7 @@ class GenesisInfoArray {
       void add(const GenesisInfo &);
       bool add(const TrackInfo &);
       bool has(const GenesisInfo &);
+      bool has_storm(const GenesisInfo &);
       void set_dland(int, double);
 
          //
