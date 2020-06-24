@@ -560,7 +560,7 @@ regrid = {
 //             set_grid  = "named grid or grid specification string";
 //
 //             // Flags
-//             is_precipiation      = boolean;
+//             is_precipitation     = boolean;
 //             is_specific_humidity = boolean;
 //             is_u_wind            = boolean;
 //             is_v_wind            = boolean;

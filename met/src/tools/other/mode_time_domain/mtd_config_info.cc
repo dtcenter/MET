@@ -297,7 +297,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
 
       // Dump the contents of the VarInfo objects
-// 
+//
 //       if(mlog.verbosity_level() >= 5) {
 //       mlog << Debug(5)
 //            << "Parsed forecast field:\n";
@@ -525,7 +525,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: inten_perc_value
 
    inten_perc_value = conf.lookup_int(conf_key_inten_perc_value);
-   
+
       // Check that intensity_percentile >= 0 and <= 100
 
    if(inten_perc_value < 0 || inten_perc_value > 100) {
@@ -765,37 +765,37 @@ table.set_entry(row, c++, s.text());
 
    //  fcst var
 
-s = check_hdr_str(fcst_info->name());
+s = check_hdr_str(fcst_info->name_attr());
 
 table.set_entry(row, c++, s.text());
 
    //  fcst units
 
-s = check_hdr_str(fcst_info->units(), true);
+s = check_hdr_str(fcst_info->units_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  fcst level
 
-s = check_hdr_str(fcst_info->level_name(), true);
+s = check_hdr_str(fcst_info->level_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  obs var
 
-s = check_hdr_str(obs_info->name());
+s = check_hdr_str(obs_info->name_attr());
 
 table.set_entry(row, c++, s.text());
 
    //  obs units
 
-s = check_hdr_str(obs_info->units(), true);
+s = check_hdr_str(obs_info->units_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
    //  obs level
 
-s = check_hdr_str(obs_info->level_name(), true);
+s = check_hdr_str(obs_info->level_attr(), true);
 
 table.set_entry(row, c++, s.text());
 
@@ -913,6 +913,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

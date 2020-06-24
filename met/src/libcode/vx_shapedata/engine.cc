@@ -919,7 +919,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
-          
+
          n = two_to_one(j, k);
 
          info_singles[n].fcst_number    = (j+1);
@@ -2204,7 +2204,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    double conf_obs, conf_fcst;
    double term, sum, weight_sum;
    double total;
-   
+
    if(mlog.verbosity_level() >= print_interest_log_level) {
 
       ConcatString cs;
@@ -2226,7 +2226,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    // large, don't compute the interest for this pair.
    //
    ////////////////////////////////////////////////////////////////////
-   
+
    if(is_single && p.centroid_dist > mc.max_centroid_dist) {
       total = bad_data_double;
 
@@ -2831,27 +2831,27 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 eng.conf_info.obs_conv_thresh.get_str());
 
    // Forecast Variable Name
-   s = check_hdr_str(eng.conf_info.fcst_info->name());
+   s = check_hdr_str(eng.conf_info.fcst_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   s = check_hdr_str(eng.conf_info.fcst_info->units(), true);
+   s = check_hdr_str(eng.conf_info.fcst_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(eng.conf_info.fcst_info->level_name(), true);
+   s = check_hdr_str(eng.conf_info.fcst_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   s = check_hdr_str(eng.conf_info.obs_info->name());
+   s = check_hdr_str(eng.conf_info.obs_info->name_attr());
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   s = check_hdr_str(eng.conf_info.obs_info->units(), true);
+   s = check_hdr_str(eng.conf_info.obs_info->units_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(eng.conf_info.obs_info->level_name(), true);
+   s = check_hdr_str(eng.conf_info.obs_info->level_attr(), true);
    at.set_entry(row, c++, s.text());
 
    // Observation type
