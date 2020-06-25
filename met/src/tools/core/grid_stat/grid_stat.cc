@@ -2625,7 +2625,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                        ncFloat, lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
-      add_var_att_local(&nc_var, "name", var_name);
+      add_var_att_local(&nc_var, "name", nc_var.getName());
       add_var_att_local(&nc_var, "long_name", long_att);
       add_var_att_local(&nc_var, "level", level_att);
       add_var_att_local(&nc_var, "units", units_att);
@@ -2746,14 +2746,14 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+      fcst_var = add_var(nc_out, (string) fcst_var_name, ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
       nc_var_sa.add(fcst_var_name);
 
       // Add variable attributes for the forecast field
-      add_var_att_local(&fcst_var, "name", fcst_var_name);
+      add_var_att_local(&fcst_var, "name", fcst_var.getName());
       att_str << cs_erase << conf_info.vx_opt[i_vx].fcst_info->name()
               << " at "
               << conf_info.vx_opt[i_vx].fcst_info->level_name();
@@ -2779,7 +2779,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       nc_var_sa.add(obs_var_name);
 
       // Add variable attributes for the observation field
-      add_var_att_local(&obs_var, "name", obs_var_name);
+      add_var_att_local(&obs_var, "name", obs_var.getName());
       att_str << cs_erase
               << conf_info.vx_opt[i_vx].obs_info->name() << " at "
               << conf_info.vx_opt[i_vx].obs_info->level_name();
