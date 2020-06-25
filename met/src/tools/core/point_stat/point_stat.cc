@@ -948,7 +948,9 @@ void process_scores() {
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
+      cs = conf_info.vx_opt[i].vx_pd.obs_info->units_attr();
+      if(cs.empty()) cs = na_string;
+      shc.set_obs_units(cs);
 
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
