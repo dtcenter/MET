@@ -263,9 +263,6 @@ MET Configuration File Options
 
 The information listed below may also be found in the data/config/README file.
 
-??Not sure what to do about the red text, which seems to happen when there is an apostrophe in the README file...??
-
-.. highlight:: bash
 .. literalinclude:: ../../data/config/README
 
 .. _Data IO MET-TC Configuration File Options:
