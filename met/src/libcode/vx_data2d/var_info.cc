@@ -539,12 +539,12 @@ void VarInfo::set_dict(Dictionary &dict) {
       parse_set_attrs_flag(dict, conf_key_is_u_wind);
    SetAttrsIsVWind =
       parse_set_attrs_flag(dict, conf_key_is_v_wind);
-   SetAttrsIsGridRelative =
-      parse_set_attrs_flag(dict, conf_key_is_grid_relative);
    SetAttrsIsWindSpeed =
       parse_set_attrs_flag(dict, conf_key_is_wind_speed);
    SetAttrsIsWindDirection =
       parse_set_attrs_flag(dict, conf_key_is_wind_direction);
+   SetAttrsIsGridRelative =
+      parse_set_attrs_flag(dict, conf_key_is_grid_relative);
    SetAttrsIsProb =
       parse_set_attrs_flag(dict, conf_key_is_prob);
 
