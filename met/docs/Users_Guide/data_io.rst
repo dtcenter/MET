@@ -263,6 +263,7 @@ MET Configuration File Options
 
 The information listed below may also be found in the data/config/README file.
 
+.. highlight:: none
 .. literalinclude:: ../../data/config/README
 
 .. _Data IO MET-TC Configuration File Options:
@@ -272,5 +273,5 @@ MET-TC Configuration File Options
 
 The information listed below may also be found in the data/config/README_TC file.
 
-.. highlight:: bash
+.. highlight:: none
 .. literalinclude:: ../../data/config/README_TC
