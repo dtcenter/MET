@@ -64,7 +64,7 @@ NumberStack::~NumberStack()
 
 {
 
-clear();
+clear(false);
 
 }
 
@@ -120,7 +120,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumberStack::clear()
+void NumberStack::clear(bool initialize)
 
 {
 
@@ -131,9 +131,11 @@ Nelements = 0;
 
 Nalloc = 0;
 
-AllocInc = default_ns_alloc_inc;
+if (initialize) {
+   AllocInc = default_ns_alloc_inc;
 
-extend(default_ns_alloc_inc);
+   extend(default_ns_alloc_inc);
+}
 
 return;
 
