@@ -150,7 +150,7 @@ static NcObsOutputData nc_out_data;
 
 static bool do_summary;
 static bool save_summary_only = false;
-static SummaryObs *summary_obs;
+static SummaryObs *summary_obs = 0;
 
 #endif   //  __MADIS2NC_H__
 
