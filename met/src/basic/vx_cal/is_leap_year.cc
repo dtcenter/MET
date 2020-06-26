@@ -124,7 +124,6 @@ unixtime add_to_unixtime(unixtime base_unixtime,
          << unix_to_yyyymmdd_hhmmss(base_unixtime)
          << " plus " << time_value << " days = "
          << unix_to_yyyymmdd_hhmmss(ut) << "\n";
-    }
   }
   
   return ut;
