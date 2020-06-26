@@ -205,6 +205,36 @@ void DataPlane::set(double v, int x, int y) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::set_block(double *v, int nx, int ny) {
+   int n;
+   const char *method_name = "DataPlane::set_block() -> ";
+
+   if (nx > Nx) {
+      mlog << Error << "\n" << method_name << "nx is too big ("
+           << nx << " should be equal or less than " << Nx << "\n\n\n";
+      exit(1);
+   }
+   if (ny > Ny) {
+      mlog << Error << "\n" << method_name << "ny is too big ("
+           << ny << " should be equal or less than " << Ny << "\n\n\n";
+      exit(1);
+   }
+
+   int offset = 0;
+   //Note: v should be a row first & the size is (nx * ny).
+   //      implemented based on two_to_one("n = y*Nx + x").
+   for (int y=0; y < ny; y++) {
+      int dp_offset = two_to_one(0, y);
+      for (int x=0; x < nx; x++) {
+         Data[dp_offset+x] = v[offset++];
+      }
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void DataPlane::set_constant(double v) {
 
    if(Data.empty()) {
