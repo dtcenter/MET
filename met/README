@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.0.2 (May 22, 2020)
+Model Evaluation Tools version 9.0.3 (June 25, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -252,9 +252,18 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
 
+Version 9.0.3 Release Notes:
+----------------------------
+https://github.com/NCAR/MET/milestone/66?closed=1
+
+- Fix support for fractional days in NetCDF files (#1370).
+- Fix runtime issues for regrid_data_plane (#1363).
+- Fix Fractions Skill Score aggregation for missing data values (#1362).
+- Fix Ensemble-Stat NMEP configuration options (#1351).
+
 Version 9.0.2 Release Notes:
 ----------------------------
-https://github.com/NCAR/MET/milestone/64?closed=1
+https://github.com/NCAR/MET/milestone/65?closed=1
 
 - Fix Ensemble-Stat runtime error when requesting only RHIST, PHIST, or RELP
   output line types (#1342).
