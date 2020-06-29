@@ -13,7 +13,15 @@ The most commonly used confidence interval about an estimate for a statistic (or
 
 .. math:: \theta \pm z_{\alpha / 2} \cdot V(\theta ) ,\eqno{(30.1)}
 
-where :math:`z_{\alpha / 2}` is the :math:`\alpha - \text{th}` quantile of the standard normal distribution, and :math:`V(\theta )` is the standard error of the statistic (or parameter), :math:`\theta`. For example, the most common example is for the mean of a sample, :math:`X_1,\cdots,X_n`,
+where :math:`z_{\alpha / 2}` is the :math:`\alpha - \text{th}` quantile of the standard normal distribution, and :math:`V(\theta )` is the standard error of the statistic (or parameter), :math:`\theta`. For example, the most common example is for the mean of a sample, :math:`X_1,\cdots,X_n`, of independent and identically distributed (iid) normal random variables with mean :math:`\mu` and variance :math:`\sigma`. Here, the mean is estimated by , and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, :math:`V( \theta ) = V ( \bar{X} ) = \frac{\sigma}{\sqrt{n}}`, and this must be estimated by :math:`\frac{1}{n} \sum_{i=1}^n X_i = \bar{X}`, which is obtained here by replacing :math:`\sigma` by its estimate, :math:`\hat{\sigma}`, where :math:`\hat{\sigma} = \frac{1}{n - 1} \sum_{i=1}^n (X_i - \bar{X})^2`.
+
+Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval (30.1) may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student’s **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of (30.1) is replaced with the quantile of this **t** distribution. That is, the interval is given by 
+
+.. math:: \mu \pm t_{\alpha / 2,\nu - 1} \cdot \frac{\sigma}{\sqrt{n}} , \eqno{(30.2)}
+
+where again, :math:`\sigma` is replaced by its estimate, :math:`\hat{\sigma}`, as described above.
+
+Table 30.1 summarizes the verification statistics in MET that have normal approximation CIs given by (30.1) along with their corresponding standard error estimates, . It should be noted that for the first two rows of this table (i.e., Forecast/Observation Mean and Mean error) MET also calculates the interval (30.2) for small sample sizes.
 
 .. list-table:: Verification statistics with normal approximation CIs given by (30.1) provided in MET along with their associated standard error estimate.
   :widths: auto
@@ -31,17 +39,6 @@ where :math:`z_{\alpha / 2}` is the :math:`\alpha - \text{th}` quantile of the s
     - :math:`V(\text{PSS}) = \sqrt{\frac{H(1 - H)}{n_H} + \frac{F(1 - F)}{n_F}}`, where **H** is the hit rate, **F** the false alarm rate, :math:`n_h` the number of hits and misses, and :math:`n_F` the number of false alarms and correct negatives.
   * - Logarithm of the odds ratio (OR)
     - :math:`V(\ln(\text{OR})) = \sqrt{\frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}}`, where the values in the denominators are the usual contingency table counts.
-
-of independent and identically distributed (iid) normal random variables with mean :math:`\mu` and variance :math:`\sigma`. Here, the mean is estimated by , and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, :math:`V( \theta ) = V ( \bar{X} ) = \frac{\sigma}{\sqrt{n}}`, and this must be estimated by :math:`\frac{1}{n} \sum_{i=1}^n X_i = \bar{X}`, which is obtained here by replacing :math:`\sigma` by its estimate, :math:`\hat{\sigma}`, where :math:`\hat{\sigma} = \frac{1}{n - 1} \sum_{i=1}^n (X_i - \bar{X})^2`.
-
-Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval (30.1) may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student’s **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of (30.1) is replaced with the quantile of this **t** distribution. That is, the interval is given by 
-
-.. math:: \mu \pm t_{\alpha / 2,\nu - 1} \cdot \frac{\sigma}{\sqrt{n}} , \eqno{(30.2)}
-
-where again, :math:`\sigma` is replaced by its estimate, :math:`\hat{\sigma}`, as described above.
-
-Table 30.1 summarizes the verification statistics in MET that have normal approximation CIs given by (30.1) along with their corresponding standard error estimates, . It should be noted that for the first two rows of this table (i.e., Forecast/Observation Mean and Mean error) MET also calculates the interval (30.2) for small sample sizes. \setcounter{table}{0} \renewcommand{\thetable}{30.\arabic{table}} 
-
 
 
 
