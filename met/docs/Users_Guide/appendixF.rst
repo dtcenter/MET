@@ -21,9 +21,6 @@ In addition to the configure option mentioned above, two variables, MET_PYTHON_C
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running configure.
 
-.. code-block:: none
-   
-  \vskip 0.1in\centerline{\hbox to 3.0in{\hrulefill}}\vskip 0.1in
 
 MET_PYTHON_EXE
 ______________
@@ -91,9 +88,6 @@ In the dictionary, valid time, initialization time, lead time and accumulation t
 
 Using Xarray Objects. To use Xarray objects, a similar procedure to the NumPy case is followed. An Xarray object has a NumpyArray called values, and an attributes dictionary called attrs. The user must name the Xarray object to be met_data. When one of the MET tools runs the Python script, it will look for an Xarray object named met_data, and will retrieve the data and metadata from the values and attrs parts, respectively, of the Xarray object. The Xarray attrs dictionary is populated in the same way as for the NumPy interface. The values Numpy array part of the Xarray object is also populated in the same way as the NumPy case.
 
-.. code-block:: none
-
-  \vskip 0.1in\centerline{\hbox to 3.0in{\hrulefill}}\vskip 0.1in
 
 It remains to discuss command lines and config files. Two methods for specifying the Python command and input file name are supported. 
 
@@ -101,9 +95,6 @@ Python Embedding Option 1:
 
 On the command line for any of the MET tools which will be obtaining its data from a Python script rather than directly from a data file, the user should specify either PYTHON_NUMPY or PYTHON_XARRAY wherever a (forecast or observation) data file name would normally be given. Then in the name entry of the config file dictionaries for the forecast or observation data, the user should list the Python script to be run followed by any command line arguments for that script. Note that for tools like MODE that take two data files, it would be entirely possible to use the NumPy interface for one file and the Xarray interface for the other.
 
-.. code-block:: none
-
-  \vskip 0.1in\centerline{\hbox to 3.0in{\hrulefill}}\vskip 0.1in
 
 Listed below is an example of running the plot_data_plane tool to call a Python script for data that is included with the MET release tarball. Assuming the MET executables are in your path, this example may be run from the top-level MET source code directory.
 
