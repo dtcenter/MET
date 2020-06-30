@@ -806,7 +806,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
-The output NetCDF file contains the dimensions and variables shown in the following Tables: :ref:`table_GS_Dimensions_NetCDF_matched_pair_out` and :ref:`table_GS_var_NetCDF_matched_pair_out`.
+The output NetCDF file contains the dimensions and variables shown in the following Tables: :numref:`table_GS_Dimensions_NetCDF_matched_pair_out` and :numref:`table_GS_var_NetCDF_matched_pair_out`.
 
 .. _table_GS_Dimensions_NetCDF_matched_pair_out:
 

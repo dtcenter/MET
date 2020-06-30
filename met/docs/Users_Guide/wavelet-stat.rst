@@ -451,7 +451,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
 
 The Wavelet-Stat tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
 
-The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables :ref:`table_NetCDF_dim_Wave_output` and :ref:`table_variables_wave_NetCDF_output`.
+The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables :numref:`table_NetCDF_dim_Wave_output` and :numref:`table_variables_wave_NetCDF_output`.
 
 .. _table_NetCDF_dim_Wave_output:
 

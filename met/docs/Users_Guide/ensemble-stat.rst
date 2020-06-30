@@ -562,7 +562,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Error percent value used in confidence intervals
   * - 24
     - LINE_TYPE
-    - Output line types are listed in :ref:`table_ES_header_info_es_out_RHIST` through :ref:`table_ES_header_info_es_out_SSVAR`.
+    - Output line types are listed in :numref:`table_ES_header_info_es_out_RHIST` through :numref:`table_ES_header_info_es_out_SSVAR`.
 
 .. _table_ES_header_info_es_out_ECNT:
 

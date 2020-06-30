@@ -155,26 +155,26 @@ ____________________
 
 The output_stats array controls the type of output that the Series-Analysis tool generates. Each flag corresponds to an output line type in the STAT file and is used to specify the comma-separated list of statistics to be computed. Use the column names from the tables listed below to specify the statistics. The output flags correspond to the following types of output line types:
 
-1. FHO for Forecast, Hit, Observation Rates (See :ref:`table_PS_format_info_FHO`)
+1. FHO for Forecast, Hit, Observation Rates (See :numref:`table_PS_format_info_FHO`)
 
-2. CTC for Contingency Table Counts (See :ref:`table_PS_format_info_CTC`)
+2. CTC for Contingency Table Counts (See :numref:`table_PS_format_info_CTC`)
 
-3. CTS for Contingency Table Statistics (See :ref:`table_PS_format_info_CTS`)
+3. CTS for Contingency Table Statistics (See :numref:`table_PS_format_info_CTS`)
 
-4. MCTC for Multi-Category Contingency Table Counts (See :ref:`table_PS_format_info_MCTC`)
+4. MCTC for Multi-Category Contingency Table Counts (See :numref:`table_PS_format_info_MCTC`)
 
-5. MCTS for Multi-Category Contingency Table Statistics (See :ref:`table_PS_format_info_MCTS`)
+5. MCTS for Multi-Category Contingency Table Statistics (See :numref:`table_PS_format_info_MCTS`)
 
-6. CNT for Continuous Statistics (See :ref:`table_PS_format_info_CNT`)
+6. CNT for Continuous Statistics (See :numref:`table_PS_format_info_CNT`)
 
-7. SL1L2 for Scalar L1L2 Partial Sums (See :ref:`table_PS_format_info_SL1L2`)
+7. SL1L2 for Scalar L1L2 Partial Sums (See :numref:`table_PS_format_info_SL1L2`)
 
-8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums climatological data is supplied (See :ref:`table_PS_format_info_SAL1L2`)
+8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums climatological data is supplied (See :numref:`table_PS_format_info_SAL1L2`)
 
-9. PCT for Contingency Table Counts for Probabilistic forecasts (See :ref:`table_PS_format_info_PCT`)
+9. PCT for Contingency Table Counts for Probabilistic forecasts (See :numref:`table_PS_format_info_PCT`)
 
-10. PSTD for Contingency Table Statistics for Probabilistic forecasts (See :ref:`table_PS_format_info_PSTD`)
+10. PSTD for Contingency Table Statistics for Probabilistic forecasts (See :numref:`table_PS_format_info_PSTD`)
 
-11. PJC for Joint and Conditional factorization for Probabilistic forecasts (See :ref:`table_PS_format_info_PJC`)
+11. PJC for Joint and Conditional factorization for Probabilistic forecasts (See :numref:`table_PS_format_info_PJC`)
 
-12. PRC for Receiver Operating Characteristic for Probabilistic forecasts (See :ref:`table_PS_format_info_PRC`)
+12. PRC for Receiver Operating Characteristic for Probabilistic forecasts (See :numref:`table_PS_format_info_PRC`)
