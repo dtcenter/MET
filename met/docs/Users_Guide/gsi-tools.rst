@@ -90,7 +90,7 @@ The gsid2mpr tool writes the same set of MPR output columns for the conventional
     - Description
   * - 1-37
     - 
-    - Standard MPR columns described in :ref:`table_PS_format_info_MPR`.
+    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`.
   * - 38
     - OBS_PRS
     - Model pressure value at the observation height (hPa)
@@ -132,7 +132,7 @@ The gsid2mpr tool writes the same set of MPR output columns for the conventional
     - Description
   * - 1-37
     -  
-    - Standard MPR columns described in :ref:`table_PS_format_info_MPR`.
+    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`.
   * - 38
     - CHAN_USE
     - Channel used (1 for yes, -1 for no)
@@ -324,7 +324,7 @@ The gsid2mpr tool writes the same set of ORANK output columns for the convention
     - Description
   * - 1-?
     -  
-    - Standard ORANK columns described in :ref:`table_ES_header_info_es_out_ORANK`.
+    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`.
   * - Last-2
     - N_USE
     - Number of members with ANLY_USE = 1
@@ -348,7 +348,7 @@ The gsid2mpr tool writes the same set of ORANK output columns for the convention
     - Description
   * - 1-?
     -  
-    - Standard ORANK columns described in :ref:`table_ES_header_info_es_out_ORANK`.
+    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`.
   * - Last-24
     - N_USE
     - Number of members with OBS_QC = 0
