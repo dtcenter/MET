@@ -3129,6 +3129,32 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute anomaly correlation from sums of squares
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_anom_corr(double ffa, double ooa, double foa) {
+   double v, c;
+
+   v = ffa*ooa;
+
+   // Check for square root of negative number
+   if(v < 0) {
+      c = bad_data_double;
+   }
+   else {
+      c = foa/sqrt(v);
+
+      // Check the computed range
+           if(c >  1) c =  1.0;
+      else if(c < -1) c = -1.0;
+   }
+
+   return(c);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 double compute_afss(double f_rate, double o_rate) {
    double num, den, afss;

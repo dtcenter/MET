@@ -673,6 +673,8 @@ extern double compute_stdev(double, double, int);
 
 extern double compute_corr(double, double, double, double, double, int);
 
+extern double compute_anom_corr(double, double, double);
+
 extern double compute_afss(double, double);
 
 extern double compute_ufss(double);
