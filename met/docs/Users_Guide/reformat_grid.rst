@@ -3,7 +3,7 @@
 Re-Formatting of Gridded Fields
 ===============================
 
-Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in ::numref:`overview`.
+Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in ::numref:`overview-figure`.
 
 Pcp-Combine tool
 ________________
@@ -69,55 +69,56 @@ Required arguments for the pcp_combine
 
 1. The Pcp-Combine tool must be run with exactly one run command (-sum, -add, -subtract, or -derive) with the corresponding additional arguments.
 
-2. The out_file argument indicates the name for the NetCDF file to be written.
+2. The **out_file** argument indicates the name for the NetCDF file to be written.
 
 Optional arguments for pcp_combine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The -field string option defines the data to be extracted from the input files. Use this option when processing fields other than APCP or non-GRIB files. This option may be used multiple times and output will be created for each.
+3. The **-field string** option defines the data to be extracted from the input files. Use this option when processing fields other than **APCP** or non-GRIB files. This option may be used multiple times and output will be created for each.
 
-4. The -name list option is a comma-separated list of output variable names which override the default choices. If specified, the number of names must match the number of variables to written to the output file.
+4. The **-name list** option is a comma-separated list of output variable names which override the default choices. If specified, the number of names must match the number of variables to written to the output file.
 
-5. The -vld_thresh n option overrides the default required ratio of valid data for at each grid point for an output value to be written. The default is 1.0.
+5. The **-vld_thresh n** option overrides the default required ratio of valid data for at each grid point for an output value to be written. The default is 1.0.
 
-6. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-7. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-8. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Required arguments for the pcp_combine sum command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The init_time argument, provided in YYYYMMDD[_HH[MMSS]] format, indicates the initialization time for model data to be summed. Only files found with this initialization time will be processed. If combining observation files, Stage II or Stage IV data for example, the initialization time is not applicable. Providing a string of all zeros (00000000_000000) indicates that all files, regardless of initialization time should be processed.
+1. The **init_time** argument, provided in YYYYMMDD[_HH[MMSS]] format, indicates the initialization time for model data to be summed. Only files found with this initialization time will be processed. If combining observation files, Stage II or Stage IV data for example, the initialization time is not applicable. Providing a string of all zeros (00000000_000000) indicates that all files, regardless of initialization time should be processed.
 
-2. The in_accum argument, provided in HH[MMSS] format, indicates the accumulation interval of the model or observation gridded files to be processed. This value must be specified, since a model output file may contain multiple accumulation periods for precipitation in a single file. The argument indicates which accumulation period to extract.
+2. The **in_accum** argument, provided in HH[MMSS] format, indicates the accumulation interval of the model or observation gridded files to be processed. This value must be specified, since a model output file may contain multiple accumulation periods for precipitation in a single file. The argument indicates which accumulation period to extract.
 
-3. The valid_time argument, in YYYYMMDD[_HH[MMSS]] format, indicates the desired valid time to which the accumulated precipitation is to be summed.
+3. The **valid_time** argument, in YYYYMMDD[_HH[MMSS]] format, indicates the desired valid time to which the accumulated precipitation is to be summed.
 
-4. The out_accum argument, in HH[MMSS] format, indicates the desired total accumulation period to be summed.
+4. The **out_accum** argument, in HH[MMSS] format, indicates the desired total accumulation period to be summed.
 
 Optional arguments for pcp_combine sum command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -pcpdir path option indicates the directories in which the input files reside. The contents of “path” will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
+5. The **-pcpdir path** option indicates the directories in which the input files reside. The contents of “**path**” will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
 
-6. The -pcprx reg_exp option indicates the regular expression to be used in matching files in the search directories specified. The contents of “reg_exp” will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
+6. The **-pcprx reg_exp** option indicates the regular expression to be used in matching files in the search directories specified. The contents of “reg_exp” will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
 
 Required arguments for the pcp_combine derive command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The “derive” run command must be followed by stat_list which is a comma-separated list of summary fields to be computed. The stat_list may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
+1. The “derive” run command must be followed by **stat_list** which is a comma-separated list of summary fields to be computed. The **stat_list** may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
 
 Input files for pcp_combine add, subtract, and derive commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The input files for the add, subtract, and derive command can be specified in one of 3 ways:
 
-1. Use file_1 config_str_1 ... file_n config_str_n to specify the full path to each input file followed by a description of the data to be read from it. The config_str_i argument describing the data can be a set to a time string in HH[MMSS] format for accumulated precipitation or a full configuration string. For example, use 'name="TMP"; level="P500";' to process temperature at 500mb.
+1. Use **file_1 config_str_1 ... file_n config_str_n** to specify the full path to each input file followed by a description of the data to be read from it. The **config_str_i** argument describing the data can be a set to a time string in HH[MMSS] format for accumulated precipitation or a full configuration string. For example, use **'name="TMP"; level="P500";'** to process temperature at 500mb.
 
-2. Use file_1 ... file_n to specify the list of input files to be processed on the command line. Rather then specifying a separate configuration string for each input file, the “-field” command line option is required to specify the data to be processed.
+2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. Rather then specifying a separate configuration string for each input file, the “-field” command line option is required to specify the data to be processed.
 
-3. Use input_file_list to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the “-field” command line option is required to specify the data to be processed.
+3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the “-field” command line option is required to specify the data to be processed.
 
 An example of the pcp_combine calling sequence is presented below:
 
@@ -166,7 +167,7 @@ The output NetCDF files contain the requested accumulation intervals as well as 
 
 Each NetCDF file generated by the Pcp-Combine tool contains the dimensions and variables shown in the following two tables.
 
-.. list-table:: Table 5.1 NetCDF file dimensions for pcp_combine output.
+.. list-table:: NetCDF file dimensions for pcp_combine output.
   :widths: auto
   :header-rows: 2
 
@@ -180,7 +181,7 @@ Each NetCDF file generated by the Pcp-Combine tool contains the dimensions and v
     - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
       
 
-.. list-table:: Table 5.2 NetCDF variables for pcp_combine output.
+.. list-table:: NetCDF variables for pcp_combine output.
   :widths: auto
   :header-rows: 2
 
@@ -232,38 +233,38 @@ The usage statement for the regrid_data_plane utility is shown below:
 Required arguments for regrid_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The input_filename is the gridded data file to be read.
+1. The **input_filename** is the gridded data file to be read.
 
-2. The to_grid defines the output grid as a named grid, the path to a gridded data file, or an explicit grid specification string. 
+2. The **to_grid** defines the output grid as a named grid, the path to a gridded data file, or an explicit grid specification string. 
 
-3. The output_filename is the output NetCDF file to be written.
+3. The **output_filename** is the output NetCDF file to be written.
 
-4. The -field string may be used multiple times to define the field(s) to be regridded.
+4. The **-field string** may be used multiple times to define the field(s) to be regridded.
 
 Optional arguments for regrid_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -method type option overrides the default regridding method. Default is NEAREST.
+5. The **-method type** option overrides the default regridding method. Default is NEAREST.
 
-6. The -width n option overrides the default regridding width. Default is 1. In case of MAXGAUSS method, the width should be the ratio between from_grid and to_grid (for example, 27 if from_grid is 3km and to_grid is 81.271km).
+6. The **-width n** option overrides the default regridding width. Default is 1. In case of MAXGAUSS method, the width should be the ratio between from_grid and to_grid (for example, 27 if from_grid is 3km and to_grid is 81.271km).
 
-7. The -gaussian_dx option overrides the default delta distance for Gaussian smoothing. Default is 81.271. Ignored if not the MAXGAUSS method.
+7. The **-gaussian_dx** option overrides the default delta distance for Gaussian smoothing. Default is 81.271. Ignored if not the MAXGAUSS method.
 
-8. The -gaussian_radius option overrides the default radius of influence for Gaussian interpolation. Default is 120. Ignored if not the MAXGAUSS method.
+8. The **-gaussian_radius** option overrides the default radius of influence for Gaussian interpolation. Default is 120. Ignored if not the MAXGAUSS method.
 
-9. The -shape option overrides the default interpolation shape. Default is SQUARE.
+9. The **-shape** option overrides the default interpolation shape. Default is SQUARE.
 
-10. The -vld_thresh n option overrides the default required ratio of valid data for regridding. Default is 0.5. 
+10. The **-vld_thresh n** option overrides the default required ratio of valid data for regridding. Default is 0.5. 
 
-11. The -name list specifies a comma-separated list of output variable names for each field specified.
+11. The **-name list** specifies a comma-separated list of output variable names for each field specified.
 
-12. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+12. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-13. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+13. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-14. The -compress level option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+14. The **-compress level** option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-For more details on setting the to_grid, -method, -width, and -vld_thresh options, see the regrid entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the regrid_data_plane calling sequence is shown below:
+For more details on setting the **to_grid, -method, -width,** and **-vld_thresh** options, see the regrid entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the regrid_data_plane calling sequence is shown below:
 
 .. code-block:: none
 
@@ -278,12 +279,12 @@ For more details on setting the to_grid, -method, -width, and -vld_thresh option
   -field 'name="HGT";  level="P500";' \
   -method BILIN -width 2 -v 1
 
-In this example, the regrid_data_plane tool will regrid data from the input.grb file to the grid on which the first record of the togrid.grb file resides using Bilinear Interpolation with a width of 2 and write the output in NetCDF format to a file named regridded.nc. The variables in regridded.nc will include 6-hour accumulated precipitation, 2m temperature, 10m U and V components of the wind, and the 500mb geopotential height.
+In this example, the regrid_data_plane tool will regrid data from the **input.grb** file to the grid on which the first record of the **togrid.grb** file resides using Bilinear Interpolation with a width of 2 and write the output in NetCDF format to a file named **regridded.nc**. The variables in **regridded.nc** will include 6-hour accumulated precipitation, 2m temperature, 10m U and V components of the wind, and the 500mb geopotential height.
 
 Automated regridding within tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While the regrid_data_plane tool is useful as a stand-alone tool, the capability is also included to automatically regrid one or both fields in most of the MET tools that handle gridded data. See the regrid entry in Section :ref:`Configuration File Details` for a description of the configuration file entries that control automated regridding.
+While the regrid_data_plane tool is useful as a stand-alone tool, the capability is also included to automatically **regrid** one or both fields in most of the MET tools that handle gridded data. See the regrid entry in Section :ref:`Configuration File Details` for a description of the configuration file entries that control automated regridding.
 
 Shift_data_plane tool
 _____________________
@@ -314,30 +315,30 @@ shift_data_plane has five required arguments and can also take optional ones.
 Required arguments for shift_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The input_filename is the gridded data file to be read.
+1. The **input_filename** is the gridded data file to be read.
 
-2. The output_filename is the output NetCDF file to be written.
+2. The **output_filename** is the output NetCDF file to be written.
 
-3. The field_string defines the data to be shifted from the input file.
+3. The **field_string** defines the data to be shifted from the input file.
 
-4. The -from lat lon specifies the starting location within the domain to define the shift. Latitude and longitude are defined in degrees North and East, respectively.
+4. The **-from lat lon** specifies the starting location within the domain to define the shift. Latitude and longitude are defined in degrees North and East, respectively.
 
-5. The -to lat lon specifies the ending location within the domain to define the shift. Lat is deg N, Lon is deg E.
+5. The **-to lat lon** specifies the ending location within the domain to define the shift. Lat is deg N, Lon is deg E.
 
 Optional arguments for shift_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-6. The -method type overrides the default regridding method. Default is NEAREST.
+6. The **-method type** overrides the default regridding method. Default is NEAREST.
 
-7. The -width n overrides the default regridding width. Default is 1.
+7. The **-width n** overrides the default regridding width. Default is 1.
 
-8. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-9. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+9. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-10. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-For more details on setting the -method and -width options, see the regrid entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the shift_data_plane calling sequence is shown below:
+For more details on setting the **-method** and **-width** options, see the **regrid** entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the shift_data_plane calling sequence is shown below:
 
 .. code-block:: none
 
@@ -349,7 +350,7 @@ For more details on setting the -method and -width options, see the regrid entry
   -to   40.1717 -105.1092 \
   -v 2
 
-In this example, the shift_data_plane tool reads 12-hour accumulated precipitation from the nam.grb file, applies a rigid shift defined by (38.6272, -90.1978) to (40.1717, -105.1092) and writes the output in NetCDF format to a file named nam_shift_APCP_12.nc. These -from and -to locations result in a grid shift of -108.30 units in the x-direction and 16.67 units in the y-direction.
+In this example, the shift_data_plane tool reads 12-hour accumulated precipitation from the **nam.grb** file, applies a rigid shift defined by (38.6272, -90.1978) to (40.1717, -105.1092) and writes the output in NetCDF format to a file named **nam_shift_APCP_12.nc**. These **-from** and **-to** locations result in a grid shift of -108.30 units in the x-direction and 16.67 units in the y-direction.
 
 MODIS regrid tool
 _________________
@@ -379,26 +380,26 @@ modis_regrid has some required arguments and can also take optional ones.
 Required arguments for modis_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -data_file path argument specifies the data files used to get the grid information.
+1. The **-data_file path** argument specifies the data files used to get the grid information.
 
-2. The -field name argument specifies the name of the field to use in the MODIS data file.
+2. The **-field name** argument specifies the name of the field to use in the MODIS data file.
 
-3. The -out path argument specifies the name of the output NetCDF file.
+3. The **-out path** argument specifies the name of the output NetCDF file.
 
-4. The -scale value argument specifies the scale factor to be used on the raw MODIS values.
+4. The **-scale value** argument specifies the scale factor to be used on the raw MODIS values.
 
-5. The -offset value argument specifies the offset value to be used on the raw MODIS values.
+5. The **-offset value** argument specifies the offset value to be used on the raw MODIS values.
 
-6. The -fill value argument specifies the bad data value in the MODIS data. 
+6. The **-fill value** argument specifies the bad data value in the MODIS data. 
 
-7. The modis_file argument is the name of the MODIS input file.
+7. The **modis_file** argument is the name of the MODIS input file.
 
 Optional arguments for modis_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-8. The -units text option specifies the units string in the global attributes section of the output file.
+8. The **-units text** option specifies the units string in the global attributes section of the output file.
 
-9. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+9. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the modis_regrid calling sequence is shown below:
 
@@ -447,18 +448,18 @@ wmmca_plot has some required arguments and can also take optional ones.
 Required arguments for wwmca_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The wwmca_cloud_pct_file_list argument represents one or more WWMCA cloud percent files given on the command line. As with any command given to a UNIX shell, the user can use meta-characters as a shorthand way to specify many filenames. For each input file specified, one output PostScript plot will be created.
+1. The **wwmca_cloud_pct_file_list** argument represents one or more WWMCA cloud percent files given on the command line. As with any command given to a UNIX shell, the user can use meta-characters as a shorthand way to specify many filenames. For each input file specified, one output PostScript plot will be created.
 
 Optional arguments for wwmca_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2. The -outdir path option specifies the directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory.
+2. The **-outdir path** option specifies the directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory.
 
-3. The -max minutes option specifies the maximum pixel age in minutes to be plotted.
+3. The **-max minutes** option specifies the maximum pixel age in minutes to be plotted.
 
-4. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-5. The -v level option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 .. _reformat_grid_fig2:
 
@@ -487,29 +488,29 @@ wmmca_regrid has some required arguments and can also take optional ones.
 Required arguments for wwmca_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -out filename argument specifies the name of the output netCDF file.
+1. The **-out filename** argument specifies the name of the output netCDF file.
 
-2. The -config filename argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+2. The **-config filename** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-3. The -nh filename [pt_filename] argument specifies the northern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the northern hemisphere.
+3. The **-nh filename [pt_filename]** argument specifies the northern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the northern hemisphere.
 
-4. The -sh filename [pt_filename] argument specifies the southern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the southern hemisphere.
+4. The **-sh filename [pt_filename]** argument specifies the southern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the southern hemisphere.
 
 Optional arguments for wwmca_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-6. The -v level option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-7. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-In any regridding problem, there are two grids involved: the “From” grid, which is the grid the input data are on, and the “To” grid, which is the grid the data are to be moved onto. In WWMCA-Regrid the “From” grid is pre-defined by the hemisphere of the WWMCA binary files being processed. The “To” grid and corresponding regridding logic are specified using the regrid section of the configuration file. If the “To” grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere need be given. If the “To” grid or the interpolation box used straddles the equator the data files for both hemispheres need be given. Once the “To” grid is specified in the config file, the WWMCA-Regrid tool will know which input data files it needs and will complain if it is not given the right ones.
+In any regridding problem, there are two grids involved: the “From” grid, which is the grid the input data are on, and the “To” grid, which is the grid the data are to be moved onto. In **WWMCA-Regrid** the “From” grid is pre-defined by the hemisphere of the WWMCA binary files being processed. The “To” grid and corresponding regridding logic are specified using the **regrid** section of the configuration file. If the “To” grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere need be given. If the “To” grid or the interpolation box used straddles the equator the data files for both hemispheres need be given. Once the “To” grid is specified in the config file, the WWMCA-Regrid tool will know which input data files it needs and will complain if it is not given the right ones.
 
 wwmca_regrid configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the WWMCA-Regrid tool named WWMCARegridConfig_default can be found in the installed share/met/config directory. We encourage users to make a copy of this file prior to modifying its contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the WWMCA-Regrid tool named **WWMCARegridConfig_default** can be found in the installed **share/met/config** directory. We encourage users to make a copy of this file prior to modifying its contents. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
@@ -519,7 +520,7 @@ ____________________________
 
   regrid = { ... }
 
-See the regrid entry in Section :ref:`Configuration File Details` for a description of the configuration file entries that control regridding.
+See the **regrid entry** in Section :ref:`Configuration File Details` for a description of the configuration file entries that control regridding.
 
 ____________________________
 
@@ -550,4 +551,4 @@ __________________________
   swap_endian     = TRUE;
   write_pixel_age = FALSE;
 
-The settings listed above are control the processing of the WWMCA pixel age data. This data is stored in binary data files in 4-byte blocks. The swap_endian option indicates whether the endian-ness of the data should be swapped after reading. The max_minutes option specifies a maximum allowed age for the cloud data in minutes. Any data values older than this value are set to bad data in the output. The write_pixel_age option writes the pixel age data, in minutes, to the output file instead of the cloud data.
+The settings listed above are control the processing of the WWMCA pixel age data. This data is stored in binary data files in 4-byte blocks. The **swap_endian** option indicates whether the endian-ness of the data should be swapped after reading. The **max_minutes** option specifies a maximum allowed age for the cloud data in minutes. Any data values older than this value are set to bad data in the output. The **write_pixel_age** option writes the pixel age data, in minutes, to the output file instead of the cloud data.
