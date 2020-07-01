@@ -1320,6 +1320,9 @@ void process_point_scores() {
                   // Subset pairs using the current obs_thresh
                   pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
 
+                  // Continue if there are no points
+                  if(pd.n_obs == 0) continue;
+
                   // Compute ECNT scores
                   if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
                      do_ecnt(conf_info.vx_opt[i],
@@ -1769,6 +1772,9 @@ void process_grid_vx() {
 
                // Subset pairs using the current obs_thresh
                pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
+
+               // Continue if there are no points
+               if(pd.n_obs == 0) continue;
 
                // Create output text files as requested in the config file
                setup_txt_files();
