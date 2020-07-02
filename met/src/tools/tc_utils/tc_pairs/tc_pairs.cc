@@ -559,6 +559,9 @@ void process_track_files(const StringArray &files,
       // Initialize counts
       cur_read = cur_add = 0;
 
+      // Set the basin map
+      line.set_basin_map(&conf_info.BasinMap);
+
       // Read each line in the file
       while(f >> line) {
 
@@ -658,6 +661,9 @@ void process_prob_files(const StringArray &files,
 
       // Initialize counts
       cur_read = cur_add = 0;
+
+      // Set the basin map
+      line.set_basin_map(&conf_info.BasinMap);
 
       // Read each line in the file
       while(f >> line) {

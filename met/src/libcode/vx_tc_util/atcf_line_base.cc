@@ -16,6 +16,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <map>
 
 #include "vx_math.h"
 
@@ -72,6 +73,8 @@ void ATCFLineBase::init_from_scratch() {
    // ATCF lines are comma-delimited
    set_delimiter(",");
 
+   BasinMap = (map<ConcatString,ConcatString> *) 0;
+
    clear();
 
    return;
@@ -85,7 +88,10 @@ void ATCFLineBase::assign(const ATCFLineBase &l) {
 
    DataLine::assign(l);
 
+   BasinMap = l.BasinMap;
+
    Type = l.Type;
+   Basin = l.Basin;
    Technique = l.Technique;
    IsBestTrack = l.IsBestTrack;
    IsOperTrack = l.IsOperTrack;
@@ -101,8 +107,7 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "Line            = " << (*this) << "\n";
    out << prefix << "Type            = " << atcflinetype_to_string(Type) << "\n";
-   cs = basin();
-   out << prefix << "Basin           = \"" << cs.contents() << "\"\n";
+   out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
    cs = cyclone_number();
    out << prefix << "CycloneNumber   = \"" << cs.contents() << "\"\n";
    out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(warning_time()) << "\n";
@@ -125,7 +130,11 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
 
 void ATCFLineBase::clear() {
    DataLine::clear();
+
+   // Do not reset the basin map pointer
+
    Type = NoATCFLineType;
+   Basin.clear();
    Technique.clear();
    IsBestTrack = false;
    IsOperTrack = false;
@@ -151,6 +160,14 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    // Set the line type from the technique number column
    Type = string_to_atcflinetype(get_item(TechniqueNumberOffset).c_str());
 
+   // Set the basin
+   Basin = get_item(BasinOffset);
+
+   // Update the basin name, if specified in the map
+   if(BasinMap) {
+      if(BasinMap->count(Basin) > 0) Basin = BasinMap->at(Basin);
+   }
+
    return(1);
 }
 
@@ -166,13 +183,13 @@ bool ATCFLineBase::is_header() const {
 ConcatString ATCFLineBase::get_item(int i) const {
    ConcatString cs;
    int i_col = i;
-   
+
    // For ATCFLineType_GenTrack:
    //    Columns 1 and 2 are consistent, use offsets 0 and 1
    //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track
    // Shift those column indices by 1.
    if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
-   
+
    cs = DataLine::get_item(i_col);
 
    // Strip off any whitespace
@@ -203,7 +220,7 @@ ATCFLineType ATCFLineBase::type() const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::basin() const {
-   return(get_item(BasinOffset));
+   return(Basin);
 }
 
 ////////////////////////////////////////////////////////////////////////

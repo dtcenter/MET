@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 
 #include "vx_cal.h"
 #include "vx_util.h"
@@ -56,7 +57,10 @@ class ATCFLineBase : public DataLine {
 
       void assign(const ATCFLineBase &);
 
+      const map<ConcatString,ConcatString> * BasinMap;  // not allocated
+
       ATCFLineType Type;
+      ConcatString Basin;
       ConcatString Technique;
       bool         IsBestTrack;
       bool         IsOperTrack;
@@ -67,7 +71,7 @@ class ATCFLineBase : public DataLine {
      ~ATCFLineBase();
       ATCFLineBase(const ATCFLineBase &);
       ATCFLineBase & operator= (const ATCFLineBase &);
-      bool       operator==(const ATCFLineBase &);
+      bool           operator==(const ATCFLineBase &);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -80,6 +84,8 @@ class ATCFLineBase : public DataLine {
          //
          // set values
          //
+
+      void set_basin_map (const map<ConcatString,ConcatString> *);
 
       void set_technique (const ConcatString &);
       void set_best_track(const bool);
@@ -116,11 +122,13 @@ class ATCFLineBase : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void ATCFLineBase::set_technique(const ConcatString &s) { Technique   = s;     }
-inline void ATCFLineBase::set_best_track(const bool tf)        { IsBestTrack = tf;    }
-inline void ATCFLineBase::set_oper_track(const bool tf)        { IsOperTrack = tf;    }
-inline bool ATCFLineBase::is_best_track() const                { return(IsBestTrack); }
-inline bool ATCFLineBase::is_oper_track() const                { return(IsOperTrack); }
+inline void ATCFLineBase::set_basin_map (const map<ConcatString,ConcatString> *m) { BasinMap = m; };
+
+inline void ATCFLineBase::set_technique (const ConcatString &s) { Technique   = s;     }
+inline void ATCFLineBase::set_best_track(const bool tf)         { IsBestTrack = tf;    }
+inline void ATCFLineBase::set_oper_track(const bool tf)         { IsOperTrack = tf;    }
+inline bool ATCFLineBase::is_best_track () const                { return(IsBestTrack); }
+inline bool ATCFLineBase::is_oper_track () const                { return(IsOperTrack); }
 
 ////////////////////////////////////////////////////////////////////////
 
