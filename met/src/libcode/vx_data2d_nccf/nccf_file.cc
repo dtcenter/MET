@@ -92,6 +92,12 @@ void NcCfFile::init_from_scratch()
   Var = (NcVarInfo *) 0;
   _time_var_info = (NcVarInfo *)NULL;
 
+  _xDim = (NcDim *)0; 
+  _yDim = (NcDim *)0;
+  _tDim = (NcDim *)0;
+  _xCoordVar = (NcVar *)0;
+  _yCoordVar = (NcVar *)0;
+
   // Close any existing file
 
   close();

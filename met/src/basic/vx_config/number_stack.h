@@ -58,7 +58,7 @@ class NumberStack {
       NumberStack(const NumberStack &);
       NumberStack & operator=(const NumberStack &);
 
-      void clear();
+      void clear(bool initialize = true);
 
       void dump(ostream &, int = 0) const;
 
