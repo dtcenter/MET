@@ -432,7 +432,7 @@ Percentiles of the errors provide more information about the distribution of err
 
 Anomaly Correlation Coefficient
 
-Called "ANOM_CORR" in CNT output :ref:`table_PS_format_info_CNT`
+Called "ANOM_CORR_RAW" in CNT output :ref:`table_PS_format_info_CNT`
 
 The Anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (c) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The Anomaly correlation coefficient is defined as: $$ \hbox{Anomoly Correlation}={ 
 

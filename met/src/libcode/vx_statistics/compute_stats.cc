@@ -69,17 +69,23 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
 
    // Handle SAL1L2 data
    if(aflag) {
-      cnt_info.pr_corr.v   = bad_data_double;
-      cnt_info.anom_corr.v = compute_anom_corr(ffbar, oobar, fobar);
-      cnt_info.rmsfa.v     = sqrt(ffbar);
-      cnt_info.rmsoa.v     = sqrt(oobar);
+      cnt_info.pr_corr.v       = bad_data_double;
+      cnt_info.anom_corr.v     = compute_corr( fbar*n,  obar*n,
+                                              ffbar*n, oobar*n,
+                                              fobar*n, n);
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffbar, oobar, fobar);
+      cnt_info.rmsfa.v         = sqrt(ffbar);
+      cnt_info.rmsoa.v         = sqrt(oobar);
    }
    // Handle SL1L2 data
    else {
-      cnt_info.pr_corr.v   = compute_corr(fbar, obar, ffbar, oobar, fobar, n);
-      cnt_info.anom_corr.v = bad_data_double;
-      cnt_info.rmsfa.v     = bad_data_double;
-      cnt_info.rmsoa.v     = bad_data_double;
+      cnt_info.pr_corr.v       = compute_corr( fbar*n,  obar*n,
+                                              ffbar*n, oobar*n,
+                                              fobar*n, n);
+      cnt_info.anom_corr.v     = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
+      cnt_info.rmsfa.v         = bad_data_double;
+      cnt_info.rmsoa.v         = bad_data_double;
    }
 
    // Compute mean error
@@ -242,7 +248,9 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Compute Pearson correlation coefficient
    //
-   cnt_info.pr_corr.v = compute_corr(f_bar,  o_bar, ff_bar, oo_bar, fo_bar, n);
+   cnt_info.pr_corr.v = compute_corr( f_bar*n,  o_bar*n,
+                                     ff_bar*n, oo_bar*n,
+                                     fo_bar*n, n);
 
    //
    // Process anomaly scores
@@ -250,20 +258,24 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    if(cmn_flag) {
 
       //
-      // Compute Anomaly Correlation
+      // Compute Anomaly Correlations
       //
-      cnt_info.anom_corr.v = compute_anom_corr(ffa_bar, ooa_bar, foa_bar);
+      cnt_info.anom_corr.v     = compute_corr( fa_bar*n,  oa_bar*n,
+                                              ffa_bar*n, ooa_bar*n,
+                                              foa_bar*n, n);
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffa_bar, ooa_bar, foa_bar);
 
       //
       // Compute RMSFA and RMSOA
       //
-      cnt_info.rmsfa.v     = sqrt(ffa_bar);
-      cnt_info.rmsoa.v     = sqrt(ooa_bar);
+      cnt_info.rmsfa.v         = sqrt(ffa_bar);
+      cnt_info.rmsoa.v         = sqrt(ooa_bar);
    }
    else {
-      cnt_info.anom_corr.v = bad_data_double;
-      cnt_info.rmsfa.v     = bad_data_double;
-      cnt_info.rmsoa.v     = bad_data_double;
+      cnt_info.anom_corr.v     = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
+      cnt_info.rmsfa.v         = bad_data_double;
+      cnt_info.rmsoa.v         = bad_data_double;
    }
 
    //
@@ -410,8 +422,9 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Compute Spearman's Rank correlation coefficient
       //
-      cnt_info.sp_corr.v = compute_corr(f_bar, o_bar, ff_bar, oo_bar,
-                                        fo_bar, n);
+      cnt_info.sp_corr.v = compute_corr( f_bar*n,  o_bar*n,
+                                        ff_bar*n, oo_bar*n,
+                                        fo_bar*n, n);
 
       //
       // Compute Kendall Tau Rank correlation coefficient:
@@ -1139,6 +1152,9 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr.v);
    cnt_mean.anom_corr.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr_raw.v);
+   cnt_mean.anom_corr_raw.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsfa.v);
    cnt_mean.rmsfa.v = na.mean();

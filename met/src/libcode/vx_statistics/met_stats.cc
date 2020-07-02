@@ -719,6 +719,7 @@ void CNTInfo::clear() {
    sp_corr.clear();
    kt_corr.clear();
    anom_corr.clear();
+   anom_corr_raw.clear();
    rmsfa.clear();
    rmsoa.clear();
    me.clear();
@@ -758,35 +759,36 @@ void CNTInfo::assign(const CNTInfo &c) {
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
-   fbar        = c.fbar;
-   fstdev      = c.fstdev;
-   obar        = c.obar;
-   ostdev      = c.ostdev;
-   pr_corr     = c.pr_corr;
-   sp_corr     = c.sp_corr;
-   kt_corr     = c.kt_corr;
-   anom_corr   = c.anom_corr;
-   rmsfa       = c.rmsfa;
-   rmsoa       = c.rmsoa;
-   me          = c.me;
-   me2         = c.me2;
-   estdev      = c.estdev;
-   mbias       = c.mbias;
-   mae         = c.mae;
-   mse         = c.mse;
-   msess       = c.msess;
-   bcmse       = c.bcmse;
-   rmse        = c.rmse;
-   e10         = c.e10;
-   e25         = c.e25;
-   e50         = c.e50;
-   e75         = c.e75;
-   e90         = c.e90;
-   eiqr        = c.eiqr;
-   mad         = c.mad;
-   n_ranks     = c.n_ranks;
-   frank_ties  = c.frank_ties;
-   orank_ties  = c.orank_ties;
+   fbar          = c.fbar;
+   fstdev        = c.fstdev;
+   obar          = c.obar;
+   ostdev        = c.ostdev;
+   pr_corr       = c.pr_corr;
+   sp_corr       = c.sp_corr;
+   kt_corr       = c.kt_corr;
+   anom_corr     = c.anom_corr;
+   anom_corr_raw = c.anom_corr_raw;
+   rmsfa         = c.rmsfa;
+   rmsoa         = c.rmsoa;
+   me            = c.me;
+   me2           = c.me2;
+   estdev        = c.estdev;
+   mbias         = c.mbias;
+   mae           = c.mae;
+   mse           = c.mse;
+   msess         = c.msess;
+   bcmse         = c.bcmse;
+   rmse          = c.rmse;
+   e10           = c.e10;
+   e25           = c.e25;
+   e50           = c.e50;
+   e75           = c.e75;
+   e90           = c.e90;
+   eiqr          = c.eiqr;
+   mad           = c.mad;
+   n_ranks       = c.n_ranks;
+   frank_ties    = c.frank_ties;
+   orank_ties    = c.orank_ties;
 
    return;
 }
@@ -815,6 +817,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       sp_corr.allocate_n_alpha(n_alpha);
       kt_corr.allocate_n_alpha(n_alpha);
       anom_corr.allocate_n_alpha(n_alpha);
+      anom_corr_raw.allocate_n_alpha(n_alpha);
       rmsfa.allocate_n_alpha(n_alpha);
       rmsoa.allocate_n_alpha(n_alpha);
       me.allocate_n_alpha(n_alpha);
@@ -859,14 +862,15 @@ void CNTInfo::compute_ci() {
       // Check for the degenerate case
       //
       if(n <= 1) {
-         fbar.v_ncl[i]      = fbar.v_ncu[i]      = bad_data_double;
-         fstdev.v_ncl[i]    = fstdev.v_ncu[i]    = bad_data_double;
-         obar.v_ncl[i]      = obar.v_ncu[i]      = bad_data_double;
-         ostdev.v_ncl[i]    = ostdev.v_ncu[i]    = bad_data_double;
-         pr_corr.v_ncl[i]   = pr_corr.v_ncu[i]   = bad_data_double;
-         anom_corr.v_ncl[i] = anom_corr.v_ncu[i] = bad_data_double;
-         me.v_ncl[i]        = me.v_ncu[i]        = bad_data_double;
-         estdev.v_ncl[i]    = estdev.v_ncu[i]    = bad_data_double;
+         fbar.v_ncl[i]          = fbar.v_ncu[i]          = bad_data_double;
+         fstdev.v_ncl[i]        = fstdev.v_ncu[i]        = bad_data_double;
+         obar.v_ncl[i]          = obar.v_ncu[i]          = bad_data_double;
+         ostdev.v_ncl[i]        = ostdev.v_ncu[i]        = bad_data_double;
+         pr_corr.v_ncl[i]       = pr_corr.v_ncu[i]       = bad_data_double;
+         anom_corr.v_ncl[i]     = anom_corr.v_ncu[i]     = bad_data_double;
+         anom_corr_raw.v_ncl[i] = anom_corr_raw.v_ncu[i] = bad_data_double;
+         me.v_ncl[i]            = me.v_ncu[i]            = bad_data_double;
+         estdev.v_ncl[i]        = estdev.v_ncu[i]        = bad_data_double;
          continue;
       }
 
@@ -964,6 +968,22 @@ void CNTInfo::compute_ci() {
       }
 
       //
+      // Compute confidence interval for the raw anomaly correlation coefficient
+      //
+      if(is_bad_data(anom_corr_raw.v) || n <= 3 ||
+         is_eq(anom_corr_raw.v, 1.0)  || is_eq(anom_corr_raw.v, -1.0)) {
+         anom_corr_raw.v_ncl[i] = bad_data_double;
+         anom_corr_raw.v_ncu[i] = bad_data_double;
+      }
+      else {
+         v = 0.5*log((1 + anom_corr_raw.v)/(1 - anom_corr_raw.v));
+         cl = v + cv_normal_l/sqrt((double) (n-3));
+         cu = v + cv_normal_u/sqrt((double) (n-3));
+         anom_corr_raw.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
+         anom_corr_raw.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
+      }
+
+      //
       // Compute confidence interval for mean error using VIF
       //
       v = me.vif*estdev.v*estdev.v;
@@ -991,36 +1011,37 @@ void CNTInfo::compute_ci() {
 double CNTInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
-        if(strcmp(stat_name, "TOTAL"     ) == 0) v = n;
-   else if(strcmp(stat_name, "FBAR"      ) == 0) v = fbar.v;
-   else if(strcmp(stat_name, "FSTDEV"    ) == 0) v = fstdev.v;
-   else if(strcmp(stat_name, "OBAR"      ) == 0) v = obar.v;
-   else if(strcmp(stat_name, "OSTDEV"    ) == 0) v = ostdev.v;
-   else if(strcmp(stat_name, "PR_CORR"   ) == 0) v = pr_corr.v;
-   else if(strcmp(stat_name, "SP_CORR"   ) == 0) v = sp_corr.v;
-   else if(strcmp(stat_name, "KT_CORR"   ) == 0) v = kt_corr.v;
-   else if(strcmp(stat_name, "RANKS"     ) == 0) v = n_ranks;
-   else if(strcmp(stat_name, "FRANK_TIES") == 0) v = frank_ties;
-   else if(strcmp(stat_name, "ORANK_TIES") == 0) v = orank_ties;
-   else if(strcmp(stat_name, "ME"        ) == 0) v = me.v;
-   else if(strcmp(stat_name, "ESTDEV"    ) == 0) v = estdev.v;
-   else if(strcmp(stat_name, "MBIAS"     ) == 0) v = mbias.v;
-   else if(strcmp(stat_name, "MAE"       ) == 0) v = mae.v;
-   else if(strcmp(stat_name, "MSE"       ) == 0) v = mse.v;
-   else if(strcmp(stat_name, "BCMSE"     ) == 0) v = bcmse.v;
-   else if(strcmp(stat_name, "RMSE"      ) == 0) v = rmse.v;
-   else if(strcmp(stat_name, "E10"       ) == 0) v = e10.v;
-   else if(strcmp(stat_name, "E25"       ) == 0) v = e25.v;
-   else if(strcmp(stat_name, "E50"       ) == 0) v = e50.v;
-   else if(strcmp(stat_name, "E75"       ) == 0) v = e75.v;
-   else if(strcmp(stat_name, "E90"       ) == 0) v = e90.v;
-   else if(strcmp(stat_name, "EIQR"      ) == 0) v = eiqr.v;
-   else if(strcmp(stat_name, "MAD  "     ) == 0) v = mad.v;
-   else if(strcmp(stat_name, "ANOM_CORR" ) == 0) v = anom_corr.v;
-   else if(strcmp(stat_name, "ME2"       ) == 0) v = me2.v;
-   else if(strcmp(stat_name, "MSESS"     ) == 0) v = msess.v;
-   else if(strcmp(stat_name, "RMSFA"     ) == 0) v = rmsfa.v;
-   else if(strcmp(stat_name, "RMSOA"     ) == 0) v = rmsoa.v;
+        if(strcmp(stat_name, "TOTAL"         ) == 0) v = n;
+   else if(strcmp(stat_name, "FBAR"          ) == 0) v = fbar.v;
+   else if(strcmp(stat_name, "FSTDEV"        ) == 0) v = fstdev.v;
+   else if(strcmp(stat_name, "OBAR"          ) == 0) v = obar.v;
+   else if(strcmp(stat_name, "OSTDEV"        ) == 0) v = ostdev.v;
+   else if(strcmp(stat_name, "PR_CORR"       ) == 0) v = pr_corr.v;
+   else if(strcmp(stat_name, "SP_CORR"       ) == 0) v = sp_corr.v;
+   else if(strcmp(stat_name, "KT_CORR"       ) == 0) v = kt_corr.v;
+   else if(strcmp(stat_name, "RANKS"         ) == 0) v = n_ranks;
+   else if(strcmp(stat_name, "FRANK_TIES"    ) == 0) v = frank_ties;
+   else if(strcmp(stat_name, "ORANK_TIES"    ) == 0) v = orank_ties;
+   else if(strcmp(stat_name, "ME"            ) == 0) v = me.v;
+   else if(strcmp(stat_name, "ESTDEV"        ) == 0) v = estdev.v;
+   else if(strcmp(stat_name, "MBIAS"         ) == 0) v = mbias.v;
+   else if(strcmp(stat_name, "MAE"           ) == 0) v = mae.v;
+   else if(strcmp(stat_name, "MSE"           ) == 0) v = mse.v;
+   else if(strcmp(stat_name, "BCMSE"         ) == 0) v = bcmse.v;
+   else if(strcmp(stat_name, "RMSE"          ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "E10"           ) == 0) v = e10.v;
+   else if(strcmp(stat_name, "E25"           ) == 0) v = e25.v;
+   else if(strcmp(stat_name, "E50"           ) == 0) v = e50.v;
+   else if(strcmp(stat_name, "E75"           ) == 0) v = e75.v;
+   else if(strcmp(stat_name, "E90"           ) == 0) v = e90.v;
+   else if(strcmp(stat_name, "EIQR"          ) == 0) v = eiqr.v;
+   else if(strcmp(stat_name, "MAD  "         ) == 0) v = mad.v;
+   else if(strcmp(stat_name, "ANOM_CORR"     ) == 0) v = anom_corr.v;
+   else if(strcmp(stat_name, "ANOM_CORR_RAW" ) == 0) v = anom_corr_raw.v;
+   else if(strcmp(stat_name, "ME2"           ) == 0) v = me2.v;
+   else if(strcmp(stat_name, "MSESS"         ) == 0) v = msess.v;
+   else if(strcmp(stat_name, "RMSFA"         ) == 0) v = rmsfa.v;
+   else if(strcmp(stat_name, "RMSOA"         ) == 0) v = rmsoa.v;
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
@@ -3130,11 +3151,12 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Compute anomaly correlation from sums of squares
+// Compute anomaly correlation from sums of squares without adjusting
+// for the mean error.
 //
 ////////////////////////////////////////////////////////////////////////
 
-double compute_anom_corr(double ffa, double ooa, double foa) {
+double compute_anom_corr_raw(double ffa, double ooa, double foa) {
    double v, c;
 
    v = ffa*ooa;
