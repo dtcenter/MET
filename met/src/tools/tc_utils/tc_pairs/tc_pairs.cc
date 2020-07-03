@@ -536,7 +536,7 @@ void process_track_files(const StringArray &files,
                          bool check_anly) {
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
-   ConcatString cs;
+   ConcatString suffix;
    ATCFTrackLine line;
 
    // Initialize
@@ -544,6 +544,11 @@ void process_track_files(const StringArray &files,
 
    // Initialize counts
    tot_read = tot_add = 0;
+
+   // Set metadata pointers
+   line.set_basin_map(&conf_info.BasinMap);
+   line.set_best_technique(&conf_info.BestTechnique);
+   line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
    for(i=0; i<files.n_elements(); i++) {
@@ -559,8 +564,9 @@ void process_track_files(const StringArray &files,
       // Initialize counts
       cur_read = cur_add = 0;
 
-      // Set the basin map
-      line.set_basin_map(&conf_info.BasinMap);
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
 
       // Read each line in the file
       while(f >> line) {
@@ -568,22 +574,6 @@ void process_track_files(const StringArray &files,
          // Increment the line counts
          cur_read++;
          tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
-
-         // Check for BEST track technqiue
-         if(conf_info.BestTechnique.has(line.technique())) {
-            line.set_best_track(true);
-         }
-
-         // Check for operational track technqiue
-         if(conf_info.OperTechnique.has(line.technique())) {
-            line.set_oper_track(true);
-         }
 
          // Check the keep status if requested
          if(check_keep && !is_keeper(&line)) continue;
@@ -639,7 +629,7 @@ void process_prob_files(const StringArray &files,
                         ProbInfoArray &probs) {
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
-   ConcatString cs;
+   ConcatString suffix;
    ATCFProbLine line;
 
    // Initialize
@@ -647,6 +637,11 @@ void process_prob_files(const StringArray &files,
 
    // Initialize counts
    tot_read = tot_add = 0;
+
+   // Set metadata pointers
+   line.set_basin_map(&conf_info.BasinMap);
+   line.set_best_technique(&conf_info.BestTechnique);
+   line.set_oper_technique(&conf_info.OperTechnique);
 
    // Process each of the input ATCF files
    for(i=0; i<files.n_elements(); i++) {
@@ -662,8 +657,9 @@ void process_prob_files(const StringArray &files,
       // Initialize counts
       cur_read = cur_add = 0;
 
-      // Set the basin map
-      line.set_basin_map(&conf_info.BasinMap);
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
 
       // Read each line in the file
       while(f >> line) {
@@ -671,12 +667,6 @@ void process_prob_files(const StringArray &files,
          // Increment the line counts
          cur_read++;
          tot_read++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
 
          // Check the keep status
          if(!is_keeper(&line)) continue;

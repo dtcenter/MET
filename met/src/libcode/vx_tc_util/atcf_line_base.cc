@@ -73,7 +73,11 @@ void ATCFLineBase::init_from_scratch() {
    // ATCF lines are comma-delimited
    set_delimiter(",");
 
-   BasinMap = (map<ConcatString,ConcatString> *) 0;
+   // Initialize pointers
+   BasinMap      = (map<ConcatString,ConcatString> *) 0;
+   BestTechnique = (StringArray *) 0;
+   OperTechnique = (StringArray *) 0;
+   TechSuffix    = (ConcatString *) 0;
 
    clear();
 
@@ -88,13 +92,16 @@ void ATCFLineBase::assign(const ATCFLineBase &l) {
 
    DataLine::assign(l);
 
-   BasinMap = l.BasinMap;
+   BasinMap      = l.BasinMap;
+   BestTechnique = l.BestTechnique;
+   OperTechnique = l.OperTechnique;
+   TechSuffix    = l.TechSuffix;
 
-   Type = l.Type;
-   Basin = l.Basin;
-   Technique = l.Technique;
-   IsBestTrack = l.IsBestTrack;
-   IsOperTrack = l.IsOperTrack;
+   Type          = l.Type;
+   Basin         = l.Basin;
+   Technique     = l.Technique;
+   IsBestTrack   = l.IsBestTrack;
+   IsOperTrack   = l.IsOperTrack;
 
    return;
 }
@@ -131,7 +138,8 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
 void ATCFLineBase::clear() {
    DataLine::clear();
 
-   // Do not reset the basin map pointer
+   // Do not reset pointers:
+   // BasinMap, BestTechnique, OperTechnique, TechSuffix
 
    Type = NoATCFLineType;
    Basin.clear();
@@ -163,9 +171,22 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    // Set the basin
    Basin = get_item(BasinOffset);
 
-   // Update the basin name, if specified in the map
+   // Update the basin name, if specified
    if(BasinMap) {
       if(BasinMap->count(Basin) > 0) Basin = BasinMap->at(Basin);
+   }
+
+   // Check for BEST and Operational tracks, if specified
+   if(BestTechnique) IsBestTrack = BestTechnique->has(Technique);
+   if(OperTechnique) IsOperTrack = OperTechnique->has(Technique);
+
+   // Append the technique suffix, if specified
+   if(TechSuffix) {
+      if(TechSuffix->length() > 0) {
+         ConcatString cs;
+         cs << get_item(TechniqueOffset) << TechSuffix->c_str();
+         Technique = cs;
+      }
    }
 
    return(1);
@@ -287,7 +308,7 @@ unixtime ATCFLineBase::valid() const {
    }
 
    // Add minutes for the BEST track
-   if(is_best_track() && !is_bad_data(tn)) {
+   if(IsBestTrack && !is_bad_data(tn)) {
       ut += sec_per_minute * tn;
    }
 
@@ -307,7 +328,7 @@ int ATCFLineBase::lead() const {
    int    s  = bad_data_int;
 
    // Lead time for the BEST track is 0
-   if(is_best_track()) {
+   if(IsBestTrack) {
       s = 0;
    }
    else if(!is_bad_data(fp)) {
