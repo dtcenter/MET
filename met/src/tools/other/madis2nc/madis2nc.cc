@@ -355,6 +355,8 @@ void process_madis_file(const char *madis_file) {
 
 void clean_up() {
 
+   if (summary_obs) delete summary_obs;
+   
    //
    // Close the output NetCDF file
    //

@@ -2404,7 +2404,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    int i, x, y, n, n_masks;
    ConcatString var_name, var_suffix, interp_str, mask_str;
    ConcatString fcst_name, obs_name, fcst_obs_name;
-   ConcatString name_att, long_att, level_att, units_att;
+   ConcatString long_att, level_att, units_att;
    NcVar nc_var;
    bool apply_mask;
 
@@ -2465,7 +2465,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_fcst_var();
          long_att  << cs_erase
                    << conf_info.vx_opt[i_vx].fcst_info->name_attr() << " at "
                    << conf_info.vx_opt[i_vx].fcst_info->level_attr();
@@ -2479,7 +2478,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
                    << conf_info.vx_opt[i_vx].obs_info->level_attr();
@@ -2489,9 +2487,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(field_name == "DIFF") {
          var_name  << cs_erase << field_name << "_"
                    << fcst_obs_name << var_suffix << "_" << mask_str << interp_str;
-         name_att  << cs_erase
-                   << "Forecast " << shc.get_fcst_var()
-                   << " minus Observed " << shc.get_obs_var();
          long_att  << cs_erase
                    << conf_info.vx_opt[i_vx].fcst_info->name_attr() << " at "
                    << conf_info.vx_opt[i_vx].fcst_info->level_attr() << " and "
@@ -2511,7 +2506,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          if(interp_str.nonempty()) {
             if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
          }
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology mean for "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2522,7 +2516,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(field_name == "CLIMO_STDEV") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology standard deviation for "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2533,7 +2526,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(field_name == "CLIMO_CDF") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology cumulative distribution function for "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2547,7 +2539,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
                    << conf_info.vx_opt[i_vx].obs_info->level_attr()
                    << var_suffix << "_" << mask_str;
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology distribution percentile thresholds for "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2563,7 +2554,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_fcst_var();
          long_att  << cs_erase
                    << "Gradient of "
                    << conf_info.vx_opt[i_vx].fcst_info->name_attr() << " at "
@@ -2579,7 +2569,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Gradient of "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2594,7 +2583,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_fcst_var();
          long_att  << cs_erase
                    << "Distance Map for "
                    << conf_info.vx_opt[i_vx].fcst_info->name_attr() << " at "
@@ -2609,7 +2597,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType_Both) {
             var_name << interp_str;
          }
-         name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Distance Map for "
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
@@ -2638,7 +2625,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                        ncFloat, lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
-      add_var_att_local(&nc_var, "name", name_att);
+      add_var_att_local(&nc_var, "name", nc_var.getName());
       add_var_att_local(&nc_var, "long_name", long_att);
       add_var_att_local(&nc_var, "level", level_att);
       add_var_att_local(&nc_var, "units", units_att);
@@ -2759,7 +2746,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+      fcst_var = add_var(nc_out, (string) fcst_var_name, ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -2792,7 +2779,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       nc_var_sa.add(obs_var_name);
 
       // Add variable attributes for the observation field
-      add_var_att_local(&obs_var, "name", shc.get_obs_var());
+      add_var_att_local(&obs_var, "name", obs_var.getName());
       att_str << cs_erase
               << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
               << conf_info.vx_opt[i_vx].obs_info->level_attr();

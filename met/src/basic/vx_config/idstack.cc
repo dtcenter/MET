@@ -388,6 +388,8 @@ IdentifierArray::~IdentifierArray()
 
 clear();
 
+if (i) delete [] i;
+
 }
 
 
@@ -471,6 +473,8 @@ void IdentifierArray::assign(const IdentifierArray & a)
 clear();
 
 int j;
+
+if (a.Nelements > Nalloc) extend(a.Nelements);
 
 Nelements = a.Nelements;
 
