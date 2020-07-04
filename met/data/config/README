@@ -538,40 +538,34 @@ regrid = {
 //          censor_thresh = [ >12000 ];
 //          censor_val    = [ 12000 ];
 //
-//      - The "set_attrs" entry is a dictionary which, when specified, overrides
-//        the metadata read from the input file. The elements which can be set
-//        are shown below:
+//      - Several configuration options are provided to override and correct the
+//        metadata read from the input file. The supported options are listed
+//        below:
 //
-//          set_attrs = {
+//        // Data attributes
+//        set_attr_name      = "string";
+//        set_attr_level     = "string";
+//        set_attr_units     = "string";
+//        set_attr_long_name = "string";
 //
-//             // Data attributes
-//             set_name      = "string";
-//             set_level     = "string";
-//             set_units     = "string";
-//             set_long_name = "string";
+//        // Time attributes
+//        set_attr_init  = "YYYYMMDD[_HH[MMSS]]";
+//        set_attr_valid = "YYYYMMDD[_HH[MMSS]]";
+//        set_attr_lead  = "HH[MMSS]";
+//        set_attr_accum = "HH[MMSS]";
 //
-//             // Time attributes
-//             set_init  = "YYYYMMDD[_HH[MMSS]]";
-//             set_valid = "YYYYMMDD[_HH[MMSS]]";
-//             set_lead  = "HH[MMSS]";
-//             set_accum = "HH[MMSS]";
+//        // Grid definition (must match the actual data dimensions)
+//        set_attr_grid  = "named grid or grid specification string";
 //
-//             // Grid definition (must match the data dimensions)
-//             set_grid  = "named grid or grid specification string";
-//
-//             // Flags
-//             is_precipitation     = boolean;
-//             is_specific_humidity = boolean;
-//             is_u_wind            = boolean;
-//             is_v_wind            = boolean;
-//             is_grid_relative     = boolean;
-//             is_wind_speed        = boolean;
-//             is_wind_direction    = boolean;
-//             is_prob              = boolean;
-//          }
-//
-//        In practice, the set_attrs dictionary should only contain entries
-//        for the subset of elements that need to be overridden.
+//        // Flags
+//        is_precipitation     = boolean;
+//        is_specific_humidity = boolean;
+//        is_u_wind            = boolean;
+//        is_v_wind            = boolean;
+//        is_grid_relative     = boolean;
+//        is_wind_speed        = boolean;
+//        is_wind_direction    = boolean;
+//        is_prob              = boolean;
 //
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.

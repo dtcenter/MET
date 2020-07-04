@@ -191,8 +191,8 @@ bool VarInfoPython::is_precipitation() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsPrecipitation)) {
-     return(SetAttrsIsPrecipitation != 0);
+  if(!is_bad_data(SetAttrIsPrecipitation)) {
+     return(SetAttrIsPrecipitation != 0);
   }
 
   return ( false );
@@ -207,8 +207,8 @@ bool VarInfoPython::is_specific_humidity() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsSpecificHumidity)) {
-     return(SetAttrsIsSpecificHumidity != 0);
+  if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+     return(SetAttrIsSpecificHumidity != 0);
   }
 
   return ( false );
@@ -223,8 +223,8 @@ bool VarInfoPython::is_u_wind() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsUWind)) {
-    return(SetAttrsIsUWind != 0);
+  if(!is_bad_data(SetAttrIsUWind)) {
+    return(SetAttrIsUWind != 0);
   }
 
   return ( false );
@@ -239,8 +239,8 @@ bool VarInfoPython::is_v_wind() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsVWind)) {
-    return(SetAttrsIsVWind != 0);
+  if(!is_bad_data(SetAttrIsVWind)) {
+    return(SetAttrIsVWind != 0);
   }
 
   return ( false );
@@ -255,8 +255,8 @@ bool VarInfoPython::is_wind_speed() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsWindSpeed)) {
-    return(SetAttrsIsWindSpeed != 0);
+  if(!is_bad_data(SetAttrIsWindSpeed)) {
+    return(SetAttrIsWindSpeed != 0);
   }
 
   return ( false );
@@ -271,8 +271,8 @@ bool VarInfoPython::is_wind_direction() const {
   //
   // Check set_attrs entry
   //
-  if(!is_bad_data(SetAttrsIsWindDirection)) {
-    return(SetAttrsIsWindDirection != 0);
+  if(!is_bad_data(SetAttrIsWindDirection)) {
+    return(SetAttrIsWindDirection != 0);
   }
 
   return ( false );
