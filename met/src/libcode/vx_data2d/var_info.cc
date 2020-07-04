@@ -31,8 +31,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary &dict, const char *key, bool check_ws=false);
-int          parse_set_attrs_flag  (Dictionary &dict, const char *key);
+ConcatString parse_set_attr_string(Dictionary &dict, const char *key, bool check_ws=false);
+int          parse_set_attr_flag  (Dictionary &dict, const char *key);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -117,26 +117,26 @@ void VarInfo::assign(const VarInfo &v) {
 
    Regrid = v.Regrid;
 
-   SetAttrsName = v.SetAttrsName;
-   SetAttrsUnits = v.SetAttrsUnits;
-   SetAttrsLevel = v.SetAttrsLevel;
-   SetAttrsLongName = v.SetAttrsLongName;
+   SetAttrName = v.SetAttrName;
+   SetAttrUnits = v.SetAttrUnits;
+   SetAttrLevel = v.SetAttrLevel;
+   SetAttrLongName = v.SetAttrLongName;
 
-   SetAttrsGrid = v.SetAttrsGrid;
+   SetAttrGrid = v.SetAttrGrid;
 
-   SetAttrsInit = v.SetAttrsInit;
-   SetAttrsValid = v.SetAttrsValid;
-   SetAttrsLead = v.SetAttrsLead;
-   SetAttrsAccum = v.SetAttrsAccum;
+   SetAttrInit = v.SetAttrInit;
+   SetAttrValid = v.SetAttrValid;
+   SetAttrLead = v.SetAttrLead;
+   SetAttrAccum = v.SetAttrAccum;
 
-   SetAttrsIsPrecipitation = v.SetAttrsIsPrecipitation;
-   SetAttrsIsSpecificHumidity = v.SetAttrsIsSpecificHumidity;
-   SetAttrsIsUWind = v.SetAttrsIsUWind;
-   SetAttrsIsVWind = v.SetAttrsIsVWind;
-   SetAttrsIsGridRelative = v.SetAttrsIsGridRelative;
-   SetAttrsIsWindSpeed = v.SetAttrsIsWindSpeed;
-   SetAttrsIsWindDirection = v.SetAttrsIsWindDirection;
-   SetAttrsIsProb = v.SetAttrsIsProb;
+   SetAttrIsPrecipitation = v.SetAttrIsPrecipitation;
+   SetAttrIsSpecificHumidity = v.SetAttrIsSpecificHumidity;
+   SetAttrIsUWind = v.SetAttrIsUWind;
+   SetAttrIsVWind = v.SetAttrIsVWind;
+   SetAttrIsGridRelative = v.SetAttrIsGridRelative;
+   SetAttrIsWindSpeed = v.SetAttrIsWindSpeed;
+   SetAttrIsWindDirection = v.SetAttrIsWindDirection;
+   SetAttrIsProb = v.SetAttrIsProb;
 
    return;
 }
@@ -177,26 +177,26 @@ void VarInfo::clear() {
 
    Regrid.clear();
 
-   SetAttrsName.clear();
-   SetAttrsUnits.clear();
-   SetAttrsLevel.clear();
-   SetAttrsLongName.clear();
+   SetAttrName.clear();
+   SetAttrUnits.clear();
+   SetAttrLevel.clear();
+   SetAttrLongName.clear();
 
-   SetAttrsGrid.clear();
+   SetAttrGrid.clear();
 
-   SetAttrsInit = (unixtime) 0;
-   SetAttrsValid = (unixtime) 0;
-   SetAttrsLead = bad_data_int;
-   SetAttrsAccum = bad_data_int;
+   SetAttrInit = (unixtime) 0;
+   SetAttrValid = (unixtime) 0;
+   SetAttrLead = bad_data_int;
+   SetAttrAccum = bad_data_int;
 
-   SetAttrsIsPrecipitation = bad_data_int;
-   SetAttrsIsSpecificHumidity = bad_data_int;
-   SetAttrsIsUWind = bad_data_int;
-   SetAttrsIsVWind = bad_data_int;
-   SetAttrsIsGridRelative = bad_data_int;
-   SetAttrsIsWindSpeed = bad_data_int;
-   SetAttrsIsWindDirection = bad_data_int;
-   SetAttrsIsProb = bad_data_int;
+   SetAttrIsPrecipitation = bad_data_int;
+   SetAttrIsSpecificHumidity = bad_data_int;
+   SetAttrIsUWind = bad_data_int;
+   SetAttrIsVWind = bad_data_int;
+   SetAttrIsGridRelative = bad_data_int;
+   SetAttrIsWindSpeed = bad_data_int;
+   SetAttrIsWindDirection = bad_data_int;
+   SetAttrIsProb = bad_data_int;
 
    return;
 }
@@ -487,18 +487,18 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Parse regrid, if present
    Regrid = parse_conf_regrid(&dict, false);
 
-   // Parse set_attrs strings
-   SetAttrsName =
-      parse_set_attrs_string(dict, conf_key_set_name, true);
-   SetAttrsUnits =
-      parse_set_attrs_string(dict, conf_key_set_units, true);
-   SetAttrsLevel =
-      parse_set_attrs_string(dict, conf_key_set_level, true);
-   SetAttrsLongName =
-      parse_set_attrs_string(dict, conf_key_set_long_name);
+   // Parse set_attr strings
+   SetAttrName =
+      parse_set_attr_string(dict, conf_key_set_attr_name, true);
+   SetAttrUnits =
+      parse_set_attr_string(dict, conf_key_set_attr_units, true);
+   SetAttrLevel =
+      parse_set_attr_string(dict, conf_key_set_attr_level, true);
+   SetAttrLongName =
+      parse_set_attr_string(dict, conf_key_set_attr_long_name);
 
-   // Parse set_attrs grid
-   s = parse_set_attrs_string(dict, conf_key_set_grid);
+   // Parse set_attr grid
+   s = parse_set_attr_string(dict, conf_key_set_attr_grid);
    if(s.nonempty()) {
 
       // Parse as a white-space separated string
@@ -506,47 +506,46 @@ void VarInfo::set_dict(Dictionary &dict) {
       sa.parse_wsss(s);
 
       // Search for a named grid
-      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrsGrid)) {
+      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrGrid)) {
       }
       // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrsGrid)) {
+      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrGrid)) {
       }
       else {
          mlog << Warning << "\nVarInfo::set_dict() -> "
-              << "unsupported " << conf_key_set_grid
+              << "unsupported " << conf_key_set_attr_grid
               << " definition string (" << s
-              << ") in the " << conf_key_set_attrs
-              << " dictionary!\n\n";
+              << ")!\n\n";
       }
    }
 
-   // Parse set_attrs times
-   s = parse_set_attrs_string(dict, conf_key_set_init);
-   if(s.nonempty()) SetAttrsInit = timestring_to_unix(s.c_str());
-   s = parse_set_attrs_string(dict, conf_key_set_valid);
-   if(s.nonempty()) SetAttrsValid = timestring_to_unix(s.c_str());
-   s = parse_set_attrs_string(dict, conf_key_set_lead);
-   if(s.nonempty()) SetAttrsLead = timestring_to_sec(s.c_str());
-   s = parse_set_attrs_string(dict, conf_key_set_accum);
-   if(s.nonempty()) SetAttrsAccum = timestring_to_sec(s.c_str());
+   // Parse set_attr times
+   s = parse_set_attr_string(dict, conf_key_set_attr_init);
+   if(s.nonempty()) SetAttrInit = timestring_to_unix(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_valid);
+   if(s.nonempty()) SetAttrValid = timestring_to_unix(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_lead);
+   if(s.nonempty()) SetAttrLead = timestring_to_sec(s.c_str());
+   s = parse_set_attr_string(dict, conf_key_set_attr_accum);
+   if(s.nonempty()) SetAttrAccum = timestring_to_sec(s.c_str());
 
-   // Parse set_attrs flags
-   SetAttrsIsPrecipitation =
-      parse_set_attrs_flag(dict, conf_key_is_precipitation);
-   SetAttrsIsSpecificHumidity =
-      parse_set_attrs_flag(dict, conf_key_is_specific_humidity);
-   SetAttrsIsUWind =
-      parse_set_attrs_flag(dict, conf_key_is_u_wind);
-   SetAttrsIsVWind =
-      parse_set_attrs_flag(dict, conf_key_is_v_wind);
-   SetAttrsIsWindSpeed =
-      parse_set_attrs_flag(dict, conf_key_is_wind_speed);
-   SetAttrsIsWindDirection =
-      parse_set_attrs_flag(dict, conf_key_is_wind_direction);
-   SetAttrsIsGridRelative =
-      parse_set_attrs_flag(dict, conf_key_is_grid_relative);
-   SetAttrsIsProb =
-      parse_set_attrs_flag(dict, conf_key_is_prob);
+   // Parse set_attr flags
+   SetAttrIsPrecipitation =
+      parse_set_attr_flag(dict, conf_key_is_precipitation);
+   SetAttrIsSpecificHumidity =
+      parse_set_attr_flag(dict, conf_key_is_specific_humidity);
+   SetAttrIsUWind =
+      parse_set_attr_flag(dict, conf_key_is_u_wind);
+   SetAttrIsVWind =
+      parse_set_attr_flag(dict, conf_key_is_v_wind);
+   SetAttrIsWindSpeed =
+      parse_set_attr_flag(dict, conf_key_is_wind_speed);
+   SetAttrIsWindDirection =
+      parse_set_attr_flag(dict, conf_key_is_wind_direction);
+   SetAttrIsGridRelative =
+      parse_set_attr_flag(dict, conf_key_is_grid_relative);
+   SetAttrIsProb =
+      parse_set_attr_flag(dict, conf_key_is_prob);
 
    return;
 }
@@ -725,10 +724,10 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 bool VarInfo::is_prob() {
 
    //
-   // Check set_attrs entry
+   // Check set_attr entry
    //
-   if(!is_bad_data(SetAttrsIsProb)) {
-      return(SetAttrsIsProb != 0);
+   if(!is_bad_data(SetAttrIsProb)) {
+      return(SetAttrIsProb != 0);
    }
 
    return(PFlag && !PAsScalar);
@@ -736,37 +735,32 @@ bool VarInfo::is_prob() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_set_attrs_string(Dictionary &dict, const char *key,
+ConcatString parse_set_attr_string(Dictionary &dict, const char *key,
                                     bool check_ws) {
-   ConcatString search, result;
+   ConcatString cs;
 
-   search << conf_key_set_attrs << "." << key;
-
-   result = dict.lookup_string(search.c_str(), false);
-   if(result.nonempty()) {
-      mlog << Debug(3) << "Parsed " << search << " = \"" << result << "\"\n";
-      if(check_ws && check_reg_exp(ws_reg_exp, result.c_str())) {
-         mlog << Error << "\nparse_set_attrs_string() -> "
-              << "the \"" << search << "\" config file entry (" << result
+   cs = dict.lookup_string(key, false);
+   if(cs.nonempty()) {
+      mlog << Debug(3) << "Parsed " << key << " = \"" << cs << "\"\n";
+      if(check_ws && check_reg_exp(ws_reg_exp, cs.c_str())) {
+         mlog << Error << "\nparse_set_attr_string() -> "
+              << "the \"" << key << "\" config file entry (" << cs
               << ") cannot contain embedded whitespace!\n\n";
          exit(1);
       }
    }
 
-   return(result);
+   return(cs);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int parse_set_attrs_flag(Dictionary &dict, const char *key) {
-   ConcatString search;
+int parse_set_attr_flag(Dictionary &dict, const char *key) {
    int v = bad_data_int;
 
-   search << conf_key_set_attrs << "." << key;
-
-   bool b = dict.lookup_bool(search.c_str(), false);
+   bool b = dict.lookup_bool(key, false);
    if(dict.last_lookup_status()) {
-      mlog << Debug(3) << "Parsed " << search << " = \""
+      mlog << Debug(3) << "Parsed " << key << " = \""
            << bool_to_string(b) << "\"\n";
       v = (int) b;
    }

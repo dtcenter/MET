@@ -59,27 +59,27 @@ class VarInfo
 
       RegridInfo    Regrid;    // Regridding logic
 
-      // Override metadata with set_attrs dictionary entries
-      ConcatString  SetAttrsName;
-      ConcatString  SetAttrsUnits;
-      ConcatString  SetAttrsLevel;
-      ConcatString  SetAttrsLongName;
+      // Options to override metadata
+      ConcatString  SetAttrName;
+      ConcatString  SetAttrUnits;
+      ConcatString  SetAttrLevel;
+      ConcatString  SetAttrLongName;
 
-      Grid          SetAttrsGrid;
+      Grid          SetAttrGrid;
 
-      unixtime      SetAttrsInit;
-      unixtime      SetAttrsValid;
-      int           SetAttrsLead;
-      int           SetAttrsAccum;
+      unixtime      SetAttrInit;
+      unixtime      SetAttrValid;
+      int           SetAttrLead;
+      int           SetAttrAccum;
 
-      int           SetAttrsIsPrecipitation;
-      int           SetAttrsIsSpecificHumidity;
-      int           SetAttrsIsUWind;
-      int           SetAttrsIsVWind;
-      int           SetAttrsIsGridRelative;
-      int           SetAttrsIsWindSpeed;
-      int           SetAttrsIsWindDirection;
-      int           SetAttrsIsProb;
+      int           SetAttrIsPrecipitation;
+      int           SetAttrIsSpecificHumidity;
+      int           SetAttrIsUWind;
+      int           SetAttrIsVWind;
+      int           SetAttrIsGridRelative;
+      int           SetAttrIsWindSpeed;
+      int           SetAttrIsWindDirection;
+      int           SetAttrIsProb;
 
       void init_from_scratch();
       void assign(const VarInfo &);
@@ -238,17 +238,17 @@ inline NumArray     VarInfo::range()          const { return(Range);            
 
 inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
 
-inline ConcatString VarInfo::name_attr()      const { return(SetAttrsName.empty()     ? name()       : SetAttrsName);     }
-inline ConcatString VarInfo::units_attr()     const { return(SetAttrsUnits.empty()    ? units()      : SetAttrsUnits);    }
-inline ConcatString VarInfo::level_attr()     const { return(SetAttrsLevel.empty()    ? level_name() : SetAttrsLevel);    }
-inline ConcatString VarInfo::long_name_attr() const { return(SetAttrsLongName.empty() ? long_name()  : SetAttrsLongName); }
+inline ConcatString VarInfo::name_attr()      const { return(SetAttrName.empty()     ? name()       : SetAttrName);     }
+inline ConcatString VarInfo::units_attr()     const { return(SetAttrUnits.empty()    ? units()      : SetAttrUnits);    }
+inline ConcatString VarInfo::level_attr()     const { return(SetAttrLevel.empty()    ? level_name() : SetAttrLevel);    }
+inline ConcatString VarInfo::long_name_attr() const { return(SetAttrLongName.empty() ? long_name()  : SetAttrLongName); }
 
-inline Grid         VarInfo::grid_attr()      const { return(SetAttrsGrid);     }
+inline Grid         VarInfo::grid_attr()      const { return(SetAttrGrid);     }
 
-inline unixtime     VarInfo::init_attr()      const { return(SetAttrsInit);     }
-inline unixtime     VarInfo::valid_attr()     const { return(SetAttrsValid);    }
-inline int          VarInfo::lead_attr()      const { return(SetAttrsLead);     }
-inline int          VarInfo::accum_attr()     const { return(SetAttrsAccum);    }
+inline unixtime     VarInfo::init_attr()      const { return(SetAttrInit);     }
+inline unixtime     VarInfo::valid_attr()     const { return(SetAttrValid);    }
+inline int          VarInfo::lead_attr()      const { return(SetAttrLead);     }
+inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
 
 ///////////////////////////////////////////////////////////////////////////////
 

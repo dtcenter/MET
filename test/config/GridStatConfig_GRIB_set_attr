@@ -56,18 +56,16 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 
-set_attrs = {
-  set_init  = "20170807_000000";
-  set_valid = "20170807_120000";
-  set_lead  = "12";
-}
+set_attr_init  = "20170807_000000";
+set_attr_valid = "20170807_120000";
+set_attr_lead  = "12";
+is_precipitation = FALSE;
+is_prob = FALSE;
 
 fcst = {
 
-   set_attrs = {
-     set_name  = "Temperature";
-     set_units = "Kelvin";
-   }
+   set_attr_name  = "Temperature";
+   set_attr_units = "Kelvin";
 
    field = [
       {
@@ -75,20 +73,16 @@ fcst = {
         name = "TMP";
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
-        set_attrs = {
-          set_level     = "TROPO";
-          set_long_name = "Temperature at the tropopause";
-        }
+        set_attr_level     = "TROPO";
+        set_attr_long_name = "Temperature at the tropopause";
       },
       {
         //max wind
         name = "TMP";
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
-        set_attrs = {
-          set_level     = "MAXWIND";
-          set_long_name = "Temperature at the maximum wind level";
-        }
+        set_attr_level     = "MAXWIND";
+        set_attr_long_name = "Temperature at the maximum wind level";
       }
    ];
 
@@ -234,7 +228,7 @@ nc_pairs_flag = {
 
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
-output_prefix    = "GRIB_set_attrs";
+output_prefix    = "GRIB_set_attr";
 version          = "V9.1";
 
 ////////////////////////////////////////////////////////////////////////////////
