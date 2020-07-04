@@ -379,6 +379,7 @@ return ( 1 );
 int DataLine::read_fwf_line(LineDataFile * ldf, const int *wdth, int n_wdth)
 
 {
+const char *method_name = "DataLine::read_fwf_line() -> ";
 
 clear();
 
@@ -400,16 +401,26 @@ int null_char_count;
 
 null_char_count = pos = count = 0;
 
+int line_len;
 for( i=0; i<n_wdth; i++ )  {
+   line_len = wdth[i];
+   if (wdth[i] >= max_str_len) {
+      line_len = (max_str_len-1);
+      mlog << Warning
+           << "\n" << method_name << "the line length " << wdth[i] << " for "
+           << i << "-th line is bigger than allocatcated buffer ("
+           << max_str_len << ").\n\n";
+   }
 
    if ( !f )  { clear();  return ( 0 ); }
 
    ++count;
 
+   
    //
    //  get the next entry
    //
-   f.read(buf, wdth[i]);
+   f.read(buf, line_len);
 
    //
    //  store the offset to this entry
@@ -420,7 +431,7 @@ for( i=0; i<n_wdth; i++ )  {
    //
    //  store this entry
    //
-   for( j=0; j<wdth[i]; j++ )  {
+   for( j=0; j<line_len; j++ )  {
 
      Line += buf[j]; pos++;
 
@@ -433,7 +444,7 @@ for( i=0; i<n_wdth; i++ )  {
      }
      else if(buf[j] == '\n') {
         mlog << Warning
-             << "\nDataLine::read_fwf_line() -> "
+             << "\n" << method_name
              << "Encountered newline while parsing line "
              << ldf->last_line_number() + 1 << ".\n\n";
      }
@@ -450,7 +461,7 @@ for( i=0; i<n_wdth; i++ )  {
 
 if (null_char_count > 0)
    mlog << Warning
-        << "\nDataLine::read_fwf_line() -> "
+        << "\n" << method_name
         << "Encountered " << null_char_count << " null character"
         << (null_char_count==1?"":"s") << " while parsing line "
         << ldf->last_line_number() + 1 << ".\n\n";

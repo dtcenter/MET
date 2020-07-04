@@ -32,8 +32,9 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GaussianInfo::GaussianInfo() {
-   weights = (double *) 0;
+GaussianInfo::GaussianInfo()
+: weights(0)
+{
    clear();
 }
 
@@ -41,7 +42,7 @@ GaussianInfo::GaussianInfo() {
 
 void GaussianInfo::clear() {
    weight_sum = 0.0;
-   if (0 < max_r && weights) {
+   if (weights) {
       delete weights;
       weights = (double *)0;
    }
