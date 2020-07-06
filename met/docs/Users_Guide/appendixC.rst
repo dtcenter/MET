@@ -436,9 +436,13 @@ Called "ANOM_CORR" and "ANOM_CORR_RAW" for centered and uncentered versions in C
 
 The anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (c) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies.
 
-The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: $$ \hbox{Anomoly Correlation}={
+The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
-The uncentered anomaly correlation coefficient (ANOM_CORR_RAW) which does not include the mean erros is defined as: $$ \hbox{Anomoly Correlation Raw}={
+.. math:: \text{Anomaly Correlation } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
+
+The uncentered anomaly correlation coefficient (ANOM_CORR_RAW) which does not include the mean errors is defined as: 
+
+.. math:: \text{Anomaly Correlation Raw } = \frac{ \bar{(f - c)(a - c)}}{ \sqrt{\bar{(f - c)^2} \bar{(a - c)^2}}}
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
