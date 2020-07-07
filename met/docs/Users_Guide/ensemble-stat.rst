@@ -6,7 +6,7 @@ Ensemble-Stat Tool
 Introduction
 ____________
 
-The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. A climatology file may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in Appendix :ref:`C MET verification measures for ensemble forecasts<App_C-ensemble>`.
+The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. A climatology file may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in Appendix :numref:`App_C-ensemble`.
 
 Scientific and statistical aspects
 __________________________________
@@ -45,7 +45,7 @@ Observation errors differ according to instrument, temporal and spatial represen
 Practical Information
 _____________________
 
-This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology file must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter :ref:`reformat_point`.
+This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology file must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter :numref:`reformat_point`.
 
 ensemble_stat usage
 ~~~~~~~~~~~~~~~~~~~
@@ -119,7 +119,7 @@ ensemble_stat configuration file
 
 The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed **share/met/config** directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
 ____________________
 
@@ -147,7 +147,7 @@ ____________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
 
 _____________________
 
@@ -244,7 +244,7 @@ ____________________
   prob_cat_thresh    = [];
 
 
-Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Ensemble-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Ensemble-Stat tool.
 
 
 The **ens** and **fcst** dictionaries do not need to include the same fields. Users may specify any number of ensemble fields to be summarized, but generally there are many fewer fields with verifying observations available. The **ens** dictionary specifies the fields to be summarized while the **fcst** dictionary specifies the fields to be verified.
@@ -396,7 +396,7 @@ The **rng** group defines the random number generator **type** and **seed** to b
 The **seed** variable may be set to a specific value to make the assignment of ranks fully repeatable. When left empty, as shown above, the random number generator seed is chosen automatically which will lead to slightly different bootstrap confidence intervals being computed each time the data is run.
 
 
-Refer to the description of the **boot** entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>` for more details on the random number generator.
+Refer to the description of the **boot** entry in :numref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>` for more details on the random number generator.
 
 
 ensemble_stat output
