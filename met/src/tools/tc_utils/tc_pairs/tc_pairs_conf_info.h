@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 
 #include "mask_poly.h"
 
@@ -106,6 +107,9 @@ class TCPairsConfInfo {
 
       // Watch/warnings time offset
       int WatchWarnOffset;
+
+      // Basin Map
+      map<ConcatString,ConcatString> BasinMap;
 
       // Config file version
       ConcatString Version;

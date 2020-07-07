@@ -177,7 +177,7 @@ void process_genesis() {
    map<ConcatString,GenesisInfoArray> fcst_ga_map;
    map<ConcatString,GenesisInfoArray>::iterator it;
    ConcatString atcf_id, cs;
-   
+
    GenCTCInfo cur_info;
 
    // Get the list of genesis track files
@@ -471,7 +471,8 @@ void process_track_files(const StringArray &files,
                          GenesisInfoArray &genesis, bool is_anly) {
    int i, j, k;
    int n_lines, tot_lines, tot_tracks, n_genesis;
-   ConcatString cs, atcf_ids;
+   ConcatString suffix, atcf_ids;
+   StringArray best_tech, oper_tech;
    LineDataFile f;
    ATCFTrackLine line;
    TrackInfoArray tracks;
@@ -493,6 +494,12 @@ void process_track_files(const StringArray &files,
    genesis.clear();
    tot_lines = tot_tracks = n_genesis = 0;
 
+   // Set metadata pointers
+   best_tech.add(conf_info.BestEventInfo.Technique);
+   line.set_best_technique(&best_tech);
+   oper_tech.add(conf_info.OperEventInfo.Technique);
+   line.set_oper_technique(&oper_tech);
+
    // Process each of the input ATCF files
    for(i=0; i<files.n(); i++) {
 
@@ -508,22 +515,16 @@ void process_track_files(const StringArray &files,
       tracks.clear();
       n_lines = 0;
 
+      // Set metadata pointer
+      suffix = model_suffix[i];
+      line.set_tech_suffix(&suffix);
+
       // Read each input line. Track lines may be interleaved
       // within a file but cannot span multiple files.
       while(f >> line) {
 
          // Increment the line counts
          n_lines++;
-
-         // Add model suffix, if specified
-         if(model_suffix[i].length() > 0) {
-            cs << cs_erase << line.technique() << model_suffix[i];
-            line.set_technique(cs);
-         }
-
-         // Check for BEST and operational track technqiue
-         line.set_best_track(line.technique() == conf_info.BestEventInfo.Technique);
-         line.set_oper_track(line.technique() == conf_info.OperEventInfo.Technique);
 
          // Only process the specified BEST and operational track
          if(is_anly && !line.is_best_track() && !line.is_oper_track()) {
@@ -633,7 +634,7 @@ void process_track_files(const StringArray &files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(int n_model) {    
+void setup_txt_files(int n_model) {
    int i, n_rows, n_cols;
 
    // Initialize file stream
@@ -717,7 +718,7 @@ void setup_table(AsciiTable &at) {
 
 void write_cts(int i_vx, GenCTCInfo &info) {
    ConcatString var_name("GENESIS");
-    
+
    // Setup header columns
    shc.set_model(info.model.c_str());
    shc.set_desc(conf_info.VxOpt[i_vx].Desc.c_str());
