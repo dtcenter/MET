@@ -14,7 +14,7 @@ _____________________
 grid_diag usage
 ~~~~~~~~~~~~~~~
 
-The following sections describe the usage statement, required arguments, and optional arguments for grid_diag.
+The following sections describe the usage statement, required arguments, and optional arguments for **grid_diag**.
 
 .. code-block:: none
 
@@ -30,23 +30,23 @@ grid_diag has required arguments and can accept several optional arguments.
 Required arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -data file_1 ... file_n | data_file_list options specify the gridded data files or an ASCII file containing list of file names to be used.
+1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing list of file names to be used.
 
-2. The -out argument is the NetCDF output file.
+2. The **-out** argument is the NetCDF output file.
 
-3. The -config file is the configuration file to be used. The contents of the configuration file are discussed below.
+3. The **-config file** is the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-5. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 grid_diag configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Grid-Diag tool named 'GridDiagConfig_default' can be found in the installed share/met/config/ directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Grid-Diag tool named 'GridDiagConfig_default' can be found in the installed **share/met/config/ directory**. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 _____________________
 
@@ -82,7 +82,7 @@ _____________________
      ];
   }
 
-The name and level entries in the data dictionary define the data to be processed. The n_bins parameter specifies the number of histogram bins for that variable, and the range parameter the lower and upper bounds of the histogram. The interval length is the upper and lower difference divided by n_bins.
+The **name** and **level** entries in the **data** dictionary define the data to be processed. The **n_bins** parameter specifies the number of histogram bins for that variable, and the **range** parameter the lower and upper bounds of the histogram. The interval length is the upper and lower difference divided by **n_bins**.
 
 grid_diag output file
 ~~~~~~~~~~~~~~~~~~~~~

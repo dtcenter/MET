@@ -63,17 +63,17 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
     - o = 0 (e.g., “No”)
     -  
   * - f = 1 (e.g., “Yes”)
-    - Hits=a
-    - False Alarms = b
-    - a+b
+    - Hits **= a**
+    - False Alarms **= b**
+    - **a+b**
   * - f = 0 (e.g., “No”)
-    - Misses=c
-    - Correct rejections = d
-    - c+d
+    - Misses **= c**
+    - Correct rejections **= d**
+    - **c+d**
   * - Total
-    - a+c
-    - b+d
-    - a+b+c+d
+    - **a+c**
+    - **b+d**
+    - **a+b+c+d**
 
 .. _wavelet-stat_NIMROD_3h_fcst:
 
@@ -126,7 +126,7 @@ Note that the energy squared of the observation binary field is identical to the
 The spatial domain constraints
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of 2ⁿ x 2ⁿ grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions 2ⁿ x 2ⁿ over the input domain in the following ways:
+The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of **2ⁿ x 2ⁿ** grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions **2ⁿ x 2ⁿ** over the input domain in the following ways:
 
 .. _wavelet-stat_energy_squared_NIMROD:
 
@@ -134,16 +134,16 @@ The Intensity-Scale technique is constrained by the fact that orthogonal wavelet
 	    
    Energy squared and energy squared perentages, for each threshold and sale, for the NIMROD foreast and analysis, and foreast and analysis En2 and En2% relative differences.  ?? This figure is no longer in the lyx documentation MET_Users_Guide_Master.lyx but it's still showing up on the old web page, page 261.  Should it be removed? https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf  ??
 	    
-1. User-Defined Tiling: The user may define one or more tiles of size 2ⁿ x 2ⁿ over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
+1. User-Defined Tiling: The user may define one or more tiles of size **2ⁿ x 2ⁿ** over their domain to be applied. This is done by selecting the grid coordinates for the lower-left corner of the tile(s) and the tile dimension to be used. If the user specifies more than one tile, the Intensity-Scale method will be applied to each tile separately. At the end, the results will automatically be aggregated across all the tiles and written out with the results for each of the individual tiles. Users are encouraged to select tiles which consist entirely of valid data.
 
-2. Automated Tiling: This tiling method is essentially the same as the user-defined tiling method listed above except that the tool automatically selects the location and size of the tile(s) to be applied. It figures out the maximum tile of dimension 2ⁿ x 2ⁿ that fits within the domain and places the tile at the center of the domain. For domains that are very elongated in one direction, it defines as many of these tiles as possible that fit within the domain.
+2. Automated Tiling: This tiling method is essentially the same as the user-defined tiling method listed above except that the tool automatically selects the location and size of the tile(s) to be applied. It figures out the maximum tile of dimension **2ⁿ x 2ⁿ** that fits within the domain and places the tile at the center of the domain. For domains that are very elongated in one direction, it defines as many of these tiles as possible that fit within the domain.
 
-3. Padding: If the domain size is only slightly smaller than 2ⁿ x 2ⁿ, for certain variables (e.g. precipitation), it is advisable to expand the domain out to 2ⁿ x 2ⁿ grid-points by adding extra rows and/or columns of fill data. For precipitation variables, a fill value of zero is used. For continuous variables, such as temperature, the fill value is defined as the mean of the valid data in the rest of the field. A drawback to the padding method is the introduction of artificial data into the original field. Padding should only be used when a very small number of rows and/or columns need to be added.
+3. Padding: If the domain size is only slightly smaller than **2ⁿ x 2ⁿ**, for certain variables (e.g. precipitation), it is advisable to expand the domain out to **2ⁿ x 2ⁿ** grid-points by adding extra rows and/or columns of fill data. For precipitation variables, a fill value of zero is used. For continuous variables, such as temperature, the fill value is defined as the mean of the valid data in the rest of the field. A drawback to the padding method is the introduction of artificial data into the original field. Padding should only be used when a very small number of rows and/or columns need to be added.
 
 Aggregation of statistics on multiple cases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Stat-Analysis tool aggregates the intensity scale technique results. Since the results are scale-dependent, it is sensible to aggregate results from multiple model runs (e.g. daily runs for a season) on the same spatial domain, so that the scale components for each singular case will be the same number, and the domain, if not a square domain of 2ⁿ x 2ⁿ grid-points, will be treated in the same fashion. Similarly, the intensity thresholds for each run should all be the same. 
+The Stat-Analysis tool aggregates the intensity scale technique results. Since the results are scale-dependent, it is sensible to aggregate results from multiple model runs (e.g. daily runs for a season) on the same spatial domain, so that the scale components for each singular case will be the same number, and the domain, if not a square domain of **2ⁿ x 2ⁿ** grid-points, will be treated in the same fashion. Similarly, the intensity thresholds for each run should all be the same. 
 
 The MSE and forecast and observation squared energy for each scale and thresholds are aggregated simply with a weighted average, where weights are proportional to the number of grid-points used in each single run to evaluate the statistics. If the same domain is always used (and it should) the weights result all the same, and the weighted averaging is a simple mean. For each threshold, the aggregated Br is equal to the aggregated squared energy of the binary observation field, and the aggregated FBI is obtained as the ratio of the aggregated squared energies of the forecast and observation binary fields. From aggregated Br and FBI, the MSErandom for the aggregated runs can be evaluated using the same formula as for the single run. Finally, the Intensity-Scale Skill Score is evaluated by using the aggregated statistics within the same formula used for the single case.
 
@@ -173,22 +173,22 @@ wavelet_stat has three required arguments and accepts several optional ones.
 Required arguments for wavelet_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The fcst_file argument is the gridded file containing the model data to be verified.
+1. The **fcst_file** argument is the gridded file containing the model data to be verified.
 
-2. The obs_file argument is the gridded file containing the observations to be used.
+2. The **obs_file** argument is the gridded file containing the observations to be used.
 
-3. The config_file argument is the configuration file to be used. The contents of the configuration file are discussed below.
+3. The **config_file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for wavelet_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -outdir path indicates the directory where output files should be written.
+4. The **-outdir path** indicates the directory where output files should be written.
 
-5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-6. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-7. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+7. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the wavelet_stat calling sequence is listed below:
 
@@ -199,14 +199,14 @@ An example of the wavelet_stat calling sequence is listed below:
   sample_obs.grb \
   WaveletStatConfig
 
-In the example, the Wavelet-Stat tool will verify the model data in the sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB file applying the configuration options specified in the WaveletStatConfig file.
+In the example, the Wavelet-Stat tool will verify the model data in the **sample_fcst.grb** GRIB file using the observations in the **sample_obs.grb** GRIB file applying the configuration options specified in the **WaveletStatConfig** file.
 
 .. _wavelet_stat-configuration-file:
 
 wavelet_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_default, can be found in the installed share/met/config directory. Another version of the configuration file is provided in scripts/config. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc configuration file` for the PB2NC tool.
+The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed **share/met/config** directory. Another version of the configuration file is provided in **scripts/config**. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below. Note that environment variables may be used when editing configuration files, as described in the Section :ref:`pb2nc configuration file` for the PB2NC tool.
 
 _______________________
 
@@ -241,15 +241,15 @@ _______________________
      location = [ { x_ll = 0; y_ll = 0; } ];
   }
 
-The grid_decomp_flag variable specifies how tiling should be performed: 
+The **grid_decomp_flag** variable specifies how tiling should be performed: 
 
-• AUTO indicates that the automated-tiling should be done.
+• **AUTO** indicates that the automated-tiling should be done.
 
-• TILE indicates that the user-defined tiles should be applied.
+• **TILE** indicates that the user-defined tiles should be applied.
 
-• PAD indicated that the data should be padded out to the nearest dimension of 2ⁿ x 2ⁿ
+• **PAD** indicated that the data should be padded out to the nearest dimension of **2ⁿ x 2ⁿ**
 
-The width and location variables allow users to manually define the tiles of dimension they would like to apply. The x_ll and y_ll variables specify the location of one or more lower-left tile grid (x, y) points.
+The **width** and **location** variables allow users to manually define the tiles of dimension they would like to apply. The x_ll and y_ll variables specify the location of one or more lower-left tile grid (x, y) points.
 
 _______________________
 
@@ -260,19 +260,19 @@ _______________________
      member = 2;
   }
 
-The wavelet_flag and wavelet_k variables specify the type and shape of the wavelet to be used for the scale decomposition. The Casati et al. (2004) method uses a Haar wavelet which is a good choice for discontinuous fields like precipitation. However, users may choose to apply any wavelet family/shape that is available in the GNU Scientific Library. Values for the wavelet_flag variable, and associated choices for k, are described below:
+The **wavelet_flag** and **wavelet_k** variables specify the type and shape of the wavelet to be used for the scale decomposition. The Casati et al. (2004) method uses a Haar wavelet which is a good choice for discontinuous fields like precipitation. However, users may choose to apply any wavelet family/shape that is available in the GNU Scientific Library. Values for the **wavelet_flag** variable, and associated choices for k, are described below:
 
-• HAAR for the Haar wavelet (member = 2).
+• **HAAR** for the Haar wavelet (member = 2).
 
-• HAAR_CNTR for the Centered-Haar wavelet (member = 2).
+• **HAAR_CNTR** for the Centered-Haar wavelet (member = 2).
 
-• DAUB for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18, 20).
+• **DAUB** for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18, 20).
 
-• DAUB_CNTR for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18, 20).
+• **DAUB_CNTR** for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18, 20).
 
-• BSPLINE for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208, 301, 303, 305, 307, 309).
+• **BSPLINE** for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208, 301, 303, 305, 307, 309).
 
-• BSPLINE_CNTR for the Centered-Bspline wavelet (member = 103, 105, 202, 204, 206, 208, 301, 303, 305, 307, 309).
+• **BSPLINE_CNTR** for the Centered-Bspline wavelet (member = 103, 105, 202, 204, 206, 208, 301, 303, 305, 307, 309).
 
 _______________________
 
@@ -282,7 +282,7 @@ _______________________
      isc = BOTH;
   }
 
-The output_flag array controls the type of output that the Wavelet-Stat tool generates. This flags is set similarly to the output flags of the other MET tools, with possible values of NONE, STAT, and BOTH. The ISC line type is the only one available for Intensity-Scale STAT lines.
+The **output_flag** array controls the type of output that the Wavelet-Stat tool generates. This flags is set similarly to the output flags of the other MET tools, with possible values of NONE, STAT, and BOTH. The ISC line type is the only one available for Intensity-Scale STAT lines.
 
 _______________________
 
@@ -449,7 +449,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
     - FBIAS
     - The frequency bias
 
-The Wavelet-Stat tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
+The **Wavelet-Stat** tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
 
 The dimensions and variables included in the wavelet_stat NetCDF files are described in Tables :numref:`table_NetCDF_dim_Wave_output` and :numref:`table_variables_wave_NetCDF_output`.
 
@@ -464,11 +464,11 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
   * - NetCDF Dimension
     - Description
   * - x
-    - Dimension of the tile which equals 2ⁿ
+    - Dimension of the tile which equals **2ⁿ**
   * - y
-    - Dimension of the tile which equals 2ⁿ
+    - Dimension of the tile which equals **2ⁿ**
   * - scale
-    - Dimension for the number of scales. This is set to n+2, where 2ⁿ is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
+    - Dimension for the number of scales. This is set to **n+2**, where **2ⁿ** is the tile dimension. The 2 extra scales are for the binary image and the wavelet averaged over the whole tile.
   * - tile
     - Dimension for the number of tiles used
 
@@ -500,6 +500,6 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
     - tile, scale, x, y
     - Wavelet scale-decomposition of the observation field specified by “FIELD_LEVEL_THRESH”
 
-Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the ps_plot_flag configuration file option.
+Lastly, the **Wavelet-Stat** tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 
 The PostScript plot begins with one summary page illustrating the tiling method that was applied to the domain. The remaining pages depict the Intensity-Scale method that was applied. For each combination of field, tile, and threshold, the binary difference field (**f-o**) is plotted followed by the difference field for each decomposed scale. Underneath each difference plot, the statistics applicable to that scale are listed. Examples of the PostScript plots can be obtained by running the example cases provided with the MET tarball.
