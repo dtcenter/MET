@@ -22,9 +22,9 @@ Interpolation/matching methods
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
-In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to SURFACE in the message_type_group_map configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. 
+In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to **SURFACE** in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. 
 
-To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. Figure 7.1  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
+To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
 
 This section describes the options for interpolation in the horizontal.
 
@@ -42,77 +42,77 @@ This section describes the options for interpolation in the horizontal.
 
 ____________________
 
-Nearest Neighbor
+**Nearest Neighbor**
 
 The forecast value at P is assigned the value at the nearest grid point. No interpolation is performed. Here, "nearest" means spatially closest in horizontal grid coordinates. This method is used by default when the interpolation width, W, is set to 1.
 
 _____________________
 
-Geography Match
+**Geography Match**
 
 The forecast value at P is assigned the value at the nearest grid point in the interpolation area where the land/sea mask and topography criteria are satisfied.
 
 _____________________
 
-Gaussian
+**Gaussian**
 
 The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point follows the Gaussian distribution with nearby points contributing more the far away points. The shape of the distribution is configured using sigma.
 
-When used for regridding, with the regrid configuration option, or smoothing, with the interp configuration option in grid-to-grid comparisons, the Gaussian method is named MAXGAUSS and is implemented as a 2-step process. First, the data is regridded or smoothed using the maximum value interpolation method described below, where the width and shape define the interpolation area. Second, the Gaussian smoother, defined by the gaussian_dx and gaussian_radius configuration options, is applied.
+When used for regridding, with the **regrid** configuration option, or smoothing, with the **interp** configuration option in grid-to-grid comparisons, the Gaussian method is named **MAXGAUSS** and is implemented as a 2-step process. First, the data is regridded or smoothed using the maximum value interpolation method described below, where the **width** and **shape** define the interpolation area. Second, the Gaussian smoother, defined by the **gaussian_dx** and **gaussian_radius** configuration options, is applied.
 
 _____________________
 
-Minimum value
+**Minimum value**
 
 The forecast value at P is the minimum of the values in the interpolation area.
 
 _____________________
 
-Maximum value
+**Maximum value**
 
 The forecast value at P is the maximum of the values in the interpolation area.
 
 ______________________
 
-Distance-weighted mean
+**Distance-weighted mean**
 
 The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point is the reciprocal of the square of the distance (in grid coordinates) from P. The weighted sum of forecast values is normalized by dividing by the sum of the weights. 
 
 _______________________
 
-Unweighted mean
+**Unweighted mean**
 
 This method is similar to the distance-weighted mean, except all the weights are equal to 1. The distance of any point from P is not considered.
 
 _____________________
 
-Median
+**Median**
 
 The forecast value at P is the median of the forecast values in the interpolation area.
 
 _____________________
 
-Least-Squares Fit
+**Least-Squares Fit**
 
 To perform least squares interpolation of a gridded field at a location P, MET uses an **WxW** subgrid centered (as closely as possible) at P. Figure 7.1 shows the case where N = 5.
 
-If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in Figure 7.1 ??(please confirm figure number), P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form :math:`z=\alpha (x) + \beta (y) + \gamma` over the subgrid. The values of :math:`\alpha, \beta, \gamma` are calculated from the data values at the vertices. Finally, the coordinates (x,y) of P are substituted into this expression to give z, our least squares interpolated data value at P.
+If we denote the horizontal coordinate in this subgrid by x, and vertical coordinate by y, then we can assign coordinates to the point P relative to this subgrid. These coordinates are chosen so that the center of the grid is. For example, in :numref:`point_stat_fig1`, P has coordinates (-0.4, 0.2). Since the grid is centered near P, the coordinates of P should always be at most 0.5 in absolute value. At each of the vertices of the grid (indicated by black dots in the figure), we have data values. We would like to use these values to interpolate a value at P. We do this using least squares. If we denote the interpolated value by z, then we fit an expression of the form :math:`z=\alpha (x) + \beta (y) + \gamma` over the subgrid. The values of :math:`\alpha, \beta, \gamma` are calculated from the data values at the vertices. Finally, the coordinates (**x,y**) of P are substituted into this expression to give z, our least squares interpolated data value at P.
 
 _______________________
 
-Bilinear Interpolation
+**Bilinear Interpolation**
 
 This method is performed using the four closest grid squares. The forecast values are interpolated linearly first in one dimension and then the other to the location of the observation.
 
 ________________________
 
-Upper Left, Upper Right, Lower Left, Lower Right Interpolation
+**Upper Left, Upper Right, Lower Left, Lower Right Interpolation**
 
 This method is performed using the four closest grid squares. The forecast values are interpolated to the specified grid point.
 
 _______________________
 
-Best Interpolation
+**Best Interpolation**
 
 The forecast value at P is the chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
@@ -125,7 +125,7 @@ The Point-Stat tool has been enhanced to include the High Resolution Assessment 
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated. 
 
-   shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
+:numref:`point_stat_fig3` shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
 
 .. _point_stat_fig3:
 
@@ -277,26 +277,26 @@ point_stat has three required arguments and can take many optional ones.
 Required arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The fcst_file argument names the gridded file in either GRIB or NetCDF containing the model data to be verified.
+1. The **fcst_file** argument names the gridded file in either GRIB or NetCDF containing the model data to be verified.
 
-2. The obs_file argument indicates the NetCDF file (output of PB2NC or ASCII2NC) containing the point observations to be used for verifying the model.
+2. The **obs_file** argument indicates the NetCDF file (output of PB2NC or ASCII2NC) containing the point observations to be used for verifying the model.
 
-3. The config_file argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+3. The **config_file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -point_obs file may be used to pass additional NetCDF point observation files to be used in the verification. 
+4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. 
 
-5. The -obs_valid_beg time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
+5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
-6. The -obs_valid_end time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
+6. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
 
-7. The -outdir path indicates the directory where output files should be written. 
+7. The **-outdir path** indicates the directory where output files should be written. 
 
-8. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-9. The -v level option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the point_stat calling sequence is shown below:
 
@@ -311,7 +311,7 @@ In this example, the Point-Stat tool evaluates the model data in the sample_fcst
 point_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the Point-Stat tool named PointStatConfig_default can be found in the installed share/met/config directory. Another version is located in scripts/config. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed **share/met/config** directory. Another version is located in **scripts/config**. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
 
@@ -351,11 +351,11 @@ The configuration options listed above are common to many MET tools and are desc
 
 _________________________
 
-Setting up the fcst and obs dictionaries of the configuration file is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Point-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. The following are some special consideration for the Point-Stat tool.
 
-The obs dictionary looks very similar to the fcst dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using obs = fcst;. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the fcst and obs dictionaries separately. The number of fields specified in the fcst and obs dictionaries must match.
+The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
 
-The message_type entry, defined in the obs dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm for a list of the possible types. If using obs = fcst;, it can be defined in the forecast dictionary and the copied into the observation dictionary.
+The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and the copied into the observation dictionary.
 
 ______________________
 
@@ -369,7 +369,7 @@ ______________________
      thresh = eq1;
   }
 
-The land_mask dictionary defines the land/sea mask field which is used when verifying at the surface. For point observations whose message type appears in the LANDSF entry of the message_type_group_map setting, only use forecast grid points where land = TRUE. For point observations whose message type appears in the WATERSF entry of the message_type_group_map setting, only use forecast grid points where land = FALSE. The flag entry enables/disables this logic. If the file_name is left empty, then the land/sea is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain. Lastly, the thresh entry is the threshold which defines land (threshold is true) and water (threshold is false).
+The **land_mask** dictionary defines the land/sea mask field which is used when verifying at the surface. For point observations whose message type appears in the **LANDSF** entry of the **message_type_group_map** setting, only use forecast grid points where land = TRUE. For point observations whose message type appears in the **WATERSF** entry of the **message_type_group_map** setting, only use forecast grid points where land = FALSE. The **flag** entry enables/disables this logic. If the **file_name** is left empty, then the land/sea is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the **field** entry. The **regrid** settings specify how this field should be regridded to the verification domain. Lastly, the **thresh** entry is the threshold which defines land (threshold is true) and water (threshold is false).
 
 __________________________
 
@@ -384,7 +384,7 @@ __________________________
      interp_fcst_thresh = ge-50&&le50;
   }
 
-The topo_mask dictionary defines the model topography field which is used when verifying at the surface. This logic is applied to point observations whose message type appears in the SURFACE entry of the message_type_group_map setting. Only use point observations where the topo - station elevation difference meets the use_obs_thresh threshold entry. For the observations kept, when interpolating forecast data to the observation location, only use forecast grid points where the topo - station difference meets the interp_fcst_thresh threshold entry. The flag entry enables/disables this logic. If the file_name is left empty, then the topography data is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the field entry. The regrid settings specify how this field should be regridded to the verification domain.
+The **topo_mask** dictionary defines the model topography field which is used when verifying at the surface. This logic is applied to point observations whose message type appears in the **SURFACE** entry of the **message_type_group_map** setting. Only use point observations where the topo - station elevation difference meets the **use_obs_thresh** threshold entry. For the observations kept, when interpolating forecast data to the observation location, only use forecast grid points where the topo - station difference meets the **interp_fcst_thresh** threshold entry. The **flag** entry enables/disables this logic. If the **file_name** is left empty, then the topography data is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the **field** entry. The **regrid** settings specify how this field should be regridded to the verification domain.
 
 ____________________________
 
@@ -399,7 +399,7 @@ ____________________________
      prob_cat_thresh = [];
   }
 
-The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :ref:`PS_HiRA_framework`. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
+The **hira** dictionary that is very similar to the **interp** and **nbrhd** entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :ref:`PS_HiRA_framework`. The **flag** entry is a boolean which toggles HiRA on (**TRUE**) and off (**FALSE**). The **width** and **shape** entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The **vld_thresh** entry is the required ratio of valid data within the neighborhood to compute an output value. The **cov_thresh** entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The **prob_cat_thresh** entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead of **prob_cat_thresh**.
 
 ________________________
 
@@ -427,45 +427,45 @@ ________________________
      mpr    = BOTH;
   }
 
-The output_flag array controls the type of output that the Point-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
+The **output_flag** array controls the type of output that the Point-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
 
-1. FHO for Forecast, Hit, Observation Rates
+1. **FHO** for Forecast, Hit, Observation Rates
 
-2. CTC for Contingency Table Counts
+2. **CTC** for Contingency Table Counts
 
-3. CTS for Contingency Table Statistics
+3. **CTS** for Contingency Table Statistics
 
-4. MCTC for Multi-category Contingency Table Counts
+4. **MCTC** for Multi-category Contingency Table Counts
 
-5. MCTS for Multi-category Contingency Table Statistics
+5. **MCTS** for Multi-category Contingency Table Statistics
 
-6. CNT for Continuous Statistics
+6. **CNT** for Continuous Statistics
 
-7. SL1L2 for Scalar L1L2 Partial Sums
+7. **SL1L2** for Scalar L1L2 Partial Sums
 
-8. SAL1L2 for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
+8. **SAL1L2** for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
 
-9. VL1L2 for Vector L1L2 Partial Sums
+9. **VL1L2** for Vector L1L2 Partial Sums
 
-10. VCNT for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
+10. **VCNT** for Vector Continuous Statistics (Note that bootstrap confidence intervals are not currently calculated for this line type.)
 
-11. VAL1L2 for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+11. **VAL1L2** for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 
-12. PCT for Contingency Table counts for Probabilistic forecasts
+12. **PCT** for Contingency Table counts for Probabilistic forecasts
 
-13. PSTD for contingency table Statistics for Probabilistic forecasts with Dichotomous outcomes
+13. **PSTD** for contingency table Statistics for Probabilistic forecasts with Dichotomous outcomes
 
-14. PJC for Joint and Conditional factorization for Probabilistic forecasts
+14. **PJC** for Joint and Conditional factorization for Probabilistic forecasts
 
-15. PRC for Receiver Operating Characteristic for Probabilistic forecasts
+15. **PRC** for Receiver Operating Characteristic for Probabilistic forecasts
 
-16. ECNT for Ensemble Continuous Statistics is only computed for the HiRA methodology
+16. **ECNT** for Ensemble Continuous Statistics is only computed for the HiRA methodology
 
-17. RPS for Ranked Probability Score is only computed for the HiRA methodology
+17. **RPS** for Ranked Probability Score is only computed for the HiRA methodology
 
-18. ECLV for Economic Cost/Loss Relative Value
+18. **ECLV** for Economic Cost/Loss Relative Value
 
-19. MPR for Matched Pair data
+19. **MPR** for Matched Pair data
 
 Note that the first two line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in Section :ref:`point_stat-output`.
 
