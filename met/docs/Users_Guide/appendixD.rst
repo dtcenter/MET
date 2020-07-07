@@ -11,19 +11,23 @@ There are two main types of CIs available with MET: parametric and non-parametri
 
 The most commonly used confidence interval about an estimate for a statistic (or parameter), :math:`\theta`, is given by the normal approximation
 
-.. math:: \theta \pm z_{\alpha / 2} \cdot V(\theta ) ,\eqno{(30.1)}
+.. math:: \theta \pm z_{\alpha / 2} \cdot V(\theta )
+   :label: equation 1
 
 where :math:`z_{\alpha / 2}` is the :math:`\alpha - \text{th}` quantile of the standard normal distribution, and :math:`V(\theta )` is the standard error of the statistic (or parameter), :math:`\theta`. For example, the most common example is for the mean of a sample, :math:`X_1,\cdots,X_n`, of independent and identically distributed (iid) normal random variables with mean :math:`\mu` and variance :math:`\sigma`. Here, the mean is estimated by , and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, :math:`V( \theta ) = V ( \bar{X} ) = \frac{\sigma}{\sqrt{n}}`, and this must be estimated by :math:`\frac{1}{n} \sum_{i=1}^n X_i = \bar{X}`, which is obtained here by replacing :math:`\sigma` by its estimate, :math:`\hat{\sigma}`, where :math:`\hat{\sigma} = \frac{1}{n - 1} \sum_{i=1}^n (X_i - \bar{X})^2`.
 
-Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval (30.1) may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student’s **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of (30.1) is replaced with the quantile of this **t** distribution. That is, the interval is given by 
+Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval :math:numref:`equation 1` may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student’s **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of :math:numref:`equation 1` is replaced with the quantile of this **t** distribution. That is, the interval is given by 
 
-.. math:: \mu \pm t_{\alpha / 2,\nu - 1} \cdot \frac{\sigma}{\sqrt{n}} , \eqno{(30.2)}
+.. math:: \mu \pm t_{\alpha / 2,\nu - 1} \cdot \frac{\sigma}{\sqrt{n}}
+   :label: equation 2
 
 where again, :math:`\sigma` is replaced by its estimate, :math:`\hat{\sigma}`, as described above.
 
-Table 30.1 summarizes the verification statistics in MET that have normal approximation CIs given by (30.1) along with their corresponding standard error estimates, . It should be noted that for the first two rows of this table (i.e., Forecast/Observation Mean and Mean error) MET also calculates the interval (30.2) for small sample sizes.
+:numref:`verif_stat_approx_CI` summarizes the verification statistics in MET that have normal approximation CIs given by :math:numref:`equation 1` along with their corresponding standard error estimates, . It should be noted that for the first two rows of this table (i.e., Forecast/Observation Mean and Mean error) MET also calculates the interval :math:numref:`equation 2` for small sample sizes.
 
-.. list-table:: Verification statistics with normal approximation CIs given by (30.1) provided in MET along with their associated standard error estimate.
+.. _verif_stat_approx_CI:
+
+.. list-table:: Verification statistics with normal approximation CIs given by :math:numref:`equation 1` provided in MET along with their associated standard error estimate.
   :widths: auto
   :header-rows: 1
 
@@ -41,25 +45,26 @@ Table 30.1 summarizes the verification statistics in MET that have normal approx
     - :math:`V(\ln(\text{OR})) = \sqrt{\frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}}`, where the values in the denominators are the usual contingency table counts.
 
 
-
-
 Other statistics in MET having parametric CIs that rely on the underlying sample to be at least approximately iid normal, but have a different form derived from the normality assumption on the sample include the variance, standard deviation, and the linear correlation coefficient. These are addressed subsequently.
 
-Generally, the normal interval (30.1) is appropriate for statistics of continuous variables, but a limit law for the binomial distribution allows for use of this interval with proportions. The most intuitive estimate for :math:`V(\theta )` in this case is given by :math:`V(p) = \sqrt{\hat{p} (1 - \hat{p}) / n}`. However, this only applies when the sample size is large. A better approximation to the CI for proportions is given by Wilson’s interval, which is 
+Generally, the normal interval :math:numref:`equation 1` is appropriate for statistics of continuous variables, but a limit law for the binomial distribution allows for use of this interval with proportions. The most intuitive estimate for :math:`V(\theta )` in this case is given by :math:`V(p) = \sqrt{\hat{p} (1 - \hat{p}) / n}`. However, this only applies when the sample size is large. A better approximation to the CI for proportions is given by Wilson’s interval, which is 
 
-.. math:: \frac{\hat{p} + z_{\alpha / 2}^2 + z_{\alpha / 2} \sqrt{\hat{p} (1 - \hat{p}) / 4n}}{1 + z_{\alpha / 2}^2 / n} , \eqno{(30.3)}
+.. math:: \frac{\hat{p} + z_{\alpha / 2}^2 + z_{\alpha / 2} \sqrt{\hat{p} (1 - \hat{p}) / 4n}}{1 + z_{\alpha / 2}^2 / n}
+   :label: equation 3
 
-where :math:`\hat{p}` is the estimated proportion (e.g., hit rate, false alarm rate, PODy, PODn, etc.). Because this interval (30.3) generally works better than the more intuitive normal approximation interval for both large and small sample sizes, this is the interval employed by MET.
+where :math:`\hat{p}` is the estimated proportion (e.g., hit rate, false alarm rate, PODy, PODn, etc.). Because this interval :math:numref:`equation 3` generally works better than the more intuitive normal approximation interval for both large and small sample sizes, this is the interval employed by MET.
 
 The forecast/observation variance has CIs derived from the underlying sample being approximately iid normal with mean :math:`\mu` and variance :math:`\sigma`. The lower and upper limits for the interval are given by
 
-.. math:: l(\sigma^2) = \frac{(n - 1)s^2}{\chi_{\alpha / 2,n - 1}^2} \text{ and } u(\sigma^2) = \frac{(n - 1)s^2}{\chi_{1 - \alpha / 2, n - 1}^2}, \eqno{(30.4)} 
+.. math:: l(\sigma^2) = \frac{(n - 1)s^2}{\chi_{\alpha / 2,n - 1}^2} \text{ and } u(\sigma^2) = \frac{(n - 1)s^2}{\chi_{1 - \alpha / 2, n - 1}^2}
+   :label: equation 4
 
-respectively, where :math:`\chi_{\alpha , \nu}^2` is the :math:`\alpha - \text{th}` quantile of the chi-square distribution with **n-1** degrees of freedom. Taking the square roots of the limits in (30.4) yields the CI for the forecast/observation standard deviation.
+respectively, where :math:`\chi_{\alpha , \nu}^2` is the :math:`\alpha - \text{th}` quantile of the chi-square distribution with **n-1** degrees of freedom. Taking the square roots of the limits in :math:numref:`equation 4` yields the CI for the forecast/observation standard deviation.
 
 Finally, the linear correlation coefficient has limits given by 
 
-.. math:: (\frac{e^{2c_l} - 1}{e^{2c_l} + 1}, \frac{e^{2c_u} - 1}{e^{2c_u} + 1}), \eqno{(30.5)} 
+.. math:: (\frac{e^{2c_l} - 1}{e^{2c_l} + 1}, \frac{e^{2c_u} - 1}{e^{2c_u} + 1})
+   :label: equation 5
 
 where :math:`c_l = v - \frac{z_{\alpha / 2}}{\sqrt{n - 3}}` and :math:`c_u = v + \frac{z_{\alpha / 2}}{\sqrt{n - 3}}`.
 
