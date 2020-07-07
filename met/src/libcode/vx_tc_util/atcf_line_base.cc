@@ -16,6 +16,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <map>
 
 #include "vx_math.h"
 
@@ -72,6 +73,12 @@ void ATCFLineBase::init_from_scratch() {
    // ATCF lines are comma-delimited
    set_delimiter(",");
 
+   // Initialize pointers
+   BasinMap      = (map<ConcatString,ConcatString> *) 0;
+   BestTechnique = (StringArray *) 0;
+   OperTechnique = (StringArray *) 0;
+   TechSuffix    = (ConcatString *) 0;
+
    clear();
 
    return;
@@ -85,10 +92,16 @@ void ATCFLineBase::assign(const ATCFLineBase &l) {
 
    DataLine::assign(l);
 
-   Type = l.Type;
-   Technique = l.Technique;
-   IsBestTrack = l.IsBestTrack;
-   IsOperTrack = l.IsOperTrack;
+   BasinMap      = l.BasinMap;
+   BestTechnique = l.BestTechnique;
+   OperTechnique = l.OperTechnique;
+   TechSuffix    = l.TechSuffix;
+
+   Type          = l.Type;
+   Basin         = l.Basin;
+   Technique     = l.Technique;
+   IsBestTrack   = l.IsBestTrack;
+   IsOperTrack   = l.IsOperTrack;
 
    return;
 }
@@ -101,8 +114,7 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "Line            = " << (*this) << "\n";
    out << prefix << "Type            = " << atcflinetype_to_string(Type) << "\n";
-   cs = basin();
-   out << prefix << "Basin           = \"" << cs.contents() << "\"\n";
+   out << prefix << "Basin           = \"" << Basin.contents() << "\"\n";
    cs = cyclone_number();
    out << prefix << "CycloneNumber   = \"" << cs.contents() << "\"\n";
    out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(warning_time()) << "\n";
@@ -125,7 +137,12 @@ void ATCFLineBase::dump(ostream &out, int indent_depth) const {
 
 void ATCFLineBase::clear() {
    DataLine::clear();
+
+   // Do not reset pointers:
+   // BasinMap, BestTechnique, OperTechnique, TechSuffix
+
    Type = NoATCFLineType;
+   Basin.clear();
    Technique.clear();
    IsBestTrack = false;
    IsOperTrack = false;
@@ -151,6 +168,27 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    // Set the line type from the technique number column
    Type = string_to_atcflinetype(get_item(TechniqueNumberOffset).c_str());
 
+   // Set the basin
+   Basin = get_item(BasinOffset);
+
+   // Update the basin name, if specified
+   if(BasinMap) {
+      if(BasinMap->count(Basin) > 0) Basin = BasinMap->at(Basin);
+   }
+
+   // Check for BEST and Operational tracks, if specified
+   if(BestTechnique) IsBestTrack = BestTechnique->has(Technique);
+   if(OperTechnique) IsOperTrack = OperTechnique->has(Technique);
+
+   // Append the technique suffix, if specified
+   if(TechSuffix) {
+      if(TechSuffix->length() > 0) {
+         ConcatString cs;
+         cs << get_item(TechniqueOffset) << TechSuffix->c_str();
+         Technique = cs;
+      }
+   }
+
    return(1);
 }
 
@@ -166,13 +204,13 @@ bool ATCFLineBase::is_header() const {
 ConcatString ATCFLineBase::get_item(int i) const {
    ConcatString cs;
    int i_col = i;
-   
+
    // For ATCFLineType_GenTrack:
    //    Columns 1 and 2 are consistent, use offsets 0 and 1
    //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track
    // Shift those column indices by 1.
    if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
-   
+
    cs = DataLine::get_item(i_col);
 
    // Strip off any whitespace
@@ -203,7 +241,7 @@ ATCFLineType ATCFLineBase::type() const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::basin() const {
-   return(get_item(BasinOffset));
+   return(Basin);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -270,7 +308,7 @@ unixtime ATCFLineBase::valid() const {
    }
 
    // Add minutes for the BEST track
-   if(is_best_track() && !is_bad_data(tn)) {
+   if(IsBestTrack && !is_bad_data(tn)) {
       ut += sec_per_minute * tn;
    }
 
@@ -290,7 +328,7 @@ int ATCFLineBase::lead() const {
    int    s  = bad_data_int;
 
    // Lead time for the BEST track is 0
-   if(is_best_track()) {
+   if(IsBestTrack) {
       s = 0;
    }
    else if(!is_bad_data(fp)) {

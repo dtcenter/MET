@@ -131,8 +131,18 @@ watch_warn = {
 }
 
 //
+// Modify basin names to make them consistent across ATCF input files.
+//
+basin_map = [
+   { key = "SI"; val = "SH"; },
+   { key = "SP"; val = "SH"; },
+   { key = "AU"; val = "SH"; },
+   { key = "AB"; val = "IO"; },
+   { key = "BB"; val = "IO"; }
+];
+
+//
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
 version = "V9.1";
-

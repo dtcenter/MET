@@ -237,6 +237,20 @@ watch_warn = {
    time_offset = -14400;
 }
 
+//
+// The basin_map entry defines a mapping of input names to output values.
+// Whenever the basin string matches "key" in the input ATCF files, it is
+// replaced with "val". This map can be used to modify basin names to make them
+// consistent across the ATCF input files.
+//
+basin_map = [
+   { key = "SI"; val = "SH"; },
+   { key = "SP"; val = "SH"; },
+   { key = "AU"; val = "SH"; },
+   { key = "AB"; val = "IO"; },
+   { key = "BB"; val = "IO"; }
+];
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // TCStatConfig_default
@@ -755,8 +769,6 @@ ci_alpha = 0.05;
 //
 output_flag = {
    fho    = NONE;
-   ctc    = BOTH; 
+   ctc    = BOTH;
    cts    = BOTH;
 }
-
-
