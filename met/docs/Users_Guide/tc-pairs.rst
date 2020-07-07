@@ -224,25 +224,10 @@ ____________________
 
 The watch_warn field specifies the file name and time applied offset to the watch_warn flag. The file_name string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named wwpts_us.txt, which is found in the installed share/met/tc_data/ directory within the MET build. The time_offset string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
-<<<<<<< HEAD
 .. _tc_pairs-output:
 
 tc_pairs output
 ~~~~~~~~~~~~~~~
-=======
-
-basin_map = [
-   { key = "SI"; val = "SH"; },
-   { key = "SP"; val = "SH"; },
-   { key = "AU"; val = "SH"; },
-   { key = "AB"; val = "IO"; },
-   { key = "BB"; val = "IO"; }
-];
-
-The basin_map entry defines a mapping of input names to output values. Whenever the basin string matches "key" in the input ATCF files, it is replaced with "val". This map can be used to modify basin names to make them consistent across the ATCF input files.
-
-20.2.3 tc_pairs output
-~~~~~~~~~~~~~~~~~~~~~~ß
 
 TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :ref:`TCST Header`.
 
