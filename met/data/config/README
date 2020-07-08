@@ -1489,7 +1489,8 @@ topo_mask = {
 //    - The "prob_cat_thresh" entry defines the thresholds which define ensemble
 //      probabilities from which to compute the ranked probability score output.
 //      If left empty but climatology data is provided, the climo_cdf thresholds
-//      will be used instead.
+//      will be used instead. If left empty but no climatology data is provided,
+//      the obs.cat_thresh thresholds will be used instead.
 //
 hira = {
    flag            = FALSE;

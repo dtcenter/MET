@@ -20,9 +20,9 @@ The statistical methods and measures computed by the Point-Stat tool are describ
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
-In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to SURFACE in the message_type_group_map configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. 
+In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to SURFACE in the message_type_group_map configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET.
 
-To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. Figure [MET_interpolation_methods] provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
+To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. Figure [MET_interpolation_methods] provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five.
 
 This section describes the options for interpolation in the horizontal.
 
@@ -66,7 +66,7 @@ The forecast value at P is the maximum of the values in the interpolation area.
 
 Distance-weighted mean
 
-The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point is the reciprocal of the square of the distance (in grid coordinates) from P. The weighted sum of forecast values is normalized by dividing by the sum of the weights. 
+The forecast value at P is a weighted sum of the values in the interpolation area. The weight given to each forecast point is the reciprocal of the square of the distance (in grid coordinates) from P. The weighted sum of forecast values is normalized by dividing by the sum of the weights.
 
 
 
@@ -111,13 +111,13 @@ The forecast value at P is the chosen as the grid point inside the interpolation
 
 The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (Mittermaier, 2014). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the output_flag dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
 
-The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated. 
+The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated.
 
-Figure1.3 shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner. 
+Figure1.3 shows a couple of examples of how the HiRA proportion is derived at a single model level using square neighborhoods. Events (in our case, model accretion values > 0) are separated from non-events (model accretion value = 0). Then, in each neighborhood, the total proportion of events is calculated. In the leftmost panel, four events exist in the 25 point neighborhood, making the HiRA proportion is 4/25 = 0.16. For the neighborhood of size 9 centered in that same panel, the HiRA proportion is 1/9. In the right panel, the size 25 neighborhood has HiRA proportion of 6/25, with the centered 9-point neighborhood having a HiRA value of 2/9. To extend this method into 3-dimensions, all layers within the user-defined layer are also included in the calculation of the proportion in the same manner.
 
 
 
-Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined. 
+Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined.
 
 7.2.3 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +136,7 @@ Measures for continuous variables
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See Appendix [chap:App_C-Verification-Measures] for specific information.
 
-A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference). 
+A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 
@@ -263,15 +263,15 @@ Required arguments for point_stat
 
 Optional arguments for point_stat
 
-4. The -point_obs file may be used to pass additional NetCDF point observation files to be used in the verification. 
+4. The -point_obs file may be used to pass additional NetCDF point observation files to be used in the verification.
 
 5. The -obs_valid_beg time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
 6. The -obs_valid_end time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
 
-7. The -outdir path indicates the directory where output files should be written. 
+7. The -outdir path indicates the directory where output files should be written.
 
-8. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+8. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 9. The -v level option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
@@ -422,7 +422,7 @@ hira = {
 
 }
 
-The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section [subsec:PS_HiRA_framework]. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh.
+The hira dictionary that is very similar to the interp and nbrhd entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section [subsec:PS_HiRA_framework]. The flag entry is a boolean which toggles HiRA on (TRUE) and off (FALSE). The width and shape entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The vld_thresh entry is the required ratio of valid data within the neighborhood to compute an output value. The cov_thresh entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The prob_cat_thresh entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the climo_cdf thresholds will be used instead of prob_cat_thresh. If left empty but no climatology data is provided, the obs.cat_thresh thresholds will be used instead.
 
 
 
@@ -523,9 +523,9 @@ point_stat produces output in STAT and, optionally, ASCII format. The ASCII outp
 
 The output STAT file will be named using the following naming convention:
 
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix, HHMMSSL indicates the forecast lead time and YYYYMMDD_HHMMSS indicates the forecast valid time. 
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix, HHMMSSL indicates the forecast lead time and YYYYMMDD_HHMMSS indicates the forecast valid time.
 
-The output ASCII files are named similarly: 
+The output ASCII files are named similarly:
 
 point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, ecnt, rps, eclv, sl1l2, sal1l2, vl1l2, vcnt or val1l2 to indicate the line type it contains.
 
@@ -538,8 +538,8 @@ The first set of header columns are common to all of the output files generated 
   :header-rows: 2
 
   * - HEADER
-    - 
-    - 
+    -
+    -
   * - Column Number
     - Header Column Name
     - Description
@@ -617,14 +617,14 @@ The first set of header columns are common to all of the output files generated 
     - Output line types are listed in tables :ref:`table_PS_format_info_FHO` through :ref:`table_PS_format_info_MPR`.
 
 .. _table_PS_format_info_FHO:
-      
+
 .. list-table:: Table 7.2 Format information for FHO (Forecast, Hit rate, Observation rate) output line type.
   :widths: auto
   :header-rows: 2
 
   * - FHO OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - FHO Column Name
     - Description
@@ -650,8 +650,8 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
+  * -
+    -
     - CTC OUTPUT FORMAT
   * - Column Number
     - CTC Column Name
@@ -679,14 +679,14 @@ The first set of header columns are common to all of the output files generated 
     :format: html
 
 .. _table_PS_format_info_CTS:
-	    
+
 .. list-table:: Table 7.4 Format information for CTS (Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
   * - CTS OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - CTS Column Name
     - Description
@@ -715,7 +715,7 @@ The first set of header columns are common to all of the output files generated 
     - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
     - Probability of detecting no including normal and bootstrap upper and lower confidence limits
   * - 54-58
-    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU       
+    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU
     - Probability of false detection including normal and bootstrap upper and lower confidence limits
   * - 59-63
     - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
@@ -731,14 +731,14 @@ The first set of header columns are common to all of the output files generated 
     :format: html
 
 .. _table_PS_format_info_CTS_cont:
-	     
+
 .. list-table:: Table 7.5 Format information for CTS (Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 2
 
   * - CTS OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - CTS Column Name
     - Description
@@ -773,19 +773,19 @@ The first set of header columns are common to all of the output files generated 
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
 
-      
+
 .. role:: raw-html(raw)
     :format: html
 
 .. _table_PS_format_info_CNT:
-	     
+
 .. list-table:: Table 7.6 Format information for CNT(Continuous Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
   * - CTS OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - CNT Column Name
     - Description
@@ -832,19 +832,19 @@ The first set of header columns are common to all of the output files generated 
     - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU, :raw-html:`<br />` ESTDEV_BCL, :raw-html:`<br />` ESTDEV_BCU
     - Standard deviation of the error including normal and bootstrap upper and lower confidence limits
 
-      
+
 .. role:: raw-html(raw)
     :format: html
 
-.. _table_PS_format_info_CNT_cont:	     
+.. _table_PS_format_info_CNT_cont:
 
 .. list-table::  Table 7.7 Format information for CNT(Continuous Statistics) output line type continued from above table
   :widths: auto
   :header-rows: 2
 
   * - CNT OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - CNT Column Name
     - Description
@@ -888,15 +888,15 @@ The first set of header columns are common to all of the output files generated 
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
 
-.. _table_PS_format_info_MCTC:      
-      
+.. _table_PS_format_info_MCTC:
+
 .. list-table:: Table 7.8  Format information for MCTC (Multi-category Contingency Table Count) output line type.
   :widths: auto
   :header-rows: 2
 
   * - MCTC OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - MCTC Column Name
     - Description
@@ -912,20 +912,20 @@ The first set of header columns are common to all of the output files generated 
   * - 27
     - Fi_Oj
     - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
-      
+
 
 .. role:: raw-html(raw)
     :format: html
-	     
+
 .. _table_PS_format_info_MCTS:
-	     
+
 .. list-table:: Table 7.9 Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
   * - MCTS OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - MCTS Column Name
     - Description
@@ -952,14 +952,14 @@ The first set of header columns are common to all of the output files generated 
     - Gerrity Score and bootstrap confidence limits
 
 .. _table_PS_format_info_PCT:
-      
+
 .. list-table:: Table 7.10 Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
   * - PCT OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - PCT Column Name
     - Description
@@ -988,16 +988,16 @@ The first set of header columns are common to all of the output files generated 
 
 .. role:: raw-html(raw)
     :format: html
-	     
+
 .. _table_PS_format_info_PSTD:
-	     
+
 .. list-table:: Table 7.11 Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
   :widths: auto
   :header-rows: 2
 
   * - PSTD OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - PSTD Column Name
     - Description
@@ -1042,14 +1042,14 @@ The first set of header columns are common to all of the output files generated 
     - The ith probability threshold value (repeated)
 
 .. _table_PS_format_info_PJC:
-      
+
 .. list-table:: Table 7.12 Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
   * - PJC OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - PJC Column Name
     - Description
@@ -1088,14 +1088,14 @@ The first set of header columns are common to all of the output files generated 
     - Last probability threshold value
 
 .. _table_PS_format_info_PRC:
-      
+
 .. list-table:: Table 7.13 Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
   * - PRC OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - PRC Column Name
     - Description
@@ -1122,14 +1122,14 @@ The first set of header columns are common to all of the output files generated 
     - Last probability threshold value
 
 .. _table_PS_format_info_ECLV:
-      
+
 .. list-table:: Table 7.14 Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
   :widths: auto
   :header-rows: 2
 
   * - ECLV OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - PRC Column Name
     - Description
@@ -1156,14 +1156,14 @@ The first set of header columns are common to all of the output files generated 
     - Relative value for the ith Cost/Loss ratio
 
 .. _table_PS_format_info_SL1L2:
-      
+
 .. list-table:: Table 7.15  Format information for SL1L2 (Scalar Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
   * - SL1L2 OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - SL1L2 Column Name
     - Description
@@ -1192,15 +1192,15 @@ The first set of header columns are common to all of the output files generated 
     - MAE
     - Mean Absolute Error
 
-.. _table_PS_format_info_SAL1L2:      
+.. _table_PS_format_info_SAL1L2:
 
 .. list-table:: Table 7.16 Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
   * - SAL1L2 OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - SAL1L2 Column Name
     - Description
@@ -1230,14 +1230,14 @@ The first set of header columns are common to all of the output files generated 
     - Mean Absolute Error
 
 .. _table_PS_format_info_VL1L2:
-      
+
 .. list-table:: Table 7.17 Format information for VL1L2 (Vector Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
   * - VL1L2 OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - VL1L2 Column Name
     - Description
@@ -1276,14 +1276,14 @@ The first set of header columns are common to all of the output files generated 
     - Mean observed wind speed
 
 .. _table_PS_format_info_VAL1L2:
-      
+
 .. list-table:: Table 7.18 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
   * - VAL1L2 OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - VAL1L2 Column Name
     - Description
@@ -1322,8 +1322,8 @@ The first set of header columns are common to all of the output files generated 
   :header-rows: 2
 
   * - VCNT OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Numbers
     - VCNT Column Name
     - Description
@@ -1397,8 +1397,8 @@ The first set of header columns are common to all of the output files generated 
   :header-rows: 2
 
   * - MPR OUTPUT FORMAT
-    - 
-    - 
+    -
+    -
   * - Column Number
     - MPR Column Name
     - Description
@@ -1445,4 +1445,4 @@ The first set of header columns are common to all of the output files generated 
     - CLIMO_CDF
     - Climatological cumulative distribution function value
 
-The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :ref:`stat-analysis`. 
+The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :ref:`stat-analysis`.

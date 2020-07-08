@@ -19,6 +19,7 @@
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>OUTPUT_PREFIX</name> <value>NCMET_NAM_HMTGAGE_HIRA</value></pair>
+      <pair><name>HIRA_PROB_CAT_THRESH</name> <value>>0, >0.1, >0.25, >0.5, >1.0, >1.5, >2.0</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
@@ -28,14 +29,26 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_pct.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_pstd.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_pjc.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_prc.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_ecnt.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_eclv.txt</stat>
-      <stat>&OUTPUT_DIR;/hira/point_stat_NCMET_NAM_HMTGAGE_HIRA_360000L_20120410_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <!--                                    -->
+  <!--  point_stat                        -->
+  <!--                                    -->
+  <test name="point_stat_HIRA_EMPTY_PROB_CAT_THRESH">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>HIRA_EMPTY_PROB_CAT_THRESH</value></pair>
+      <pair><name>HIRA_PROB_CAT_THRESH</name> <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      &CONFIG_DIR;/PointStatConfig_APCP_HIRA \
+      -outdir &OUTPUT_DIR;/hira -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/hira/point_stat_HIRA_EMPTY_PROB_CAT_THRESH_360000L_20120410_120000V.stat</stat>
     </output>
   </test>
 
