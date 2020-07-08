@@ -10,7 +10,7 @@ ____________
 
 This chapter provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in Davis *et al.* (2006a, b), Brown *et al.* (2007) and Bullock *et al.* (2016). 
 
-MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (e.g., clouds, convection).
+MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (*e.g.*, clouds, convection).
 
 MODE is only one of a number of different approaches that have been developed in recent years to meet these needs. In the future, we expect that the MET package will include additional methods. References for many of these methods are provided at http://www.rap.ucar.edu/projects/icp/index.html.
 
@@ -56,9 +56,9 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 
 .. figure:: figure/mode-object_id.png
 
-   Example of an application of the MODE object identification process to a model precipitation field.  ?? The lyx document, MET_Users_Guide_Master.lyx and the web page don't have figure 15.1 in the same location.
-Web: above 15.2.3 Fuzzy Logic: https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf page 307.
-Lyx: Just above 15.2.2 Attributes.  Where does it belong??
+   Example of an application of the MODE object identification process to a model precipitation field.
+
+?? It is unclear where the figure should be placed. The lyx document, MET_Users_Guide_Master.lyx and the web page don't have figure 15.1 in the same location.  lyx web: above 15.2.3 Fuzzy Logic: https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf page 307. Lyx: Just above 15.2.2 Attributes.  Where does it belong??
 
 
 Attributes
@@ -87,7 +87,7 @@ Several area measures are also used for pair attributes. **Union Area** is the t
 Fuzzy logic
 ~~~~~~~~~~~
 
-Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (e.g., intersection area), low values indicate low interest, and high values indicate more interest.
+Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (*e.g.*, intersection area), low values indicate low interest, and high values indicate more interest.
 
 The next step is to define confidence maps :math:`C_i` for each attribute. These maps (again with values ranging from zero to one) reflect how confident we are in the calculated value of an attribute. The confidence maps generally are functions of the entire attribute vector :math:`\alpha = (\alpha_1, \alpha_2, \ldots, \alpha_n)`, in contrast to the interest maps, where each :math:`I_i` is a function only of :math:`\alpha_i`. To see why this is necessary, imagine an electronic anemometer that outputs a stream of numerical values of wind speed and direction. It is typically the case for such devices that when the wind speed becomes small enough, the wind direction is poorly resolved. The wind must be at least strong enough to overcome friction and turn the anemometer. Thus, in this case, our confidence in one attribute (wind direction) is dependent on the value of another attribute (wind speed). In MODE, all of the confidence maps except the map for axis angle are set to a constant value of 1. The axis angle confidence map is a function of aspect ratio, with values near one having low confidence, and values far from one having high confidence.
 
@@ -249,7 +249,7 @@ The **censor_thresh** and **censor_val** entries are used to censor the raw data
 
 The **conv_radius** entry defines the radius of the circular convolution applied to smooth the raw fields. The radii are specified in terms of grid units. The default convolution radii are defined in terms of the previously defined **grid_res** entry. Multiple convolution radii may be specified as an array (e.g. **conv_radius = [ 5, 10, 15 ];**).
 
-The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh** = [ >=5.0, >=10.0, >=15.0 ];).
+The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];)**.
 
 Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.
 
@@ -257,13 +257,13 @@ The **vld_thresh** entry must be set between 0 and 1. When performing the circul
 
 The **filter_attr_name** and **filter_attr_thresh** entries are arrays of the same length which specify object filtering criteria. By default, no object filtering criteria is defined.
 
-The **filter_attr_name** entry is an array of strings specifying the MODE output header column names for the object attributes of interest, such as **AREA, LENGTH, WIDTH**, and **INTENSITY_50**. In addition, **ASPECT_RATIO** specifies the aspect ratio (width/length), **INTENSITY_101** specifies the mean intensity value, and INTENSITY_102 specifies the sum of the intensity values.
+The **filter_attr_name** entry is an array of strings specifying the MODE output header column names for the object attributes of interest, such as **AREA, LENGTH, WIDTH**, and **INTENSITY_50**. In addition, **ASPECT_RATIO** specifies the aspect ratio (width/length), **INTENSITY_101** specifies the mean intensity value, and **INTENSITY_102** specifies the sum of the intensity values.
 
 The **filter_attr_thresh** entry is an array of thresholds for these object attributes. Any simple objects not meeting all of the filtering criteria are discarded.
 
 Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated. 
 
-The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of merge_thresh entries must match the number of conv_thresh entries.
+The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
 
 The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field. 
 
@@ -407,7 +407,7 @@ _____________________
 
   print_interest_thresh = 0.0;
 
-The **print_interest_thres**h entry determines which pairs of object attributes will be written to the output object attribute ASCII file. The user may choose to set the **print_interest_thresh** to the same value as the **total_interest_thresh**, meaning that only object pairs that actually match are written to the output file. By default, the print interest threshold is set to zero, meaning that all object pair attributes will be written as long as the distance between the object centroids is less than the **max_centroid_dist** entry.
+The **print_interest_thresh** entry determines which pairs of object attributes will be written to the output object attribute ASCII file. The user may choose to set the **print_interest_thresh** to the same value as the **total_interest_thresh**, meaning that only object pairs that actually match are written to the output file. By default, the print interest threshold is set to zero, meaning that all object pair attributes will be written as long as the distance between the object centroids is less than the **max_centroid_dist** entry.
 
 _____________________
 
@@ -639,11 +639,13 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
     - ODDS
     - Odds Ratio
 
-This first file uses the following naming convention:  ?? missing code
+This first file uses the following naming convention:
 
-$$where {\tt PREFIX} indicates the user-defined output prefix, {\tt FCST\_VAR\_LVL} is the forecast variable and vertical level being used, {\tt OBS\_VAR\_LVL} is the observation variable and vertical level being used, {\tt HHMMSSL} indicates the forecast lead time, {\tt YYYYMMDD\_HHMMSSV} indicates the forecast valid time, and {\tt HHMMSSA} indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the {\tt ct\_stats\_flag} option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
+:math:`mode\_PREFIX\_FCST\_VAR\_LVL\_vs\_OBS\_VAR\_LVL\_HHMMSSL\_YYYYMMDD\_HHMMSSV\_HHMMSSA\_cts.txt`
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The OBJECT_ID can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NN**N is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN, and CONNN**) contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in :numref:`MODE_object_attribute`. 
+where {\tt PREFIX} indicates the user-defined output prefix, {\tt FCST\_VAR\_LVL} is the forecast variable and vertical level being used, {\tt OBS\_VAR\_LVL} is the observation variable and vertical level being used, {\tt HHMMSSL} indicates the forecast lead time, {\tt YYYYMMDD\_HHMMSSV} indicates the forecast valid time, and {\tt HHMMSSA} indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the {\tt ct\_stats\_flag} option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
+
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in :numref:`MODE_object_attribute`. 
 
 
 .. role:: raw-html(raw)
@@ -861,7 +863,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - INTEREST
     - Total interest value computed for a pair of simple objects (unitless)
 
-NetCDF Output
+**NetCDF Output**
 
 The MODE tool creates a NetCDF output file containing the object fields that are defined. The NetCDF file contains gridded fields including indices for the simple forecast objects, indices for the simple observation objects, indices for the matched cluster forecast objects, and indices for the matched cluster observation objects. The NetCDF file also contains lat/lon and x/y data for the vertices of the polygons for the boundaries of the simple forecast and observation objects. The generation of this file can be disabled using the **nc_pairs_flag** configuration file option.
 
