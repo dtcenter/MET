@@ -179,7 +179,7 @@ class CNTInfo {
       CIInfo pr_corr, sp_corr, kt_corr;
 
       // Anomaly correlation and RMS Anomalies
-      CIInfo anom_corr, anom_corr_raw, rmsfa, rmsoa;
+      CIInfo anom_corr, rmsfa, rmsoa, anom_corr_raw;
 
       CIInfo me, me2, estdev, mbias, mae, mse, msess, bcmse, rmse;
       CIInfo e10, e25, e50, e75, e90, eiqr;

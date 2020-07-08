@@ -875,21 +875,21 @@ The first set of header columns are common to all of the output files generated 
   * - 102-106
     - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
     - The Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
-  * - 107-111
-    - ANOM_CORR_RAW, :raw-html:`<br />` ANOM_CORR_RAW_NCL, :raw-html:`<br />` ANOM_CORR_RAW_NCU, :raw-html:`<br />` ANOM_CORR_RAW_BCL, :raw-html:`<br />` ANOM_CORR_RAW_BCU
-    - The Anomaly Correlation excluding mean error with normal and bootstrap upper and lower confidence limits
-  * - 112-114
+  * - 107-109
     - ME2, :raw-html:`<br />` ME2_BCL, :raw-html:`<br />` ME2_BCU
     - The square of the mean error (bias) including bootstrap upper and lower confidence limits
-  * - 115-117
+  * - 110-112
     - MSESS, :raw-html:`<br />` MSESS_BCL, :raw-html:`<br />` MSESS_BCU
     - The mean squared error skill score including bootstrap upper and lower confidence limits
-  * - 118-120
+  * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
-  * - 121-123
+  * - 117-119
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
+  * - 120-122
+    - ANOM_CORR_RAW, :raw-html:`<br />` ANOM_CORR_RAW_BCL, :raw-html:`<br />` ANOM_CORR_RAW_BCU
+    - The Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
 
 .. _table_PS_format_info_MCTC:
 

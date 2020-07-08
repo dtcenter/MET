@@ -719,9 +719,9 @@ void CNTInfo::clear() {
    sp_corr.clear();
    kt_corr.clear();
    anom_corr.clear();
-   anom_corr_raw.clear();
    rmsfa.clear();
    rmsoa.clear();
+   anom_corr_raw.clear();
    me.clear();
    me2.clear();
    estdev.clear();
@@ -767,9 +767,9 @@ void CNTInfo::assign(const CNTInfo &c) {
    sp_corr       = c.sp_corr;
    kt_corr       = c.kt_corr;
    anom_corr     = c.anom_corr;
-   anom_corr_raw = c.anom_corr_raw;
    rmsfa         = c.rmsfa;
    rmsoa         = c.rmsoa;
+   anom_corr_raw = c.anom_corr_raw;
    me            = c.me;
    me2           = c.me2;
    estdev        = c.estdev;
@@ -817,9 +817,9 @@ void CNTInfo::allocate_n_alpha(int i) {
       sp_corr.allocate_n_alpha(n_alpha);
       kt_corr.allocate_n_alpha(n_alpha);
       anom_corr.allocate_n_alpha(n_alpha);
-      anom_corr_raw.allocate_n_alpha(n_alpha);
       rmsfa.allocate_n_alpha(n_alpha);
       rmsoa.allocate_n_alpha(n_alpha);
+      anom_corr_raw.allocate_n_alpha(n_alpha);
       me.allocate_n_alpha(n_alpha);
       me2.allocate_n_alpha(n_alpha);
       estdev.allocate_n_alpha(n_alpha);
@@ -868,7 +868,6 @@ void CNTInfo::compute_ci() {
          ostdev.v_ncl[i]        = ostdev.v_ncu[i]        = bad_data_double;
          pr_corr.v_ncl[i]       = pr_corr.v_ncu[i]       = bad_data_double;
          anom_corr.v_ncl[i]     = anom_corr.v_ncu[i]     = bad_data_double;
-         anom_corr_raw.v_ncl[i] = anom_corr_raw.v_ncu[i] = bad_data_double;
          me.v_ncl[i]            = me.v_ncu[i]            = bad_data_double;
          estdev.v_ncl[i]        = estdev.v_ncu[i]        = bad_data_double;
          continue;
@@ -968,22 +967,6 @@ void CNTInfo::compute_ci() {
       }
 
       //
-      // Compute confidence interval for the raw anomaly correlation coefficient
-      //
-      if(is_bad_data(anom_corr_raw.v) || n <= 3 ||
-         is_eq(anom_corr_raw.v, 1.0)  || is_eq(anom_corr_raw.v, -1.0)) {
-         anom_corr_raw.v_ncl[i] = bad_data_double;
-         anom_corr_raw.v_ncu[i] = bad_data_double;
-      }
-      else {
-         v = 0.5*log((1 + anom_corr_raw.v)/(1 - anom_corr_raw.v));
-         cl = v + cv_normal_l/sqrt((double) (n-3));
-         cu = v + cv_normal_u/sqrt((double) (n-3));
-         anom_corr_raw.v_ncl[i] = (pow(vx_math_e, 2*cl) - 1)/(pow(vx_math_e, 2*cl) + 1);
-         anom_corr_raw.v_ncu[i] = (pow(vx_math_e, 2*cu) - 1)/(pow(vx_math_e, 2*cu) + 1);
-      }
-
-      //
       // Compute confidence interval for mean error using VIF
       //
       v = me.vif*estdev.v*estdev.v;
@@ -1037,11 +1020,11 @@ double CNTInfo::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "EIQR"          ) == 0) v = eiqr.v;
    else if(strcmp(stat_name, "MAD  "         ) == 0) v = mad.v;
    else if(strcmp(stat_name, "ANOM_CORR"     ) == 0) v = anom_corr.v;
-   else if(strcmp(stat_name, "ANOM_CORR_RAW" ) == 0) v = anom_corr_raw.v;
    else if(strcmp(stat_name, "ME2"           ) == 0) v = me2.v;
    else if(strcmp(stat_name, "MSESS"         ) == 0) v = msess.v;
    else if(strcmp(stat_name, "RMSFA"         ) == 0) v = rmsfa.v;
    else if(strcmp(stat_name, "RMSOA"         ) == 0) v = rmsoa.v;
+   else if(strcmp(stat_name, "ANOM_CORR_RAW" ) == 0) v = anom_corr_raw.v;
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name

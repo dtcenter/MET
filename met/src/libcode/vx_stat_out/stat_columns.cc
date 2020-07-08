@@ -2342,13 +2342,13 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    E75,           E75_BCL,           E75_BCU,
    //    E90,           E90_BCL,           E90_BCU,
    //    EIQR,          EIQR_BCL,          EIQR_BCU,
-   //    ANOM_CORR,     ANOM_CORR_NCL,     ANOM_CORR_NCU,     ANOM_CORR_BCL,     ANOM_CORR_BCU
-   //    ANOM_CORR_RAW, ANOM_CORR_RAW_NCL, ANOM_CORR_RAW_NCU, ANOM_CORR_RAW_BCL, ANOM_CORR_RAW_BCU
-   //    MAD,           MAD_BCL,           MAD_BCU
+   //    ANOM_CORR,     ANOM_CORR_NCL,     ANOM_CORR_NCU,     ANOM_CORR_BCL,     ANOM_CORR_BCU,
+   //    MAD,           MAD_BCL,           MAD_BCU,
    //    ME2,           ME2_BCL,           ME2_BCU,
    //    MSESS,         MSESS_BCL,         MSESS_BCU,
    //    RMSFA,         RMSFA_BCL,         RMSFA_BCU,
-   //    RMSOA,         RMSOA_BCL,         RMSOA_BCU
+   //    RMSOA,         RMSOA_BCL,         RMSOA_BCU,
+   //    ANOM_CORR_RAW, ANOM_CORR_RAW_BCL, ANOM_CORR_RAW_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2597,56 +2597,50 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+81, // Anomaly Correlation BCU
       cnt_info.anom_corr.v_bcu[i]);
 
-   at.set_entry(r, c+82, // Anomaly Correlation Raw
-      cnt_info.anom_corr_raw.v);
-
-   at.set_entry(r, c+83, // Anomaly Correlation Raw NCL
-      cnt_info.anom_corr_raw.v_ncl[i]);
-
-   at.set_entry(r, c+84, // Anomaly Correlation Raw NCU
-      cnt_info.anom_corr_raw.v_ncu[i]);
-
-   at.set_entry(r, c+85, // Anomaly Correlation Raw BCL
-      cnt_info.anom_corr_raw.v_bcl[i]);
-
-   at.set_entry(r, c+86, // Anomaly Correlation Raw BCU
-      cnt_info.anom_corr_raw.v_bcu[i]);
-
-   at.set_entry(r, c+87, // Mean Error Squared
+   at.set_entry(r, c+82, // Mean Error Squared
       cnt_info.me2.v);
 
-   at.set_entry(r, c+88, // Mean Error Squared BCL
+   at.set_entry(r, c+83, // Mean Error Squared BCL
       cnt_info.me2.v_bcl[i]);
 
-   at.set_entry(r, c+89, // Mean Error Squared BCU
+   at.set_entry(r, c+84, // Mean Error Squared BCU
       cnt_info.me2.v_bcu[i]);
 
-   at.set_entry(r, c+90, // Mean Squared Error Skill Score
+   at.set_entry(r, c+85, // Mean Squared Error Skill Score
       cnt_info.msess.v);
 
-   at.set_entry(r, c+91, // Mean Squared Error Skill Score BCL
+   at.set_entry(r, c+86, // Mean Squared Error Skill Score BCL
       cnt_info.msess.v_bcl[i]);
 
-   at.set_entry(r, c+92, // Mean Squared Error Skill Score BCU
+   at.set_entry(r, c+87, // Mean Squared Error Skill Score BCU
       cnt_info.msess.v_bcu[i]);
 
-   at.set_entry(r, c+93, // Root Mean Squared Forecast Anomaly
+   at.set_entry(r, c+88, // Root Mean Squared Forecast Anomaly
       cnt_info.rmsfa.v);
 
-   at.set_entry(r, c+94, // Root Mean Squared Forecast Anomaly BCL
+   at.set_entry(r, c+89, // Root Mean Squared Forecast Anomaly BCL
       cnt_info.rmsfa.v_bcl[i]);
 
-   at.set_entry(r, c+95, // Root Mean Squared Forecast Anomaly BCU
+   at.set_entry(r, c+90, // Root Mean Squared Forecast Anomaly BCU
       cnt_info.rmsfa.v_bcu[i]);
 
-   at.set_entry(r, c+96, // Root Mean Squared Observation Anomaly
+   at.set_entry(r, c+91, // Root Mean Squared Observation Anomaly
       cnt_info.rmsoa.v);
 
-   at.set_entry(r, c+97, // Root Mean Squared Observation Anomaly BCL
+   at.set_entry(r, c+92, // Root Mean Squared Observation Anomaly BCL
       cnt_info.rmsoa.v_bcl[i]);
 
-   at.set_entry(r, c+98, // Root Mean Squared Observation Anomaly BCU
+   at.set_entry(r, c+93, // Root Mean Squared Observation Anomaly BCU
       cnt_info.rmsoa.v_bcu[i]);
+
+   at.set_entry(r, c+94, // Anomaly Correlation Raw
+      cnt_info.anom_corr_raw.v);
+
+   at.set_entry(r, c+95, // Anomaly Correlation Raw BCL
+      cnt_info.anom_corr_raw.v_bcl[i]);
+
+   at.set_entry(r, c+96, // Anomaly Correlation Raw BCU
+      cnt_info.anom_corr_raw.v_bcu[i]);
 
    return;
 }

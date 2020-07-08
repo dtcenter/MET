@@ -73,9 +73,9 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
       cnt_info.anom_corr.v     = compute_corr( fbar*n,  obar*n,
                                               ffbar*n, oobar*n,
                                               fobar*n, n);
-      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffbar, oobar, fobar);
       cnt_info.rmsfa.v         = sqrt(ffbar);
       cnt_info.rmsoa.v         = sqrt(oobar);
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffbar, oobar, fobar);
    }
    // Handle SL1L2 data
    else {
@@ -83,9 +83,9 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
                                               ffbar*n, oobar*n,
                                               fobar*n, n);
       cnt_info.anom_corr.v     = bad_data_double;
-      cnt_info.anom_corr_raw.v = bad_data_double;
       cnt_info.rmsfa.v         = bad_data_double;
       cnt_info.rmsoa.v         = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
    }
 
    // Compute mean error
@@ -258,24 +258,28 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    if(cmn_flag) {
 
       //
-      // Compute Anomaly Correlations
+      // Compute Anomaly Correlation
       //
       cnt_info.anom_corr.v     = compute_corr( fa_bar*n,  oa_bar*n,
                                               ffa_bar*n, ooa_bar*n,
                                               foa_bar*n, n);
-      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffa_bar, ooa_bar, foa_bar);
 
       //
       // Compute RMSFA and RMSOA
       //
       cnt_info.rmsfa.v         = sqrt(ffa_bar);
       cnt_info.rmsoa.v         = sqrt(ooa_bar);
+
+      //
+      // Compute Raw (uncentered) Anomaly Correlation
+      //
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffa_bar, ooa_bar, foa_bar);
    }
    else {
       cnt_info.anom_corr.v     = bad_data_double;
-      cnt_info.anom_corr_raw.v = bad_data_double;
       cnt_info.rmsfa.v         = bad_data_double;
       cnt_info.rmsoa.v         = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
    }
 
    //
@@ -1153,14 +1157,14 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr.v);
    cnt_mean.anom_corr.v = na.mean();
 
-   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr_raw.v);
-   cnt_mean.anom_corr_raw.v = na.mean();
-
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsfa.v);
    cnt_mean.rmsfa.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsoa.v);
    cnt_mean.rmsoa.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr_raw.v);
+   cnt_mean.anom_corr_raw.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].me.v);
    cnt_mean.me.v = na.mean();
