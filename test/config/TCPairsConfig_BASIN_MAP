@@ -127,7 +127,8 @@ basin_map = [
    { key = "SP"; val = "SH"; },
    { key = "AU"; val = "SH"; },
    { key = "AB"; val = "IO"; },
-   { key = "BB"; val = "IO"; }
+   { key = "BB"; val = "IO"; },
+   { key = "AL"; val = "ATLANTIC"; }
 ];
 
 //
