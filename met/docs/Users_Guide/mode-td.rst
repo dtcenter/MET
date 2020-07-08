@@ -33,7 +33,7 @@ __________________________________
 Attributes
 ~~~~~~~~~~
 
-Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidian/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no metric) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
+Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidian/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no *metric*) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
 
 This means that some care must be taken both in determining how to generalize the calculation of a geometric attribute to three-dimensional spacetime, and also in interpreting the attributes even in the case where the generalization is straightforward. 
 
@@ -71,9 +71,9 @@ The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to an 3
 	    
    Velocity
 
-The spatial orientation of a object (what traditional MODE calls the axis angle of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
+The spatial orientation of a object (what traditional MODE calls the **axis angle** of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
 
-:numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, i.e., axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
+:numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, *i.e.,* axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
 
 .. _mtd-axis_3d:
 
@@ -85,7 +85,7 @@ A simple integer count of the number of grid squares in an object for all of it'
 
 The **start time** and **end time** of an object are attributes as well. This is an integer telling which time step an object starts and ends at. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
 
-**Centroid distance travelled** is the total great circle distance, in kilometers, travelled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of *t* will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as *t* varies. This attribute represents this total 2D centroid movement over time.
+**Centroid distance travelled** is the total great circle distance, in kilometers, travelled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
 
 Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the the attributes are purely geometrical.
 
@@ -207,22 +207,22 @@ The MODE-TD tool has three required arguments and can accept several optional ar
 Required arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. {\tt -fcst file\_list} gives a list of forecast 2D data files to be processed by MTD. The files should have equally-spaced intervals of valid time. 
+1. **-fcst file\_list** gives a list of forecast 2D data files to be processed by MTD. The files should have equally-spaced intervals of valid time. 
 
-2. {\tt -obs file\_list} gives a list of observation 2D data files to be processed by MTD. As with the {\cb -fcst} option, the files should have equally-spaced intervals of valid time. This valid time spacing should be the same as for the forecast files. 
+2. **-obs file\_list** gives a list of observation 2D data files to be processed by MTD. As with the {\cb -fcst} option, the files should have equally-spaced intervals of valid time. This valid time spacing should be the same as for the forecast files. 
 
-3. {\tt -config config\_file} gives the path to a local configuration file that is specific to this particular run of MTD. The default MTD configuration file will be read first, followed by this one. Thus, only configuration options that are different from the default settings need be specified. Options set in this file will override any corresponding options set in the default configuration file. 
+3. **-config config\_file** gives the path to a local configuration file that is specific to this particular run of MTD. The default MTD configuration file will be read first, followed by this one. Thus, only configuration options that are different from the default settings need be specified. Options set in this file will override any corresponding options set in the default configuration file. 
 
 Optional arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. {\tt -single file\_list} may be used instead of {\tt -fcst} and {\tt -obs} to define objects in a single field.
+4. **-single file\_list** may be used instead of **-fcst** and **-obs** to define objects in a single field.
 
-5. {\tt -log file} gives the name of a file where a log of this MTD run will be written. All output that appears on the screen during a MTD run will be duplicated in the log file. 
+5. **-log file** gives the name of a file where a log of this MTD run will be written. All output that appears on the screen during a MTD run will be duplicated in the log file. 
 
-6. {\tt -v level} gives the verbosity level. As with the {\tt -log} option described above, this option is present in most of the MET tools. Increasing this value causes more diagnostic output to be written to the screen (and also to the log file, if one has been specified). 
+6. **-v level** gives the verbosity level. As with the **-log** option described above, this option is present in most of the MET tools. Increasing this value causes more diagnostic output to be written to the screen (and also to the log file, if one has been specified). 
 
-7. {\tt -outdir path} gives the name of the directory into which MTD will write its output files. If not specified, then MTD will write its output into the current directory.
+7. **-outdir path** gives the name of the directory into which MTD will write its output files. If not specified, then MTD will write its output into the current directory.
 
 An example of the mtd calling sequence is listed below:
 
@@ -274,7 +274,7 @@ ______________________
 
 The configuration options listed above are common to many MODE and are described in Section :ref:`MODE-configuration-file`.
 
-The {\bf conv\_time\_window} entry is a dictionary defining how much smoothing in time should be done. The {\bf beg} and {\bf end} entries are integers defining how many time steps should be used before and after the current time. The default setting of {\bf beg = -1; end = 1;} uses one time step before and after. Setting them both to 0 effectively disables smoothing in time.
+The **conv_time_window** entry is a dictionary defining how much smoothing in time should be done. The **beg** and **end** entries are integers defining how many time steps should be used before and after the current time. The default setting of **beg = -1; end = 1;** uses one time step before and after. Setting them both to 0 effectively disables smoothing in time.
 
 ______________________
 
@@ -282,7 +282,7 @@ ______________________
 
   inten_perc_value = 99;
 
-The {\bf inten\_perc\_value} entry is an integer between 0 and 100 which specifies a requested intensity percentile value. By default, MTD writes 5 output columns for the 10th, 25th, 50th, 75th, and 90th percentile of object intensities. The percentile value specified here indicates which percentile should be written to the 6th output column.
+The **inten_perc_value** entry is an integer between 0 and 100 which specifies a requested intensity percentile value. By default, MTD writes 5 output columns for the 10th, 25th, 50th, 75th, and 90th percentile of object intensities. The percentile value specified here indicates which percentile should be written to the 6th output column.
 
 ______________________
 
@@ -290,7 +290,7 @@ ______________________
 
   min_volume = 2000;
 
-The {\bf min\_volume} entry tell MTD to throw away objects whose "volume" (as described elsewhere in this chapter) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10{,}000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting {\tt min\_volume} too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in Section :ref:`MODE-configuration-file`.
+The **min_volume** entry tell MTD to throw away objects whose "volume" (as described elsewhere in this chapter) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in Section :ref:`MODE-configuration-file`.
 
 ______________________
 
@@ -307,7 +307,7 @@ ______________________
      end_time_delta       = 1.0; 
   } 
 
-The weight entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :numref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
+The **weight** entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :numref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
 
 ______________________
 
@@ -324,7 +324,7 @@ ______________________
      end_time_delta      = ( ... );
   };
 
-The interest_function entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :numref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined grid_res entry.
+The **interest_function** entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. See :numref:`table_mtd-3D-Pair-Attribute` for a description of each weight option. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
 
 ______________________
 
@@ -337,7 +337,7 @@ ______________________
      cluster_id = true;
   }; 
 
-The {\bf nc\_output} dictionary contains a collection of boolean flags controlling which fields are written to the NetCDF output file. {\bf latlon} controls the output of a pair of 2D fields giving the latitude and longitude of each grid point. The {\bf raw} entry controls the output of the raw input data for the MTD run. These will be 3D fields, one for the forecast data and one for the observation data. Finally, the {\bf object\_id} and {\bf cluster\_id} flags control the output of the object numbers and cluster numbers for the objects. This is similar to MODE.
+The **nc_output** dictionary contains a collection of boolean flags controlling which fields are written to the NetCDF output file. **latlon** controls the output of a pair of 2D fields giving the latitude and longitude of each grid point. The **raw** entry controls the output of the raw input data for the MTD run. These will be 3D fields, one for the forecast data and one for the observation data. Finally, the **object_id** and **cluster_id** flags control the output of the object numbers and cluster numbers for the objects. This is similar to MODE.
 
 ______________________
 
@@ -348,14 +348,14 @@ ______________________
      attributes_3d = true;
   }; 
 
-The {\bf txt\_output} dictionary also contains a collection of boolean flags, in this case controlling the output of ASCII attribute files. The {\bf attributes\_2d} flag controls the output of the 2D object attributes for constant-time slices of 3D objects, while the {\bf attributes\_3d} flag controls the output of single and pair 3D spacetime object attributes.
+The **txt_output** dictionary also contains a collection of boolean flags, in this case controlling the output of ASCII attribute files. The **attributes_2d** flag controls the output of the 2D object attributes for constant-time slices of 3D objects, while the **attributes_3d** flag controls the output of single and pair 3D spacetime object attributes.
 
 mtd output
 ~~~~~~~~~~
 
 MTD creates several output files after each run in ASCII and NetCDF formats. There are text files giving 2D and 3D attributes of spacetime objects and information on matches and merges, as well as a NetCDF file giving the objects themselves, in case any further or specialized analysis of the objects needs to be done.
 
-MODE, along with several other of the MET tools ({\tt wavelet\_stat} for example, and a few others), provides PostScript-based graphics output to help visualize the output. Unfortunately, no similar graphics capabilities are provided with MTD, mainly because of the complexity of producing 3D plots. This should not discourage the user from making their own plots, however. There is enough information in the various output files created by MTD to make a wide variety of plots. Highly motivated users who write their own plotting scripts are encouraged to submit them to the user-contributed code area of the MET website. Due credit will be given, and others will benefit from their creations.
+MODE, along with several other of the MET tools (**wavelet_stat** for example, and a few others), provides PostScript-based graphics output to help visualize the output. Unfortunately, no similar graphics capabilities are provided with MTD, mainly because of the complexity of producing 3D plots. This should not discourage the user from making their own plots, however. There is enough information in the various output files created by MTD to make a wide variety of plots. Highly motivated users who write their own plotting scripts are encouraged to submit them to the user-contributed code area of the MET website. Due credit will be given, and others will benefit from their creations.
 
 **ASCII output**
 
@@ -375,7 +375,7 @@ Each ASCII file is laid out in tabular format, with the first line consisting of
 
 These columns are explained in :numref:`table_mtd-header-columns`. Each file contains additional columns that come after these. Columns for 2D constant-time attributes are shown in :numref:`table_mtd-2D-Attributes`. Columns for 3D single and pair attributes are shown in :numref:`table_mtd-3D-single-attributes` and :numref:`table_mtd-3D-Pair-Attribute` respectively.
 
-The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using the same logic as the MODE tool. In these columns, the F and O prefixes are used to indicate simple forecast and observation objects, respectively. Similarly, the CF and CO prefixes indicate cluster forecast and observation objects, respectively. Each prefix is followed by a 3-digit number, using leading zeros, to indicate the object number (as in F001, O001, CF001, or CO000). Pairs of objects are indicated by listing the forecast object information followed by the observation object information, separated by an underscore (as in F001_O001 or CF001_CO001). The OBJECT_ID column indicates the single object or pair of objects being described in that line. The OBJECT_CAT column indicates the cluster or pair of clusters to which these object(s) belong. A simple object that is not part of a cluster is assigned a cluster number of zero (as in CF000 or CO000). When pairs of objects belong to the same matching cluster, the OBJECT_CAT column indicates the matching cluster number (as in CF001_CO001). When they do not, the OBJECT_CAT column is set to CF000_CO000.
+The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using the same logic as the MODE tool. In these columns, the F and O prefixes are used to indicate simple forecast and observation objects, respectively. Similarly, the CF and CO prefixes indicate cluster forecast and observation objects, respectively. Each prefix is followed by a 3-digit number, using leading zeros, to indicate the object number (as in **F001, O001, CF001**, or **CO000**). Pairs of objects are indicated by listing the forecast object information followed by the observation object information, separated by an underscore (as in **F001_O001** or **CF001_CO001**). The OBJECT_ID column indicates the single object or pair of objects being described in that line. The OBJECT_CAT column indicates the cluster or pair of clusters to which these object(s) belong. A simple object that is not part of a cluster is assigned a cluster number of zero (as in **CF000** or **CO000**). When pairs of objects belong to the same matching cluster, the OBJECT_CAT column indicates the matching cluster number (as in **CF001_CO001**). When they do not, the OBJECT_CAT column is set to **CF000_CO000**.
 
 .. _table_mtd-header-columns:
 

@@ -20,7 +20,7 @@ The other option for operating the analysis tool is “bycase”. Given initial 
 Practical information
 _____________________
 
-The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the mode_analysis usage statement, required arguments, and optional arguments.
+The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the **mode_analysis** usage statement, required arguments, and optional arguments.
 
 .. _mode_analysis-usage:
 
@@ -48,18 +48,18 @@ The MODE-Analysis tool has two required arguments and can accept several optiona
 Required arguments for mode_analysis:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -lookin path specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
+1. The **-lookin path** specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
 
 2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified. 
 
-Specifying -summary will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the -column option. Column names are not case sensitive. The column names are the same as described in Section :ref:`MODE-output`. More information about this option is provided in subsequent sections.
+Specifying **-summary** will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the **-column** option. Column names are not case sensitive. The column names are the same as described in Section :ref:`MODE-output`. More information about this option is provided in subsequent sections.
 
-Specifying -bycase will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
+Specifying **-bycase** will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
 
 Optional arguments for mode_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The mode_analysis options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
+3. The **mode_analysis** options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
 
 Analysis options
 ^^^^^^^^^^^^^^^^
@@ -80,7 +80,7 @@ ____________________
 
   -dump_row filename
 
-Any MODE lines kept from the input files are written to filename.
+Any MODE lines kept from the input files are written to *filename*.
 
 ____________________
 
@@ -596,4 +596,4 @@ The parameters that are set in the configuration file either add to or override 
 mode_analysis output
 ~~~~~~~~~~~~~~~~~~~~
 
-The output of the MODE-Analysis tool is a self-describing tabular format written to standard output. The length and contents of the table vary depending on whether -summary or -bycase is selected. The contents also change for -summary depending on the number of columns specified by the user.
+The output of the MODE-Analysis tool is a self-describing tabular format written to standard output. The length and contents of the table vary depending on whether **-summary** or **-bycase** is selected. The contents also change for **-summary** depending on the number of columns specified by the user.
