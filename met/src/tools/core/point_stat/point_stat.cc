@@ -1838,13 +1838,25 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          RPSInfo rps_info;
          rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].hira_info.prob_cat_ta);
 
-         // If prob_cat_thresh is empty and climo data is available,
-         // use climo_cdf thresholds instead
-         if(rps_info.fthresh.n()                      == 0 &&
-            hira_pd.cmn_na.n_valid()                   > 0 &&
-            hira_pd.csd_na.n_valid()                   > 0 &&
-            conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
-            rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
+         // If prob_cat_thresh is empty, try to select other thresholds
+         if(rps_info.fthresh.n() == 0) {
+
+            // Use climo data, if avaiable
+            if(hira_pd.cmn_na.n_valid()                   > 0 &&
+               hira_pd.csd_na.n_valid()                   > 0 &&
+               conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
+               mlog << Debug(3) << "Resetting the empty HiRA \""
+                    << conf_key_prob_cat_thresh << "\" thresholds to "
+                    << "climatological distribution thresholds.\n";
+               rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
+            }
+            // Otherwise, use categorical observation thresholds
+            else {
+               mlog << Debug(3) << "Resetting the empty HiRA \""
+                    << conf_key_prob_cat_thresh << "\" thresholds to the "
+                    << "observed categorical thresholds.\n";
+               rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].ocat_ta);
+            }
          }
 
          // Check for no thresholds
@@ -1852,7 +1864,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             mlog << Debug(3) << "Skipping HiRA RPS output since no "
                  << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
-                 << "\" dictionary.\n";     
+                 << "\" dictionary.\n";
             if(gt) { delete gt; gt = 0; }
             break;
          }

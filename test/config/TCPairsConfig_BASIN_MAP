@@ -22,7 +22,7 @@ desc = "NA";
 //
 // Storm identifiers
 //
-storm_id = [ "ALAL2010" ];
+storm_id = [];
 
 //
 // Basins
@@ -59,15 +59,15 @@ valid_end = "";
 init_hour = [];
 
 //
-// Required lead time in hours
-//
-lead_req = [ ${LEAD_REQ} ];
-
-//
 // lat/lon polylines defining masking regions
 //
 init_mask  = "";
 valid_mask = "";
+
+//
+// Select tracks which contain all required lead times.
+//
+lead_req = [];
 
 //
 // Specify if the code should check for duplicate ATCF lines
@@ -127,7 +127,8 @@ basin_map = [
    { key = "SP"; val = "SH"; },
    { key = "AU"; val = "SH"; },
    { key = "AB"; val = "IO"; },
-   { key = "BB"; val = "IO"; }
+   { key = "BB"; val = "IO"; },
+   { key = "AL"; val = "ATLANTIC"; }
 ];
 
 //

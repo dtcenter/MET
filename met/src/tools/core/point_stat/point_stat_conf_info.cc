@@ -294,7 +294,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -312,7 +312,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -330,7 +330,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n_elements(); j++) {
+      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
 
          // Process new station ID mask
          if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
@@ -792,7 +792,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Check for equal threshold length for non-probability fields
    if(!vx_pd.fcst_info->is_prob() &&
-      fcat_ta.n_elements() != ocat_ta.n_elements()) {
+      fcat_ta.n() != ocat_ta.n()) {
 
       mlog << Error << "\nPointStatVxOpt::process_config() -> "
            << "The number of thresholds for each field in \"fcst."
@@ -803,14 +803,14 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    }
 
    // Add default continuous thresholds until the counts match
-   n = max(fcnt_ta.n_elements(), ocnt_ta.n_elements());
-   while(fcnt_ta.n_elements() < n) fcnt_ta.add(na_str);
-   while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
+   n = max(fcnt_ta.n(), ocnt_ta.n());
+   while(fcnt_ta.n() < n) fcnt_ta.add(na_str);
+   while(ocnt_ta.n() < n) ocnt_ta.add(na_str);
 
    // Add default wind speed thresholds until the counts match
-   n = max(fwind_ta.n_elements(), owind_ta.n_elements());
-   while(fwind_ta.n_elements() < n) fwind_ta.add(na_str);
-   while(owind_ta.n_elements() < n) owind_ta.add(na_str);
+   n = max(fwind_ta.n(), owind_ta.n());
+   while(fwind_ta.n() < n) fwind_ta.add(na_str);
+   while(owind_ta.n() < n) owind_ta.add(na_str);
 
    // Verifying with multi-category contingency tables
    if(!vx_pd.fcst_info->is_prob() &&
@@ -890,8 +890,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
 void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    int i, n;
-   int n_msg_typ = msg_typ.n_elements();
-   int n_mask    = mask_name.n_elements();
+   int n_msg_typ = msg_typ.n();
+   int n_mask    = mask_name.n();
    int n_interp  = interp_info.n_interp;
    ConcatString cs;
    StringArray sa;
@@ -969,36 +969,36 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    for(i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
-      if(sa.n_elements() == 0) sa.add(msg_typ[i]);
+      if(sa.n() == 0) sa.add(msg_typ[i]);
       vx_pd.set_msg_typ_vals(i, sa);
    }
 
    // Define the masking information: grid, poly, sid, point
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n_elements(); i++) {
+   for(i=0; i<mask_grid.n(); i++) {
       n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n_elements(); i++) {
-      n = i + mask_grid.n_elements();
+   for(i=0; i<mask_poly.n(); i++) {
+      n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n_elements(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements();
+   for(i=0; i<mask_sid.n(); i++) {
+      n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
    for(i=0; i<(int) mask_llpnt.size(); i++) {
-      n = i + mask_grid.n_elements() + mask_poly.n_elements() + mask_sid.n_elements();
+      n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
@@ -1093,7 +1093,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          // Number of CTS lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
-         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() * 
+         n = (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
               get_n_ci_alpha());
          break;
 
@@ -1147,7 +1147,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          //    HiRA widths
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
-                  hira_info.width.n_elements());
+                  hira_info.width.n());
          }
 
          break;
@@ -1164,7 +1164,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          //    HiRA widths * Alphas
          if(hira_info.flag) {
             n += (prob_flag ? 0 : n_pd *
-                  get_n_cat_thresh() * hira_info.width.n_elements() *
+                  get_n_cat_thresh() * hira_info.width.n() *
                   get_n_ci_alpha());
          }
 
@@ -1176,7 +1176,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Message Types * Masks * Interpolations * HiRA widths *
          //    Alphas
          if(hira_info.flag) {
-            n = n_pd * hira_info.width.n_elements() * get_n_ci_alpha();
+            n = n_pd * hira_info.width.n() * get_n_ci_alpha();
          }
          else {
             n = 0;
@@ -1209,7 +1209,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
          if(hira_info.flag) {
             n += (prob_flag ? 0 :
                   vx_pd.get_n_pair() * get_n_cat_thresh() *
-                  hira_info.width.n_elements());
+                  hira_info.width.n());
          }
 
          break;
@@ -1229,35 +1229,35 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
 int PointStatVxOpt::get_n_cnt_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcnt_ta.n_elements());
+          0 : fcnt_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_cat_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+          0 : fcat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_wind_thresh() const {
    return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fwind_ta.n_elements());
+          0 : fwind_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_fprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+          0 : fcat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_oprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : ocat_ta.n_elements());
+          0 : ocat_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////

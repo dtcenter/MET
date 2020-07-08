@@ -93,6 +93,7 @@ void TCPairsConfInfo::clear() {
    DLandFile.clear();
    WatchWarnFile.clear();
    WatchWarnOffset = bad_data_int;
+   BasinMap.clear();
    Version.clear();
 
    return;
@@ -285,6 +286,9 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: WatchWarnOffset
    WatchWarnOffset = dict->lookup_int(conf_key_time_offset);
+
+   // Conf: BasinMap
+   BasinMap = parse_conf_key_value_map(dict, conf_key_basin_map);
 
    return;
 }
