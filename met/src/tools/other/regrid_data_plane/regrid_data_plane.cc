@@ -319,14 +319,14 @@ void process_data_file() {
       }
 
       // Select output variable name
-      if(VarNameSA.n_elements() == 0) {
-         vname << cs_erase << vinfo->name();
+      if(VarNameSA.n() == 0) {
+         vname << cs_erase << vinfo->name_attr();
          if(vinfo->level().type() != LevelType_Accum &&
             ftype != FileType_NcMet &&
             ftype != FileType_General_Netcdf &&
             ftype != FileType_NcPinterp &&
             ftype != FileType_NcCF) {
-            vname << "_" << vinfo->level_name();
+            vname << "_" << vinfo->level_attr();
          }
       }
       else {
@@ -422,9 +422,9 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)vname);
-   add_att(&data_var, "long_name", (string)vinfo->long_name());
-   add_att(&data_var, "level", (string)vinfo->level_name());
-   add_att(&data_var, "units", (string)vinfo->units());
+   add_att(&data_var, "long_name", (string)vinfo->long_name_attr());
+   add_att(&data_var, "level", (string)vinfo->level_attr());
+   add_att(&data_var, "units", (string)vinfo->units_attr());
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
 

@@ -10,15 +10,14 @@
 //
 //
 //   Description:
-//      This tool reads 2-dimensional fields from a gridded input file,
+//      This tool reads the point observation fields from a GOES16/17 or
+//      MET generated point NetCDF (by ascii2nc, madis2nc, pb2nc, etc),
 //      regrids them to the user-specified output grid, and writes the
 //      regridded output data in NetCDF format.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    01-29-15  Halley Gotway  New
-//   001    03-23-17  Halley Gotway  Change -name to an array.
-//   002    06-25-17  Howard Soh     Support GOES-16
+//   000    12-11-19  Howard Soh     Support GOES-16
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -175,7 +174,6 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 static void save_geostationary_data(const ConcatString geostationary_file,
             const float *latitudes, const float *longitudes,
             const GoesImagerData grid_data);
-static void set_goes_interpolate_option();
 static void set_qc_flags(const StringArray &);
 static void write_grid_mapping(const char *grid_map_file,
             IntArray *cellMapping, Grid from_grid, Grid to_grid);
@@ -204,7 +202,7 @@ int main(int argc, char *argv[]) {
 int process_command_line(int argc, char **argv) {
    CommandLine cline;
    int obs_type = TYPE_OBS;
-   static const char *method_name = "process_command_line() ";
+   static const char *method_name = "process_command_line() -> ";
 
    // Set default regridding options
    RGInfo.enable     = true;
@@ -263,10 +261,32 @@ int process_command_line(int argc, char **argv) {
       usage();
    }
 
+   // Check that same variable is required multiple times without -name argument
+   if(VarNameSA.n_elements() == 0) {
+      VarInfo *vinfo;
+      MetConfig config;
+      VarInfoFactory v_factory;
+      ConcatString vname;
+      StringArray var_names;
+      vinfo = v_factory.new_var_info(FileType_NcMet);
+      for(int i=0; i<FieldSA.n_elements(); i++) {
+         vinfo->clear();
+         // Populate the VarInfo object using the config string
+         config.read_string(FieldSA[i].c_str());
+         vinfo->set_dict(config);
+         vname = vinfo->name();
+         if (var_names.has(vname)) {
+            mlog << Error << "\n" << method_name
+                 << "Please add -name argument to avoid the output name conflicts on handling the variable \""
+                 << vname << "\" multiple times.\n\n";
+            usage();
+         }
+         else var_names.add(vname);
+      }
+   }
    // Check that the number of output names and fields match
-   if(VarNameSA.n_elements() > 0 &&
-      VarNameSA.n_elements() != FieldSA.n_elements()) {
-      mlog << Error << "\nprocess_command_line() -> "
+   else if(VarNameSA.n_elements() != FieldSA.n_elements()) {
+      mlog << Error << "\n" << method_name
            << "When the -name option is used, the number of entries ("
            << VarNameSA.n_elements() << ") must match the number of "
            << "-field entries (" << FieldSA.n_elements() << ")!\n\n";
@@ -285,8 +305,6 @@ int process_command_line(int argc, char **argv) {
 
    ConcatString att_val;
    if (get_global_att(InputFilename.c_str(), (string)"scene_id", att_val)) {
-      if ( att_val == "Full Disk" || att_val == "CONUS" 
-          || att_val == "Mesoscale" ) set_goes_interpolate_option();
       obs_type = TYPE_GOES;
       if (0 < AdpFilename.length()) {
          obs_type = TYPE_GOES_ADP;
@@ -555,13 +573,13 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       exit(1);
    }
    
-   // support only 1 variable
-   if (1 < FieldSA.n_elements()) {
+   // Check for at least one configuration string
+   if(FieldSA.n_elements() < 1) {
       mlog << Error << "\n" << method_name
-           << "Support only 1 variable. \"" << FieldSA.n_elements() << "\" variables were requested.\n\n";
-      exit(1);
+           << "The -field option must be used at least once!\n\n";
+      usage();
    }
-   
+
    int *obs_ids = new int[nobs];       // grib_code or var_id
    int *obs_hids = new int[nobs];
    float *hdr_lats = new float[nhdr];
@@ -2148,17 +2166,6 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_goes_interpolate_option() {
-   //if (RGInfo.width == DefaultInterpWdth) {
-   //   RGInfo.width = 2;
-   //}
-   if (RGInfo.method == DefaultInterpMthd) {
-      RGInfo.method = InterpMthd_UW_Mean;
-   }
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_grid_mapping(const char *grid_map_file,
       IntArray *cellMapping, Grid from_grid, Grid to_grid) {
    static const char *method_name = "write_grid_mapping() ";
@@ -2286,7 +2293,8 @@ void usage() {
 
         << "\t\t\"-method type\" overrides the default regridding "
         << "method (default: " << interpmthd_to_string(RGInfo.method)
-        << ", optional). Allows one more \"-method GAUSSIAN\" which applied only to the probabililty variable.\n"
+        << ", optional) to -field variable. Additional gaussian smoothing only to the probabililty variable"
+        << " with additional \"-method GAUSSIAN\" or \"-method MAXGAUSS\".\n"
 
         << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
         << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"

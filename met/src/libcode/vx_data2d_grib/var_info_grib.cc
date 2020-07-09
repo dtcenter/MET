@@ -354,6 +354,13 @@ bool VarInfoGrib::is_precipitation() const {
    bool status = false;
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsPrecipitation)) {
+      return(SetAttrIsPrecipitation != 0);
+   }
+
+   //
    // The ReqName member contains the requested GRIB code abbreviation.
    // Check to see if it matches the GRIB precipitation abbreviations.
    //
@@ -374,6 +381,13 @@ bool VarInfoGrib::is_specific_humidity() const {
    bool status = false;
 
    //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+      return(SetAttrIsSpecificHumidity != 0);
+   }
+
+   //
    // The ReqName meber contains the requested GRIB code abbreviation.
    // Check to see if it matches the GRIB specific humidity abbreviations.
    //
@@ -390,24 +404,56 @@ bool VarInfoGrib::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_u_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsUWind)) {
+      return(SetAttrIsUWind != 0);
+   }
+
    return(Code == ugrd_grib_code || ReqName == ugrd_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_v_wind() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsVWind)) {
+      return(SetAttrIsVWind != 0);
+   }
+
    return(Code == vgrd_grib_code || ReqName == vgrd_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_wind_speed() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindSpeed)) {
+      return(SetAttrIsWindSpeed != 0);
+   }
+
    return(Code == wind_grib_code || ReqName == wind_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_wind_direction() const {
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindDirection)) {
+      return(SetAttrIsWindDirection != 0);
+   }
+
    return(Code == wdir_grib_code || ReqName == wdir_abbr_str);
 }
 

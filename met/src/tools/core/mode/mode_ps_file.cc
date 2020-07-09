@@ -208,7 +208,7 @@ mlog << Debug(1) << "Loading observation raw color table: " << s << "\n";
    // data_min and data_max values
    //
 
-if ( (ConfInfo->fcst_info->name() == ConfInfo->obs_info->name()) &&
+if ( (ConfInfo->fcst_info->name_attr() == ConfInfo->obs_info->name_attr()) &&
       is_eq( FcstRawCtable.data_min (bad_data_double), 0.0) &&
       is_eq( FcstRawCtable.data_max (bad_data_double), 1.0) &&
       is_eq(  ObsRawCtable.data_min (bad_data_double), 0.0) &&
@@ -546,10 +546,10 @@ const MergeType  obs_merge_flag = ConfInfo->obs_merge_flag;
 ConcatString s;
 
 s << cs_erase
-  << "MODE: " << ConfInfo->fcst_info->name() << " at "
-  << ConfInfo->fcst_info->level_name() << " vs "
-  << ConfInfo->obs_info->name() << " at "
-  << ConfInfo->obs_info->level_name();
+  << "MODE: " << ConfInfo->fcst_info->name_attr() << " at "
+  << ConfInfo->fcst_info->level_attr() << " vs "
+  << ConfInfo->obs_info->name_attr() << " at "
+  << ConfInfo->obs_info->level_attr();
 
  plot_engine(*Engine, FOEng, s.c_str());
 

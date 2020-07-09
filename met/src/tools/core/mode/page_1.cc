@@ -331,8 +331,8 @@ t1.write_xy1_to_cell(1, 2, 0.0, dy, 0.5, 0.0, eng.conf_info.model.c_str());
 
 nextline();
 
-t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name().c_str());
-t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name().c_str());
+t1.write_xy1_to_cell(2, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->name_attr().c_str());
+t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name_attr().c_str());
 
    //
    // Level Name
@@ -340,8 +340,8 @@ t1.write_xy1_to_cell(2, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->name().c_st
 
 nextline();
 
-t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_name().c_str());
-t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name().c_str());
+t1.write_xy1_to_cell(3, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->level_attr().c_str());
+t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_attr().c_str());
 
    //
    // Units
@@ -349,8 +349,8 @@ t1.write_xy1_to_cell(3, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->level_name(
 
 nextline();
 
-t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units().c_str());
-t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units().c_str());
+t1.write_xy1_to_cell(4, 1, dx, dy, 0.0, 0.0, eng.conf_info.fcst_info->units_attr().c_str());
+t1.write_xy1_to_cell(4, 2, dx, dy, 0.0, 0.0, eng.conf_info.obs_info->units_attr().c_str());
 
    //
    // Initialization Time

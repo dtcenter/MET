@@ -22,7 +22,7 @@
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB_lvl_typ_val</value></pair>
     </env>
     <param> \
-      &DATA_DIR_MODEL;/grib2/galwem/GALWEM_20170610_CY00_FH18.GR2\
+      &DATA_DIR_MODEL;/grib2/galwem/GALWEM_20170610_CY00_FH18.GR2 \
       &DATA_DIR_MODEL;/grib2/galwem-gpp/PS.557WW_SC.U_DI.F_GP.GALWEM-GD_GR.0P25DEG_AR.GLOBAL_DD.20170610_CY.00_FH.018_DF.GR2 \
       &CONFIG_DIR;/GridStatConfig_GRIB_lvl_typ_val \
       -outdir &OUTPUT_DIR;/grid_stat -v 1
@@ -30,6 +30,23 @@
     <output>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_lvl_typ_val_180000L_20170610_180000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_lvl_typ_val_180000L_20170610_180000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_GRIB_set_attr">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB_set_attr</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/galwem/GALWEM_20170610_CY00_FH18.GR2 \
+      &DATA_DIR_MODEL;/grib2/galwem-gpp/PS.557WW_SC.U_DI.F_GP.GALWEM-GD_GR.0P25DEG_AR.GLOBAL_DD.20170610_CY.00_FH.018_DF.GR2 \
+      &CONFIG_DIR;/GridStatConfig_GRIB_set_attr \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_set_attr_120000L_20170807_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_set_attr_120000L_20170807_120000V_pairs.nc</grid_nc>
     </output>
   </test>
 

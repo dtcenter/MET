@@ -224,6 +224,38 @@ ____________________
 
 The watch_warn field specifies the file name and time applied offset to the watch_warn flag. The file_name string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named wwpts_us.txt, which is found in the installed share/met/tc_data/ directory within the MET build. The time_offset string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
+basin_map = [
+   { key = "SI"; val = "SH"; },
+   { key = "SP"; val = "SH"; },
+   { key = "AU"; val = "SH"; },
+   { key = "AB"; val = "IO"; },
+   { key = "BB"; val = "IO"; }
+];
+
+The basin_map entry defines a mapping of input names to output values.
+Whenever the basin string matches "key" in the input ATCF files, it is
+replaced with "val". This map can be used to modify basin names to make them
+consistent across the ATCF input files.
+
+Many global modeling centers use ATCF basin identifiers based on region
+(e.g., 'SP' for South Pacific Ocean, etc.), however the best track data
+provided by the Joint Typhoon Warning Center (JTWC) use just one basin
+identifier 'SH' for all of the Southern Hemisphere basins. Additionally,
+some modeling centers may report basin identifiers separately for the Bay
+of Bengal (BB) and Arabian Sea (AB) whereas JTWC uses 'IO'.
+
+The basin mapping allows MET to map the basin identifiers to the expected
+values without having to modify your data. For example, the first entry
+in the list below indicates that any data entries for 'SI' will be matched
+as if they were 'SH'. In this manner, all verification results for the
+Southern Hemisphere basins will be reported together as one basin.
+
+An empty list indicates that no basin mapping should be used. Use this if
+you are not using JTWC best tracks and you would like to match explicitly
+by basin or sub-basin. Note that if your model data and best track do not
+use the same basin identifier conventions, using an empty list for this
+parameter will result in missed matches.
+
 .. _tc_pairs-output:
 
 tc_pairs output
