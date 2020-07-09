@@ -492,7 +492,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_header_info_point-stat_out:
 
-.. list-table:: Table 7.1 Header information for each file point-stat outputs.
+.. list-table:: Header information for each file point-stat outputs.
   :widths: auto
   :header-rows: 2
 
@@ -577,7 +577,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_FHO:
 
-.. list-table:: Table 7.2 Format information for FHO (Forecast, Hit rate, Observation rate) output line type.
+.. list-table:: Format information for FHO (Forecast, Hit rate, Observation rate) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -605,7 +605,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CTC:
 
-.. list-table:: Table 7.3 Format information for CTC (Contingency Table Counts) output line type.
+.. list-table:: Format information for CTC (Contingency Table Counts) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -639,7 +639,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CTS:
 
-.. list-table:: Table 7.4 Format information for CTS (Contingency Table Statistics) output line type.
+.. list-table:: Format information for CTS (Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -691,7 +691,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CTS_cont:
 
-.. list-table:: Table 7.5 Format information for CTS (Contingency Table Statistics) output line type, continued from above
+.. list-table::  Format information for CTS (Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 2
 
@@ -738,7 +738,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CNT:
 
-.. list-table:: Table 7.6 Format information for CNT(Continuous Statistics) output line type.
+.. list-table:: Format information for CNT(Continuous Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -797,7 +797,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_CNT_cont:
 
-.. list-table::  Table 7.7 Format information for CNT(Continuous Statistics) output line type continued from above table
+.. list-table::  Format information for CNT(Continuous Statistics) output line type continued from above table
   :widths: auto
   :header-rows: 2
 
@@ -849,7 +849,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_MCTC:
 
-.. list-table:: Table 7.8  Format information for MCTC (Multi-category Contingency Table Count) output line type.
+.. list-table:: Format information for MCTC (Multi-category Contingency Table Count) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -878,7 +878,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_MCTS:
 
-.. list-table:: Table 7.9 Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+.. list-table:: Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -912,7 +912,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_PCT:
 
-.. list-table:: Table 7.10 Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -950,7 +950,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_PSTD:
 
-.. list-table:: Table 7.11 Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
+.. list-table:: Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
   :widths: auto
   :header-rows: 2
 
@@ -1002,7 +1002,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_PJC:
 
-.. list-table:: Table 7.12 Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1048,7 +1048,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_PRC:
 
-.. list-table:: Table 7.13 Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1082,7 +1082,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_ECLV:
 
-.. list-table:: Table 7.14 Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
+.. list-table:: Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1116,7 +1116,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_SL1L2:
 
-.. list-table:: Table 7.15  Format information for SL1L2 (Scalar Partial Sums) output line type.
+.. list-table:: Format information for SL1L2 (Scalar Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1153,7 +1153,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_SAL1L2:
 
-.. list-table:: Table 7.16 Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
+.. list-table:: Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1190,7 +1190,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_VL1L2:
 
-.. list-table:: Table 7.17 Format information for VL1L2 (Vector Partial Sums) output line type.
+.. list-table:: Format information for VL1L2 (Vector Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1236,7 +1236,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_VAL1L2:
 
-.. list-table:: Table 7.18 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
+.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -1276,7 +1276,7 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_VCNT:
 
-.. list-table:: Table 7.19 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+.. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
   :header-rows: 2
 
@@ -1347,11 +1347,11 @@ The first set of header columns are common to all of the output files generated 
     - DIR_ABSERR
     - Absolute value of DIR_ABSERR
 
-?? Missing table 20.  Were things mis-numbered?
+?? Missing table 20 or table 21.  Were things mis-numbered?
 
 .. _table_PS_format_info_MPR:
 
-.. list-table:: Table 7.21 Format information for MPR (Matched Pair) output line type.
+.. list-table:: Format information for MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
 
