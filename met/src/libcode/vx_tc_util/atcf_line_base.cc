@@ -177,8 +177,8 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    }
 
    // Check for BEST and Operational tracks, if specified
-   if(BestTechnique) IsBestTrack = BestTechnique->has(Technique);
-   if(OperTechnique) IsOperTrack = OperTechnique->has(Technique);
+   if(BestTechnique) IsBestTrack = BestTechnique->has(technique());
+   if(OperTechnique) IsOperTrack = OperTechnique->has(technique());
 
    // Append the technique suffix, if specified
    if(TechSuffix) {
