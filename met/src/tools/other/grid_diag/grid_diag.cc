@@ -184,7 +184,7 @@ void process_command_line(int argc, char **argv) {
     // Determine the verification grid
     grid = parse_vx_grid(conf_info.data_info[0]->regrid(),
         &(data_mtddf->grid()), &(data_mtddf->grid()));
-    
+
     // Process masking regions
     conf_info.process_masks(grid);
 }
@@ -249,7 +249,7 @@ void process_series(void) {
                 if(!(cur_grid == grid)) {
                     mlog << Debug(1)
                          << "Regridding field " << data_info->magic_str()
-                         << " to the verification grid.\n"; 
+                         << " to the verification grid.\n";
                     data_dp = met_regrid(data_dp, cur_grid, grid,
                                          data_info->regrid());
                 }
@@ -363,9 +363,9 @@ void setup_nc_file(void) {
         VarInfo* data_info = conf_info.data_info[i_var];
 
         // Set variable NetCDF name
-        ConcatString var_name = data_info->name();
+        ConcatString var_name = data_info->name_attr();
         var_name.add("_");
-        var_name.add(data_info->level_name());
+        var_name.add(data_info->level_attr());
 
         // Define histogram dimensions
         NcDim var_dim
@@ -387,9 +387,9 @@ void setup_nc_file(void) {
             var_mid_name, ncFloat, var_dim);
 
         // Add units
-        var_min.putAtt("units", data_info->units());
-        var_max.putAtt("units", data_info->units());
-        var_mid.putAtt("units", data_info->units());
+        var_min.putAtt("units", data_info->units_attr());
+        var_max.putAtt("units", data_info->units_attr());
+        var_mid.putAtt("units", data_info->units_attr());
 
         // Write bin values
         var_min.putVar(bin_mins[data_info->magic_str()].data());
@@ -403,9 +403,9 @@ void setup_nc_file(void) {
         VarInfo* data_info = conf_info.data_info[i_var];
 
         // Set variable NetCDF name
-        ConcatString var_name = data_info->name();
+        ConcatString var_name = data_info->name_attr();
         var_name.add("_");
-        var_name.add(data_info->level_name());
+        var_name.add(data_info->level_attr());
 
         ConcatString hist_name("hist_");
         hist_name.add(var_name);
@@ -425,13 +425,13 @@ void setup_nc_file(void) {
             VarInfo* joint_info = conf_info.data_info[j_var];
 
             ConcatString hist_name("hist_");
-            hist_name.add(data_info->name());
+            hist_name.add(data_info->name_attr());
             hist_name.add("_");
-            hist_name.add(data_info->level_name());
+            hist_name.add(data_info->level_attr());
             hist_name.add("_");
-            hist_name.add(joint_info->name());
+            hist_name.add(joint_info->name_attr());
             hist_name.add("_");
-            hist_name.add(joint_info->level_name());
+            hist_name.add(joint_info->level_attr());
 
             NcDim var_dim = data_var_dims[i_var];
             NcDim joint_dim = data_var_dims[j_var];
@@ -456,7 +456,7 @@ void write_histograms(void) {
         VarInfo* data_info = conf_info.data_info[i_var];
         NcVar hist_var = hist_vars[i_var];
 
-        int* hist = histograms[data_info->magic_str()].data(); 
+        int* hist = histograms[data_info->magic_str()].data();
 
         hist_var.putVar(hist);
     }
@@ -483,7 +483,7 @@ void write_joint_histograms(void) {
             joint_str.add("_");
             joint_str.add(joint_info->magic_str());
 
-            int* hist = joint_histograms[joint_str].data(); 
+            int* hist = joint_histograms[joint_str].data();
 
             offsets.clear();
             counts.clear();

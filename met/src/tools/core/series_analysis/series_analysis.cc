@@ -337,7 +337,7 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
    // Compute the number of reads required
    n_reads = nint(ceil((double) nxy / conf_info.block_size));
-   
+
    mlog << Debug(2)
         << "Computing statistics using a block size of "
         << conf_info.block_size << ", requiring " << n_reads
@@ -477,7 +477,7 @@ void get_series_data(int i_series,
          exit(1);
          break;
    }
-   
+
    // Setup the verification grid
    if(nxy == 0) process_grid(fcst_grid, obs_grid);
 
@@ -738,7 +738,7 @@ void process_scores() {
                is_bad_data(fcst_dp(x, y))              ||
                is_bad_data(obs_dp(x,y))                ||
                (cmn_flag && is_bad_data(cmn_dp(x, y))) ||
-               (csd_flag && is_bad_data(csd_dp(x, y)))) continue; 
+               (csd_flag && is_bad_data(csd_dp(x, y)))) continue;
 
             pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
                          (cmn_flag ? cmn_dp(x, y) : bad_data_double),
@@ -2031,12 +2031,12 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
                                   (string)conf_info.mask_grid_name : na_str));
    add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name.nonempty() ?
                                   (string)conf_info.mask_poly_name : na_str));
-   add_att(nc_out, "fcst_var",   (string)fcst_info->name());
-   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_name());
-   add_att(nc_out, "fcst_units", (string)fcst_info->units());
-   add_att(nc_out, "obs_var",    (string)obs_info->name());
-   add_att(nc_out, "obs_lev",    (string)obs_info->level_name());
-   add_att(nc_out, "obs_units",  (string)obs_info->units());
+   add_att(nc_out, "fcst_var",   (string)fcst_info->name_attr());
+   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_attr());
+   add_att(nc_out, "fcst_units", (string)fcst_info->units_attr());
+   add_att(nc_out, "obs_var",    (string)obs_info->name_attr());
+   add_att(nc_out, "obs_lev",    (string)obs_info->level_attr());
+   add_att(nc_out, "obs_units",  (string)obs_info->units_attr());
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -2298,7 +2298,7 @@ void set_verbosity(const StringArray & a) {
    if(mlog.verbosity_level() >= 3) {
       mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
            << "produces excessive log output and can slow the runtime "
-           << "considerably.\n\n"; 
+           << "considerably.\n\n";
    }
 }
 

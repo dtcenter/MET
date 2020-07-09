@@ -234,6 +234,7 @@ class Grid : public GridInterface {
 
       int nx() const;
       int ny() const;
+      int nxy() const;
 
       double scale_km() const;   //  returns -1.0 if scale is unknown or inapplicable
 

@@ -810,7 +810,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
          //  check for a valid match
          if( -1 != i_rec ) { met_closedir(dp);  break; }
-	 
+
       } // end if
 
    } // end while
@@ -1346,8 +1346,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       // special characters.
       //
       if(nc_accum == 0) {
-         var_str = var_info->name();
-         cs      = var_info->level_name();
+         var_str = var_info->name_attr();
+         cs      = var_info->level_attr();
          if(!check_reg_exp("[\\(\\*\\,\\)]", cs.c_str())) var_str << "_" << cs;
       }
       //
@@ -1358,7 +1358,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
          //
          // Use the name prior to the first underscore.
          //
-         cs      = var_info->name();
+         cs      = var_info->name_attr();
          sa      = cs.split("_");
          var_str = sa[0];
 
@@ -1399,7 +1399,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    add_att(&nc_var, "name",  var_str.c_str());
    if(run_command == der) cs = long_name_prefix;
    else                   cs.clear();
-   cs << var_info->long_name();
+   cs << var_info->long_name_attr();
    add_att(&nc_var, "long_name", cs.c_str());
 
    // Ouput level string.
@@ -1410,11 +1410,11 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
          var_str << cs_erase << 'A' << sec_to_hhmmss(nc_accum);
       }
    } else {
-      var_str << cs_erase << var_info->level().name();
+      var_str << cs_erase << var_info->level_attr();
    }
 
    add_att(&nc_var, "level", var_str.c_str());
-   add_att(&nc_var, "units", var_info->units().c_str());
+   add_att(&nc_var, "units", var_info->units_attr().c_str());
    add_att(&nc_var, "_FillValue", bad_data_float);
 
    //

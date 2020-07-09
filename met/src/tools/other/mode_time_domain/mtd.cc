@@ -1100,11 +1100,11 @@ mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
    //  copy forecast name/units/level to observation
    //
 
-config.obs_info->set_name(config.fcst_info->name().text());
+config.obs_info->set_name(config.fcst_info->name_attr().text());
 
-config.obs_info->set_units(config.fcst_info->units().text());
+config.obs_info->set_units(config.fcst_info->units_attr().text());
 
-config.obs_info->set_level_name(config.fcst_info->level_name().text());
+config.obs_info->set_level_name(config.fcst_info->level_attr().text());
 
 config.delta_t_seconds = raw.delta_t();
 
