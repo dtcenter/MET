@@ -78,6 +78,22 @@
     </output>
   </test>
 
+  <test name="point2grid_pb2nc_methods">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000";' \
+      -field 'name="RH"; level="*"; valid_time="20120409_120000";' \
+      -v 1
+    </param>
+    <!--  -->
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_big_input">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
