@@ -85,7 +85,7 @@
       G212 \
       &OUTPUT_DIR;/point2grid/pb2nc_TMP_RH.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000";' \
-      -field 'name="RH"; level="*"; valid_time="20120409_113600";' \
+      -field 'name="RH"; level="*"; valid_time="20120409_120000";' \
       -v 1
     </param>
     <!--  -->
