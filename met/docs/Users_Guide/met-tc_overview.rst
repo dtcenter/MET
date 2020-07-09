@@ -26,77 +26,77 @@ The ATCF file format includes a section with common fields:
 
 BASIN, CY, YYYYMMDDHH, TECHNUM/MIN, TECH, TAU, LatN/S, LonE/W, VMAX, MSLP, TY, RAD, WINDCODE, RAD1, RAD2, RAD3, RAD4, POUTER, ROUTER, RMW, GUSTS, EYE, SUBREGION, MAXSEAS, INITIALS, DIR, SPEED, STORMNAME, DEPTH, SEAS, SEASCODE, SEAS1, SEAS2, SEAS3, SEAS4
 
-BASIN: basin
+**BASIN**: basin
 
-CY: annual cyclone number: 1 - 99
+**CY**: annual cyclone number: 1 - 99
 
-YYYYMMDDHH: Warning Date-Time-Group.
+**YYYYMMDDHH**: Warning Date-Time-Group.
 
-TECHNUM/MIN: objective technique sorting number, minutes for best track: 00 - 99
+**TECHNUM/MIN**: objective technique sorting number, minutes for best track: 00 - 99
 
-TECH: acronym for each objective technique or CARQ or WRNG, BEST for best track
+**TECH**: acronym for each objective technique or CARQ or WRNG, BEST for best track
 
-TAU: forecast period: -24 through 240 hours, 0 for best-track
+**TAU**: forecast period: -24 through 240 hours, 0 for best-track
 
-LatN/S: Latitude for the date time group (DTG)
+**LatN/S**: Latitude for the date time group (DTG)
 
-LonE/W: Longitude for the DTG
+**LonE/W**: Longitude for the DTG
 
-VMAX: Maximum sustained wind speed in knots
+**VMAX**: Maximum sustained wind speed in knots
 
-MSLP: Minimum sea level pressure, 850 - 1050 mb.
+**MSLP**: Minimum sea level pressure, 850 - 1050 mb.
 
-TY: Highest level of tropical cyclone development
+**TY**: Highest level of tropical cyclone development
 
-RAD: Wind intensity for the radii defined in this record: 34, 50 or 64 kt.
+**RAD**: Wind intensity for the radii defined in this record: 34, 50 or 64 kt.
 
-WINDCODE: Radius code
+**WINDCODE**: Radius code
 
-RAD1: If full circle, radius of specified wind intensity, or radius of first quadrant wind intensity
+**RAD1**: If full circle, radius of specified wind intensity, or radius of first quadrant wind intensity
 
-RAD2: If full circle this field not used, or radius of 2nd quadrant wind intensity
+**RAD2**: If full circle this field not used, or radius of 2nd quadrant wind intensity
 
-RAD3: If full circle this field not used, or radius of 3rd quadrant wind intensity
+**RAD3**: If full circle this field not used, or radius of 3rd quadrant wind intensity
 
-RAD4: If full circle this field not used, or radius of 4th quadrant wind intensity
+**RAD4**: If full circle this field not used, or radius of 4th quadrant wind intensity
 
-POUTER: pressure in millibars of the last closed isobar
+**POUTER**: pressure in millibars of the last closed isobar
 
-ROUTER: radius of the last closed isobar
+**ROUTER**: radius of the last closed isobar
 
-RMW: radius of max winds
+**RMW**: radius of max winds
 
-GUSTS: gusts
+**GUSTS**: gusts
 
-EYE: eye diameter
+**EYE**: eye diameter
 
-SUBREGION: subregion
+**SUBREGION**: subregion
 
-MAXSEAS: max seas
+**MAXSEAS**: max seas
 
-INITIALS: Forecaster's initials
+**INITIALS**: Forecaster's initials
 
-DIR: storm direction
+**DIR**: storm direction
 
-SPEED: storm speed
+**SPEED**: storm speed
 
-STORMNAME: literal storm name, number, NONAME or INVEST, or TCcyx
+**STORMNAME**: literal storm name, number, NONAME or INVEST, or TCcyx
 
-DEPTH: system depth
+**DEPTH**: system depth
 
-SEAS: Wave height for radii defined in SEAS1 - SEAS4
+**SEAS**: Wave height for radii defined in SEAS1 - SEAS4
 
-SEASCODE - Radius code
+**SEASCODE** - Radius code
 
-SEAS1: first quadrant seas radius as defined by SEASCODE
+**SEAS1**: first quadrant seas radius as defined by SEASCODE
 
-SEAS2: second quadrant seas radius as defined by SEASCODE
+**SEAS2**: second quadrant seas radius as defined by SEASCODE
 
-SEAS3: third quadrant seas radius as defined by SEASCODE
+**SEAS3**: third quadrant seas radius as defined by SEASCODE
 
-SEAS4: fourth quadrant seas radius as defined by SEASCODE
+**SEAS4**: fourth quadrant seas radius as defined by SEASCODE
 
-Of the above common fields in the ATCF file format, MET-TC requires the input file has the first 8 comma-separated columns present. Although all 8 columns must exist, valid data in each field is not required. In order to ensure proper matching, unique data in the BASIN, CY, YYYYMMDDHH, and TAU fields should be present.
+**Of the above common fields in the ATCF file format, MET-TC requires the input file has the first 8 comma-separated columns present.** Although all 8 columns must exist, valid data in each field is not required. In order to ensure proper matching, unique data in the BASIN, CY, YYYYMMDDHH, and TAU fields should be present.
 
 The TC-Pairs tool expects two input data sources in order to generate matched pairs and subsequent error statistics. The expected input for MET-TC is an ATCF format file from model output, or the operational aids files with the operational model output for the 'adeck' and the NHC best track analysis (BEST) for the 'bdeck'. The BEST is a subjectively smoothed representation of the storm's location and intensity over its lifetime. The track and intensity values are based on a retrospective assessment of all available observations of the storm.
 
