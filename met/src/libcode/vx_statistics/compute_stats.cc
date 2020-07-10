@@ -69,21 +69,23 @@ void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
 
    // Handle SAL1L2 data
    if(aflag) {
-      cnt_info.pr_corr.v   = bad_data_double;
-      cnt_info.anom_corr.v = compute_corr( fbar*n,  obar*n,
-                                          ffbar*n, oobar*n,
-                                          fobar*n, n);
-      cnt_info.rmsfa.v     = sqrt(ffbar);
-      cnt_info.rmsoa.v     = sqrt(oobar);
+      cnt_info.pr_corr.v       = bad_data_double;
+      cnt_info.anom_corr.v     = compute_corr( fbar*n,  obar*n,
+                                              ffbar*n, oobar*n,
+                                              fobar*n, n);
+      cnt_info.rmsfa.v         = sqrt(ffbar);
+      cnt_info.rmsoa.v         = sqrt(oobar);
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffbar, oobar, fobar);
    }
    // Handle SL1L2 data
    else {
-      cnt_info.pr_corr.v   = compute_corr( fbar*n,  obar*n,
-                                          ffbar*n, oobar*n,
-                                          fobar*n, n);
-      cnt_info.anom_corr.v = bad_data_double;
-      cnt_info.rmsfa.v     = bad_data_double;
-      cnt_info.rmsoa.v     = bad_data_double;
+      cnt_info.pr_corr.v       = compute_corr( fbar*n,  obar*n,
+                                              ffbar*n, oobar*n,
+                                              fobar*n, n);
+      cnt_info.anom_corr.v     = bad_data_double;
+      cnt_info.rmsfa.v         = bad_data_double;
+      cnt_info.rmsoa.v         = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
    }
 
    // Compute mean error
@@ -258,20 +260,26 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Compute Anomaly Correlation
       //
-      cnt_info.anom_corr.v = compute_corr( fa_bar*n,  oa_bar*n,
-                                          ffa_bar*n, ooa_bar*n,
-                                          foa_bar*n, n);
+      cnt_info.anom_corr.v     = compute_corr( fa_bar*n,  oa_bar*n,
+                                              ffa_bar*n, ooa_bar*n,
+                                              foa_bar*n, n);
 
       //
       // Compute RMSFA and RMSOA
       //
-      cnt_info.rmsfa.v     = sqrt(ffa_bar);
-      cnt_info.rmsoa.v     = sqrt(ooa_bar);
+      cnt_info.rmsfa.v         = sqrt(ffa_bar);
+      cnt_info.rmsoa.v         = sqrt(ooa_bar);
+
+      //
+      // Compute Raw (uncentered) Anomaly Correlation
+      //
+      cnt_info.anom_corr_raw.v = compute_anom_corr_raw(ffa_bar, ooa_bar, foa_bar);
    }
    else {
-      cnt_info.anom_corr.v = bad_data_double;
-      cnt_info.rmsfa.v     = bad_data_double;
-      cnt_info.rmsoa.v     = bad_data_double;
+      cnt_info.anom_corr.v     = bad_data_double;
+      cnt_info.rmsfa.v         = bad_data_double;
+      cnt_info.rmsoa.v         = bad_data_double;
+      cnt_info.anom_corr_raw.v = bad_data_double;
    }
 
    //
@@ -1127,33 +1135,36 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].fbar.v);
    cnt_mean.fbar.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].fstdev.v);
    cnt_mean.fstdev.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].obar.v);
    cnt_mean.obar.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].ostdev.v);
    cnt_mean.ostdev.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].pr_corr.v);
    cnt_mean.pr_corr.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].sp_corr.v);
    cnt_mean.sp_corr.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].kt_corr.v);
    cnt_mean.kt_corr.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr.v);
    cnt_mean.anom_corr.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsfa.v);
    cnt_mean.rmsfa.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmsoa.v);
    cnt_mean.rmsoa.v = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].anom_corr_raw.v);
+   cnt_mean.anom_corr_raw.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].me.v);
    cnt_mean.me.v = na.mean();
@@ -1163,10 +1174,10 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].estdev.v);
    cnt_mean.estdev.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mbias.v);
    cnt_mean.mbias.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].mae.v);
    cnt_mean.mae.v = na.mean();
 
@@ -1178,10 +1189,10 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bcmse.v);
    cnt_mean.bcmse.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].rmse.v);
    cnt_mean.rmse.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e10.v);
    cnt_mean.e10.v = na.mean();
 
@@ -1193,10 +1204,10 @@ void compute_cnt_mean(const CNTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e75.v);
    cnt_mean.e75.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].e90.v);
    cnt_mean.e90.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].eiqr.v);
    cnt_mean.eiqr.v = na.mean();
 
@@ -1230,7 +1241,7 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
    // Allocate one alpha value but compute no confidence intervals
    pct_mean.allocate_n_alpha(1);
    pct_mean.alpha[0] = bad_data_double;
-   
+
    // Compute the sum of the totals
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].total);
    pct_mean.total = na.sum();
@@ -1239,28 +1250,28 @@ void compute_pct_mean(const PCTInfo *cnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].baser.v);
    pct_mean.baser.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].reliability);
    pct_mean.reliability = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].resolution);
    pct_mean.resolution = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].uncertainty);
    pct_mean.uncertainty = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].roc_auc);
    pct_mean.roc_auc = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].brier.v);
    pct_mean.brier.v = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].briercl.v);
    pct_mean.briercl.v = na.mean();
 
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bss);
    pct_mean.bss = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(cnt_info[i].bss_smpl);
    pct_mean.bss_smpl = na.mean();
 
@@ -1296,7 +1307,7 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
 
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crps);
    ecnt_mean.crps = na.mean();
-   
+
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].crpss);
    ecnt_mean.crpss = na.mean();
 
@@ -1328,4 +1339,3 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
 }
 
 ////////////////////////////////////////////////////////////////////////
-

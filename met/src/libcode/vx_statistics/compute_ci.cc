@@ -1134,6 +1134,18 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               cnt_info.rmsoa.v_bcu[i]);
 
       //
+      // Compute bootstrap interval for anom_corr_raw
+      //
+      s = cnt_info.anom_corr_raw.v;
+      read_ldf(cnt_i_file, c,   si_na);
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_bca_interval(s, si_na, sr_na,
+                              cnt_info.alpha[i],
+                              cnt_info.anom_corr_raw.v_bcl[i],
+                              cnt_info.anom_corr_raw.v_bcu[i]);
+
+      //
       // Compute bootstrap interval for me
       //
       s = cnt_info.me.v;
@@ -2127,6 +2139,17 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                cnt_info.alpha[i],
                                cnt_info.rmsoa.v_bcl[i],
                                cnt_info.rmsoa.v_bcu[i]);
+
+      //
+      // Compute bootstrap interval for anom_corr_raw
+      //
+      s = cnt_info.anom_corr_raw.v;
+      read_ldf(cnt_r_file, c++, sr_na);
+      for(i=0; i<cnt_info.n_alpha; i++)
+         compute_perc_interval(s, sr_na,
+                               cnt_info.alpha[i],
+                               cnt_info.anom_corr_raw.v_bcl[i],
+                               cnt_info.anom_corr_raw.v_bcu[i]);
 
       //
       // Compute bootstrap interval for me
@@ -3832,13 +3855,14 @@ void write_cntinfo(ofstream &tmp_out, const CNTInfo &c) {
    char line[max_line_len];
 
    snprintf(line, max_line_len,
-           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
-           c.fbar.v,    c.fstdev.v,    c.obar.v,    c.ostdev.v,
-           c.pr_corr.v, c.anom_corr.v, c.rmsfa.v,   c.rmsoa.v,
-           c. me.v,     c.me2.v,       c.estdev.v,  c.mbias.v,
-           c.mae.v,     c.mse.v,       c.msess.v,   c.bcmse.v,
-           c.rmse.v,    c.e10.v,       c.e25.v,     c.e50.v,
-           c.e75.v,     c.e90.v,       c.eiqr.v,    c.mad.v);
+           "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+           c.fbar.v,    c.fstdev.v,    c.obar.v,          c.ostdev.v,
+           c.pr_corr.v, c.anom_corr.v,
+           c.rmsfa.v,   c.rmsoa.v,     c.anom_corr_raw.v,
+           c.me.v,      c.me2.v,       c.estdev.v,        c.mbias.v,
+           c.mae.v,     c.mse.v,       c.msess.v,         c.bcmse.v,
+           c.rmse.v,    c.e10.v,       c.e25.v,           c.e50.v,
+           c.e75.v,     c.e90.v,       c.eiqr.v,          c.mad.v);
 
    tmp_out << line << "\n";
 

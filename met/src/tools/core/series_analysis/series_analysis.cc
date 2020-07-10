@@ -1632,6 +1632,9 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "RMSOA")         { v = cnt_info.rmsoa.v;            }
       else if(c == "RMSOA_BCL")     { v = cnt_info.rmsoa.v_bcl[i];     }
       else if(c == "RMSOA_BCU")     { v = cnt_info.rmsoa.v_bcu[i];     }
+      else if(c == "ANOM_CORR_RAW") { v = cnt_info.anom_corr_raw.v;    }
+      else if(c == "ANOM_CORR_RAW_BCL") { v = cnt_info.anom_corr_raw.v_bcl[i]; }
+      else if(c == "ANOM_CORR_RAW_BCU") { v = cnt_info.anom_corr_raw.v_bcu[i]; }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
@@ -2299,8 +2302,13 @@ void set_verbosity(const StringArray & a) {
       mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
            << "produces excessive log output and can slow the runtime "
            << "considerably.\n\n";
+<<<<<<< HEAD
    }
 }
+=======
+   }
+}
+>>>>>>> develop
 
 ////////////////////////////////////////////////////////////////////////
 
