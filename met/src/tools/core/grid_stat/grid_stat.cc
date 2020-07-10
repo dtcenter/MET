@@ -2422,16 +2422,15 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    }
 
    // Set output forecast and observation long names
-   fcst_long_name = conf_info.vx_opt[i_vx].fcst_info->long_name_attr();
-   if(fcst_long_name.empty()) {
-      fcst_long_name << conf_info.vx_opt[i_vx].fcst_info->name_attr() << " at "
-                     << conf_info.vx_opt[i_vx].fcst_info->level_attr();
-   }
-   obs_long_name = conf_info.vx_opt[i_vx].obs_info->long_name_attr();
-   if(obs_long_name.empty()) {
-      obs_long_name << conf_info.vx_opt[i_vx].obs_info->name_attr() << " at "
-                    << conf_info.vx_opt[i_vx].obs_info->level_attr();
-   }
+   fcst_long_name = (conf_info.vx_opt[i_vx].fcst_info->long_name_attr().empty() ?
+                     conf_info.vx_opt[i_vx].fcst_info->name_attr() :
+                     conf_info.vx_opt[i_vx].fcst_info->long_name_attr());
+   fcst_long_name << " at " << conf_info.vx_opt[i_vx].fcst_info->level_attr();
+
+   obs_long_name  = (conf_info.vx_opt[i_vx].obs_info->long_name_attr().empty() ?
+                     conf_info.vx_opt[i_vx].obs_info->name_attr() :
+                     conf_info.vx_opt[i_vx].obs_info->long_name_attr());
+   obs_long_name  << " at " << conf_info.vx_opt[i_vx].obs_info->level_attr();
 
    // Append nc_pairs_var_suffix config file entry
    if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {

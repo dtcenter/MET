@@ -1,6 +1,0 @@
-Single Attribute
-An attribute of a simple or cluster object in one field.
-Examples are centroid, area and axis angle.
-MODE writes out attributes for both simple and cluster objects
-in its {\co ascii} output file, but only attributes for 
-simple objects play a role in the matching and merging process.

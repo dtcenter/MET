@@ -1,4 +1,0 @@
-Interest Map
-A function, associated with an attribute, that tells MODE which
-values of the attribute are interesting (or not) for purposes 
-of matching and merging.

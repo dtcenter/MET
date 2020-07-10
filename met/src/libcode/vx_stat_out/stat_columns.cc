@@ -83,13 +83,13 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
                               int i_bin, int n_bin) {
 
    if(n_bin == 1) return(mask_name);
-   
+
    // Append the climo CDF bin number.
    ConcatString cs;
    cs << mask_name << "_BIN_";
    if(i_bin == -1) cs << "MEAN";
    else            cs << i_bin+1;
-   
+
    return(cs);
 }
 
@@ -1151,7 +1151,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    AsciiTable &txt_at, int &txt_row,
                    bool update_thresh) {
    ConcatString mask_name = shc.get_mask();
- 
+
    // PRC line type
    shc.set_line_type(stat_prc_str);
 
@@ -1598,7 +1598,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
 }
 
 ////////////////////////////////////////////////////////////////////////
-    
+
 void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
                     STATOutputType out_type, int i_bin, int n_bin,
                     AsciiTable &stat_at, int &stat_row,
@@ -2323,31 +2323,32 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    // Continuous Variable Stats
    // Dump out the CNT line:
    //    TOTAL,
-   //    FBAR,        FBAR_NCL,      FBAR_NCU,      FBAR_BCL,      FBAR_BCU,
-   //    FSTDEV,      FSTDEV_NCL,    FSTDEV_NCU,    FSTDEV_BCL,    FSTDEV_BCU,
-   //    OBAR,        OBAR_NCL,      OBAR_NCU,      OBAR_BCL,      OBAR_BCU,
-   //    OSTDEV,      OSTDEV_NCL,    OSTDEV_NCU,    OSTDEV_BCL,    OSTDEV_BCU,
-   //    PR_CORR,     PR_CORR_NCL,   PR_CORR_NCU,   PR_CORR_BCL,   PR_CORR_BCU,
-   //    SP_CORR,     KT_CORR,       RANKS,         FRANK_TIES,    ORANK_TIES,
-   //    ME,          ME_NCL,        ME_NCU,        ME_BCL,        ME_BCU,
-   //    ESTDEV,      ESTDEV_NCL,    ESTDEV_NCU,    ESTDEV_BCL,    ESTDEV_BCU,
-   //    MBIAS,       MBIAS_BCL,     MBIAS_BCU,
-   //    MAE,         MAE_BCL,       MAE_BCU,
-   //    MSE,         MSE_BCL,       MSE_BCU,
-   //    BCMSE,       BCMSE_BCL,     BCMSE_BCU,
-   //    RMSE,        RMSE_BCL,      RMSE_BCU,
-   //    E10,         E10_BCL,       E10_BCU,
-   //    E25,         E25_BCL,       E25_BCU,
-   //    E50,         E50_BCL,       E50_BCU,
-   //    E75,         E75_BCL,       E75_BCU,
-   //    E90,         E90_BCL,       E90_BCU,
-   //    EIQR,        EIQR_BCL,      EIQR_BCU,
-   //    ANOM_CORR,   ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
-   //    MAD,         MAD_BCL,       MAD_BCU
-   //    ME2,         ME2_BCL,       ME2_BCU,
-   //    MSESS,       MSESS_BCL,     MSESS_BCU,
-   //    RMSFA,       RMSFA_BCL,     RMSFA_BCU,
-   //    RMSOA,       RMSOA_BCL,     RMSOA_BCU
+   //    FBAR,          FBAR_NCL,          FBAR_NCU,          FBAR_BCL,          FBAR_BCU,
+   //    FSTDEV,        FSTDEV_NCL,        FSTDEV_NCU,        FSTDEV_BCL,        FSTDEV_BCU,
+   //    OBAR,          OBAR_NCL,          OBAR_NCU,          OBAR_BCL,          OBAR_BCU,
+   //    OSTDEV,        OSTDEV_NCL,        OSTDEV_NCU,        OSTDEV_BCL,        OSTDEV_BCU,
+   //    PR_CORR,       PR_CORR_NCL,       PR_CORR_NCU,       PR_CORR_BCL,       PR_CORR_BCU,
+   //    SP_CORR,       KT_CORR,           RANKS,             FRANK_TIES,        ORANK_TIES,
+   //    ME,            ME_NCL,            ME_NCU,            ME_BCL,            ME_BCU,
+   //    ESTDEV,        ESTDEV_NCL,        ESTDEV_NCU,        ESTDEV_BCL,        ESTDEV_BCU,
+   //    MBIAS,         MBIAS_BCL,         MBIAS_BCU,
+   //    MAE,           MAE_BCL,           MAE_BCU,
+   //    MSE,           MSE_BCL,           MSE_BCU,
+   //    BCMSE,         BCMSE_BCL,         BCMSE_BCU,
+   //    RMSE,          RMSE_BCL,          RMSE_BCU,
+   //    E10,           E10_BCL,           E10_BCU,
+   //    E25,           E25_BCL,           E25_BCU,
+   //    E50,           E50_BCL,           E50_BCU,
+   //    E75,           E75_BCL,           E75_BCU,
+   //    E90,           E90_BCL,           E90_BCU,
+   //    EIQR,          EIQR_BCL,          EIQR_BCU,
+   //    ANOM_CORR,     ANOM_CORR_NCL,     ANOM_CORR_NCU,     ANOM_CORR_BCL,     ANOM_CORR_BCU,
+   //    MAD,           MAD_BCL,           MAD_BCU,
+   //    ME2,           ME2_BCL,           ME2_BCU,
+   //    MSESS,         MSESS_BCL,         MSESS_BCU,
+   //    RMSFA,         RMSFA_BCL,         RMSFA_BCU,
+   //    RMSOA,         RMSOA_BCL,         RMSOA_BCU,
+   //    ANOM_CORR_RAW, ANOM_CORR_RAW_BCL, ANOM_CORR_RAW_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2631,6 +2632,15 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
    at.set_entry(r, c+93, // Root Mean Squared Observation Anomaly BCU
       cnt_info.rmsoa.v_bcu[i]);
+
+   at.set_entry(r, c+94, // Anomaly Correlation Raw
+      cnt_info.anom_corr_raw.v);
+
+   at.set_entry(r, c+95, // Anomaly Correlation Raw BCL
+      cnt_info.anom_corr_raw.v_bcl[i]);
+
+   at.set_entry(r, c+96, // Anomaly Correlation Raw BCU
+      cnt_info.anom_corr_raw.v_bcu[i]);
 
    return;
 }
