@@ -14,7 +14,7 @@ _____________________
 rmw_analysis usage
 ~~~~~~~~~~~~~~~~~~
 
-The following sections describe the usage statement, required arguments, and optional arguments for rmw_analysis.
+The following sections describe the usage statement, required arguments, and optional arguments for **rmw_analysis**.
 
 _______________________
 
@@ -32,23 +32,23 @@ rmw_analysis has required arguments and can accept several optional arguments.
 Required arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -data file_1 ... file_n | data_file_list argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files.
+1. The **-data file_1 ... file_n | data_file_list** argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files.
 
-2. The -config file argument is the RMWAnalysisConfig to be used. The contents of the configuration file are discussed below.
+2. The **-config file** argument is the RMWAnalysisConfig to be used. The contents of the configuration file are discussed below.
 
-3. The -out file argument is the NetCDF output file to be written.
+3. The **-out** file argument is the NetCDF output file to be written.
 
 Optional arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
 
-5. The -v level option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 rmw_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the RMW-Analysis tool named 'RMWAnalysisConfig_default' can be found in the installed share/met/config/ directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the RMW-Analysis tool named 'RMWAnalysisConfig_default' can be found in the installed **share/met/config/** directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 ______________________
 
@@ -63,7 +63,7 @@ ______________________
      ];
   }
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options`.
 
 ____________________
 

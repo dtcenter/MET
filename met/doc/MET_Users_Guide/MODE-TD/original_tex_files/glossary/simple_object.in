@@ -1,5 +1,0 @@
-Simple Object
-An object that has not yet participated in the matching 
-and merging process.  Alternatively, the connected pieces
-of the collection of grid points where the mask field
-takes the value $1$.

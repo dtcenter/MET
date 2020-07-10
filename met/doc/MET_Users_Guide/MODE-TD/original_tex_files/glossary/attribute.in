@@ -1,5 +1,0 @@
-Attribute
-Any feature or characteristic of an object that is of interest.
-Attributes can be purely geometric, like area, centroid and axis angle.
-Other attributes are intensity-based, such as do_ordinal(90) percentile
-intensity values inside an object.

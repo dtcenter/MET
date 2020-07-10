@@ -1,7 +1,0 @@
-Confidence Map
-A function associated to an attribute that tells MODE how
-much to trust the calculated or measured value of that
-attribute.
-
-The degree of confidence in the value of one attribute 
-may well depend on the values of other attributes.

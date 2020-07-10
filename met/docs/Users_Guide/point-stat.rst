@@ -172,7 +172,7 @@ When the "prob" entry is set as a dictionary to define the field of interest, se
 Measures for comparison against climatology
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
+For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR and ANOM_CORR_RAW), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
 
 Often, the sample climatology is used as a reference by a skill score. The sample climatology is the average over all included observations and may be transparent to the user. This is the case in most categorical skill scores. The sample climatology will probably prove more difficult to improve upon than a long term climatology, since it will be from the same locations and time periods as the forecasts. This may mask legitimate forecast skill. However, a more general climatology, perhaps covering many years, is often easier to improve upon and is less likely to mask real forecast skill.
 
@@ -833,7 +833,7 @@ The first set of header columns are common to all of the output files generated 
     - The Median Absolute Deviation including bootstrap upper and lower confidence limits
   * - 102-106
     - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
-    - The Anomaly Correlation including normal and bootstrap upper and lower confidence limits
+    - The Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
   * - 107-109
     - ME2, :raw-html:`<br />` ME2_BCL, :raw-html:`<br />` ME2_BCU
     - The square of the mean error (bias) including bootstrap upper and lower confidence limits
@@ -843,9 +843,12 @@ The first set of header columns are common to all of the output files generated 
   * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
-  * - 116-118
+  * - 117-119
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
+  * - 120-122
+    - ANOM_CORR_RAW, :raw-html:`<br />` ANOM_CORR_RAW_BCL, :raw-html:`<br />` ANOM_CORR_RAW_BCU
+    - The Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
 
 .. _table_PS_format_info_MCTC:
 
