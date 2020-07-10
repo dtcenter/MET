@@ -1,5 +1,5 @@
 // ** Copyright UCAR (c) 1992 - 2020
-// ** University Corporation for Atmospheric Research (UCAR)
+// ** University Corporation for Atmospheric Research led(UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
@@ -936,22 +936,24 @@ void process_scores() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(na_string);
+      cs = conf_info.vx_opt[i].vx_pd.obs_info->units_attr();
+      if(cs.empty()) cs = na_string;
+      shc.set_obs_units(cs);
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().c_str());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
 
       // Set the forecast lead time
       shc.set_fcst_lead_sec(conf_info.vx_opt[i].vx_pd.fcst_dpa[0].lead());
@@ -1208,10 +1210,10 @@ void process_scores() {
                   } // end for m
 
                   // Reset the forecast variable name
-                  shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name());
+                  shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
                   // Reset the observation variable name
-                  shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name());
+                  shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
 
                } // end Compute VL1L2 and VAL1L2
 

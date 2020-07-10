@@ -243,6 +243,25 @@ watch_warn = {
 // replaced with "val". This map can be used to modify basin names to make them
 // consistent across the ATCF input files.
 //
+// Many global modeling centers use ATCF basin identifiers based on region
+// (e.g., 'SP' for South Pacific Ocean, etc.), however the best track data
+// provided by the Joint Typhoon Warning Center (JTWC) use just one basin
+// identifier 'SH' for all of the Southern Hemisphere basins. Additionally,
+// some modeling centers may report basin identifiers separately for the Bay
+// of Bengal (BB) and Arabian Sea (AB) whereas JTWC uses 'IO'.
+//
+// The basin mapping allows MET to map the basin identifiers to the expected
+// values without having to modify your data. For example, the first entry
+// in the list below indicates that any data entries for 'SI' will be matched
+// as if they were 'SH'. In this manner, all verification results for the
+// Southern Hemisphere basins will be reported together as one basin.
+//
+// An empty list indicates that no basin mapping should be used. Use this if
+// you are not using JTWC best tracks and you would like to match explicitly
+// by basin or sub-basin. Note that if your model data and best track do not
+// use the same basin identifier conventions, using an empty list for this
+// parameter will result in missed matches.
+//
 basin_map = [
    { key = "SI"; val = "SH"; },
    { key = "SP"; val = "SH"; },

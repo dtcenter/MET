@@ -372,16 +372,16 @@ void def_tc_data(NcFile* nc_out,
     dims.push_back(azimuth_dim);
     dims.push_back(track_point_dim);
 
-    ConcatString var_name = data_info->name();
+    ConcatString var_name = data_info->name_attr();
     var_name.add("_");
-    var_name.add(data_info->level().name());
+    var_name.add(data_info->level_attr());
 
     data_var = nc_out->addVar(
         var_name, ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);
 }
 
@@ -399,11 +399,11 @@ void def_tc_data_3d(NcFile* nc_out,
     dims.push_back(track_point_dim);
 
     data_var = nc_out->addVar(
-        data_info->name(), ncDouble, dims);
+        data_info->name_attr(), ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);
 }
 
@@ -418,16 +418,16 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     dims.push_back(range_dim);
     dims.push_back(track_point_dim);
 
-    ConcatString var_name = data_info->name();
+    ConcatString var_name = data_info->name_attr();
     var_name.add("_");
-    var_name.add(data_info->level().name());
+    var_name.add(data_info->level_attr());
     var_name.add("_azi_mean");
 
     data_var = nc_out->addVar(var_name, ncDouble, dims);
 
     // Set attributes
-    add_att(&data_var, "long_name", data_info->long_name());
-    add_att(&data_var, "units", data_info->units());
+    add_att(&data_var, "long_name", data_info->long_name_attr());
+    add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);
 }
 

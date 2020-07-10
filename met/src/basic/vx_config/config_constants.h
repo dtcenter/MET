@@ -618,6 +618,27 @@ static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 
 //
+// Entries to override file metadata 
+//
+static const char conf_key_set_attr_name[]        = "set_attr_name";
+static const char conf_key_set_attr_units[]       = "set_attr_units";
+static const char conf_key_set_attr_level[]       = "set_attr_level";
+static const char conf_key_set_attr_long_name[]   = "set_attr_long_name";
+static const char conf_key_set_attr_grid[]        = "set_attr_grid";
+static const char conf_key_set_attr_init[]        = "set_attr_init";
+static const char conf_key_set_attr_valid[]       = "set_attr_valid";
+static const char conf_key_set_attr_lead[]        = "set_attr_lead";
+static const char conf_key_set_attr_accum[]       = "set_attr_accum";
+static const char conf_key_is_precipitation[]     = "is_precipitation";
+static const char conf_key_is_specific_humidity[] = "is_specific_humidity";
+static const char conf_key_is_u_wind[]            = "is_u_wind";
+static const char conf_key_is_v_wind[]            = "is_v_wind";
+static const char conf_key_is_grid_relative[]     = "is_grid_relative";
+static const char conf_key_is_wind_speed[]        = "is_wind_speed";
+static const char conf_key_is_wind_direction[]    = "is_wind_direction";
+static const char conf_key_is_prob[]              = "is_prob";
+
+//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";

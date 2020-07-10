@@ -10,7 +10,7 @@ include ${top_srcdir}/Make-include
 
 # The program
 
-bin_PROGRAMS    = tc_rmw
+bin_PROGRAMS   = tc_rmw
 tc_rmw_SOURCES = tc_rmw.cc \
 	tc_rmw_conf_info.cc
 tc_rmw_CPPFLAGS = ${MET_CPPFLAGS}
@@ -35,6 +35,7 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
+	-lvx_color \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
 	$(FLIBS)
