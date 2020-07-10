@@ -1,6 +1,0 @@
-Pair Attribute
-An attribute defined on a pair of objects, 
-one object being from the forecast
-field and the other from the observed field.
-Examples are intersection area, distance between
-centroids, and the angle between axis lines.

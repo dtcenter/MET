@@ -1,8 +1,0 @@
-Axis
-A line associated to an object giving information on
-the spatial orientation of the object.
-MODE outputs the axis angle, which gives the inclination of the
-axis line to the $x$ grid direction.
-Since the axis line always passes through the centroid of the 
-given object, this angle (along with the location of
-the centroid ) suffices to determine the axis line.
