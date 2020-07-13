@@ -30,24 +30,24 @@ plot_point_obs has two required arguments and can take optional ones.
 Required arguments for plot_point_obs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The nc_file argument indicates the name of the file to be plotted.
+1. The **nc_file** argument indicates the name of the file to be plotted.
 
-2. The ps_file argument indicates the name given to the output file containing the plot.
+2. The **ps_file** argument indicates the name given to the output file containing the plot.
 
 Optional arguments for plot_point_obs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The -gc code is the GRIB code(s) to be plotted.
+3. The **-gc code** is the GRIB code(s) to be plotted.
 
-4. The -msg_typ name is the message type(s) to be plotted.
+4. The **-msg_typ name** is the message type(s) to be plotted.
 
-5. The -data_file name is a data file whose grid should be used for the plot. 
+5. The **-data_file name** is a data file whose grid should be used for the plot. 
 
-6. The -dotsize val option overrides the default dot size value (1). 
+6. The **-dotsize val** option overrides the default dot size value (1). 
 
-7. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+7. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
 
-8. The -v level option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the plot_point_obs calling sequence is shown below:
 
@@ -81,24 +81,24 @@ plot_data_plane has two required arguments and can take optional ones.
 Required arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The input_filename argument indicates the name of the gridded data file to be plotted.
+1. The **input_filename** argument indicates the name of the gridded data file to be plotted.
 
-2. The output_filename argument indicates the name given to the output PostScript file containing the plot.
+2. The **output_filename** argument indicates the name given to the output PostScript file containing the plot.
 
-3. The field_string argument contains information about the field and level to be plotted.
+3. The **field_string** argument contains information about the field and level to be plotted.
 
 Optional arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The -color_table color_table_name overrides the default color table ("MET_BASE/colortables/met_default.ctable")
+4. The **-color_table color_table_name** overrides the default color table ("MET_BASE/colortables/met_default.ctable")
 
-5. The -plot_range min max sets the minimum and maximum values to plot.
+5. The **-plot_range min max** sets the minimum and maximum values to plot.
 
-6. The -title title_string sets the title text for the plot. 
+6. The **-title title_string** sets the title text for the plot. 
 
-7. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+7. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
 
-8. The -v level option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the plot_data_plane calling sequence is shown below:
 
@@ -134,20 +134,20 @@ plot_mode_field has four required arguments and can take optional ones.
 Required arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The mode_nc_file_list specifies the MODE output files to be used for plotting. 
+1. The **mode_nc_file_list** specifies the MODE output files to be used for plotting. 
 
-2. The -raw | -simple | -cluster argument indicates the types of field to be plotted. Exactly one must be specified. For details about the types of objects, see the chapter in this document on MODE.
+2. The **-raw | -simple | -cluster** argument indicates the types of field to be plotted. Exactly one must be specified. For details about the types of objects, see the chapter in this document on MODE.
 
-3. The -obs | -fcst option specifies whether to plot the observed or forecast field from the MODE output files. Exactly one must be specified.
+3. The **-obs | -fcst** option specifies whether to plot the observed or forecast field from the MODE output files. Exactly one must be specified.
 
-4. The -config file specifies the configuration file to use for specification of plotting options.
+4. The **-config file** specifies the configuration file to use for specification of plotting options.
 
 Optional arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -log file option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
 
-6. The -v level option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the plot_mode_field calling sequence is shown below:
 
@@ -206,9 +206,9 @@ In addition to the traditional scores, MODE output allows more information to be
 TC-Stat tool example
 ~~~~~~~~~~~~~~~~~~~~
 
-There is a basic R script located in the MET installation, share/met/Rscripts/plot_tcmpr.R. The usage statement with a short description of the options for plot_tcmpr.R can be obtained by typing: Rscript plot_tcmpr.R with no additional arguments. The only required argument is the -lookin source, which is the path to the TC-Pairs TCST output files. The R script reads directly from the TC-Pairs output, and calls TC-Stat directly for filter jobs specified in the "-filter options" argument.
+There is a basic R script located in the MET installation, share/met/Rscripts/plot_tcmpr.R. The usage statement with a short description of the options for *plot_tcmpr.R* can be obtained by typing: Rscript *plot_tcmpr.R* with no additional arguments. The only required argument is the *-lookin* source, which is the path to the TC-Pairs TCST output files. The R script reads directly from the TC-Pairs output, and calls TC-Stat directly for filter jobs specified in the *"-filter options"* argument.
 
-In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the MET_INSTALL_DIR/share/met directory. In addition, the tc_stat tool under MET_INSTALL_DIR/bin must be in your system path.
+In order to run this script, the MET_INSTALL_DIR environment variable must be set to the MET installation directory and the MET_BASE environment variable must be set to the MET_INSTALL_DIR/share/met directory. In addition, the *tc_stat tool* under MET_INSTALL_DIR/bin must be in your system path.
 
 The supplied R script can generate a number of different plot types including boxplots, mean, median, rank, and relative performance. Pairwise differences can be plotted for the boxplots, mean, and median. Normal confidence intervals are applied to all figures unless the no_ci option is set to TRUE. Below are two example plots generated from the tools.
 
