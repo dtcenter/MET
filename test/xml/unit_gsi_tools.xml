@@ -123,11 +123,11 @@
       -lookin &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001.stat \
       -job aggregate_stat -line_type MPR -out_line_type CNT -by fcst_var \
       -column_thresh ANLY_USE ==1 \
-      -out_stat &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_CNT.txt \
+      -out_stat &OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_cnt.txt \
       -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_CNT.txt</stat>
+      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_cnt.txt</stat>
     </output>
   </test>
 
