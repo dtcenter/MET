@@ -3,7 +3,7 @@
 Re-Formatting of Point Observations
 ===================================
 
-There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in ::numref:`overview`. The software tools used to reformat point data are described in this chapter.
+There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in :numref:`overview`. The software tools used to reformat point data are described in this chapter.
 
 .. _PB2NC tool:
 
@@ -92,7 +92,7 @@ In this example, the PB2NC tool will process the input **sample_pb.blk** file ap
 pb2nc configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed share/met/config directory. The version used for the example run in Section :ref:`Software Installation, sample test cases<Sample test cases>` is available in **scripts/config**. It is recommended that users make a copy of configuration files prior to modifying their contents.
+The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed share/met/config directory. The version used for the example run in :numref:`Sample test cases` is available in **scripts/config**. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
 When editing configuration files, environment variables may be used for setting the configurable parameters if convenient. The configuration file parser expands any environment variables to their full value before proceeding. Within the configuration file, environment variables must be specified in the form: **${VAR_NAME}**.
 
@@ -113,7 +113,7 @@ ____________________
 		tmp_dir    = "/tmp";
 		version    = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
 
 _____________________
 
@@ -190,7 +190,7 @@ _________________
 The **beg** and **end** variables are used to stratify the model level of observations to be retained. The range shown above is 1 to 255.
 
 
-The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :ref:`Table 4.1 Values for the level_category option.<table_reform-point_pb2nc_level_category>` See the following for more details:
+The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :numref:`<table_reform-point_pb2nc_level_category`. See the following for more details:
 
 
 http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm
@@ -513,7 +513,7 @@ Optional arguments for ascii2nc
 
 6. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
 
-7. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the “sid” entry in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+7. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the “sid” entry in :numref:`Data IO MET Configuration File Options`.
 
 8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
@@ -543,7 +543,7 @@ Here is an example of processing the same set of observations but using Python e
 		“MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
 		sample_ascii_obs_python.nc
 
-Please refer to :ref:`Appendix F Python Embedding<appendixF>` for more details about Python embedding in MET.
+Please refer to :numref:`appendixF` for more details about Python embedding in MET.
 
 ascii2nc configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -558,7 +558,7 @@ __________________
 
 		version = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
 
 _________________
 
@@ -567,7 +567,7 @@ _________________
 		time_summary = { ... }
 
 
-The **time_summary** feature was implemented to allow additional processing of observations with high temporal resolution, such as SURFRAD data every 5 minutes. This option is described in Section :ref:`pb2nc configuration file`.
+The **time_summary** feature was implemented to allow additional processing of observations with high temporal resolution, such as SURFRAD data every 5 minutes. This option is described in :numref:`pb2nc configuration file`.
 
 _________________
 
@@ -592,7 +592,7 @@ This entry is an array of dictionaries, each containing a **key** string and **v
 ascii2nc output
 ~~~~~~~~~~~~~~~
 
-The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in Section :ref:`pb2nc output`.
+The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
 
 MADIS2NC tool
@@ -662,7 +662,7 @@ Optional arguments for madis2nc
 9. The **-mask_poly file** option defines a polyline masking file for filtering the point observations spatially.
 
 
-10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the “sid” entry in  :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+10. The **-mask_sid file|list** option is a station ID masking file or a comma-separated list of station ID's for filtering the point observations spatially. See the description of the “sid” entry in  :numref:`Data IO MET Configuration File Options`.
 
 
 11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
@@ -702,7 +702,7 @@ _________________
 		version = "VN.N";
 
 
-The configuration options listed above are common to many MET tools and are described in Section :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
 
 __________________
 
@@ -712,13 +712,13 @@ __________________
 		time_summary = { ... }
 
 
-The **time_summary** dictionary is described in Section :ref:`pb2nc configuration file`.
+The **time_summary** dictionary is described in :numref:`pb2nc configuration file`.
 
 
 madis2nc output
 ~~~~~~~~~~~~~~~
 
-The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in Section :ref:`pb2nc output`.
+The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
 
 LIDAR2NC tool
@@ -767,7 +767,7 @@ Optional arguments for lidar2nc
 lidar2nc output
 ~~~~~~~~~~~~~~~
 
-Each observation type in the lidar2nc output is assigned a GRIB code. These are outlined in :ref:`lidar2nc_grib_code_table`. GRIB codes were assigned to these fields arbitrarily, with GRIB codes in the 600s denoting individual bit fields taken from the feature classification flag field in the CALIPSO file.
+Each observation type in the lidar2nc output is assigned a GRIB code. These are outlined in :numref:`lidar2nc_grib_code_table`. GRIB codes were assigned to these fields arbitrarily, with GRIB codes in the 600s denoting individual bit fields taken from the feature classification flag field in the CALIPSO file.
 
 
 We will not give a detailed description of each CALIPSO data product that lidar2nc reads. Users should refer to existing CALIPSO documentation for this information. We will, however, give some explanation of how the cloud layer base and top information is encoded in the lidar2nc NetCDF output file.

@@ -264,7 +264,7 @@ Optional arguments for regrid_data_plane
 
 14. The **-compress level** option specifies the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-For more details on setting the **to_grid, -method, -width,** and **-vld_thresh** options, see the regrid entry in :numref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the regrid_data_plane calling sequence is shown below:
+For more details on setting the **to_grid, -method, -width,** and **-vld_thresh** options, see the regrid entry in :numref:`Data IO MET Configuration File Options`. An example of the regrid_data_plane calling sequence is shown below:
 
 .. code-block:: none
 
@@ -338,7 +338,7 @@ Optional arguments for shift_data_plane
 
 10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-For more details on setting the **-method** and **-width** options, see the **regrid** entry in :numref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. An example of the shift_data_plane calling sequence is shown below:
+For more details on setting the **-method** and **-width** options, see the **regrid** entry in :numref:`Data IO MET Configuration File Options`. An example of the shift_data_plane calling sequence is shown below:
 
 .. code-block:: none
 
@@ -512,7 +512,7 @@ wwmca_regrid configuration file
 
 The default configuration file for the WWMCA-Regrid tool named **WWMCARegridConfig_default** can be found in the installed **share/met/config** directory. We encourage users to make a copy of this file prior to modifying its contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
 ____________________________
 
