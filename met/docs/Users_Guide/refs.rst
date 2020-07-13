@@ -61,7 +61,7 @@ Roberts, N.M., and H.W. Lean, 2008: Scale-selective verification of rainfall acc
 
 Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of observation errors on the statistics for ensemble spread and reliability. *Monthy Weather Review* 132: 1487–1501.
 
-Santos C. and A. Ghelli, 2012: Observational probability method to assess ensemble precipitation forecasts. *Quarterly Journal of the Royal Meteorol. Soc.* 138: 209–221.
+Santos C. and A. Ghelli, 2012: Observational probability method to assess ensemble precipitation forecasts. *Quarterly Journal of the Royal Meteorological Society* 138: 209–221.
 
 Stephenson, D.B., 2000: Use of the “Odds Ratio” for diagnosing forecast skill. *Weather and Forecasting*, 15, 221-232.
 
