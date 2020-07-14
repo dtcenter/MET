@@ -62,7 +62,7 @@ The confidence intervals for the Grid-Stat tool are the same as those provided f
 Grid weighting
 ~~~~~~~~~~~~~~
 
-When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>` for more information.
+When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :ref:`Data IO MET Configuration File Options` for more information.
 
 Neighborhood methods
 ~~~~~~~~~~~~~~~~~~~~
@@ -229,7 +229,7 @@ __________________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :ref:`Data IO MET Configuration File Options`.
 
 ___________________________
 

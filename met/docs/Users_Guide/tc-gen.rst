@@ -151,7 +151,7 @@ ______________________
 
   desc = "NA";
 
-The **desc** configuration option is common to many MET tools and is described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The **desc** configuration option is common to many MET tools and is described in :ref:`Data IO MET Configuration File Options`.
 
 ______________________
 
@@ -246,7 +246,7 @@ ______________________
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
   version    = "V9.0";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
+The configuration options listed above are common to many MET tools and are described in :ref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
 
 tc_gen output
 ~~~~~~~~~~~~~
