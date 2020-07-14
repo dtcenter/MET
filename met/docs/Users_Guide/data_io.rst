@@ -3,14 +3,14 @@
 MET Data I/O
 ============
 
-Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this chapter. Both the input and output file formats are described in this chapter. Sections :ref:`Input data formats` and :ref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in Figure :numref:`overview-figure`. Output data formats are described in later Section :ref:`Output data formats`. Common configuration files options are described in Section :ref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in Chapters :ref:`reformat_point`  and :ref:`reformat_grid`.
+Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this chapter. Both the input and output file formats are described in this chapter. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
 
 .. _Input data formats:
 
 Input data formats
 __________________
 
-The MET package can handle gridded input data in one of four formats: GRIB version 1, GRIB version 2, NetCDF files following the Climate and Forecast (CF) conventions, and NetCDF files produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF grib tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :ref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
+The MET package can handle gridded input data in one of four formats: GRIB version 1, GRIB version 2, NetCDF files following the Climate and Forecast (CF) conventions, and NetCDF files produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF grib tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.
 
 When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, Ensemble-Stat, MODE, MTD, or Series-Analysis tools, the input model and observation datasets must be on the same grid. MET will regrid files according to user specified options. Alternately, outside of MET, the copygb and wgrib2 utilities are recommended for re-gridding GRIB1 and GRIB2 files, respectively. To preserve characteristics of the observations, it is generally preferred to re-grid the model data to the observation grid, rather than vice versa.
 
@@ -40,7 +40,7 @@ The MODE tool creates two ASCII output files as well (although they are not in a
 
 The TC-Pairs and TC-Stat utilities produce ASCII output, similar in style to the STAT files, but with TC relevant fields.
 
-Many of the tools generate gridded NetCDF output. Generally, this output acts as input to other MET tools or plotting programs. The point observation preprocessing tools produce NetCDF output as input to the statistics tools. Full details of the contents of the NetCDF files is found in Section :ref:`Data format summary` below.
+Many of the tools generate gridded NetCDF output. Generally, this output acts as input to other MET tools or plotting programs. The point observation preprocessing tools produce NetCDF output as input to the statistics tools. Full details of the contents of the NetCDF files is found in :numref:`Data format summary` below.
 
 The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing the spatial approach used in the verification. The PostScript plots are generated using internal libraries and do not depend on an external plotting package. The MODE plots contain several summary pages at the beginning, but the total number of pages will depend on the merging options chosen. Additional pages will be created if merging is performed using the double thresholding or fuzzy engine merging techniques for the forecast and observation fields. The number of pages in the Wavelet-Stat plots depend on the number of masking tiles used and the dimension of those tiles. The first summary page is followed by plots for the wavelet decomposition of the forecast and observation fields. The generation of these PostScript output files can be disabled using command line options.
 
@@ -53,197 +53,198 @@ ___________________
 
 The following is a summary of the input and output formats for each of the tools currently in MET. The output listed is the maximum number of possible output files. Generally, the type of output files generated can be controlled by the configuration files and/or the command line options:
 
-1. **PB2NC Tool**  ??numbering section formatting spacing below is inconsistent.  It needs to be fixed.??
+#. **PB2NC Tool**
 
-   \* **Input**: One PrepBUFR point observation file and one configuration file.
+    \* **Input**: One PrepBUFR point observation file and one configuration file.
 
-   \* **Output**: One NetCDF file containing the observations that have been retained.
+    \* **Output**: One NetCDF file containing the observations that have been retained.
 
-2. **ASCII2NC Tool**
+#. **ASCII2NC Tool**
 
-   \* **Input**: One or more ASCII point observation file(s) that has (have) been formatted as expected, and optional configuration file. 
+    \* **Input**: One or more ASCII point observation file(s) that has (have) been formatted as expected, and optional configuration file.
 
-   \* **Output**: One NetCDF file containing the reformatted observations.
+    \* **Output**: One NetCDF file containing the reformatted observations.
 
-3. **MADIS2NC Tool**
+#. **MADIS2NC Tool**
 
-   \* **Input**: One MADIS point observation file.
+    \* **Input**: One MADIS point observation file.
 
-   \* **Output**: One NetCDF file containing the reformatted observations.
+    \* **Output**: One NetCDF file containing the reformatted observations.
 
-4. **LIDAR2NC Tool**
 
-   \* **Input**: One CALIPSO satellite HDF file
+#. **LIDAR2NC Tool**
 
-   \* **Output**: One NetCDF file containing the reformatted observations.
+    \* **Input**: One CALIPSO satellite HDF file
 
-5. **Point2Grid Tool**
+    \* **Output**: One NetCDF file containing the reformatted observations.
 
-   \* **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
+#. **Point2Grid Tool**
 
-   \* **Output**: One NetCDF file containing a gridded representation of the point observations.
+    \* **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
 
-6. **Pcp-Combine Tool**
+    \* **Output**: One NetCDF file containing a gridded representation of the point observations.
 
-   \* **Input**: Two or more gridded model or observation files (in GRIB format for “sum” command, or any gridded file for “add”, “subtract”, and “derive” commands) containing data (often accumulated precipitation) to be combined.
+#. **Pcp-Combine Tool**
 
-   \* **Output**: One NetCDF file containing output for the requested operation(s).
+    \* **Input**: Two or more gridded model or observation files (in GRIB format for “sum” command, or any gridded file for “add”, “subtract”, and “derive” commands) containing data (often accumulated precipitation) to be combined.
 
-7. **Regrid-Data-Plane Tool**
+    \* **Output**: One NetCDF file containing output for the requested operation(s).
 
-   \* **Input**: One gridded model or observation field and one gridded field to provide grid specification if desired.
+#. **Regrid-Data-Plane Tool**
 
-   \* **Output**: One NetCDF file containing the regridded data field(s).
+    \* **Input**: One gridded model or observation field and one gridded field to provide grid specification if desired.
 
-8. **Shift-Data-Plane Tool**
+    \* **Output**: One NetCDF file containing the regridded data field(s).
 
-   \* **Input**: One gridded model or observation field.
+#. **Shift-Data-Plane Tool**
 
-   \* **Output**: One NetCDF file containing the shifted data field.
+    \* **Input**: One gridded model or observation field.
 
-9. **MODIS-Regrid Tool**
+    \* **Output**: One NetCDF file containing the shifted data field.
 
-   \* **Input**: One gridded model or observation field and one gridded field to provide grid specification.
+#. **MODIS-Regrid Tool**
 
-   \* **Output**: One NetCDF file containing the regridded data field.
+    \* **Input**: One gridded model or observation field and one gridded field to provide grid specification.
 
-10. **Gen-VX-Mask Tool**
+    \* **Output**: One NetCDF file containing the regridded data field.
 
-   \* **Input**: One gridded model or observation file and one file defining the masking region (varies based on masking type).
+#. **Gen-VX-Mask Tool**
 
-   \* **Output**: One NetCDF file containing a bitmap for the resulting masking region.
+    \* **Input**: One gridded model or observation file and one file defining the masking region (varies based on masking type).
 
-11. **Point-Stat Tool**
+    \* **Output**: One NetCDF file containing a bitmap for the resulting masking region.
 
-   \* **Input**: One gridded model file, at least one point observation file in NetCDF format (as the output of the PB2NC, ASCII2NC, MADIS2NC, or LIDAR2NC tool), and one configuration file.
+#. **Point-Stat Tool**
 
-   \* **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
+    \* **Input**: One gridded model file, at least one point observation file in NetCDF format (as the output of the PB2NC, ASCII2NC, MADIS2NC, or LIDAR2NC tool), and one configuration file.
 
-12. **Grid-Stat Tool**
+    \* **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
 
-   \* **Input**: One gridded model file, one gridded observation file, and one configuration file.
+#. **Grid-Stat Tool**
 
-   \* **Output**: One STAT file containing all of the requested line types, several ASCII files for each line type requested, and one NetCDF file containing the matched pair data and difference field for each verification region and variable type/level being verified.
+    \* **Input**: One gridded model file, one gridded observation file, and one configuration file.
 
-13. **Ensemble Stat Tool**
+    \* **Output**: One STAT file containing all of the requested line types, several ASCII files for each line type requested, and one NetCDF file containing the matched pair data and difference field for each verification region and variable type/level being verified.
 
-   \* **Input**: An arbitrary number of gridded model files, one or more gridded and/or point observation files, and one configuration file. Point and gridded observations are both accepted.
+#. **Ensemble Stat Tool**
 
-   \* **Output**: One NetCDF file containing requested ensemble forecast information. If observations are provided, one STAT file containing all requested line types, several ASCII files for each line type requested, and one NetCDF file containing gridded observation ranks.
+    \* **Input**: An arbitrary number of gridded model files, one or more gridded and/or point observation files, and one configuration file. Point and gridded observations are both accepted.
 
-14. **Wavelet-Stat Tool**
+    \* **Output**: One NetCDF file containing requested ensemble forecast information. If observations are provided, one STAT file containing all requested line types, several ASCII files for each line type requested, and one NetCDF file containing gridded observation ranks.
 
-   \* **Input**: One gridded model file, one gridded observation file, and one configuration file.
+#. **Wavelet-Stat Tool**
 
-   \* **Output**: One STAT file containing the “ISC” line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
+    \* **Input**: One gridded model file, one gridded observation file, and one configuration file.
 
-15. **GSID2MPR Tool**
+    \* **Output**: One STAT file containing the “ISC” line type, one ASCII file containing intensity-scale information and statistics, one NetCDF file containing information about the wavelet decomposition of forecast and observed fields and their differences, and one PostScript file containing plots and summaries of the intensity-scale verification.
 
-   \* **Input**: One or more binary GSI diagnostic files (conventional or radiance) to be reformatted.
+#. **GSID2MPR Tool**
 
-   \* **Output**: One ASCII file in matched pair (MPR) format.
+    \* **Input**: One or more binary GSI diagnostic files (conventional or radiance) to be reformatted.
 
-16. **GSID2ORANK Tool**
+    \* **Output**: One ASCII file in matched pair (MPR) format.
 
-   \* **Input**: One or more binary GSI diagnostic files (conventional or radiance) to be reformatted.
+#. **GSID2ORANK Tool**
 
-   \* **Output**: One ASCII file in observation rank (ORANK) format.
+    \* **Input**: One or more binary GSI diagnostic files (conventional or radiance) to be reformatted.
 
-17. **Stat-Analysis Tool**
+    \* **Output**: One ASCII file in observation rank (ORANK) format.
 
-   \* **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
+#. **Stat-Analysis Tool**
 
-   \* **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the “-out” option or redirected to a STAT output file using the “-out_stat” option.
+    \* **Input**: One or more STAT files output from the Point-Stat, Grid-Stat, Ensemble Stat, Wavelet-Stat, or TC-Gen tools and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the STAT data.
 
-18. **Series-Analysis Tool**
+    \* **Output**: ASCII output of the analysis jobs is printed to the screen unless redirected to a file using the “-out” option or redirected to a STAT output file using the “-out_stat” option.
 
-   \* **Input**: An arbitrary number of gridded model files and gridded observation files and one configuration file.
+#. **Series-Analysis Tool**
 
-   \* **Output**: One NetCDF file containing requested output statistics on the same grid as the input files.
+    \* **Input**: An arbitrary number of gridded model files and gridded observation files and one configuration file.
 
-19. **Grid-Diag Tool**
+    \* **Output**: One NetCDF file containing requested output statistics on the same grid as the input files.
 
-   \* **Input**: An arbitrary number of gridded data files and one configuration file.
+#. **Grid-Diag Tool**
 
-   \* **Output**: One NetCDF file containing individual and joint histograms of the requested data.
+    \* **Input**: An arbitrary number of gridded data files and one configuration file.
 
-20. **MODE Tool**
+    \* **Output**: One NetCDF file containing individual and joint histograms of the requested data.
 
-   \* **Input**: One gridded model file, one gridded observation file, and one or two configuration files.
+#. **MODE Tool**
 
-   \* **Output**: One ASCII file containing contingency table counts and statistics, one ASCII file containing single and pair object attribute values, one NetCDF file containing object indices for the gridded simple and cluster object fields, and one PostScript plot containing a summary of the features-based verification performed.
+    \* **Input**: One gridded model file, one gridded observation file, and one or two configuration files.
 
-21. **MODE-Analysis Tool**
+    \* **Output**: One ASCII file containing contingency table counts and statistics, one ASCII file containing single and pair object attribute values, one NetCDF file containing object indices for the gridded simple and cluster object fields, and one PostScript plot containing a summary of the features-based verification performed.
 
-   \* **Input**: One or more MODE object statistics files from the MODE tool and, optionally, one configuration file containing specification for the analysis job(s) to be run on the object data.
+#. **MODE-Analysis Tool**
 
-   \* **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    \* **Input**: One or more MODE object statistics files from the MODE tool and, optionally, one configuration file containing specification for the analysis job(s) to be run on the object data.
 
-22. **MODE-TD Tool**
+    \* **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
 
-   \* **Input**: Two or more gridded model files, two or more gridded observation files, and one configuration file.
+#. **MODE-TD Tool**
 
-   \* **Output**: One ASCII file containing 2D object attributes, four ASCII files containing 3D object attributes, and one NetCDF file containing object indices for the gridded simple and cluster object fields.
+    \* **Input**: Two or more gridded model files, two or more gridded observation files, and one configuration file.
 
-23. **TC-Dland Tool**
+    \* **Output**: One ASCII file containing 2D object attributes, four ASCII files containing 3D object attributes, and one NetCDF file containing object indices for the gridded simple and cluster object fields.
 
-   \* **Input**: One or more files containing the longitude (Degrees East) and latitude (Degrees North) of all the coastlines and islands considered to be a significant landmass.
+#. **TC-Dland Tool**
 
-   \* **Output**: One NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file.
+    \* **Input**: One or more files containing the longitude (Degrees East) and latitude (Degrees North) of all the coastlines and islands considered to be a significant landmass.
 
-24. **TC-Pairs Tool**
+    \* **Output**: One NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file.
 
-   \* **Input**: At least one A-deck and one B-deck ATCF format file containing output from a tropical cyclone tracker and one configuration file. The A-deck files contain forecast tracks while the B-deck files are typically the NHC Best Track Analysis but could also be any ATCF format reference.
+#. **TC-Pairs Tool**
 
-   \* **Output**: ASCII output with the suffix .tcstat.
+    \* **Input**: At least one A-deck and one B-deck ATCF format file containing output from a tropical cyclone tracker and one configuration file. The A-deck files contain forecast tracks while the B-deck files are typically the NHC Best Track Analysis but could also be any ATCF format reference.
 
-25. **TC-Stat Tool**
+    \* **Output**: ASCII output with the suffix .tcstat.
 
-   \* **Input**: One or more TCSTAT output files output from the TC-Pairs tool and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the TCSTAT data.
+#. **TC-Stat Tool**
 
-   \* **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
+    \* **Input**: One or more TCSTAT output files output from the TC-Pairs tool and, optionally, one configuration file containing specifications for the analysis job(s) to be run on the TCSTAT data.
 
-26. **TC-Gen Tool**
+    \* **Output**: ASCII output of the analysis jobs will be printed to the screen unless redirected to a file using the “-out” option.
 
-   \* **Input**: One or more Tropical Cyclone genesis format files, one or more verifying operational and BEST track files in ATCF format, and one configuration file.
+#. **TC-Gen Tool**
 
-   \* **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
+    \* **Input**: One or more Tropical Cyclone genesis format files, one or more verifying operational and BEST track files in ATCF format, and one configuration file.
 
-27. **TC-RMW Tool**
+    \* **Output**: One STAT file containing all of the requested line types and several ASCII files for each line type requested.
 
-   \* **Input**: One or more gridded data files, one ATCF track file defining the storm location, and one configuration file.
+#. **TC-RMW Tool**
 
-   \* **Output**: One gridded NetCDF file containing the requested model fields transformed into cylindrical coordinates.
+    \* **Input**: One or more gridded data files, one ATCF track file defining the storm location, and one configuration file.
 
-28. **RMW-Analysis Tool**
+    \* **Output**: One gridded NetCDF file containing the requested model fields transformed into cylindrical coordinates.
 
-   \* **Input**: One or more NetCDF output files from the TC-RMW tool and one configuration file.
+#. **RMW-Analysis Tool**
 
-   \* **Output**: One NetCDF file for results aggregated across the filtered set of input files.
+    \* **Input**: One or more NetCDF output files from the TC-RMW tool and one configuration file.
 
-29. **Plot-Point-Obs Tool**
+    \* **Output**: One NetCDF file for results aggregated across the filtered set of input files.
 
-   \* **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
+#. **Plot-Point-Obs Tool**
 
-   \* **Output**: One postscript file containing a plot of the requested field.
+    \* **Input**: One NetCDF file containing point observation from the ASCII2NC, PB2NC, MADIS2NC, or LIDAR2NC tool.
 
-30. **Plot-Data-Plane Tool**
+    \* **Output**: One postscript file containing a plot of the requested field.
 
-   \* **Input**: One gridded data file to be plotted.
+#. **Plot-Data-Plane Tool**
 
-   \* **Output**: One postscript file containing a plot of the requested field.
+    \* **Input**: One gridded data file to be plotted.
 
-31. **Plot-MODE-Field Tool**
+    \* **Output**: One postscript file containing a plot of the requested field.
 
-   \* **Input**: One or more MODE output files to be used for plotting and one configuration file.
+#. **Plot-MODE-Field Tool**
 
-   \* **Output**: One PNG file with the requested MODE objects plotted. Options for objects include raw, simple or cluster and forecast or observed objects.
+    \* **Input**: One or more MODE output files to be used for plotting and one configuration file.
 
-32. **GIS-Util Tools**
+    \* **Output**: One PNG file with the requested MODE objects plotted. Options for objects include raw, simple or cluster and forecast or observed objects.
 
-   \* **Input**: ESRI shape files ending in .dbf, .shp, or .shx.
+#. **GIS-Util Tools**
 
-   \* **Output**: ASCII description of their contents printed to the screen.
+    \* **Input**: ESRI shape files ending in .dbf, .shp, or .shx.
+
+    \* **Output**: ASCII description of their contents printed to the screen.
 
 .. _Configuration File Details:
   
