@@ -133,7 +133,7 @@ Building the MET package consists of three main steps: (1) install the required 
 
 Install the required libraries.
 
-• Please refer to Sections :ref:`Installation-of-required` and :ref:`Installation-of-optional` on how to install the required and optional libraries.
+• Please refer to :numref:`Installation-of-required` and :ref:`Installation-of-optional` on how to install the required and optional libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to included the path to the library files.
 
