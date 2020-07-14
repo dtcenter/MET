@@ -281,7 +281,7 @@ Version 9.1 BETA2 Release Notes:
      #1347, #1339, #1338, #1333).
    - Fix parsing of CF-compliant time stamps from CDO (#1331).
    - Update attributes in the Grid-Stat NetCDF matched pairs file (#1324).
-   - Updates to the MET User's Guide (#1324).
+   - Updates to the MET User's Guide (#1321).
    - Add track filtering to the TC-RMW tool (#1315).
    - Update Python embedding scripts (#1265).
    - Add various set_attr configuration options (#1020).
