@@ -252,7 +252,7 @@ For more information on confidence intervals pertaining to verification measures
 Practical information
 _____________________
 
-The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter :ref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
+The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
 point_stat usage
 ~~~~~~~~~~~~~~~~

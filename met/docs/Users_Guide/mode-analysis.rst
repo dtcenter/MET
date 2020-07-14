@@ -326,7 +326,7 @@ _____________________
 Floating-point max/min options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to Chapter :ref:`MODE-output` for a description of these attributes as needed.
+Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to :numref:`MODE-output` for a description of these attributes as needed.
 
 
 ____________________
