@@ -367,7 +367,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 21. **DMAP** for Distance Map Statistics
 
 
-Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in Section :ref:`grid_stat-output`.
+Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in :numref:`grid_stat-output`.
 
 _____________________
 
@@ -425,7 +425,7 @@ The output ASCII files are named similarly:
 
 grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc, eclv, nbrctc, nbrcts, nbrcnt, dmap, or grad to indicate the line type it contains.
 
-The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in Section :ref:`7.3.3 point_stat output<point_stat-output>` for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
+The format of the STAT and ASCII output of the Grid-Stat tool are the same as the format of the STAT and ASCII output of the Point-Stat tool with the exception of the five additional line types. Please refer to the tables in :numref:`point_stat-output` for a description of the common output STAT and optional ASCII file line types. The formats of the five additional line types for grid_stat are explained in the following tables.
 
 .. _table_GS_header_info_gs_outputs:
 
@@ -510,7 +510,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Error percent value used in confidence intervals
   * - 24
     - LINE_TYPE
-    - Various line type options, refer to Section :ref:`7.3.3 point_stat output<point_stat-output>` and the tables below.
+    - Various line type options, refer to :numref:`point_stat-output` and the tables below.
 
 .. _table_GS_format_info_NBRCTC:
 

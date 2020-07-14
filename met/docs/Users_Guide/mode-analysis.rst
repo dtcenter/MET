@@ -52,7 +52,7 @@ Required arguments for mode_analysis:
 
 2. The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase. Exactly one of these job types must be specified. 
 
-Specifying **-summary** will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the **-column** option. Column names are not case sensitive. The column names are the same as described in Section :ref:`MODE-output`. More information about this option is provided in subsequent sections.
+Specifying **-summary** will produce summary statistics for the MODE output column specified. For this job type, a column name (or column number) must be specified using the **-column** option. Column names are not case sensitive. The column names are the same as described in :numref:`MODE-output`. More information about this option is provided in subsequent sections.
 
 Specifying **-bycase** will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
 
@@ -72,7 +72,7 @@ ____________________
 
   -config filename
 
-This option gives the name of a configuration file to be read. The contents of the configuration file are described in Section :ref:`mode_analysis-configuration-file`.
+This option gives the name of a configuration file to be read. The contents of the configuration file are described in :numref:`mode_analysis-configuration-file`.
 
 ____________________
 

@@ -104,7 +104,7 @@ Another merging method is available in MODE, which can be used instead of, or al
 Summary statistics
 ~~~~~~~~~~~~~~~~~~
 
-Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to Section :ref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
+Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to :numref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
 
 Practical information
 _____________________
@@ -389,7 +389,7 @@ _____________________
      inten_perc_ratio   = ratio_if;
   }
 
-The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See Section :ref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
+The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See :numref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
 
 
 _____________________
