@@ -6,7 +6,7 @@ TC-Pairs Tool
 Introduction
 ____________
 
-The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :ref:`TC-Pairs_Practical-information`. 
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`. 
 
 .. _TC-Pairs_Practical-information:
 
@@ -106,7 +106,7 @@ ____________________
   match_points = TRUE;
   version      = "VN.N";
 
-The configuration options listed above are common to multiple MET tools and are described in :ref:`Data IO MET-TC Configuration File Options`.
+The configuration options listed above are common to multiple MET tools and are described in :numref:`Data IO MET-TC Configuration File Options`.
 
 ____________________
 
@@ -263,7 +263,7 @@ parameter will result in missed matches.
 tc_pairs output
 ~~~~~~~~~~~~~~~
 
-TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :ref:`TCST Header`.
+TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :numref:`TCST Header`.
 
 .. _TCST Header:
 

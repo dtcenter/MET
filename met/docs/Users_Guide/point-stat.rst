@@ -13,7 +13,7 @@ Scientific and statistical aspects of the Point-Stat tool are discussed in the f
 Scientific and statistical aspects
 __________________________________
 
-The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, :numref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in :numref:`PS_Statistical-measures` and in more detail in :ref:`appendixC`. :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in :ref:`App_D-Confidence-Intervals`.
+The statistical methods and measures computed by the Point-Stat tool are described briefly in this section. In addition, :numref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Point-Stat tool are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`appendixC`. :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Point-Stat tool; more detail on confidence intervals is provided in :numref:`App_D-Confidence-Intervals`.
 
 .. _matching-methods:
 
@@ -140,28 +140,28 @@ Often, the neighborhood size is chosen so that multiple models to be compared ha
 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~
 
-The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :ref:`appendixC`. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2003), and on the world-wide web at
+The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`appendixC`. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2003), and on the world-wide web at
 
 http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html.
 
-In addition to these verification measures, the Point-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :ref:`appendixC`.
+In addition to these verification measures, the Point-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :numref:`appendixC`.
 
 Measures for categorical variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. If the original forecast is continuous, the user may specify one or more threhsolds in the configuration file to divide the continuous measure into categories. Currently, Point-Stat computes categorical statistics for variables in two or more categories. The special case of dichotomous (i.e., 2-category) variables has several types of statistics calculated from the resulting contingency table and are available in the CTS output line type. For multi-category variables, fewer statistics can be calculated so these are available separately, in line type MCTS. Categorical variables can be intrinsic (e.g., rain/no-rain) or they may be formed by applying one or more thresholds to a continuous variable (e.g., temperature < 273.15 K or cloud coverage percentages in 10% bins). See :ref:`appendixC` for more information.
+Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. If the original forecast is continuous, the user may specify one or more threhsolds in the configuration file to divide the continuous measure into categories. Currently, Point-Stat computes categorical statistics for variables in two or more categories. The special case of dichotomous (i.e., 2-category) variables has several types of statistics calculated from the resulting contingency table and are available in the CTS output line type. For multi-category variables, fewer statistics can be calculated so these are available separately, in line type MCTS. Categorical variables can be intrinsic (e.g., rain/no-rain) or they may be formed by applying one or more thresholds to a continuous variable (e.g., temperature < 273.15 K or cloud coverage percentages in 10% bins). See :numref:`appendixC` for more information.
 
 Measures for continuous variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :ref:`appendixC` for specific information.
+For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`appendixC` for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See :ref:`appendixC` for specific information.
+For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See :numref:`appendixC` for specific information.
 
 Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1. To make configuration easier, in METv6.0, these probabilities may be specified in the configuration file as a list (>=0.00,>=0.25,>=0.50,>=0.75,>=1.00) or using shorthand notation (==0.25) for bins of equal width.
 
@@ -313,7 +313,7 @@ point_stat configuration file
 
 The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed **share/met/config** directory. Another version is located in **scripts/config**. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
 
 ________________________
 
@@ -347,11 +347,11 @@ ________________________
   output_prefix  = "";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
 
 _________________________
 
-Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :ref:`Data IO MET Configuration File Options`. The following are some special consideration for the Point-Stat tool.
+Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`Data IO MET Configuration File Options`. The following are some special consideration for the Point-Stat tool.
 
 The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
 
@@ -399,7 +399,7 @@ ____________________________
      prob_cat_thresh = [];
   }
 
-The **hira** dictionary that is very similar to the **interp** and **nbrhd** entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :ref:`PS_HiRA_framework`. The **flag** entry is a boolean which toggles HiRA on (**TRUE**) and off (**FALSE**). The **width** and **shape** entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The **vld_thresh** entry is the required ratio of valid data within the neighborhood to compute an output value. The **cov_thresh** entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The **prob_cat_thresh** entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead of **prob_cat_thresh**.
+The **hira** dictionary that is very similar to the **interp** and **nbrhd** entries. It specifies information for applying the High Resolution Assessment (HiRA) verification logic described in section :numref:`PS_HiRA_framework`. The **flag** entry is a boolean which toggles HiRA on (**TRUE**) and off (**FALSE**). The **width** and **shape** entries define the neighborhood size and shape, respectively. Since HiRA applies to point observations, the width may be even or odd. The **vld_thresh** entry is the required ratio of valid data within the neighborhood to compute an output value. The **cov_thresh** entry is an array of probabilistic thresholds used to populate the Nx2 probabilistic contingency table written to the PCT output line and used for computing probabilistic statistics. The **prob_cat_thresh** entry defines the thresholds to be used in computing the ranked probability score in the RPS output line type. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead of **prob_cat_thresh**.
 
 ________________________
 
@@ -1407,4 +1407,4 @@ The first set of header columns are common to all of the output files generated 
     - CLIMO_CDF
     - Climatological cumulative distribution function value
 
-The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :ref:`stat-analysis`.
+The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.

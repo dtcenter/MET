@@ -133,7 +133,7 @@ Building the MET package consists of three main steps: (1) install the required 
 
 Install the required libraries.
 
-• Please refer to :numref:`Installation-of-required` and :ref:`Installation-of-optional` on how to install the required and optional libraries.
+• Please refer to :numref:`Installation-of-required` and :numref:`Installation-of-optional` on how to install the required and optional libraries.
 
 • If installing the required and optional libraries in a non-standard location, the user may need to tell MET where to find them. This can be done by setting or adding to the LD_LIBRARY PATH to included the path to the library files.
 
@@ -164,7 +164,7 @@ MET_PYTHON_CC='-I/usr/include/python3.6'
 
 MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
 
-For more information about Python support in MET, please refer to :ref:`appendixF`.
+For more information about Python support in MET, please refer to :numref:`appendixF`.
 
    \- If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the main HDF4 directory, or set $MET_HDFINC to point to the directory with the HDF4 include files and set $MET_HDFLIB to point to the directory with the HDF4 library files. Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEOSINC to point to the directory with the HDF EOS include files and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library files.
 

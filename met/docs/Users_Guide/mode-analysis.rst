@@ -589,7 +589,7 @@ This option prints the usage message.
 mode_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in :ref:`mode_analysis-usage`.
+To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in :numref:`mode_analysis-usage`.
 
 The parameters that are set in the configuration file either add to or override parameters that are set on the command line. For the “set string” and “set integer type” options enclosed in brackets, the values specified in the configuration file are added to any values set on the command line. For the “toggle” and “min/max type” options, the values specified in the configuration file override those set on the command line.
 
