@@ -151,7 +151,7 @@ ______________________
 
   desc = "NA";
 
-The **desc** configuration option is common to many MET tools and is described in :ref:`Data IO MET Configuration File Options`.
+The **desc** configuration option is common to many MET tools and is described in :numref:`Data IO MET Configuration File Options`.
 
 ______________________
 
@@ -246,11 +246,11 @@ ______________________
   dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
   version    = "V9.0";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. Note that TC-Gen writes output for 2x2 contingency tables to the **FHO, CTC**, and **CTS** line types.
 
 tc_gen output
 ~~~~~~~~~~~~~
 
-TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, “./tc_gen” writes output files in the current working directory named “tc_gen.stat” and, optionally, “tc_gen_fho.txt”, “tc_gen_ctc.txt”, and “tc_gen_cts.txt”. The contents of these output files are described in section :ref:`point_stat-output`.
+TC-Gen produces output in STAT and, optionally, ASCII format. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are created based on the **-out** command line argument. The default output base name, “./tc_gen” writes output files in the current working directory named “tc_gen.stat” and, optionally, “tc_gen_fho.txt”, “tc_gen_ctc.txt”, and “tc_gen_cts.txt”. The contents of these output files are described in section :numref:`point_stat-output`.
 
-Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in chapter :ref:`stat-analysis`.
+Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in chapter :numref:`stat-analysis`.
