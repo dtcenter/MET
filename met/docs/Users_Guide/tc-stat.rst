@@ -6,7 +6,7 @@ TC-Stat Tool
 Introduction
 ____________
 
-The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See Section :ref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in Section :ref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirwjob** process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in Section :ref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in Section :ref:`Practical-information-1`.
+The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirwjob** process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
 
 .. _Statistical-aspects:
 
@@ -18,14 +18,14 @@ Filter TCST lines
 
 The TC-Stat tool can be used to simply filter specific lines of the TCST file based on user-defined filtering criteria. All of the TCST lines that are retained from one or more files are written out to a single output file. The output file is also in TCST format.
 
-Filtering options are outlined below in Section :ref:`tc_stat-configuration-file` (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
+Filtering options are outlined below in :numref:`tc_stat-configuration-file` (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
 
 Summary statistics for columns
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The TC-Stat tool can be used to produce summary information for a single column of data. After the user specifies the specific column of interest, and any other relevant search criteria, summary information is produced from values in that column of data. The summary statistics produced are listed in :numref:`table_columnar_output_summary_tc_stat`.
 
-Confidence intervals are computed for the mean of the column of data. Confidence intervals are computed using the assumption of normality for the mean. For further information on computing confidence intervals, refer to Appendix :ref:`D Confidence Intervals<App_D-Confidence-Intervals>` of the MET user's guide.
+Confidence intervals are computed for the mean of the column of data. Confidence intervals are computed using the assumption of normality for the mean. For further information on computing confidence intervals, refer to :numref:`App_D-Confidence-Intervals` of the MET user's guide.
 
 When operating on columns, a specific column name can be listed (e.g. TK_ERR), as well as the differences of two columns (e.g. AMAX_WIND-BMAX_WIND), and the absolute difference of the column(s) (e.g. abs(AMAX_WIND-BMAX_WIND)). Additionally, several shortcuts can be applied to choose multiple columns with a single entry. Shortcut options for the -column entry are as follows:
 
@@ -88,14 +88,14 @@ The usage statement for tc_stat is shown below:
 
 TC-Stat has one required argument and accepts optional ones. 
 
-The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :numref:`table_columnar_output_summary_tc_stat` and the filtering options are described in :ref:`tc_stat-configuration-file`.
+The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :numref:`table_columnar_output_summary_tc_stat` and the filtering options are described in :numref:`tc_stat-configuration-file`.
 
 Required arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-lookin source** argument indicates the location of the input TCST files generated from **tc_pairs**. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
 
-2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in Section :ref:`tc_stat-configuration-file`.
+2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in :numref:`tc_stat-configuration-file`.
 
 Optional arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,7 +114,7 @@ An example of the **tc_stat** calling sequence is shown below:
 
   tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name, etc..**.) option within the job command lines may further refine these selections. See Section :ref:`tc_stat-configuration-file` for options available for job command line and :ref:`Data IO MET-TC Configuration File Options` for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name, etc..**.) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
 
 .. _tc_stat-configuration-file:
 
@@ -146,7 +146,7 @@ _________________________
   match_points = TRUE;
   version      = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in Section :ref:`Data IO MET-TC Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET-TC Configuration File Options`.
 
 Note that the options specified in the first section of the configuration file, prior to the job list, will be applied to every job specified in the joblist. However, if an individual job specifies an option listed above, it will be applied to that job. For example, if model = [ **"GFSI", "LGEM", "DSHP"** ]; is set at the top, but the job in the joblist sets the -model option to "**LGEM**", that job will only run using the LGEM model data.
 
@@ -353,7 +353,7 @@ The output generated from the TC-Stat tool contains statistics produced by the a
 
 **Job: Filter**
 
-This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the **-dump_row** option. The TCST output from this job follows the TCST output description in Chapters :ref:`tc-dland` and :ref:`tc-pairs`.
+This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the **-dump_row** option. The TCST output from this job follows the TCST output description in :numref:`tc-dland` and :numref:`tc-pairs`.
 
 **Job: Summary**
 

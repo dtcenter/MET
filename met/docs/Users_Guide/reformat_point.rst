@@ -190,7 +190,7 @@ _________________
 The **beg** and **end** variables are used to stratify the model level of observations to be retained. The range shown above is 1 to 255.
 
 
-The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :numref:`<table_reform-point_pb2nc_level_category`. See the following for more details:
+The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :numref:`table_reform-point_pb2nc_level_category`. See the following for more details:
 
 
 http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm

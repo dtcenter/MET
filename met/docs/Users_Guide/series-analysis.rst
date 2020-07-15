@@ -11,7 +11,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal g
 Practical Information
 _____________________
 
-This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in the Chapter :ref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
+This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in the :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
 
 This tool computes statistics for exactly one series each time it is run. Multiple series may be processed by running the tool multiple times. The length of the series to be processed is determined by the first of the following that is greater than one: the number of forecast fields in the configuration file, the number of observation fields in the configuration file, the number of input forecast files, the number of input observation files. Several examples of defining series are described below.
 
@@ -92,7 +92,7 @@ series_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The default configuration file for the Series-Analysis tool named SeriesAnalysisConfig_default can be found in the installed share/met/config directory. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :ref:`PB2NC Configuration File <pb2nc configuration file>` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 
 ____________________
 
@@ -114,7 +114,7 @@ ____________________
   tmp_dir        = "/tmp";
   version        = "VN.N";
 
-The configuration options listed above are common to many MET tools and are described in :ref:`Data I/O MET Configuration File Options<Data IO MET Configuration File Options>`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
 
 ____________________
 
