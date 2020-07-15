@@ -542,15 +542,18 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    int idx_x, idx_y;
    double value;
+   int count_bad;
    int max_r = gaussian.max_r;
    int g_nx = max_r * 2 + 1;
    int nx = dp.nx();
    int ny = dp.ny();
    DataPlane d_dp;
    DataPlane g_dp;
+   double data_min, data_max, data_min_i, data_max_i;
+   static const char *method_name = "interp_gaussian_dp() -> ";
    
    if (max_r <= 0 || gaussian.weights == (double *)0) {
-      mlog << Error << "\ninterp_gaussian_dp() -> "
+      mlog << Error << "\n" << method_name
            << "the gaussian weights were not computed (max_r: " << max_r << ").\n\n";
       exit(1);
    }
@@ -569,19 +572,45 @@ void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
          d_dp.set(dp.get(idx_x, idx_y), idx_x, idx_y);
       } // end for y
    } // end for x
+   
+   count_bad = 0;
    for(idx_x=0; idx_x<nx; idx_x++) {
       for(idx_y=0; idx_y<ny; idx_y++) {
          value = interp_gaussian(d_dp, g_dp, (double)idx_x,
                                  (double)idx_y, max_r, t);
          dp.set(value, idx_x, idx_y);
+         if (is_eq(value, bad_data_double)) count_bad++;
       } // end for y
    } // end for x
 
-   mlog << Debug(5) << "interp_gaussian_dp() "
-        << "weight_sum: " << gaussian.weight_sum
-        << " weight_cnt: " << gaussian.weight_cnt
-        << " nx: " << nx << ", ny: " << ny << " max_r: " << max_r
-        << "\n";
+   dp.data_range(data_min, data_max);
+   d_dp.data_range(data_min_i, data_max_i);
+   if (is_eq(data_max, bad_data_double)) {
+      if (is_eq(data_max_i, bad_data_double))
+         mlog << Warning << "\n" << method_name
+              << "No valid data because of no valid data from the input" << "\n\n";
+      else
+         mlog << Warning << "\n" << method_name
+              << "No valid data after Gaussian smoothing\n"
+              << "\tinput: between " << data_min_i << " and " << data_max_i
+              << (is_eq(data_max_i, data_min_i)
+                  ? " " : ". Try to adjust -vld_thresh")
+              << "\n\n";
+   }
+   else if (is_eq(data_max, data_min)) {
+      mlog << Warning << "\n" << method_name << "Only one value for all (" << data_max
+           << "), input: between " << data_min_i << " and " << data_max_i << "\n\n";
+   }
+   else {
+      mlog << Debug(5) << method_name
+           << "weight_sum: " << gaussian.weight_sum
+           << " weight_cnt: " << gaussian.weight_cnt
+           << " nx: " << nx << ", ny: " << ny << " max_r: " << max_r
+           << "\n";
+      mlog << Debug(7) << method_name
+           << "data range after Gaussian: between " << data_min << " and " << data_max
+           << ", input: between " << data_min_i << " and " << data_max_i << "\n";
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -589,7 +618,7 @@ void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
 double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
                        double obs_x, double obs_y, int max_r, double t) {
    int count, count_vld;
-   double value, gaussian_value, gaussian_weight, weight_sum;
+   double value, gaussian_value, gaussian_weight;
 
    int x = nint(obs_x);
    int y = nint(obs_y);
@@ -598,7 +627,7 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
    int g_nx = g_dp.nx();
 
    count = count_vld = 0;
-   gaussian_value = weight_sum = 0.0;
+   gaussian_value = 0.0;
    for(int x_idx=0; x_idx<g_nx; x_idx++) {
       int ix = x - max_r + x_idx;
       if (0 > ix || ix >= nx) continue;
@@ -612,19 +641,20 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
          count++;
          if(is_bad_data(value)) continue;
          gaussian_value += value * gaussian_weight;
-         weight_sum += gaussian_weight;
+         //weight_sum += gaussian_weight;
          count_vld++;
       }
    }
 
    // Check whether enough valid grid points were found
-   if(0 == count || (double)count_vld/count < t || count_vld == 0) {
+   if(count_vld == 0 || 0 == count || (double)count_vld/count < t) {
       gaussian_value = bad_data_double;
+      mlog << Debug(10) << "interp_gaussian() "
+           << "count: " << count << ", count_vld: " << count_vld
+           << (0 == count ? (double)count : (double)count_vld/count)
+           << " < " << t << "\n";
    }
-   else {
-      gaussian_value /= weight_sum;
-   }
-
+   
    return(gaussian_value);
 }
 
