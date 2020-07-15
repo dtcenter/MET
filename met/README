@@ -1,10 +1,10 @@
-Model Evaluation Tools version 9.1 BETA1 (April 29, 2020)
+Model Evaluation Tools version 9.1 BETA2 (July 14, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
 ================================================================================
 
-Copyright 2020, UCAR/NCAR, NOAA, and CSU/CIRA 
+Copyright 2020, UCAR/NCAR, NOAA, and CSU/CIRA
 Licensed under the Apache License, Version 2.0 (the "License");
    You may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -252,6 +252,41 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
 
+Version 9.1 BETA2 Release Notes:
+--------------------------------
+
+- Bugfixes:
+   - All changes included in the met-9.0.2 and met-9.0.3 bugfix releases:
+     https://github.com/NCAR/MET/milestone/65?closed=1
+     https://github.com/NCAR/MET/milestone/66?closed=1
+
+- Enhancements to Existing Tools:
+   - Update HiRA configuration options in Point-Stat for computing RPS (#1400).
+   - Add new anomaly correlation without the mean error (ANOM_CORR_RAW) to the
+     CNT line type (#1399).
+   - Fix Ensemble-Stat runtime error when obs_thresh results in 0 pairs being
+     retained (#1397).
+   - Enhance point2grid to process multiple fields (#1396).
+   - Add new basin_map configuration option for TC-Pairs (#1390).
+   - Fix valgrind warnings (#1387).
+   - Fix uninitialized ConcatString variable (#1386).
+   - Add Series-Analysis verbosity level warning (#1382).
+   - Add TC-Gen warning for duplicate genesis events (#1380).
+   - Fix the compilation of the make_mapfiles development utility (#1364).
+   - Address Fortify findings from met-9.0.2 (#1359).
+   - Make the ConcatString class more efficient (#1358).
+   - Make the StringArray class more efficient (#1357).
+   - Address Fortify findings for point2grid (#1352).
+   - Enhance various log message, error messages, and usage statements (#1350,
+     #1347, #1339, #1338, #1333).
+   - Fix parsing of CF-compliant time stamps from CDO (#1331).
+   - Update attributes in the Grid-Stat NetCDF matched pairs file (#1324).
+   - Updates to the MET User's Guide (#1321).
+   - Add track filtering to the TC-RMW tool (#1315).
+   - Update Python embedding scripts (#1265).
+   - Add various set_attr configuration options (#1020).
+   - Run valgrind to search for memory issues (#816).
+
 Version 9.1 BETA1 Release Notes:
 --------------------------------
 
@@ -322,7 +357,7 @@ Version 9.0 Release Notes:
       - Add the "sid_inc" option to specify which stations should be included in
         the verification (#1235).
       - Add the "prob_cat_thresh" entry to the "hira" dictionary (#1262).
-      - Add the "rps" entry to the "output_flag" dictionary (#681).        
+      - Add the "rps" entry to the "output_flag" dictionary (#681).
    - Series-Analysis
       - Add the "climo_stdev" dictionary to support CDP thresholds (#1138).
    - MTD
@@ -378,7 +413,7 @@ Version 9.0 Release Notes:
       - Add "GRIB1_tri" configuration file option to filter GRIB1 records based
         on the time range indicator value (#1263).
       - Bugfix for reporting the units for GRIB2 probabilities as "%" (#1212).
-   - Common Libraries      
+   - Common Libraries
       - Print a warning message when a user specifies a config file entry as
         the wrong type (#1225).
       - Fix bug in the parsing of file lists and make this logic consistent
