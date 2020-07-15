@@ -142,6 +142,7 @@ On the command line for any of the MET tools, specify the path to the input grid
 Python Embedding for Point Observations
 _______________________________________
 
+
 The ASCII2NC tool supports the “-format python” option. With this option, point observations may be passed as input. An example of this is provided in :numref:`ascii2nc-pyembed`. That example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
 
 The **read_ascii_point.py** sample script can be found in:
