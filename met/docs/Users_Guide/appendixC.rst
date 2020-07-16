@@ -3,6 +3,7 @@
 Appendix C Verification Measures
 ================================
 
+This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 
 Which statistics are the same, but with different names?
@@ -47,7 +48,6 @@ ________________________________________________________
   * - Ignorance Score
     - Logarithmic Scoring Rule
 
-This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 .. _categorical variables:
 
@@ -55,9 +55,11 @@ MET verification measures for categorical (dichotomous) variables
 _________________________________________________________________
 
 
-The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in Table 29.2. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table 29.2 are counts of the number of occurrences of the four possible combinations of forecasts and observations. \setcounter{table}{0} \renewcommand{\thetable}{C.\arabic{table}} 
+The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_2X2`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_2X2` are counts of the number of occurrences of the four possible combinations of forecasts and observations. 
 
-.. list-table:: 2x2 contingency table in terms of counts. The nij values in the table represent the counts in each forecast-observation category, where i represents the forecast and j represents the observations. The "." symbols in the total cells represent sums across categories.
+.. _table_2X2:
+
+.. list-table:: 2x2 contingency table in terms of counts. The :math:`\mathbf{n}_\mathbf{ij}` values in the table represent the counts in each forecast-observation category, where :math:`\mathbf{i}` represents the forecast and :math:`\mathbf{j}` represents the observations. The "." symbols in the total cells represent sums across categories.
   :widths: auto
   :header-rows: 2
 
@@ -87,7 +89,7 @@ The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and} n_{00},` are sometimes cal
 
 By dividing the counts in the cells by the overall total, T, the joint proportions, :math:`\mathbf{p}_{11}, \mathbf{p}_{10}, \mathbf{p}_{01}, \text{and } \mathbf{p}_{00}` can be computed. Note that :math:`\mathbf{p}_{11} + \mathbf{p}_{10} + \mathbf{p}_{01} + \mathbf{p}_{00} = 1.` Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
 
-The values in Table 29.2 can also be used to compute the F, O, and H relative frequencies that are produced by the NCEP Verification System, and the Point-Stat tool provides an option to produce the statistics in this form. In terms of the other statistics computed by the Point-Stat tool, F is equivalent to the Mean Forecast; H is equivalent to POD; and O is equivalent to the Base Rate. All of these statistics are defined in the subsections below. The Point-Stat tool also provides the total number of observations, **T**.
+The values in :numref:`table_2X2` can also be used to compute the F, O, and H relative frequencies that are produced by the NCEP Verification System, and the Point-Stat tool provides an option to produce the statistics in this form. In terms of the other statistics computed by the Point-Stat tool, F is equivalent to the Mean Forecast; H is equivalent to POD; and O is equivalent to the Base Rate. All of these statistics are defined in the subsections below. The Point-Stat tool also provides the total number of observations, **T**.
 
 The categorical verification measures produced by the Point-Stat and Grid-Stat tools are described in the following subsections. They are presented in the order shown in :numref:`table_PS_format_info_FHO` through :numref:`table_PS_format_info_CTS_cont`.
 
@@ -680,7 +682,9 @@ _____________________________________________________
 
 The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
 
-The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in Table 29.3. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in Table 29.3 are counts of the number of occurrences of all possible combinations of forecasts and observations. \setcounter{table}{0}\renewcommand{\thetable}{29.3} 
+The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_cont_table_counts`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_cont_table_counts` are counts of the number of occurrences of all possible combinations of forecasts and observations.
+
+.. _table_cont_table_counts:
 
 .. list-table::  2x2 contingency table in terms of counts. The :math:`\mathbf{n_{ij}}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. The ""."" symbols in the total cells represent sums across categories.
   :widths: auto
@@ -831,7 +835,7 @@ Reliability diagram
 
 The reliability diagram is a plot of the observed frequency of events versus the forecast probability of those events, with the range of forecast probabilities divided into categories.
 
-The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{C.\arabic{figure}}
+The ideal forecast (i.e., one with perfect reliability) has conditional observed probabilities that are equivalent to the forecast probability, on average. On a reliability plot, this equivalence is represented by the one-to-one line (the solid line in the figure below). So, better forecasts are closer to the diagonal line and worse ones are farther away. The distance of each point from the diagonal gives the conditional bias. Points that lie below the diagonal line indicate over-forecasting; in other words, the forecast probabilities are too large. The forecast probabilities are too low when the points lie above the line. The reliability diagram is conditioned on the forecasts so it is often used in combination with the ROC, which is conditioned on the observations, to provide a "complete" representation of the performance of probabilistic forecasts.
 
 .. _appendixC-rel_diag:
 
@@ -846,7 +850,7 @@ MET produces hit rate (POD) and false alarm rate (POFD) values for each user-spe
 
 An ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast.
 
-An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. \setcounter{figure}{0}\renewcommand{\thefigure}{29.2} 
+An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. 
 
 .. _appendixC-roc_example:
 
