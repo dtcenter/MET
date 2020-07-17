@@ -752,7 +752,7 @@ Required arguments for lidar2nc
 1. The **lidar_file** argument is the input HDF lidar data file to be processed. Currently, CALIPSO files are supported but support for additional file types will be added in future releases.
 
 
-2. The o**ut_file** argument is the NetCDF output file to be written.
+2. The **out_file** argument is the NetCDF output file to be written.
 
 
 Optional arguments for lidar2nc

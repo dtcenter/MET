@@ -57,9 +57,9 @@ The first place to look for help with individual commands is this user's guide o
 
 **MET won't compile**
 
-* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET\_ environment variables prior to running configure?**
+* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET\_ environment variables prior to running configure?
 
-* Have these libraries been compiled and installed using the same set of compilers used to build MET?**
+* Have these libraries been compiled and installed using the same set of compilers used to build MET?
 
 * Are you using NetCDF version 3.4 or version 4? Currently, only NetCDF version 3.6 can be used with MET.
 
