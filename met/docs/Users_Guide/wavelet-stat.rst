@@ -50,7 +50,7 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
 .. _contingency_table_counts:
 
-.. list-table:: Table 10.1  2x2 contingency table in terms of counts. The **nij** values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. 
+.. list-table:: 2x2 contingency table in terms of counts. The :math:`\mathbf{n}_\mathbf{ij}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. 
   :widths: auto
   :header-rows: 1
 
@@ -314,7 +314,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
 
 .. _table_WS_header_info_ws_outputs:
 
-.. list-table:: Table 10.2 Header information for each file wavelet-stat outputs.
+.. list-table:: Header information for each file wavelet-stat outputs.
   :widths: auto
   :header-rows: 2
 
@@ -399,7 +399,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
 
 ..  _table_WS_format_info_ISC:
    
-.. list-table:: Table 10.3 Format information for the ISC (Intensity-Scale) output line type.
+.. list-table:: Format information for the ISC (Intensity-Scale) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -455,7 +455,7 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
 
 .. _table_NetCDF_dim_Wave_output:
 
-.. list-table:: Table 10.4 Dimensions defined in NetCDF output.
+.. list-table:: Dimensions defined in NetCDF output.
   :widths: auto
   :header-rows: 2
 
@@ -474,7 +474,7 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
 
 .. _table_variables_wave_NetCDF_output:
       
-.. list-table:: Table 10.5 Variables defined in NetCDF output.
+.. list-table:: Variables defined in NetCDF output.
   :widths: auto
   :header-rows: 2
 

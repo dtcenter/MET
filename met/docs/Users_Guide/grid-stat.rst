@@ -429,7 +429,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Table 8.1 Header information for each file grid-stat outputs
+.. list-table:: Header information for each file grid-stat outputs
   :widths: auto
   :header-rows: 2
 
@@ -514,7 +514,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCTC:
 
-.. list-table:: Table 8.2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
+.. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
   :header-rows: 2
 
@@ -548,7 +548,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCTS:
 
-.. list-table:: Table 8.3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -600,7 +600,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Table 8.4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 1
 
@@ -644,7 +644,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCNT:
 	     
-.. list-table:: Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
+.. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -681,7 +681,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_GRAD:
 
-.. list-table:: Table 8.6 Format information for GRAD (Gradient Statistics) output line type
+.. list-table:: Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -727,7 +727,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_DMAP:
 
-.. list-table:: Table 8.7 Format information for DMAP (Distance Map) output line type
+.. list-table:: Format information for DMAP (Distance Map) output line type
   :widths: auto
   :header-rows: 2
 
@@ -810,7 +810,7 @@ The output NetCDF file contains the dimensions and variables shown in the follow
 
 .. _table_GS_Dimensions_NetCDF_matched_pair_out:
 
-.. list-table:: Table 8.8 Dimensions defined in NetCDF matched pair output
+.. list-table:: Dimensions defined in NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 
@@ -829,7 +829,7 @@ The output NetCDF file contains the dimensions and variables shown in the follow
 	     
 .. _table_GS_var_NetCDF_matched_pair_out:
 
-.. list-table:: Table 8.9 A selection of variables that can appear in the NetCDF matched pair output
+.. list-table:: A selection of variables that can appear in the NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 
