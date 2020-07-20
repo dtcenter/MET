@@ -396,9 +396,7 @@ if ( lseek(fd, hd.pos_first_record, SEEK_SET) < 0 )  {
 
 for (j=0; j<(hd.n_records); ++j)  {
 
-   bytes = hd.record_length;
-
-   if (bytes > buf_size) {
+   if ( (hd.record_length + 1) > buf_size) {
 
       cerr << "\n  " << program_name << ": buffer size (" << buf_size
            << ") is too small. Increase to at least " << bytes
@@ -407,6 +405,8 @@ for (j=0; j<(hd.n_records); ++j)  {
       exit ( 1 );
 
    }
+
+   bytes = hd.record_length;
 
    n_read = read(fd, buf, bytes);
 
