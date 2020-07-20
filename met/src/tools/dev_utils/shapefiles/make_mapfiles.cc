@@ -398,6 +398,16 @@ for (j=0; j<(hd.n_records); ++j)  {
 
    bytes = hd.record_length;
 
+   if (bytes > buf_size) {
+
+      cerr << "\n  " << program_name << ": buffer size (" << buf_size
+           << ") is too small. Increase to at least " << bytes
+           << ".\n\n";
+
+      exit ( 1 );
+
+   }
+
    n_read = read(fd, buf, bytes);
 
    if ( n_read != bytes )  {
