@@ -123,7 +123,6 @@ static const int mxr8lv_small   = 255;
 static const int mxr8lv         = 1023;   // was 255;
 // Maximum number of BUFR event sequences
 static const int mxr8vn         = 10;
-//static const int mxr8vn         = 26;
 // Maximum number of BUFR variable types
 static const int mxr8vt         = 6;
 // Maximum length of BUFR variable name

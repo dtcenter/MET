@@ -127,27 +127,9 @@ while ( 1 )  {
 
    if ( t < 0 )  continue;
 
-   // cout << "next\n";
-
    if ( t > 0 )  break;
 
-   // if ( t == eof           )  break;
-   // if ( t == COLOR_NAME    )  break;
-   // if ( t == BLEND         )  break;
-   // if ( t == HSV           )  break;
-   // if ( t == CMYK          )  break;
-   // if ( t == GRAYVALUE     )  break;
-   // if ( t == QUOTED_STRING )  break;
-   // if ( t == ID            )  break;
-
 }   //  while
-
-
-// cout << "\n\n   my colorlex() -> returned token " << t;
-// 
-// if ( lexeme[0] )  cout << " ... \"" << lexeme << "\"   color_file_line_number = " << color_file_line_number;
-//  
-// cout << "\n\n" << flush;
 
 return ( t );
 
@@ -256,9 +238,6 @@ while ( count < max_lexeme_size )  {
 lexeme[max_lexeme_size] = (char) 0;
 
 if ( count == 0 )  return ( skip );
-
-// if ( strncmp((char *) lexeme, "enum",  max_lexeme_size) == 0 )  { do_enum();   return ( token(ENUM)  ); }
-// if ( strncmp((char *) lexeme, "class", max_lexeme_size) == 0 )  { do_class();  return ( token(CLASS) ); }
 
 if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
 
@@ -569,11 +548,7 @@ int do_int()
 
 {
 
-// color_file_column += strlen(colortext);
-
 colorlval.ival = atoi(colortext);
-
-
 
 return ( 1 );
 
@@ -587,11 +562,7 @@ bool do_float()
 
 {
 
-// color_file_column += strlen(colortext);
-
 colorlval.dval = atof(colortext);
-
-
 
 return ( true );
 
@@ -821,8 +792,6 @@ while ( 1 )  {
 
 }
 
-// if ( c == '\n' )  { ++color_file_line_number;  color_file_column = 0; }
-
 return;
 
 }
@@ -839,9 +808,6 @@ int c;
 
 
 c = fgetc(colorin);
-
-// if ( c < 0 )  c += 256;   //  fgetc returns unsigned char cast to int
-                             //  so don't need this
 
 ++color_file_column;
 

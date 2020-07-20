@@ -174,14 +174,6 @@ for (j=0; j<ny_half; ++j)  {
 
 }
 
-// cout << "///////////////////////////////////////////////////////////////////\n";
-// 
-// for (j=0; j<Ny; ++j)  {
-// 
-//    cout << "Latitudes[" << j << "] = " << Latitudes[j] << '\n';
-// 
-// }
-
    //
    //  done
    //
@@ -195,13 +187,6 @@ for (j=0; j<ny_half; ++j)  {
 void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) const
 
 {
-
-// mlog << Error 
-//      << "\nGaussianGrid::latlon_to_xy() not implemented!\n\n";
-// 
-// exit ( 1 );
-
-
 
 int j;
 const double lat_top = Latitudes[Ny - 1];

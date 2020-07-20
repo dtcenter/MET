@@ -985,8 +985,6 @@ data.name = "lc_zoom";
 
 data.hemisphere = ( is_north_projection ? 'N' : 'S' );
 
-// const double H = ( is_north_projection ? 1.0 : -1.0 );
-
 data.scale_lat_1 = lat_cen;
 data.scale_lat_2 = lat_cen;
 
@@ -1021,16 +1019,9 @@ g_old.latlon_to_xy(lat_prev, lon_prev, x_prev, y_prev);
 
 angle = atan2d(x_prev - x_cen, y_prev - y_cen);
 
-
-// cout << "create_oriented_lc() -> anagle = " << angle << "\n";
-
 s = angle - bearing;
 
-// cout << "create_oriented_lc() -> s = " << s << "\n";
-
 s -= 360.0*floor((s + 180.0)/360.0);
-
-// cout << "create_oriented_lc() -> s = " << s << "\n";
 
 data.so2_angle = s;
 

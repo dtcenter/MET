@@ -240,8 +240,6 @@ for (j=0; j<Nobj; ++j)  {
    //  overwrite the obs valid entry in the header columns
    //
 
-// const int  obs_valid_column = 6;   //  0-based
-
 r = 0;
 
 for (j=0; j<(att.n()); ++j)  {
