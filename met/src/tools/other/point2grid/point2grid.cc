@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 
    // Process the command line arguments
    int obs_type = process_command_line(argc, argv);
-   
+
    // Process the input data file
    process_data_file(obs_type);
 
@@ -255,21 +255,21 @@ int process_command_line(int argc, char **argv) {
    OutputFilename = cline[2];
 
    // Check for at least one configuration string
-   if(FieldSA.n_elements() < 1) {
+   if(FieldSA.n() < 1) {
       mlog << Error << "\nprocess_command_line() -> "
            << "The -field option must be used at least once!\n\n";
       usage();
    }
 
    // Check that same variable is required multiple times without -name argument
-   if(VarNameSA.n_elements() == 0) {
+   if(VarNameSA.n() == 0) {
       VarInfo *vinfo;
       MetConfig config;
       VarInfoFactory v_factory;
       ConcatString vname;
       StringArray var_names;
       vinfo = v_factory.new_var_info(FileType_NcMet);
-      for(int i=0; i<FieldSA.n_elements(); i++) {
+      for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
          config.read_string(FieldSA[i].c_str());
@@ -283,13 +283,15 @@ int process_command_line(int argc, char **argv) {
          }
          else var_names.add(vname);
       }
+      // Clean up
+      if(vinfo) { delete vinfo; vinfo = (VarInfo *) 0; }
    }
    // Check that the number of output names and fields match
-   else if(VarNameSA.n_elements() != FieldSA.n_elements()) {
+   else if(VarNameSA.n() != FieldSA.n()) {
       mlog << Error << "\n" << method_name
            << "When the -name option is used, the number of entries ("
-           << VarNameSA.n_elements() << ") must match the number of "
-           << "-field entries (" << FieldSA.n_elements() << ")!\n\n";
+           << VarNameSA.n() << ") must match the number of "
+           << "-field entries (" << FieldSA.n() << ")!\n\n";
       usage();
    }
 
@@ -297,7 +299,7 @@ int process_command_line(int argc, char **argv) {
    if (do_gaussian_filter) RGInfo.gaussian.compute();
 
    // Read the config files
-   conf_info.read_config(default_config_filename, 
+   conf_info.read_config(default_config_filename,
                          (config_filename.empty()
                           ? default_config_filename : config_filename.c_str()));
    // Process the configuration
@@ -314,7 +316,7 @@ int process_command_line(int argc, char **argv) {
          }
       }
    }
-   
+
    return obs_type;
 }
 
@@ -449,7 +451,7 @@ bool get_nc_data_int_array(NcFile *nc, const char *var_name, int *data_array, bo
 bool get_nc_data_float_array(NcFile *nc, char *var_name, float *data_array) {
    NcVar nc_var = get_nc_var(nc, (char *)var_name);
    if (IS_INVALID_NC(nc_var)) exit(1);
-   
+
    bool status = get_nc_data(&nc_var, data_array);
    return status;
 }
@@ -474,7 +476,7 @@ bool get_nc_data_string_array(NcFile *nc, char *var_name,
                               StringArray *stringArray) {
    NcVar nc_var = get_nc_var(nc, var_name, true);
    if (IS_INVALID_NC(nc_var)) exit(1);
-   
+
    bool status = get_nc_data_to_array(&nc_var, stringArray);
    return status;
 }
@@ -485,7 +487,7 @@ bool get_nc_data_string_array(NcFile *nc, char *var_name,
 
 bool get_nc_data_string_array(NcFile *nc, const char *var_name,
                               StringArray *stringArray) {
-   bool status = false;    
+   bool status = false;
    char *_var_name = strdup(var_name);
    if (_var_name) {
       status = get_nc_data_string_array(nc, _var_name, stringArray);
@@ -500,10 +502,10 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 void prepare_message_types(const StringArray hdr_types) {
    static const char *method_name = "prepare_message_types() -> ";
    message_type_list.clear();
-   if (0 < conf_info.message_type.n_elements()) {
+   if (0 < conf_info.message_type.n()) {
       int hdr_idx;
       ConcatString msg_list_str;
-      for(int idx=0; idx<conf_info.message_type.n_elements(); idx++) {
+      for(int idx=0; idx<conf_info.message_type.n(); idx++) {
          string message_type_str = conf_info.message_type[idx];
          if (hdr_types.has(message_type_str, hdr_idx)) {
             message_type_list.add(hdr_idx);
@@ -515,8 +517,8 @@ void prepare_message_types(const StringArray hdr_types) {
          if (idx > 0) msg_list_str << ",";
          msg_list_str << message_type_str;
       }
-      if (0 == message_type_list.n_elements()) {
-         mlog << Error << method_name << " No matching message types [" 
+      if (0 == message_type_list.n()) {
+         mlog << Error << method_name << " No matching message types ["
               << msg_list_str << "].\n";
          exit(1);
       }
@@ -527,9 +529,9 @@ void prepare_message_types(const StringArray hdr_types) {
 
 IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
    IntArray qc_idx_array;
-   bool has_qc_flags = (qc_flags.n_elements() > 0);
+   bool has_qc_flags = (qc_flags.n() > 0);
    if (has_qc_flags) {
-      for(int idx=0; idx<qc_tables.n_elements(); idx++) {
+      for(int idx=0; idx<qc_tables.n(); idx++) {
          int qc_value = (qc_tables[idx] == "NA")
                         ? QC_NA_INDEX : atoi(qc_tables[idx].c_str());
          if (qc_flags.has(qc_value) && !qc_idx_array.has(idx)) {
@@ -572,9 +574,9 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
            << "can not find the obs dimension\"" << nc_dim_nobs << "\".\n\n";
       exit(1);
    }
-   
+
    // Check for at least one configuration string
-   if(FieldSA.n_elements() < 1) {
+   if(FieldSA.n() < 1) {
       mlog << Error << "\n" << method_name
            << "The -field option must be used at least once!\n\n";
       usage();
@@ -597,11 +599,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    StringArray var_names;
    StringArray hdr_types;
    StringArray hdr_valid_times;
-   
+
    if (!get_nc_data_string_array(nc_in, nc_var_hdr_typ_tbl, &hdr_types)) exit(1);
    // Check the message types
    prepare_message_types(hdr_types);
-   
+
    // Check and read obs_vid and obs_var if exists
    bool success_to_read = true;
    NcVar obs_vid_var = get_var(nc_in, nc_var_obs_vid);
@@ -617,7 +619,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
               << "\"" << InputFilename << "\" is very old format. Not supported\n\n";
       }
    }
-   
+
    if (success_to_read)
       success_to_read = get_nc_data_int_array(nc_in, nc_var_obs_hid, obs_hids);
    if (success_to_read)
@@ -644,11 +646,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       success_to_read = get_nc_data_string_array(
             nc_in, nc_var_obs_qty_tbl, &qc_tables);
    if (success_to_read) {
-      bool has_qc_flags = (qc_flags.n_elements() > 0);
+      bool has_qc_flags = (qc_flags.n() > 0);
       IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
-      
+
       // Initialize configuration object
-      
+
       nx = to_grid.nx();
       ny = to_grid.ny();
       to_dp.set_size(nx, ny);
@@ -658,22 +660,22 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          prob_dp.set_size(nx, ny);
          prob_mask_dp.set_size(nx, ny);
       }
-      
+
       // Loop through the requested fields
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
-      
+
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
-      for(int i=0; i<FieldSA.n_elements(); i++) {
+      for(int i=0; i<FieldSA.n(); i++) {
          var_idx_or_gc = -1;
          // Initialize
          vinfo->clear();
-         
+
          // Populate the VarInfo object using the config string
          config.read_string(FieldSA[i].c_str());
          vinfo->set_dict(config);
-      
+
          // Check the variable name
          ConcatString error_msg;
          vname = vinfo->name();
@@ -713,11 +715,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
             }
          }
-         
+
          if (exit_by_field_name_error) {
             ConcatString log_msg;
             if (use_var_id) {
-               for (int idx=0; idx<var_names.n_elements(); idx++) {
+               for (int idx=0; idx<var_names.n(); idx++) {
                   if (0 < idx) log_msg << ", ";
                   log_msg << var_names[idx];
                }
@@ -739,11 +741,11 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                  << "\t" << log_msg <<"\n\n";
             exit(1);
          }
-      
+
          // Check the time range. Apply the time window
          bool valid_time_from_config = true;
          unixtime valid_beg_ut, valid_end_ut, obs_time;
-         
+
          valid_time_array.clear();
          valid_time = vinfo->valid();
          if (valid_time == 0) valid_time = conf_info.valid_time;
@@ -752,7 +754,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             valid_beg_ut = valid_end_ut = valid_time;
             if (!is_eq(bad_data_int, conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
             if (!is_eq(bad_data_int, conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
-            for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
+            for(idx=0; idx<hdr_valid_times.n(); idx++) {
                obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
                if (valid_beg_ut <= obs_time and obs_time <= valid_end_ut) {
                   valid_time_array.add(idx);
@@ -766,7 +768,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             valid_time_from_config = false;
             // Set the latest available valid time
             valid_time = 0;
-            for(idx=0; idx<hdr_valid_times.n_elements(); idx++) {
+            for(idx=0; idx<hdr_valid_times.n(); idx++) {
                obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
                if (obs_time > valid_time) valid_time = obs_time;
             }
@@ -774,7 +776,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          mlog << Debug(3) << method_name << " valid_time from "
               << (valid_time_from_config ? "config" : "input data") << ": "
               << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
-        
+
          to_dp.set_init(valid_time);
          to_dp.set_valid(valid_time);
          cnt_dp.set_init(valid_time);
@@ -787,38 +789,38 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             prob_mask_dp.set_init(valid_time);
             prob_mask_dp.set_valid(valid_time);
          }
-         
+
          var_index_array.clear();
          // Select output variable name
-         vname = (VarNameSA.n_elements() == 0)
+         vname = (VarNameSA.n() == 0)
                  ? conf_info.get_var_name(vinfo->name())
                  : conf_info.get_var_name(VarNameSA[i]);
          mlog << Debug(4) << method_name
               << " var: " << vname << ", index: " << var_idx_or_gc << ".\n";
-         
+
          var_count = var_count2 = to_count = 0;
          filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
          for (idx=0; idx < nobs; idx++) {
             if (var_idx_or_gc == obs_ids[idx]) {
                var_count2++;
                hdr_idx = obs_hids[idx];
-               if (0 < valid_time_array.n_elements() &&
+               if (0 < valid_time_array.n() &&
                      !valid_time_array.has(hdr_vld_ids[hdr_idx])) {
                   filtered_by_time++;
                   continue;
                }
-        
+
                if(!keep_message_type(hdr_typ_ids[hdr_idx])) {
                   filtered_by_msg_type++;
                   continue;
                }
-               
+
                //Filter by QC flag
                if (has_qc_flags && !qc_idx_array.has(obs_qty_ids[idx])) {
                   filtered_by_qc++;
                   continue;
                }
-               
+
                var_index_array.add(idx);
                var_count++;
                if (is_eq(obs_vals[idx], 0.)) obs_count_zero_from++;
@@ -844,7 +846,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
             float data_value;
             float from_min_value =  10e10;
             float from_max_value = -10e10;
-      
+
             to_count = 0;
             to_dp.set_constant(bad_data_double);
             cnt_dp.set_constant(0);
@@ -853,29 +855,27 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                prob_dp.set_constant(0);
                prob_mask_dp.set_constant(0);
             }
-            
+
             for (int x_idx = 0; x_idx<nx; x_idx++) {
                for (int y_idx = 0; y_idx<ny; y_idx++) {
                   offset = to_dp.two_to_one(x_idx,y_idx);
                   cellArray = cellMapping[offset];
                   int prob_cnt = 0;
                   int prob_value_sum = 0;
-                  if (0 < cellArray.n_elements()) {
-                     //cnt_dp.set(cellArray.n_elements(), x_idx, y_idx);
-                     //mask_dp.set(1, x_idx, y_idx);
+                  if (0 < cellArray.n()) {
                      valid_count = 0;
                      dataArray.clear();
-                     for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
+                     for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                         from_index = cellArray[dIdx];
                         data_value = obs_vals[from_index];
                         if (is_eq(data_value, bad_data_float)) continue;
-                  
+
                         if(mlog.verbosity_level() >= 4) {
                            if (from_min_value > data_value) from_min_value = data_value;
                            if (from_max_value < data_value) from_max_value = data_value;
                         }
-                        
-                        for(int ic=0; ic<vinfo->censor_thresh().n_elements(); ic++) {
+
+                        for(int ic=0; ic<vinfo->censor_thresh().n(); ic++) {
                            // Break out after the first match.
                            if(vinfo->censor_thresh()[ic].check(data_value)) {
                               data_value = vinfo->censor_val()[ic];
@@ -883,13 +883,13 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                               break;
                            }
                         }
-                        
+
                         dataArray.add(data_value);
                         valid_count++;
                      }
                      if (0 < valid_count) to_count++;
-                     
-                     int data_count = dataArray.n_elements();
+
+                     int data_count = dataArray.n();
                      if (0 < data_count) {
                         float to_value;
                         if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
@@ -901,10 +901,10 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                               to_value = (to_value + dataArray[(data_count/2)+1])/2;
                         }
                         else to_value = dataArray.sum() / data_count;
-                        
+
                         if (is_eq(to_value, 0.)) obs_count_zero_to++;
                         else obs_count_non_zero_to++;
-      
+
                         cnt_dp.set(data_count, x_idx, y_idx);
                         mask_dp.set(1, x_idx, y_idx);
                         to_dp.set(to_value, x_idx, y_idx);
@@ -913,7 +913,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                            prob_dp.set(1, x_idx, y_idx);
                            prob_mask_dp.set(1, x_idx, y_idx);
                         }
-                        
+
                         if (1 < data_count) {
                            mlog << Debug(9) << method_name
                                 << " to_value:" << to_value
@@ -930,37 +930,37 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
             }
          }
-      
+
          // Write the regridded data
          write_nc(to_dp, to_grid, vinfo, vname.c_str());
-         
+
          vname_cnt = vname;
          vname_cnt << "_cnt";
          vname_mask = vname;
          vname_mask << "_mask";
-      
+
          ConcatString tmp_long_name;
          ConcatString var_long_name = vinfo->long_name();
          ConcatString dim_string = "(*,*)";
-         
+
          tmp_long_name = vname_cnt;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
          write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
-         
+
          tmp_long_name = vname_mask;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
          write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
-         
+
          if (has_prob_thresh || do_gaussian_filter) {
             ConcatString vname_prob = vname;
             vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
             ConcatString vname_prob_mask = vname_prob;
             vname_prob_mask << "_mask";
-      
+
             if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-            
+
             tmp_long_name = vname_prob;
             tmp_long_name << dim_string;
             vinfo->set_long_name(tmp_long_name.c_str());
@@ -973,17 +973,17 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
                }
             }
-            
+
             tmp_long_name = vname_prob_mask;
             tmp_long_name << dim_string;
             vinfo->set_long_name(tmp_long_name.c_str());
             write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
          }
          vinfo->set_long_name(var_long_name.c_str());
-         
+
          mlog << Debug(7) << method_name << " obs_count_zero_to: " << obs_count_zero_to
               << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
-      
+
          ConcatString log_msg;
          log_msg << "Filtered by time: " << filtered_by_time;
          if (0 < requested_valid_time) {
@@ -992,7 +992,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          log_msg << ", by msg_type: " << filtered_by_msg_type;
          if (0 < filtered_by_msg_type) {
             log_msg << " [";
-            for(idx=0; idx<conf_info.message_type.n_elements(); idx++) {
+            for(idx=0; idx<conf_info.message_type.n(); idx++) {
                if (idx > 0) log_msg << ",";
                log_msg << conf_info.message_type[idx];
             }
@@ -1001,7 +1001,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          log_msg << ", by QC: " << filtered_by_qc;
          if (0 < filtered_by_qc) {
             log_msg << " [";
-            for(idx=0; idx<qc_flags.n_elements(); idx++) {
+            for(idx=0; idx<qc_flags.n(); idx++) {
                if (idx > 0) log_msg << ",";
                log_msg << qc_flags[idx];
             }
@@ -1011,7 +1011,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
          if (0 == var_count) {
             if (0 == filtered_count) {
-               mlog << Error << method_name << " No valid data for the variable [" 
+               mlog << Error << method_name << " No valid data for the variable ["
                     << vinfo->name() << "]\n";
             }
             else {
@@ -1025,16 +1025,16 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                  << ", grid: " << to_count << " out of " << (nx * ny) << "  "
                  << (0 < filtered_count ? log_msg.c_str() : " ")
                  //<< ",    Obs_value] zero: " << obs_count_zero_from
-                 //<< ", non_zero: " <<obs_count_non_zero_from 
+                 //<< ", non_zero: " <<obs_count_non_zero_from
                  << "\n";
          }
       } // end for i
-      
+
       if (cellMapping) {
          delete [] cellMapping;   cellMapping = (IntArray *)0;
       }
    }
-   
+
    delete [] obs_ids;
    delete [] obs_hids;
    delete [] hdr_lats;
@@ -1216,7 +1216,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    grid_map_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
    geostationary_file.add("/");
    geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name, false));
-   
+
    // Open ADP file if exists
    if (0 < AdpFilename.length() && file_exists(AdpFilename.c_str())) {
       nc_adp = open_ncfile(AdpFilename.c_str());
@@ -1228,7 +1228,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          exit(1);
       }
    }
-   
+
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
 
    valid_time = find_valid_time(mapVar);
@@ -1245,7 +1245,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
 
    // Loop through the requested fields
-   for(int i=0; i<FieldSA.n_elements(); i++) {
+   for(int i=0; i<FieldSA.n(); i++) {
 
       // Initialize
       vinfo->clear();
@@ -1271,7 +1271,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       }
 
       // Select output variable name
-      if(VarNameSA.n_elements() == 0) {
+      if(VarNameSA.n() == 0) {
          vname << cs_erase << vinfo->name();
       }
       else {
@@ -1280,7 +1280,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
-      
+
       NcVar to_var = get_nc_var(nc_out, vname.c_str());
       NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
       if(IS_VALID_NC(var_data)) {
@@ -1311,7 +1311,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                }
             }
          }
-          
+
          if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
          if(IS_VALID_NC(var_data)) {
@@ -1391,12 +1391,12 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
-                             const IntArray obs_index_array, const int *obs_hids, 
+                             const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons) {
    bool status = false;
    static const char *method_name = "get_grid_mapping() ";
 
-   int obs_count = obs_index_array.n_elements();
+   int obs_count = obs_index_array.n();
    if (0 == obs_count) {
       mlog << Warning << method_name << " no valid point observation data\n";
       return status;
@@ -1427,13 +1427,13 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
          count_in_grid++;
       }
    }
-   
+
    if (0 == count_in_grid)
       mlog << Warning << method_name << " no valid point observation data within to grid\n";
    else {
       status = true;
       mlog << Debug(3) << method_name << " count in grid: " << count_in_grid
-           << " out of " << obs_count << " (" 
+           << " out of " << obs_count << " ("
            << ((obs_count > 0) ? count_in_grid*100/obs_count : 0) << "%)\n";
    }
    return status;
@@ -1498,7 +1498,7 @@ ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
    else if (file_exists(geostationary_file.c_str())) {
       run_string << geostationary_file;
    }
-   
+
    return run_string;
 }
 
@@ -1516,7 +1516,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    int from_lon_count = fr_grid.nx();
 
    bool has_coord_input = false;
-   ConcatString tmp_coord_name;   
+   ConcatString tmp_coord_name;
 
    if (get_env(key_geostationary_data, tmp_coord_name) &&
        tmp_coord_name.nonempty() &&
@@ -1750,7 +1750,7 @@ static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
       geo_data_filename << "_to_";
       if (file_exists(regrid_name.c_str())) {
           StringArray file_names = regrid_name.split("\\/");
-          geo_data_filename << file_names[file_names.n_elements()-1];
+          geo_data_filename << file_names[file_names.n()-1];
       }
       else geo_data_filename << to_grid.name();
       geo_data_filename << ".grid_map";
@@ -1772,7 +1772,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
    get_att_value_string(nc_in,  (string)"time_coverage_end",   aod_end_time  );
    get_att_value_string(nc_adp, (string)"time_coverage_start", adp_start_time);
    get_att_value_string(nc_adp, (string)"time_coverage_end",   adp_end_time  );
-   
+
    ConcatString log_message;
    if (aod_start_time != adp_start_time) {
       time_mismatch = true;
@@ -1789,9 +1789,9 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
    }
    return time_mismatch;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
-   
+
 
 IntArray *read_grid_mapping(const char *grid_map_file) {
    static const char *method_name = "read_grid_mapping() ";
@@ -1823,14 +1823,14 @@ IntArray *read_grid_mapping(const char *grid_map_file) {
 
          str_arr.clear();
          str_arr.parse_delim(line.c_str(), "=");
-         if (str_arr.n_elements() == 2) {
+         if (str_arr.n() == 2) {
             if (map_data) {
                cell_index_arr.clear();
                to_offset = atoi(str_arr[0].c_str());
                if ((to_offset >= 0) && (to_offset < map_size)) {
                   cell_index_arr.parse_delim(str_arr[1], ",");
-                  if (0 < cell_index_arr.n_elements()) map_count++;
-                  for (int idx=0; idx<cell_index_arr.n_elements(); idx++) {
+                  if (0 < cell_index_arr.n()) map_count++;
+                  for (int idx=0; idx<cell_index_arr.n(); idx++) {
                      coord_offset = atoi(cell_index_arr[idx].c_str());
                      if (coord_offset >= 0) {
                         cellMapping[to_offset].add(coord_offset);
@@ -1928,13 +1928,13 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             vname_dust.length(), vname_dust.c_str()));
       is_smoke_only = (0 == vinfo->name().comparecase((actual_var_len + 1),
             vname_smoke.length(), vname_smoke.c_str()));
-      
+
       if      (is_dust_only)    var_adp = get_goes_nc_var(nc_adp, vname_dust);
       else if (is_smoke_only)   var_adp = get_goes_nc_var(nc_adp, vname_smoke);
-      
+
       if (IS_VALID_NC(var_adp)) {
          get_nc_data(&var_adp, adp_data);
-         
+
          //Smoke:ancillary_variables = "DQF" ; ubyte DQF(y, x) ;
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
@@ -1991,7 +1991,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    IntArray cellArray;
    NumArray dataArray;
    int particle_qc;
-   bool has_qc_flags = (qc_flags.n_elements() > 0);
+   bool has_qc_flags = (qc_flags.n() > 0);
 
    missing_count = non_missing_count = 0;
    to_dp.set_constant(bad_data_double);
@@ -2000,10 +2000,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
          int offset = to_dp.two_to_one(xIdx,yIdx);
          cellArray = cellMapping[offset];
-         if (0 < cellArray.n_elements()) {
+         if (0 < cellArray.n()) {
             int valid_count = 0;
             dataArray.clear();
-            for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
+            for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
                data_value = from_data[from_index];
                if (is_eq(data_value, bad_data_float)) {
@@ -2020,7 +2020,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                //Filter by QC flag
                qc_value = qc_data[from_index];
                if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
-                  for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+                  for(int i=0; i<vinfo->censor_thresh().n(); i++) {
                      // Break out after the first match.
                      if(vinfo->censor_thresh()[i].check(data_value)) {
                         data_value = vinfo->censor_val()[i];
@@ -2032,7 +2032,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                      absent_count++;
                      continue;
                   }
-                  
+
                   if (has_adp_qc_var && has_qc_flags) {
                      int shift_bits = 2;
                      if (is_dust_only) shift_bits += 2;
@@ -2043,7 +2043,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         continue;
                      }
                   }
-                  
+
                   dataArray.add(data_value);
                   if (mlog.verbosity_level() >= 4) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
@@ -2055,9 +2055,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                }
                valid_count++;
             }
-            
-            if (0 < dataArray.n_elements()) {
-               int data_count = dataArray.n_elements();
+
+            if (0 < dataArray.n()) {
+               int data_count = dataArray.n();
                float to_value;
                if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
                else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
@@ -2192,7 +2192,7 @@ void write_grid_mapping(const char *grid_map_file,
          }
          map_file << "[mapping]\n";
          for (int idx=0; idx<map_size; idx++) {
-            int mem_count = cellMapping[idx].n_elements();
+            int mem_count = cellMapping[idx].n();
             map_file << idx << "=";
             if (mem_count > 0) {
                for (int idx2=0; idx2<mem_count; idx2++) {
@@ -2236,10 +2236,10 @@ void close_nc() {
 
 //bool keep_message_type(const char *mt_str) {
 bool keep_message_type(const int mt_index) {
-    
+
    bool keep = false;
 
-   keep = message_type_list.n_elements() == 0 ||
+   keep = message_type_list.n() == 0 ||
           message_type_list.has(mt_index);
 
    return(keep);
@@ -2399,7 +2399,7 @@ void set_qc_flags(const StringArray & a) {
    StringArray sa;
 
    sa.parse_css(a[0]);
-   for (int idx=0; idx<sa.n_elements(); idx++) {
+   for (int idx=0; idx<sa.n(); idx++) {
       qc_flag = atoi(sa[idx].c_str());
       if ( !qc_flags.has(qc_flag) ) qc_flags.add(qc_flag);
    }
