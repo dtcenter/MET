@@ -379,7 +379,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-header-columns:
 
-.. list-table:: Table 17.1 Text Header Columns
+.. list-table:: Text Header Columns
   :widths: auto
   :header-rows: 2
 
@@ -458,7 +458,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-2D-Attributes:
 
-.. list-table:: Table 17.2 2D Attribute
+.. list-table:: 2D Attribute
   :widths: auto
   :header-rows: 2
 
@@ -516,7 +516,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-3D-single-attributes:
 
-.. list-table:: Table 17.3 3D Single Attribute
+.. list-table:: 3D Single Attribute
   :widths: auto
   :header-rows: 2
 
@@ -589,7 +589,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-3D-Pair-Attribute:
 
-.. list-table:: Table 17.4 3D Pair Attribute
+.. list-table:: 3D Pair Attribute
   :widths: auto
   :header-rows: 2
 

@@ -58,7 +58,7 @@ The Stat-Analysis “ss_index” and “go_index” jobs calculate the skill sco
 
 .. _compute_GO_Index:
 
-.. list-table:: Table 12.1 Variables, levels, and weights used to compute the GO Index.
+.. list-table:: Variables, levels, and weights used to compute the GO Index.
   :widths: auto
   :header-rows: 2
 
@@ -437,7 +437,7 @@ All possible tasks for job_name are listed in :numref:`Des_components_STAT_analy
 
 .. _Des_components_STAT_analysis_tool:
 	 
-.. list-table:: Table 12.2 Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
+.. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
   :widths: 15 55 20
   :header-rows: 1
 
@@ -600,7 +600,7 @@ This job produces summary statistics for the column name and line type specified
 
 .. _Columnar_output:
 
-.. list-table:: Table 12.3 Columnar output of "summary" job output from the Stat-Analysis tool.
+.. list-table:: Columnar output of "summary" job output from the Stat-Analysis tool.
   :widths: auto
   :header-rows: 1
 
@@ -652,7 +652,7 @@ This job is similar to the "aggregate" job listed above, however the format of i
 
 .. _arg_agg_stat_job:
 
-.. list-table:: Table 12. 4 Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
+.. list-table:: Valid combinations of "-line_type" and "-out_line_type" arguments for the "aggregate_stat" job.
   :widths: auto
   :header-rows: 1
 

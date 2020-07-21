@@ -78,7 +78,7 @@ The gsid2mpr tool performs a simple reformatting step and thus requires no confi
 The gsid2mpr tool writes the same set of MPR output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the MPR line which depend on the input file type. Those additional columns are described in the following tables.
 
 
-.. list-table:: Table 11.1  Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
+.. list-table:: Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -120,7 +120,7 @@ The gsid2mpr tool writes the same set of MPR output columns for the conventional
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Table 11.2 Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
+.. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -312,7 +312,7 @@ The gsidens2orank tool performs a simple reformatting step and thus requires no 
 
 The gsid2mpr tool writes the same set of ORANK output columns for the conventional and radiance data types. However, it also writes additional columns at the end of the ORANK line which depend on the input file type. The extra columns are limited to quantities which remain constant over all the ensemble members and are therefore largely a subset of the extra columns written by the gsid2mpr tool. Those additional columns are described in the following tables.
 
-.. list-table:: Table 11.3 Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
+.. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -336,7 +336,7 @@ The gsid2mpr tool writes the same set of ORANK output columns for the convention
     - Setup quality control
 
 
-.. list-table:: Table 11.4 Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
+.. list-table:: Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 

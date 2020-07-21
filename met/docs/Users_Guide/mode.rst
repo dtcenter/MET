@@ -505,7 +505,7 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
 
 .. _CTS_output:
 
-.. list-table:: Table 15.1 Format of MODE CTS output file.
+.. list-table:: Format of MODE CTS output file.
   :widths: auto
   :header-rows: 2
 
@@ -653,7 +653,7 @@ The second ASCII file the MODE tool generates contains all of the attributes for
 
 .. _MODE_object_attribute:
 	    
-.. list-table:: Table 15.2 Object identifier descriptions for MODE object attribute output file.
+.. list-table:: Object identifier descriptions for MODE object attribute output file.
   :widths: auto
   :header-rows: 2
 
@@ -682,7 +682,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
 
 .. _MODE_object_attribute_output:
 
-.. list-table:: Table 15.3 Format of MODE object attribute output files.
+.. list-table:: Format of MODE object attribute output files.
   :widths: auto
   :header-rows: 2
 
@@ -807,7 +807,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
 .. role:: raw-html(raw)
    :format: html
 
-.. list-table:: Table 15.4 Format of MODE object attribute output files continued.
+.. list-table:: Format of MODE object attribute output files continued.
   :widths: auto
   :header-rows: 2
 
@@ -871,7 +871,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 
 .. _NetCDF_dimensions_for_MODE_output:
 
-.. list-table:: Table 15.5 NetCDF dimensions for MODE output.
+.. list-table:: NetCDF dimensions for MODE output.
   :widths: auto
   :header-rows: 2
 
@@ -914,7 +914,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 .. role:: raw-html(raw)
    :format: html
 
-.. list-table:: Table 15.6 Variables contained in MODE NetCDF output.
+.. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto
   :header-rows: 2
 
@@ -981,7 +981,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 .. role:: raw-html(raw)
    :format: html
 
-.. list-table:: Table 15.7 Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
+.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
   :widths: auto
   :header-rows: 2
 
@@ -1070,7 +1070,7 @@ The dimensions and variables included in the mode NetCDF files are described in 
 .. role:: raw-html(raw)
    :format: html
 
-.. list-table:: Table 15.8 Variables contained in MODE NetCDF output - Clustered Objects, continued from :numref:`Variables_contained_in_MODE_NetCDF_output_part_2`
+.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from :numref:`Variables_contained_in_MODE_NetCDF_output_part_2`
   :widths: auto
   :header-rows: 2
 
