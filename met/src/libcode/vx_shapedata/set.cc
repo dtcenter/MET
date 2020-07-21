@@ -485,8 +485,6 @@ void SetCollection::extend(int N)
 
 if ( N <= n_alloc )  return;
 
-// cout << "\n  SetCollection::extend() -> N = " << N << "\n";
-
 int j, k;
 FcstObsSet * u = 0;
 

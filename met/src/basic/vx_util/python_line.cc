@@ -185,10 +185,7 @@ ConcatString PyLineDataFile::make_header_line() const
 
 {
 
-// int j;
-// bool last = false;
 ConcatString line;
-
 
 line << "VERSION"        << ' ';
 line << "MODEL"          << ' ';
@@ -214,31 +211,6 @@ line << "OBS_THRESH"     << ' ';
 line << "COV_THRESH"     << ' ';
 line << "ALPHA"          << ' ';
 line << "LINE_TYPE";
-
-      ///////////////
-
-
-
-/*
-line << "VERSION"    << ' ';
-line << "FCST_VALID" << ' ';
-line << "OBS_VALID"  << ' ';
-
-for (j=0; j<n_mpr_columns; ++j)  {
-
-   last = (j == (n_mpr_columns - 1));
-
-   line << mpr_columns[j];
-
-   if ( ! last )  line << ' ';
-
-}
-
-line << ' ' << "LINE_TYPE";
-*/
-
-
-// cout << "\n   PyLineDataFile::make_header_line()  -> line = \"" << line << "\"\n\n" << flush;
 
    //
    //  done
@@ -327,8 +299,6 @@ void PyLineDataFile::do_straight()
 
 {
 
-// cout << "\n\n  in PyLineDataFile::do_straight()\n\n" << flush;
-
 ConcatString command, path, user_base;
 
 path = generic_python_wrapper;
@@ -410,8 +380,6 @@ return;
 void PyLineDataFile::do_pickle()
 
 {
-
-// cout << "\n\n  in PyLineDataFile::do_pickle()\n\n" << flush;
 
 int j;
 const int N = UserScriptArgs.n();
@@ -531,28 +499,6 @@ return ( true );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-int PyLineDataFile::operator>>(DataLine & d)
-
-{
-
-bool status = d.read_py_single_text_line(this);
-
-cout << d << flush;
-
-++Last_Line_Number;
-
-if ( index == 0 ) set_header(d);
-
-cout << "  in PyLineDataFile::operator>>(DataLine &) ... status = " << status << "\n" << flush;
-
-return ( status ? 1 : 0 );
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
