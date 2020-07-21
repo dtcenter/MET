@@ -262,8 +262,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          if(!(cur_ta == fcat_ta)) {
             mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
                  << "\"" << conf_key_cat_thresh << "\" should be specified "
-                 << "in the fcst dictionary, not within each fcst.field array "
-                 << "entry!\n\n";
+                 << "in the top level of the fcst dictionary, not within each "
+                 << "fcst.field array entry!\n\n";
          }
       }
 
@@ -273,8 +273,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          if(!(cur_ta == fcnt_ta)) {
            mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
                 << "\"" << conf_key_cnt_thresh << "\" should be specified "
-                << "in the fcst dictionary, not within each fcst.field array "
-                << "entry!\n\n";
+                << "in the top level of the fcst dictionary, not within each "
+                << "fcst.field array entry!\n\n";
          }
       }
    } // end for i
@@ -319,8 +319,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          if(!(cur_ta == ocat_ta)) {
             mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
                  << "\"" << conf_key_cat_thresh << "\" should be specified "
-                 << "in the obs dictionary, not within each obs.field array "
-                 << "entry!\n\n";
+                 << "in the top level of the obs dictionary, not within each "
+                 << "obs.field array entry!\n\n";
          }
       }
 
@@ -330,8 +330,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          if(!(cur_ta == ocnt_ta)) {
            mlog << Warning << "\nSeriesAnalysisConfInfo::process_config() -> "
                 << "\"" << conf_key_cnt_thresh << "\" should be specified "
-                << "in the obs dictionary, not within each obs.field array "
-                << "entry!\n\n";
+                << "in the top level of the obs dictionary, not within each "
+                << "obs.field array entry!\n\n";
          }
       }
    } // end for i
