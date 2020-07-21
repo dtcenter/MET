@@ -265,7 +265,7 @@ The usage statement for the gsidens2orank tool is shown below:
          [-log file]
          [-v level]
 
-gsidens2orank has three required arguments and accept several optional ones.
+gsidens2orank has three required arguments and accepts several optional ones.
 
 Required arguments for gsidens2orank
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
