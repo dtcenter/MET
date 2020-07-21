@@ -1396,6 +1396,9 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    //  the following code was lifted and modified from:
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
 
+   //  custom out of memory function for GRIB2
+   set_new_handler(oom_grib2);
+
    //  g2c fields
    g2int listsec0[3], listsec1[13], numlocal, lskip, lgrib;
 
@@ -1418,6 +1421,9 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
    //  cleanup
    if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+
+   //  reset to default out of memory handler
+   set_new_handler(oom);
 
    //  return the offset of the next record
    return lskip + lgrib;
