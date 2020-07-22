@@ -17,7 +17,7 @@ The usage statement for **wwmca_plot** is
 
 Here, **wwmca_cloud_pct_file_list** represents one or more WWMCA cloud percent files given on the command line. As with any command given to a UNIX shell, the user can use meta-characters as a shorthand way to specify many filenames.
 
-The optional **-outdir** argument specifies a directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory. :numref:`reformat_grid_fig2` ??figure isn't linking correctly.  pdf shows it linking to app. C.2?? shows an example of the **wwmca_plot** output.
+The optional **-outdir** argument specifies a directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory. :numref:`reformat_grid_fig2` shows an example of the **wwmca_plot** output.
 
 .. _reformat_grid_fig2:
 
