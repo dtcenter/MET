@@ -251,14 +251,14 @@ OR measures the ratio of the odds of a forecast of the event being correct to th
 
 .. math:: \text{OR } = \frac{n_{11} \times n_{00}}{n_{10} \times n_{01}} = \frac{(\frac{\text{POD}}{1 - \text{POD}})}{(\frac{\text{POFD}}{1 - \text{POFD}})}.
 
-OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (Stephenson 2000).
+OR can range from 0 to :math:`\infty`. A perfect forecast would have a value of OR = infinity. OR is often expressed as the log Odds Ratio or as the Odds Ratio Skill Score (:ref:`Stephenson 2000 <Stephenson-2000>`).
 
 Logarithm of the Odds Ratio (LODDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "LODDS" in CTS output :numref:`table_PS_format_info_CTS`
 
-LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (Stephenson 2000). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
+LODDS transforms the odds ratio via the logarithm, which tends to normalize the statistic for rare events (:ref:`Stephenson 2000 <Stephenson-2000>`). However, it can take values of :math:`\pm\infty` when any of the contingency table counts is 0. LODDS is defined as :math:`\text{LODDS} = ln(OR)`.
 
 Odds Ratio Skill Score (ORSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -269,7 +269,7 @@ ORSS is a skill score based on the odds ratio. ORSS is defined as
 
 .. math:: \text{ORSS } = \frac{OR - 1}{OR + 1}.
 
-ORSS is sometime also referred to as Yule's Q. (Stephenson 2000).
+ORSS is sometime also referred to as Yule's Q. (:ref:`Stephenson 2000 <Stephenson-2000>`).
 
 Extreme Dependency Score (EDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,7 +280,7 @@ The extreme dependency score measures the association between forecast and obser
 
 .. math:: \text{EDS } = \frac{2 ln(\frac{n_{11} + n_{01}}{T})}{ln(\frac{n_{11}}{T})} - 1.
 
-EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (Stephenson et al, 2008).
+EDS can range from -1 to 1, with 0 representing no skill. A perfect forecast would have a value of EDS = 1. EDS is independent of bias, so should be presented along with the frequency bias statistic (:ref:`Stephenson et al, 2008 <Stephenson-2008>`).
 
 Extreme Dependency Index (EDI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -293,7 +293,7 @@ The extreme dependency index measures the association between forecast and obser
 
 where *H* and *F* are the Hit Rate and False Alarm Rate, respectively. 
 
-EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (Ferro and Stephenson, 2011).
+EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Symmetric Extreme Dependency Score (SEDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -304,7 +304,7 @@ The symmetric extreme dependency score measures the association between forecast
 
 .. math:: \text{SEDS } = \frac{2 \ln [\frac{(n_{11} + n_{01}) (n_{11} + n_{10})}{T^2}]}{\ln (\frac{n_{11}}{T})} - 1.
 
-SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (Ferro and Stephenson, 2011).
+SEDS can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDS = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Symmetric Extremal Dependency Index (SEDI)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,14 +317,14 @@ The symmetric extremal dependency index measures the association between forecas
 
 where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively. 
 
-SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (Ferro and Stephenson, 2011).
+SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
 Bias Adjusted Gilbert Skill Score (GSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "BAGSS" in CTS output :numref:`table_PS_format_info_CTS`
 
-BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (Brill and Mesinger, 2009).
+BAGSS is based on the GSS, but is corrected as much as possible for forecast bias (:ref:`Brill and Mesinger, 2009<Brill-2009>`).
 
 Economic Cost Loss Relative Value (ECLV)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,7 +344,7 @@ For cost / loss ratio above the base rate, the ECLV is defined as:
 MET verification measures for continuous variables
 __________________________________________________
 
-For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
+For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
@@ -567,7 +567,7 @@ Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 
 The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries (e.g. partial sums) that can later be accumulated into verification statistics. These are divided according to scalar or vector summaries (S or V). The climate anomaly values (A) can be stored in place of the actuals, which is just a re-centering of the values around the climatological average. L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred to as the “city block” and “Euclidean” distances. The city block is the absolute value of a distance while the Euclidean distance is the square root of the squared distance.
 
-The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (Mood et al, 1974). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance. 
+The partial sums can be accumulated over individual cases to produce statistics for a longer period without any loss of information because these sums are *sufficient* for resulting statistics such as RMSE, bias, correlation coefficient, and MAE (:ref:`Mood et al, 1974 <Mood-1974>`). Thus, the individual errors need not be stored, all of the information relevant to calculation of statistics are contained in the sums. As an example, the sum of all data points and the sum of all squared data points (or equivalently, the sample mean and sample variance) are *jointly sufficient* for estimates of the Gaussian distribution mean and variance.
 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
@@ -680,7 +680,7 @@ where the weights are applied at each grid location, with values assigned accord
 MET verification measures for probabilistic forecasts
 _____________________________________________________
 
-The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (Bradley 2008); the joint distribution, calibration-refinement, likelihood-base rate (Wilks 2011); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
+The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (:ref:`Bradley, 2008 <Bradley-2008>`); the joint distribution, calibration-refinement, likelihood-base rate (:ref:`Wilks, 2011 <Wilks-2011>`); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
 
 The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_cont_table_counts`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_cont_table_counts` are counts of the number of occurrences of all possible combinations of forecasts and observations.
 
@@ -757,7 +757,7 @@ The Brier score is the mean squared probability error. In MET, the Brier Score (
 
 The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` . 
 
-BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (Murphy, 1973).
+BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (:ref:`Murphy, 1987 <Murphy-1987>`).
 
 .. math:: \text{BS} = \frac{1}{T} \sum_i (p_i - o_i)^2 = \frac{1}{T} \sum n_{i.} (p_i - \bar{o}_i)^2 - \frac{1}{T} \sum n_{i.} (\bar{o}_i - \bar{o})^2 + \bar{o}(1 - \bar{o})
 
@@ -779,7 +779,7 @@ OY_TP - Observed Yes Total Proportion
 
 Called "OY_TP" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the cell probability for row **i**, column **j=1** (observed event), a part of the joint distribution (Wilks, 2011). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values. 
+This is the cell probability for row **i**, column **j=1** (observed event), a part of the joint distribution (:ref:`Wilks, 2011 <Wilks-2011>`). Along with ON_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
 
 .. math:: \text{OYTP}(i) = \frac{n_{i1}}{T} = \text{probability}(o_{i1})
 
@@ -788,7 +788,7 @@ ON_TP - Observed No Total Proportion
 
 Called "ON_TP" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the cell probability for row **i**, column **j=0** (observed non-event), a part of the joint distribution (Wilks, 2011). Along with OY_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
+This is the cell probability for row **i**, column **j=0** (observed non-event), a part of the joint distribution (:ref:`Wilks, 2011 <Wilks-2011>`). Along with OY_TP, this set of measures provides information about the joint distribution of forecasts and events. There are no ideal or better values.
 
 .. math:: \text{ONTP}(i) = \frac{n_{i0}}{T} = \text{probability}(o_{i0})
 
@@ -797,7 +797,7 @@ Calibration
 
 Called "CALIBRATION" in PJC output :numref:`table_PS_format_info_PJC`
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in Wilks (2011). A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa. 
+Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks (2011) <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
 
 .. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
@@ -806,7 +806,7 @@ Refinement
 
 Called "REFINEMENT" in PJC output :numref:`table_PS_format_info_PJC`
 
-The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by Wilks (2011).
+The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by :ref:`Wilks (2011) <Wilks-2011>`.
 
 .. math:: \text{Refinement}(i) = \frac{n_{i.}}{T} = \text{probability}(p_i)
 
@@ -815,7 +815,7 @@ Likelihood
 
 Called "LIKELIHOOD" in PJC output :numref:`table_PS_format_info_PJC`
 
-Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see Wilks (2011) for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts.
+Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see :ref:`Wilks (2011) <Wilks-2011>` for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts.
 
 .. math:: \text{Likelihood}(i) = \frac{n_{i1}}{n_{.1}} = \text{probability}(p_i|o_1)
 
@@ -826,7 +826,7 @@ Base Rate
 
 Called "BASER" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures if paired with likelihood in the likelihood-base rate factorization, see Wilks (2011) for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
+This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures if paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks (2011) <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
 
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
@@ -879,7 +879,7 @@ CRPS
 
 Called "CRPS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (Gneiting et al, 2004). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the CRPS calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -907,7 +907,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (Gneiting et al, 2004). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{\sigma^2}.
 
@@ -918,14 +918,14 @@ PIT
 
 Called "PIT" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
-The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (Dawid, 1984). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (:ref:`Dawid, 1984 <Dawid-1984>`). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
 
 RANK
 ~~~~
 
 Called "RANK" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
-The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (Hamill, 2001). When ensemble forecasts possesses the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat.
+The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (:ref:`Hamill, 2001 <Hamill-2001>`). When ensemble forecasts possesses the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat.
 
 The rank histogram does not provide information about the accuracy of ensemble forecasts. Further, examination of "rank" only makes sense for ensembles of a fixed size. Thus, if ensemble members are occasionally unavailable, the rank histogram should not be used. The PIT may be used instead.
 
@@ -975,7 +975,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 All of these measures are defined in :numref:`categorical variables`.
 
-In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in Ebert (2008) and Roberts and Lean (2008). Roberts and Lean (2008) also present an application of the methodology.
+In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean 2008 <Roberts-2008>`. Roberts and Lean (2008) also present an application of the methodology.
 
 Fractions Brier Score
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1040,7 +1040,7 @@ A mathematical metric, :math:`m(A,B)\geq 0`, must have the following three prope
 
 The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < M(A,B)`.
 
-It has been argued in Gilleland (2017) that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
+It has been argued in :ref:`Gilleland (2019) <Gilleland-2019>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
 The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's :math:`\Delta` Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 
