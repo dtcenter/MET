@@ -14,7 +14,7 @@ Scientific and statistical aspects
 __________________________________
 
 The Stat-Analysis tool can perform a variety of analyses, and each type of analysis is called a “job”. The job types include the ability to (i) aggregate results over a user-specified time; (ii) stratify statistics based on time of day, model initialization time, lead-time, model run identifier, output filename, or wavelet decomposition scale; and (iii) compute specific verification indices such as the GO Index 
-Footnote: [#1]_
+Footnote: [1]_
 and wind direction statistics. Future functionality may include information about time-trends and/or calculations based on climatology (e.g., anomaly correlation). This section summarizes the capabilities of the supported Stat-Analysis jobs.
 
 Filter STAT lines
@@ -695,4 +695,4 @@ See the README file in the installed share/met/config directory for a detailed d
 
 The default output for this job is contingency table counts and statistics (-out_line_type CTC,CTS). Matched pair information may also be output by requesting MPR output (-out_line_type CTC,CTS,MPR).
 
-.. [#1] The GO Index is a summary measure for NWP models that is used by the US Air Force. It combines verification statistics for several forecast variables and lead times.
+.. [#] The GO Index is a summary measure for NWP models that is used by the US Air Force. It combines verification statistics for several forecast variables and lead times.
