@@ -586,8 +586,6 @@ bool DataLine::read_py_single_text_line(PyLineDataFile * pldf)
 
 {
 
-// cout << "\n  in DataLine::read_py_single_text_line()\n\n" << flush;
-
 bool status = false;
 ConcatString s;
 
@@ -596,8 +594,6 @@ status = pldf->next_line(s);
 if ( ! status )  return ( false );
 
 Line = s.text();
-
-// cout << "\n  DataLine::read_py_single_text_line() ... Line = \"" << Line << "\"\n\n" << flush;
 
 return ( true );
 
@@ -812,8 +808,6 @@ int status;
 do {
 
    status = a.read_line(this);
-
-   // cout << "\n  LineDataFile::operator>>(DataLine &) -> status = " << status << "\n" << flush;
 
    if ( !status ) return ( 0 );
 

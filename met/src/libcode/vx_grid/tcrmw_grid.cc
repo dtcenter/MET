@@ -33,10 +33,6 @@ using namespace std;
 
 static const double tol = 1.0e-4;
 
-// static const double earth_radius_km = 6378.140;
-
-// static const double pi = M_PI ;
-
 static const double km_per_deg = (pi/180.0)*earth_radius_km;
 
 static const double deg_per_km = 1.0/km_per_deg;
@@ -286,20 +282,9 @@ void TcrmwGrid::range_azi_to_latlon(const double range_km, const double azi_deg,
 
 {
 
-const double range_deg     = deg_per_km*range_km;
-const double lat_rot       = 90.0 - range_deg;
-const double lon_rot       = azi_deg;
-// Vector P;
-
-// P =   (cosd(lat_eff)*sind(lon_eff))*Ir
-// 
-//     + (cosd(lat_eff)*cosd(lon_eff))*Jr
-// 
-//     + (sind(lat_eff))*Kr;
-// 
-// 
-// P.get_latlon(lat, lon);
-
+const double range_deg = deg_per_km*range_km;
+const double lat_rot   = 90.0 - range_deg;
+const double lon_rot   = azi_deg;
 double x, y;
 
 y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
@@ -326,33 +311,13 @@ double range_deg;
 double x, y;
 const double range_max_deg = deg_per_km*Range_max_km;
 
-// double xx, yy, zz;
-// Vector P;
-// 
-// P.set_latlon(lat, lon);
-// 
-// xx = dot(P, Ir);
-// yy = dot(P, Jr);
-// zz = dot(P, Kr);
-// 
-// range_deg = acosd(zz);
-// 
-// range_km = km_per_deg*range_deg;
-// 
-// azi_deg = atan2d(xx, yy);   //  NOT atan2d(yy, xx);
-
 RotatedLatLonGrid::latlon_to_xy(lat, lon, x, y);
-
 
 azi_deg = x*(RData.delta_rot_lon);
 
 range_deg = range_max_deg - y*(RData.delta_rot_lat);
 
 range_km = range_deg*km_per_deg;
-
-
-
-
 
 return;
 
@@ -411,13 +376,6 @@ void TcrmwGrid::wind_ne_to_ra_conventional (const double lat, const double lon,
 
 wind_ne_to_ra(lat, lon, east_component, north_component, radial_component, azimuthal_component);
 
-
-// radial_component    *= -1.0;
-
-// azimuthal_component *= -1.0;
-
-
-
 return;
 
 }
@@ -465,8 +423,6 @@ return;
 void TcrmwGrid::latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const
 
 {
-
-// cout << "in TcrmwGrid::latlon_to_xy()\n" << flush;
 
 RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 
