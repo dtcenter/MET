@@ -23,7 +23,20 @@ using namespace std;
 
 void oom() {
 
-   mlog << Error << "\nout of memory!  Exiting!\n\n";
+   mlog << Error << "\nOut of memory!  Exiting!\n\n";
+   exit(1);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void oom_grib2() {
+
+   mlog << Error << "\nOut of memory reading GRIB2 data!  Exiting!\n"
+	<< "Check that MET and the GRIB2C library were compiled "
+        << "consistently, either with or without the -D__64BIT__ "
+        << "flag.\n\n";
    exit(1);
 
    return;

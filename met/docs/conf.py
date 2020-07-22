@@ -38,7 +38,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'Flowchart' ]
 
 # Suppress certain warning messages
 suppress_warnings = ['ref.citation']
@@ -63,3 +63,9 @@ html_logo = os.path.join('_static','met_logo_2019_09.png')
 
 # -- Intersphinx control ---------------------------------------------------------------
 intersphinx_mapping = {'numpy':("https://docs.scipy.org/doc/numpy/", None)}
+
+numfig = True
+
+numfig_format = {
+    'figure': 'Figure %s',
+}

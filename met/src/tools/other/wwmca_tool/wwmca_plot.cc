@@ -540,10 +540,6 @@ bool region_ok(const MapRegion & r, const char hemisphere)
 
 {
 
-// if ( (hemisphere == 'N') && (r.lat_max() < -21.0) )  return ( false );
-//
-// if ( (hemisphere == 'S') && (r.lat_min() >  21.0) )  return ( false );
-
 return ( true );
 
 }

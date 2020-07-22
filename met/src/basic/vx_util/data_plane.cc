@@ -862,8 +862,6 @@ if ( xb )  { delete [] xb;  xb = 0; }
 if ( C )  { delete [] C;  C = 0; }
 if ( S )  { delete [] S;  S = 0; }
 
-// cout << "\n\n  Elapsed time: " << (time(0) - start_time) << "\n\n";
-
    //
    //  done
    //

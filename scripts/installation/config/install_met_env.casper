@@ -1,0 +1,17 @@
+module load intel/19.0.5
+module load python/3.7.5
+module load netcdf/4.7.3
+ncar_pylib
+
+export TEST_BASE=/glade/p/ral/jntp/MET/MET_releases/casper/9.0.3
+export COMPILER=intel_19.0.5
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=met-9.0.3.20200626.tar.gz
+export USE_MODULES=TRUE
+export MET_PYTHON=/glade/u/apps/dav/opt/python/3.7.5/gnu/8.3.0/pkg-library/20200417
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.7m\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
+export MET_NETCDF=/glade/u/apps/dav/opt/netcdf/4.7.3/intel/19.0.5
+export SET_D64BIT=FALSE
+export CFLAGS="-Wall -g"
+export CXXFLAGS="-Wall -g"
