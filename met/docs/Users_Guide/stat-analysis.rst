@@ -484,7 +484,7 @@ ___________________
                      "VCNT:FSTDEV", "VCNT:OSTDEV" ];
 
   wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
-                       "CNT:KT_CORR", "CNT:ANOM_CORR", "CNT:ANOM_CORR_RAW" ];
+                       "CNT:KT_CORR", "CNT:ANOM_CORR", "CNT:ANOM_CORR_UNCNTR" ];
 
 
 These entries specify lists of statistics in the form LINE_TYPE:COLUMN to which the various WMO mean logic types should be applied for the summary job type.

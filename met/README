@@ -262,8 +262,8 @@ Version 9.1 BETA2 Release Notes:
 
 - Enhancements to Existing Tools:
    - Update HiRA configuration options in Point-Stat for computing RPS (#1400).
-   - Add new anomaly correlation without the mean error (ANOM_CORR_RAW) to the
-     CNT line type (#1399).
+   - Add new anomaly correlation without the mean error (ANOM_CORR_UNCNTR) to
+     the CNT line type (#1399).
    - Fix Ensemble-Stat runtime error when obs_thresh results in 0 pairs being
      retained (#1397).
    - Enhance point2grid to process multiple fields (#1396).

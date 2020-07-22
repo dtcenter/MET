@@ -721,7 +721,7 @@ void CNTInfo::clear() {
    anom_corr.clear();
    rmsfa.clear();
    rmsoa.clear();
-   anom_corr_raw.clear();
+   anom_corr_uncntr.clear();
    me.clear();
    me2.clear();
    estdev.clear();
@@ -759,36 +759,36 @@ void CNTInfo::assign(const CNTInfo &c) {
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
-   fbar          = c.fbar;
-   fstdev        = c.fstdev;
-   obar          = c.obar;
-   ostdev        = c.ostdev;
-   pr_corr       = c.pr_corr;
-   sp_corr       = c.sp_corr;
-   kt_corr       = c.kt_corr;
-   anom_corr     = c.anom_corr;
-   rmsfa         = c.rmsfa;
-   rmsoa         = c.rmsoa;
-   anom_corr_raw = c.anom_corr_raw;
-   me            = c.me;
-   me2           = c.me2;
-   estdev        = c.estdev;
-   mbias         = c.mbias;
-   mae           = c.mae;
-   mse           = c.mse;
-   msess         = c.msess;
-   bcmse         = c.bcmse;
-   rmse          = c.rmse;
-   e10           = c.e10;
-   e25           = c.e25;
-   e50           = c.e50;
-   e75           = c.e75;
-   e90           = c.e90;
-   eiqr          = c.eiqr;
-   mad           = c.mad;
-   n_ranks       = c.n_ranks;
-   frank_ties    = c.frank_ties;
-   orank_ties    = c.orank_ties;
+   fbar             = c.fbar;
+   fstdev           = c.fstdev;
+   obar             = c.obar;
+   ostdev           = c.ostdev;
+   pr_corr          = c.pr_corr;
+   sp_corr          = c.sp_corr;
+   kt_corr          = c.kt_corr;
+   anom_corr        = c.anom_corr;
+   rmsfa            = c.rmsfa;
+   rmsoa            = c.rmsoa;
+   anom_corr_uncntr = c.anom_corr_uncntr;
+   me               = c.me;
+   me2              = c.me2;
+   estdev           = c.estdev;
+   mbias            = c.mbias;
+   mae              = c.mae;
+   mse              = c.mse;
+   msess            = c.msess;
+   bcmse            = c.bcmse;
+   rmse             = c.rmse;
+   e10              = c.e10;
+   e25              = c.e25;
+   e50              = c.e50;
+   e75              = c.e75;
+   e90              = c.e90;
+   eiqr             = c.eiqr;
+   mad              = c.mad;
+   n_ranks          = c.n_ranks;
+   frank_ties       = c.frank_ties;
+   orank_ties       = c.orank_ties;
 
    return;
 }
@@ -819,7 +819,7 @@ void CNTInfo::allocate_n_alpha(int i) {
       anom_corr.allocate_n_alpha(n_alpha);
       rmsfa.allocate_n_alpha(n_alpha);
       rmsoa.allocate_n_alpha(n_alpha);
-      anom_corr_raw.allocate_n_alpha(n_alpha);
+      anom_corr_uncntr.allocate_n_alpha(n_alpha);
       me.allocate_n_alpha(n_alpha);
       me2.allocate_n_alpha(n_alpha);
       estdev.allocate_n_alpha(n_alpha);
@@ -994,37 +994,37 @@ void CNTInfo::compute_ci() {
 double CNTInfo::get_stat(const char *stat_name) {
    double v = bad_data_double;
 
-        if(strcmp(stat_name, "TOTAL"         ) == 0) v = n;
-   else if(strcmp(stat_name, "FBAR"          ) == 0) v = fbar.v;
-   else if(strcmp(stat_name, "FSTDEV"        ) == 0) v = fstdev.v;
-   else if(strcmp(stat_name, "OBAR"          ) == 0) v = obar.v;
-   else if(strcmp(stat_name, "OSTDEV"        ) == 0) v = ostdev.v;
-   else if(strcmp(stat_name, "PR_CORR"       ) == 0) v = pr_corr.v;
-   else if(strcmp(stat_name, "SP_CORR"       ) == 0) v = sp_corr.v;
-   else if(strcmp(stat_name, "KT_CORR"       ) == 0) v = kt_corr.v;
-   else if(strcmp(stat_name, "RANKS"         ) == 0) v = n_ranks;
-   else if(strcmp(stat_name, "FRANK_TIES"    ) == 0) v = frank_ties;
-   else if(strcmp(stat_name, "ORANK_TIES"    ) == 0) v = orank_ties;
-   else if(strcmp(stat_name, "ME"            ) == 0) v = me.v;
-   else if(strcmp(stat_name, "ESTDEV"        ) == 0) v = estdev.v;
-   else if(strcmp(stat_name, "MBIAS"         ) == 0) v = mbias.v;
-   else if(strcmp(stat_name, "MAE"           ) == 0) v = mae.v;
-   else if(strcmp(stat_name, "MSE"           ) == 0) v = mse.v;
-   else if(strcmp(stat_name, "BCMSE"         ) == 0) v = bcmse.v;
-   else if(strcmp(stat_name, "RMSE"          ) == 0) v = rmse.v;
-   else if(strcmp(stat_name, "E10"           ) == 0) v = e10.v;
-   else if(strcmp(stat_name, "E25"           ) == 0) v = e25.v;
-   else if(strcmp(stat_name, "E50"           ) == 0) v = e50.v;
-   else if(strcmp(stat_name, "E75"           ) == 0) v = e75.v;
-   else if(strcmp(stat_name, "E90"           ) == 0) v = e90.v;
-   else if(strcmp(stat_name, "EIQR"          ) == 0) v = eiqr.v;
-   else if(strcmp(stat_name, "MAD  "         ) == 0) v = mad.v;
-   else if(strcmp(stat_name, "ANOM_CORR"     ) == 0) v = anom_corr.v;
-   else if(strcmp(stat_name, "ME2"           ) == 0) v = me2.v;
-   else if(strcmp(stat_name, "MSESS"         ) == 0) v = msess.v;
-   else if(strcmp(stat_name, "RMSFA"         ) == 0) v = rmsfa.v;
-   else if(strcmp(stat_name, "RMSOA"         ) == 0) v = rmsoa.v;
-   else if(strcmp(stat_name, "ANOM_CORR_RAW" ) == 0) v = anom_corr_raw.v;
+        if(strcmp(stat_name, "TOTAL"           ) == 0) v = n;
+   else if(strcmp(stat_name, "FBAR"            ) == 0) v = fbar.v;
+   else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = fstdev.v;
+   else if(strcmp(stat_name, "OBAR"            ) == 0) v = obar.v;
+   else if(strcmp(stat_name, "OSTDEV"          ) == 0) v = ostdev.v;
+   else if(strcmp(stat_name, "PR_CORR"         ) == 0) v = pr_corr.v;
+   else if(strcmp(stat_name, "SP_CORR"         ) == 0) v = sp_corr.v;
+   else if(strcmp(stat_name, "KT_CORR"         ) == 0) v = kt_corr.v;
+   else if(strcmp(stat_name, "RANKS"           ) == 0) v = n_ranks;
+   else if(strcmp(stat_name, "FRANK_TIES"      ) == 0) v = frank_ties;
+   else if(strcmp(stat_name, "ORANK_TIES"      ) == 0) v = orank_ties;
+   else if(strcmp(stat_name, "ME"              ) == 0) v = me.v;
+   else if(strcmp(stat_name, "ESTDEV"          ) == 0) v = estdev.v;
+   else if(strcmp(stat_name, "MBIAS"           ) == 0) v = mbias.v;
+   else if(strcmp(stat_name, "MAE"             ) == 0) v = mae.v;
+   else if(strcmp(stat_name, "MSE"             ) == 0) v = mse.v;
+   else if(strcmp(stat_name, "BCMSE"           ) == 0) v = bcmse.v;
+   else if(strcmp(stat_name, "RMSE"            ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "E10"             ) == 0) v = e10.v;
+   else if(strcmp(stat_name, "E25"             ) == 0) v = e25.v;
+   else if(strcmp(stat_name, "E50"             ) == 0) v = e50.v;
+   else if(strcmp(stat_name, "E75"             ) == 0) v = e75.v;
+   else if(strcmp(stat_name, "E90"             ) == 0) v = e90.v;
+   else if(strcmp(stat_name, "EIQR"            ) == 0) v = eiqr.v;
+   else if(strcmp(stat_name, "MAD  "           ) == 0) v = mad.v;
+   else if(strcmp(stat_name, "ANOM_CORR"       ) == 0) v = anom_corr.v;
+   else if(strcmp(stat_name, "ME2"             ) == 0) v = me2.v;
+   else if(strcmp(stat_name, "MSESS"           ) == 0) v = msess.v;
+   else if(strcmp(stat_name, "RMSFA"           ) == 0) v = rmsfa.v;
+   else if(strcmp(stat_name, "RMSOA"           ) == 0) v = rmsoa.v;
+   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = anom_corr_uncntr.v;
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
@@ -2374,7 +2374,7 @@ void PCTInfo::assign(const PCTInfo &c) {
    briercl     = c.briercl;
    bss         = c.bss;
    bss_smpl    = c.bss_smpl;
-   
+
    return;
 }
 
@@ -2739,7 +2739,7 @@ void DMAPInfo::clear() {
    med_fo   = med_of = med_min = med_max = med_mean = bad_data_double;
    fom_fo   = fom_of = fom_min = fom_max = fom_mean = bad_data_double;
    zhu_fo   = zhu_of = zhu_min = zhu_max = zhu_mean = bad_data_double;
-   
+
    return;
 }
 
@@ -2749,7 +2749,7 @@ void DMAPInfo::reset_options() {
    baddeley_p = 2;          // Exponent for lp-norm
    baddeley_max_dist = 5.0; // Maximum distance constant
    fom_alpha = 0.1;         // FOM Alpha
-   zhu_weight = 0.5;        // Zhu Weight 
+   zhu_weight = 0.5;        // Zhu Weight
 
    return;
 }
@@ -2823,7 +2823,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
            << fthr_na.n()  << ", " << othr_na.n() << ")\n\n";
       exit(1);
    }
-   
+
    // Initialize
    clear();
 
@@ -2843,7 +2843,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
    double baddeley_delta_sum = 0.0;
 
    non_zero_count = 0;
-   
+
    mlog << Debug(4) << " DMAP.Options: baddeley_p=" << baddeley_p
         << ", baddeley_max_dist=" << baddeley_max_dist
         << ", fom_alpha=" << fom_alpha
@@ -2865,9 +2865,9 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
          med_fo_sum += fdmap_na[i];
          fom_fo_sum += 1 / (1 + fdmap_na[i] * fdmap_na[i] * fom_alpha);
       }
-      
+
       sum_event_diff += (fthr_na[i] - othr_na[i]) * (fthr_na[i] - othr_na[i]);
-      
+
       f_distance = (!is_bad_data(baddeley_max_dist) &&
                     fdmap_na[i] > baddeley_max_dist ?
                     baddeley_max_dist : fdmap_na[i]);
@@ -2879,7 +2879,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
          baddeley_delta_sum += pow((double)abs_diff_distance, baddeley_p);
          non_zero_count++;
       }
-      
+
       // Distance metrics
       abs_diff_distance = abs(fdmap_na[i] - odmap_na[i]);
       if (hausdorff < abs_diff_distance) hausdorff = abs_diff_distance;
@@ -2904,10 +2904,10 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
       med_min  = min(med_fo, med_of);
       med_mean = (med_fo + med_of) / 2;
    }
-   
+
    // Distance metrics
    baddeley = pow(baddeley_delta_sum/(double)total, 1.0/baddeley_p);
-   
+
    // Pratt's Figure of Merit
    if(max_events > 0) {
       if(oy > 0) fom_fo = fom_fo_sum / max_events;
@@ -2918,7 +2918,7 @@ void DMAPInfo::set(const SingleThresh &fthr, const SingleThresh &othr,
          fom_mean = (fom_fo + fom_of) / 2;
       }
    }
- 
+
    // Zhu Metric
    zhu_common = zhu_weight * sqrt(sum_event_diff / total);
    zhu_fo = (is_bad_data(med_fo) ? bad_data_double : zhu_common + (1-zhu_weight) * med_fo);
@@ -3134,12 +3134,12 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Compute anomaly correlation from sums of squares without adjusting
-// for the mean error.
+// Compute the uncentered anomaly correlation from sums of squares
+// without adjusting for the mean error.
 //
 ////////////////////////////////////////////////////////////////////////
 
-double compute_anom_corr_raw(double ffa, double ooa, double foa) {
+double compute_anom_corr_uncntr(double ffa, double ooa, double foa) {
    double v, c;
 
    v = ffa*ooa;
