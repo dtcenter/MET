@@ -2302,13 +2302,8 @@ void set_verbosity(const StringArray & a) {
       mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
            << "produces excessive log output and can slow the runtime "
            << "considerably.\n\n";
-<<<<<<< HEAD
    }
 }
-=======
-   }
-}
->>>>>>> develop
 
 ////////////////////////////////////////////////////////////////////////
 
