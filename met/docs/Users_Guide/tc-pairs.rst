@@ -168,7 +168,7 @@ The following are valid baselines for the **best_baseline** field:
 
 **BTCLIP**: Neumann original 3-day CLIPER in best track mode. Used for the Atlantic basin only. Specify model as BCLP.
 
-**BTCLIP5**: 5-day CLIPER (**Aberson, 1998**)/SHIFOR (**DeMaria and Knaff, 2001**) in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
+**BTCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>` in best track mode for either Atlantic or eastern North Pacific basins. Specify model as BCS5.
 
 **BTCLIPA**: Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track mode. Used for Atlantic basin only. Specify model as BCLA.
 
@@ -185,9 +185,9 @@ The following are valid baselines for the **oper_baseline** field:
 
 **OCLIP**: Merrill modified (operational) 3-day CLIPER run in operational mode. Used for Atlantic basin only. Specify model as OCLP.
 
-**OCLIP5**: 5-day CLIPER (**Aberson, 1998**)/ SHIFOR (**DeMaria and Knaff, 2001**) in operational mode, rerun using CARQ data. Specify model as OCS5.
+**OCLIP5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/ SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>`) in operational mode, rerun using CARQ data. Specify model as OCS5.
 
-**OCLIPD5**: 5-day CLIPER (**Aberson, 1998**)/ DECAY-SHIFOR (**DeMaria and Knaff, 2001**). Specify model as OCD5.
+**OCLIPD5**: 5-day CLIPER (:ref:`Aberson, 1998 <Aberson-1998>`)/ DECAY-SHIFOR (:ref:`DeMaria and Knaff, 2003 <Knaff-2003>`). Specify model as OCD5.
 
 ____________________
 

@@ -3,7 +3,7 @@
 Re-Formatting of Gridded Fields
 ===============================
 
-Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in ::numref:`overview-figure`.
+Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in :numref:`overview-figure`.
 
 Pcp-Combine tool
 ________________
@@ -460,8 +460,6 @@ Optional arguments for wwmca_plot
 4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
 5. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
-
-.. _reformat_grid_fig2:
 
 .. figure:: figure/reformat_grid_fig2.png
 	    

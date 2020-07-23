@@ -38,7 +38,7 @@ where again, :math:`\sigma` is replaced by its estimate, :math:`\hat{\sigma}`, a
   * - Mean error
     - :math:`V(\bar{F} - \bar{O}) = \frac{\sigma_{F - O}}{\sqrt{n}}`, where :math:`\sigma_{F - O}` emphasizes that this is the estimated standard deviation of the errors, :math:`F - O`.
   * - Brier Score (BS)
-    - :math:`V(\text{BS}) = \frac{1}{T} [\sum F^4 + \bar{O} (1 - 4 \sum F_{F | O=1}^3 + 6 \sum F_{F | O=1}^2 - 4 \sum F_{F | O=1}) - \text{BS}^2]` where **F** is the **probability** forecast and **O** is the observation. See Bradley et al (2008) for derivation and details.
+    - :math:`V(\text{BS}) = \frac{1}{T} [\sum F^4 + \bar{O} (1 - 4 \sum F_{F | O=1}^3 + 6 \sum F_{F | O=1}^2 - 4 \sum F_{F | O=1}) - \text{BS}^2]` where **F** is the **probability** forecast and **O** is the observation. See :ref:`Bradley et al, 2008 <Bradley-2008>` for derivation and details.
   * - Peirce Skill Score (PSS)
     - :math:`V(\text{PSS}) = \sqrt{\frac{H(1 - H)}{n_H} + \frac{F(1 - F)}{n_F}}`, where **H** is the hit rate, **F** the false alarm rate, :math:`n_h` the number of hits and misses, and :math:`n_F` the number of false alarms and correct negatives.
   * - Logarithm of the odds ratio (OR)
@@ -84,4 +84,4 @@ Typically, a simple random sample is taken for step 2, and that is how it is don
 
 There are numerous ways to construct CIs from the sample obtained in step 4. MET allows for two of these procedures: the percentile and the BCa. The percentile is the most commonly known method, and the simplest to understand. It is merely the :math:`\alpha / 2` and :math:`1 - \alpha / 2` percentiles from the sample of statistics. Unfortunately, however, it has been shown that this interval is too optimistic in practice (i.e., it doesn’t have accurate coverage). One solution is to use the BCa method, which is very accurate, but it is also computationally intensive. This method adjusts for bias and non-constant variance, and yields the percentile interval in the event that the sample is unbiased with constant variance.
 
-If there is dependency in the sample, then it is prudent to account for this dependency in some way. One method that does not make a lot of assumptions is circular block bootstrapping. This is not currently implemented in MET, but will be available in a future release. At that time, the method will be explained more fully here, but until then consult Gilleland (2010) for more details. 
+If there is dependency in the sample, then it is prudent to account for this dependency in some way. One method that does not make a lot of assumptions is circular block bootstrapping. This is not currently implemented in MET, but will be available in a future release. At that time, the method will be explained more fully here, but until then consult :ref:`Gilleland (2010) <Gilleland-2010>` for more details.
