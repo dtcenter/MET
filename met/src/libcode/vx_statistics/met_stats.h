@@ -179,7 +179,7 @@ class CNTInfo {
       CIInfo pr_corr, sp_corr, kt_corr;
 
       // Anomaly correlation and RMS Anomalies
-      CIInfo anom_corr, rmsfa, rmsoa, anom_corr_raw;
+      CIInfo anom_corr, rmsfa, rmsoa, anom_corr_uncntr;
 
       CIInfo me, me2, estdev, mbias, mae, mse, msess, bcmse, rmse;
       CIInfo e10, e25, e50, e75, e90, eiqr;
@@ -605,7 +605,7 @@ class DMAPInfo {
       int    baddeley_p;           // Exponent for lp-norm
       double baddeley_max_dist;    // Maximum distance constant
       double fom_alpha;            // FOM Alpha
-      double zhu_weight;           // Zhu Weight 
+      double zhu_weight;           // Zhu Weight
 
    public:
 
@@ -673,7 +673,7 @@ extern double compute_stdev(double, double, int);
 
 extern double compute_corr(double, double, double, double, double, int);
 
-extern double compute_anom_corr_raw(double, double, double);
+extern double compute_anom_corr_uncntr(double, double, double);
 
 extern double compute_afss(double, double);
 

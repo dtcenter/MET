@@ -96,7 +96,7 @@ wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
 
 wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
                      "CNT:KT_CORR", "CNT:ANOM_CORR",
-                     "CNT:ANOM_CORR_RAW" ];
+                     "CNT:ANOM_CORR_UNCNTR" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

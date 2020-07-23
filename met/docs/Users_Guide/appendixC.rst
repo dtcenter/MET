@@ -540,7 +540,7 @@ Percentiles of the errors provide more information about the distribution of err
 Anomaly Correlation Coefficient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Called "ANOM_CORR" and "ANOM_CORR_RAW" for centered and uncentered versions in CNT output :numref:`table_PS_format_info_CNT`
+Called "ANOM_CORR" and "ANOM_CORR_UNCNTR" for centered and uncentered versions in CNT output :numref:`table_PS_format_info_CNT`
 
 The anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (**c**) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The anomaly correlation coefficient is defined as: 
 
@@ -550,7 +550,7 @@ The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean
 
 .. math:: \text{Anomaly Correlation } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
 
-The uncentered anomaly correlation coefficient (ANOM_CORR_RAW) which does not include the mean errors is defined as: 
+The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
 .. math:: \text{Anomaly Correlation Raw } = \frac{ \bar{(f - c)(a - c)}}{ \sqrt{\bar{(f - c)^2} \bar{(a - c)^2}}}
 
