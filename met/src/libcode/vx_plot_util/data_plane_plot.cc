@@ -255,7 +255,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
          //
       tick_val = val_m * i + colortable.data_min(bad_data_double);
 
-      junk.format("%.3f", tick_val);
+      junk.format("%.3g", tick_val);
 
          //
          // 2 means to center text both horizontally and vertically,
