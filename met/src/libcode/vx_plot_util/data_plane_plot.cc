@@ -166,7 +166,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
    plot.comment("end drawing map");
 
    draw_border(plot, map_box, 2.0);
-   
+
       //
       // annotate the plot with the filename and the title if set
       //
@@ -255,7 +255,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
          //
       tick_val = val_m * i + colortable.data_min(bad_data_double);
 
-      junk.format("%.3g", tick_val);
+      junk.format("%g", tick_val);
 
          //
          // 2 means to center text both horizontally and vertically,
@@ -348,7 +348,7 @@ void fill_colorbar_image(Ppm & image, const ColorTable & ctable)
       //
    dmin = ctable.data_min(bad_data_double);
    dmax = ctable.data_max(bad_data_double);
- 
+
    m = (dmax - dmin)/(num_cbar_vals - 1);
 
    for (i = 0; i < num_cbar_vals; i++)
