@@ -22,8 +22,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 void get_series_entry(int, VarInfo*, const StringArray&,
-                      const GrdFileType, StringArray&, DataPlane&,
-                      Grid&);
+                      const GrdFileType, DataPlane&, Grid&);
 
 bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
                        DataPlane&, Grid&);
