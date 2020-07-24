@@ -21,8 +21,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_data(int, VarInfo*, DataPlane&);
-
 void get_series_entry(int, VarInfo*, const StringArray&,
                       const GrdFileType, StringArray&, DataPlane&,
                       Grid&);
