@@ -105,6 +105,8 @@ As described in the introduction to this chapter, two additional utilities are s
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. Please refer to the "Unified Post-processor" utility mentioned above for information on availability and installation.
 
+.. _met_directory_structure:
+
 MET directory structure
 _______________________
 
