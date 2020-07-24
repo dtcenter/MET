@@ -50,8 +50,6 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
          exit(1);
       }
       else {
-         mlog << Debug(3)
-              << "Use the matching forecast and observation grids.\n";
          vx_grid = *fgrid;
       }
    }
