@@ -21,8 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 void get_series_entry(int i_series, VarInfo* data_info,
-   const StringArray& search_files, const GrdFileType type,
-   StringArray& found_files, DataPlane& dp, Grid& grid) {
+        const StringArray& search_files, const GrdFileType type,
+        DataPlane& dp, Grid& grid) {
 
    mlog << Debug(3)
         << "Processing series entry " << i_series + 1 << ": "
@@ -48,7 +48,7 @@ void get_series_entry(int i_series, VarInfo* data_info,
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo* info, const ConcatString& filename,
-   const GrdFileType type, DataPlane& dp, Grid& grid) {
+        const GrdFileType type, DataPlane& dp, Grid& grid) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile* mtddf = (Met2dDataFile*) 0;

@@ -69,7 +69,7 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray data_files, found_data_files;
+static StringArray data_files;
 static GrdFileType dtype = FileType_None;
 static int compress_level = -1;
 
@@ -104,17 +104,6 @@ static Grid grid;
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
-
-// Enumeration of ways that a series can be defined
-enum SeriesType {
-    SeriesType_None,       // Undefined series type
-    SeriesType_Data_Conf,  // Defined by data.field configuration
-    SeriesType_Data_Files, // Defined by -data command line option
-};
-static SeriesType series_type = SeriesType_None;
-
-// Series length
-static int n_series = 0;
 
 // Variable histogram map
 map<ConcatString, vector<int> > histograms;

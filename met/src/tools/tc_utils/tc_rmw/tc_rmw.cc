@@ -731,9 +731,8 @@ void process_fields(const TrackInfoArray& tracks) {
             data_info->set_valid(valid_time);
 
             // Find data for this track point
-            get_series_entry(i_point, data_info,
-                data_files, ftype, found_data_files,
-                data_dp, latlon_arr);
+            get_series_entry(i_point, data_info, data_files, ftype, data_dp,
+                             latlon_arr);
 
             // Check data range
             double data_min, data_max;
