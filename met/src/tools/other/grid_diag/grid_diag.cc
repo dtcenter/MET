@@ -211,10 +211,6 @@ void process_series(void) {
           get_series_entry(i_series, data_info, data_files, dtype,
                            data_dp, cur_grid);
 
-          mlog << Debug(3)
-               << "Processing " << data_info->magic_str() << " into "
-               << data_info->n_bins() << " bins.\n";
-
           // Regrid, if necessary
           if(!(cur_grid == grid)) {
              mlog << Debug(1)
@@ -302,7 +298,8 @@ void setup_histograms(void) {
       // Initialize histograms
       mlog << Debug(2)
            << "Initializing " << data_info->magic_str()
-           << " histogram.\n";
+           << " histogram with " << n_bins << " bins from "
+           << min << " to " << max << ".\n";
       histograms[data_info->magic_str()] = vector<int>();
       init_pdf(n_bins, histograms[data_info->magic_str()]);
    } // for i_var
@@ -326,7 +323,8 @@ void setup_joint_histograms(void) {
          joint_str.add("_");
          joint_str.add(joint_info->magic_str());
          mlog << Debug(2)
-              << "Initializing " << joint_str << " joint histogram.\n";
+              << "Initializing " << joint_str << " joint histogram with "
+              << n_bins << " x " << n_joint_bins << " bins.\n";
          joint_histograms[joint_str] = vector<int>();
 
          init_joint_pdf(n_bins, n_joint_bins,
