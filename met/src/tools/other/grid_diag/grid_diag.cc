@@ -81,11 +81,11 @@ int main(int argc, char *argv[]) {
     // Setup joint variable histograms
     setup_joint_histograms();
 
-    // Setup netcdf output
-    setup_nc_file();
-
     // Process series
     process_series();
+
+    // Setup netcdf output
+    setup_nc_file();
 
     // Write variable histograms
     write_histograms();
