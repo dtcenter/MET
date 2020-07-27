@@ -6,7 +6,7 @@ Software Installation/Getting Started
 Introduction
 ____________
 
-This chapter describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
+This section describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
 
 Supported architectures
 _______________________
@@ -99,7 +99,7 @@ In the directions above, the static library file that is created will be named l
 Installation of optional utilities
 __________________________________
 
-As described in the introduction to this chapter, two additional utilities are strongly recommended for use with MET.
+As described in the introduction to this section, two additional utilities are strongly recommended for use with MET.
 
 1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the data with MET. The Unified Post-Processor may be used on WRF output from both the ARW and NMM cores. https://dtcenter.org/community-code/unified-post-processor-upp .
 

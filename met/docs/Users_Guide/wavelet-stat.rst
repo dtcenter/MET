@@ -8,7 +8,7 @@ Wavelet-Stat Tool
 Introduction
 ____________
 
-The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This chapter describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by :ref:`Casati et al (2004) <Casati-2004>`.
+The Wavelet-Stat tool decomposes two-dimensional forecasts and observations according to intensity and scale. This section describes the Wavelet-Stat tool, which enables users to apply the Intensity-Scale verification technique described by :ref:`Casati et al (2004) <Casati-2004>`.
 
 The Intensity-Scale technique is one of the recently developed verification approaches that focus on verification of forecasts defined over spatial domains. Spatial verification approaches, as opposed to point-by-point verification approaches, aim to account for the presence of features and for the coherent spatial structure characterizing meteorological fields. Since these approaches account for the intrinsic spatial correlation existing between nearby grid-points, they do not suffer from point-by-point comparison related verification issues, such as double penalties. Spatial verification approaches aim to account for the observation and forecast time-space uncertainties, and aim to provide feedback on the forecast error in physical terms.
 

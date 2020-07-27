@@ -8,7 +8,7 @@ ____________
 
 The Grid-Stat tool provides verification statistics for a matched forecast and observation grid. All of the forecast grid points in the region of interest are matched to observation grid points on the same grid. All the matched grid points are used to compute the verification statistics. The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that no interpolation is required because the forecasts and observations are on the same grid. However, the interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
-Scientific and statistical aspects of the Grid-Stat tool are briefly described in this chapter, followed by practical details regarding usage and output from the tool.
+Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
 Scientific and statistical aspects
 __________________________________

@@ -3,7 +3,7 @@
 MET Data I/O
 ============
 
-Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this chapter. Both the input and output file formats are described in this chapter. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
+Data must often be preprocessed prior to using it for verification. Several MET tools exist for this purpose. In addition to preprocessing observations, some plotting utilities for data checking are also provided and described at the end of this section. Both the input and output file formats are described in this section. :numref:`Input data formats` and :numref:`Intermediate data formats` are primarily concerned with re-formatting input files into the intermediate files required by some MET modules. These steps are represented by the first three columns in the MET flowchart depicted in :numref:`overview-figure`. Output data formats are described in :numref:`Output data formats`. Common configuration files options are described in :numref:`Configuration File Details`. Description of software modules used to reformat the data may now be found in :numref:`reformat_point`  and :numref:`reformat_grid`.
 
 .. _Input data formats:
 
@@ -255,7 +255,7 @@ Part of the strength of MET is the leveraging of capability across tools. There 
 
 Many of the MET tools use a configuration file to set parameters. This prevents the command line from becoming too long and cumbersome and makes the output easier to duplicate.
 
-Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the chapters for those tools. In addition, these configuration settings are described in the share/met/config/README file and the share/met/config/README-TC file for the MET-Tropical Cyclone tools.
+Settings common to multiple tools are described in the following sections while those specific to individual tools are explained in the sections for those tools. In addition, these configuration settings are described in the share/met/config/README file and the share/met/config/README-TC file for the MET-Tropical Cyclone tools.
 
 .. _Data IO MET Configuration File Options:
 

@@ -136,7 +136,7 @@ Required arguments for plot_mode_field
 
 1. The **mode_nc_file_list** specifies the MODE output files to be used for plotting. 
 
-2. The **-raw | -simple | -cluster** argument indicates the types of field to be plotted. Exactly one must be specified. For details about the types of objects, see the chapter in this document on MODE.
+2. The **-raw | -simple | -cluster** argument indicates the types of field to be plotted. Exactly one must be specified. For details about the types of objects, see the section in this document on MODE.
 
 3. The **-obs | -fcst** option specifies whether to plot the observed or forecast field from the MODE output files. Exactly one must be specified.
 

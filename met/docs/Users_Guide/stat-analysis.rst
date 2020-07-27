@@ -6,7 +6,7 @@ Stat-Analysis Tool
 Introduction
 ____________
 
-The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this chapter.
+The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this section.
 
 MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the “-lookin python ...” option. An example of running Stat-Analysis with Python embedding is shown in :numref:`stat_analysis-usage`.
 
