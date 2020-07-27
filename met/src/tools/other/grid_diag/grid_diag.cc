@@ -192,6 +192,7 @@ void process_series(void) {
     Grid cur_grid;
     DataPlane data_dp;
     DataPlane joint_dp;
+    double min, max;
 
     // List the lengths of the series options
     mlog << Debug(1)
@@ -236,6 +237,17 @@ void process_series(void) {
              if(data_dp.valid() > valid_end) valid_end = data_dp.valid();
              if(data_dp.lead()  < lead_beg)  lead_beg  = data_dp.lead();
              if(data_dp.lead()  > lead_end)  lead_end  = data_dp.lead();
+          }
+
+          // Check the range of the data
+          data_dp.data_range(min, max);
+          if(min < data_info->range()[0] || max > data_info->range()[1]) {
+             mlog << Warning << "\nprocess_series() -> "
+                  << "the range of the " << data_info->magic_str()
+                  << " data (" << min << ", " << max
+                  << ") falls outside the configuration file range ("
+                  << data_info->range()[0] << ", " << data_info->range()[1]
+                  << ")!\n\n";
           }
 
           // Update partial sums
