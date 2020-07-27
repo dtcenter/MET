@@ -100,13 +100,13 @@ Required arguments for tc_stat
 Optional arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2. The **-out file** argument indicates the desired name of the TCST format output file.
+3. The **-out file** argument indicates the desired name of the TCST format output file.
 
-3. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-4. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-5. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+6. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 An example of the **tc_stat** calling sequence is shown below:
 
@@ -205,22 +205,22 @@ Other uses of the WATCH_WARN column include filtering when:
 
 The following filtering options can be achieved by the following:
 
-1. init_str_name = ["WATCH_WARN"];
+    1. init_str_name = ["WATCH_WARN"];
 
-   init_str_val = ["ALL"];
-
-2. column_str_name = ["WATCH_WARN"];
-
-   column_str_val = ["ALL"];
-
-3. init_str_name = ["WATCH_WARN"];
-
-   init_str_val = ["NA"];
-
-4. column_str_name = ["WATCH_WARN"];
-
-   column_str_val = ["NA"];
-
+       init_str_val = ["ALL"];
+ 
+    2. column_str_name = ["WATCH_WARN"];
+    
+       column_str_val = ["ALL"];
+   
+    3. init_str_name = ["WATCH_WARN"];
+    
+       init_str_val = ["NA"];
+    
+    4. column_str_name = ["WATCH_WARN"];
+    
+       column_str_val = ["NA"];
+    
 Further information on the **column_str** and **init_str** fields is described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will stratify by a single or multiple types of warnings.
 
 _________________________
