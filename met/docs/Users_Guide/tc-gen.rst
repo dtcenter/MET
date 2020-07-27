@@ -59,19 +59,19 @@ Optional arguments for tc_gen
 
 The TC-Gen tool implements the following logic:
 
-• Parse the genesis data and identify forecast genesis events separately for each model present.
+* Parse the genesis data and identify forecast genesis events separately for each model present.
 
-• Parse the BEST and operational track data and identify observed genesis events.
+* Parse the BEST and operational track data and identify observed genesis events.
 
-• Loop over the filters defined in the configuration file and apply the following logic for each.
+* Loop over the filters defined in the configuration file and apply the following logic for each.
 
-– For each forecast genesis event, search the BEST genesis events for a match that is close enough in time and space. If not found, search the operational genesis events for a match. If a match is found, classify the forecast genesis event as a **hit**. Otherwise, classify it as a **false alarm**.
+ * For each forecast genesis event, search the BEST genesis events for a match that is close enough in time and space. If not found, search the operational genesis events for a match. If a match is found, classify the forecast genesis event as a **hit**. Otherwise, classify it as a **false alarm**.
+   
+ * For each BEST track genesis event, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Classify as a **miss** each model opportunity that was not counted as a hit in the previous step.
+   
+ * Do not count any correct negatives.
 
-– For each BEST track genesis event, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Classify as a **miss** each model opportunity that was not counted as a hit in the previous step.
-
-– Do not count any correct negatives.
-
-• Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter.
+* Report the contingency table hits, misses, and false alarms separately for each forecast model and configuration file filter.
 
 tc_gen configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~
