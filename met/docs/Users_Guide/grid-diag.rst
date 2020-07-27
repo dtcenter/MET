@@ -24,6 +24,7 @@ The following sections describe the usage statement, required arguments, and opt
          -config file
          [-log file]
          [-v level]
+         [-compress level]
 
 grid_diag has required arguments and can accept several optional arguments.
 
@@ -39,9 +40,11 @@ Required arguments for grid_diag
 Optional arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+6. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 grid_diag configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,7 +59,7 @@ _____________________
   regrid        = { ... }
   censor_thresh = [];
   censor_val    = [];
-  mask          = { grid = [ "FULL" ]; poly = []; }
+  mask          = { grid = ""; poly = ""; }
   version       = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
@@ -66,7 +69,7 @@ _____________________
 .. code-block:: none
 
   data = {
-   f  ield = [
+   field = [
         {
            name   = "APCP";
            level  = ["L0"];
@@ -89,4 +92,4 @@ grid_diag output file
 
 The NetCDF file has a dimension for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum, midpoint, and maximum values are indicated with an _min, _min, or _max appended to the variable/level.
 
-For each variable/level combination in the data dictionary a corresponding histogram will be output to the NetCDF file. For example, hist_APCP_L0 and hist_PWAT_L0. These are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. In addition to 1D histograms, 2D histograms for all variable/level pairs are written. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels.
+For each variable/level combination in the data dictionary, a corresponding histogram will be written to the NetCDF output file. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file. In addition to 1D histograms, 2D histograms for all variable/level pairs are written. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels. The output variables for grid_size, mask_size, and n_series specify the number of points in the grid, the number of grid points in the mask, and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes.

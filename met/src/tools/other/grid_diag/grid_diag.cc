@@ -403,6 +403,10 @@ void setup_nc_file(void) {
    write_nc_var_int("n_series", "length of series",
                     data_files.n());
 
+   // Compression level
+  int deflate_level = compress_level;
+  if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
       VarInfo* data_info = conf_info.data_info[i_var];
 
@@ -423,9 +427,12 @@ void setup_nc_file(void) {
       var_min_name.add("_min");
       var_max_name.add("_max");
       var_mid_name.add("_mid");
-      NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim);
-      NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim);
-      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim);
+      NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
+                              deflate_level);
+      NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
+                              deflate_level);
+      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
+                              deflate_level);
 
       // Add variable attributes
       cs << cs_erase << "Minimum value of " << var_name << " bin";
@@ -459,7 +466,8 @@ void setup_nc_file(void) {
       ConcatString hist_name("hist_");
       hist_name.add(var_name);
       NcDim var_dim = data_var_dims[i_var];
-      NcVar hist_var = add_var(nc_out, hist_name, ncInt, var_dim);
+      NcVar hist_var = add_var(nc_out, hist_name, ncInt, var_dim,
+                               deflate_level);
       hist_vars.push_back(hist_var);
 
       // Add variable attributes
@@ -492,7 +500,8 @@ void setup_nc_file(void) {
          dims.push_back(var_dim);
          dims.push_back(joint_dim);
 
-         NcVar hist_var = add_var(nc_out, hist_name, ncInt, dims);
+         NcVar hist_var = add_var(nc_out, hist_name, ncInt, dims,
+                                  deflate_level);
          joint_hist_vars.push_back(hist_var);
 
          // Add variable attributes
