@@ -209,6 +209,11 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
       apply_mask(mask_area, mask_poly);
    }
 
+   // Report the size of the mask
+   mlog << Debug(3)
+        << "Including " << mask_area.count() << " of the " << grid.nxy()
+        << " grid points in the analysis.\n";
+
    return;
 }
 

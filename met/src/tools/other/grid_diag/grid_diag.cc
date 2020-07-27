@@ -51,6 +51,8 @@ static void process_series(void);
 static void setup_histograms(void);
 static void setup_joint_histograms(void);
 static void setup_nc_file(void);
+static void write_nc_var_int(const char *, const char *, int);
+static void add_var_att_local(NcVar *, const char *, const ConcatString);
 static void write_histograms(void);
 static void write_joint_histograms(void);
 static void clean_up();
@@ -220,11 +222,27 @@ void process_series(void) {
                                   data_info->regrid());
           }
 
+          // Initialize timing info
+          if(i_series == 0 && i_var == 0) {
+             init_beg  = init_end  = data_dp.init();
+             valid_beg = valid_end = data_dp.valid();
+             lead_beg  = lead_end  = data_dp.lead();
+          }
+          // Update timing info
+          else {
+             if(data_dp.init()  < init_beg)  init_beg  = data_dp.init();
+             if(data_dp.init()  > init_end)  init_end  = data_dp.init();
+             if(data_dp.valid() < valid_beg) valid_beg = data_dp.valid();
+             if(data_dp.valid() > valid_end) valid_end = data_dp.valid();
+             if(data_dp.lead()  < lead_beg)  lead_beg  = data_dp.lead();
+             if(data_dp.lead()  > lead_end)  lead_end  = data_dp.lead();
+          }
+
           // Update partial sums
           update_pdf(bin_mins[data_info->magic_str()][0],
                      bin_deltas[data_info->magic_str()],
                      histograms[data_info->magic_str()],
-                     data_dp);
+                     data_dp, conf_info.mask_area);
 
           for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
@@ -254,7 +272,7 @@ void process_series(void) {
                               bin_deltas[data_info->magic_str()],
                               bin_deltas[joint_info->magic_str()],
                               joint_histograms[joint_str],
-                              data_dp, joint_dp);
+                              data_dp, joint_dp, conf_info.mask_area);
          } // end for j_var
       } // end for i_var
    } // end for i_series
@@ -336,6 +354,8 @@ void setup_joint_histograms(void) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(void) {
+   int n;
+   ConcatString cs;
 
    // Create NetCDF file
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -346,6 +366,30 @@ void setup_nc_file(void) {
            << out_file << "\n\n";
       exit(1);
    }
+
+   // Add global attributes
+   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+                       conf_info.model.c_str());
+   add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
+                                (string)conf_info.mask_grid_name : na_str));
+   add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
+                                (string)conf_info.mask_poly_name : na_str));
+
+   // Add time range information to the global attributes
+   add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
+   add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
+   add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
+   add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
+   add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
+   add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
+
+   // Write the grid size, mask size, and series length
+   write_nc_var_int("grid_size", "number of grid points",
+                    grid.nxy());
+   write_nc_var_int("mask_size", "number of mask points",
+                    conf_info.mask_area.count());
+   write_nc_var_int("n_series", "length of series",
+                    data_files.n());
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
       VarInfo* data_info = conf_info.data_info[i_var];
@@ -371,10 +415,18 @@ void setup_nc_file(void) {
       NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim);
       NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim);
 
-      // Add units
-      var_min.putAtt("units", data_info->units_attr());
-      var_max.putAtt("units", data_info->units_attr());
-      var_mid.putAtt("units", data_info->units_attr());
+      // Add variable attributes
+      cs << cs_erase << "Minimum value of " << var_name << " bin";
+      add_var_att_local(&var_min, "long_name", cs);
+      add_var_att_local(&var_min, "units", data_info->units_attr());
+
+      cs << cs_erase << "Maximum value of " << var_name << " bin";
+      add_var_att_local(&var_max, "long_name", cs);
+      add_var_att_local(&var_max, "units", data_info->units_attr());
+
+      cs << cs_erase << "Midpoint value of " << var_name << " bin";
+      add_var_att_local(&var_mid, "long_name", cs);
+      add_var_att_local(&var_mid, "units", data_info->units_attr());
 
       // Write bin values
       var_min.putVar(bin_mins[data_info->magic_str()].data());
@@ -397,6 +449,10 @@ void setup_nc_file(void) {
       NcDim var_dim = data_var_dims[i_var];
       NcVar hist_var = add_var(nc_out, hist_name, ncInt, var_dim);
       hist_vars.push_back(hist_var);
+
+      // Add variable attributes
+      cs << cs_erase << "Histogram of " << var_name << " values";
+      add_var_att_local(&hist_var, "long_name", cs);
    }
 
    // Define joint histograms
@@ -426,8 +482,37 @@ void setup_nc_file(void) {
 
          NcVar hist_var = add_var(nc_out, hist_name, ncInt, dims);
          joint_hist_vars.push_back(hist_var);
+
+         // Add variable attributes
+         cs << cs_erase
+            << "Joint histogram of " << hist_name << " values";
+         add_var_att_local(&hist_var, "long_name", cs);
       }
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_var_int(const char *var_name, const char *long_name,
+                      int n) {
+
+   // Add the variable
+   NcVar var = add_var(nc_out, var_name, ncInt);
+   add_att(&var, "long_name", long_name);
+
+   if(!put_nc_data(&var, &n)) {
+      mlog << Error << "\nwrite_nc_int() -> "
+           << "error writing the \"" << long_name << "\" variable.\n\n";
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void add_var_att_local(NcVar *var, const char *att_name,
+                       const ConcatString att_value) {
+   if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
+   else                     add_att(var, att_name, na_str);
 }
 
 ////////////////////////////////////////////////////////////////////////

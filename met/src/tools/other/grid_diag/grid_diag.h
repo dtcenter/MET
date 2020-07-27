@@ -113,6 +113,14 @@ map<ConcatString, vector<double> > bin_maxs;
 map<ConcatString, vector<double> > bin_mids;
 map<ConcatString, double> bin_deltas;
 
+// Range of timing values encountered in the data
+static unixtime init_beg  = (unixtime) 0;
+static unixtime init_end  = (unixtime) 0;
+static unixtime valid_beg = (unixtime) 0;
+static unixtime valid_end = (unixtime) 0;
+static int      lead_beg  = bad_data_int;
+static int      lead_end  = bad_data_int;
+
 #endif  //  __GRID_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////
