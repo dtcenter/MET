@@ -1007,7 +1007,7 @@ Uniform Fractions Skill Score
 
 Called "UFSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
-The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total forecast events across the grid. This no-skill forecast defines the UFSS, and thus a skilled forecast must have a higher value of FSS than the UFSS. Again, the formula is the same as for FSS as above, the forecast proportion in each neighborhood is the same, and is equivalent to the overall forecast event proportion.
+The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total observed events across the grid. UFSS represents the FSS that would be obtained at the grid scale from a forecast with a fraction/probability equal to the total observed event proportion at every point. The formula is :math:`UFSS = (1 + f_o)/2` (i.e., halfway between perfect skill and random forecast skill) where :math:`f_o` is the total observed event proportion (i.e. observation rate).
 
 Forecast Rate
 ~~~~~~~~~~~~~
