@@ -657,9 +657,9 @@ These object identifiers are described in :numref:`MODE_object_attribute`.
   :widths: auto
   :header-rows: 2
 
-  * - mode ASCII OBJECT
+  * - 
+    - mode ASCII OBJECT
     - IDENTIFIER DESCRIPTIONS
-    - 
   * - Object identifier (object_id)
     - Valid Data Columns
     - Description of valid data
@@ -901,8 +901,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
   :widths: auto
   :header-rows: 2
 
-  * - mode NETCDF VARIABLES
-    - 
+  * - 
+    - mode NETCDF VARIABLES
     - 
   * - NetCDF Variable
     - Dimension

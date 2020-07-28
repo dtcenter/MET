@@ -25,7 +25,7 @@ In the past, many MET users have performed separate MODE runs at a series of for
 
 At first glance, the addition of a third dimension would seem to entail no difficulties other than increased memory and processing requirements to handle the three-dimensional datasets and objects, and that would indeed be largely true of an extension of MODE that used three spatial dimensions. In fact, the implementation of MTD entailed both conceptual difficulties (mostly due to the fact that there is no distance function in spacetime, so some MODE attributes, such as centroid distance, no longer even made sense), and engineering difficulties brought on by the need to redesign several core MODE algorithms for speed. It is planned that in the future some of these improved algorithms will be incorporated into MODE.
 
-In this users' guide, we will assume that the reader has a basic familiarity with traditional MODE, its internal operation, (convolution thresholding, fuzzy logic matching and merging) and its output. We will not review these things here. Instead, we will point out differences in MTD from the way traditional MODE does things when they come up. This release is a beta version of MTD, intended mostly to encourage users to experiment with it and give us feedback and suggestions to be used in a more robust MTD release in the future.
+In this section, we will assume that the reader has a basic familiarity with traditional MODE, its internal operation, (convolution thresholding, fuzzy logic matching and merging) and its output. We will not review these things here. Instead, we will point out differences in MTD from the way traditional MODE does things when they come up. This release is a beta version of MTD, intended mostly to encourage users to experiment with it and give us feedback and suggestions to be used in a more robust MTD release in the future.
 
 Scientific and statistical aspects
 __________________________________
@@ -54,7 +54,7 @@ The most basic change is to use a square convolution filter rather than the circ
 	    
    Convolution Region
 
-Another change is that we do not allow any bad data in thee convolution square. in MODE, the user may specify what percentage of bad data in the convolution region is permissible, and MODE will rescale the value of the filter accordingly for each data point. For the sake of speed, MTD requires that there be no bad data in the convolution region. If any bad data exists in the region, the convolved value there is set to a bad data flag.
+Another change is that we do not allow any bad data in the convolution square. In MODE, the user may specify what percentage of bad data in the convolution region is permissible, and it will rescale the value of the filter accordingly for each data point. For the sake of speed, MTD requires that there be no bad data in the convolution region. If any bad data exists in the region, the convolved value there is set to a bad data flag.
 
 3D Single Attributes
 ~~~~~~~~~~~~~~~~~~~~
@@ -83,9 +83,9 @@ The spatial orientation of a object (what traditional MODE calls the **axis angl
 
 A simple integer count of the number of grid squares in an object for all of it's lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
 
-The **start time** and **end time** of an object are attributes as well. This is an integer telling which time step an object starts and ends at. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
+The **start time** and **end time** of an object are attributes as well. These are integers reflecing at which time step an object starts and ends. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
 
-**Centroid distance travelled** is the total great circle distance, in kilometers, travelled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
+**Centroid distance traveled** is the total great circle distance, in kilometers, traveled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
 
 Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the the attributes are purely geometrical.
 
@@ -106,7 +106,7 @@ The **axis difference** is smaller of the two angles that the two spatial axis p
 
 **Speed delta** and **direction difference** are obtained from the velocity vectors of the two objects. Speed delta is the difference in the lengths of the vectors, and direction difference is the angle that the two vectors make with each other.
 
-**Volume ratio** is volume of the forecast object divided by the volume of the observed object. Note that any 3D object must necessarily have a nonzero volume, so there's no chance of zeros in the denominator.
+**Volume ratio** is the volume of the forecast object divided by the volume of the observed object. Note that any 3D object must necessarily have a nonzero volume, so there's no chance of zeros in the denominator.
 
 **Start time delta** and **end time delta** are the differences in the corresponding time steps associated with the two objects and are computed as "forecast minus obs".
 
