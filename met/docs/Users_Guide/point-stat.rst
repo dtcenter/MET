@@ -114,7 +114,7 @@ _______________________
 
 **Best Interpolation**
 
-The forecast value at P is the chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
+The forecast value at P is chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
 .. _PS_HiRA_framework:
 
@@ -609,9 +609,9 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * -
+  * - CTC OUTPUT FORMAT
     -
-    - CTC OUTPUT FORMAT
+    - 
   * - Column Number
     - CTC Column Name
     - Description
@@ -695,7 +695,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CTS OUTPUT FORMAT
+  * - CTS OUTPUT FORMAT (continued)
     -
     -
   * - Column Number
@@ -742,7 +742,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CTS OUTPUT FORMAT
+  * - CNT OUTPUT FORMAT
     -
     -
   * - Column Number
@@ -801,7 +801,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CNT OUTPUT FORMAT
+  * - CNT OUTPUT FORMAT (continued)
     -
     -
   * - Column Number
@@ -1349,8 +1349,6 @@ The first set of header columns are common to all of the output files generated 
   * - 77–79
     - DIR_ABSERR
     - Absolute value of DIR_ABSERR
-
-?? Missing table 20 or table 21.  Were things mis-numbered?
 
 .. _table_PS_format_info_MPR:
 

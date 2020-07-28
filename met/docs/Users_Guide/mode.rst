@@ -10,11 +10,9 @@ ____________
 
 This section provides a description of the Method for Object-Based Diagnostic Evaluation (MODE) tool, which was developed at the Research Applications Laboratory, NCAR/Boulder, USA. More information about MODE can be found in :ref:`Davis et al. (2006a,b) <Davis-2006>`, :ref:`Brown et al. (2007) <Brown-2007>` and :ref:`Bullock et al. (2016) <Bullock-2016>`.
 
-MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (*e.g.*, clouds, convection).
+MODE was developed in response to a need for verification methods that can provide diagnostic information that is more directly useful and meaningful than the information that can be obtained from traditional verification approaches, especially in application to high-resolution NWP output. The MODE approach was originally developed for application to spatial precipitation forecasts, but it can also be applied to other fields with coherent spatial structures (*e.g.*, clouds, convection). MODE is only one of a number of different approaches that have been developed in recent years to meet these needs. In the future, we expect that the MET package will include additional methods. References for many of these methods are provided at http://www.rap.ucar.edu/projects/icp/index.html.
 
-MODE is only one of a number of different approaches that have been developed in recent years to meet these needs. In the future, we expect that the MET package will include additional methods. References for many of these methods are provided at http://www.rap.ucar.edu/projects/icp/index.html.
-
-MODE may be used in a generalized way to compare any two fields. For simplicity, field1 may be thought of in this section as "the forecast", while field2 may be thought of as "the observation", which is usually a gridded analysis of some sort. The convention of field1/field2 is also used in :numref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call "regions of interest". Object attributes are calculated and compared, and are used to associate ("merge") objects within a single field, as well as to "match" objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
+MODE may be used in a generalized way to compare any two fields. For simplicity, field_1 may be thought of in this section as "the forecast", while field_2 may be thought of as "the observation", which is usually a gridded analysis of some sort. The convention of field_1/field_2 is also used in :numref:`MODE_object_attribute`. MODE resolves objects in both the forecast and observed fields. These objects mimic what humans would call "regions of interest". Object attributes are calculated and compared, and are used to associate ("merge") objects within a single field, as well as to "match" objects between the forecast and observed fields. Finally, summary statistics describing the objects and object pairs are produced. These statistics can be used to identify correlations and differences among the objects, leading to insights concerning forecast strengths and weaknesses.
 
 .. _MODE_Scientific-and-statistical:
 
@@ -50,15 +48,13 @@ where :math:`T` is the threshold. The objects are the connected regions where :m
 
 Thus, two parameters — the radius of influence :math:`R`, and the threshold :math:`T` — control the entire process of resolving objects in the raw data field.
 
-An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. :numref:`mode-object_id` shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
+An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. It shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
 .. _mode-object_id:
 
 .. figure:: figure/mode-object_id.png
 
    Example of an application of the MODE object identification process to a model precipitation field.
-
-?? It is unclear where the figure should be placed. The lyx document, MET_Users_Guide_Master.lyx and the web page don't have figure 15.1 in the same location.  lyx web: above 15.2.3 Fuzzy Logic: https://dtcenter.org/sites/default/files/community-code/met/docs/user-guide/MET_Users_Guide_v9.0.pdf page 307. Lyx: Just above 15.2.2 Attributes.  Where does it belong??
 
 
 Attributes
@@ -381,7 +377,9 @@ _____________________
      angle_diff         = ( ... );
      aspect_diff        = ( ... );
      corner             = 0.8;
-     ratio_if           = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
+     ratio_if           = ( ( 0.0, 0.0 )
+                          ( corner, 1.0 )
+			  ( 1.0, 1.0 ) );
      area_ratio         = ratio_if;
      int_area_ratio     = ( ... );
      curvature_ratio    = ratio_if;
@@ -509,9 +507,9 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
+  * - mode ASCII
+    - CONTINGENCY TABLE
+    - OUTPUT FORMAT
   * - Column Number
     - MODE CTS Column Name
     - Description
@@ -641,11 +639,13 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
 
 This first file uses the following naming convention:
 
-:math:`mode\_PREFIX\_FCST\_VAR\_LVL\_vs\_OBS\_VAR\_LVL\_HHMMSSL\_YYYYMMDD\_HHMMSSV\_HHMMSSA\_cts.txt`
+*mode\_PREFIX\_FCST\_VAR\_LVL\_vs\_OBS\_VAR\_LVL\_HHMMSSL\_YYYYMMDD\_HHMMSSV\_HHMMSSA\_cts.txt*
 
-where {\tt PREFIX} indicates the user-defined output prefix, {\tt FCST\_VAR\_LVL} is the forecast variable and vertical level being used, {\tt OBS\_VAR\_LVL} is the observation variable and vertical level being used, {\tt HHMMSSL} indicates the forecast lead time, {\tt YYYYMMDD\_HHMMSSV} indicates the forecast valid time, and {\tt HHMMSSA} indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the {\tt ct\_stats\_flag} option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
+where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the forecast variable and vertical level being used, *OBS\_VAR\_LVL* is the observation variable and vertical level being used, *HHMMSSL* indicates the forecast lead time, *YYYYMMDD\_HHMMSSV* indicates the forecast valid time, and *HHMMSSA* indicates the accumulation period. The {\tt cts} string stands for contingency table statistics. The generation of this file can be disabled using the *ct\_stats\_flag* option in the configuration file. This CTS output file differs somewhat from the CTS output of the Point-Stat and Grid-Stat tools. The columns of this output file are summarized in :numref:`CTS_output`.
 
-The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40–51 and fill data in columns 19–39. These object identifiers are described in :numref:`MODE_object_attribute`. 
+The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19–39 and fill data in columns 40–51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40–51 and fill data in columns 19–39.
+
+These object identifiers are described in :numref:`MODE_object_attribute`. 
 
 
 .. role:: raw-html(raw)
@@ -657,9 +657,9 @@ The second ASCII file the MODE tool generates contains all of the attributes for
   :widths: auto
   :header-rows: 2
 
-  * - 
+  * - mode ASCII OBJECT
+    - IDENTIFIER DESCRIPTIONS
     - 
-    - mode ASCII OBJECT IDENTIFIER DESCRIPTIONS
   * - Object identifier (object_id)
     - Valid Data Columns
     - Description of valid data
@@ -678,7 +678,7 @@ The second ASCII file the MODE tool generates contains all of the attributes for
 
 **A note on terminology:** a cluster (referred to as "composite" in earlier versions) object need not necessarily consist of more than one simple object. A cluster object is by definition any set of one or more objects in one field which match a set of one or more objects in the other field. When a single simple forecast object matches a single simple observation object, they are each considered to be cluster objects as well.
 
-The contents of the columns in this ASCII file are summarized in :numref:`MODE_object_attribute_output` and :numref:`MODE_object_attribute_output_part_2`.
+The contents of the columns in this ASCII file are summarized in :numref:`MODE_object_attribute_output`.
 
 .. _MODE_object_attribute_output:
 
@@ -686,9 +686,9 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
   :widths: auto
   :header-rows: 2
 
-  * - 
+  * - mode ASCII OBJECT
+    - ATTRIBUTE OUTPUT FORMAT
     - 
-    - mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
   * - Column
     - MODE Column Name
     - Description
@@ -800,23 +800,6 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
   * - 43
     - INTENSITY_NN
     - The percentile of intensity chosen for use in the PERCENTILE_INTENSITY_RATIO column (variable units)
-
-      
-.. _MODE_object_attribute_output_part_2:
-
-.. role:: raw-html(raw)
-   :format: html
-
-.. list-table:: Format of MODE object attribute output files continued.
-  :widths: auto
-  :header-rows: 2
-
-  * - 
-    - 
-    - mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
-  * - Column
-    - MODE Column Name
-    - Description
   * - 44
     - INTENSITY_SUM
     - Sum of the intensities of the raw field within the object (variable units)
@@ -867,7 +850,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
 
 The MODE tool creates a NetCDF output file containing the object fields that are defined. The NetCDF file contains gridded fields including indices for the simple forecast objects, indices for the simple observation objects, indices for the matched cluster forecast objects, and indices for the matched cluster observation objects. The NetCDF file also contains lat/lon and x/y data for the vertices of the polygons for the boundaries of the simple forecast and observation objects. The generation of this file can be disabled using the **nc_pairs_flag** configuration file option.
 
-The dimensions and variables included in the mode NetCDF files are described in :numref:`NetCDF_dimensions_for_MODE_output`, :numref:`Variables_contained_in_MODE_NetCDF_output` and :numref:`Variables_contained_in_MODE_NetCDF_output_part_2`.  ?? should Variables_contained_in_MODE_NetCDF_output_part_3 be referenced too?
+The dimensions and variables included in the mode NetCDF files are described in :numref:`NetCDF_dimensions_for_MODE_output` and :numref:`Variables_contained_in_MODE_NetCDF_output`.
 
 .. _NetCDF_dimensions_for_MODE_output:
 
@@ -875,8 +858,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - mode NETCDF DIMENSIONS
+  * - mode NETCDF DIMENSIONS
+    - 
   * - NetCDF Dimension
     - Description
   * - lat
@@ -918,9 +901,9 @@ The dimensions and variables included in the mode NetCDF files are described in 
   :widths: auto
   :header-rows: 2
 
-  * - 
+  * - mode NETCDF VARIABLES
     - 
-    - mode NETCDF VARIABLES
+    - 
   * - NetCDF Variable
     - Dimension
     - Description
@@ -973,24 +956,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
     - \-
     - Number of simple observation objects
   * - n_clus
-    -  
+    - \-
     - Number of cluster objects
-
-.. _Variables_contained_in_MODE_NetCDF_output_part_2:
-
-.. role:: raw-html(raw)
-   :format: html
-
-.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from Table[Variables_contained_in_MODE_NetCDF_output_part_2]
-  :widths: auto
-  :header-rows: 2
-
-  * - 
-    - 
-    - mode NETCDF VARIABLES
-  * - NetCDF Variable
-    - Dimension
-    - Description
   * - fcst_simp_bdy :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Boundary Starting Index
@@ -1063,23 +1030,6 @@ The dimensions and variables included in the mode NetCDF files are described in 
   * - obs_simp_hull_y
     - obs_simp_hull
     - Observation Simple Convex Hull Point Y-Coordinate
-
-
-.. _Variables_contained_in_MODE_NetCDF_output_part_3:
-
-.. role:: raw-html(raw)
-   :format: html
-
-.. list-table:: Variables contained in MODE NetCDF output - Clustered Objects, continued from :numref:`Variables_contained_in_MODE_NetCDF_output_part_2`
-  :widths: auto
-  :header-rows: 2
-
-  * - 
-    - 
-    - mode NETCDF VARIABLES
-  * - NetCDF Variable
-    - Dimension
-    - Description
   * - fcst_clus_hull :raw-html:`<br />` \_start
     - fcst_clus
     - Forecast Cluster Convex Hull Starting Index
