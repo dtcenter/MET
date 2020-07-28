@@ -318,7 +318,7 @@ ___________________
   fcst_init_end  = "";
   fcst_init_hour = "";
   obs_init_beg   = "";
- obs_init_end   = "";
+  obs_init_end   = "";
   obs_init_hour  = "";
 
 The user may specify the beginning, ending, or exact model initialization times in YYYYMMDD[_HH[MMSS]] format to be used for all analyses performed. If multiple init times fall within the init time window, the analyses will be performed on their union. These selections may be further refined by using the "-fcst_init_beg", "-fcst_init_end", "-obs_init_beg", "-obs_init_end", fcst_init_hour" and "-obs_init_hour" options within the job command line.
@@ -675,18 +675,16 @@ This job is similar to the "aggregate" job listed above, however the format of i
     - CNT, SL1L2, SAL1L2, WDIR
   * - MPR
     - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
+    
+**Job: ss_index**
 
-?? should the below Jobs be listed as a header?
-      
-Job: ss_index
+The output from this job consists of three lines, the first two of which contain "JOB_LIST" and "COL_NAME", as described above. The third line contains "SS_INDEX" followed by a colon and then the value computed for the user-defined Skill Score Index. 
 
-The output from this job consists of three lines, the first two of which contain "JOB_LIST" and"COL_NAME", as described above. The third line contains "SS_INDEX" followed by a colon and then the value computed for the user-defined Skill Score Index. 
-
-Job: go_index
+**Job: go_index**
 
 The output from this job consists of three lines, the first two of which contain "JOB_LIST" and"COL_NAME", as described above. The third line contains "GO_INDEX" followed by a colon and then the value computed for the GO Index. 
 
-Job: ramp
+**Job: ramp**
 
 The ramp job operates on a time-series of forecast and observed values and is analogous to the RIRW (Rapid Intensification and Weakening) job described in :numref:`tc_stat-output`. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
 

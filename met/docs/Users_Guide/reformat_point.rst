@@ -59,6 +59,7 @@ The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning 
 
 3.
 The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
+
 4.
 The **-nmsg num_messages** option may be used for testing purposes. This argument indicates that only the first “num_messages” PrepBUFR messages should be processed rather than the whole file. This option is provided to speed up testing because running the PB2NC tool can take a few minutes for each file. Most users will not need this option.
 
@@ -100,7 +101,7 @@ For example, using an environment variable to set the **message_type** (see belo
 
 \* In a C-Shell: **setenv MSG_TYP ' “ADPUPA”, “ADPSFC” '**
 
-\* In the configuration file: **message_type[] = [ ${MSG_TYP} ];**
+\* In the configuration file: **message_type = [ ${MSG_TYP} ];**
 
  The contents of the default pb2nc configuration file are described below.
 
@@ -173,11 +174,9 @@ __________________
 						  
 The **pb_report_type, in_report_type**, and **instrument_type** variables are used to specify comma-separated lists of PrepBUFR report types, input report types, and instrument types to be retained, respectively. If left empty, all PrepBUFR report types, input report types, and instrument types will be retained. See the following for more details:
 
+https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
 
-http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_4.htm
-
-
-http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_6.htm
+https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
 
 _________________
 
@@ -192,8 +191,7 @@ The **beg** and **end** variables are used to stratify the model level of observ
 
 The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :numref:`table_reform-point_pb2nc_level_category`. See the following for more details:
 
-
-http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm
+https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 
 
 .. _table_reform-point_pb2nc_level_category:
@@ -594,6 +592,8 @@ ascii2nc output
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
+“obs_vid” variable is replaced with “obs_gc” when the GRIB code is given instead of the variable names. In this case, the global variable “use_var_id” does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+
 
 MADIS2NC tool
 _____________
@@ -719,6 +719,8 @@ madis2nc output
 ~~~~~~~~~~~~~~~
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
+
+“obs_vid” variable is replaced with “obs_gc” when the GRIB code is given instead of the variable names. In this case, the global variable “use_var_id” does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
 
 
 LIDAR2NC tool
@@ -894,10 +896,10 @@ Optional arguments for point2grid
 
 8. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 
-9. The **-gaussian_dx n** option defines the distance interval for Gaussian smoothing. The default is 81.271 km. Ignored if the method is not GAUSSIAN.
+9. The **-gaussian_dx n** option defines the distance interval for Gaussian smoothing. The default is 81.271 km. Ignored if the method is not GAUSSIAN or MAXGAUSS.
 
 
-10. The **-gaussian_radius** n option defines the radius of influence for Gaussian interpolation. The default is 120. Ignored if the method is not GAUSSIAN.
+10. The **-gaussian_radius** n option defines the radius of influence for Gaussian interpolation. The default is 120. Ignored if the method is not GAUSSIAN or MAXGAUSS.
 
 
 11.The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
@@ -917,8 +919,9 @@ Optional arguments for point2grid
 
 16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-
-For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So the computed coordinate (lat/long) is saved into the NetCDF file to the environment variable MET_TMP_DIR or /tmp if MET_TMP_DIR is not defined. The computing lat/long step can be skipped if the coordinate file is given through the environment variable MET_GEOSTATIONARY_DATA. An example of call point2grid to process GOES-16 AOD data is shown below:
+Only 4 interpolation methods are applied to the field variables; MIN/MAX/MEDIAN/UW_MEAN. The GAUSSIAN method is applied to the probability variable only. Unlike regrad_data_plane, MAX method is applied to the file variable and Gaussian method to the probability variable with the MAXGAUSS method. If the probability variable is not requested, MAXGAUSS method is the same as MAX method.
+    
+For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So the computed coordinate (lat/long) is saved into the NetCDF file to the environment variable MET_TMP_DIR or /tmp if MET_TMP_DIR is not defined. The computing lat/long step can be skipped if the coordinate file is given through the environment variable MET_GEOSTATIONARY_DATA. The grid mapping to the target grid is saved to MET_TMP_DIR to save the execution time. Once this file is created, the MET_GEOSTATIONARY_DATA is ignored. The grid mapping file should be deleted manually in order to apply a new MET_GEOSTATIONARY_DATA environment variable or to re-generate the grid mapping file. An example of call point2grid to process GOES-16 AOD data is shown below:
 
 .. code-block:: none
 		

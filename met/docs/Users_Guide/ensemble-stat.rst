@@ -590,7 +590,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The Continuous Ranked Probability Score
   * - 28
     - CRPSS
-    - The ContinuousRanked Probability Skill Score
+    - The Continuous Ranked Probability Skill Score
   * - 29
     - IGN
     - The Ignorance Score
