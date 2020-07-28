@@ -55,7 +55,7 @@ _____________________
 
 .. code-block:: none
 
-  model         = "GFS";
+  desc          = "GFS";
   regrid        = { ... }
   censor_thresh = [];
   censor_val    = [];

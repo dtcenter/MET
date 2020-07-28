@@ -40,11 +40,10 @@ class GridDiagConfInfo {
       // Grid Diagnostics configuration object
       MetConfig conf;
 
-      ConcatString version; // Config file version
+      ConcatString version;        // Config file version
+      ConcatString desc;           // Data description
 
-      ConcatString model; // Model name
-
-      VarInfo ** data_info; // Pointer array for data VarInfo [n_data]
+      VarInfo ** data_info;        // Pointer array for data VarInfo [n_data]
 
       ConcatString mask_grid_file; // Path for masking grid area
       ConcatString mask_grid_name; // Name of masking grid area

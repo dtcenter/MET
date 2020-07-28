@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    10/01/19  Fillmore        New
+//   001    07/28/20  Halley Gotway   Updates for #1391.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -381,7 +382,7 @@ void setup_nc_file(void) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_file.c_str(), program_name,
-                       conf_info.model.c_str());
+                       NULL, NULL, conf_info.desc.c_str());
    add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
                                 (string)conf_info.mask_grid_name : na_str));
    add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?

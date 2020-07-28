@@ -58,7 +58,7 @@ void GridDiagConfInfo::init_from_scratch() {
 void GridDiagConfInfo::clear() {
 
    // Initialize values
-   model.clear();
+   desc.clear();
    mask_grid_file.clear();
    mask_grid_name.clear();
    mask_poly_file.clear();
@@ -118,8 +118,8 @@ void GridDiagConfInfo::process_config(GrdFileType ftype) {
    // Conf: version
    version = parse_conf_version(&conf);
 
-   // Conf: model
-   model = parse_conf_string(&conf, conf_key_model);
+   // Conf: desc
+   desc = parse_conf_string(&conf, conf_key_desc);
 
    // Conf: data.field
    fdict = conf.lookup_array(conf_key_data_field);
