@@ -476,6 +476,7 @@ void process_track_files(const StringArray &files,
    LineDataFile f;
    ATCFTrackLine line;
    TrackInfoArray tracks;
+   GenesisEventInfo *event_info = (GenesisEventInfo *) 0;
    bool keep;
 
    // Analysis ATCF ID's
@@ -563,18 +564,23 @@ void process_track_files(const StringArray &files,
             if(tracks[j].duration() < conf_info.MinDur*sec_per_hour) {
                continue;
             }
-
-            // Check the genesis event criteria for each track point
-            keep = false;
-            for(k=0; k<tracks[j].n_points(); k++) {
-               if(conf_info.FcstEventInfo.is_keeper(tracks[j][k])) {
-                  keep = true;
-                  break;
-               }
-            } // end for k
-
-            if(!keep) continue;
          }
+
+         // Select the genesis event filtering criteria
+         if(tracks[j].is_best_track())      event_info = &conf_info.BestEventInfo;
+         else if(tracks[j].is_oper_track()) event_info = &conf_info.OperEventInfo;
+         else                               event_info = &conf_info.FcstEventInfo;
+
+         // Check the genesis event criteria for each track point
+         keep = false;
+         for(k=0; k<tracks[j].n_points(); k++) {
+            if(event_info->is_keeper(tracks[j][k])) {
+               keep = true;
+               break;
+            }
+         } // end for k
+
+         if(!keep) continue;
 
          // Store the genesis event
          genesis.add(tracks[j]);
