@@ -36,7 +36,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char python_str [] = "python";
+static const char python_str    [] = "python";
+static const char file_list_str [] = "file_list";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -322,6 +323,8 @@ StringArray parse_ascii_file_list(const char * path)
 ifstream f_in;
 StringArray a;
 std::string file_name;
+ConcatString list_str(file_list_str);
+bool check_files_exist = true;
 
    //
    //  Open the input ascii file
@@ -349,6 +352,19 @@ const int max_missing = 10;
 
 while(f_in >> file_name)  {
 
+   //
+   //  If the first entry is file_list, do not check
+   //  that the following entries actually exist as
+   //  files on the system
+   //
+
+   if( a.n() == 0 && list_str.comparecase(file_name.c_str()) == 0 ) {
+
+      check_files_exist = false;
+
+      continue;
+   }
+
    a.add(file_name.c_str());
 
    //
@@ -356,7 +372,7 @@ while(f_in >> file_name)  {
    //  abort after too many missing files
    //
 
-   if ( n_exist == 0 )  {
+   if ( check_files_exist && n_exist == 0 )  {
 
       if ( a.n() >= max_missing )  break;
 
@@ -367,10 +383,11 @@ while(f_in >> file_name)  {
 }
 
    //
-   //  If no files exist, return an empty list
+   //  When checking file existene and none exist,
+   //  return an empty list
    //
 
-if ( n_exist == 0 )  a.clear();
+if ( check_files_exist && n_exist == 0 )  a.clear();
 
    //
    //  done
