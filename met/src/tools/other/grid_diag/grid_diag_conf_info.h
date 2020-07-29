@@ -29,51 +29,46 @@
 
 class GridDiagConfInfo {
 
-    private:
+   private:
 
-        void init_from_scratch();
+      void init_from_scratch();
 
-        int n_data; // Number of data fields
+      int n_data; // Number of data fields
 
-    public:
+   public:
 
-        // Grid Diagnostics configuration object
-        MetConfig conf;
+      // Grid Diagnostics configuration object
+      MetConfig conf;
 
-        ConcatString version; // Config file version
+      ConcatString version;        // Config file version
+      ConcatString desc;           // Data description
 
-        ConcatString model; // Model name
+      VarInfo ** data_info;        // Pointer array for data VarInfo [n_data]
 
-        VarInfo ** data_info; // Pointer array for data VarInfo [n_data]
+      ConcatString mask_grid_file; // Path for masking grid area
+      ConcatString mask_grid_name; // Name of masking grid area
+      ConcatString mask_poly_file; // Path for masking poly area
+      ConcatString mask_poly_name; // Name of masking poly area
+      MaskPlane    mask_area;
 
-        NumArray range;
+      GridDiagConfInfo();
+      ~GridDiagConfInfo();
 
-        int n_bins;
+      void clear();
 
-        ConcatString mask_grid_file; // Path for masking grid area
-        ConcatString mask_grid_name; // Name of masking grid area
-        ConcatString mask_poly_file; // Path for masking poly area
-        ConcatString mask_poly_name; // Name of masking poly area
-        MaskPlane    mask_area;
+      void read_config(const char *, const char *);
+      void set_n_data();
+      void process_config(vector<GrdFileType>);
+      void process_masks(const Grid &);
 
-        GridDiagConfInfo();
-        ~GridDiagConfInfo();
-
-        void clear();
-
-        void read_config(const char *, const char *);
-        void process_config(GrdFileType);
-        void process_masks(const Grid &);
-
-        int get_n_data() const;
-        int get_compression_level();
+      int get_n_data() const;
+      int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int GridDiagConfInfo::get_n_data() const { return(n_data); }
-inline int GridDiagConfInfo::get_compression_level()
-    { return conf.nc_compression(); }
+inline int GridDiagConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 

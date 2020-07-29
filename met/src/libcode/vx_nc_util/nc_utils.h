@@ -6,7 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __NC_UTILS_H__
@@ -65,7 +64,6 @@ static const string C_unknown_str = string("unknown");
 #define GET_NC_VARS_P(ncObjPtr)         ncObjPtr->getVars()
 
 ////////////////////////////////////////////////////////////////////////
-
 
 #define DEF_DEFLATE_LEVEL   (0)
 
@@ -137,7 +135,6 @@ static const int exit_code_no_dim      = 1;
 static const int exit_code_no_hdr_vars = 2;
 static const int exit_code_no_loc_vars = 3;
 static const int exit_code_no_obs_vars = 4;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -234,7 +231,6 @@ extern ConcatString* get_string_val(NcFile *, const char * var_name, const int i
                     const int len, ConcatString &tmp_cs);
 
 extern ConcatString* get_string_val(NcVar *var, const int index, const int len, ConcatString &tmp_cs);
-
 
 extern bool get_nc_data(NcVar *, int    *data);
 extern bool get_nc_data(NcVar *, char   *data);

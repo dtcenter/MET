@@ -20,15 +20,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_data(int i_series, VarInfo* data_info, DataPlane& dp) {
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void get_series_entry(int i_series, VarInfo* data_info,
-   const StringArray& search_files, const GrdFileType type,
-   StringArray& found_files, DataPlane& dp, Grid& grid) {
+        const StringArray& search_files, const GrdFileType type,
+        DataPlane& dp, Grid& grid) {
 
    mlog << Debug(3)
         << "Processing series entry " << i_series + 1 << ": "
@@ -37,22 +31,31 @@ void get_series_entry(int i_series, VarInfo* data_info,
    ConcatString filename;
    filename = search_files[i_series];
 
+   // Initialize
    dp.clear();
 
-   read_single_entry(data_info, filename, type, dp, grid);
+   // Error out if requested data is not found in the i-th file
+   if(!read_single_entry(data_info, filename, type, dp, grid)) {
+      mlog << Error << "\nget_series_entry() -> "
+           << "Could not find data for " << data_info->magic_str()
+           << " in file: " << filename << "\n\n";
+      exit(1);
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo* info, const ConcatString& filename,
-   const GrdFileType type, DataPlane& dp, Grid& grid) {
+        const GrdFileType type, DataPlane& dp, Grid& grid) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile* mtddf = (Met2dDataFile*) 0;
 
    // Check that file exists
    if(!file_exists(filename.c_str())) {
-       mlog << Warning << "\nseries_data:read_single_entry() - >"
+       mlog << Warning << "\nread_single_entry() -> "
             << "File does not exist: " << filename << "\n\n";
        return(false);
    }
@@ -69,7 +72,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    // Cleanup
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
-   return found;
+   return(found);
 }
 
 ////////////////////////////////////////////////////////////////////////

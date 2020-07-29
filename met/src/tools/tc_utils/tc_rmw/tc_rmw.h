@@ -77,11 +77,11 @@ static const char* default_out_prefix = "";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray    data_files, found_data_files;
-static StringArray    deck_source, deck_model_suffix;
-static ConcatString   config_file;
-static TCRMWConfInfo  conf_info;
-static GrdFileType    ftype;
+static StringArray   data_files;
+static StringArray   deck_source, deck_model_suffix;
+static ConcatString  config_file;
+static TCRMWConfInfo conf_info;
+static GrdFileType   ftype;
 
 // Optional arguments
 static ConcatString out_dir;
