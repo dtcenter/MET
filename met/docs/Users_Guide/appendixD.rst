@@ -54,14 +54,14 @@ where :math:`\hat{p}` is the estimated proportion (e.g., hit rate, false alarm r
 The forecast/observation variance has CIs derived from the underlying sample being approximately iid normal with mean :math:`\mu` and variance :math:`\sigma`. The lower and upper limits for the interval are given by
 
 .. math:: l(\sigma^2) = \frac{(n - 1)s^2}{\chi_{\alpha / 2,n - 1}^2} \text{ and } u(\sigma^2) = \frac{(n - 1)s^2}{\chi_{1 - \alpha / 2, n - 1}^2}
-   :label: equation 4
+
 
 respectively, where :math:`\chi_{\alpha , \nu}^2` is the :math:`\alpha - \text{th}` quantile of the chi-square distribution with **n-1** degrees of freedom. Taking the square roots of the limits of :math:`l` yields the CI for the forecast/observation standard deviation.
 
 Finally, the linear correlation coefficient has limits given by 
 
 .. math:: (\frac{e^{2c_l} - 1}{e^{2c_l} + 1}, \frac{e^{2c_u} - 1}{e^{2c_u} + 1})
-   :label: equation 5
+
 
 where :math:`c_l = v - \frac{z_{\alpha / 2}}{\sqrt{n - 3}}` and :math:`c_u = v + \frac{z_{\alpha / 2}}{\sqrt{n - 3}}`.
 
