@@ -46,8 +46,8 @@ data = {
       {
          name   = "TMP";
          level  = ["P500"];
-         n_bins = 45;
-         range  = [255, 300];
+         n_bins = 50;
+         range  = [250, 300];
       },
       {
          name   = "TMP";
