@@ -9,7 +9,7 @@ Traditionally, vectors have been defined as quantities having both magnitude and
 
 .. math:: \mathbf{v} = (a,b)
 
-to show that the vector :math:`\mathbf{v}` consists of the ordered pair of numbers *a* and *b*. The number *a* is called the first (or *x*) component of :math:`\mathbf{v}`, and *b* is called the second (or *y*) component. Vector addition is performed component-wise: :math:`(a, b) + (c, d) = (a + c, b + d)`, and similarly for subtraction. If :math:`\alpha` is a scalar, then we define multiplication by the scalar :math:`\alpha \text{ as } \alpha (a, b) = (\alpha a, \alpha b)`, and similarly for division by a (nonzero!) scalar.
+to show that the vector :math:`\mathbf{v}` consists of the ordered pair of numbers *a* and *b*. The number *a* is called the first (or *x*) component of :math:`\mathbf{v}`, and *b* is called the second (or *y*) component. Vector addition is performed component-wise: :math:`(a, b) + (c, d) = (a + c, b + d)`, and similarly for subtraction. If :math:`\alpha` is a scalar, then we define multiplication by the scalar :math:`\alpha \text{ as } \alpha (a, b) = (\alpha a, \alpha b)`, and similarly for division by a (nonzero) scalar.
 
 The *norm* (or length, or magnitude) of a vector :math:`\mathbf{v} = (a, b)`, is
 
@@ -114,7 +114,7 @@ FDIR and ODIR are the direction (angle) of :math:`\mathbf{F}_a \text{ and } \mat
 ________________________
 
 
-FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed wind vectors. Note that this is {\it not} the same as the average forecast and observed wind speeds (*ie.,* the length of an average vector :math:`\neq` the average length of the vector).
+FBAR_SPEED and OBAR_SPEED are the lengths of the average forecast and observed wind vectors. Note that this is *not* the same as the average forecast and observed wind speeds (*ie.,* the length of an average vector :math:`\neq` the average length of the vector).
 
 .. math:: \text{FBAR_SPEED } = | \mathbf{F}_a |
 	  
