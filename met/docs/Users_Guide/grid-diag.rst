@@ -66,7 +66,7 @@ _____________________
 .. code-block:: none
 
   data = {
-   f  ield = [
+     field = [
         {
            name   = "APCP";
            level  = ["L0"];
@@ -87,6 +87,6 @@ The **name** and **level** entries in the **data** dictionary define the data to
 grid_diag output file
 ~~~~~~~~~~~~~~~~~~~~~
 
-The NetCDF file has a dimension for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum, midpoint, and maximum values are indicated with an _min, _min, or _max appended to the variable/level.
+The NetCDF file has a dimension for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level.
 
 For each variable/level combination in the data dictionary a corresponding histogram will be output to the NetCDF file. For example, hist_APCP_L0 and hist_PWAT_L0. These are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. In addition to 1D histograms, 2D histograms for all variable/level pairs are written. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels.

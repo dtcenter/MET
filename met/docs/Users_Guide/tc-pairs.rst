@@ -39,14 +39,14 @@ Required arguments for tc_pairs
 
 2. The **-edeck source** argument indicates the edeck ATCF format data source containing probabilistic track data to be verified. It specifies the name of an ATCF format file or top-level directory containing ATCF format files ending in “.dat” to be processed. The **-adeck** or **-edeck** option must be used at least once.
 
-3. The **-bdeck source** argument indicates the ATCF format data source containing the tropical cyclone reference dataset to be used for verifying the adeck source. It specifies the name of an ATCF format file or top-level directory containing ATCF format files ending in “.dat” to be processed. This source is expected to be the NHC Best Track Analysis, but could also be any ATCF format reference.
+3. The **-bdeck source** argument indicates the ATCF format data source containing the tropical cyclone reference dataset to be used for verifying the adeck source. It specifies the name of an ATCF format file or top-level directory containing ATCF format files ending in “.dat” to be processed. This source is expected to be the NHC Best Track Analysis, but could also be any ATCF-formatted reference.
 
 4. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 Optional arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (./out_tcmpr)
+5. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
 
 6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
@@ -81,7 +81,7 @@ The TC-Pairs tool implements the following logic:
 tc_pairs configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The default configuration file for the TC-Pairs tool named 'TCPairsConfig_default' can be found in the installed **share/met/config/** directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the TC-Pairs tool named **'TCPairsConfig_default'** can be found in the installed **share/met/config/** directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
 The contents of the tc_pairs configuration file are described below.
 
@@ -114,7 +114,7 @@ ____________________
 
   model = [ "DSHP", "LGEM", "HWRF" ];
 
-The **model** variable contains a list of comma-separated models to be used. The models are identified with an ATCF ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed.
+The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed.
 
 ____________________
 
@@ -122,7 +122,7 @@ ____________________
 
   check_dup = FALSE;
 
-The **check_dup** flag expects either TRUE and FALSE, indicating whether the code should check for duplicate ATCF lines when building tracks. Setting **check_dup** to TRUE will check for duplicated lines, and produce output information regarding the duplicate. The duplicated ATCF line will not be processed in the tc_pairs output. Setting **check_dup** to FALSE, will still exclude tracks that decrease with time, and will overwrite repeated lines, but specific duplicate log information will not be output. Setting **check_dup** to FALSE will make parsing the track quicker.
+The **check_dup** flag expects either TRUE and FALSE, indicating whether the code should check for duplicate ATCF lines when building tracks. Setting **check_dup** to TRUE will check for duplicated lines, and produce output information regarding the duplicate. Any duplicated ATCF line will not be processed in the tc_pairs output. Setting **check_dup** to FALSE, will still exclude tracks that decrease with time, and will overwrite repeated lines, but specific duplicate log information will not be output. Setting **check_dup** to FALSE will make parsing the track quicker.
 
 ____________________
 
@@ -130,7 +130,7 @@ ____________________
 
   interp12 = NONE;
 
-The **interp12** flag expects the entry NONE, FILL, or REPLACE, indicating whether special processing should be performed for interpolated forecasts. The NONE option indicates no changes are made to the interpolated forecasts. The FILL and REPLACE (default) options determine when the 12-hour interpolated forecast (normally indicated with a "2" or "3" at the end of the ATCF ID) will be renamed with the 6-hour interpolated ATCF ID (normally indicated with the letter "I" at the end of the ATCF ID). The FILL option renames the 12-hour interpolated forecasts with the 6-hour interpolated forecast ATCF ID only when the 6-hour interpolated forecasts is missing (in the case of a 6-hour interpolated forecast which only occurs every 12-hours (e.g. EMXI, EGRI), the 6-hour interpolated forecasts will be "filled in" with the 12-hour interpolated forecasts in order to provide a record every 6-hours). The REPLACE option renames all 12-hour interpolated forecasts with the 6-hour interpolated forecasts ATCF ID regardless of whether the 6-hour interpolated forecast exists. The original 12-hour ATCF ID will also be retained in the output file (all modified ATCF entries will appear at the end of the TC-Pairs output file). This functionality expects both the 12-hour and 6-hour early (interpolated) ATCF IDs are listed in the model field.
+The **interp12** flag expects the entry NONE, FILL, or REPLACE, indicating whether special processing should be performed for interpolated forecasts. The NONE option indicates no changes are made to the interpolated forecasts. The FILL and REPLACE (default) options determine when the 12-hour interpolated forecast (normally indicated with a "2" or "3" at the end of the ATCF ID) will be renamed with the 6-hour interpolated ATCF ID (normally indicated with the letter "I" at the end of the ATCF ID). The FILL option renames the 12-hour interpolated forecasts with the 6-hour interpolated forecast ATCF ID only when the 6-hour interpolated forecasts is missing (in the case of a 6-hour interpolated forecast which only occurs every 12-hours (e.g. EMXI, EGRI), the 6-hour interpolated forecasts will be "filled in" with the 12-hour interpolated forecasts in order to provide a record every 6-hours). The REPLACE option renames all 12-hour interpolated forecasts with the 6-hour interpolated forecasts ATCF ID regardless of whether the 6-hour interpolated forecast exists. The original 12-hour ATCF ID will also be retained in the output file (all modified ATCF entries will appear at the end of the TC-Pairs output file). This functionality expects both the 12-hour and 6-hour early (interpolated) ATCF IDs to be listed in the model field.
 
 ____________________
 
@@ -145,7 +145,7 @@ ____________________
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (1st entry in TCPairsConfig_default). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
+The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
 
 ____________________
 
@@ -234,7 +234,7 @@ The **watch_warn** field specifies the file name and time applied offset to the 
      { key = "BB"; val = "IO"; }
   ];
 
-The basin_map entry defines a mapping of input names to output values.
+The **basin_map** entry defines a mapping of input names to output values.
 Whenever the basin string matches "key" in the input ATCF files, it is
 replaced with "val". This map can be used to modify basin names to make them
 consistent across the ATCF input files.
@@ -539,7 +539,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Best track storm classification at RI end
   * - 34
     - N_THRESH
-    - Number of pro-ability thresholds
+    - Number of probability thresholds
   * - 35
     - THRESH_i
     - The ith probability threshold value (repeated)
