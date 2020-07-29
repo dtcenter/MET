@@ -8,6 +8,7 @@
 
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <met_test>
@@ -48,6 +49,36 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_temperature.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_diag_APCP_06_FCST_OBS">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F006.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F012.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F018.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F024.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib" \
+                > &OUTPUT_DIR;/grid_diag/fcst_file_list; \
+          echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                > &OUTPUT_DIR;/grid_diag/obs_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/obs_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_APCP_06_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc</grid_nc>
     </output>
   </test>
 
