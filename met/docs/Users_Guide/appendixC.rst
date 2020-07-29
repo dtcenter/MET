@@ -85,7 +85,7 @@ The verification statistics for dichotomous variables are formulated using a con
     - :math:`T = \mathbf{n}_{11} + \mathbf{n}_{10} + \mathbf{n}_{01} + \mathbf{n}_{00}`
 
 
-The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and} n_{00},` are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
+The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and } n_{00},` are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
 
 By dividing the counts in the cells by the overall total, T, the joint proportions, :math:`\mathbf{p}_{11}, \mathbf{p}_{10}, \mathbf{p}_{01}, \text{and } \mathbf{p}_{00}` can be computed. Note that :math:`\mathbf{p}_{11} + \mathbf{p}_{10} + \mathbf{p}_{01} + \mathbf{p}_{00} = 1.` Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
 
@@ -214,18 +214,18 @@ where
 
 GSS is also known as the Equitable Threat Score (ETS). GSS values range from -1/3 to 1. A no-skill forecast would have GSS = 0; a perfect forecast would have GSS = 1.
 
-Hanssen-Kuipers Discriminant (H-K)
+Hanssen-Kuipers Discriminant (HK)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "HK" in CTS output :numref:`table_PS_format_info_CTS`
 
-H-K is defined as 
+HK is defined as 
 
-.. math:: \text{H-K } = \frac{n_{11} n_{00} - n_{10} n_{01}}{(n_{11} + n_{01}) (n_{10} + n_{00})}.
+.. math:: \text{HK } = \frac{n_{11} n_{00} - n_{10} n_{01}}{(n_{11} + n_{01}) (n_{10} + n_{00})}.
 
-More simply, H-K = POD :math:`-` POFD.
+More simply, HK = POD :math:`-` POFD.
 
-H-K is also known as the True Skill Statistic (TSS) and less commonly (although perhaps more properly) as the Peirce Skill Score. H-K measures the ability of the forecast to discriminate between (or correctly classify) events and non-events. H-K values range between -1 and 1. A value of 0 indicates no skill; a perfect forecast would have H-K = 1.
+HK is also known as the True Skill Statistic (TSS) and less commonly (although perhaps more properly) as the Peirce Skill Score. HK measures the ability of the forecast to discriminate between (or correctly classify) events and non-events. HK values range between -1 and 1. A value of 0 indicates no skill; a perfect forecast would have HK = 1.
 
 Heidke Skill Score (HSS)
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -373,7 +373,7 @@ Called "FSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
 The sample variance of the forecasts is defined as 
 
-.. math:: s_o^2 = \frac{1}{T - 1} \sum_{i=1}^T (f_i - \bar{f})^2 .
+.. math:: s_f^2 = \frac{1}{T - 1} \sum_{i=1}^T (f_i - \bar{f})^2 .
 
 The forecast standard deviation is defined as :math:`s_f = \sqrt{s_f^2}`.
 
@@ -399,8 +399,8 @@ The Pearson correlation coefficient, **r**, measures the strength of linear asso
 
 **r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
-Spearman rank correlation coefficient (\rho_{s})
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Spearman rank correlation coefficient :math:`(\rho_{s})`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
 
@@ -508,7 +508,7 @@ Median Absolute Deviation (MAD)
 
 Called "MAD" in CNT output :numref:`table_PS_format_info_CNT`
 
-The Median Absolute Deviation (MAD) is defined as :math:`text{MAD} = \text{median}|f_i - o_i|`.
+The Median Absolute Deviation (MAD) is defined as :math:`\text{MAD} = \text{median}|f_i - o_i|`.
 
 MAD is an estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAD = 0.
 
@@ -552,7 +552,7 @@ The anomaly correlation coefficient is equivalent to the Pearson correlation coe
 
 The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
-.. math:: \text{Anomaly Correlation } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
+.. math:: \text{ANOM_CORR } = \frac{ \bar{[(f - c) - \bar{(f - c)}][(a - c) - \bar{(a - c)}]}}{ \sqrt{ \bar{( (f - c) - \bar{(f - c)})^2} \bar{( (a - c) - \bar{(a - c)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
@@ -633,7 +633,7 @@ Vector anomaly L1 and L2 values
 
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR" in VAL1L2 output :numref:`table_PS_format_info_VAL1L2`
 
-These statistics require climatological values for the wind vector components, :math:`u_c \text{and} v_c`. The measures are defined below:
+These statistics require climatological values for the wind vector components, :math:`u_c \text{ and } v_c`. The measures are defined below:
 
 .. math:: \text{UFABAR} = \text{Mean}(u_f - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c)
 
@@ -686,7 +686,7 @@ The verification statistics for probabilistic forecasts of dichotomous variables
 
 .. _table_cont_table_counts:
 
-.. list-table::  2x2 contingency table in terms of counts. The :math:`\mathbf{n_{ij}}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. The ""."" symbols in the total cells represent sums across categories.
+.. list-table::  2x2 contingency table in terms of counts. The :math:`\mathbf{n_{ij}}` values in the table represent the counts in each forecast-observation category, where **i** represents the forecast and **j** represents the observations. The "." symbols in the total cells represent sums across categories.
   :widths: auto
   :header-rows: 1
 
@@ -826,7 +826,7 @@ Base Rate
 
 Called "BASER" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures if paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks (2011) <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
+This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures is paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks (2011) <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
 
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
@@ -848,7 +848,7 @@ Receiver operating characteristic
 
 MET produces hit rate (POD) and false alarm rate (POFD) values for each user-specified threshold. This information can be used to create a scatter plot of POFD vs. POD. When the points are connected, the plot is generally referred to as the receiver operating characteristic (ROC) curve (also called the "relative operating characteristic" curve). See the area under the ROC curve (AUC) entry for related information.
 
-An ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast.
+A ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast.
 
 An ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. 
 
@@ -907,7 +907,7 @@ IGN
 
 Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{and } \sigma`, the ignorance score is
+The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
 .. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{\sigma^2}.
 
@@ -1007,7 +1007,7 @@ Uniform Fractions Skill Score
 
 Called "UFSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
-The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total forecast events across the grid. This no-skill forecast defines the UFSS, and thus a skilled forecast must have a higher value of FSS than the UFSS. Again, the formula is the same as for FSS as above, the forecast proportion in each neighborhood is the same, and is equivalent to the overall forecast event proportion.
+The Uniform Fractions Skill Score (UFSS) is a reference statistic for the Fractions Skill score based on a uniform distribution of the total observed events across the grid. UFSS represents the FSS that would be obtained at the grid scale from a forecast with a fraction/probability equal to the total observed event proportion at every point. The formula is :math:`UFSS = (1 + f_o)/2` (i.e., halfway between perfect skill and random forecast skill) where :math:`f_o` is the total observed event proportion (i.e. observation rate).
 
 Forecast Rate
 ~~~~~~~~~~~~~
@@ -1038,7 +1038,7 @@ A mathematical metric, :math:`m(A,B)\geq 0`, must have the following three prope
 
 3. Triangle inequality: :math:`m(A,C) \leq m(A,B) + m(B,C)`
 
-The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < M(A,B)`.
+The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < m(A,B)`.
 
 It has been argued in :ref:`Gilleland (2019) <Gilleland-2019>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
