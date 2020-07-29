@@ -30,14 +30,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 GridDiagConfInfo::GridDiagConfInfo() {
-
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 GridDiagConfInfo::~GridDiagConfInfo() {
-
    clear();
 }
 
@@ -86,7 +84,7 @@ void GridDiagConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridDiagConfInfo::read_config(const char *default_file_name,
-                              const char *user_file_name) {
+                                   const char *user_file_name) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -102,18 +100,35 @@ void GridDiagConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridDiagConfInfo::process_config(GrdFileType ftype) {
+void GridDiagConfInfo::set_n_data() {
+   Dictionary *dict = (Dictionary *) 0;
+
+   // Conf: data.field
+   dict = conf.lookup_array(conf_key_data_field);
+
+   // Determine the number of fields (name/level) to be processed
+   n_data = parse_conf_n_vx(dict);
+
+   // Check for empty data
+   if(n_data == 0) {
+      mlog << Error << "\nGridDiagConfInfo::set_n_data() -> "
+          << "the \"data.field\" array can't be empty!\n\n";
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary i_fdict;
+   Dictionary *dict = (Dictionary *) 0;
+   Dictionary i_dict;
+   GrdFileType file_type;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
-
-   // Initialize
-   clear();
 
    // Conf: version
    version = parse_conf_version(&conf);
@@ -122,35 +137,29 @@ void GridDiagConfInfo::process_config(GrdFileType ftype) {
    desc = parse_conf_string(&conf, conf_key_desc);
 
    // Conf: data.field
-   fdict = conf.lookup_array(conf_key_data_field);
-
-   // Determine the number of fields (name/level) to be verified
-   n_data = parse_conf_n_vx(fdict);
-
-   // Check for empty data
-   if(n_data == 0) {
-      mlog << Error << "\nGridDiagConfInfo::process_config() -> "
-          << "the \"data\" settings may not be empty.\n\n";
-      exit(1);
-   }
+   dict = conf.lookup_array(conf_key_data_field);
 
    // Allocate space based on the number of verification tasks
    data_info = new VarInfo * [n_data];
 
    // Initialize pointers
-   for(int i=0; i< n_data; i++) data_info[i] = (VarInfo *) 0;
+   for(int i=0; i<n_data; i++) data_info[i] = (VarInfo *) 0;
 
    // Parse the data field information
    for(int i=0; i<n_data; i++) {
 
+      // Determine the file type
+      file_type = (file_types.size() > 1 ?
+                   file_types[i] : file_types[0]);
+
       // Allocate new VarInfo objects
-      data_info[i] = info_factory.new_var_info(ftype);
+      data_info[i] = info_factory.new_var_info(file_type);
 
       // Get the current dictionaries
-      i_fdict = parse_conf_i_vx_dict(fdict, i);
+      i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Set the current dictionaries
-      data_info[i]->set_dict(i_fdict);
+      data_info[i]->set_dict(i_dict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {

@@ -69,8 +69,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray data_files;
-static GrdFileType dtype = FileType_None;
+static vector <StringArray> data_files;
+static vector <GrdFileType> file_types;
 static int compress_level = -1;
 
 // Output file
@@ -112,6 +112,9 @@ map<ConcatString, vector<double> > bin_mins;
 map<ConcatString, vector<double> > bin_maxs;
 map<ConcatString, vector<double> > bin_mids;
 map<ConcatString, double> bin_deltas;
+
+// Series length
+static int n_series = bad_data_int;
 
 // Range of timing values encountered in the data
 static unixtime init_beg  = (unixtime) 0;

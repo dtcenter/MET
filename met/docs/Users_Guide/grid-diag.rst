@@ -26,12 +26,16 @@ The following sections describe the usage statement, required arguments, and opt
          [-v level]
          [-compress level]
 
+    NOTE: The "-data" option can be used once to read all fields from each input file or once for each field to be processed.
+
 grid_diag has required arguments and can accept several optional arguments.
 
 Required arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing list of file names to be used.
+
+When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
 
 2. The **-out** argument is the NetCDF output file.
 
