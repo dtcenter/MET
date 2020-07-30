@@ -61,10 +61,12 @@ void update_pdf(
     double min,
     double delta,
     vector<int>& pdf,
-    const DataPlane& dp) {
+    const DataPlane& dp,
+    const MaskPlane& mp) {
 
     for(int i = 0; i < dp.nx(); i++) {
         for(int j = 0; j < dp.ny(); j++) {
+            if(!mp.s_is_on(i, j)) continue;
             double value = dp.get(i, j);
             int k = floor((value - min) / delta);
             if(k < 0) k = 0;
@@ -85,10 +87,12 @@ void update_joint_pdf(
     double delta_B,
     vector<int>& pdf,
     const DataPlane& dp_A,
-    const DataPlane& dp_B) {
+    const DataPlane& dp_B,
+    const MaskPlane& mp) {
 
     for(int i = 0; i < dp_A.nx(); i++) {
         for(int j = 0; j < dp_A.ny(); j++) {
+            if(!mp.s_is_on(i, j)) continue;
             double value_A = dp_A.get(i, j);
             int k_A = floor((value_A - min_A) / delta_A);
             if(k_A < 0) k_A = 0;
@@ -99,28 +103,6 @@ void update_joint_pdf(
             if(k_B >= n_B) k_B = n_B - 1;
             int k = k_A * n_B + k_B;
             pdf[k]++;
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void update_pdf(
-    double min,
-    double delta,
-    vector<int>& pdf,
-    const DataPlane& dp,
-    const MaskPlane& mp) {
-
-    for(int i = 0; i < dp.nx(); i++) {
-        for(int j = 0; j < dp.ny(); j++) {
-            if(mp.s_is_on(i, j)) {
-                double value = dp.get(i, j);
-                int k = floor((value - min) / delta);
-                if(k < 0) k = 0;
-                if(k >= pdf.size()) k = pdf.size() - 1;
-                pdf[k]++;
-            }
         }
     }
 }

@@ -53,7 +53,8 @@ void update_pdf(
     double min,
     double delta,
     vector<int>& pdf,
-    const DataPlane&);
+    const DataPlane&,
+    const MaskPlane&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,14 +67,6 @@ void update_joint_pdf(
     double delta_B,
     vector<int>& pdf,
     const DataPlane&,
-    const DataPlane&);
-
-////////////////////////////////////////////////////////////////////////
-
-void update_pdf(
-    double min,
-    double delta,
-    vector<int>& pdf,
     const DataPlane&,
     const MaskPlane&);
 

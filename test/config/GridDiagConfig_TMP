@@ -9,7 +9,7 @@
 //
 // Data description 
 //
-desc = "GFS";
+desc = "RUC13";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -38,16 +38,22 @@ censor_val    = [];
 data = {
    field = [
       {
-         name   = "APCP";
-         level  = ["L0"];
-         n_bins = 55;
-         range  = [0, 55]; // kg/m^2
+         name   = "TMP";
+         level  = ["Z2"];
+         n_bins = 65;
+         range  = [255, 320];
       },
       {
-         name   = "PWAT";
-         level  = ["L0"];
-         n_bins = 35;
-         range  = [35, 70]; // kg/m^2
+         name   = "TMP";
+         level  = ["P500"];
+         n_bins = 50;
+         range  = [250, 300];
+      },
+      {
+         name   = "TMP";
+         level  = ["P850"];
+         n_bins = 45;
+         range  = [265, 310];
       }
    ];
 }
@@ -56,7 +62,7 @@ data = {
 
 mask = {
    grid = "";
-   poly = "";
+   poly = "MET_BASE/poly/CONUS.poly";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
