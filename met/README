@@ -1,4 +1,4 @@
-Model Evaluation Tools version 9.1 BETA2 (July 14, 2020)
+Model Evaluation Tools version 9.1 BETA3 (July 29, 2020)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -251,6 +251,27 @@ Release Notes
 When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
    https://github.com/NCAR/MET/issues
+
+
+Version 9.1 BETA3 Release Notes:
+--------------------------------
+
+- Bugfixes:
+   - Fix TC-Gen to correctly apply the genesis event definition criteria from
+     the configuration file to BEST and operational tracks (#1427).
+
+- Enhancements to Existing Tools:
+   - Enhance Grid-Diag to support multiple input file lists, improve the log
+     messages, and write additional output variables and attributes (#1391).
+   - Enhance the parsing of ASCII file lists with Python embedding (#1423).
+   - Update the formatting of the colorbar values in plot_data_plane to show
+     more significant digits (#1423).
+   - Enhance Series-Analysis to print a warning message about a common
+     misconfiguration (#1372).
+   - Enhance the GRIB2 library to print a warning message about inconsistent
+     usage of the -D__64BIT__ compilation flag (#1416).
+   - Continued reduction of Fortify findings (#1417).
+   - Various documentation updates (#1325 and #1431).
 
 Version 9.1 BETA2 Release Notes:
 --------------------------------
