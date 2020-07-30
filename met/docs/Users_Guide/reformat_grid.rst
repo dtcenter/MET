@@ -355,7 +355,7 @@ In this example, the shift_data_plane tool reads 12-hour accumulated precipitati
 MODIS regrid tool
 _________________
 
-This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from MODIS level 2 cloud product from NASA. The data browser for these files is: http://ladsweb.nascom.nasa.gov/.
+This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from MODIS level 2 cloud product from NASA. The data browser for these files is: https://ladsweb.modaps.eosdis.nasa.gov
 
 modis_regrid usage
 ~~~~~~~~~~~~~~~~~~
