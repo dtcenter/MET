@@ -1,4 +1,4 @@
-1.. _point-stat:
+.. _point-stat:
 
 Point-Stat Tool
 ===============
