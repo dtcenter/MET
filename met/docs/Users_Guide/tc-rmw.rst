@@ -33,7 +33,7 @@ Required arguments for tc_rmw
 
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used.
 
-2. The **-deck source** argument is the ATCF format data source. ?? Is it 'deck' or 'adek' please confirm??
+2. The **-deck source** argument is the ATCF format data source.
 
 3. The **-config file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
