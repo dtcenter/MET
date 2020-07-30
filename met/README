@@ -263,7 +263,7 @@ Version 9.1 BETA3 Release Notes:
 - Enhancements to Existing Tools:
    - Enhance Grid-Diag to support multiple input file lists, improve the log
      messages, and write additional output variables and attributes (#1391).
-   - Enhance the parsing of ASCII file lists with Python embedding (#1423).
+   - Enhance the parsing of ASCII file lists with Python embedding (#1432).
    - Update the formatting of the colorbar values in plot_data_plane to show
      more significant digits (#1423).
    - Enhance Series-Analysis to print a warning message about a common
