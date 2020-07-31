@@ -50,6 +50,8 @@ A. Type the name of the tool followed by -version. For example, type “pb2nc -v
 
 A. MET considers north latitude and east longitude positive. Latitudes have range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have range from :math:`-180^\circ` to :math:`+180^\circ`. Plane angles such as azimuths and bearing (example: horizontal wind direction) have range :math:`0^\circ` to :math:`360^\circ` and are measured clockwise from north.
 
+.. _Troubleshooting:   
+   
 Troubleshooting
 _______________
 
@@ -57,9 +59,9 @@ The first place to look for help with individual commands is this user's guide o
 
 **MET won't compile**
 
-* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET\_ environment variables prior to running configure?**
+* Have you specified the locations of NetCDF, GNU Scientific Library, and BUFRLIB, and optional additional libraries using corresponding MET\_ environment variables prior to running configure?
 
-* Have these libraries been compiled and installed using the same set of compilers used to build MET?**
+* Have these libraries been compiled and installed using the same set of compilers used to build MET?
 
 * Are you using NetCDF version 3.4 or version 4? Currently, only NetCDF version 3.6 can be used with MET.
 

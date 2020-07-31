@@ -114,14 +114,14 @@ _______________________
 
 **Best Interpolation**
 
-The forecast value at P is the chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
+The forecast value at P is chosen as the grid point inside the interpolation area whose value most closely matches the observation value.
 
 .. _PS_HiRA_framework:
 
 HiRA framework
 ~~~~~~~~~~~~~~
 
-The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (Mittermaier, 2014). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the output_flag dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
+The Point-Stat tool has been enhanced to include the High Resolution Assessment (HiRA) verification logic (:ref:`Mittermaier, 2014 <Mittermaier-2014>`). HiRA is analogous to neighborhood verification but for point observations. The HiRA logic interprets the forecast values surrounding each point observation as an ensemble forecast. These ensemble values are processed in two ways. First, the ensemble continuous statistics (ECNT) and the ranked probability score (RPS) line types are computed directly from the ensemble values. Second, for each categorical threshold specified, a fractional coverage value is computed as the ratio of the nearby forecast values that meet the threshold criteria. Point-Stat evaluates those fractional coverage values as if they were a probability forecast. When applying HiRA, users should enable the matched pair (MPR), probabilistic (PCT, PSTD, PJC, or PRC), continuous ensemble statistics (ECNT), or ranked probability score (RPS) line types in the output_flag dictionary. The number of probabilistic HiRA output lines is determined by the number of categorical forecast thresholds and HiRA neighborhood widths chosen.
 
 The HiRA framework provides a unique method for evaluating models in the neighborhood of point observations, allowing for some spatial and temporal uncertainty in the forecast and/or the observations. Additionally, the HiRA framework can be used to compare deterministic forecasts to ensemble forecasts. In MET, the neighborhood is a circle or square centered on the grid point closest to the observation location. An event is defined, then the proportion of points with events in the neighborhood is calculated. This proportion is treated as an ensemble probability, though it is likely to be uncalibrated.
 
@@ -140,7 +140,7 @@ Often, the neighborhood size is chosen so that multiple models to be compared ha
 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~
 
-The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`appendixC`. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2003), and on the world-wide web at
+The Point-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into statistics for categorical variables and statistics for continuous variables. The categories of measures are briefly described here; specific descriptions of the measures are provided in :numref:`appendixC`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and on the world-wide web at
 
 http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html.
 
@@ -154,14 +154,14 @@ Categorical verification statistics are used to evaluate forecasts that are in t
 Measures for continuous variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`appendixC` for specific information.
+For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`appendixC` for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as``'conditional verification''. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See :numref:`appendixC` for specific information.
+For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in :ref:`Wilks (2011) <Wilks-2011>`. See :numref:`appendixC` for specific information.
 
 Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1. To make configuration easier, in METv6.0, these probabilities may be specified in the configuration file as a list (>=0.00,>=0.25,>=0.50,>=0.75,>=1.00) or using shorthand notation (==0.25) for bins of equal width.
 
@@ -172,7 +172,7 @@ When the "prob" entry is set as a dictionary to define the field of interest, se
 Measures for comparison against climatology
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR and ANOM_CORR_UNCNTR), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
+For each of the types of statistics mentioned above (categorical, continuous, and probabilistic), it is possible to calculate measures of skill relative to climatology. MET will accept a climatology file provided by the user, and will evaluate it as a reference forecast. Further, anomalies, i.e. departures from average conditions, can be calculated. As with all other statistics, the available measures will depend on the nature of the forecast. Common statistics that use a climatological reference include: the mean squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR and ANOM_CORR_UNCNTR), scalar and vector anomalies (SAL1L2 and VAL1L2), continuous ranked probability skill score (CRPSS), Brier Skill Score (BSS) (:ref:`Wilks, 2011 <Wilks-2011>`; :ref:`Mason, 2004 <Mason-2004>`).
 
 Often, the sample climatology is used as a reference by a skill score. The sample climatology is the average over all included observations and may be transparent to the user. This is the case in most categorical skill scores. The sample climatology will probably prove more difficult to improve upon than a long term climatology, since it will be from the same locations and time periods as the forecasts. This may mask legitimate forecast skill. However, a more general climatology, perhaps covering many years, is often easier to improve upon and is less likely to mask real forecast skill.
 
@@ -191,7 +191,7 @@ Bootstrap confidence intervals for any verification statistic are available in M
 
 Confidence intervals can be calculated from the sample of verification statistics obtained through the bootstrap algorithm. The most intuitive method is to simply take the appropriate quantiles of the sample of statistic(s). For example, if one wants a 95% CI, then one would take the 2.5 and 97.5 percentiles of the resulting sample. This method is called the percentile method, and has some nice properties. However, if the original sample is biased and/or has non-constant variance, then it is well known that this interval is too optimistic. The most robust, accurate, and well-behaved way to obtain accurate CIs from bootstrapping is to use the bias corrected and adjusted percentile method (or BCa). If there is no bias, and the variance is constant, then this method will yield the usual percentile interval. The only drawback to the approach is that it is computationally intensive. Therefore, both the percentile and BCa methods are available in MET, with the considerably more efficient percentile method being the default.
 
-The only other option associated with bootstrapping currently available in MET is to obtain replicated samples smaller than the original sample (i.e., to sample *m<n* points at each replicate). Ordinarily, one should use *m=n*, and this is the default. However, there are cases where it is more appropriate to use a smaller value of m (e.g., when making inference about high percentiles of the original sample). See Gilleland (2008) for more information and references about this topic.
+The only other option associated with bootstrapping currently available in MET is to obtain replicated samples smaller than the original sample (i.e., to sample *m<n* points at each replicate). Ordinarily, one should use *m=n*, and this is the default. However, there are cases where it is more appropriate to use a smaller value of m (e.g., when making inference about high percentiles of the original sample). See :ref:`Gilleland (2010) <Gilleland-2010>` for more information and references about this topic.
 
 MET provides parametric confidence intervals based on assumptions of normality for the following categorical statistics:
 
@@ -245,7 +245,7 @@ MET provides parametric confidence intervals based on assumptions of normality f
 
 MET provides non-parametric bootstrap confidence intervals for many categorical and continuous statistics. Kendall's Tau and Spearman's Rank correlation coefficients are the only exceptions. Computing bootstrap confidence intervals for these statistics would be computationally unrealistic.
 
-For more information on confidence intervals pertaining to verification measures, see Wilks (2011), Jolliffe and Stephenson (2003), and Bradley (2008).
+For more information on confidence intervals pertaining to verification measures, see :ref:`Wilks (2011) <Wilks-2011>`, :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and Bradley (2008).
 
 .. _tc-stat_practical-information:
 
@@ -355,7 +355,7 @@ Setting up the **fcst** and **obs** dictionaries of the configuration file is de
 
 The **obs** dictionary looks very similar to the **fcst** dictionary. When the forecast and observation variables follow the same naming convention, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However when verifying forecast data in NetCDF format or verifying against not-standard observation variables, users will need to specify the **fcst** and **obs** dictionaries separately. The number of fields specified in the **fcst** and **obs** dictionaries must match.
 
-The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See http://www.emc.ncep.noaa.gov/mmb/data_processing/PrepBUFR.doc/table_1.htm for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and the copied into the observation dictionary.
+The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and the copied into the observation dictionary.
 
 ______________________
 
@@ -609,9 +609,9 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * -
+  * - CTC OUTPUT FORMAT
     -
-    - CTC OUTPUT FORMAT
+    - 
   * - Column Number
     - CTC Column Name
     - Description
@@ -695,7 +695,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CTS OUTPUT FORMAT
+  * - CTS OUTPUT FORMAT (continued)
     -
     -
   * - Column Number
@@ -742,7 +742,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CTS OUTPUT FORMAT
+  * - CNT OUTPUT FORMAT
     -
     -
   * - Column Number
@@ -801,7 +801,7 @@ The first set of header columns are common to all of the output files generated 
   :widths: auto
   :header-rows: 2
 
-  * - CNT OUTPUT FORMAT
+  * - CNT OUTPUT FORMAT (continued)
     -
     -
   * - Column Number
@@ -1349,8 +1349,6 @@ The first set of header columns are common to all of the output files generated 
   * - 77–79
     - DIR_ABSERR
     - Absolute value of DIR_ABSERR
-
-?? Missing table 20 or table 21.  Were things mis-numbered?
 
 .. _table_PS_format_info_MPR:
 

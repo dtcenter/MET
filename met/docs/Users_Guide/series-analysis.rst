@@ -44,13 +44,13 @@ series_analysis has four required arguments and accepts several optional ones.
 Required arguments series_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The -fcst file_1 ... file_n | fcst_file_list options specify the gridded forecast files or ASCII files containing lists of file names to be used.
+1. The **-fcst file_1 ... file_n | fcst_file_list** options specify the gridded forecast files or ASCII files containing lists of file names to be used.
 
-2. The -obs file_1 ... file_n | obs_file_list are the gridded observation files or ASCII files containing lists of file names to be used.
+2. The **-obs file_1 ... file_n | obs_file_list** are the gridded observation files or ASCII files containing lists of file names to be used.
 
-3. The -out file is the NetCDF output file containing computed statistics.
+3. The **-out file** is the NetCDF output file containing computed statistics.
 
-4. The -config file is a Series-Analysis Configuration file containing the desired settings.
+4. The **-config file** is a Series-Analysis Configuration file containing the desired settings.
 
 Optional arguments for series_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -90,7 +90,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
 series_analysis configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The default configuration file for the Series-Analysis tool named SeriesAnalysisConfig_default can be found in the installed share/met/config directory. The contents of the configuration file are described in the subsections below.
+The default configuration file for the Series-Analysis tool named *SeriesAnalysisConfig_default* can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
 

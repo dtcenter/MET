@@ -6,7 +6,7 @@ TC-RMW Tool
 Introduction
 ____________
 
-The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
+The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
 
 Practical information
 _____________________
@@ -33,7 +33,7 @@ Required arguments for tc_rmw
 
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used.
 
-2. The **-deck source** argument is the ATCF format data source. ?? Is it 'deck' or 'adek' please confirm??
+2. The **-deck source** argument is the ATCF format data source.
 
 3. The **-config file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
@@ -54,34 +54,8 @@ The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' c
 _______________________
 
 .. code-block:: none
-		
-  model = "";
-  storm_id = "";
-  basin = "";
-  cyclone = "";
-  init_inc = "";
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
-These options are used to filter input data down to a single storm track.
-
-_______________________
-
-.. code-block:: none
-
-  valid_beg = "";
-  valid_end = "";
-  valid_inc = [];
-  valid_exc = [];
-  valid_hour = [];
-  lead       = [];
-
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
-These options are used to subset a single storm track down to individual points. The tropical cyclone model data corresponding to these track points will be processed.
-
-_______________________
-
-.. code-block:: none
-
+  model =       "GFS";
   censor_thresh = [];
   censor_val    = [];
   data  = {
@@ -106,7 +80,7 @@ _______________________
   }
   regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
 
 _______________________
 

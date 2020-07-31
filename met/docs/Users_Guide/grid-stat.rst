@@ -8,7 +8,7 @@ ____________
 
 The Grid-Stat tool provides verification statistics for a matched forecast and observation grid. All of the forecast grid points in the region of interest are matched to observation grid points on the same grid. All the matched grid points are used to compute the verification statistics. The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that no interpolation is required because the forecasts and observations are on the same grid. However, the interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
-Scientific and statistical aspects of the Grid-Stat tool are briefly described in this chapter, followed by practical details regarding usage and output from the tool.
+Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
 Scientific and statistical aspects
 __________________________________
@@ -17,32 +17,32 @@ __________________________________
 Statistical measures
 ~~~~~~~~~~~~~~~~~~~~
 
-The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in :numref:`appendixC`. Additional information can be found in Wilks (2011) and Jolliffe and Stephenson (2012), and on the world-wide web at
+The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in :ref:`appendixC`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and on the world-wide web at
 
 http://www.cawcr.gov.au/projects/verification/verif_web_page.html.
 
-In addition to these verification measures, the Grid-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :numref:`appendixC`.
+In addition to these verification measures, the Grid-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :ref:`appendixC`.
 
 Measures for categorical variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. Grid-Stat computes both 2x2 and multi-category contingency tables and their associated statistics, similar to Point-Stat. See :numref:`appendixC` for more information.
+Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. Grid-Stat computes both 2x2 and multi-category contingency tables and their associated statistics, similar to Point-Stat. See :ref:`appendixC` for more information.
 
 Measures for continuous variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by Murphy and Winkler (1987). The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`appendixC` for specific information.
+For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :ref:`appendixC` for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in Wilks (2011). See :numref:`appendixC` for specific information.
+For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in :ref:`Wilks (2011) <Wilks-2011>`. See :ref:`appendixC` for specific information.
 
-Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1. To make configuration easier, in METv6.0, these probabilities may be specified in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
+Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 to 100. If the max data value is > 1, we assume the data range is 0 to 100, and divide all the values by 100. If the max data value is <= 1, then we use the values as is. Further, thresholds are applied to the probabilities with equality on the lower end. For example, with a forecast probability p, and thresholds t1 and t2, the range is defined as: t1 <= p < t2. The exception is for the highest set of thresholds, when the range includes 1: t1 <= p <= 1. To make configuration easier, since METv6.0, these probabilities may be specified in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
 
-In METv6.0, when the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities.For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
+Since METv6.0, when the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities.For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
 Use of a climatology field for comparative verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57,7 +57,7 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis fie
 Statistical confidence intervals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., Efron 2007). See :numref:`appendixD` for details regarding confidence intervals provided by MET.
+The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron 2007 <Efron-2007>`). See :ref:`appendixD` for details regarding confidence intervals provided by MET.
 
 Grid weighting
 ~~~~~~~~~~~~~~
@@ -69,7 +69,7 @@ Neighborhood methods
 
 MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as “fuzzy” verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
 
-There are several ways to present the results of the neighborhood approaches, such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS). These scores are presented in :numref:`appendixC`. One can also simply up-scale the information on the forecast verification grid by smoothing or resampling within a specified neighborhood around each grid point and recalculate the traditional verification metrics on the coarser grid. The MET output includes traditional contingency table statistics for each threshold and neighborhood window size.
+There are several ways to present the results of the neighborhood approaches, such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS). These scores are presented in :ref:`appendixC`. One can also simply up-scale the information on the forecast verification grid by smoothing or resampling within a specified neighborhood around each grid point and recalculate the traditional verification metrics on the coarser grid. The MET output includes traditional contingency table statistics for each threshold and neighborhood window size.
 
 The user must specify several parameters in the grid_stat configuration file to utilize the neighborhood approach, such as the interpolation method, size of the smoothing window, and required fraction of valid data points within the smoothing window. For FSS-specific results, the user must specify the size of the neighborhood window, the required fraction of valid data points within the window, and the fractional coverage threshold from which the contingency tables are defined. These parameters are described further in the practical information section below.
 
@@ -80,7 +80,7 @@ The MET software will compute the full one-dimensional Fourier transform, then d
 
 Decomposition via Fourier transform allows the user to evaluate the model separately at each spatial frequency. As an example, the Fourier analysis allows users to examine the "dieoff", or reduction, in anomaly correlation of geopotential height at various levels for bands of waves. A band of low wave numbers, say 0 - 3, represent larger frequency components, while a band of higher wave numbers, for example 70 - 72, represent smaller frequency components. Generally, anomaly correlation should be higher for frequencies with low wave numbers than for frequencies with high wave numbers, hence the "dieoff".
 
-Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (Casati et al, 2004; Weniger et al 2016). Both the Fourier and wavelet methods can be used to look at different spatial scales.
+Wavelets, and in particular the MET wavelet tool, can also be used to define a band pass filter (:ref:`Casati et al, 2004 <Casati-2004>`; :ref:`Weniger et al 2016 <Weniger-2016>`). Both the Fourier and wavelet methods can be used to look at different spatial scales.
 
 Gradient Statistics
 ~~~~~~~~~~~~~~~~~~~
@@ -122,7 +122,7 @@ While :numref:`grid-stat_fig1` and :numref:`grid-stat_fig2` are helpful in illus
 
    The absolute difference between the distance maps in the bottom row of :numref:`grid-stat_fig3` (top left), the shortest distances from every grid point in B to the nearest grid point in A (top right), and the shortest distances from every grid point in A to the nearest grid points in B (bottom left). The latter two do not have axes in order to emphasize that the distances are now only considered from within the respective event sets. The top right graphic is the distance map of A conditioned on the presence of an event from B, and that in the bottom left is the distance map of B conditioned on the presence of an event from A.
 
-The statistics derived from these distance maps are described in :numref:`App_C-distance_maps`. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
+The statistics derived from these distance maps are described in Appendix C: :ref:`App_C-distance_maps`. For each combination of input field and categorical threshold requested in the configuration file, Grid-Stat applies that threshold to define events in the forecast and observation fields and computes distance maps for those binary fields. Statistics for all requested masking regions are derived from those distance maps. Note that the distance maps are computed only once over the full verification domain, not separately for each masking region. Events occurring outside of a masking region can affect the distance map values inside that masking region and, therefore, can also affect the distance maps statistics for that region.
 
 Practical information
 _____________________
@@ -429,7 +429,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Table 8.1 Header information for each file grid-stat outputs
+.. list-table:: Header information for each file grid-stat outputs
   :widths: auto
   :header-rows: 2
 
@@ -514,7 +514,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCTC:
 
-.. list-table:: Table 8.2 Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
+.. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
   :header-rows: 2
 
@@ -548,7 +548,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCTS:
 
-.. list-table:: Table 8.3 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -600,7 +600,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 .. role:: raw-html(raw)
     :format: html
 
-.. list-table:: Table 8.4 Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
+.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
   :widths: auto
   :header-rows: 1
 
@@ -644,7 +644,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_NBRCNT:
 	     
-.. list-table:: Table 8.5  Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
+.. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -681,7 +681,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_GRAD:
 
-.. list-table:: Table 8.6 Format information for GRAD (Gradient Statistics) output line type
+.. list-table:: Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
   :header-rows: 2
 
@@ -727,7 +727,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_format_info_DMAP:
 
-.. list-table:: Table 8.7 Format information for DMAP (Distance Map) output line type
+.. list-table:: Format information for DMAP (Distance Map) output line type
   :widths: auto
   :header-rows: 2
 
@@ -806,11 +806,11 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
-The output NetCDF file contains the dimensions and variables shown in the following Tables: :numref:`table_GS_Dimensions_NetCDF_matched_pair_out` and :numref:`table_GS_var_NetCDF_matched_pair_out`.
+The output NetCDF file contains the dimensions and variables shown in :numref:`table_GS_Dimensions_NetCDF_matched_pair_out` and :numref:`table_GS_var_NetCDF_matched_pair_out`.
 
 .. _table_GS_Dimensions_NetCDF_matched_pair_out:
 
-.. list-table:: Table 8.8 Dimensions defined in NetCDF matched pair output
+.. list-table:: Dimensions defined in NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 
@@ -829,7 +829,7 @@ The output NetCDF file contains the dimensions and variables shown in the follow
 	     
 .. _table_GS_var_NetCDF_matched_pair_out:
 
-.. list-table:: Table 8.9 A selection of variables that can appear in the NetCDF matched pair output
+.. list-table:: A selection of variables that can appear in the NetCDF matched pair output
   :widths: auto
   :header-rows: 2
 

@@ -6,7 +6,7 @@ Software Installation/Getting Started
 Introduction
 ____________
 
-This chapter describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
+This section describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
 
 Supported architectures
 _______________________
@@ -33,7 +33,7 @@ The GNU make utility is used in building all executables and is therefore requir
 
 The MET package consists of a group of command line utilities that are compiled separately. The user may choose to run any subset of these utilities to employ the type of verification methods desired. New tools developed and added to the toolkit will be included as command line utilities.
 
-In order to control the desired flow through MET, users are encouraged to run the tools via a script or consider using the METplus package (https://dtcenter.org/community-code/metplus). Some sample scripts are provided in the distribution; these examples are written in the Bourne shell. However, users are free to adapt these sample scripts to any scripting language desired.
+In order to control the desired flow through MET, users are encouraged to run the tools via a script or consider using the `METplus package <https://dtcenter.org/community-code/metplus>`_. Some sample scripts are provided in the distribution; these examples are written in the Bourne shell. However, users are free to adapt these sample scripts to any scripting language desired.
 
 .. _Install_Required-libraries-and:
 
@@ -42,17 +42,17 @@ _________________________________________
 
 Three external libraries are required for compiling/building MET and should be downloaded and installed before attempting to install MET. Additional external libraries required for building advanced features in MET are discussed in :numref:`Installation-of-required` :
 
-1. NCEP's BUFRLIB is used by MET to decode point-based observation datasets in PrepBUFR format. BUFRLIB is distributed and supported by NCEP and is freely available for download from NCEP's website at https://www.emc.ncep.noaa.gov/index.php?branch=BUFRLIB. BUFRLIB requires C and Fortran-90 compilers that should be from the same family of compilers used when building MET.
+1. NCEP's BUFRLIB is used by MET to decode point-based observation datasets in PrepBUFR format. BUFRLIB is distributed and supported by NCEP and is freely available for download from `NCEP's BUFRLIB website <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_. BUFRLIB requires C and Fortran-90 compilers that should be from the same family of compilers used when building MET.
 
-2. Several tools within MET use Unidata's NetCDF libraries for writing output NetCDF files. NetCDF libraries are distributed and supported by Unidata and are freely available for download from Unidata's website at http://www.unidata.ucar.edu/software/netcdf. The same family of compilers used to build NetCDF should be used when building MET. MET is now compatible with the enhanced data model provided in NetCDF version 4. The support for NetCDF version 4 requires HDF5 which is freely available for download at https://support.hdfgroup.org/HDF5/.
+2. Several tools within MET use Unidata's NetCDF libraries for writing output NetCDF files. NetCDF libraries are distributed and supported by Unidata and are freely available for download from `Unidata's NetCDF website <http://www.unidata.ucar.edu/software/netcdf>`_. The same family of compilers used to build NetCDF should be used when building MET. MET is now compatible with the enhanced data model provided in NetCDF version 4. The support for NetCDF version 4 requires NetCDF-C, NetCDF-CXX, and HDF5, which is freely available for download on the `HDF5 webpage <https://support.hdfgroup.org/HDF5/>`_.
 
-3. The GNU Scientific Library (GSL) is used by MET when computing confidence intervals. GSL is distributed and supported by the GNU Software Foundation and is freely available for download from the GNU website at http://www.gnu.org/software/gsl. 
+3. The GNU Scientific Library (GSL) is used by MET when computing confidence intervals. GSL is distributed and supported by the GNU Software Foundation and is freely available for download from the `GNU website <http://www.gnu.org/software/gsl>`_. 
 
-4. The Zlib is used by MET for compression when writing postscript image files from tools (e.g. MODE, Wavelet-Stat, Plot-Data-Plane, and Plot-Point-Obs). Zlib is distributed and supported Zlib.org and is freely available for download from the Zlib website at http://www.zlib.net. 
+4. The Zlib is used by MET for compression when writing postscript image files from tools (e.g. MODE, Wavelet-Stat, Plot-Data-Plane, and Plot-Point-Obs). Zlib is distributed and supported Zlib.org and is freely available for download from the `Zlib website <http://www.zlib.net>`_. 
 
 Two additional utilities are strongly recommended for use with MET:
 
-1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the model forecasts with MET. The Unified Post-Processor is freely available for download https://dtcenter.org/community-code/unified-post-processor-upp. MET can read data on a standard, de-staggered grid and on pressure or regular levels in the vertical. The Unified Post-Processor outputs model data in this format from both WRF cores, the NMM and the ARW. However, the Unified Post-Processor is not strictly required as long as the user can produce gridded model output on a standard de-staggered grid on pressure or regular levels in the vertical. Two-dimensional fields (e.g., precipitation amount) are also accepted for some modules.
+1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the model forecasts with MET. The Unified Post-Processor is freely available for `download <https://dtcenter.org/community-code/unified-post-processor-upp>`_. MET can read data on a standard, de-staggered grid and on pressure or regular levels in the vertical. The Unified Post-Processor outputs model data in this format from both WRF cores, the NMM and the ARW. However, the Unified Post-Processor is not strictly required as long as the user can produce gridded model output on a standard de-staggered grid on pressure or regular levels in the vertical. Two-dimensional fields (e.g., precipitation amount) are also accepted for some modules.
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB version 1 format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. While earlier versions of MET required that all gridded data be placed on a common grid, MET version 5.1 added support for automated re-gridding on the fly. After version 5.1, users have the option of running copygb to regrid their GRIB1 data ahead of time or leveraging the automated regridding capability within MET. 
 
@@ -64,57 +64,68 @@ __________________________________
 As described in :numref:`Install_Required-libraries-and`, some external libraries are required for building the MET:
 
 1.
-NCEP's BUFRLIB is used by the MET to decode point-based observation datasets in PrepBUFR format. Once you have downloaded and unpacked the BUFRLIB tarball, refer to the README_BUFRLIB file. When compiling the library using the GNU C and Fortran compilers, users are strongly encouraged to use the -DUNDERSCORE and -fno-second-underscore options. Compiling the BUFRLIB using the GNU compilers consists of the following 3 steps:
+NCEP's BUFRLIB is used by the MET to decode point-based observation datasets in PrepBUFR format. Once you have downloaded and unpacked the BUFRLIB tarball, refer to the README_BUFRLIB file. When compiling the library using the GNU C and Fortran compilers, users are strongly encouraged to use the -DUNDERSCORE and -fno-second-underscore options. Compiling the BUFRLIB verison 11.3.0 (recommended version) using the GNU compilers consists of the following three steps:
 
-   | \* gcc -c -DUNDERSCORE \*.c
-   | \* gfortran -c -DUNDERSCORE -fno-second-underscore \*.f \*.F
-   | \* ar crv libbufr.a \*.o
+.. code-block:: none
+		
+  gcc -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log
+  gfortran -c -fno-second-underscore `./getdefflags_F.sh` modv*.F moda*.F \
+  `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log
+  ar crv libbufr.a *.o
 
-Compiling the BUFRLIB using the PGI C and Fortran-90 compilers consists of the following 3 steps:
+Compiling the BUFRLIB using the PGI C and Fortran-90 compilers consists of the following three steps:
 
-   | \* pgcc -c -DUNDERSCORE \*.c
-   | \* pgf90 -c -DUNDERSCORE -Mnosecond_underscore \*.f \*.F
-   | \* ar crv libbufr.a \*.o
+.. code-block:: none
 
-Compiling the BUFRLIB using the Intel icc and ifort compilers consists of the following 3 steps:
+  pgcc -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log
+  pgf90 -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F \
+  `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log
+  ar crv libbufr.a *.o
 
-   | \* icc -c -DUNDERSCORE \*.c
-   | \* ifort -c -DUNDERSCORE \*.f \*.F
-   | \* ar crv libbufr.a \*.o
+Compiling the BUFRLIB using the Intel icc and ifort compilers consists of the following three steps:
+
+.. code-block:: none
+		
+  icc -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log
+  ifort -c `./getdefflags_F.sh` modv*.F moda*.F \
+  `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log
+  ar crv libbufr.a *.o
 
 In the directions above, the static library file that is created will be named libbufr.a. MET will check for the library file named libbufr.a, however in some cases (e.g. where the BUFRLIB is already available on a system) the library file may be named differently (e.g. libbufr_v11.3.0_4_64.a). If the library is named anything other than libbufr.a, users will need to tell MET what library to link with by passing the BUFRLIB_NAME option to MET when running configure (e.g. BUFRLIB_NAME=-lbufr_v11.3.0_4_64).
 
-2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Detailed installation instructions are available from Unidata at http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-install/. Support for NetCDF version 4 requires HDF5. Detailed installation instructions for HDF5 are available at https://support.hdfgroup.org/HDF5/release/obtainsrc.html.
+2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. Both `NetCDF-C and NetCDF-CXX <https://www.unidata.ucar.edu/downloads/netcdf/>`_ are required. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Support for NetCDF version 4 requires `HDF5 <https://portal.hdfgroup.org/display/HDF5/HDF5>`_.
 
-3. The GNU Scientific Library (GSL) is used by MET for random sampling and normal and binomial distribution computations when estimating confidence intervals. Precompiled binary packages are available for most GNU/Linux distributions and may be installed with root access. When installing GSL from a precompiled package on Debian Linux, the developer's version of GSL must be used; otherwise, use the GSL version available from the GNU website (http://www.gnu.org/software/gsl/). MET requires access to the GSL source headers and library archive file at build time. 
+3. The GNU Scientific Library (GSL) is used by MET for random sampling and normal and binomial distribution computations when estimating confidence intervals. Precompiled binary packages are available for most GNU/Linux distributions and may be installed with root access. When installing GSL from a precompiled package on Debian Linux, the developer's version of GSL must be used; otherwise, use the GSL version available from the `GNU GSL website <http://www.gnu.org/software/gsl/>`_. MET requires access to the GSL source headers and library archive file at build time. 
 
-4. For users wishing to compile MET with GRIB2 file support, NCEP's GRIB2 Library in C (g2clib) must be installed, along with jasperlib, libpng, and zlib. (http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2). Please note that compiling the GRIB2C library with the -D__64BIT__ option requires that MET also be configured with CFLAGS="-D__64BIT__". Compiling MET and the GRIB2C library inconsistently may result in a segmentation fault when reading GRIB2 files. MET looks for the GRIB2C library to be named libgrib2c.a, which may be set in the GRIB2C makefile as LIB=libgrib2c.a. However in some cases, the library file may be named differently (e.g. libg2c_v1.6.0.a). If the library is named anything other than libgrib2c.a, users will need to tell MET what library to link with by passing the GRIB2CLIB_NAME option to MET when running configure (e.g. GRIB2CLIB_NAME=-lg2c_v1.6.0).
+4. For users wishing to compile MET with GRIB2 file support, `NCEP's GRIB2 Library <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ in C (g2clib) must be installed, along with jasperlib, libpng, and zlib. **Please note that compiling the GRIB2C library with the -D__64BIT__ option requires that MET also be configured with CFLAGS="-D__64BIT__". Compiling MET and the GRIB2C library inconsistently may result in a segmentation fault or an "out of memory" error when reading GRIB2 files.** MET looks for the GRIB2C library to be named libgrib2c.a, which may be set in the GRIB2C makefile as LIB=libgrib2c.a. However in some cases, the library file may be named differently (e.g. libg2c_v1.6.0.a). If the library is named anything other than libgrib2c.a, users will need to tell MET what library to link with by passing the GRIB2CLIB_NAME option to MET when running configure (e.g. GRIB2CLIB_NAME=-lg2c_v1.6.0).
 
-5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the HDF4 and HDF-EOS2 libraries available from the HDF group websites (http://www.hdfgroup.org/products/hdf4) and (http://www.hdfgroup.org/hdfeos.html).
+5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the `HDF4 <https://portal.hdfgroup.org/display/HDF4/HDF4>`_ and `HDF-EOS2 <http://hdfeos.org/>`_ libraries available from the HDF group websites linked here.
 
-6. The MODE-Graphics utility requires Cairo and FreeType. Thus, users who wish to compile this utility must install both libraries, available from (http://cairographics.org/releases) and (http://www.freetype.org/download.html). In addition, users will need to download Ghostscript font data required at runtime (http://sourceforge.net/projects/gs-fonts).
+6. The MODE-Graphics utility requires `Cairo <http://cairographics.org/releases>`_ and `FreeType <http://www.freetype.org/download.html>`_. Thus, users who wish to compile this utility must install both libraries. In addition, users will need to download the `Ghostscript font data <http://sourceforge.net/projects/gs-fonts>`_ required at runtime.
 
 .. _Installation-of-optional:
 
 Installation of optional utilities
 __________________________________
 
-As described in the introduction to this chapter, two additional utilities are strongly recommended for use with MET.
+As described in the introduction to this section, two additional utilities are strongly recommended for use with MET.
 
-1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the data with MET. The Unified Post-Processor may be used on WRF output from both the ARW and NMM cores. https://dtcenter.org/community-code/unified-post-processor-upp .
+1. The `Unified Post-Processor <https://dtcenter.org/community-code/unified-post-processor-upp>`_ is recommended for post-processing the raw WRF model output prior to verifying the data with MET. The Unified Post-Processor may be used on WRF output from both the ARW and NMM cores.
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. Please refer to the "Unified Post-processor" utility mentioned above for information on availability and installation.
+
+.. _met_directory_structure:
 
 MET directory structure
 _______________________
 
 The top-level MET directory consists of a README file, Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in :numref:`Install_Building-the-MET`.
 
-When MET has been successfully built and installed, the installation directory contains two subdirectories. The bin/ directory contains executables for each module of MET as well as several plotting utilities. The share/met/ directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The colortables/, map/, and ps/ subdirectories contain data used in creating PostScript plots for several MET tools. The poly/ subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in Appendix B. The config/ directory contains default configuration files for the MET tools. The table_files/ and tc_data/ subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The Rscripts/ subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET scripts/Rscripts directory, other than it is the installed location.
+When MET has been successfully built and installed, the installation directory contains two subdirectories. The bin/ directory contains executables for each module of MET as well as several plotting utilities. The share/met/ directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The colortables/, map/, and ps/ subdirectories contain data used in creating PostScript plots for several MET tools. The poly/ subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in Appendix B. The config/ directory contains default configuration files for the MET tools. The python/ subdirectory contains sample scripts used in Python embedding (:numref:`appendixF`). The table_files/ and tc_data/ subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The Rscripts/ subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET scripts/Rscripts directory, other than it is the installed location. The wrappers/ subdirectory contains code used in Python embedding (:numref:`appendixF`).
 
 The data/ directory contains several configuration and static data files used by MET. The sample_fcst/ and sample_obs/ subdirectories contain sample data used by the test scripts provided in the scripts/ directory. 
 
-The doc/ directory contains documentation for MET, including the MET User's Guide.
+The docs/ directory contains the Sphinx documentation for MET.
 
 The out/ directory will be populated with sample output from the test cases described in the next section. 
 
@@ -129,9 +140,10 @@ The share/met/Rscripts directory contains a handful of sample R scripts, include
 Building the MET package
 ________________________
 
-Building the MET package consists of three main steps: (1) install the required libraries, (2) configure the environment variables, and (3) configure and execute the build.
+Building the MET package consists of three main steps: (1) install the required libraries, (2) configure the environment variables, and (3) configure and execute the build. Users can follow the instructions below or use a sample installation script.  Users can find the script and its instructions under on the `Downloads <https://dtcenter.org/community-code/model-evaluation-tools-met/download>`_ page of the MET website.
 
-Install the required libraries.
+Install the Required Libraries
+______________________________
 
 • Please refer to :numref:`Installation-of-required` and :numref:`Installation-of-optional` on how to install the required and optional libraries.
 
@@ -148,7 +160,7 @@ The $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the librar
 
 The following environment variables should also be set:
 
-   \- Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC to point to the directory with the NetCDF include files and set $MET_NETCDFLIB to point to the directory with the NetCDF library files.
+   \- Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC to point to the directory with the NetCDF include files and set $MET_NETCDFLIB to point to the directory with the NetCDF library files. Note that the files for both NetCDF-C and NetCDF-CXX must be installed in the same include and library directories.
 
    \- Set $MET_HDF5 to point to the main HDF5 directory.
 
@@ -228,7 +240,7 @@ If all tools are enabled and the build is successful, the "<prefix>/bin" directo
    - wwmca_plot
    - wwmca_regrid
 
-NOTE: Several compilation warnings may occur which are expected. If any errors occur, please refer to the appendix on troubleshooting for common problems. 
+NOTE: Several compilation warnings may occur which are expected. If any errors occur, please refer to the appendix on troubleshooting (:numref:`Troubleshooting`) for common problems. 
 
 **-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
 
@@ -245,6 +257,18 @@ Enable compilation of utilities using GRIB2. Requires $MET_GRIB2C.
 **-\\-enable-python**
 
 Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
+
+**-\\-enable-lidar2nc**
+
+Enable compilation of utilities using lidar2nc.
+
+**-\\-enable-modis**
+
+Enable compilation of modis_regrid. Requires $MET_HDF, $MET_HDFEOSINC, and $MET_HDFEOSLIB.
+
+**-\\-enable-mode_graphics**
+
+Enable compilation of mode_graphics. Requires $MET_CAIRO and $MET_FREETYPE.
 
 **-\\-disable-block4**
 
