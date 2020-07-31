@@ -727,8 +727,7 @@ void process_obs_file(int i_nc) {
         << " messages.\n";
 
    StringArray var_names;
-   char var_name[var_name_len+1];
-   strcpy(var_name, "");
+   ConcatString var_name("");
    if (use_var_id) {
       if (!get_nc_data_to_array(obs_in, nc_var_obs_var, &var_names)) {
          mlog << Error << "\nprocess_obs_file() -> "
@@ -864,11 +863,11 @@ void process_obs_file(int i_nc) {
 
          int grib_code = obs_arr[1];
          if (use_var_id && grib_code < var_names.n()) {
-            strcpy(var_name, var_names[grib_code].c_str());
+            var_name   = var_names[grib_code];
             obs_arr[1] = bad_data_int;
          }
          else {
-            strcpy(var_name, "");
+            var_name = "";
          }
 
          // Check each conf_info.vx_pd object to see if this observation
@@ -882,7 +881,7 @@ void process_obs_file(int i_nc) {
             conf_info.vx_opt[j].vx_pd.add_point_obs(hdr_arr,
                                          hdr_typ_str, hdr_sid_str,
                                          hdr_ut, obs_qty_str, obs_arr,
-                                         grid, var_name);
+                                         grid, var_name.c_str());
          }
 
          obs_arr[1] = grib_code;
