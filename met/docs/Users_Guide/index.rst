@@ -12,11 +12,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa Fo
 
 **New for METv9.1**
 
-Output Format Changes:
-Configuration File Changes:
-Build Process Changes:
-Enhancements to Existing Tools:
-
+The release notes for METv9.1 can be found on the `Release Notes page of the MET wepage <https://dtcenter.org/community-code/model-evaluation-tools-met/met-version-9-1#notes>`_.
 
 **Model Evaluation Tools (MET)  TERMS OF USE - IMPORTANT!**
 
