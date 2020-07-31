@@ -105,6 +105,10 @@ static Grid grid;
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
 
+// Variable min/max values
+vector<double> var_mins;
+vector<double> var_maxs;
+
 // Variable histogram map
 map<ConcatString, vector<int> > histograms;
 map<ConcatString, vector<int> > joint_histograms;
@@ -123,6 +127,7 @@ static unixtime valid_beg = (unixtime) 0;
 static unixtime valid_end = (unixtime) 0;
 static int      lead_beg  = bad_data_int;
 static int      lead_end  = bad_data_int;
+
 
 #endif  //  __GRID_DIAG_H__
 

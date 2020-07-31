@@ -279,13 +279,13 @@ void process_series(void) {
                                        data_info->regrid());
         }
 
-        // Initialize timing info
+        // Initialize time ranges
         if(i_series == 0 && i_var == 0) {
            init_beg  = init_end  = data_dp[i_var].init();
            valid_beg = valid_end = data_dp[i_var].valid();
            lead_beg  = lead_end  = data_dp[i_var].lead();
         }
-        // Update timing info
+        // Update time ranges
         else {
            if(data_dp[i_var].init() < init_beg) {
               init_beg  = data_dp[i_var].init();
@@ -307,15 +307,16 @@ void process_series(void) {
            }
         }
 
-        // Check the range of the data
+        // Apply the mask before updating the data ranges
+        apply_mask(data_dp[i_var], conf_info.mask_area);
+
+        // Update the range of the data values
         data_dp[i_var].data_range(min, max);
-        if(min < data_info->range()[0] || max > data_info->range()[1]) {
-           mlog << Warning << "\nprocess_series() -> "
-                << "the range of the " << data_info->magic_str()
-                << " data (" << min << ", " << max
-                << ") falls outside the configuration file range ("
-                << data_info->range()[0] << ", "
-                << data_info->range()[1] << ")!\n\n";
+        if(is_bad_data(var_mins[i_var]) || min < var_mins[i_var]) {
+           var_mins[i_var] = min;
+        }
+        if(is_bad_data(var_maxs[i_var]) || max < var_maxs[i_var]) {
+           var_maxs[i_var] = max;
         }
 
         // Update partial sums
@@ -352,6 +353,29 @@ void process_series(void) {
      } // end for i_var
    } // end for i_series
 
+   // Report the ranges of values for each field
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+
+      VarInfo *data_info = conf_info.data_info[i_var];
+
+      mlog << Debug(2)
+           << "Processed " << data_info->magic_str()
+           << " data with range (" << var_mins[i_var] << ", "
+           << var_maxs[i_var] << ") into bins with range ("
+           << data_info->range()[0] << ", "
+           << data_info->range()[1] << ").\n";
+
+      if(var_mins[i_var] < data_info->range()[0] ||
+         var_maxs[i_var] > data_info->range()[1]) {
+         mlog << Warning << "\nprocess_series() -> "
+              << "the range of the " << data_info->magic_str()
+              << " data (" << var_mins[i_var] << ", " << var_maxs[i_var]
+              << ") falls outside the configuration file range ("
+              << data_info->range()[0] << ", "
+              << data_info->range()[1] << ")!\n\n";
+      }
+   } // end for i_var
+
    return;
 }
 
@@ -362,6 +386,10 @@ void setup_histograms(void) {
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
       VarInfo *data_info = conf_info.data_info[i_var];
+
+      // Initialize variable min and max values
+      var_mins.push_back(bad_data_double);
+      var_maxs.push_back(bad_data_double);
 
       // Find bin ranges
       NumArray range = data_info->range();
