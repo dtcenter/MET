@@ -205,25 +205,33 @@ Other uses of the WATCH_WARN column include filtering when:
 
 The following filtering options can be achieved by the following:
 
-    1.
-    init_str_name = ["WATCH_WARN"];
+Option 1. A forecast is issued when a watch/warning is in effect
 
-    init_str_val = ["ALL"];
+.. code-block:: none
+		
+  init_str_name = ["WATCH_WARN"];
+  init_str_val = ["ALL"];
  
-    2.
-    column_str_name = ["WATCH_WARN"];
-    
-    column_str_val = ["ALL"];
+Option 2. A forecast is verifying when a watch/warning is in effect
+
+.. code-block:: none
+
+  column_str_name = ["WATCH_WARN"];  
+  column_str_val = ["ALL"];
    
-    3.
-    init_str_name = ["WATCH_WARN"];
+Option 3. A forecast is issued when a watch/warning is NOT in effect
+
+.. code-block:: none
+
+  init_str_name = ["WATCH_WARN"];  
+  init_str_val = ["NA"];
     
-    init_str_val = ["NA"];
-    
-    4.
-    column_str_name = ["WATCH_WARN"];
-    
-    column_str_val = ["NA"];
+Option 4. A forecast is verified when a watch/warning is NOT in effect
+
+.. code-block:: none
+
+  column_str_name = ["WATCH_WARN"];
+  column_str_val = ["NA"];
     
 Further information on the **column_str** and **init_str** fields is described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will stratify by a single or multiple types of warnings.
 
