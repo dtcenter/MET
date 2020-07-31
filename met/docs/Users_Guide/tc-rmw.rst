@@ -54,33 +54,6 @@ The default configuration file for the TC-RMW tool named 'TCRMWConfig_default' c
 _______________________
 
 .. code-block:: none
-		
-  model = "";
-  storm_id = "";
-  basin = "";
-  cyclone = "";
-  init_inc = "";
-
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
-These options are used to filter input data down to a single storm track.
-
-_______________________
-
-.. code-block:: none
-
-  valid_beg = "";
-  valid_end = "";
-  valid_inc = [];
-  valid_exc = [];
-  valid_hour = [];
-  lead       = [];
-
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
-These options are used to subset a single storm track down to individual points. The tropical cyclone model data corresponding to these track points will be processed.
-
-_______________________
-
-.. code-block:: none
 
   model =       "GFS";
   censor_thresh = [];
@@ -107,7 +80,7 @@ _______________________
   }
   regrid = { ... }
 
-The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`.
+The configuration options listed above are common to many MET tools and are described in :numref:`Data IO MET Configuration File Options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
 
 _______________________
 
