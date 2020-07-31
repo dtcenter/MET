@@ -112,7 +112,7 @@ An example of the ensemble_stat calling sequence is shown below:
      -point_obs out/ascii2nc/precip24_2010010112.nc \
      -outdir out/ensemble_stat -v 2
 
-In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and used to ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
+In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
 ensemble_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

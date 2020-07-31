@@ -183,7 +183,7 @@ _________________________
 
   line_type = [];
 
-The **line_type** field stratifies by the line_type column. Currently TCMPR is the only line_type option used in MET-TC.
+The **line_type** field stratifies by the line_type column.
 
 _________________________
 

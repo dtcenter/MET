@@ -77,7 +77,7 @@ Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated Probabi
 
 Hamill, T. M., 2001: Interpretation of rank histograms for verifying ensemble forecasts. *Monthly Weather Review*, 129, 550-560.
 
-Hersbach, H., 2000: Decomposition of the continuous ranked probability score for ensemble prediction systems. *Weather Forecasting,* 15, 559–570.
+.. _Hogan-2009:
 
 Hogan, R., E. O'Connor, and A. Illingworth, 2009: Verification of cloud-fraction forecasts. *Quarterly Journal of the Royal Meteorological Society*, 135, 1494-1511.
 

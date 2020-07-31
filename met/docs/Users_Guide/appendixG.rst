@@ -97,7 +97,7 @@ MSVE and RMSVE are, respectively, the mean squared, and root mean squared, lengt
 ____________________________
 
 
-FSTDEV and OSTDEV are the standard deviations of the forecast and observed wind speeds. In these equations, :math:`\mu_f \text{ and } \mu_o` are the average forecast and observed wind speeds
+FSTDEV and OSTDEV are the standard deviations of the forecast and observed wind speeds.
 
 .. math:: \text{FSTDEV } = \frac{1}{N} \sum_i (s_{fi} - \text{FBAR})^2 = \frac{1}{N} \sum_i s_{fi}^2 - \text{FBAR}^2
 

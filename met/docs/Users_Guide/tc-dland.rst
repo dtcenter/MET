@@ -24,7 +24,7 @@ The output file from TC-dland is a NetCDF format file containing a gridded field
 Practical information
 _____________________
 
-This section briefly describes how to run tc_dland. The default grid is set to 1/10th degree NW hemisphere grid.
+This section briefly describes how to run tc_dland. The default grid is set to 1/10th degree Northwest (NW) hemispheric quadrant (over North America) grid.
 
 tc_dland usage
 ~~~~~~~~~~~~~~
