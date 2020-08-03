@@ -67,6 +67,8 @@ static void   write_cts            (int, GenCTCInfo &);
 static void   finish_txt_files     ();
 
 static void   usage                ();
+static void   set_source           (const StringArray &, const char *,
+                                    StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
 static void   set_track            (const StringArray &);
 static void   set_config           (const StringArray &);
@@ -824,14 +826,16 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-genesis path\" specifies an ATCF genesis file "
-        << "or top-level directory with files matching the regular "
-        << "expression \"" << atcf_gen_reg_exp << "\" (required).\n"
+        << "\twhere\t\"-genesis path\" is one or more ATCF genesis "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_gen_reg_exp << "\" (required).\n"
 
-        << "\t\t\"-track path\" specifies an ATCF track file or "
-        << "top-level directory with files matching the regular "
-        << "expression \"" << atcf_reg_exp << "\" for the verifying "
-        << "BEST and operational tracks (required).\n"
+        << "\t\t\"-track path\" is one or more ATCF track "
+        << "files, an ASCII file list containing them, or a top-level "
+        << "directory with files matching the regular expression \""
+        << atcf_reg_exp << "\" for the verifying BEST and operational "
+        << "tracks (required).\n"
 
         << "\t\t\"-config file\" is used once to specify the "
         << "TCGenConfig file containing the desired configuration "
@@ -851,80 +855,73 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_genesis(const StringArray & a) {
-   int i;
-   StringArray sa;
+void set_source(const StringArray &a, const char *type_str,
+                StringArray &source, StringArray &model_suffix) {
+   int i, j;
+   StringArray sa, tmp_src, tmp_suf;
    ConcatString cs;
 
    // Check for optional suffix sub-argument
    for(i=0; i<a.n(); i++) {
-
       cs = a[i];
       if(cs.startswith("suffix")) {
          sa = cs.split("=");
          if(sa.n() != 2) {
-            mlog << Error << "\nset_genesis() -> "
-                 << "the model suffix must be specified as "
+            mlog << Error << "\nset_source() -> "
+                 << "in -" << type_str
+                 << " the model suffix must be specified as "
                  << "\"suffix=string\".\n\n";
+            exit(1);
          }
          else {
-            genesis_model_suffix.add(sa[1]);
+            tmp_suf.add(sa[1]);
          }
       }
       else {
-         genesis_source.add(a[i]);
+         tmp_src.add(a[i]);
       }
-   }
+   } // end for i
 
    // Check for consistent usage
-   if(genesis_model_suffix.n() > 0 &&
-      genesis_model_suffix.n() != genesis_source.n()) {
-      mlog << Error << "\nset_genesis() -> "
+   if(tmp_suf.n() > 0 && tmp_suf.n() != tmp_src.n()) {
+      mlog << Error << "\nset_source() -> "
            << "the number of \"suffix=string\" options must match the "
-           << "number of -genesis options.\n\n";
+           << "number of -" << type_str << " options.\n\n";
       exit(1);
    }
+
+   // Process each source element as a file list
+   for(i=0; i<tmp_src.n(); i++) {
+
+      sa = parse_ascii_file_list(tmp_src[i].c_str());
+
+      // Add list elements, if present
+      if(sa.n() > 0) {
+         source.add(sa);
+         if(tmp_suf.n() > 0) {
+            for(j=0; j<sa.n(); j++) model_suffix.add(tmp_suf[i]);
+         }
+      }
+      // Otherwise, add a single element
+      else {
+         source.add(tmp_src[i]);
+         if(tmp_suf.n() > 0) model_suffix.add(tmp_suf[i]);
+      }
+   } // end for i
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_genesis(const StringArray & a) {
+   set_source(a, "genesis", genesis_source, genesis_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void set_track(const StringArray & a) {
-   int i;
-   StringArray sa;
-   ConcatString cs;
-
-   // Check for optional suffix sub-argument
-   for(i=0; i<a.n(); i++) {
-
-      cs = a[i];
-      if(cs.startswith("suffix")) {
-         sa = cs.split("=");
-         if(sa.n() != 2) {
-            mlog << Error << "\nset_track() -> "
-                 << "the model suffix must be specified as "
-                 << "\"suffix=string\".\n\n";
-         }
-         else {
-            track_model_suffix.add(sa[1]);
-         }
-      }
-      else {
-         track_source.add(a[i]);
-      }
-   }
-
-   // Check for consistent usage
-   if(track_model_suffix.n() > 0 &&
-      track_model_suffix.n() != track_source.n()) {
-      mlog << Error << "\nset_track() -> "
-           << "the number of \"suffix=string\" options must match the "
-           << "number of -track options.\n\n";
-      exit(1);
-   }
-
-   return;
+   set_source(a, "track", track_source, track_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
