@@ -1,7 +1,7 @@
 .. _met-tc_overview:
 
-18 MET-TC Overview
-==================
+MET-TC Overview
+===============
 
 Introduction
 ____________
