@@ -327,6 +327,12 @@ ConcatString list_str(file_list_str);
 bool check_files_exist = true;
 
    //
+   //  If the input is not a regular file, return an empty list
+   //
+
+if ( !is_regular_file(path) )  return(a);
+
+   //
    //  Open the input ascii file
    //
 
@@ -383,7 +389,7 @@ while(f_in >> file_name)  {
 }
 
    //
-   //  When checking file existene and none exist,
+   //  When checking file existence and none exist,
    //  return an empty list
    //
 
