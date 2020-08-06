@@ -6,13 +6,9 @@ User's Guide
 
 This User's guide is provided as an aid to users of the Model Evaluation Tools (MET).  MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework.  METplus details can be found at: `http://dtcenter.org/community-code/metplus <http://dtcenter.org/community-code/metplus>`_.
 
-It is important to note here that MET is an evolving software package.  Previous releases of MET have occurred each year since 2008. This documentation describes the 9.1 release in July 2020.  Intermediate releases may include bug fixes.  MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution.  Please send an email to:  `met_help@ucar.edu <mailto:>`__.  We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
+It is important to note here that MET is an evolving software package.  Previous releases of MET have occurred each year since 2008. Intermediate releases may include bug fixes.  MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution.  Please send an email to:  `met_help@ucar.edu <mailto:>`__.  We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
 
 This User's Guide was prepared by the developers of the MET, including Tressa Fowler, John Halley Gotway, Randy Bullock, Kathryn Newman, Julie Prestopnik, Lisa Goodrich, Tara Jensen, Barbara Brown, Howard Soh, Tatiana Burek, Minna Win-Gildenmeister, George McCabe, David Fillmore, Paul Prestopnik, Eric Gilleland, Nancy Rehak, Paul Oldenburg, Anne Holmes, Lacey Holland, David Ahijevych and Bonny Strong.
-
-**New for METv9.1**
-
-The release notes for METv9.1 can be found on the `Release Notes page of the MET wepage <https://dtcenter.org/community-code/model-evaluation-tools-met/met-version-9-1#notes>`_.
 
 **Model Evaluation Tools (MET)  TERMS OF USE - IMPORTANT!**
 
