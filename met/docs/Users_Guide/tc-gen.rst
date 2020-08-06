@@ -159,7 +159,7 @@ ______________________
 
   model = [];
 
-The **model** entry is an array defining the model ATCF ID's for which output should be computed. If left empty, the default setting, output will be computed for each model encountered in the data. Otherwise, output will be computed only for the ATCF ID's listed.
+The **model** entry is an array defining the model ATCF ID's for which output should be computed. If left empty, the default setting, output will be computed for each model encountered in the data. Otherwise, output will be computed only for the ATCF ID's listed. Note that when reading ATCF track data, all instances of the string AVN are automatically replaced with GFS.
 
 ______________________
 
