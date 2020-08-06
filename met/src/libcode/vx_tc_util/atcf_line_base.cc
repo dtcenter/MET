@@ -24,6 +24,11 @@ using namespace std;
 #include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+// Only print the AVN to GFS conversion message once
+static bool print_avn_to_gfs_message = true;
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class ATCFLineBase
 //
@@ -271,7 +276,16 @@ ConcatString ATCFLineBase::technique() const {
    else                     cs = get_item(TechniqueOffset);
 
    // Replace instances of AVN with GFS
-   cs.replace("AVN", "GFS");
+   if(strstr(cs.c_str(), "AVN") != NULL) {
+      if(print_avn_to_gfs_message) {
+         mlog << Debug(1)
+              << "When reading ATCF track data, all instances of "
+              << "\"AVN\" are automatically replaced with \"GFS\" "
+              << "(ATCF ID = " << cs << ").\n";
+         print_avn_to_gfs_message = false;
+      }
+      cs.replace("AVN", "GFS");
+   }
 
    return(cs);
 }
