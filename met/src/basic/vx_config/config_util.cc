@@ -511,6 +511,32 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
+   StringArray sa;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_tc_model() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   sa = dict->lookup_string_array(conf_key_model);
+
+   // Print a warning if AVN appears in the model list
+   for(int i=0; i<sa.n(); i++) {
+      if(sa[i].find("AVN") != string::npos) {
+         mlog << Warning << "\nparse_conf_tc_model() -> "
+              << "Requesting tropical cyclone model name \""  << sa[i]
+              << "\" will yield no results since \"AVN\" is automatically "
+              << "replaced with \"GFS\" when reading ATCF inputs.\n\n";
+      }
+   }
+
+   return(sa);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
    StringArray sa;
 
