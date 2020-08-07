@@ -528,7 +528,9 @@ StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
          mlog << Warning << "\nparse_conf_tc_model() -> "
               << "Requesting tropical cyclone model name \""  << sa[i]
               << "\" will yield no results since \"AVN\" is automatically "
-              << "replaced with \"GFS\" when reading ATCF inputs.\n\n";
+              << "replaced with \"GFS\" when reading ATCF inputs. Please use "
+              << "\"GFS\" in the \"" << conf_key_model << "\" entry of the "
+              << "configuration file to read/process \"AVN\" entries.\n\n";
       }
    }
 
