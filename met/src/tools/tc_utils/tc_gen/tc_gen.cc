@@ -585,7 +585,7 @@ void process_track_files(const StringArray &files,
          if(!keep) continue;
 
          // Store the genesis event
-         genesis.add(tracks[j]);
+         genesis.add(tracks[j], k);
 
       } // end for j
 
