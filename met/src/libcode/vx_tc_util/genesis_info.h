@@ -88,7 +88,7 @@ class GenesisInfo {
 
       void set_storm_id();
       void set_dland(double);
-      bool set(const TrackInfo &);
+      bool set(const TrackInfo &, int);
 
          //
          //  get stuff
@@ -191,7 +191,7 @@ class GenesisInfoArray {
          //
 
       void add(const GenesisInfo &);
-      bool add(const TrackInfo &);
+      bool add(const TrackInfo &, int);
       bool has(const GenesisInfo &);
       bool has_storm(const GenesisInfo &);
       void set_dland(int, double);

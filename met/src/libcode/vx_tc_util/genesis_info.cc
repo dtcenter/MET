@@ -289,7 +289,7 @@ void GenesisInfo::set_dland(double d) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfo::set(const TrackInfo &t) {
+bool GenesisInfo::set(const TrackInfo &t, int i_point) {
    int i;
 
    // Initialize
@@ -310,9 +310,9 @@ bool GenesisInfo::set(const TrackInfo &t) {
    Initials        = t.initials();
 
    // Store genesis time and location.
-   GenesisTime = t[0].valid();
-   Lat         = t[0].lat();
-   Lon         = t[0].lon();
+   GenesisTime = t[i_point].valid();
+   Lat         = t[i_point].lat();
+   Lon         = t[i_point].lon();
 
    // For analysis tracks, keep InitTime = LeadTime = 0.
    if(IsAnlyTrack) {
@@ -321,7 +321,7 @@ bool GenesisInfo::set(const TrackInfo &t) {
    }
    else {
       InitTime = t.init();
-      LeadTime = t[0].lead();
+      LeadTime = t[i_point].lead();
    }
 
    // Compute the track time ranges
@@ -515,11 +515,11 @@ void GenesisInfoArray::add(const GenesisInfo &g) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GenesisInfoArray::add(const TrackInfo &t) {
+bool GenesisInfoArray::add(const TrackInfo &t, int i_point) {
    GenesisInfo g;
 
    // Attempt to create a genesis object
-   if(!g.set(t)) return(false);
+   if(!g.set(t, i_point)) return(false);
 
    // Ignore true duplicates
    if(has(g)) {
