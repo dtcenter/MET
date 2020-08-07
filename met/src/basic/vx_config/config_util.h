@@ -34,6 +34,7 @@ extern map<STATLineType,StringArray>
                        parse_conf_output_stats(Dictionary *dict);
 extern int             parse_conf_n_vx(Dictionary *dict);
 extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
+extern StringArray     parse_conf_tc_model(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern StringArray     parse_conf_message_type(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern StringArray     parse_conf_sid_list(Dictionary *dict, const char *);
 extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
