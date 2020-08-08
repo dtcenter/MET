@@ -5,6 +5,25 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 https://github.com/NCAR/MET/issues
 
+Version 9.1 release notes
+-------------------------
+
+- **Date: 20200810**
+
+Version 9.1 BETA4 release notes
+-------------------------------
+
+- **Date: 20200808**
+
+- Migrate the User's Guide from Lyx to Sphinx and publish the result (`#1217 <http://github.com/NCAR/MET/issues/1217>`_, `#1322 <http://github.com/NCAR/MET/issues/1322>`_, `#1323 <http://github.com/NCAR/MET/issues/1323>`_).
+- Enhancements, refinement, and testing of the Grid-Diag tool (`#1391 <http://github.com/NCAR/MET/issues/1391>`_, `#1279 <http://github.com/NCAR/MET/issues/1279>`_).
+- Fix TC-Gen BEST track genesis event definition (`#1447 <http://github.com/NCAR/MET/issues/1447>`_).
+- Enhance TC-Gen to support file lists for teh -genesis and -track command line options (`#1442 <http://github.com/NCAR/MET/issues/1442>`_).
+- Alert users of the automatic renaming of AVN to GFS in MET tropical cyclone tools (`#1444 <http://github.com/NCAR/MET/issues/1444>`_).
+- Enhance Ensemble-Stat log messages (`#1440 <http://github.com/NCAR/MET/issues/1440>`_).
+- Resolve Point-Stat compiler warning messages (`#1435 <http://github.com/NCAR/MET/issues/1435>`_).
+- Clarify Point2Grid documentation about Gaussian methods (`#1413 <http://github.com/NCAR/MET/issues/1413>`_).
+
 Version 9.1 BETA3 release notes
 -------------------------------
 
