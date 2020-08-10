@@ -12,7 +12,7 @@ Version |version| release notes (|release_date|)
    - All changes included in the `met-9.0.1 <https://github.com/NCAR/MET/milestone/64?closed=1>`_, `met-9.0.2 <https://github.com/NCAR/MET/milestone/65?closed=1>`_, and `met-9.0.3 <https://github.com/NCAR/MET/milestone/66?closed=1>`_ bugfix releases.
 
 - Output format changes:
-   - Add new CNT line type columns (ANOM_CORR_UNCNTR) for the anomaly correlation without the mean error (`#1399 <http://github.com/NCAR/MET/issues/1399>`_).
+   - Add new CNT line type columns (ANOM_CORR_UNCNTR) for the uncentered anomaly correlation without the mean error (`#1399 <http://github.com/NCAR/MET/issues/1399>`_).
    - Add new RPS line type column (RPS_COMP) for the complement of RPS (`#1280 <http://github.com/NCAR/MET/issues/1280>`_).
 
 - Configuration file changes:
@@ -63,7 +63,7 @@ Version |version| release notes (|release_date|)
       - Enhance Point2Grid to process multiple fields (`#1396 <http://github.com/NCAR/MET/issues/1396>`_).
       - Enhance Point2Grid to enable Gaussian filtering for GOES16/17 data (`#1291 <http://github.com/NCAR/MET/issues/1291>`_).
    - Point-Stat and Grid-Stat
-      - Add new CNT line type columns (ANOM_CORR_UNCNTR) for the anomaly correlation without the mean error (`#1399 <http://github.com/NCAR/MET/issues/1399>`_).
+      - Add new CNT line type columns (ANOM_CORR_UNCNTR) for the uncentered anomaly correlation without the mean error (`#1399 <http://github.com/NCAR/MET/issues/1399>`_).
       - Add new RPS line type column (RPS_COMP) for the complement of RPS (`#1280 <http://github.com/NCAR/MET/issues/1280>`_).
    - Point-Stat
       - Update Point-Stat HiRA configuration options for computing RPS (`#1400 <http://github.com/NCAR/MET/issues/1400>`_).
