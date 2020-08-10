@@ -826,6 +826,16 @@ void process_obs_file(int i_nc) {
          strncpy(hdr_vld_str, header_data.vld_array[hdr_idx].c_str(), str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
+         // Store the variable name
+         int grib_code = obs_arr[1];
+         if (use_var_id && grib_code < var_names.n()) {
+            var_name   = var_names[grib_code];
+            obs_arr[1] = bad_data_int;
+         }
+         else {
+            var_name = "";
+         }
+
          // Check for wind components
          is_ugrd = ( use_var_id &&         var_name == ugrd_abbr_str ) ||
                    (!use_var_id && nint(obs_arr[1]) == ugrd_grib_code);
@@ -860,15 +870,6 @@ void process_obs_file(int i_nc) {
 
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
-
-         int grib_code = obs_arr[1];
-         if (use_var_id && grib_code < var_names.n()) {
-            var_name   = var_names[grib_code];
-            obs_arr[1] = bad_data_int;
-         }
-         else {
-            var_name = "";
-         }
 
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
