@@ -1,26 +1,26 @@
 .. _met-tc_overview:
 
-18 MET-TC Overview
-==================
+MET-TC Overview
+===============
 
 Introduction
 ____________
 
 The purpose of this User's Guide is to provide basic information to the users of the Model Evaluation Tools - Tropical Cyclone (MET-TC) to enable users to apply MET-TC to their tropical cyclone datasets and evaluation studies. MET-TC is intended for use with model forecasts run through a vortex tracking software or with operational model forecasts in Automated Tropical Cyclone Forecast (ATCF) file format.
 
-The following chapters provide an overview of MET-TC and its components, as well as basic information on the software build. The required input, including file format and the MET-TC are discussed followed by a description of the TC-Dland tool, TC-Pairs, and TC-Stat tools. Each chapter cover the input and output, and practical usage including a description of the configuration files. This is followed by a short overview of graphical utilities available within the MET-TC release.
+The following sections provide an overview of MET-TC and its components, as well as basic information on the software build. The required input, including file format and the MET-TC are discussed followed by a description of the TC-Dland tool, TC-Pairs, and TC-Stat tools. Each section covers the input, output and practical usage including a description of the configuration files. This is followed by a short overview of graphical utilities available within the MET-TC release.
 
 MET-TC components
 _________________
 
-The MET tools used in the verification of Tropical Cyclones are referred to as MET-TC. These tools are shown across the bottom of the flowchart in ::numref:`overview`. The MET-TC tools are described in more detail in later chapters.
+The MET tools used in the verification of Tropical Cyclones are referred to as MET-TC. These tools are shown across the bottom of the flowchart in :numref:`overview-figure`. The MET-TC tools are described in more detail in later sections.
 
 The TC-Dland tool is used to generate a gridded file that determines the location of coastlines and islands, and is used as input to the TC-Pairs tool to determine the distance from land of a particular track point. The TC-Pairs tool matches pairs of input model data and BEST track (or any reference forecast) and calculates position errors. The TC-Stat tool uses the TC-Pairs output to perform filter and summary jobs over the matched pair dataset. The TC-Gen tool performs a categorical analysis for tropical cyclone genesis forecasts. The TC-RMW tool performs a coordinate transformation of gridded model data, centered on the storm's location. The RMW-Analysis tool aggregates TC-RMW output across multiple cases.
 
 Input data format
 _________________
 
-This chapter discusses the input and output file formats expected and produced by MET-TC. When discussing the input data, it is expected that users have run model output through vortex tracking software in order to obtain position and intensity information in Automated Tropical Cyclone Forecasting System (ATCF) file format. Best track and aids files in Automated Tropical Cyclone Forecasting System (ATCF) format (hereafter referred to as ATCF format) are necessary for model data input into the TC-Pairs tool. The ATCF format was first developed at the Naval Oceanographic and Atmospheric Research Laboratory (NRL), and is currently used for the National Hurricane Center (NHC) operations. ATCF format must be adhered to in order for the MET-TC tools to properly parse the input data.
+This section discusses the input and output file formats expected and produced by MET-TC. When discussing the input data, it is expected that users have run model output through vortex tracking software in order to obtain position and intensity information in Automated Tropical Cyclone Forecasting System (ATCF) file format. Best track and aids files in Automated Tropical Cyclone Forecasting System (ATCF) format (hereafter referred to as ATCF format) are necessary for model data input into the TC-Pairs tool. The ATCF format was first developed at the Naval Oceanographic and Atmospheric Research Laboratory (NRL), and is currently used for the National Hurricane Center (NHC) operations. ATCF format must be adhered to in order for the MET-TC tools to properly parse the input data.
 
 The ATCF file format includes a section with common fields:
 
@@ -106,7 +106,7 @@ All operational model aids and the BEST can be obtained from the NHC ftp server:
 
 For more detailed information on the ATCF format description and specifications see: http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt
 
-In order to adhere to ATCF file format, model data must be run through a vortex tracking algorithm prior to becoming input for MET-TC. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from a model forecasts. One vortex tracking algorithm that is supported and freely available is the GFDL vortex tracker. Refer to http://www.dtcenter.org/HurrWRF/users/downloads/index.php for more information on the GFDL vortex tracker package.
+If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from a model forecasts. One vortex tracking algorithm that is supported and freely available is the GFDL vortex tracker. Refer to https://dtcenter.org/community-code/gfdl-vortex-tracker for more information on the GFDL vortex tracker package.
 
 Output data format
 __________________

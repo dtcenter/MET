@@ -14,7 +14,7 @@ Over the years, MET and VSDB packages grew in complexity.  Verification capabili
 					  
 .. toctree::
    :hidden:
-   :caption: Model Evalutaion Tools
+   :caption: Model Evaluation Tools
 
    Users_Guide/index
    Contributors_Guide/index

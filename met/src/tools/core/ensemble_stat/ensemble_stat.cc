@@ -1575,7 +1575,13 @@ void process_grid_vx() {
 
          // If found, break out of the loop
          if(!found) n_miss++;
-         else       break;
+         else {
+            mlog << Debug(2)
+                 << "Reading gridded observation for "
+                 << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
+                 << " from file: " << grid_obs_file_list[j] << "\n";
+            break;
+         }
       }
 
       // Check if the observation field was found
@@ -2915,8 +2921,9 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
             << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Append smoothing information, except for the raw observations
+   ConcatString type_cs(type_str);
    if(wdth > 1 &&
-      (type_str != "OBS" ||
+      (type_cs != "OBS" ||
        conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
        conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;

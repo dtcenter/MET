@@ -18,25 +18,25 @@ Ensemble forecasts are often created as a set of deterministic forecasts. The en
 
 The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. MET will create the ensemble relative frequency as the proportion of ensemble members forecasting some event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be :math:`5/10=0.5`. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
 
-The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in Schwartz and Sobash (2017). They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
+The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
 
 The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
 Ensemble statistics
 ~~~~~~~~~~~~~~~~~~~
 
-Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (Hamill, 2001). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
+Rank histograms and probability integral transform (PIT) histograms are used to determine if the distribution of ensemble values is the same as the distribution of observed values for any forecast field (:ref:`Hamill, 2001 <Hamill-2001>`). The rank histogram is a tally of the rank of the observed value when placed in order with each of the ensemble values from the same location. If the distributions are identical, then the rank of the observation will be uniformly distributed. In other words, it will fall among the ensemble members randomly in equal likelihood. The PIT histogram applies this same concept, but transforms the actual rank into a probability to facilitate ensembles of differing sizes or with missing members.
 
-Often, the goal of ensemble forecasting is to reproduce the distribution of observations using a set of many forecasts. In other words, the ensemble members represent the set of all possible outcomes. When this is true, the spread of the ensemble is identical to the error in the mean forecast. Though this rarely occurs in practice, the spread / skill relationship is still typically assessed for ensemble forecasts (Barker, 1991; Buizza, 1997). MET calculates the spread and skill in user defined categories according to Eckel et al, 2012.
+Often, the goal of ensemble forecasting is to reproduce the distribution of observations using a set of many forecasts. In other words, the ensemble members represent the set of all possible outcomes. When this is true, the spread of the ensemble is identical to the error in the mean forecast. Though this rarely occurs in practice, the spread / skill relationship is still typically assessed for ensemble forecasts (:ref:`Barker, 1991 <Barker-1991>`; :ref:`Buizza, 1997 <Buizza-1997>`). MET calculates the spread and skill in user defined categories according to :ref:`Eckel et al, 2012 <Eckel-2012>`.
 
 The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
 
-The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. (Gneiting et al, 2004). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
+The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. (:ref:`Gneiting et al, 2004 <Gneiting-2004>`). The CRPS statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
 Ensemble observation error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in Candile and Talagrand (2008) can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (e.g. Candille and Talagrand, 2008; Saetra et al., 2004; Santos and Ghelli, 2012). Generally, perturbation make verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
+In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in Candile and Talagrand (2008) can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
 Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
 
@@ -45,7 +45,7 @@ Observation errors differ according to instrument, temporal and spatial represen
 Practical Information
 _____________________
 
-This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology file must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in Chapter :numref:`reformat_point`.
+This section contains information about configuring and running the Ensemble-Stat tool. The Ensemble-Stat tool creates or verifies gridded model data. For verification, this tool can accept either gridded or point observations. If provided, the climatology file must be gridded. The input gridded model, observation, and climatology datasets must be on the same grid prior to calculation of any statistics, and in one of the MET supported gridded file formats. If gridded files are not on the same grid, MET will do the regridding for you if you specify the desired output grid. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`.
 
 ensemble_stat usage
 ~~~~~~~~~~~~~~~~~~~
@@ -112,7 +112,7 @@ An example of the ensemble_stat calling sequence is shown below:
      -point_obs out/ascii2nc/precip24_2010010112.nc \
      -outdir out/ensemble_stat -v 2
 
-In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and used to ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
+In this example, the Ensemble-Stat tool will process six forecast files specified in the file list into an ensemble forecast. Observations in both point and grid format will be included, and be used to compute ensemble statistics separately. Ensemble Stat will create a NetCDF file containing requested ensemble fields and an output STAT file.
 
 ensemble_stat configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,7 +189,7 @@ _______________________
 The **nbrhd_prob** dictionary defines the neighborhoods used to compute NEP and NMEP output.
 
 
-The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the width array specifies the **width** of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed.
+The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the width of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed.
 
 
 If **ensemble_flag.nep** is set to TRUE, NEP output is created for each combination of the categorical threshold (**cat_thresh**) and neighborhood width specified.
@@ -256,7 +256,7 @@ The **obs** dictionary looks very similar to the **fcst** dictionary. If verifyi
 The **ens_ssvar_bin_size** and **ens_phist_bin_size** specify the width of the categorical bins used to accumulate frequencies for spread-skill-variance or probability integral transform statistics, respectively.
 
 
-The **prob_cat_thresh** entry is an array of thresholds to be applied in the computation of the RPS line type. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead. If not climatology data is provide, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined.
+The **prob_cat_thresh** entry is an array of thresholds to be applied in the computation of the RPS line type. Since these thresholds can change for each variable, they can be specified separately for each **fcst.field** entry. If left empty but climatology data is provided, the **climo_cdf** thresholds will be used instead. If no climatology data is provided, and the RPS output line type is requested, then the **prob_cat_thresh** array must be defined.
 
 __________________
 
@@ -481,7 +481,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out:
 
-.. list-table:: Table 9.1 Header information for each file ensemble-stat outputs
+.. list-table:: Header information for each file ensemble-stat outputs
   :widths: auto
   :header-rows: 2
 
@@ -566,7 +566,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_ECNT:
 
-.. list-table:: Table 9.2 Format information for ECNT (Ensemble Continuous Statistics) output line type.
+.. list-table:: Format information for ECNT (Ensemble Continuous Statistics) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -590,7 +590,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The Continuous Ranked Probability Score
   * - 28
     - CRPSS
-    - The ContinuousRanked Probability Skill Score
+    - The Continuous Ranked Probability Skill Score
   * - 29
     - IGN
     - The Ignorance Score
@@ -618,7 +618,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_RPS:
       
-.. list-table:: Table 9.3 Format information for RPS (Ranked Probability Score) output line type.
+.. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -658,7 +658,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_RHIST:
       
-.. list-table:: Table 9.4 Format information for RHIST (Ranked Histogram) output line type.
+.. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -683,7 +683,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_PHIST:
       
-.. list-table:: Table 9.5 Format information for PHIST (Probability Integral Transform Histogram) output line type.
+.. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -711,7 +711,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_RELP:
 
-.. list-table:: Table 9.6 Format information for RELP (Relative Position) output line type.
+.. list-table:: Format information for RELP (Relative Position) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -736,7 +736,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_ORANK:
       
-.. list-table:: Table 9.7 Format information for ORANK (Observation Rank) output line type.
+.. list-table:: Format information for ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
@@ -816,7 +816,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out_SSVAR:	     
 
-.. list-table:: Table 9.8 Format information for SSVAR (Spread/Skill Variance) output line type.
+.. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
   :header-rows: 2
 

@@ -3,7 +3,7 @@
 Re-Formatting of Gridded Fields
 ===============================
 
-Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this chapter. These tools are represented by the reformatting column of MET flowchart depicted in ::numref:`overview-figure`.
+Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this section. These tools are represented by the reformatting column of MET flowchart depicted in :numref:`overview-figure`.
 
 Pcp-Combine tool
 ________________
@@ -306,6 +306,7 @@ The usage statement for the shift_data_plane utility is shown below:
          -to lat lon
          [-method type]
          [-width n]
+	 [-shape SHAPE]
          [-log file] 
          [-v level]
          [-compress level]
@@ -330,13 +331,15 @@ Optional arguments for shift_data_plane
 
 6. The **-method type** overrides the default regridding method. Default is NEAREST.
 
-7. The **-width n** overrides the default regridding width. Default is 1.
+7. The **-width n** overrides the default regridding width. Default is 2.
 
-8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+8. The **-shape SHAPE** overrides the default interpolation shape. Default is SQUARE. 
 
-9. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-10. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+11. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of “level” will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 For more details on setting the **-method** and **-width** options, see the **regrid** entry in :numref:`Data IO MET Configuration File Options`. An example of the shift_data_plane calling sequence is shown below:
 
@@ -355,7 +358,7 @@ In this example, the shift_data_plane tool reads 12-hour accumulated precipitati
 MODIS regrid tool
 _________________
 
-This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from MODIS level 2 cloud product from NASA. The data browser for these files is: http://ladsweb.nascom.nasa.gov/.
+This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from MODIS level 2 cloud product from NASA. The data browser for these files is: https://ladsweb.modaps.eosdis.nasa.gov
 
 modis_regrid usage
 ~~~~~~~~~~~~~~~~~~
@@ -461,11 +464,9 @@ Optional arguments for wwmca_plot
 
 5. The **-v level** option indicates the desired level of verbosity. The value of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-.. _reformat_grid_fig2:
-
 .. figure:: figure/reformat_grid_fig2.png
 	    
-   Example output of {\tt wwmca\_plot} tool.
+   Example output of wwmca\_plot tool.
 
 wwmca_regrid usage
 ~~~~~~~~~~~~~~~~~~

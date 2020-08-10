@@ -117,7 +117,7 @@ unixtime add_to_unixtime(unixtime base_unixtime,
       }
     }
     day = day_offset;
-    if (day == 0) day == 1;
+    if (day == 0) day = 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
     ut += (time_fraction * sec_per_unit);
     mlog << Debug(5) << "add_to_unixtime() -> "

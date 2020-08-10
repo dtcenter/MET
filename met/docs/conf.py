@@ -18,12 +18,13 @@ print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'MET'
-copyright = '2020, NCAR'
-author = 'NCAR'
-
-# The full version, including alpha/beta/rc tags
-release = '9.1'
-
+author = 'UCAR/NCAR, NOAA, and CSU/CIRA'
+author_list = 'Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T.'
+version = '9.1'
+release = f'{version}'
+release_year = '2020'
+release_date = f'{release_year}0810'
+copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
 
@@ -61,7 +62,7 @@ html_static_path = ['_static']
 # of the sidebar.
 html_logo = os.path.join('_static','met_logo_2019_09.png')
 
-# -- Intersphinx control ---------------------------------------------------------------
+# -- Intersphinx control -----------------------------------------------------
 intersphinx_mapping = {'numpy':("https://docs.scipy.org/doc/numpy/", None)}
 
 numfig = True
@@ -69,3 +70,16 @@ numfig = True
 numfig_format = {
     'figure': 'Figure %s',
 }
+
+# -- Export variables --------------------------------------------------------
+
+rst_epilog = """
+.. |copyright|    replace:: {copyrightstr}
+.. |author_list|  replace:: {author_liststr}
+.. |release_date| replace:: {release_datestr}
+.. |release_year| replace:: {release_yearstr}
+""".format(copyrightstr    = copyright,
+           author_liststr  = author_list,
+           release_datestr = release_date,
+           release_yearstr = release_year)
+

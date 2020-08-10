@@ -135,7 +135,7 @@ void TCPairsConfInfo::process_config() {
    Desc = parse_conf_string(&Conf, conf_key_desc);
 
    // Conf: Model
-   Model = Conf.lookup_string_array(conf_key_model);
+   Model = parse_conf_tc_model(&Conf);
 
    // Conf: StormId
    StormId = Conf.lookup_string_array(conf_key_storm_id);

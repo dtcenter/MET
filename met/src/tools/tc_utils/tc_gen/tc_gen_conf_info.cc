@@ -181,7 +181,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    Desc = parse_conf_string(&dict, conf_key_desc);
 
    // Conf: model
-   Model = dict.lookup_string_array(conf_key_model);
+   Model = parse_conf_tc_model(&dict);
 
    // Conf: storm_id
    StormId = dict.lookup_string_array(conf_key_storm_id);

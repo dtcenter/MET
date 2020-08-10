@@ -6,7 +6,7 @@ TC-Stat Tool
 Introduction
 ____________
 
-The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirwjob** process PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
+The TC-Stat tool ties together results from the TC-Pairs tool by providing summary statistics and filtering jobs on TCST output files. The TC-Stat tool requires TCST output from the TC-Pairs tool. See :numref:`tc_stat-output` of this users guide for information on the TCST output format of the TC-Pairs tool. The TC-Stat tool supports several analysis job types. The **filter** job stratifies the TCST data using various conditions and thresholds described in :numref:`tc_stat-configuration-file`. The **summary** job produces summary statistics including frequency of superior performance, time-series independence calculations, and confidence intervals on the mean. The **rirw** job processes TCMPR lines, identifies adeck and bdeck rapid intensification or weakening events, populates a 2x2 contingency table, and derives contingency table statistics. The **probrirw job** processes PROBRIRW lines, populates an Nx2 probabilistic contingency table, and derives probabilistic statistics. The statistical aspects are described in :numref:`Statistical-aspects`, and practical use information for the TC-Stat tool is described in :numref:`Practical-information-1`.
 
 .. _Statistical-aspects:
 
@@ -61,7 +61,7 @@ Users may specify several job command options to configure the behavior of this 
 Probability of Rapid Intensification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The TC-Stat tool can be used to accumulate multiple PROBRIRW lines and derive probabilistic statistics summarizing performance. The PROBRIRW line contains a probabilistic forecast for a specified intensity change along with the actual intensity change that occurred in the BEST track. Accurately forecast the likelihood of large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
+The TC-Stat tool can be used to accumulate multiple PROBRIRW lines and derive probabilistic statistics summarizing performance. The PROBRIRW line contains a probabilistic forecast for a specified intensity change along with the actual intensity change that occurred in the BEST track. Accurately forecasting the likelihood of large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
 Users may specify several job command options to configure the behavior of this job. The TC-Stat tools reads the input PROBI lines, applies the configurable options to extract a forecast probability value and BEST track event, and bins those probabilistic pairs into an Nx2 contingency table. This job writes up to four probabilistic output line types summarizing the performance.
 
@@ -100,13 +100,13 @@ Required arguments for tc_stat
 Optional arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2. The **-out file** argument indicates the desired name of the TCST format output file.
+3. The **-out file** argument indicates the desired name of the TCST format output file.
 
-3. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
 
-4. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+5. The **-v level** option indicates the desired level of verbosity. The contents of “level” will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-5. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
+6. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
 An example of the **tc_stat** calling sequence is shown below:
 
@@ -114,14 +114,14 @@ An example of the **tc_stat** calling sequence is shown below:
 
   tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
-In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name, etc..**.) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
+In this example, the TC-Stat tool uses any TCST file (output from **tc_pairs**) in the listed directory for the 9th Atlantic Basin storm in 2010. Filtering options and aggregated statistics are generated following configuration options specified in the **TCStatConfig** file. Further, using flags (e.g. **-basin, -column, -storm_name,** etc...) option within the job command lines may further refine these selections. See :numref:`tc_stat-configuration-file` for options available for job command line and :numref:`Data IO MET-TC Configuration File Options` for how to use them.
 
 .. _tc_stat-configuration-file:
 
 tc_stat configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed share/met/config directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
+The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed **share/met/config** directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The contents of the tc_stat configuration file are described below.
 
@@ -183,7 +183,7 @@ _________________________
 
   line_type = [];
 
-The **line_type** field stratifies by the line_type column. Currently TCMPR is the only line_type option used in MET-TC.
+The **line_type** field stratifies by the line_type column.
 
 _________________________
 
@@ -195,32 +195,44 @@ The **track_watch_warn** flag stratifies over the watch_warn column in the TCST 
 
 Other uses of the WATCH_WARN column include filtering when:
 
-1. A forecast is issued when a watch/warn is in effect
+1. A forecast is issued when a watch/warning is in effect
 
-2. A forecast is verifying when a watch/warn is in effect
+2. A forecast is verifying when a watch/warning is in effect
 
-3. A forecast is issued when a watch/warn is NOT in effect
+3. A forecast is issued when a watch/warning is NOT in effect
 
-4. A forecast is verified when a watch/warn is NOT in effect
+4. A forecast is verified when a watch/warning is NOT in effect
 
 The following filtering options can be achieved by the following:
 
-1. init_str_name = ["WATCH_WARN"];
+Option 1. A forecast is issued when a watch/warning is in effect
 
-   init_str_val = ["ALL"];
+.. code-block:: none
+		
+  init_str_name = ["WATCH_WARN"];
+  init_str_val = ["ALL"];
+ 
+Option 2. A forecast is verifying when a watch/warning is in effect
 
-2. column_str_name = ["WATCH_WARN"];
+.. code-block:: none
 
-   column_str_val = ["ALL"];
+  column_str_name = ["WATCH_WARN"];  
+  column_str_val = ["ALL"];
+   
+Option 3. A forecast is issued when a watch/warning is NOT in effect
 
-3. init_str_name = ["WATCH_WARN"];
+.. code-block:: none
 
-   init_str_val = ["NA"];
+  init_str_name = ["WATCH_WARN"];  
+  init_str_val = ["NA"];
+    
+Option 4. A forecast is verified when a watch/warning is NOT in effect
 
-4. column_str_name = ["WATCH_WARN"];
+.. code-block:: none
 
-   column_str_val = ["NA"];
-
+  column_str_name = ["WATCH_WARN"];
+  column_str_val = ["NA"];
+    
 Further information on the **column_str** and **init_str** fields is described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will stratify by a single or multiple types of warnings.
 
 _________________________
@@ -290,7 +302,7 @@ _________________________
   landfall_beg = "-24";
   landfall_end = "00";
 
-The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to 0, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option with the job command lines may further refine these selections. The **-landfall_window** job command option takes 1 or 2 arguments in HH[MMSS] format. Use 1 argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- 6 hours around the landfall time. Use 2 arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to 12 hours after. 
+The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to zero, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option with the job command lines may further refine these selections. The **-landfall_window** job command option takes one or two arguments in HH[MMSS] format. Use one argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- six hours around the landfall time. Use two arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to twelve hours after. 
 
 _________________________
 
@@ -298,7 +310,7 @@ _________________________
 
   event_equal = FALSE;
 
-Thee **event_equal** flag specifies whether only those track points common to all models in the dataset should be retained. The event equalization is performed only using cases common to all listed amodel entries. A case is defined by comparing the following columns in the TCST files: BMODEL, BASIN, CYCLONE, INIT, LEAD, VALID. This option may be modified using the **-event_equal** option within the job command lines.
+The **event_equal** flag specifies whether only those track points common to all models in the dataset should be retained. The event equalization is performed only using cases common to all listed amodel entries. A case is defined by comparing the following columns in the TCST files: BMODEL, BASIN, CYCLONE, INIT, LEAD, VALID. This option may be modified using the **-event_equal** option within the job command lines.
 
 _________________________
 
@@ -357,7 +369,18 @@ This job command finds and filters TCST lines down to those meeting the criteria
 
 **Job: Summary**
 
-This job produces summary statistics for the column name specified by the **-column** option. The output of the summary job consists of three rows: "JOB_LIST", which shows the job definition parameters used for this job. "COL_NAME", followed by the summary statistics that are applied. “SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance. The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option. 
+This job produces summary statistics for the column name specified by the **-column** option. The output of the summary job consists of three rows:
+
+1.
+"JOB_LIST", which shows the job definition parameters used for this job;
+
+2.
+"COL_NAME", followed by the summary statistics that are applied;
+
+3.
+“SUMMARY”, which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance.
+
+The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option. 
 
 .. _table_columnar_output_summary_tc_stat:
 
@@ -381,7 +404,7 @@ This job produces summary statistics for the column name specified by the **-col
   * - 5
     - Valid
   * - 6-8
-    - Mean including normal upper and lower confidence limits
+    - Mean, including normal upper and lower confidence limits
   * - 9
     - Standard deviation
   * - 10
@@ -413,7 +436,7 @@ The RIRW job produces contingency table counts and statistics defined by identif
 
 • The **-rirw_window** option may be passed one or two arguments in HH[MMSS] format to define how close adeck and bdeck events must be to be considered hits or correct negatives. One time string defines a symmetric time window while two time strings define an asymmetric time window. The default is 0, requiring an exact match in time.
 
-• The **-out_line_type** option defines the output data that should written. This job can write contingency table counts (CTC), contingency table statistics (CTS), and RIRW matched pairs (MPR). The default is CTC and CTS, but the MPR output provides great amount of detail.
+• The **-out_line_type** option defines the output data that should be written. This job can write contingency table counts (CTC), contingency table statistics (CTS), and RIRW matched pairs (MPR). The default is CTC and CTS, but the MPR output provides a great amount of detail.
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the CTS output line type. In addition, the **-by column_name** option is a convenient way of running the same job across multiple stratifications of data. For example, **-by AMODEL** runs the same job for each unique AMODEL name in the data.
 
@@ -429,7 +452,7 @@ The PROBRIRW job produces probabilistic contingency table counts and statistics 
 
 • The **-probri_prob_thresh threshold_list** option defines the probability thresholds used to create the output Nx2 contingency table. The default is probability bins of width 0.1. These probabilities may be specified as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using shorthand notation (==0.25) for bins of equal width.
 
-• The **-out_line_type** option defines the output data that should written. This job can write PCT, PSTD, PJC, and PRC output line types. The default is PCT and PSTD.
+• The **-out_line_type** option defines the output data that should be written. This job can write PCT, PSTD, PJC, and PRC output line types. The default is PCT and PSTD.  Please see :numref:`table_PS_format_info_PCT` through :numref:`table_PS_format_info_PRC` for more details.
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the PSTD output line type. Multiple values in the **RI_WINDOW** column cannot be combined in a single PROBRIRW job since BEST track intensity threshold should change for each. Using the **-by RI_WINDOW** option or -column_thresh **RI_WINDOW ==24** option provide convenient ways avoiding this problem.
 
