@@ -37,9 +37,9 @@ Version |version| release notes (|release_date|)
    - Enhance various log message, error messages, and usage statements (`#1350 <http://github.com/NCAR/MET/issues/1350>`_, `#1347 <http://github.com/NCAR/MET/issues/1347>`_, `#1339 <http://github.com/NCAR/MET/issues/1339>`_, `#1338 <http://github.com/NCAR/MET/issues/1338>`_, `#1333 <http://github.com/NCAR/MET/issues/1333>`_).
    - Remove MET_BASE references from Rscripts (`#1289 <http://github.com/NCAR/MET/issues/1289>`_).
 
-- Fority changes:
+- Fortify changes:
    - Address Fortify findings for Point2Grid (`#1352 <http://github.com/NCAR/MET/issues/1352>`_).
-   - Address Fortify findings from met-9.0.2 (`#1359 <http://github.com/NCAR/MET/issues/1359>`_).
+   - Address Fortify findings for met-9.0.2 (`#1359 <http://github.com/NCAR/MET/issues/1359>`_).
    - Address Fortify findings for met-9.1_beta2 (`#1417 <http://github.com/NCAR/MET/issues/1417>`_).
 
 - Enhancements to existing tools:
