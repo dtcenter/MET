@@ -6,13 +6,13 @@ User's Guide
 
 This User's guide is provided as an aid to users of the Model Evaluation Tools (MET). MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework. METplus details can be found at: `http://dtcenter.org/community-code/metplus <http://dtcenter.org/community-code/metplus>`_.
 
-It is important to note here that MET is an evolving software package. This documentation describes the |release| release. Previous releases of MET have occurred each year since 2008. Intermediate releases may include bug fixes. MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution. Please send an email to: `met_help@ucar.edu <mailto:>`__. We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
+It is important to note here that MET is an evolving software package. This documentation describes the |release| release dated |release_date|. Previous releases of MET have occurred each year since 2008. Intermediate releases may include bug fixes. MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution. Please send an email to: `met_help@ucar.edu <mailto:>`__. We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
 
 This User's Guide was prepared by the developers of MET, including Tressa Fowler, John Halley Gotway, Randy Bullock, Kathryn Newman, Julie Prestopnik, Lisa Goodrich, Tara Jensen, Barbara Brown, Howard Soh, Tatiana Burek, Minna Win-Gildenmeister, George McCabe, David Fillmore, John Opatz, Lindsay Blank, Tracy Hertneky, Paul Prestopnik, Eric Gilleland, Nancy Rehak, Paul Oldenburg, Anne Holmes, Lacey Holland, David Ahijevych and Bonny Strong.
 
 **Model Evaluation Tools (MET)  TERMS OF USE - IMPORTANT!**
 
-Copyright 2020, UCAR/NCAR, NOAA, and CSU/CIRA
+Copyright |copyright|
 Licensed under the Apache License, Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -27,8 +27,10 @@ governing permissions and limitations under the License.
 **Citations**
 
 The citation for this User's Guide should be:
-Brown, B., Bullock, R., Fowler, T., Halley Gotway, J., Newman, K., Jensen, T., 2020: The MET Version 9.1 User's Guide.
-Developmental Testbed Center. Available at: https://github.com/NCAR/MET/releases.
+
+|author_list|, |release_year|: The MET Version |version| User's Guide.
+Developmental Testbed Center.
+Available at: https://github.com/NCAR/MET/releases
 
 **Acknowledgments**
 

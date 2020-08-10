@@ -5,8 +5,8 @@ When applicable, release notes are followed by the GitHub issue number which
 describes the bugfix, enhancement, or new feature:
 https://github.com/NCAR/MET/issues
 
-Version 9.1 release notes
--------------------------
+Version |version| release notes
+-------------------------------
 
 - **Date: 20200810**
 
