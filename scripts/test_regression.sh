@@ -9,7 +9,7 @@
 # been run, the comp_dir utility is called to compare the output of the
 # two sets of tests.  To run this script, use the following commands:
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/test_regression.sh version1 version2
 #
 # Usage: test_regression.sh version1 version2

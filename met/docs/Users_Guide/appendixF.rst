@@ -151,7 +151,7 @@ The **read_ascii_point.py** sample script can be found in:
 
 • MET installation directory in **MET_BASE/python**.
 
-• MET GitHub repository (https://github.com/NCAR/MET) in **met/scripts/python**.
+• MET GitHub repository (https://github.com/dtcenter/MET) in **met/scripts/python**.
 
 Python Embedding for MPR data
 _____________________________
@@ -162,4 +162,4 @@ The **read_ascii_mpr.py** sample script can be found in:
 
 • MET installation directory in **MET_BASE/python**.
 
-• MET GitHub repository (https://github.com/NCAR/MET) in **met/scripts/python**.
+• MET GitHub repository (https://github.com/dtcenter/MET) in **met/scripts/python**.

@@ -17,7 +17,7 @@ RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
     fi
 
 ENV MET_GIT_NAME    ${SOURCE_BRANCH}
-ENV MET_GIT_URL     https://github.com/NCAR/MET
+ENV MET_GIT_URL     https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT true
 
 #

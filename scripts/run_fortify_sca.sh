@@ -8,7 +8,7 @@
 # go to the directory where you would like the SCA output written and
 # then run:
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/run_fortify_sca.sh name
 #
 # Usage: run_fortify_sca.sh name
@@ -20,7 +20,7 @@
 #=======================================================================
 
 # Constants
-GIT_REPO="https://github.com/NCAR/MET"
+GIT_REPO="https://github.com/dtcenter/MET"
 FORTIFY_BIN=/d3/projects/Fortify/19.2.0/Fortify_SCA_and_Apps_19.2.0/bin
 
 function usage {
