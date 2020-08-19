@@ -8,7 +8,7 @@
 # nightly through cron.  Output should be directed to the LOGFILE, per
 # cron convention.  To run this script, use the following commands:
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/test_nightly.sh name
 #
 # Usage: test_nightly.sh name

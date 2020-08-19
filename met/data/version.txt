@@ -1,3 +1,3 @@
-Repository:	https://github.com/NCAR/MET
+Repository:	https://github.com/dtcenter/MET
 Revision:	development
 Change Date:	development 
