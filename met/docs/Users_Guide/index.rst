@@ -30,7 +30,7 @@ The citation for this User's Guide should be:
 
 |author_list|, |release_year|: The MET Version |version| User's Guide.
 Developmental Testbed Center.
-Available at: https://github.com/NCAR/MET/releases
+Available at: https://github.com/dtcenter/MET/releases
 
 **Acknowledgments**
 

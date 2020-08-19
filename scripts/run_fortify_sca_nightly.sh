@@ -8,7 +8,7 @@
 # should be directed to the LOGFILE, per cron convention.  To run this
 # script, use the following commands:
 #
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/run_fortify_sca_nightly.sh name
 #
 # Usage: run_fortify_sca_nightly.sh name

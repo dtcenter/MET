@@ -8,7 +8,7 @@
 # of MET using either the latest version of the files or using
 # an existing tag or branch name.  First, go to the directory where
 # you'd like the release built.  Then run:
-#    git clone https://github.com/NCAR/MET
+#    git clone https://github.com/dtcenter/MET
 #    MET/scripts/met_checkout_and_build.sh [new|tag|branch] [name]
 #
 # For a new release, this script will:
@@ -35,7 +35,7 @@
 #=======================================================================
 
 # Constants
-GIT_REPO="https://github.com/NCAR/MET"
+GIT_REPO="https://github.com/dtcenter/MET"
 
 # MET_DEVELOPMENT must be set to build a release
 export MET_DEVELOPMENT=true
