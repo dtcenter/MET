@@ -4,7 +4,7 @@ User's Guide
 
 **Foreword: A note to MET users**
 
-This User's guide is provided as an aid to users of the Model Evaluation Tools (MET). MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework. METplus details can be found at: `http://dtcenter.org/community-code/metplus <http://dtcenter.org/community-code/metplus>`_.
+This User's guide is provided as an aid to users of the Model Evaluation Tools (MET). MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework. `METplus website <http://dtcenter.org/community-code/metplus>`_.
 
 It is important to note here that MET is an evolving software package. This documentation describes the |release| release dated |release_date|. Previous releases of MET have occurred each year since 2008. Intermediate releases may include bug fixes. MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution. Please send an email to: `met_help@ucar.edu <mailto:>`__. We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
 
@@ -13,11 +13,10 @@ This User's Guide was prepared by many current and former developers of MET, inc
 **Model Evaluation Tools (MET)  TERMS OF USE - IMPORTANT!**
 
 Copyright |copyright|
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the `Apache License, Version 2.0 (the "License"); <http://www.apache.org/licenses/LICENSE-2.0>`_
 You may not use this file except in compliance with the License.
-You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+
 
 Unless required by applicable law or agreed to in writing, software distributed under
 the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
@@ -30,7 +29,7 @@ The citation for this User's Guide should be:
 
 |author_list|, |release_year|: The MET Version |version| User's Guide.
 Developmental Testbed Center.
-Available at: https://github.com/dtcenter/MET/releases
+Available at: `MET releases <https://github.com/dtcenter/MET/releases>`_
 
 **Acknowledgments**
 

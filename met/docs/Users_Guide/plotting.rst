@@ -164,7 +164,7 @@ In this example, the plot_mode_field tool will plot simple objects from an obser
 	    
    Simple observed precipitation objects
 
-Once MET has been applied to forecast and observed fields (or observing locations), and the output has been sorted through the Analysis Tool, numerous graphical and summary analyses can be performed depending on a specific user's needs. Here we give some examples of graphics and summary scores that one might wish to compute with the given output of MET and MET-TC. Any computing language could be used for this stage; some scripts will be provided on the MET users web page (https://dtcenter.org/community-code/model-evaluation-tools-met) as examples to assist users.
+Once MET has been applied to forecast and observed fields (or observing locations), and the output has been sorted through the Analysis Tool, numerous graphical and summary analyses can be performed depending on a specific user's needs. Here we give some examples of graphics and summary scores that one might wish to compute with the given output of MET and MET-TC. Any computing language could be used for this stage; some scripts will be provided on the `MET users web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_ as examples to assist users.
 
 Examples of plotting MET output
 _______________________________
