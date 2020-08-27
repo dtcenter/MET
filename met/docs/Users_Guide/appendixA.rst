@@ -36,7 +36,7 @@ A. No - it will not. In the future, we may add options to allow additional model
 
 **Q. How do I get help if my questions are not answered in the User's Guide?**
 
-A. First, look on our website https://dtcenter.org/community-code/model-evaluation-tools-met. If that doesn't answer your question, then email: met_help@ucar.edu.
+A. First, look on our `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_. If that doesn't answer your question, then email: met_help@ucar.edu.
 
 **Q. Where are the graphics?**
 
