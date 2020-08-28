@@ -21,7 +21,7 @@ Brill, K. F., and F. Mesinger, 2009: Applying a general analytic method for asse
 
 .. _Brown-2007:
 
-Brown, B.G., R. Bullock, J. Halley Gotway, D. Ahijevych, C. Davis, E. Gilleland, and L. Holland, 2007: Application of the MODE object-based verification tool for the evaluation of model precipitation fields. *AMS 22nd Conference on Weather Analysis and Forecasting and 18th Conference on Numerical Weather Prediction*, 25-29 June, Park City, Utah, American Meteorological Society (Boston), Available at http://ams.confex.com/ams/pdfpapers/124856.pdf.
+Brown, B.G., R. Bullock, J. Halley Gotway, D. Ahijevych, C. Davis, E. Gilleland, and L. Holland, 2007: Application of the MODE object-based verification tool for the evaluation of model precipitation fields. *AMS 22nd Conference on Weather Analysis and Forecasting and 18th Conference on Numerical Weather Prediction*, 25-29 June, Park City, Utah, American Meteorological Society (Boston), `AMS papers online. <http://ams.confex.com/ams/pdfpapers/124856.pdf>`_
 
 .. _Buizza-1997:
 
@@ -55,7 +55,7 @@ Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts: a re
 
 .. _Eckel-2012:
 
-Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts. *Weather Forecasting,* 27, 50-69. doi: http://dx.doi.org/10.1175/WAF-D-11-00015.1
+Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts. *Weather Forecasting,* 27, 50-69. `AMS doi. <http://dx.doi.org/10.1175/WAF-D-11-00015.1>`_
 
 .. _Efron-2007:
 
@@ -71,7 +71,7 @@ Gilleland, E., 2019: Bootstrap methods for statistical inference. Part II: Extre
 
 .. _Gneiting-2004:
 
-Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics and Minimum CRPS Estimation*. Technical Report no. 449, Department of Statistics, University of Washington. [Available online at http://www.stat.washington.edu/www/research/reports/ ]
+Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics and Minimum CRPS Estimation*. Technical Report no. 449, Department of Statistics, University of Washington, `UW online. <http://www.stat.washington.edu/www/research/reports/>`_
 
 .. _Hamill-2001:
 

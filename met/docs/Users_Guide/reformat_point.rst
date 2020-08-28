@@ -174,9 +174,9 @@ __________________
 						  
 The **pb_report_type, in_report_type**, and **instrument_type** variables are used to specify comma-separated lists of PrepBUFR report types, input report types, and instrument types to be retained, respectively. If left empty, all PrepBUFR report types, input report types, and instrument types will be retained. See the following for more details:
 
-https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+`Code table for PrepBUFR report types used by Regional NAM GSI analyses. <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm>`_
 
-https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
+`PrepBUFR Code table for input report types. <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm>`_
 
 _________________
 
@@ -191,7 +191,7 @@ The **beg** and **end** variables are used to stratify the model level of observ
 
 The **level_category** variable is used to specify a comma-separated list of PrepBUFR data level categories to retain. An empty string indicates that all level categories should be retained. Accepted values and their meanings are described in :numref:`table_reform-point_pb2nc_level_category`. See the following for more details:
 
-https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+`PrepBUFR mnemonic table. <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 
 .. _table_reform-point_pb2nc_level_category:
@@ -420,7 +420,7 @@ _____________
 
 This section describes how to run the ASCII2NC tool. The ASCII2NC tool is used to reformat ASCII point observations into the NetCDF format expected by the Point-Stat tool. For those users wishing to verify against point observations that are not available in PrepBUFR format, the ASCII2NC tool provides a way of incorporating those observations into MET. If the ASCII2NC tool is used to perform a reformatting step, no configuration file is needed. However, for more complex processing, such as summarizing time series observations, a configuration file may be specified. For details on the configuration file options, see the share/met/config/README file and example configuration files distributed with the MET code.
 
-Initial versions of the ASCII2NC tool supported only a simple 11 column ASCII point observation format. It currently supports point observation data in the following formats: the default 11 column format, little_r format, SURFace RADiation (SURFRAD) and Integrated Surface Irradiance Study (ISIS) formats (found at http://www.esrl.noaa.gov/gmd/grad/surfrad/), the Western Wind and Solar Integration Study (WWSIS) format, and the AErosol RObotic NEtwork (AERONET) versions 2 and 3 format (found at http://aeronet.gsfc.nasa.gov/). WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
+Initial versions of the ASCII2NC tool supported only a simple 11 column ASCII point observation format. It currently supports point observation data in the following formats: the default 11 column format, little_r format, `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats, the Western Wind and Solar Integration Study (WWSIS) format, and the `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format. <http://aeronet.gsfc.nasa.gov/>`_  WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
 MET version 9.0 adds support for the passing observations to ascii2nc using a Python script with the “-format python” option. An example of running ASCII2NC with Python embedding is included below.
 
@@ -599,7 +599,7 @@ MADIS2NC tool
 _____________
 
 
-This section describes how to run the MADIS2NC tool. The MADIS2NC tool is used to reformat Meteorological Assimilation Data Ingest System (MADIS) point observations into the NetCDF format expected by the MET statistics tools. More information about MADIS data and formatting is available at http://madis.noaa.gov. Since the MADIS2NC tool simply performs a reformatting step, no configuration file is needed. The MADIS2NC tool supports many of the MADIS data types, as listed in the usage statement below. Support for additional MADIS data types may be added in the future based on user feedback.
+This section describes how to run the MADIS2NC tool. The MADIS2NC tool is used to reformat `Meteorological Assimilation Data Ingest System (MADIS) <http://madis.noaa.gov>`_ point observations into the NetCDF format expected by the MET statistics tools. Since the MADIS2NC tool simply performs a reformatting step, no configuration file is needed. The MADIS2NC tool supports many of the MADIS data types, as listed in the usage statement below. Support for additional MADIS data types may be added in the future based on user feedback.
 
 
 madis2nc usage
