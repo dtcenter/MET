@@ -55,7 +55,7 @@ Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts: a re
 
 .. _Eckel-2012:
 
-Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts. *Weather Forecasting,* 27, 50-69, doi: http://dx.doi.org/10.1175/WAF-D-11-00015.1
+Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts. *Weather Forecasting,* 27, 50-69. doi: http://dx.doi.org/10.1175/WAF-D-11-00015.1
 
 .. _Efron-2007:
 
