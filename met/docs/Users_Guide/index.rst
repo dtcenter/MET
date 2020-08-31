@@ -13,9 +13,12 @@ This User's Guide was prepared by many current and former developers of MET, inc
 **Model Evaluation Tools (MET)  TERMS OF USE - IMPORTANT!**
 
 Copyright |copyright|
-Licensed under the `Apache License, Version 2.0 (the "License"); <http://www.apache.org/licenses/LICENSE-2.0>`_
+Licensed under the Apache License, Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
 
+You may obtain a copy of the License at	
+
+http://www.apache.org/licenses/LICENSE-2.0
 
 
 Unless required by applicable law or agreed to in writing, software distributed under
