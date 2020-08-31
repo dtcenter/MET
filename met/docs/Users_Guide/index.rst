@@ -4,7 +4,7 @@ User's Guide
 
 **Foreword: A note to MET users**
 
-This User's guide is provided as an aid to users of the Model Evaluation Tools (MET). MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework. `METplus website <http://dtcenter.org/community-code/metplus>`_.
+This User's guide is provided as an aid to users of the Model Evaluation Tools (MET). MET is a set of verification tools developed by the Developmental Testbed Center (DTC) for use by the numerical weather prediction community to help them assess and evaluate the performance of numerical weather predictions. It is also the core component of the unified METplus verification framework. More details about METplus can be found on the `METplus website <http://dtcenter.org/community-code/metplus>`_.
 
 It is important to note here that MET is an evolving software package. This documentation describes the |release| release dated |release_date|. Previous releases of MET have occurred each year since 2008. Intermediate releases may include bug fixes. MET is also able to accept new modules contributed by the community. If you have code you would like to contribute, we will gladly consider your contribution. Please send an email to: `met_help@ucar.edu <mailto:>`__. We will then determine the maturity of new verification method and coordinate the inclusion of the new module in a future version.
 
