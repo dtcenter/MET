@@ -102,11 +102,11 @@ The TC-Pairs tool expects two input data sources in order to generate matched pa
 
 The BEST is in ATCF file format and contains all the above listed common fields. Given the reference dataset is expected in ATCF file format, any second ATCF format file from model output or operational model output from the NHC aids files can be supplied as well. The expected use of the TC-Pairs tool is to generate matched pairs between model output and the BEST. Note that some of the columns in the TC-Pairs output are populated based on the BEST information (e.g. storm category), therefore use of a different baseline many reduce the available filtering options.
 
-All operational model aids and the BEST can be obtained from the NHC ftp server: ftp://ftp.nhc.noaa.gov/atcf/archive/
+All operational model aids and the BEST can be obtained from the `NHC ftp server. <ftp://ftp.nhc.noaa.gov/atcf/archive/>`_
 
-For more detailed information on the ATCF format description and specifications see: http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt
+`Click here for detailed information on the ATCF format description and specifications. <http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt>`_
 
-If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from a model forecasts. One vortex tracking algorithm that is supported and freely available is the GFDL vortex tracker. Refer to https://dtcenter.org/community-code/gfdl-vortex-tracker for more information on the GFDL vortex tracker package.
+If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from a model forecasts. One vortex tracking algorithm that is supported and freely available is the `GFDL vortex tracker package. <https://dtcenter.org/community-code/gfdl-vortex-tracker>`_
 
 Output data format
 __________________
