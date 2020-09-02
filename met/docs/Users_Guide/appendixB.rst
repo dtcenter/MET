@@ -20,6 +20,8 @@ The following map projections are currently supported in MET:
 
 * Rotated Lat/Lon Projection
 
+* Gaussian Projection
+
 Grids
 _____
 
