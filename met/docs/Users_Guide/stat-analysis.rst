@@ -241,7 +241,7 @@ The example below uses Python embedding.
   -job aggregate_stat -line_type MPR -out_line_type CNT \
   -by FCST_VAR,FCST_LEV
 
-In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.py Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input. Please refer to :numref:`appendixF` for more details about Python embedding in MET.
+In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.py Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input. Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 .. _stat_analysis-configuration-file:
 

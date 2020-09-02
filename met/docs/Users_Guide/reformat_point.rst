@@ -541,7 +541,7 @@ Here is an example of processing the same set of observations but using Python e
 		“MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
 		sample_ascii_obs_python.nc
 
-Please refer to :numref:`appendixF` for more details about Python embedding in MET.
+Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 ascii2nc configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
