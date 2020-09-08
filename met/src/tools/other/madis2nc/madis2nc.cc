@@ -418,17 +418,26 @@ static bool get_filtered_nc_data(NcVar var, float *data,
 
    bool status;
    float in_fill_value;
+   const char * method_name = "get_filtered_nc_data(float)";
 
-   if(!(status = get_nc_data(&var, data, dim, cur))) return status;
-
-   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
-   for (int idx=0; idx<dim; idx++) {
-      if(is_eq(data[idx], in_fill_value)) {
-         data[idx] = bad_data_float;
-         rej_fill++;
+   if (IS_INVALID_NC(var)) {
+      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
+      
+      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
+      for (int idx=0; idx<dim; idx++) {
+         if(is_eq(data[idx], in_fill_value)) {
+            data[idx] = bad_data_float;
+            rej_fill++;
+         }
       }
    }
+   else {
+      status = false;
+      mlog << Error << "\n" << method_name
+           << " Can not read a NetCDF data because the variable is missing.\n\n";
+   }
    return status;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -438,26 +447,34 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
 
    bool status;
    int in_fill_value;
+   const char * method_name = "get_filtered_nc_data_2d(int)";
 
-   if(!(status = get_nc_data(&var, data, dim, cur))) return status;
-
-   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
-   mlog << Debug(5)  << "    get_filtered_nc_data_2d(int): in_fill_value="
-        << in_fill_value << "\n";
-
-   int offset, offsetStart = 0;
-   for (int idx=0; idx<dim[0]; idx++) {
-      offsetStart = idx * dim[1];
-      for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-         offset = offsetStart + vIdx;
-
-         if(is_eq(data[offset], in_fill_value)) {
-            data[offset] = bad_data_int;
-            if(count_bad) {
-               rej_fill++;
+   if (IS_INVALID_NC(var)) {
+      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
+      
+      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
+      mlog << Debug(5)  << "    " << method_name << ": in_fill_value="
+           << in_fill_value << "\n";
+      
+      int offset, offsetStart = 0;
+      for (int idx=0; idx<dim[0]; idx++) {
+         offsetStart = idx * dim[1];
+         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+            offset = offsetStart + vIdx;
+      
+            if(is_eq(data[offset], in_fill_value)) {
+               data[offset] = bad_data_int;
+               if(count_bad) {
+                  rej_fill++;
+               }
             }
          }
       }
+   }
+   else {
+      status = false;
+      mlog << Error << "\n" << method_name
+           << " Can not read a NetCDF data because the variable is missing.\n\n";
    }
    return status;
 }
@@ -469,26 +486,35 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
    bool status;
    float in_fill_value;
+   const char * method_name = "get_filtered_nc_data_2d()";
 
-   if(!(status = get_nc_data(&var, data, dim, cur))) return status;
+   if (IS_INVALID_NC(var)) {
 
-   get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
-   mlog << Debug(5)  << "    get_filtered_nc_data_2d: in_fill_value="
-        << in_fill_value << "\n";
-
-   int offset, offsetStart = 0;
-   for (int idx=0; idx<dim[0]; idx++) {
-      offsetStart = idx * dim[1];
-      for (int vIdx=0; vIdx<dim[1]; vIdx++) {
-         offset = offsetStart + vIdx;
-
-         if(is_eq(data[offset], in_fill_value)) {
-            data[offset] = bad_data_float;
-            if(count_bad) {
-               rej_fill++;
+      if(!(status = get_nc_data(&var, data, dim, cur))) return status;
+      
+      get_nc_att(&var, (string)in_fillValue_str, in_fill_value);
+      mlog << Debug(5)  << "    get_filtered_nc_data_2d: in_fill_value="
+           << in_fill_value << "\n";
+      
+      int offset, offsetStart = 0;
+      for (int idx=0; idx<dim[0]; idx++) {
+         offsetStart = idx * dim[1];
+         for (int vIdx=0; vIdx<dim[1]; vIdx++) {
+            offset = offsetStart + vIdx;
+      
+            if(is_eq(data[offset], in_fill_value)) {
+               data[offset] = bad_data_float;
+               if(count_bad) {
+                  rej_fill++;
+               }
             }
          }
       }
+   }
+   else {
+      status = false;
+      mlog << Error << "\n" << method_name
+           << " Can not read a NetCDF data because the variable is missing.\n\n";
    }
    return status;
 }
@@ -719,7 +745,8 @@ void process_madis_metar(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
-
+   StringArray missing_vars;
+   const char * method_name = "process_madis_metar()";
 
    //
    // Input header variables
@@ -760,6 +787,50 @@ void process_madis_metar(NcFile *&f_in) {
    NcVar precip6HourQty_var  = get_var(f_in, "precip6HourDD");
    NcVar precip24HourQty_var = get_var(f_in, "precip24HourDD");
    NcVar snowCoverQty_var    = get_var(f_in, "snowCoverDD");
+
+   if (IS_INVALID_NC(in_hdr_typ_var)) missing_vars.add("reportType");
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("stationName");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("timeObs");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("latitude");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("longitude");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("elevation");
+
+   if (IS_INVALID_NC(seaLevelPress_var)) missing_vars.add("seaLevelPress");
+   if (IS_INVALID_NC(visibility_var   )) missing_vars.add("visibility");
+   if (IS_INVALID_NC(temperature_var  )) missing_vars.add("temperature");
+   if (IS_INVALID_NC(dewpoint_var     )) missing_vars.add("dewpoint");
+   if (IS_INVALID_NC(windDir_var      )) missing_vars.add("windDir");
+   if (IS_INVALID_NC(windSpeed_var    )) missing_vars.add("windSpeed");
+   if (IS_INVALID_NC(windGust_var     )) missing_vars.add("windGust");
+   if (IS_INVALID_NC(minTemp24Hour_var)) missing_vars.add("minTemp24Hour");
+   if (IS_INVALID_NC(maxTemp24Hour_var)) missing_vars.add("maxTemp24Hour");
+   if (IS_INVALID_NC(precip1Hour_var  )) missing_vars.add("precip1Hour");
+   if (IS_INVALID_NC(precip3Hour_var  )) missing_vars.add("precip3Hour");
+   if (IS_INVALID_NC(precip6Hour_var  )) missing_vars.add("precip6Hour");
+   if (IS_INVALID_NC(precip24Hour_var )) missing_vars.add("precip24Hour");
+   if (IS_INVALID_NC(snowCover_var    )) missing_vars.add("snowCover");
+
+   if (IS_INVALID_NC(seaLevelPressQty_var)) missing_vars.add("seaLevelPressDD");
+   if (IS_INVALID_NC(visibilityQty_var   )) missing_vars.add("visibilityDD");
+   if (IS_INVALID_NC(temperatureQty_var  )) missing_vars.add("temperatureDD");
+   if (IS_INVALID_NC(dewpointQty_var     )) missing_vars.add("dewpointDD");
+   if (IS_INVALID_NC(windDirQty_var      )) missing_vars.add("windDirDD");
+   if (IS_INVALID_NC(windSpeedQty_var    )) missing_vars.add("windSpeedDD");
+   if (IS_INVALID_NC(windGustQty_var     )) missing_vars.add("windGustDD");
+   if (IS_INVALID_NC(minTemp24HourQty_var)) missing_vars.add("minTemp24HourDD");
+   if (IS_INVALID_NC(maxTemp24HourQty_var)) missing_vars.add("maxTemp24HourDD");
+   if (IS_INVALID_NC(precip1HourQty_var  )) missing_vars.add("precip1HourDD");
+   if (IS_INVALID_NC(precip3HourQty_var  )) missing_vars.add("precip3HourDD");
+   if (IS_INVALID_NC(precip6HourQty_var  )) missing_vars.add("precip6HourDD");
+   if (IS_INVALID_NC(precip24HourQty_var )) missing_vars.add("precip24HourDD");
+   if (IS_INVALID_NC(snowCoverQty_var    )) missing_vars.add("snowCoverDD");
+
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a METAR.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
 
    //
    // Retrieve applicable dimensions
@@ -1084,6 +1155,8 @@ void process_madis_raob(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
+   StringArray missing_vars;
+   const char *method_name = "process_madis_raob()";
 
    int maxlvl_manLevel;
    int maxlvl_sigTLevel;
@@ -1159,6 +1232,74 @@ void process_madis_raob(NcFile *&f_in) {
    NcVar prMaxWQty_var   = get_var(f_in, "prMaxWDD");
    NcVar wdMaxWQty_var   = get_var(f_in, "wdMaxWDD");
    NcVar wsMaxWQty_var   = get_var(f_in, "wsMaxWDD");
+
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("staName");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("synTime");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("staLat");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("staLon");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("staElev");
+
+   if (IS_INVALID_NC(in_man_var   )) missing_vars.add("numMand");
+   if (IS_INVALID_NC(in_sigt_var  )) missing_vars.add("numSigT");
+   if (IS_INVALID_NC(in_sigw_var  )) missing_vars.add("numSigW");
+   if (IS_INVALID_NC(in_sigprw_var)) missing_vars.add("numSigPresW");
+   if (IS_INVALID_NC(in_trop_var  )) missing_vars.add("numTrop");
+   if (IS_INVALID_NC(in_maxw_var  )) missing_vars.add("numMwnd");
+
+   if (IS_INVALID_NC(prMan_var   )) missing_vars.add("prMan");
+   if (IS_INVALID_NC(htMan_var   )) missing_vars.add("htMan");
+   if (IS_INVALID_NC(tpMan_var   )) missing_vars.add("tpMan");
+   if (IS_INVALID_NC(tdMan_var   )) missing_vars.add("tdMan");
+   if (IS_INVALID_NC(wdMan_var   )) missing_vars.add("wdMan");
+   if (IS_INVALID_NC(wsMan_var   )) missing_vars.add("wsMan");
+   if (IS_INVALID_NC(prSigT_var  )) missing_vars.add("prSigT");
+   if (IS_INVALID_NC(tpSigT_var  )) missing_vars.add("tpSigT");
+   if (IS_INVALID_NC(tdSigT_var  )) missing_vars.add("tdSigT");
+   if (IS_INVALID_NC(htSigW_var  )) missing_vars.add("htSigW");
+   if (IS_INVALID_NC(wdSigW_var  )) missing_vars.add("wdSigW");
+   if (IS_INVALID_NC(wsSigW_var  )) missing_vars.add("wsSigW");
+   if (IS_INVALID_NC(prSigW_var  )) missing_vars.add("prSigW");
+   if (IS_INVALID_NC(wdSigPrW_var)) missing_vars.add("wdSigPrW");
+   if (IS_INVALID_NC(wsSigPrW_var)) missing_vars.add("wsSigPrW");
+   if (IS_INVALID_NC(prTrop_var  )) missing_vars.add("prTrop");
+   if (IS_INVALID_NC(tpTrop_var  )) missing_vars.add("tpTrop");
+   if (IS_INVALID_NC(tdTrop_var  )) missing_vars.add("tdTrop");
+   if (IS_INVALID_NC(wdTrop_var  )) missing_vars.add("wdTrop");
+   if (IS_INVALID_NC(wsTrop_var  )) missing_vars.add("wsTrop");
+   if (IS_INVALID_NC(prMaxW_var  )) missing_vars.add("prMaxW");
+   if (IS_INVALID_NC(wdMaxW_var  )) missing_vars.add("wdMaxW");
+   if (IS_INVALID_NC(wsMaxW_var  )) missing_vars.add("wsMaxW");
+
+   if (IS_INVALID_NC(prManQty_var   )) missing_vars.add("prManDD");
+   if (IS_INVALID_NC(htManQty_var   )) missing_vars.add("htManDD");
+   if (IS_INVALID_NC(tpManQty_var   )) missing_vars.add("tpManDD");
+   if (IS_INVALID_NC(tdManQty_var   )) missing_vars.add("tdManDD");
+   if (IS_INVALID_NC(wdManQty_var   )) missing_vars.add("wdManDD");
+   if (IS_INVALID_NC(wsManQty_var   )) missing_vars.add("wsManDD");
+   if (IS_INVALID_NC(prSigTQty_var  )) missing_vars.add("prSigTDD");
+   if (IS_INVALID_NC(tpSigTQty_var  )) missing_vars.add("tpSigTDD");
+   if (IS_INVALID_NC(tdSigTQty_var  )) missing_vars.add("tdSigTDD");
+   if (IS_INVALID_NC(htSigWQty_var  )) missing_vars.add("htSigWDD");
+   if (IS_INVALID_NC(wdSigWQty_var  )) missing_vars.add("wdSigWDD");
+   if (IS_INVALID_NC(wsSigWQty_var  )) missing_vars.add("wsSigWDD");
+   if (IS_INVALID_NC(prSigWQty_var  )) missing_vars.add("prSigWDD");
+   if (IS_INVALID_NC(wdSigPrWQty_var)) missing_vars.add("wdSigPrWDD");
+   if (IS_INVALID_NC(wsSigPrWQty_var)) missing_vars.add("wsSigPrWDD");
+   if (IS_INVALID_NC(prTropQty_var  )) missing_vars.add("prTropDD");
+   if (IS_INVALID_NC(tpTropQty_var  )) missing_vars.add("tpTropDD");
+   if (IS_INVALID_NC(tdTropQty_var  )) missing_vars.add("tdTropDD");
+   if (IS_INVALID_NC(wdTropQty_var  )) missing_vars.add("wdTropDD");
+   if (IS_INVALID_NC(wsTropQty_var  )) missing_vars.add("wsTropDD");
+   if (IS_INVALID_NC(prMaxWQty_var  )) missing_vars.add("prMaxWDD");
+   if (IS_INVALID_NC(wdMaxWQty_var  )) missing_vars.add("wdMaxWDD");
+   if (IS_INVALID_NC(wsMaxWQty_var  )) missing_vars.add("wsMaxWDD");
+
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a RAOB.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
 
    //
    // Retrieve applicable dimensions
@@ -1800,6 +1941,8 @@ void process_madis_profiler(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
    int count;
+   StringArray missing_vars;
+   const char *method_name = "process_madis_profiler()";
 
    //
    // Input header variables:
@@ -1820,6 +1963,26 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    NcVar in_pressure_var = get_var(f_in, "pressure");
    NcVar var_levels = get_var(f_in, "levels");
+
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("staName");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("timeObs");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("staLat");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("staLon");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("staElev");
+   if (IS_INVALID_NC(in_uComponent_var)) missing_vars.add("uComponent");
+   if (IS_INVALID_NC(in_vComponent_var)) missing_vars.add("vComponent");
+   if (IS_INVALID_NC(in_uComponentQty_var)) missing_vars.add("uComponentDD");
+   if (IS_INVALID_NC(in_vComponentQty_var)) missing_vars.add("vComponentDD");
+
+   if (IS_INVALID_NC(in_pressure_var)) missing_vars.add("pressure");
+   if (IS_INVALID_NC(var_levels)) missing_vars.add("levels");
+   
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a profiler.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
 
    //
    // Retrieve applicable dimensions
@@ -2028,6 +2191,8 @@ void process_madis_maritime(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure;
    int count;
+   StringArray missing_vars;
+   const char *method_name = "process_madis_maritime()";
 
    //
    // Input header variables:
@@ -2068,6 +2233,46 @@ void process_madis_maritime(NcFile *&f_in) {
    NcVar in_precip18HourQty_var = get_var(f_in, "precip18HourDD");
    NcVar in_precip24HourQty_var = get_var(f_in, "precip24HourDD");
 
+
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("stationName");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("timeObs");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("latitude");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("longitude");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("elevation");
+
+   if (IS_INVALID_NC(in_pressure_var)) missing_vars.add("stationPress");
+
+   if (IS_INVALID_NC(in_windDir_var)) missing_vars.add("windDir");
+   if (IS_INVALID_NC(in_windSpeed_var)) missing_vars.add("windSpeed");
+   if (IS_INVALID_NC(in_temperature_var)) missing_vars.add("temperature");
+   if (IS_INVALID_NC(in_dewpoint_var)) missing_vars.add("dewpoint");
+   if (IS_INVALID_NC(in_seaLevelPress_var)) missing_vars.add("seaLevelPress");
+   if (IS_INVALID_NC(in_windGust_var)) missing_vars.add("windGust");
+   if (IS_INVALID_NC(in_precip1Hour_var)) missing_vars.add("precip1Hour");
+   if (IS_INVALID_NC(in_precip6Hour_var)) missing_vars.add("precip6Hour");
+   if (IS_INVALID_NC(in_precip12Hour_var)) missing_vars.add("precip12Hour");
+   if (IS_INVALID_NC(in_precip18Hour_var)) missing_vars.add("precip18Hour");
+   if (IS_INVALID_NC(in_precip24Hour_var)) missing_vars.add("precip24Hour");
+
+   if (IS_INVALID_NC(in_windDirQty_var)) missing_vars.add("windDirDD");
+   if (IS_INVALID_NC(in_windSpeedQty_var)) missing_vars.add("windSpeedDD");
+   if (IS_INVALID_NC(in_temperatureQty_var)) missing_vars.add("temperatureDD");
+   if (IS_INVALID_NC(in_dewpointQty_var)) missing_vars.add("dewpointDD");
+   if (IS_INVALID_NC(in_seaLevelPressQty_var)) missing_vars.add("seaLevelPressDD");
+   if (IS_INVALID_NC(in_windGustQty_var)) missing_vars.add("windGustDD");
+   if (IS_INVALID_NC(in_precip1HourQty_var)) missing_vars.add("precip1HourDD");
+   if (IS_INVALID_NC(in_precip6HourQty_var)) missing_vars.add("precip6HourDD");
+   if (IS_INVALID_NC(in_precip12HourQty_var)) missing_vars.add("precip12HourDD");
+   if (IS_INVALID_NC(in_precip18HourQty_var)) missing_vars.add("precip18HourDD");
+   if (IS_INVALID_NC(in_precip24HourQty_var)) missing_vars.add("precip24HourDD");
+
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a maritime.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
+   
    //
    // Retrieve applicable dimensions
    //
@@ -2353,6 +2558,8 @@ void process_madis_mesonet(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
    int count;
+   StringArray missing_vars;
+   const char *method_name = "process_madis_mesonet()";
 
    //
    // Input header variables
@@ -2411,6 +2618,67 @@ void process_madis_mesonet(NcFile *&f_in) {
    NcVar in_windDir10Qty_var = get_var(f_in, "windDir10DD");
    NcVar in_windSpeed10Qty_var = get_var(f_in, "windSpeed10DD");
 
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("stationId");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("observationTime");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("latitude");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("longitude");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("elevation");
+
+   if (IS_INVALID_NC(in_temperature_var)) missing_vars.add("temperature");
+   if (IS_INVALID_NC(in_dewpoint_var)) missing_vars.add("dewpoint");
+   if (IS_INVALID_NC(in_relHumidity_var)) missing_vars.add("relHumidity");
+   if (IS_INVALID_NC(in_stationPressure_var)) missing_vars.add("stationPressure");
+   if (IS_INVALID_NC(in_seaLevelPressure_var)) missing_vars.add("seaLevelPressure");
+   if (IS_INVALID_NC(in_windDir_var)) missing_vars.add("windDir");
+   if (IS_INVALID_NC(in_windSpeed_var)) missing_vars.add("windSpeed");
+   if (IS_INVALID_NC(in_windGust_var)) missing_vars.add("windGust");
+   if (IS_INVALID_NC(in_visibility_var)) missing_vars.add("visibility");
+   if (IS_INVALID_NC(in_precipRate_var)) missing_vars.add("precipRate");
+   if (IS_INVALID_NC(in_solarRadiation_var)) missing_vars.add("solarRadiation");
+   if (IS_INVALID_NC(in_seaSurfaceTemp_var)) missing_vars.add("seaSurfaceTemp");
+   if (IS_INVALID_NC(in_totalColumnPWV_var)) missing_vars.add("totalColumnPWV");
+   if (IS_INVALID_NC(in_soilTemperature_var)) missing_vars.add("soilTemperature");
+   if (IS_INVALID_NC(in_minTemp24Hour_var)) missing_vars.add("minTemp24Hour");
+   if (IS_INVALID_NC(in_maxTemp24Hour_var)) missing_vars.add("maxTemp24Hour");
+   if (IS_INVALID_NC(in_precip3hr_var)) missing_vars.add("precip3hr");
+   if (IS_INVALID_NC(in_precip6hr_var)) missing_vars.add("precip6hr");
+   if (IS_INVALID_NC(in_precip12hr_var)) missing_vars.add("precip12hr");
+   if (IS_INVALID_NC(in_precip10min_var)) missing_vars.add("precip10min");
+   if (IS_INVALID_NC(in_precip1min_var)) missing_vars.add("precip1min");
+   if (IS_INVALID_NC(in_windDir10_var)) missing_vars.add("windDir10");
+   if (IS_INVALID_NC(in_windSpeed10_var)) missing_vars.add("windSpeed10");
+
+   if (IS_INVALID_NC(in_temperatureQty_var)) missing_vars.add("temperatureDD");
+   if (IS_INVALID_NC(in_dewpointQty_var)) missing_vars.add("dewpointDD");
+   if (IS_INVALID_NC(in_relHumidityQty_var)) missing_vars.add("relHumidityDD");
+   if (IS_INVALID_NC(in_stationPressureQty_var)) missing_vars.add("stationPressureDD");
+   if (IS_INVALID_NC(in_seaLevelPressureQty_var)) missing_vars.add("seaLevelPressureDD");
+   if (IS_INVALID_NC(in_windDirQty_var)) missing_vars.add("windDirDD");
+   if (IS_INVALID_NC(in_windSpeedQty_var)) missing_vars.add("windSpeedDD");
+   if (IS_INVALID_NC(in_windGustQty_var)) missing_vars.add("windGustDD");
+   if (IS_INVALID_NC(in_visibilityQty_var)) missing_vars.add("visibilityDD");
+   if (IS_INVALID_NC(in_precipRateQty_var)) missing_vars.add("precipRateDD");
+   if (IS_INVALID_NC(in_solarRadiationQty_var)) missing_vars.add("solarRadiationDD");
+   if (IS_INVALID_NC(in_seaSurfaceTempQty_var)) missing_vars.add("seaSurfaceTempDD");
+   if (IS_INVALID_NC(in_totalColumnPWVQty_var)) missing_vars.add("totalColumnPWVDD");
+   if (IS_INVALID_NC(in_soilTemperatureQty_var)) missing_vars.add("soilTemperatureDD");
+   if (IS_INVALID_NC(in_minTemp24HourQty_var)) missing_vars.add("minTemp24HourDD");
+   if (IS_INVALID_NC(in_maxTemp24HourQty_var)) missing_vars.add("maxTemp24HourDD");
+   if (IS_INVALID_NC(in_precip3hrQty_var)) missing_vars.add("precip3hrDD");
+   if (IS_INVALID_NC(in_precip6hrQty_var)) missing_vars.add("precip6hrDD");
+   if (IS_INVALID_NC(in_precip12hrQty_var)) missing_vars.add("precip12hrDD");
+   if (IS_INVALID_NC(in_precip10minQty_var)) missing_vars.add("precip10minDD");
+   if (IS_INVALID_NC(in_precip1minQty_var)) missing_vars.add("precip1minDD");
+   if (IS_INVALID_NC(in_windDir10Qty_var)) missing_vars.add("windDir10DD");
+   if (IS_INVALID_NC(in_windSpeed10Qty_var)) missing_vars.add("windSpeed10DD");
+
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a MESONET.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
+   
    //
    // Retrieve applicable dimensions
    //
@@ -2842,6 +3110,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float pressure, wdir, wind, ugrd, vgrd;
    int count;
+   StringArray missing_vars;
+   const char * method_name = "process_madis_acarsProfiles() -> ";
 
    //
    // Input header variables:
@@ -2865,6 +3135,26 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    NcVar in_windSpeedQty_var = get_var(f_in, "windSpeedDD");
    NcVar in_nLevelsQty_var = get_var(f_in, "nLevelsDD");
    NcVar in_altitudeQty_var = get_var(f_in, "altitudeDD");
+
+
+   if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("profileAirport");
+   if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("profileTime");
+   if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("trackLat");
+   if (IS_INVALID_NC(in_hdr_lon_var)) missing_vars.add("trackLon");
+   if (IS_INVALID_NC(in_hdr_elv_var)) missing_vars.add("altitude");
+   if (IS_INVALID_NC(in_hdr_tob_var)) missing_vars.add("obsTimeOfDay");
+
+   if (IS_INVALID_NC(in_temperature_var)) missing_vars.add("temperature");
+   if (IS_INVALID_NC(in_dewpoint_var)) missing_vars.add("dewpoint");
+   if (IS_INVALID_NC(in_windDir_var)) missing_vars.add("windDir");
+   if (IS_INVALID_NC(in_windSpeed_var)) missing_vars.add("windSpeed");
+
+   if (IS_INVALID_NC(in_temperatureQty_var)) missing_vars.add("temperatureDD");
+   if (IS_INVALID_NC(in_dewpointQty_var)) missing_vars.add("dewpointDD");
+   if (IS_INVALID_NC(in_windDirQty_var)) missing_vars.add("windDirDD");
+   if (IS_INVALID_NC(in_windSpeedQty_var)) missing_vars.add("windSpeedDD");
+   if (IS_INVALID_NC(in_nLevelsQty_var)) missing_vars.add("nLevelsDD");
+   if (IS_INVALID_NC(in_altitudeQty_var)) missing_vars.add("altitudeDD");
 
    //
    // Retrieve applicable dimensions
@@ -2893,6 +3183,13 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    // Get the number of levels
    //
    NcVar in_var = get_var(f_in, "nLevels");
+   if (IS_INVALID_NC(in_var)) missing_vars.add("nLevels");
+   if (missing_vars.n() > 0) {
+      mlog << Error << "\n" << method_name << "Please check if the input is a ACARS Profiles.\n\n";
+      for (int idx=0; idx<missing_vars.n(); idx++)
+         mlog << Warning << "    missing variable: " << missing_vars[idx] << "\n";
+      exit(1);
+   }
 
    //
    // Obtain the total number of levels
