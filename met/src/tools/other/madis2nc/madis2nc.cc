@@ -486,7 +486,7 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
 
    bool status;
    float in_fill_value;
-   const char * method_name = "get_filtered_nc_data_2d()";
+   const char * method_name = "get_filtered_nc_data_2d(float)";
 
    if (IS_INVALID_NC(var)) {
 
