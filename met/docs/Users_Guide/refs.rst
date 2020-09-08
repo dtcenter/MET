@@ -71,7 +71,7 @@ Gilleland, E., 2019: Bootstrap methods for statistical inference. Part II: Extre
 
 .. _Gneiting-2004:
 
-Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics and Minimum CRPS Estimation*. Technical Report no. 449, Department of Statistics, University of Washington. [Available online at http://www.stat.washington.edu/www/research/reports/ ]
+Gneiting, T., A. Westveld, A. Raferty, and T. Goldman, 2004: *Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics and Minimum CRPS Estimation*. Technical Report no. 449, Department of Statistics, University of Washington. Available at http://www.stat.washington.edu/www/research/reports/ 
 
 .. _Hamill-2001:
 

@@ -25,16 +25,14 @@ _____
 
 All of NCEP's pre-defined grids that reside on one of the projections listed above are implemented in MET. The user may specify one of these NCEP grids in the configuration files as "GNNN" where NNN is the 3-digit NCEP grid number. Defining a new masking grid in MET would involve modifying the vx_data_grids library and recompiling.
 
-Please see NCEP's website for a description and plot of these pre-defined grids: 
-
-http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html.
+Please see `NCEP's website for a description and plot of these pre-defined grids <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
 
 Polylines for NCEP Regions
 __________________________
 
 Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed share/met/poly directory. Users may also easily define their own lat/lon polyline files.
 
-See NCEP's website for a description and plot of these pre-defined verification regions: http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html 
+See `NCEP's website for a description and plot of these pre-defined verification regions <http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html>`_. 
 
 The NCEP verification regions that are implemented in MET as lat/lon polylines are listed below:
 
