@@ -29,6 +29,7 @@ static const char             st_string [] = "Polar Stereographic";
 static const char           merc_string [] = "Mercator";
 static const char         latlon_string [] = "LatLon";
 static const char rotated_latlon_string [] = "Rotated LatLon";
+static const char       gaussian_string [] = "Gaussian";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,7 @@ static void get_st_grid             (const Python3_Dict & dict, Grid & g);
 static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
 static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
+static void get_gaussian_grid       (const Python3_Dict & dict, Grid & g);
 
 static void set_string(const char * & dest, const ConcatString & src);
 
@@ -71,6 +73,7 @@ else if ( proj_type ==             st_string )  get_st_grid             (dict, g
 else if ( proj_type ==           merc_string )  get_merc_grid           (dict, g);
 else if ( proj_type ==         latlon_string )  get_latlon_grid         (dict, g);
 else if ( proj_type == rotated_latlon_string )  get_rotated_latlon_grid (dict, g);
+else if ( proj_type ==       gaussian_string )  get_gaussian_grid       (dict, g);
 else {
 
    mlog << Error << "\ngrid_from_python_dict() -> "
@@ -390,6 +393,51 @@ if ( ! west_longitude_positive )  {
 
    toggle_sign(data.rot_lon_ll);
    toggle_sign(data.true_lon_south_pole);
+
+}
+
+   //
+   //  done
+   //
+
+g.set(data);
+
+if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   // name      (string)
+   //
+   // lon_zero  (double)
+   //
+   // nx, ny    (int)
+   //
+
+void get_gaussian_grid (const Python3_Dict & dict, Grid & g)
+
+{
+
+GaussianData data;
+ConcatString s;
+
+s = dict.lookup_string("name");
+
+set_string(data.name, s);
+
+data.lon_zero = rescale_lon(dict.lookup_double("lon_zero"));
+
+data.nx = dict.lookup_int("nx");
+data.ny = dict.lookup_int("ny");
+
+if ( ! west_longitude_positive )  {
+
+   toggle_sign(data.lon_zero);
 
 }
 
