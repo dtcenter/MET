@@ -30,7 +30,6 @@ using namespace std;
 
 #include "get_filenames.h"
 #include "string_fxns.h"
-#include "file_exists.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -382,7 +381,7 @@ while(f_in >> file_name)  {
 
       if ( a.n() >= max_missing )  break;
 
-      if ( file_exists(file_name.c_str()) )  n_exist++;
+      if ( is_regular_file(file_name.c_str()) )  n_exist++;
 
    }
 
