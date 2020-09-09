@@ -36,6 +36,7 @@ using namespace std;
 
 #include "tc_gen.h"
 
+#include "vx_data2d_factory.h"
 #include "vx_statistics.h"
 #include "vx_tc_util.h"
 #include "vx_grid.h"
