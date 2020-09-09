@@ -57,18 +57,20 @@ Consider the impact to the other METplus components.
 
 ## Bugfix Checklist ##
 See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
-- [ ] Complete the issue definition above.
+- [ ] Complete the issue definition above, including the **Time Estimate** and **Funding source**.
 - [ ] Fork this repository or create a branch of **master_\<Version>**.
 Branch name:  `bugfix_<Issue Number>_master_<Version>_<Description>`
 - [ ] Fix the bug and test your changes.
+- [ ] Add/update log messages for easier debugging.
 - [ ] Add/update unit tests.
 - [ ] Add/update documentation.
 - [ ] Push local changes to GitHub.
-- [ ] Submit a pull request to merge into **master_\<Version>** and link the pull request to this issue.
+- [ ] Submit a pull request to merge into **master_\<Version>**.
 Pull request: `bugfix <Issue Number> master_<Version> <Description>`
+- [ ] Complete PR metadata, if permissions allow: assign **Reviewer(s)**, select **Project(s)**, select **Milestone**, and **Link** to this issue.
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
-- [ ] Complete the steps above to fix the bug on the **develop** branch and link the pull request to this issue.
+- [ ] Complete the steps above to fix the bug on the **develop** branch.
 Branch name:  `bugfix_<Issue Number>_develop_<Description>`
 Pull request: `bugfix <Issue Number> develop <Description>`
 - [ ] Close this issue.
