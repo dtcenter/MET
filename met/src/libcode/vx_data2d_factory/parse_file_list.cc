@@ -29,6 +29,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "parse_file_list.h"
+#include "data2d_factory_utils.h"
 #include "string_fxns.h"
 
 
@@ -92,6 +93,7 @@ StringArray parse_ascii_file_list(const char * path)
 
 ifstream f_in;
 StringArray a;
+GrdFileType file_type;
 std::string file_name;
 ConcatString list_str(file_list_str);
 bool check_files_exist = true;
@@ -101,6 +103,20 @@ bool check_files_exist = true;
    //
 
 if ( !is_regular_file(path) )  return(a);
+
+   //
+   //  If the input is a known gridded data file, return an empty list
+   //
+
+if ( (file_type = grd_file_type(path)) != FileType_None )  {
+
+   mlog << Debug(5) << "parse_ascii_file_list() -> "
+        << "File \"" << path << "\" of type "
+        << grdfiletype_to_string(file_type)
+        << " is not an ASCII file list.\n";
+
+   return(a);
+}
 
    //
    //  Open the input ascii file
