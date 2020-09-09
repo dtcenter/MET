@@ -67,7 +67,7 @@ Branch name: `bugfix_<Issue Number>_master_<Version>_<Description>`
 - [ ] Push local changes to GitHub.
 - [ ] Submit a pull request to merge into **master_\<Version>**.
 Pull request: `bugfix <Issue Number> master_<Version> <Description>`
-- [ ] Define pull request metadata, as permissions allow.
+- [ ] Define the pull request metadata, as permissions allow.
 Select: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
