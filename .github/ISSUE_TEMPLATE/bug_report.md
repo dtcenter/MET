@@ -59,7 +59,7 @@ Consider the impact to the other METplus components.
 See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
 - [ ] Complete the issue definition above, including the **Time Estimate** and **Funding Source**.
 - [ ] Fork this repository or create a branch of **master_\<Version>**.
-Branch name:  `bugfix_<Issue Number>_master_<Version>_<Description>`
+Branch name: `bugfix_<Issue Number>_master_<Version>_<Description>`
 - [ ] Fix the bug and test your changes.
 - [ ] Add/update log messages for easier debugging.
 - [ ] Add/update unit tests.
@@ -67,7 +67,8 @@ Branch name:  `bugfix_<Issue Number>_master_<Version>_<Description>`
 - [ ] Push local changes to GitHub.
 - [ ] Submit a pull request to merge into **master_\<Version>**.
 Pull request: `bugfix <Issue Number> master_<Version> <Description>`
-- [ ] Add PR metadata, as permissions allow: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
+- [ ] Define pull request metadata, as permissions allow.
+Select: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
 - [ ] Complete the steps above to fix the bug on the **develop** branch.

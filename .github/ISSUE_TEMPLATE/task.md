@@ -49,7 +49,7 @@ Consider the impact to the other METplus components.
 See the [METplus Workflow](https://dtcenter.github.io/METplus/Contributors_Guide/github_workflow.html) for details.
 - [ ] Complete the issue definition above, including the **Time Estimate** and **Funding Source**.
 - [ ] Fork this repository or create a branch of **develop**.
-Branch name:  `feature_<Issue Number>_<Description>`
+Branch name: `feature_<Issue Number>_<Description>`
 - [ ] Complete the development and test your changes.
 - [ ] Add/update log messages for easier debugging.
 - [ ] Add/update unit tests.
@@ -57,7 +57,8 @@ Branch name:  `feature_<Issue Number>_<Description>`
 - [ ] Push local changes to GitHub.
 - [ ] Submit a pull request to merge into **develop**.
 Pull request: `feature <Issue Number> <Description>`
-- [ ] Add PR metadata, as permissions allow: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
+- [ ] Define pull request metadata, as permissions allow.
+Select: **Reviewer(s)**, **Project(s)**, **Milestone**, and **Linked issues**
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
 - [ ] Close this issue.
