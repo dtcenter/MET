@@ -415,9 +415,9 @@ An example of the modis_regrid calling sequence is shown below:
   -scale 0.01 \
   -offset 0 \
   -fill 127 \
-  modisfile
+  modis_file
 
-In this example, the modis_regrid tool will process the Cloud_Fraction field from **modisfile** and write it out to the output NetCDF file t2.nc on the grid specified in grid_file using the appropriate scale, offset and fill values.
+In this example, the modis_regrid tool will process the Cloud_Fraction field from **modis_file** and write it out to the output NetCDF file t2.nc on the grid specified in grid_file using the appropriate scale, offset and fill values.
 
 .. _reformat_grid_fig1:
 
