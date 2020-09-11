@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2020
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -10,33 +8,33 @@
 
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __DATA2D_FACTORY_H__
-#define  __DATA2D_FACTORY_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "data2d_factory.h"
-#include "data2d_factory_utils.h"
-#include "is_bufr_file.h"
-#include "is_grib_file.h"
-#include "is_netcdf_file.h"
-#include "parse_file_list.h"
-#include "var_info_factory.h"
+#ifndef  __PARSE_FILE_LIST__
+#define  __PARSE_FILE_LIST__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __DATA2D_FACTORY_H__
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
+
+extern StringArray parse_file_list(const StringArray&);
+
+extern StringArray parse_ascii_file_list(const char * path);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   //  __PARSE_FILE_LIST__
+
+
+////////////////////////////////////////////////////////////////////////
 
 
