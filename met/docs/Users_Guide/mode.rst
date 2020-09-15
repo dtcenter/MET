@@ -48,7 +48,7 @@ where :math:`T` is the threshold. The objects are the connected regions where :m
 
 Thus, two parameters — the radius of influence :math:`R`, and the threshold :math:`T` — control the entire process of resolving objects in the raw data field.
 
-An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. It shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part b shows the convolved field, and part c shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
+An example of the steps involved in resolving objects is shown in :numref:`mode-object_id`. It shows a "raw" precipitation field, where the vertical coordinate represents the precipitation amount. Part (b) shows the convolved field, and part (c) shows the masked field obtained after the threshold is applied. Finally, :numref:`mode-object_id` shows the objects once the original precipitation values have been restored to the interiors of the objects.
 
 .. _mode-object_id:
 
@@ -72,11 +72,11 @@ Higher order moments are similarly defined and are used in the calculation of so
 
 **Axis Angle**, denoted by :math:`\theta`, is calculated from the second-order moments. It gives information on the orientation or "tilt" of an object. **Curvature** is another attribute that uses moments in its calculation, specifically, third-order moments.
 
-**Aspect Ratio** is computed by fitting a rectangle around an object. The rectangle is aligned so that it has the same axis angle as the object, and the length and width are chosen so as to just enclose the object. We make no claim that the rectangle so obtained is the smallest possible rectangle enclosing the given object. However, this rectangle is much easier to calculate than a smallest enclosing rectangle and serves our purposes just as well. Once the rectangle is determined, the aspect ratio of the object is defined to be the width of the fitted rectangle divided by its length.
+**Aspect Ratio** is computed by fitting a rectangle around an object. The rectangle is aligned so that it has the same axis angle as the object, and the length and width are chosen so as to just enclose the object. We make no claim that the rectangle so obtained is the smallest possible rectangle enclosing the given object. However, this rectangle is much easier to calculate than a smaller enclosing rectangle and serves our purposes just as well. Once the rectangle is determined, the aspect ratio of the object is defined to be the width of the fitted rectangle divided by its length.
 
 Another object attribute defined by MODE is **complexity**. Complexity is defined by comparing the area of an object to the area of its convex hull.
 
-All the attributes discussed so far are defined for single objects. Once these are determined, they can be used to calculate attributes for pairs of objects. One example is **centroid difference**. This measure is simply the (vector) difference between the centroids of the two objects. Another example is **angle difference**, the difference between the axis angles.
+All the attributes discussed so far are defined for single objects. Once these are determined, they can be used to calculate attributes for pairs of objects. One example is the  **centroid difference**. This measure is simply the (vector) difference between the centroids of the two objects. Another example is the  **angle difference**. This is the difference between the axis angles.
 
 Several area measures are also used for pair attributes. **Union Area** is the total area that is in either one (or both) of the two objects. **Intersection Area** is the area that is inside both objects simultaneously. **Symmetric Difference** is the area inside at least one object, but not inside both.
 
