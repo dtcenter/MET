@@ -1227,6 +1227,7 @@ boot = {
 //       - "FCST" to interpolate/smooth the forecast field.
 //       - "OBS" to interpolate/smooth the observation field.
 //       - "BOTH" to interpolate/smooth both the forecast and the observation.
+//       - "NONE" do not interpolate/smooth.
 //
 //    - The "vld_thresh" entry specifies a number between 0 and 1. When
 //      performing interpolation over some neighborhood of points the ratio of
