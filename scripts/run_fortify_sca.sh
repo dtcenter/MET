@@ -13,9 +13,9 @@
 #
 # Usage: run_fortify_sca.sh name
 #    Test the specified branched version of MET:
-#       run_fortify_sca.sh master_v8.1
+#       run_fortify_sca.sh {branch name}
 #    Test the specified tagged version of MET:
-#       run_fortify_sca.sh met-8.1
+#       run_fortify_sca.sh {tag name}
 #
 #=======================================================================
 
