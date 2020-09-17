@@ -13,7 +13,7 @@ ________________________________________________________
   :widths: auto
   :header-rows: 1
 
-  * - Statitistic in MET
+  * - Statistics in MET
     - Other names for the same statistic
   * - Probability of Detection
     - Hit Rate
@@ -38,9 +38,9 @@ ________________________________________________________
   * - MSESS
     - Murphy's MSESS
   * - Pearson Correlation
-    - Anomolous Pattern Correlation
-  * - Anomoly Correlation
-    - Anomolous Correction
+    - Anomalous Pattern Correlation
+  * - Anomaly Correlation
+    - Anomalous Correction
   * - Rank Histogram
     - Talagrand Diagram
   * - Reliability Diagram
@@ -269,7 +269,7 @@ ORSS is a skill score based on the odds ratio. ORSS is defined as
 
 .. math:: \text{ORSS } = \frac{OR - 1}{OR + 1}.
 
-ORSS is sometime also referred to as Yule's Q. (:ref:`Stephenson 2000 <Stephenson-2000>`).
+ORSS is sometimes also referred to as Yule's Q. (:ref:`Stephenson 2000 <Stephenson-2000>`).
 
 Extreme Dependency Score (EDS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,12 +494,12 @@ The Mean Absolute Error (MAE) is defined as :math:`\text{MAE} = \frac{1}{n} \sum
 
 MAE is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have MAE = 0.
 
-Inter Quartile Range of the Errors (IQR)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+InterQuartile Range of the Errors (IQR)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Called "IQR" in CNT output :numref:`table_PS_format_info_CNT`
 
-The Inter Quartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as :math:`\text{IQR} = p_{75} (f_i - o_i) - p_{25} (f_i - o_i)`.
+The InterQuartile Range of the Errors (IQR) is the difference between the 75th and 25th percentiles of the errors. It is defined as :math:`\text{IQR} = p_{75} (f_i - o_i) - p_{25} (f_i - o_i)`.
 
 IQR is another estimate of spread, similar to standard error, but is less influenced by large errors and also does not depend on the mean error. A perfect forecast would have IQR = 0.
 
@@ -680,7 +680,7 @@ where the weights are applied at each grid location, with values assigned accord
 MET verification measures for probabilistic forecasts
 _____________________________________________________
 
-The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the mid-point value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (:ref:`Bradley, 2008 <Bradley-2008>`); the joint distribution, calibration-refinement, likelihood-base rate (:ref:`Wilks, 2011 <Wilks-2011>`); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
+The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the midpoint value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (:ref:`Bradley, 2008 <Bradley-2008>`); the joint distribution, calibration-refinement, likelihood-base rate (:ref:`Wilks, 2011 <Wilks-2011>`); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
 
 The verification statistics for probabilistic forecasts of dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_cont_table_counts`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_cont_table_counts` are counts of the number of occurrences of all possible combinations of forecasts and observations.
 
@@ -925,7 +925,7 @@ RANK
 
 Called "RANK" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
-The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (:ref:`Hamill, 2001 <Hamill-2001>`). When ensemble forecasts possesses the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat.
+The rank of an observation, compared to all members of an ensemble forecast, is a measure of dispersion of the forecasts (:ref:`Hamill, 2001 <Hamill-2001>`). When ensemble forecasts possess the same amount of variability as the corresponding observations, then the rank of the observation will follow a discrete uniform distribution. Thus, a rank histogram will be approximately flat.
 
 The rank histogram does not provide information about the accuracy of ensemble forecasts. Further, examination of "rank" only makes sense for ensembles of a fixed size. Thus, if ensemble members are occasionally unavailable, the rank histogram should not be used. The PIT may be used instead.
 

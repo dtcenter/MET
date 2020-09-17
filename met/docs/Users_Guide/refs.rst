@@ -111,7 +111,7 @@ Roberts, N.M., and H.W. Lean, 2008: Scale-selective verification of rainfall acc
 
 .. _Saetra-2004:
 
-Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of observation errors on the statistics for ensemble spread and reliability. *Monthy Weather Review* 132: 1487–1501.
+Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of observation errors on the statistics for ensemble spread and reliability. *Monthly Weather Review* 132: 1487–1501.
 
 .. _Santos-2012:
 
