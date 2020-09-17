@@ -11,9 +11,9 @@
 #
 # Usage: test_unit.sh name
 #    Test the specified branched version of MET:
-#       test_unit.sh master_v8.1
+#       test_unit.sh {branch name}
 #    Test the specified tagged version of MET:
-#       test_unit.sh met-8.1
+#       test_unit.sh {tag name}
 #
 #=======================================================================
 
