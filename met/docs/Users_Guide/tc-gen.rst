@@ -6,7 +6,7 @@ TC-Gen Tool
 Introduction
 ____________
 
-The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlines in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
+The TC-Gen tool provides verification of tropical cyclone genesis forecasts in ATCF file format. Producing reliable tropical cyclone genesis forecasts is an important metric for global numerical weather prediction models. This tool ingests deterministic model output post-processed by a genesis tracking software (e.g. GFDL vortex tracker) and ATCF format reference dataset(s) (e.g. Best Track analysis and CARQ operational tracks) and outputs categorical counts and statistics. The capability to modify the spatial and temporal tolerances that define a “hit” forecast is included to give users the ability to condition the criteria based on model performance and/or conduct sensitivity analyses. Statistical aspects are outlined in Section 21.2 and practical aspects of the TC-Gen tool are described in Section 21.3.
 
 Statistical aspects
 ___________________
@@ -135,7 +135,7 @@ ______________________
      mslp_thresh = NA;
   }
 
-The **best_genesis** and **oper_genesis** dictionaries defines genesis criteria for the BEST and operational tracks, respectively. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST and operational tracks.
+The **best_genesis** and **oper_genesis** dictionaries define genesis criteria for the BEST and operational tracks, respectively. Like the **fcst_genesis** dictionary, the **vmax_thresh** and **mslp_thresh** thresholds define required genesis criteria. In addition, the **category** array defines the ATCF storm categories that should qualify as genesis events. The **technique** string defines the ATCF ID for the BEST and operational tracks.
 
 ______________________
 
@@ -177,7 +177,7 @@ ______________________
   init_beg = "";
   init_end = "";
 
-The **init_beg** and **init_end** entries are strings in YYYYMMDD[_HH[MMSS]] format which defining which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
+The **init_beg** and **init_end** entries are strings in YYYYMMDD[_HH[MMSS]] format which defines which forecast and operational tracks initializations to be processed. If left empty, all tracks will be used. Otherwise, only those tracks whose initialization time falls within the window will be included. Note that these settings only apply to the forecast and operational tracks, not the BEST tracks, for which the initialization time is undefined. Care should be given when interpreting the contingency table results for filtered data.
 
 ______________________
 
@@ -212,7 +212,7 @@ ______________________
 
   dland_thresh = NA;
 
-The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (**NA**) always evaluate to true.
+The **dland_thresh** entry is a threshold defining whether the genesis event should be included based on it's distance to land. The default threshold (**NA**) always evaluates to true.
 
 ______________________
 

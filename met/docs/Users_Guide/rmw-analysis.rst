@@ -27,7 +27,7 @@ _______________________
          [-log file]
          [-v level]
 
-rmw_analysis has required arguments and can accept several optional arguments.
+**rmw_analysis** has required arguments and can accept several optional arguments.
 
 Required arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
