@@ -89,7 +89,13 @@ if [ -z ${MET_NETCDF} ]; then
 else
     COMPILE_NETCDF=0
 fi
-COMPILE_GSL=0
+
+if [ -z ${MET_GSL} ]; then
+    COMPILE_GSL=1
+else
+    COMPILE_GSL=0
+fi
+
 COMPILE_HDF=0
 COMPILE_HDFEOS=0
 COMPILE_FREETYPE=0
@@ -719,14 +725,20 @@ if [ $COMPILE_MET -eq 1 ]; then
       export MET_NETCDF=${MET_NETCDF}
       export MET_HDF5=${MET_HDF5}
   fi
-  
-  export MET_GSL=${LIB_DIR}
+ 
+  if [ -z ${MET_GSL} ]; then
+      export MET_GSL=${LIB_DIR}
+  else
+      export MET_GSL=${MET_GSL}
+      export LD_LIBRARY_PATH=${MET_GSL}/lib:${LD_LIBRARY_PATH}
+  fi
+
   export MET_HDF=${LIB_DIR}
   export MET_HDFEOS=${LIB_DIR}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib"
+  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_NETCDF}/lib:${MET_HDF5}/lib:${MET_BUFRLIB}:${MET_GRIB2CLIB}:${MET_PYTHON}/lib:${MET_GSL}/lib"
   export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER}:${LIB_LIBPNG}:${LIB_Z}"
   export LDFLAGS="${LDFLAGS} -L${LIB_JASPER} -L${MET_HDF5}/lib"
   export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
