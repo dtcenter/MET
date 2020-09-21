@@ -33,7 +33,7 @@ grid_diag has required arguments and can accept several optional arguments.
 Required arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing list of file names to be used.
+1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used.
 
 When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
 

@@ -31,7 +31,7 @@ Measures for continuous variables
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
-A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these threhsolds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
+A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as “conditional verification”. For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
 Measures for probabilistic forecasts and dichotomous outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -244,7 +244,7 @@ ___________________________
 	 
 The **nbrhd** dictionary contains a list of values to be used in defining the neighborhood to be used when computing neighborhood verification statistics. The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** value specifies the width of the square or diameter of the circle as an odd integer.
 
-The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always to be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
+The **field** entry is set to **BOTH, FCST, OBS**, or **NONE** to indicate the fields to which the fractional coverage derivation logic should be applied. This should always be set to **BOTH** unless you have already computed the fractional coverage field(s) with numbers between 0 and 1 outside of MET.
 
 The **vld_thresh** entry contains a number between 0 and 1. When performing neighborhood verification over some neighborhood of points the ratio of the number of valid data points to the total number of points in the neighborhood is computed. If that ratio is greater than this threshold, that value is included in the neighborhood verification. Setting this threshold to 1, which is the default, requires that the entire neighborhood must contain valid data. This variable will typically come into play only along the boundaries of the verification region chosen.
 
@@ -622,16 +622,16 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
   * - 95-99
     - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
-    - Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+    - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 100-104
     - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL SEDS _BCU
-    - Symmetric Extreme Depenency Score including normal and bootstrap upper and lower confidence limits
+    - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
   * - 105-109
     - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
-    - Extreme Depenency Index including normal and bootstrap upper and lower confidence limits
+    - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 110-114
     - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL,SEDI _BCU
-    - Symmetric Extremal Depenency Index including normal and bootstrap upper and lower confidence limits
+    - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits

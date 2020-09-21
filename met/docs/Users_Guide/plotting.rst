@@ -55,7 +55,7 @@ An example of the plot_point_obs calling sequence is shown below:
 
   plot_point_obs sample_pb.nc sample_data.ps
 
-In this example, the plot_point_obs tool will process the input sample_pb.nc file write a postscript file containing a plot to a file named sample_pb.ps.
+In this example, the plot_point_obs tool will process the input sample_pb.nc file and write a postscript file containing a plot to a file named sample_pb.ps.
 
 .. _plot_data_plane-usage:
 
@@ -76,7 +76,7 @@ The usage statement for the plot_data_plane utility is shown below:
          [-log file]
          [-v level]
 
-plot_data_plane has two required arguments and can take optional ones. 
+**plot_data_plane** has two required arguments and can take optional ones. 
 
 Required arguments for plot_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -100,13 +100,13 @@ Optional arguments for plot_data_plane
 
 8. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the plot_data_plane calling sequence is shown below:
+An example of the **plot_data_plane** calling sequence is shown below:
 
 .. code-block:: none
 		
   plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";'
 
-A second example of the plot_data_plane calling sequence is shown below:
+A second example of the **plot_data_plane** calling sequence is shown below:
 
 .. code-block:: none
 		
@@ -117,7 +117,7 @@ In the first example, the plot_data_plane tool will process the input test.grb f
 plot_mode_field usage
 ~~~~~~~~~~~~~~~~~~~~~
 
-The usage statement for the plot_mode_field utility is shown below:
+The usage statement for the **plot_mode_field** utility is shown below:
 
 .. code-block:: none
 		
@@ -129,14 +129,14 @@ The usage statement for the plot_mode_field utility is shown below:
          [-log file]
          [-v level]
 
-plot_mode_field has four required arguments and can take optional ones. 
+**plot_mode_field** has four required arguments and can take optional ones. 
 
 Required arguments for plot_mode_field
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **mode_nc_file_list** specifies the MODE output files to be used for plotting. 
 
-2. The **-raw | -simple | -cluster** argument indicates the types of field to be plotted. Exactly one must be specified. For details about the types of objects, see the section in this document on MODE.
+2. The **-raw | -simple | -cluster** argument indicates the types of fields to be plotted. Exactly one must be specified. For details about the types of objects, see the section in this document on MODE.
 
 3. The **-obs | -fcst** option specifies whether to plot the observed or forecast field from the MODE output files. Exactly one must be specified.
 
@@ -149,7 +149,7 @@ Optional arguments for plot_mode_field
 
 6. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-An example of the plot_mode_field calling sequence is shown below:
+An example of the **plot_mode_field** calling sequence is shown below:
 
 .. code-block:: none
 		

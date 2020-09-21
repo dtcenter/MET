@@ -3,7 +3,7 @@
 Re-Formatting of Point Observations
 ===================================
 
-There are several formats of point observations that may preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in :numref:`overview`. The software tools used to reformat point data are described in this section.
+There are several formats of point observations that may be preprocessed using the suite of reformatting tools in MET. These include PrepBUFR data from NCEP, SURFRAD data from NOAA, AERONET data from NASA, MADIS data from NOAA, little_r from WRF simulations, and user-defined data in a generic ASCII format. These steps are represented by the first columns in the MET flowchart depicted in :numref:`overview`. The software tools used to reformat point data are described in this section.
 
 .. _PB2NC tool:
 
@@ -496,7 +496,7 @@ ascii2nc has two required arguments and can take several optional ones.
 Required arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **ascii_file** argument is the ASCII point observation file(s) to be processed. If using Python embedding with “-format python” provide a quoted string containing the Python script to be run followed by any command line arguments that script takes.
+1. The **ascii_file** argument is the ASCII point observation file(s) to be processed. If using Python embedding with “-format python” provides a quoted string containing the Python script to be run followed by any command line arguments that script takes.
 
 2. The **netcdf_file** argument is the NetCDF output file to be written.
 
@@ -638,7 +638,7 @@ Required arguments for madis2nc
 2. The **netcdf_file** argument is the NetCDF output file to be written.
 
 
-3. The argument **-type str** is type of MADIS observations (metar, raob, profiler, maritime, mesonet or acarsProfiles).
+3. The argument **-type str** is a type of MADIS observations (metar, raob, profiler, maritime, mesonet or acarsProfiles).
 
 
 Optional arguments for madis2nc
@@ -892,7 +892,7 @@ Optional arguments for point2grid
 
 6. The **-qc** flags option specifies a comma-separated list of quality control (QC) flags, for example “0,1”. This should only be applied if grid_mapping is set to “goes_imager_projection” and the QC variable exists.
 
-7. The **-adp adp_file_name** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD (“AOD_Dust” or “AOD_Smoke”) from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -qc options is given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
+7. The **-adp adp_file_name** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD (“AOD_Dust” or “AOD_Smoke”) from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
 
 8. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 

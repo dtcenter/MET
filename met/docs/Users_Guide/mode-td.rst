@@ -9,7 +9,7 @@ ____________
 Motivation
 ~~~~~~~~~~
 
-MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method in inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
+MODE Time Domain (MTD) is an extension of the MODE object-based approach to verification. In addition to incorporating spatial information, MTD utilizes the time dimension to get at temporal aspects of forecast verification. Since the two spatial dimensions of traditional meteorological forecasts are retained in addition to the time dimension, the method is inherently three dimensional. Given that, however, the overall methodology has deliberately been kept as similar as possible to that of traditional MODE.
 
 .. _mtd-3d_color:
 
@@ -33,7 +33,7 @@ __________________________________
 Attributes
 ~~~~~~~~~~
 
-Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidian/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no *metric*) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
+Object attributes are, for the most part, calculated in much the same way in MTD as they are in MODE, although the fact that one of the dimensions is non-spatial introduces a few quirks. Several of the object attributes that traditional MODE calculates assume that distances, angles and areas can be calculated in grid coordinates via the usual Euclidean/Cartesian methods. That is no longer the case in spacetime, since there is no distance function (more precisely, no *metric*) there. Given two points in this spacetime, say :math:`(x_1, y_1, t_1)` and :math:`(x_2, y_2, t_2)`, there is no way to measure their separation with a single nonnegative number in a physically meaningful way. If all three of our dimensions were spatial, there would be no difficulties.
 
 This means that some care must be taken both in determining how to generalize the calculation of a geometric attribute to three-dimensional spacetime, and also in interpreting the attributes even in the case where the generalization is straightforward. 
 
@@ -63,7 +63,7 @@ MTD calculates several 3D attributes for single objects. The object could come f
 
 A 3D spacetime **centroid** :math:`(\bar{x}, \bar{y}, \bar{t})` is calculated. There are no statistical overtones here. The number :math:`\bar{x}`, for example, is just the average value of the :math:`x` coordinate over the object.
 
-The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to an 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the **speed** and **direction** of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
+The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to a 3D object. The requirement for fitting the line is to minimize the sum of the squares of the spatial distances from each point of the object to the line to be minimized. (We can't measure distances in spacetime but at each fixed time t we can measure purely spatial distances.) See :numref:`mtd-velocity` for an illustration, where the solid line is the fitted axis, and the inclination of the axis from the vertical is a measure of object speed. Thus, from this velocity we get the **speed** and **direction** of movement of the object. As in MODE, where spatial separation is in units of the grid resolution, so here in MTD the unit of length is the grid resolution, and the unit of time is whatever the time separation between the input files is. Speed and velocity are thus in grid units per time unit.
 
 .. _mtd-velocity:
 
@@ -71,7 +71,7 @@ The vector **velocity** :math:`(v_x, v_y)` is obtained by fitting a line to an 3
 	    
    Velocity
 
-The spatial orientation of a object (what traditional MODE calls the **axis angle** of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
+The spatial orientation of an object (what traditional MODE calls the **axis angle** of an object) is gotten by fitting a plane to an object. As with the case of velocity, our optimization criterion is that the sum of the squares of the spatial distances from each point of the object to the plane be minimized.
 
 :numref:`mtd-axis_3d` gives some idea of the reason for fitting a plane, rather than a line, as MODE does. On the left in the figure, we see an object (in blue shaped like an “A”) at several time steps moving through the grid. For simplicity, the object is not rotating as it moves (though of course real objects can certainly do this). At each time step, the 2D MODE spatial axis of the object is indicated by the red line. In the center of the figure, we see the same thing, just with more time steps. And on the right, even more time steps. We see that the axis lines at each time step sweep out a plane in three dimensions, shown in red on the right. This plane is the same one that MTD would calculate for this 3D object to determine its spatial orientation, *i.e.,* axis angle. Indeed, for the special case of an object that is not moving at all, the MTD calculation of axis angle reduces to the same one that traditional MODE uses, as it should.
 
@@ -83,11 +83,11 @@ The spatial orientation of a object (what traditional MODE calls the **axis angl
 
 A simple integer count of the number of grid squares in an object for all of it's lifetime gives the **volume** of the object. Remember that while we're working in three dimensions, one of the dimensions is non-spatial, so one should not attempt to convert this to a volume in, e.g., :math:`\text{km}^3`.
 
-The **start time** and **end time** of an object are attributes as well. These are integers reflecing at which time step an object starts and ends. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
+The **start time** and **end time** of an object are attributes as well. These are integers reflecting at which time step an object starts and ends. These values are zero-based, so for example, if an object comes into existence at the :math:`\text{3}^{rd}` time step and lasts until the :math:`\text{9}^{th}` time step, then the start time and end time will be listed as 2 and 8, respectively. Note that this object has a lifetime of 7 time steps, not 6.
 
 **Centroid distance traveled** is the total great circle distance, in kilometers, traveled by the 2D spatial centroid over the lifetime of the object. In other words, at each time :math:`t` for which the 3D object exists, the set of points in the object also have that value of :math:`t` will together form a 2D spatial object. That 2D object will have a spatial centroid, which will move around as :math:`t` varies. This attribute represents this total 2D centroid movement over time.
 
-Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the the attributes are purely geometrical.
+Finally, MTD calculates several **intensity percentiles** of the raw data values inside each object. Not all of the attributes are purely geometrical.
 
 3D Pair Attributes
 ~~~~~~~~~~~~~~~~~~
@@ -234,7 +234,7 @@ An example of the mtd calling sequence is listed below:
    -outdir out_dir/mtd \
    -v 1 
 
-In this example, the MODE-TD tool will read in a list of forecast GRIB file in the fcst_files directory and a similarly spaced observation GRIB files in the obs_files director. It uses a configuration file called MTDConfig_default and writes the output to out_dir/mtd directory. 
+In this example, the MODE-TD tool will read in a list of forecast GRIB files in the fcst_files directory and similarly spaced observation GRIB files in the obs_files directory. It uses a configuration file called MTDConfig_default and writes the output to the out_dir/mtd directory. 
 
 MTD configuration file
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -290,7 +290,7 @@ ______________________
 
   min_volume = 2000;
 
-The **min_volume** entry tell MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in :numref:`MODE-configuration-file`.
+The **min_volume** entry tells MTD to throw away objects whose "volume" (as described elsewhere in this section) is smaller than the given value. Spacetime objects whose volume is less than this will not participate in the matching and merging process, and no attribute information will be written to the ASCII output files. The default value is 10,000. If this seems rather large, consider the following example: Suppose the user is running MTD on a :math:`600 \times 400` grid, using 24 time steps. Then the volume of the whole data field is 600 :math:`\times` 400 :math:`\times` 24 = 5,760,000 cells. An object of volume 10,000 represents only 10,000/5,760,000 = 1/576 of the total data field. Setting **min\_volume** too small will typically produce a very large number of small objects, slowing down the MTD run and increasing the size of the output files.The configuration options listed above are common to many MODE and are described in :numref:`MODE-configuration-file`.
 
 ______________________
 
@@ -634,7 +634,7 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - “Volume” of object intersection
   * - 34
     - DURATION_DIFF
-    - Dfference in the lifetimes of the two objects
+    - Difference in the lifetimes of the two objects
   * - 35
     - INTEREST
     - Total interest for this object pair

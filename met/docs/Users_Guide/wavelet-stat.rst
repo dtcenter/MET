@@ -46,7 +46,7 @@ The Intensity Scale approach can be summarized in the following 5 steps:
 
 5. For each threshold (**t**) and scale component (**j**), the skill score based on the MSE of binary forecast and observation scale components is evaluated (:numref:`wavelet-stat_Intensity_Scale_skill_score_NIMROD`). The standard skill score definition as in :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>` or :ref:`Wilks, 2006 <Wilks-2010>` is used, and random chance is used as reference forecast. The MSE for the random binary forecast is equipartitioned on the **n+1** scales to evaluate the skill score: :math:`{SS} (t,j)=1- {MSE}(t,j)*(n+1)/ {MSE}(t) {random}`
 
-The Intensity-Scale (IS) skill score evaluates the forecast skill as a function of the precipitation intensity and of the spatial scale of the error. Positive values of the IS skill score are associated to a skillful forecast, whereas negative values are associated to no skill. Usually large scales exhibit positive skill (large scale events, such as fronts, are well predicted), whereas small scales exhibit negative skill (small scale events, such as convective showers, are less predictable), and the smallest scale and highest thresholds exhibit the worst skill. For the NIMROD case illustrated note the negative skill associated to the 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced almost its entire length.
+The Intensity-Scale (IS) skill score evaluates the forecast skill as a function of the precipitation intensity and of the spatial scale of the error. Positive values of the IS skill score are associated with a skillful forecast, whereas negative values are associated with no skill. Usually large scales exhibit positive skill (large scale events, such as fronts, are well predicted), whereas small scales exhibit negative skill (small scale events, such as convective showers, are less predictable), and the smallest scale and highest thresholds exhibit the worst skill. For the NIMROD case illustrated note the negative skill associated with the 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced almost its entire length.
 
 .. _contingency_table_counts:
 
@@ -85,7 +85,7 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
 .. figure:: figure/wavelet-stat_NIMROD_binary_fcst_and_obs.png
 
-   NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refer to the largest father wavelet component (1280 km resolution).
+   NIMROD binary forecast (top) and binary analysis (bottom) spatial scale components obtained by a 2D Haar wavelet transform (th=1 mm/h). Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160, 320, 640 km resolution); scale 9 refers to the largest father wavelet component (1280 km resolution).
 
 .. _wavelet-stat_NIMROD_diff:
 
@@ -97,31 +97,31 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
 .. figure:: figure/wavelet-stat_MSE_percent_NIMROD.png
 
-   MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated to the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated to the displaced storm.
+   MSE and MSE % for the NIMROD binary forecast and analysis spatial scale components. In the MSE%, note the large error associated with the scale 6 = 160 km, for the thresholds ½ to 4 mm/h, associated with the displaced storm.
 
 .. _wavelet-stat_Intensity_Scale_skill_score_NIMROD:
 
 .. figure:: figure/wavelet-stat_Intensity_Scale_skill_score_NIMROD.png
 
-   Intensity-Scale skill score for the NIMROD forecast and analysis shown in :numref:`wavelet-stat_NIMROD_3h_fcst`. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated to the scale 6 = 160 km, for the thresholds to 4 mm/h, associated to the displaced storm.
+   Intensity-Scale skill score for the NIMROD forecast and analysis shown in :numref:`wavelet-stat_NIMROD_3h_fcst`. The skill score is a function of the intensity of the precipitation rate and spatial scale of the error. Note the negative skill associated with the scale 6 = 160 km, for the thresholds to 4 mm/h, associated with the displaced storm.
 
 
 
-In addition to the MSE and the SS, the energy squared is also evaluated, for each threshold and scale (:numref:`wavelet-stat_energy_squared_NIMROD`). The energy squared of a field X is the average of the squared values: :math:`{En2}(X)= \sum_i x_i^2`. The energy squared provides feedback on the amount of events present in the forecast and observation fields for each scale, for a given threshold. Usually, small thresholds are associated to a large energy, since many events exceed the threshold. Large thresholds are associated to a small energy, since few events exceed the threshold. Comparison of the forecast and observed squared energy provide feedback on the bias on different scales, for each threshold.
+In addition to the MSE and the SS, the energy squared is also evaluated, for each threshold and scale (:numref:`wavelet-stat_energy_squared_NIMROD`). The energy squared of a field X is the average of the squared values: :math:`{En2}(X)= \sum_i x_i^2`. The energy squared provides feedback on the amount of events present in the forecast and observation fields for each scale, for a given threshold. Usually, small thresholds are associated with a large energy, since many events exceed the threshold. Large thresholds are associated with a small energy, since few events exceed the threshold. Comparison of the forecast and observed squared energy provide feedback on the bias on different scales, for each threshold.
 
 .. _wavelet-stat_energy_squared_NIMROD:
 
 .. figure:: figure/wavelet-stat_energy_squared_NIMROD.png
 
-   Energy squared and energy squared perentages, for each threshold and sale, for the NIMROD foreast and analysis, and foreast and analysis En2 and En2% relative differences.
+   Energy squared and energy squared percentages, for each threshold and sale, for the NIMROD forecast and analysis, and forecast and analysis En2 and En2% relative differences.
 
 The En2 bias for each threshold and scale is assessed by the En2 relative difference, equal to the difference between forecast and observed squared energies normalized by their sum: :math:`{En2}(F)- {En2}(O)]/[{En2}(F)+ {En2}(O)]`. Since defined in such a fashion, the En2 relative difference accounts for the difference between forecast and observation squared energies relative to their magnitude, and it is sensitive therefore to the ratio of the forecast and observed squared energies. The En2 relative difference ranges between -1 and 1, positive values indicate over-forecast and negative values indicate under-forecast. For the NIMROD case illustrated the forecast exhibits over-forecast for small thresholds, quite pronounced on the large scales, and under-forecast for high thresholds.
 
-As for the MSE, the sum of the energy of the scale components is equal to the energy of the original binary field: :math:`{En2}(t) = j \ {En2}(t,j)`. Therefore, the percentage that the En2 for each scale contributes the total En2 may be computed: for a given threshold, **t**, :math:`{En2\%}(t,j) = {En2}(t,j)/ {En2}(t)`. Usually, for precipitation fields, low thresholds exhibit most of the energy percentage on large scales (and less percentage on the small scales), since low thresholds are associated to large scale features, such as fronts. On the other hand, for higher thresholds the energy percentage is usually larger on small scales, since intense events are associated to small scales features, such as convective cells or showers. The comparison of the forecast and observation squared energy percentages provides feedback on how the events are distributed across the scales, and enable the comparison of forecast and observation scale structure.
+As for the MSE, the sum of the energy of the scale components is equal to the energy of the original binary field: :math:`{En2}(t) = j \ {En2}(t,j)`. Therefore, the percentage that the En2 for each scale contributes the total En2 may be computed: for a given threshold, **t**, :math:`{En2\%}(t,j) = {En2}(t,j)/ {En2}(t)`. Usually, for precipitation fields, low thresholds exhibit most of the energy percentage on large scales (and less percentage on the small scales), since low thresholds are associated with large scale features, such as fronts. On the other hand, for higher thresholds, the energy percentage is usually larger on small scales, since intense events are associated with small scales features, such as convective cells or showers. The comparison of the forecast and observation squared energy percentages provides feedback on how the events are distributed across the scales, and enables the comparison of forecast and observation scale structure.
 
-For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast over-estimates the number of large scale events and under-estimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast under-estimates the number of large scale events and over-estimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast over-estimates the percentage of events associated to high occurrence, and under-estimate the percentage of events associated to low occurrence. The En2% for the 64 mm/h thresholds is homogeneously under-estimated for all the scales, since the forecast does not have any event exceeding this threshold. 
+For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast overestimates the number of large scale events and underestimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast underestimates the number of large scale events and overestimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast overestimates the percentage of events associated with high occurrence, and underestimates the percentage of events associated with low occurrence. The En2% for the 64 mm/h thresholds is homogeneously underestimated for all the scales, since the forecast does not have any event exceeding this threshold. 
 
-Note that the energy squared of the observation binary field is identical to the sample climatology :math:`{Br}=(a+c)/n`. Similarly, the energy squared of the forecast binary field is equal to :math:`(a+b)/n`. The ratio of the squared energies of the forecast and observation binary fields is equal to the :math:`{FBI}=(a+b)/(a+c)`, for the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtained the binary forecast and observation fields.
+Note that the energy squared of the observation binary field is identical to the sample climatology :math:`{Br}=(a+c)/n`. Similarly, the energy squared of the forecast binary field is equal to :math:`(a+b)/n`. The ratio of the squared energies of the forecast and observation binary fields is equal to the :math:`{FBI}=(a+b)/(a+c)`, for the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields.
 
 
 
@@ -278,7 +278,7 @@ _______________________
      isc = BOTH;
   }
 
-The **output_flag** array controls the type of output that the Wavelet-Stat tool generates. This flags is set similarly to the output flags of the other MET tools, with possible values of NONE, STAT, and BOTH. The ISC line type is the only one available for Intensity-Scale STAT lines.
+The **output_flag** array controls the type of output that the Wavelet-Stat tool generates. This flag is set similarly to the output flag of the other MET tools, with possible values of NONE, STAT, and BOTH. The ISC line type is the only one available for Intensity-Scale STAT lines.
 
 _______________________
 

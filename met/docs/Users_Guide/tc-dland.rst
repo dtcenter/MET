@@ -8,14 +8,14 @@ ____________
 
 Many filtering criteria within the MET-TC tools depend on the distinction between when a storm is over land or water. The TC-dland tool was developed to aid in quickly parsing data for filter jobs that only verify over water, threshold verification based on distance to land, and exclusion of forecasts outside a specified time window of landfall. For each grid point in the user-specified grid, it computes the great circle arc distance to the nearest coast line. Compared to the simple Euclidean distances, great circle arc distances are more accurate but take considerably longer to compute. Grid points over water have distances greater than zero while points over land have distances less than zero.
 
-While the TC-dland tool is available to be run, most users will find the pre-computed distance to land files distributed with the release sufficient. Therefore, the typical user will not actually need to run this tool.
+While the TC-dland tool is available to be run, most users will find the precomputed distance to land files distributed with the release sufficient. Therefore, the typical user will not actually need to run this tool.
 
 Input/output format
 ___________________
 
 The input for the TC-dland tool is a file containing the longitude (degrees east) and latitude (degrees north) of all the coastlines and islands considered to be a significant landmass. The default input is to use all three land data files (**aland.dat, shland.dat, wland.dat**) found in the installed **share/met/tc_data/** directory. The use of all three files produces a global land data file. The **aland.dat** file contains the longitude and latitude distinctions used by NHC for the Atlantic and eastern North Pacific basins, the **shland.dat** contains longitude and latitude distinctions for the Southern Hemisphere (south Pacific and South Indian Ocean), and the **wland.dat** contains the remainder of the Northern Hemisphere (western North Pacific and North Indian Ocean). Users may supply their own input file in order to refine the definition of coastlines and a significant landmass.
 
-The output file from TC-dland is a NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file. This file is used in the TC-Pairs tool to compute the distance from land for each track point in the adeck and bdeck. As noted in :numref:`met_directory_structure`, pre-computed distance to land (NetCDF output from TC-dland) files are available in the release. In the installed **share/met/tc_data** directory: 
+The output file from TC-dland is a NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file. This file is used in the TC-Pairs tool to compute the distance from land for each track point in the adeck and bdeck. As noted in :numref:`met_directory_structure`, precomputed distance to land (NetCDF output from TC-dland) files are available in the release. In the installed **share/met/tc_data** directory: 
 
 **dland_nw_hem_tenth_degree.nc:** TC-dland output from **aland.dat** using a 1/10th degree grid
 
@@ -40,12 +40,12 @@ tc_dland usage
          [-v level]
          [-compress level]
 
-tc_dland has one required argument and accepts several optional ones.
+**tc_dland** has one required argument and accepts several optional ones.
 
 Required arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **out_file** argument indicates indicates the NetCDF output file containing the computed distances to land.
+1. The **out_file** argument indicates the NetCDF output file containing the computed distances to land.
 
 Optional arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

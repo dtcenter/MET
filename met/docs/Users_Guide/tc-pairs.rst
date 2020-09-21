@@ -18,7 +18,7 @@ This section describes how to configure and run the TC-Pairs tool. The TC-Pairs 
 tc_pairs usage
 ~~~~~~~~~~~~~~
 
-The usage statement for tc_pairs is shown below:
+The usage statement for **tc_pairs** is shown below:
 
 .. code-block:: none
 
@@ -30,7 +30,7 @@ The usage statement for tc_pairs is shown below:
          [-log file]
          [-v level]
 
-tc_pairs has required arguments and can accept several optional arguments.
+**tc_pairs** has required arguments and can accept several optional arguments.
 
 Required arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +54,7 @@ Optional arguments for tc_pairs
 
 This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases. At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names.
 
-An example of the tc_pairs calling sequence is shown below:
+An example of the **tc_pairs** calling sequence is shown below:
 
 .. code-block:: none
 
@@ -222,7 +222,7 @@ ____________________
      time_offset = -14400;
   }
 
-The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in affect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed **share/met/tc_data/** directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
+The **watch_warn** field specifies the file name and time applied offset to the **watch_warn** flag. The **file_name** string specifies the path of the watch/warning file to be used to determine when a watch or warning is in effect during the forecast initialization and verification times. The default file is named **wwpts_us.txt**, which is found in the installed **share/met/tc_data/** directory within the MET build. The **time_offset** string is the time window (in seconds) assigned to the watch/warning. Due to the non-uniform time watches and warnings are issued, a time window is assigned for which watch/warnings are included in the verification for each valid time. The default watch/warn file is static, and therefore may not include warned storms beyond the current MET code release date; therefore users may wish to contact met_help@ucar.edu to obtain the most recent watch/warning file if the static file does not contain storms of interest.
 
 .. code-block:: none
 
