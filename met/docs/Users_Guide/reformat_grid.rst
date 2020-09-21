@@ -116,7 +116,7 @@ The input files for the add, subtract, and derive command can be specified in on
 
 1. Use **file_1 config_str_1 ... file_n config_str_n** to specify the full path to each input file followed by a description of the data to be read from it. The **config_str_i** argument describing the data can be a set to a time string in HH[MMSS] format for accumulated precipitation or a full configuration string. For example, use **'name="TMP"; level="P500";'** to process temperature at 500mb.
 
-2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. rather than specifying a separate configuration string for each input file, the “-field” command line option is required to specify the data to be processed.
+2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. Rather than specifying a separate configuration string for each input file, the “-field” command line option is required to specify the data to be processed.
 
 3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the “-field” command line option is required to specify the data to be processed.
 
