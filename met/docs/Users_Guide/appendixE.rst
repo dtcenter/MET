@@ -37,7 +37,7 @@ The **-nh** and **-sh** options give names of WWMCA cloud percent files that **w
 
 In any regridding problem, there are two grids involved: the “From” grid, which is the grid the input data are on, and the “To” grid, which is the grid the data are to be moved onto. For **wwmca_regrid**, the “To” grid is specified in the config file. If this grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere needs to be given. It’s only when the “To” grid straddles the equator that data files for both hemispheres need to be given (though the interpolation width parameter in the config file can change this—see below). Once the “To” grid is specified in the config file, the **wwmca_regrid** tool will know which input data files it needs, and will complain if it’s not given the right ones.
 
-Now let’s talk about the details of the config file. The config file has the same C-like syntax that all the other MET config files use. The first (and most complicated) thing to specify is the “To” grid. This is given by the **To_grid** parameter. If you are using one of the standard NCEP grids, for example grid #218, you can simply write
+Now let’s talk about the details of the config file. The config file has the same C-like syntax that all the other MET config files use. The first (and most complicated) thing to specify is the “To” grid. This is given by the **to_grid** parameter. If you are using one of the standard NCEP grids, for example grid #218, you can simply write
 
 .. code-block:: none
 

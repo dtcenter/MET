@@ -112,7 +112,7 @@ A second example of the **plot_data_plane** calling sequence is shown below:
 		
   plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' -v 4
 
-In the first example, the plot_data_plane tool will process the input test.grb file and write a PostScript image to a file named test.ps showing temperature at 2 meters. The second example plots downward shortwave radiation flux at the surface. The second example is run at verbosity level 4 so that user can inspect the output and make sure its plotting the intended record.
+In the first example, the Plot_Data_Plane tool will process the input test.grb file and write a PostScript image to a file named test.ps showing temperature at 2 meters. The second example plots downward shortwave radiation flux at the surface. The second example is run at verbosity level 4 so that the user can inspect the output and make sure its plotting the intended record.
 
 plot_mode_field usage
 ~~~~~~~~~~~~~~~~~~~~~
