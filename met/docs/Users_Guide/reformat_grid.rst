@@ -42,7 +42,7 @@ The usage statement for the Pcp-Combine tool is shown below:
          [-v level]
          [-compress level]
 
-The arguments to pcp_combine vary depending on the run command. Listed below are the arguments for the sum command:
+The arguments to **pcp_combine** vary depending on the run command. Listed below are the arguments for the sum command:
 
 .. code-block:: none
 
