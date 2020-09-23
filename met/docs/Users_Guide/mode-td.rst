@@ -234,7 +234,7 @@ An example of the mtd calling sequence is listed below:
    -outdir out_dir/mtd \
    -v 1 
 
-In this example, the MODE-TD tool will read in a list of forecast GRIB files in the fcst_files directory and similarly spaced observation GRIB files in the obs_files directory. It uses a configuration file called MTDConfig_default and writes the output to the out_dir/mtd directory. 
+In this example, the MODE-TD tool will read in a list of forecast GRIB files in the fcst_files directory and similarly spaced observation GRIB files in the obs_files directory. It uses a configuration file called MTDConfig_default and writes the output to the *out_dir/mtd* directory. 
 
 MTD configuration file
 ~~~~~~~~~~~~~~~~~~~~~~
